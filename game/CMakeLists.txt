@@ -5,8 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(${PROJECT_NAME} main.cpp)
 
-message("$SOLUTION_DIR")
+target_link_libraries(${PROJECT_NAME} PRIVATE engine)
 
-target_link_libraries(${PROJECT_NAME} engine)
+target_include_directories(${PROJECT_NAME} PRIVATE ../engine/src)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../engine/src)

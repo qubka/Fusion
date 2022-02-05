@@ -9,5 +9,4 @@ cpp.hint
 # Other
 cmake-build-debug/
 mason_packages/
-external/
 bin/
