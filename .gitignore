@@ -1,0 +1,13 @@
+# IDEs
+*.user
+.idea
+.vscode
+.vs
+CMakeSettings.json
+cpp.hint
+
+# Other
+cmake-build-debug/
+mason_packages/
+external/
+bin/
