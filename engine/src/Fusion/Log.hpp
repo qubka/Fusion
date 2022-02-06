@@ -1,5 +1,6 @@
 #pragma once
-/*
+
+#include "Core.hpp"
 #include "spdlog/spdlog.h"
 
 namespace Fusion {
@@ -14,4 +15,3 @@ namespace Fusion {
         static std::shared_ptr<spdlog::logger> clientLogger;
     };
 }
-*/
