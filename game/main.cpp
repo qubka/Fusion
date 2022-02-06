@@ -1,4 +1,5 @@
 #include <Fusion.hpp>
+#include "Fusion/EntryPoint.hpp"
 
 class Sandbox : public Fusion::Application {
 public:
