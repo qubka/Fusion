@@ -37,35 +37,35 @@ namespace Fusion {
 
     class FUSION_API MouseMovedEvent : public Event {
     public:
-        MouseMovedEvent(float x, float y) : mouseX{x}, mouseY{y} {}
+        MouseMovedEvent(const glm::vec2 mouse) : mouse{mouse} {}
 
-        float getX() const { return mouseX; }
-        float getY() const { return mouseY; }
+        const glm::vec2& getMouse() const { return mouse; }
 
         std::string toString() const override {
-            return "MouseMovedEvent: [" + std::to_string(mouseX) + ", " + std::to_string(mouseY) + "]";
+            return "MouseMovedEvent: " + glm::to_string(mouse);
         }
 
         EVENT_CLASS_TYPE(MouseMoved)
         EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
     private:
-        float mouseX;
-        float mouseY;
+        glm::vec2 mouse;
     };
 
     class FUSION_API MouseScrollEvent : public Event {
     public:
-        MouseScrollEvent(float x, float y) : offsetX{x}, offsetY{y} {}
+        MouseScrollEvent(const glm::vec2& offset) : offset{offset} {}
 
-        float getX() const { return offsetX; }
-        float getY() const { return offsetY; }
+        const glm::vec2& getOffset() const { return offset; }
+
+        std::string toString() const override {
+            return "MouseScrollEvent: " + glm::to_string(offset);
+        }
 
         EVENT_CLASS_TYPE(MouseScrolled)
         EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
     private:
-        float offsetX;
-        float offsetY;
+        glm::vec2 offset;
     };
 }

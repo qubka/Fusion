@@ -37,6 +37,8 @@ namespace Fusion {
 
 #define EVENT_CLASS_CATEGORY(category) int getCategoryFlags() const override { return category; }
 
+#define BIND_EVENT_FUNC(member) std::bind(&Application::member, this, std::placeholders::_1)
+
     class FUSION_API Event {
         friend class EventDispatcher;
     public:
@@ -54,13 +56,10 @@ namespace Fusion {
 
     class FUSION_API EventDispatcher {
     public:
-        template<typename T>
-        using EventFn = std::function<bool(T&)>;
-    public:
         EventDispatcher(Event& event) : event{event} {}
 
         template<typename T>
-        bool dispatch(EventFn<T> func) {
+        bool dispatch(std::function<bool(T&)> func) {
             if (event.getType() == T::getStaticType()) {
                 event.handled = func(*(T*)&event);
                 return true;

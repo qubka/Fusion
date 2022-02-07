@@ -38,3 +38,6 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/norm.hpp>
 #include "glm/gtx/hash.hpp"
+
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"

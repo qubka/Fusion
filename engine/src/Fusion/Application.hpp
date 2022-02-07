@@ -1,15 +1,14 @@
 #pragma once
 
 #include "Core.hpp"
-#include "LayerStack.hpp"
 
 namespace Fusion {
-    class Event;
     class Window;
+    class Input;
+    class Layer;
+    class Event;
 
     class WindowCloseEvent;
-
-#define BIND_EVENT_FUNC(x) std::bind(&Application::x, this, std::placeholders::_1)
 
     class FUSION_API Application {
     public:
@@ -24,9 +23,10 @@ namespace Fusion {
     private:
         bool onWindowClose(WindowCloseEvent& event);
 
-        std::unique_ptr<Window> window;
-        LayerStack layerStack;
-        bool running{true};
+        Window* window;
+        Input* input;
+        std::deque<Layer*> layers;
+        bool isRunning{true};
     };
 
     Application* CreateApplication();

@@ -7,8 +7,8 @@ namespace Fusion {
 
     class FUSION_API Layer {
     public:
-        Layer(std::string name = "Layer");
-        virtual ~Layer();
+        Layer(std::string name = "Layer") : name{std::move(name)} {}
+        virtual ~Layer() = default;
 
         virtual void onAttach() {};
         virtual void onDetach() {};
