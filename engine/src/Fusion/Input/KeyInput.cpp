@@ -1,5 +1,5 @@
 #include "KeyInput.hpp"
-#include "../Window.hpp"
+#include "Fusion/Window.hpp"
 
 using namespace Fusion;
 
@@ -13,12 +13,11 @@ KeyInput::~KeyInput() {
     instances.erase(std::remove(instances.begin(), instances.end(), this), instances.end());
 }
 
-void KeyInput::setupKeyInputs(Window& window) {
-    auto* pWindow = static_cast<GLFWwindow *>(window.getNativeWindow());
-    glfwSetKeyCallback(pWindow, KeyInput::keyCallback);
+void KeyInput::SetupKeyInputs(Window& window) {
+    glfwSetKeyCallback(window, KeyInput::KeyCallback);
 }
 
-void KeyInput::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void KeyInput::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mods) {
     // Send key event to all KeyInput instances
     for (auto* input : instances) {
         input->setKey(key, action);

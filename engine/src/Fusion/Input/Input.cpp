@@ -1,5 +1,5 @@
 #include "Input.hpp"
-#include "../Window.hpp"
+#include "Fusion/Window.hpp"
 
 using namespace Fusion;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Core.hpp"
+#include "Fusion/Core.hpp"
 
 namespace Fusion {
     class Window;

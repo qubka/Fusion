@@ -11,6 +11,7 @@ namespace Fusion {
         virtual void onAttach() {}
         virtual void onDetach() {}
         virtual void onUpdate() {}
+        virtual void onImGui() {}
 
         const std::string& getName() const { return name; }
     protected:

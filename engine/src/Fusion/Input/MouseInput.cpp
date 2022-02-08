@@ -1,5 +1,5 @@
 #include "MouseInput.hpp"
-#include "../Window.hpp"
+#include "Fusion/Window.hpp"
 
 using namespace Fusion;
 
@@ -18,20 +18,19 @@ void MouseInput::setCursorPosition(const glm::vec2& pos) {
     position = pos;
 }
 
-void MouseInput::setupMouseInputs(Window& window) {
-    auto* pWindow = static_cast<GLFWwindow *>(window.getNativeWindow());
-    glfwSetMouseButtonCallback(pWindow, mouseButtonCallback);
-    glfwSetCursorPosCallback(pWindow, cursorPositionCallback);
-    //glfwSetScrollCallback(pWindow, scrollCallback);
+void MouseInput::SetupMouseInputs(Window& window) {
+    glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    glfwSetCursorPosCallback(window, CursorPositionCallback);
+    //glfwSetScrollCallback(window, scrollCallback);
 }
 
-void MouseInput::cursorPositionCallback(GLFWwindow* window, double mouseX, double mouseY) {
+void MouseInput::CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY) {
     for (auto* input : instances) {
         input->setCursorPosition({mouseX, mouseY});
     }
 }
 
-void MouseInput::mouseButtonCallback(GLFWwindow* window, int button, int action, int mode) {
+void MouseInput::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode) {
     for (auto* input : instances) {
         input->setKey(button, action);
     }

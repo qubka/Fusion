@@ -1,5 +1,6 @@
 #include <Fusion.hpp>
 #include "Fusion/EntryPoint.hpp"
+#include "imgui.h"
 
 class ExampleLayer : public Fusion::Layer {
 public:
@@ -7,6 +8,14 @@ public:
 
     void onUpdate() override {
         //FS_LOG_INFO("ExampleLayer::onUpdate");
+    }
+
+    void onImGui() override {
+        ImGui::Begin("Settings");
+
+        ImGui::Text("Hello World");
+
+        ImGui::End();
     }
 };
 

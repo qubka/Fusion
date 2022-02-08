@@ -17,7 +17,7 @@ namespace Fusion {
         const glm::vec2& mousePosition() const { return position; };
         const glm::vec2& mouseDelta() const { return delta; };
 
-        static void setupMouseInputs(Window& window);
+        static void SetupMouseInputs(Window& window);
     private:
         glm::vec2 delta{};
         glm::vec2 position{};
@@ -26,8 +26,8 @@ namespace Fusion {
 
         /// Workaround for C++ class using a c-style-callback
 
-        static void cursorPositionCallback(GLFWwindow* window, double mouseX, double mouseY);
-        static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mode);
+        static void CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY);
+        static void MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode);
 
         static std::vector<MouseInput*> instances;
     };

@@ -14,11 +14,11 @@ namespace Fusion {
         bool getKeyUp(int key) const { return isKeyUp(key); };
         bool getKeyDown(int key) const { return isKeyDown(key); };
 
-        static void setupKeyInputs(Window& window);
+        static void SetupKeyInputs(Window& window);
     private:
         /// Workaround for C++ class using a c-style-callback
 
-        static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        static void KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mods);
 
         static std::vector<KeyInput*> instances;
     };

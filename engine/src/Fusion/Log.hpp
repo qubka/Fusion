@@ -6,7 +6,7 @@
 namespace Fusion {
     class FUSION_API Log {
     public:
-        static void init();
+        static void Init();
 
         static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return coreLogger; }
         static std::shared_ptr<spdlog::logger>& GetGameLogger() { return gameLogger; }

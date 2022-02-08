@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Core.hpp"
+#include "Window.hpp"
+#include "LayerStack.hpp"
 
 namespace Fusion {
-    class Window;
-    class Input;
     class Layer;
+    class ImGuiLayer;
 
     class FUSION_API Application {
     public:
@@ -16,12 +17,18 @@ namespace Fusion {
 
         void pushLayer(Layer& layer);
         void pushOverlay(Layer& overlay);
-        void addInput(Input& input);
-    private:
+        void popLayer(Layer& layer);
+        void popOverlay(Layer& overlay);
 
-        Window* window;
-        std::deque<Layer*> layers;
-        std::vector<Input*> inputs;
+        Window& getWindow() { return window; }
+
+        static Application& Instance() { return *instance; }
+    private:
+        Window window{"Fusion", 1280, 720, true};
+        LayerStack layers;
+        ImGuiLayer* imGuiLayer;
+
+        static Application* instance;
     };
 
     Application* CreateApplication();

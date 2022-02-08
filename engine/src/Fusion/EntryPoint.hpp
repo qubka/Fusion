@@ -3,7 +3,7 @@
 //Fusion::Application* Fusion::CreateApplication();
 
 int main(int args, char** argv) {
-    Fusion::Log::init();
+    Fusion::Log::Init();
     FS_LOG_CORE_INFO("Fusion Engine");
 
     auto app = Fusion::CreateApplication();

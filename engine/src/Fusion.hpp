@@ -9,4 +9,6 @@
 #include "Fusion/Input/KeyInput.hpp"
 #include "Fusion/Input/MouseInput.hpp"
 
+#include "Fusion/ImGui/ImGuiLayer.hpp"
+
 //#include "Fusion/EntryPoint.hpp" add for dynamic linking

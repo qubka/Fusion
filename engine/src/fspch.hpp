@@ -30,14 +30,14 @@
 #define GLM_FORCE_XYZW_ONLY
 //#define GLM_ENABLE_EXPERIMENTAL
 
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/compatibility.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <glm/gtx/norm.hpp>
-#include "glm/gtx/hash.hpp"
+#include <glm.hpp>
+#include <ext.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+#include <gtx/compatibility.hpp>
+#include <gtx/string_cast.hpp>
+#include <gtx/norm.hpp>
+#include <gtx/hash.hpp>
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
