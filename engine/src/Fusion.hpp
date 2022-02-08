@@ -4,11 +4,9 @@
 #include "Fusion/Log.hpp"
 #include "Fusion/Window.hpp"
 #include "Fusion/Layer.hpp"
-#include "Fusion/Input.hpp"
 
-#include "Fusion/Events/Event.hpp"
-#include "Fusion/Events/ApplicationEvents.hpp"
-#include "Fusion/Events/KeyEvents.hpp"
-#include "Fusion/Events/MouseEvents.hpp"
+#include "Fusion/Input/Input.hpp"
+#include "Fusion/Input/KeyInput.hpp"
+#include "Fusion/Input/MouseInput.hpp"
 
 //#include "Fusion/EntryPoint.hpp" add for dynamic linking

@@ -6,9 +6,6 @@ namespace Fusion {
     class Window;
     class Input;
     class Layer;
-    class Event;
-
-    class WindowCloseEvent;
 
     class FUSION_API Application {
     public:
@@ -19,14 +16,12 @@ namespace Fusion {
 
         void pushLayer(Layer& layer);
         void pushOverlay(Layer& overlay);
-        void onEvent(Event& event);
+        void addInput(Input& input);
     private:
-        bool onWindowClose(WindowCloseEvent& event);
 
         Window* window;
-        Input* input;
         std::deque<Layer*> layers;
-        bool isRunning{true};
+        std::vector<Input*> inputs;
     };
 
     Application* CreateApplication();

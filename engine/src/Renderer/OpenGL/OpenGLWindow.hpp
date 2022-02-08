@@ -19,10 +19,12 @@ namespace Fusion {
         float getAspect() override { return data.aspect; };
         glm::vec4 getViewport() override { return {0, data.height, data.width, -data.height}; }; // vertical flip is required
 
-        bool isVSync() override { return data.vsync; };
+        bool shouldClose() override;
+        void shouldClose(bool flag) override;
+
+        bool vSync() override { return data.vsync; };
         void vSync(bool flag) override;
 
-        void setEventCallback(const EventCallbackFn& callback) override { data.eventCallback = callback; };
     private:
         void init();
 
@@ -34,7 +36,6 @@ namespace Fusion {
             uint32_t height;
             float aspect;
             bool vsync;
-            EventCallbackFn eventCallback;
         };
 
         WindowData data;

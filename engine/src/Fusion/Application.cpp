@@ -1,10 +1,9 @@
 #include "Application.hpp"
 #include "Log.hpp"
 #include "Window.hpp"
-#include "Input.hpp"
+#include "Input/KeyInput.hpp"
+#include "Input/MouseInput.hpp"
 #include "Layer.hpp"
-#include "Events/Event.hpp"
-#include "Events/ApplicationEvents.hpp"
 
 using namespace Fusion;
 
@@ -18,14 +17,15 @@ Application::Application() {
     glfwSetErrorCallback(GLFWErrorCallback);
 
     window = Window::create();
-    window->setEventCallback(BIND_EVENT_FUNC(onEvent));
-
-    //input = Input::create(*window);
+    KeyInput::setupKeyInputs(*window);
+    MouseInput::setupMouseInputs(*window);
 }
 
 Application::~Application() {
-    //delete input;
     delete window;
+    for (auto* input : inputs) {
+        delete input;
+    }
     for (auto* layer : layers) {
         delete layer;
     }
@@ -33,11 +33,15 @@ Application::~Application() {
 }
 
 void Application::run() {
-    while (isRunning) {
+    while (!window->shouldClose()) {
         window->onUpdate();
 
         for (auto* layer : layers) {
             layer->onUpdate();
+        }
+
+        for (auto* input : inputs) {
+            input->onUpdate();
         }
     }
 }
@@ -50,20 +54,6 @@ void Application::pushOverlay(Layer& overlay) {
     layers.push_back(&overlay);
 }
 
-void Application::onEvent(Event& event) {
-    FS_LOG_INFO("{0}", event.toString());
-
-    EventDispatcher dispatcher{event};
-    dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(onWindowClose));
-
-    for (auto it = layers.end(); it != layers.begin(); ) {
-        (*--it)->onEvent(event);
-        if (event.isHandled())
-            break;
-    }
-}
-
-bool Application::onWindowClose(WindowCloseEvent& event) {
-    isRunning = false;
-    return true;
+void Application::addInput(Input& input) {
+    inputs.push_back(&input);
 }

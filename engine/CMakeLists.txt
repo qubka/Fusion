@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(external/spdlog)
 add_subdirectory(external/glm)
 add_subdirectory(external/glfw)
+add_subdirectory(external/imgui)
 
 set(RENDERER_NAME OpenGL)
 find_package(${RENDERER_NAME} REQUIRED)
@@ -31,9 +32,13 @@ elseif(${RENDERER_NAME} STREQUAL "Vulkan")
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC external/glm)
+target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm)
 
 target_include_directories(${PROJECT_NAME} PUBLIC external/glfw/include)
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
+
+target_include_directories(${PROJECT_NAME} PUBLIC external/imgui)
+target_link_libraries(${PROJECT_NAME} PUBLIC imgui::imgui)
 
 target_include_directories(${PROJECT_NAME} PUBLIC external/spdlog/include)
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog_header_only)

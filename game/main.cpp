@@ -8,10 +8,6 @@ public:
     void onUpdate() override {
         //FS_LOG_INFO("ExampleLayer::onUpdate");
     }
-
-    void onEvent(Fusion::Event& event) override {
-        FS_LOG_INFO("{0}", event.toString());
-    }
 };
 
 class Sandbox : public Fusion::Application {
