@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fusion/Layer.hpp"
+#include "Fusion/Core/Layer.hpp"
 
 namespace Fusion {
     class FUSION_API ImGuiLayer : public Layer {
@@ -14,6 +14,6 @@ namespace Fusion {
         void begin();
         void end();
     private:
-        void setDarkThemeColors();
+        static void setDarkThemeColors();
     };
 }

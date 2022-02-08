@@ -1,14 +1,12 @@
 #include "Application.hpp"
 #include "Log.hpp"
 #include "Window.hpp"
-#include "Input/KeyInput.hpp"
-#include "Input/MouseInput.hpp"
 #include "Layer.hpp"
 
-#include "Fusion/ImGui/ImGuiLayer.hpp"
+#include "Fusion/Input/KeyInput.hpp"
+#include "Fusion/Input/MouseInput.hpp"
 
 using namespace Fusion;
-
 
 Application* Application::instance{nullptr};
 
@@ -19,8 +17,7 @@ Application::Application() {
     KeyInput::SetupKeyInputs(window);
     MouseInput::SetupMouseInputs(window);
 
-    imGuiLayer = new ImGuiLayer();
-    pushOverlay(*imGuiLayer);
+    pushOverlay(imGuiLayer);
 }
 
 Application::~Application() {
@@ -29,33 +26,26 @@ Application::~Application() {
 
 void Application::run() {
     while (!window.shouldClose()) {
+        frameCounter++;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto* layer : layers) {
             layer->onUpdate();
         }
 
-        imGuiLayer->begin();
+        imGuiLayer.begin();
         for (Layer* layer : layers)
             layer->onImGui();
-        imGuiLayer->end();
+        imGuiLayer.end();
 
         window.onUpdate();
     }
 }
 
 void Application::pushLayer(Layer& layer) {
-    layers.pushLayer(layer);
+    layers.pushFront(layer);
 }
 
 void Application::pushOverlay(Layer& overlay) {
-    layers.pushOverlay(overlay);
-}
-
-void Application::popLayer(Layer& layer) {
-    layers.popLayer(layer);
-}
-
-void Application::popOverlay(Layer& overlay) {
-    layers.pushLayer(overlay);
+    layers.pushBack(overlay);
 }

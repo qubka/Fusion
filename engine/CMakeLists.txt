@@ -37,4 +37,4 @@ target_link_libraries(${PROJECT_NAME}
         )
 
 # defines
-target_compile_definitions(${PROJECT_NAME} PRIVATE FS_ADD_EXPORTS FS_ENABLE_ASSERTS)
+target_compile_definitions(${PROJECT_NAME} PRIVATE FS_DEBUG)

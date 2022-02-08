@@ -1,5 +1,5 @@
 #include <Fusion.hpp>
-#include "Fusion/EntryPoint.hpp"
+#include "Fusion/Core/EntryPoint.hpp"
 #include "imgui.h"
 
 class ExampleLayer : public Fusion::Layer {

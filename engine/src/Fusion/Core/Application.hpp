@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Core.hpp"
+#include "Base.hpp"
 #include "Window.hpp"
 #include "LayerStack.hpp"
 
+#include "Fusion/ImGui/ImGuiLayer.hpp"
+
 namespace Fusion {
     class Layer;
-    class ImGuiLayer;
 
     class FUSION_API Application {
     public:
@@ -17,16 +18,17 @@ namespace Fusion {
 
         void pushLayer(Layer& layer);
         void pushOverlay(Layer& overlay);
-        void popLayer(Layer& layer);
-        void popOverlay(Layer& overlay);
 
         Window& getWindow() { return window; }
+        ImGuiLayer& getGuiLayer() { return imGuiLayer; }
+        uint64_t getFrameCounter() const { return frameCounter; }
 
         static Application& Instance() { return *instance; }
     private:
         Window window{"Fusion", 1280, 720, true};
-        LayerStack layers;
-        ImGuiLayer* imGuiLayer;
+        LayerStack layers{};
+        ImGuiLayer imGuiLayer{};
+        uint64_t frameCounter;
 
         static Application* instance;
     };

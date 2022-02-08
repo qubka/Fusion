@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core.hpp"
+#include "Base.hpp"
 #include "spdlog/spdlog.h"
 
 namespace Fusion {

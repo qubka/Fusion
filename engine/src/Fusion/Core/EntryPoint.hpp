@@ -9,4 +9,6 @@ int main(int args, char** argv) {
     auto app = Fusion::CreateApplication();
     app->run();
     delete app;
+
+    return EXIT_SUCCESS;
 }

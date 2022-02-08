@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core.hpp"
+#include "Base.hpp"
 
 namespace Fusion {
     class FUSION_API Layer {
