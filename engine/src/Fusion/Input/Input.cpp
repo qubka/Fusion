@@ -1,5 +1,5 @@
 #include "Input.hpp"
-#include "Fusion/Core/Window.hpp"
+#include "Fusion/Core/Application.hpp"
 
 using namespace Fusion;
 
@@ -21,6 +21,7 @@ bool Input::isKey(int keycode) const {
 
 bool Input::isKeyUp(int keycode) const {
     if (enabled) {
+        uint32_t currentFrame = Application::Instance().getFrameCounter();
         if (auto it{ keys.find(keycode) }; it != keys.end()) {
             const auto& key{ it->second };
             return !key.pressed && key.frame == currentFrame;
@@ -31,6 +32,7 @@ bool Input::isKeyUp(int keycode) const {
 
 bool Input::isKeyDown(int keycode) const {
     if (enabled) {
+        uint32_t currentFrame = Application::Instance().getFrameCounter();
         if (auto it{ keys.find(keycode)}; it != keys.end()) {
             const auto& key{ it->second };
             return key.pressed && key.frame == currentFrame;
@@ -43,6 +45,7 @@ void Input::setKey(int keycode, int action) {
     if (action == GLFW_REPEAT)
         return;
 
+    uint32_t currentFrame = Application::Instance().getFrameCounter();
     if (auto it{ keys.find(keycode)}; it != keys.end()) {
         auto& key{ it->second };
         switch (action) {

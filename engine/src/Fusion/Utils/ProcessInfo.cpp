@@ -8,6 +8,9 @@
 
 #ifdef linux
 #include <sys/sysinfo.h>
+#include <bits/confname.h>
+#include <unistd.h>
+
 #define LINEBUFFLEN 2048
 #endif
 
@@ -110,7 +113,7 @@ unsigned long long ProcessInfo::getProcessUptime() {
 	return lUptimeInSec;
 
 #elif defined(linux)
-    struct sysinfo lSysinfo;
+    struct sysinfo lSysinfo{};
     int lReturn = sysinfo(&lSysinfo);
 
     if (lReturn == 0)
