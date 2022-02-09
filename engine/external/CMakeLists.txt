@@ -74,6 +74,30 @@ target_include_directories(${GLAD_LIB_NAME}
         "${GLAD_INC_PATH}"
         )
 
+# entt
+set(ENTT_LIB_NAME "entt")
+set(ENTT_INC_PATH ${ENTT_LIB_NAME}/src)
+
+add_library(${ENTT_LIB_NAME} INTERFACE)
+
+target_include_directories(${ENTT_LIB_NAME}
+        INTERFACE
+        ${ENTT_INC_PATH}
+        )
+
+# OR
+#set(ENTT_LIB_NAME "ENTT")
+#set(ENTT_INC_PATH ${ENTT_LIB_NAME}/ENTT)
+
+#set(ENTT_TEST_ENABLE OFF CACHE BOOL "" FORCE)
+
+#add_subdirectory(${ENTT_LIB_NAME})
+
+#target_include_directories(${ENTT_LIB_NAME}
+#    PUBLIC
+#        $(ENTT_INC_PATH)
+#)
+
 
 # imgui
 set(IMGUI_LIB_NAME "imgui")

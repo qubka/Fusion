@@ -35,8 +35,8 @@
 #endif
 
 #ifdef FS_ENABLE_ASSERTS
-#define FS_CORE_ASSERT(x, ...) { if(!x) { FS_LOG_CORE_FATAL("Assertion Failed: {0}", __VA_ARGS__); FS_DEBUG_BREAK; }}
-#define FS_ASSERT(x, ...) { if(!x) { FS_LOG_CORE_FATAL("Assertion Failed: {0}", __VA_ARGS__); FS_DEBUG_BREAK; }}
+#define FS_CORE_ASSERT(x, ...) if(!(x)) { FS_LOG_CORE_FATAL("Assertion Failed: {0}", __VA_ARGS__); FS_DEBUG_BREAK; }
+#define FS_ASSERT(x, ...) if(!x) { FS_LOG_CORE_FATAL("Assertion Failed: {0}", __VA_ARGS__); FS_DEBUG_BREAK; }
 #else
 #define FS_CORE_ASSERT(x, ...)
 #define FS_ASSERT(x, ...)

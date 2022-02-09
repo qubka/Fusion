@@ -32,6 +32,7 @@ target_link_libraries(${PROJECT_NAME}
         glfw
         imgui
         glm
+        entt
         #glm_static    # if build with add_subdirectory
         spdlog::spdlog
         )

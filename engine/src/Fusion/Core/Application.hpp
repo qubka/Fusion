@@ -4,10 +4,9 @@
 #include "Window.hpp"
 #include "LayerStack.hpp"
 
-#include "Fusion/ImGui/ImGuiLayer.hpp"
-
 namespace Fusion {
     class Layer;
+    class ImGuiLayer;
 
     class FUSION_API Application {
     public:
@@ -19,15 +18,15 @@ namespace Fusion {
         void pushLayer(Layer& layer);
         void pushOverlay(Layer& overlay);
 
-        Window& getWindow() { return window; }
-        ImGuiLayer& getGuiLayer() { return imGuiLayer; }
+        const Window& getWindow() { return window; }
+        const ImGuiLayer& getGuiLayer() { return *imGuiLayer; }
         uint32_t getFrameCounter() const { return frameCounter; }
 
         static Application& Instance() { return *instance; }
     private:
         Window window{"Fusion", 1280, 720, true};
         LayerStack layers{};
-        ImGuiLayer imGuiLayer{};
+        ImGuiLayer* imGuiLayer;
         uint32_t frameCounter;
 
         static Application* instance;

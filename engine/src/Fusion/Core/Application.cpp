@@ -5,6 +5,7 @@
 
 #include "Fusion/Input/KeyInput.hpp"
 #include "Fusion/Input/MouseInput.hpp"
+#include "Fusion/ImGui/ImGuiLayer.hpp"
 
 using namespace Fusion;
 
@@ -17,7 +18,7 @@ Application::Application() {
     KeyInput::SetupKeyInputs(window);
     MouseInput::SetupMouseInputs(window);
 
-    pushOverlay(imGuiLayer);
+    pushOverlay(*new ImGuiLayer());
 }
 
 Application::~Application() {
@@ -33,10 +34,10 @@ void Application::run() {
             layer->onUpdate();
         }
 
-        imGuiLayer.begin();
+        imGuiLayer->begin();
         for (Layer* layer : layers)
             layer->onImGui();
-        imGuiLayer.end();
+        imGuiLayer->end();
 
         window.onUpdate();
     }

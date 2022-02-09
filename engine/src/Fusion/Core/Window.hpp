@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Base.hpp"
+#include "Event.hpp"
 
 namespace Fusion {
+    class DemoEvent;
     class FUSION_API Window {
     public:
         Window(std::string title, uint32_t width, uint32_t height, bool vsync);
@@ -26,6 +28,7 @@ namespace Fusion {
         bool shouldClose() const;
         void shouldClose(bool flag) const;
 
+        void demoEvent(DemoEvent* demo);
     private:
         GLFWwindow* window;
         std::string title;
@@ -35,6 +38,8 @@ namespace Fusion {
         bool vsync;
         bool resized;
         bool locked;
+
+        EventBus eventBus;
 
         void init();
 

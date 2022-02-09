@@ -25,6 +25,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <optional>
+#include <typeindex>
+#include <list>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

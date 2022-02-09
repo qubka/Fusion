@@ -8,7 +8,6 @@
 
 #ifdef linux
 #include <sys/sysinfo.h>
-#include <bits/confname.h>
 #include <unistd.h>
 
 #define LINEBUFFLEN 2048
