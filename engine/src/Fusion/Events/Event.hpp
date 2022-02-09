@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Fusion/Core/Base.hpp"
+
 namespace Fusion {
 
-    class Event {
+    class FUSION_API Event {
     };
 
-    class HandlerFunctionBase {
+    class FUSION_API HandlerFunctionBase {
     public:
         void exec(Event* event) {
             call(event);
@@ -15,15 +17,15 @@ namespace Fusion {
     };
     
     template<class T, class EventType>
-    class MemberFunctionHandler : public HandlerFunctionBase {
+    class FUSION_API MemberFunctionHandler : public HandlerFunctionBase {
     public:
-        typedef void (T::*MemberFunction)(EventType*);
+        typedef void (T::*MemberFunction)(const EventType&);
 
         MemberFunctionHandler(T * instance, MemberFunction memberFunction)
-            : instance{ instance }, memberFunction{ memberFunction } {};
+            : instance{instance}, memberFunction{memberFunction} {};
 
-        void call(Event* event) {
-            (instance->*memberFunction)(static_cast<EventType*>(event));
+        void call(Event* event) override {
+            (instance->*memberFunction)(static_cast<const EventType&>(*event));
         }
     private:
         T* instance;
@@ -31,17 +33,17 @@ namespace Fusion {
     };
     
     typedef std::list<HandlerFunctionBase*> HandlerList;
-    class EventBus {
+    class FUSION_API EventBus {
     public:
         template<typename EventType>
         void publish(EventType* event) {
-            HandlerList * handlers = subscribers[typeid(EventType)];
+            auto* handlers = subscribers[typeid(EventType)];
 
             if (handlers == nullptr) {
                 return;
             }
 
-            for (auto & handler : *handlers) {
+            for (auto& handler : *handlers) {
                 if (handler != nullptr) {
                     handler->exec(event);
                 }
@@ -49,10 +51,10 @@ namespace Fusion {
         }
 
         template<class T, class EventType>
-        void subscribe(T* instance, void (T::*memberFunction)(EventType*)) {
-            HandlerList* handlers = subscribers[typeid(EventType)];
+        void subscribe(T* instance, void (T::*memberFunction)(const EventType&)) {
+            auto* handlers = subscribers[typeid(EventType)];
 
-            //First time initialization
+            // First time initialization
             if (handlers == nullptr) {
                 handlers = new HandlerList();
                 subscribers[typeid(EventType)] = handlers;

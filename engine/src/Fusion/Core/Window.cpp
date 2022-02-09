@@ -1,17 +1,8 @@
 #include "Window.hpp"
 #include "Log.hpp"
 
-
 using namespace Fusion;
 
-namespace Fusion {
-    struct DemoEvent : public Event {
-        DemoEvent(int a, int b) : entityA{a}, entityB{b} {}
-
-        int entityA;
-        int entityB;
-    };
-}
 uint8_t Window::GLFWWindowCount{0};
 
 static void GLFWErrorCallback(int error, const char* description) {
@@ -67,15 +58,6 @@ void Window::init() {
     glfwSetWindowUserPointer(window, this);
 
     glfwSetFramebufferSizeCallback(window, WindowResizeCallback);
-
-    eventBus.subscribe(this, &Window::demoEvent);
-    eventBus.publish(new DemoEvent(1, 2));
-}
-
-void Window::demoEvent(DemoEvent* demo) {
-    std::cout << "demo" << std::endl;
-    std::cout << demo->entityA << std::endl;
-    std::cout << demo->entityB << std::endl;
 }
 
 void Window::onUpdate() {
@@ -113,7 +95,6 @@ void Window::WindowResizeCallback(GLFWwindow* handle, int width, int height) {
     window.width = static_cast<uint32_t>(width);
     window.height = static_cast<uint32_t>(height);
     window.aspect = static_cast<float>(width) / static_cast<float>(height);
-    std::cout << "RESIZE" << std::endl;
 #ifdef GLFW_INCLUDE_VULKAN
     window.resized = true;
 #else

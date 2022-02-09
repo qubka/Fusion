@@ -1,6 +1,5 @@
 #include "Application.hpp"
 #include "Log.hpp"
-#include "Window.hpp"
 #include "Layer.hpp"
 
 #include "Fusion/Input/KeyInput.hpp"
@@ -27,7 +26,7 @@ Application::~Application() {
 
 void Application::run() {
     while (!window.shouldClose()) {
-        frameCounter++;
+        frameCount++;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto* layer : layers) {

@@ -20,14 +20,14 @@ namespace Fusion {
 
         const Window& getWindow() { return window; }
         const ImGuiLayer& getGuiLayer() { return *imGuiLayer; }
-        uint32_t getFrameCounter() const { return frameCounter; }
+        uint32_t getFrameCount() const { return frameCount; }
 
         static Application& Instance() { return *instance; }
     private:
         Window window{"Fusion", 1280, 720, true};
         LayerStack layers{};
         ImGuiLayer* imGuiLayer;
-        uint32_t frameCounter;
+        uint32_t frameCount;
 
         static Application* instance;
     };

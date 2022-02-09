@@ -11,6 +11,16 @@
 #include "Fusion/Input/MouseInput.hpp"
 #include "Fusion/Input/MouseCodes.hpp"
 
+#include "Fusion/Geometry/AABB.hpp"
+#include "Fusion/Geometry/Frustum.hpp"
+#include "Fusion/Geometry/Plane.hpp"
+#include "Fusion/Geometry/Ray.hpp"
+#include "Fusion/Geometry/Sphere.hpp"
+#include "Fusion/Geometry/Geometry.hpp"
+
+#include "Fusion/Events/Event.hpp"
+#include "Fusion/Events/WindowEvents.hpp"
+
 #include "Fusion/ImGui/ImGuiLayer.hpp"
 
 //#include "Fusion/EntryPoint.hpp" add for dynamic linking
