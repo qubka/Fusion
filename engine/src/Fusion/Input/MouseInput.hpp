@@ -7,8 +7,10 @@ namespace Fusion {
 
     class FUSION_API MouseInput : public Input {
     public:
-        MouseInput(const std::vector<int>& keysToMonitor);
+        MouseInput(const std::vector<int>& buttonsToMonitor);
         ~MouseInput() override;
+
+        void onUpdate() override;
 
         //! Returns whether the given mouse button is held down.
         bool getMouseButton(int button) const { return isKey(button); };
@@ -24,8 +26,10 @@ namespace Fusion {
         //! The current mouse scroll delta.
         const glm::vec2& mouseScroll() const { return scroll; };
 
-        //! Must be called before any KeyInput instances will work
-        static void SetupMouseInputs(Window& window);
+        //! Must be called before any MouseInput instances will work
+        static void Setup(Window& window);
+        //! Can be called before poll events to reset some values
+        static void Update();
     private:
         glm::vec2 delta{};
         glm::vec2 position{};

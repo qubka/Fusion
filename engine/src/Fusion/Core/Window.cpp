@@ -9,14 +9,17 @@ static void GLFWErrorCallback(int error, const char* description) {
     FS_LOG_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 }
 
-Window::Window(std::string title, uint32_t width, uint32_t height, bool vsync) :
+Window::Window(std::string title, int width, int height, bool vsync) :
     title{std::move(title)},
     width{width},
     height{height},
     aspect{static_cast<float>(width) / static_cast<float>(height)},
-    vsync{vsync}
+    vsync{vsync},
+    minimize{width == 0 || height == 0},
+    resized{false},
+    locked{false}
 {
-    FS_CORE_ASSERT(width > 0 && height > 0, "Width or height cannot be negative");
+    FS_CORE_ASSERT(width >= 0 && height >= 0, "Width or height cannot be negative");
 
     if (GLFWWindowCount == 0) {
         int success = glfwInit();
@@ -92,9 +95,10 @@ glm::vec4 Window::getViewport() const {
 
 void Window::WindowResizeCallback(GLFWwindow* handle, int width, int height) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.width = static_cast<uint32_t>(width);
-    window.height = static_cast<uint32_t>(height);
+    window.width = width;
+    window.height = height;
     window.aspect = static_cast<float>(width) / static_cast<float>(height);
+    window.minimize = width == 0 || height == 0;
 #ifdef GLFW_INCLUDE_VULKAN
     window.resized = true;
 #else

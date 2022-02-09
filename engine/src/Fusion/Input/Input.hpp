@@ -11,11 +11,11 @@ namespace Fusion {
     public:
         //! Takes a list of which keys to keep state for
         Input(const std::vector<int>& keysToMonitor);
-        virtual ~Input() = default;
+        virtual ~Input();
 
-        //virtual void onUpdate() { currentFrame++; }
         //virtual void onAttach() {}
         //virtual void onDetach() {}
+        virtual void onUpdate() {/* currentFrame++ */}
 
         //! If disabled, Input.isKey_ always returns false
         bool isEnabled() const { return enabled; }
@@ -30,10 +30,13 @@ namespace Fusion {
 
         struct Key {
             bool pressed{false};
-            uint64_t frame{std::numeric_limits<uint64_t>::max()};
+            uint64_t lastFrame{std::numeric_limits<uint64_t>::max()};
         };
 
         std::map<int, Key> keys;
+        //uint32_t currentFrame{0};
         bool enabled{true};
+
+        //static std::map<std::type_index, Input*> instances;
     };
 }

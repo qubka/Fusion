@@ -32,7 +32,7 @@ namespace Fusion {
         MemberFunction memberFunction;
     };
     
-    typedef std::list<HandlerFunctionBase*> HandlerList;
+    typedef std::vector<HandlerFunctionBase*> HandlerList; // std::list
     class FUSION_API EventBus {
     public:
         template<typename EventType>
@@ -60,7 +60,7 @@ namespace Fusion {
                 subscribers[typeid(EventType)] = handlers;
             }
 
-            handlers->push_back(new MemberFunctionHandler<T, EventType>(instance, memberFunction));
+            handlers->emplace_back(instance, memberFunction);
         }
     private:
         std::map<std::type_index, HandlerList*> subscribers;

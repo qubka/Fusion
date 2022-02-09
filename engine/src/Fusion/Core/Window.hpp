@@ -5,14 +5,14 @@
 namespace Fusion {
     class FUSION_API Window {
     public:
-        Window(std::string title, uint32_t width, uint32_t height, bool vsync);
+        Window(std::string title, int width, int height, bool vsync);
         ~Window();
 
         void onUpdate();
 
         operator GLFWwindow*() const { return window; }
-        uint32_t getWidth() const { return width; }
-        uint32_t getHeight() const { return height; }
+        int getWidth() const { return width; }
+        int getHeight() const { return height; }
         float getAspect() const { return aspect; }
         const std::string& getTitle() const { return title; }
         glm::vec4 getViewport() const;
@@ -20,6 +20,7 @@ namespace Fusion {
         bool vSync() const  { return vsync; }
         void vSync(bool flag);
 
+        bool isMinimize() const { return minimize; }
         bool wasResized() const { return resized; };
         void resetResized() { resized = false; };
 
@@ -29,10 +30,11 @@ namespace Fusion {
     private:
         GLFWwindow* window;
         std::string title;
-        uint32_t width;
-        uint32_t height;
+        int width;
+        int height;
         float aspect;
         bool vsync;
+        bool minimize;
         bool resized;
         bool locked;
 

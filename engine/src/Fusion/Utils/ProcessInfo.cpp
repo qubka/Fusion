@@ -1,4 +1,4 @@
-#include "ProcessInfo.h"
+#include "ProcessInfo.hpp"
 
 #ifdef _WIN32
 #include "psapi.h"

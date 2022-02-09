@@ -1,5 +1,4 @@
-#ifndef ProcessInfo_h
-#define ProcessInfo_h
+#pragma once
 
 #ifdef _WIN32
 #include <windows.h>
@@ -33,5 +32,3 @@ private:
     unsigned long long prevKernelTime;
 #endif
 };
-
-#endif

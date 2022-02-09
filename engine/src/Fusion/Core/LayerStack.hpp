@@ -12,9 +12,9 @@ namespace Fusion {
         ~LayerStack();
 
         //! Inserts the specified element at the front of this deque if it is possible to do so immediately without violating capacity restrictions.
-        void pushFront(Layer& layer);
+        void pushFront(Layer* layer);
         // Inserts the specified element at the end of this deque if it is possible to do so immediately without violating capacity restrictions.
-        void pushBack(Layer& layer);
+        void pushBack(Layer* layer);
         //! Retrieves and removes the first element of this deque, or returns null if this deque is empty.
         Layer* pollFront();
         //! Retrieves and removes the last element of this deque, or returns null if this deque is empty.
@@ -24,7 +24,7 @@ namespace Fusion {
         //! Retrieves and removes the last element of this deque. This method differs from \a pollBack only in that it throws an exception if this deque is empty.
         Layer* removeBack();
         //! Removes the first occurrence of the specified element from this deque.
-        void remove(Layer& layer);
+        void remove(Layer* layer);
 
         //! Retrieves, but does not remove, the first element of this deque. This method differs from \a peekFront only in that it throws an exception if this deque is empty.
         Layer* getFront() const { return layers.front(); }

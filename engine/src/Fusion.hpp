@@ -4,6 +4,7 @@
 #include "Fusion/Core/Log.hpp"
 #include "Fusion/Core/Window.hpp"
 #include "Fusion/Core/Layer.hpp"
+#include "Fusion/Core/Time.hpp"
 
 #include "Fusion/Input/Input.hpp"
 #include "Fusion/Input/KeyInput.hpp"
@@ -22,5 +23,8 @@
 #include "Fusion/Events/WindowEvents.hpp"
 
 #include "Fusion/ImGui/ImGuiLayer.hpp"
+
+#include "Fusion/Utils/ProcessInfo.hpp"
+#include "Fusion/Utils/Extentions.hpp"
 
 //#include "Fusion/EntryPoint.hpp" add for dynamic linking

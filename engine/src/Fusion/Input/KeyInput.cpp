@@ -13,12 +13,17 @@ KeyInput::~KeyInput() {
     instances.erase(std::remove(instances.begin(), instances.end(), this), instances.end());
 }
 
-void KeyInput::SetupKeyInputs(Window& window) {
+void KeyInput::Setup(Window& window) {
     glfwSetKeyCallback(window, KeyInput::KeyCallback);
 }
 
+void KeyInput::Update() {
+    /*for (auto* input : instances) {
+        input->onUpdate();
+    }*/
+}
+
 void KeyInput::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mods) {
-    // Send key event to all KeyInput instances
     for (auto* input : instances) {
         input->setKey(key, action);
     }

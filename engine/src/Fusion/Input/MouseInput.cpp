@@ -5,7 +5,7 @@ using namespace Fusion;
 
 std::vector<MouseInput*> MouseInput::instances;
 
-MouseInput::MouseInput(const std::vector<int>& keysToMonitor) : Input(keysToMonitor) {
+MouseInput::MouseInput(const std::vector<int>& buttonsToMonitor) : Input(buttonsToMonitor) {
     instances.push_back(this);
 }
 
@@ -22,10 +22,22 @@ void MouseInput::setScrollOffset(const glm::vec2& offset) {
     scroll = offset;
 }
 
-void MouseInput::SetupMouseInputs(Window& window) {
+void MouseInput::onUpdate() {
+    Input::onUpdate();
+    delta.x = 0;
+    delta.y = 0;
+}
+
+void MouseInput::Setup(Window& window) {
     glfwSetMouseButtonCallback(window, MouseButtonCallback);
     glfwSetCursorPosCallback(window, CursorPositionCallback);
     glfwSetScrollCallback(window, MouseScrollCallback);
+}
+
+void MouseInput::Update() {
+    for (auto* input : instances) {
+        input->onUpdate();
+    }
 }
 
 void MouseInput::CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY) {

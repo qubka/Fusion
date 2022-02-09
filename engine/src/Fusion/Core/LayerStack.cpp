@@ -10,14 +10,14 @@ LayerStack::~LayerStack() {
     }
 }
 
-void LayerStack::pushFront(Layer& layer) {
-    layers.push_front(&layer);
-    layer.onAttach();
+void LayerStack::pushFront(Layer* layer) {
+    layers.push_front(layer);
+    layer->onAttach();
 }
 
-void LayerStack::pushBack(Layer& layer) {
-    layers.push_back(&layer);
-    layer.onAttach();
+void LayerStack::pushBack(Layer* layer) {
+    layers.push_back(layer);
+    layer->onAttach();
 }
 
 Layer* LayerStack::pollFront() {
@@ -42,10 +42,10 @@ Layer* LayerStack::removeBack() {
     return layer;
 }
 
-void LayerStack::remove(Layer& layer) {
-    auto it = std::find(layers.begin(), layers.end(), &layer);
+void LayerStack::remove(Layer* layer) {
+    auto it = std::find(layers.begin(), layers.end(), layer);
     if (it != layers.end()) {
-        layer.onDetach();
+        layer->onDetach();
         layers.erase(it);
     }
 }

@@ -18,7 +18,9 @@ namespace Fusion {
         bool getKeyDown(int key) const { return isKeyDown(key); };
 
         //! Must be called before any KeyInput instances will work
-        static void SetupKeyInputs(Window& window);
+        static void Setup(Window& window);
+        //! Can be called before poll events to reset some values
+        static void Update();
     private:
         /// Workaround for C++ class using a c-style-callback
         static void KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mods);

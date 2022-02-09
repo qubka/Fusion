@@ -65,10 +65,10 @@ void ImGuiLayer::begin() {
 
 void ImGuiLayer::end() {
     ImGuiIO& io = ImGui::GetIO();
-    Application& app = Application::Instance();
+    Window& window = Application::Instance().getWindow();
     io.DisplaySize = ImVec2(
-            static_cast<float>(app.getWindow().getWidth()),
-            static_cast<float>(app.getWindow().getHeight())
+            static_cast<float>(window.getWidth()),
+            static_cast<float>(window.getHeight())
             );
 
     // Rendering
