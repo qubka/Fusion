@@ -15,16 +15,15 @@
 #include <filesystem>
 #include <cstring>
 #include <string>
-#include <stack>
+//#include <stack>
 #include <deque>
 #include <array>
 #include <vector>
-#include <utility>
-#include <set>
+//#include <set>
 #include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <optional>
+//#include <unordered_map>
+//#include <unordered_set>
+//#include <optional>
 #include <typeindex>
 #include <list>
 
@@ -42,5 +41,6 @@
 #include <gtx/norm.hpp>
 #include <gtx/hash.hpp>
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+#include "Fusion/Core/Base.hpp"
+#include "Fusion/Core/Log.hpp"
+#include "Fusion/Utils/Extentions.hpp"

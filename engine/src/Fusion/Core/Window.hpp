@@ -1,6 +1,9 @@
 #pragma once
 
-#include "Base.hpp"
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
+#include "Fusion/Events/Event.hpp"
 
 namespace Fusion {
     class FUSION_API Window {
@@ -17,15 +20,14 @@ namespace Fusion {
         const std::string& getTitle() const { return title; }
         glm::vec4 getViewport() const;
 
+        bool shouldClose() const;
+        void shouldClose(bool flag) const;
+
         bool vSync() const  { return vsync; }
         void vSync(bool flag);
 
         bool isMinimize() const { return minimize; }
-        bool wasResized() const { return resized; };
-        void resetResized() { resized = false; };
-
-        bool shouldClose() const;
-        void shouldClose(bool flag) const;
+        EventBus& bus() { return eventBus; }
 
     private:
         GLFWwindow* window;
@@ -35,14 +37,13 @@ namespace Fusion {
         float aspect;
         bool vsync;
         bool minimize;
-        bool resized;
-        bool locked;
 
-        //EventBus eventBus;
+        EventBus eventBus;
 
         void init();
 
-        static uint8_t GLFWWindowCount;
+        static uint8_t GLFWwindowCount;
         static void WindowResizeCallback(GLFWwindow* handle, int width, int height);
+        static void WindowCloseCallback(GLFWwindow* handle);
     };
 }

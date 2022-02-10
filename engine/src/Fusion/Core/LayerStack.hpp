@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Base.hpp"
-
 namespace Fusion {
     class Layer;
 

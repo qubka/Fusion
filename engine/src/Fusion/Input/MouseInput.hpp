@@ -1,23 +1,22 @@
 #pragma once
 
 #include "Input.hpp"
+#include "MouseCodes.hpp"
 
 namespace Fusion {
     class Window;
 
-    class FUSION_API MouseInput : public Input {
+    class FUSION_API MouseInput : public Input<MouseCode> {
     public:
-        MouseInput(const std::vector<int>& buttonsToMonitor);
-        ~MouseInput() override;
-
-        void onUpdate() override;
+        MouseInput(const std::vector<MouseCode>& buttonsToMonitor);
+        ~MouseInput();
 
         //! Returns whether the given mouse button is held down.
-        bool getMouseButton(int button) const { return isKey(button); };
+        bool getMouseButton(MouseCode button) const { return isKey(button); };
         //!	Returns true during the frame the user releases the given mouse button.
-        bool getMouseButtonUp(int button) const { return isKeyUp(button); };
+        bool getMouseButtonUp(MouseCode button) const { return isKeyUp(button); };
         //! Returns true during the frame the user pressed the given mouse button.
-        bool getMouseButtonDown(int button) const { return isKeyDown(button); };
+        bool getMouseButtonDown(MouseCode button) const { return isKeyDown(button); };
 
         //! The current mouse position in pixel coordinates.
         const glm::vec2& mousePosition() const { return position; };
@@ -28,8 +27,6 @@ namespace Fusion {
 
         //! Must be called before any MouseInput instances will work
         static void Setup(Window& window);
-        //! Can be called before poll events to reset some values
-        static void Update();
     private:
         glm::vec2 delta{};
         glm::vec2 position{};

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Fusion/Core/Base.hpp"
-
 namespace Fusion {
     class Ray;
     class Sphere;

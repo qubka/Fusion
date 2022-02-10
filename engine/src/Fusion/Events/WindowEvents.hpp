@@ -4,11 +4,14 @@
 
 namespace Fusion {
 
-    struct WindowResizeEvent : public Event {
+    struct FUSION_API WindowResizeEvent : public Event {
         int width;
         int height;
     };
 
-    struct WindowCloseEvent : public Event {
+    struct FUSION_API WindowCloseEvent : public Event {
+    };
+
+    struct FUSION_API WindowTypedTypedEvent : public Event {
     };
 }

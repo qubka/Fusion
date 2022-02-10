@@ -3,19 +3,15 @@
 
 using namespace Fusion;
 
-//std::map<std::type_index, Input*> Input::instances;
-
-Input::Input(const std::vector<int>& keysToMonitor) {
-    for (int keycode : keysToMonitor) {
+template<class T>
+Input<T>::Input(const std::vector<T>& keysToMonitor) {
+    for (T keycode : keysToMonitor) {
         keys.emplace(keycode, Key{});
     }
 }
 
-Input::~Input() {
-
-}
-
-bool Input::isKey(int keycode) const {
+template<class T>
+bool Input<T>::isKey(T keycode) const {
     if (enabled) {
         if (auto it { keys.find(keycode) }; it != keys.end()) {
             const auto& key{ it->second };
@@ -25,7 +21,8 @@ bool Input::isKey(int keycode) const {
     return false;
 }
 
-bool Input::isKeyUp(int keycode) const {
+template<class T>
+bool Input<T>::isKeyUp(T keycode) const {
     if (enabled) {
         if (auto it{ keys.find(keycode) }; it != keys.end()) {
             const auto& key{ it->second };
@@ -35,7 +32,8 @@ bool Input::isKeyUp(int keycode) const {
     return false;
 }
 
-bool Input::isKeyDown(int keycode) const {
+template<class T>
+bool Input<T>::isKeyDown(T keycode) const {
     if (enabled) {
         if (auto it{ keys.find(keycode) }; it != keys.end()) {
             const auto& key{ it->second };
@@ -45,7 +43,8 @@ bool Input::isKeyDown(int keycode) const {
     return false;
 }
 
-void Input::setKey(int keycode, int action) {
+template<class T>
+void Input<T>::setKey(T keycode, uint8_t action) {
     if (action == GLFW_REPEAT)
         return;
 

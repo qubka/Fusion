@@ -24,14 +24,14 @@ Application::Application(std::string name, CommandLineArgs args)
 }
 
 Application::~Application() {
-
+    delete camera;
 }
 
 void Application::run() {
     while (!window.shouldClose()) {
         Time::Tick();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glfwPollEvents();
 
         for (auto* layer : layers) {
             layer->onUpdate();
@@ -47,9 +47,6 @@ void Application::run() {
                 layer->onImGui();
             imGuiLayer->end();
         }
-
-        KeyInput::Update();
-        MouseInput::Update();
 
         window.onUpdate();
     }

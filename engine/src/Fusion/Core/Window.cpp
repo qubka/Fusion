@@ -1,9 +1,10 @@
 #include "Window.hpp"
-#include "Log.hpp"
+
+#include "Fusion/Events/WindowEvents.hpp"
 
 using namespace Fusion;
 
-uint8_t Window::GLFWWindowCount{0};
+uint8_t Window::GLFWwindowCount{0};
 
 static void GLFWErrorCallback(int error, const char* description) {
     FS_LOG_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
@@ -15,13 +16,11 @@ Window::Window(std::string title, int width, int height, bool vsync) :
     height{height},
     aspect{static_cast<float>(width) / static_cast<float>(height)},
     vsync{vsync},
-    minimize{width == 0 || height == 0},
-    resized{false},
-    locked{false}
+    minimize{width == 0 || height == 0}
 {
     FS_CORE_ASSERT(width >= 0 && height >= 0, "Width or height cannot be negative");
 
-    if (GLFWWindowCount == 0) {
+    if (GLFWwindowCount == 0) {
         int success = glfwInit();
         FS_CORE_ASSERT(success, "Could not initialize GLFW!");
         glfwSetErrorCallback(GLFWErrorCallback);
@@ -33,8 +32,8 @@ Window::Window(std::string title, int width, int height, bool vsync) :
 Window::~Window() {
     glfwDestroyWindow(window);
 
-    GLFWWindowCount--;
-    if (GLFWWindowCount == 0) {
+    GLFWwindowCount--;
+    if (GLFWwindowCount == 0) {
         glfwTerminate();
     }
 }
@@ -49,7 +48,7 @@ void Window::init() {
 
     window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
     FS_CORE_ASSERT(window, "failed to create window!");
-    GLFWWindowCount++;
+    GLFWwindowCount++;
 
 #ifndef GLFW_INCLUDE_VULKAN
     glfwMakeContextCurrent(window);
@@ -61,11 +60,13 @@ void Window::init() {
     glfwSetWindowUserPointer(window, this);
 
     glfwSetFramebufferSizeCallback(window, WindowResizeCallback);
+    glfwSetWindowCloseCallback(window, WindowCloseCallback);
 }
 
 void Window::onUpdate() {
-    glfwPollEvents();
 #ifndef GLFW_INCLUDE_VULKAN
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0, 0, 0, 1);
     glfwSwapBuffers(window);
 #endif
 }
@@ -99,9 +100,17 @@ void Window::WindowResizeCallback(GLFWwindow* handle, int width, int height) {
     window.height = height;
     window.aspect = static_cast<float>(width) / static_cast<float>(height);
     window.minimize = width == 0 || height == 0;
+
+    window.bus().publish(new WindowResizeEvent{{}, width, height});
 #ifdef GLFW_INCLUDE_VULKAN
     window.resized = true;
 #else
     glViewport(0, 0, width, height);
 #endif
+}
+
+void Window::WindowCloseCallback(GLFWwindow* handle) {
+    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+
+    window.bus().publish(new WindowCloseEvent{});
 }

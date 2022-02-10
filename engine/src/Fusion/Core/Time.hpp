@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Base.hpp"
-
 namespace Fusion {
     //! Global time holder
     class FUSION_API Time {

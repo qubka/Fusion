@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Fusion/Core/Base.hpp"
-
 namespace Fusion {
     class FUSION_API Ray {
         glm::vec3 origin;

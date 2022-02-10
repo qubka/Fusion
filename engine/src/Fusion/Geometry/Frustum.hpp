@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Fusion/Core/Base.hpp"
 #include "Plane.hpp"
 
 namespace Fusion {

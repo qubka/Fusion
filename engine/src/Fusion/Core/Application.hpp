@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Base.hpp"
 #include "Window.hpp"
-#include "Log.hpp"
 #include "LayerStack.hpp"
 
 int main(int argc, char** argv);

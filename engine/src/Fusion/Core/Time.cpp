@@ -1,4 +1,5 @@
 #include "Time.hpp"
+#include "GLFW/glfw3.h"
 
 using namespace Fusion;
 
@@ -15,6 +16,7 @@ void Time::Tick() {
     time = currentTime;
 
     frameCount++;
+
     frameNumber++;
     if (currentTime - frameTime >= 1) {
         framesPerSecond = frameNumber;

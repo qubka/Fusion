@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Base.hpp"
-
 namespace Fusion {
-    class Input;
     class FUSION_API Layer {
     public:
         Layer(std::string name = "Layer") : name{std::move(name)} {}

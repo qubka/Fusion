@@ -2,8 +2,6 @@
 #include "AABB.hpp"
 #include "Ray.hpp"
 
-#include "Fusion/Core/Log.hpp"
-
 using namespace Fusion;
 
 Sphere::Sphere() : center{0}, radius{0} {

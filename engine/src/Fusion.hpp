@@ -12,6 +12,10 @@
 #include "Fusion/Input/MouseInput.hpp"
 #include "Fusion/Input/MouseCodes.hpp"
 
+#include "Fusion/Renderer/Camera.hpp"
+#include "Fusion/Renderer/PerspectiveCamera.hpp"
+#include "Fusion/Renderer/OrthographicCamera.hpp"
+
 #include "Fusion/Geometry/AABB.hpp"
 #include "Fusion/Geometry/Frustum.hpp"
 #include "Fusion/Geometry/Plane.hpp"
@@ -21,6 +25,8 @@
 
 #include "Fusion/Events/Event.hpp"
 #include "Fusion/Events/WindowEvents.hpp"
+#include "Fusion/Events/MouseEvents.hpp"
+#include "Fusion/Events/KeyEvents.hpp"
 
 #include "Fusion/ImGui/ImGuiLayer.hpp"
 

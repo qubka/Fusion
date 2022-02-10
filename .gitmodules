@@ -13,3 +13,6 @@
 [submodule "engine/external/entt"]
 	path = engine/external/entt
 	url = https://github.com/skypjack/entt
+[submodule "engine/external/stb"]
+	path = engine/external/stb
+	url = https://github.com/nothings/stb.git
