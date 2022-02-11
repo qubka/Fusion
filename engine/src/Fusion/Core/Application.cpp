@@ -33,8 +33,8 @@ Application::~Application() {
 
 void Application::run() {
     while (!window.shouldClose()) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0, 0, 0, 1);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glClearColor(0, 0, 0, 1);
 
         Time::Tick();
 
@@ -49,10 +49,10 @@ void Application::run() {
                 layer->onRender();
             }
 
-            imGuiLayer->begin();
+            /*imGuiLayer->begin();
             for (auto* layer: layers)
                 layer->onImGui();
-            imGuiLayer->end();
+            imGuiLayer->end();*/
         }
 
         window.onUpdate();

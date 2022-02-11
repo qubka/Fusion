@@ -18,11 +18,11 @@ Window::Window(std::string title, int width, int height, bool vsync) :
     vsync{vsync},
     minimize{width == 0 || height == 0}
 {
-    FS_CORE_ASSERT(width >= 0 && height >= 0, "Width or height cannot be negative");
+    FS_CORE_ASSERT(width >= 0 && height >= 0, "width or height cannot be negative");
 
     if (GLFWwindowCount == 0) {
         int success = glfwInit();
-        FS_CORE_ASSERT(success, "Could not initialize GLFW!");
+        FS_CORE_ASSERT(success, "could not initialize GLFW!");
         glfwSetErrorCallback(GLFWErrorCallback);
     }
 

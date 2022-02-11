@@ -121,7 +121,8 @@ set(IMGUI_SOURCES
         "${IMGUI_LIB_NAME}/imgui_tables.cpp"
         "${IMGUI_LIB_NAME}/imgui_widgets.cpp"
         "${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.cpp"
-        "${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.cpp"
+        #"${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.cpp"
+        "${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.cpp"
         )
 
 set(IMGUI_HEADERS
@@ -132,7 +133,8 @@ set(IMGUI_HEADERS
         "${IMGUI_LIB_NAME}/imstb_textedit.h"
         "${IMGUI_LIB_NAME}/imstb_truetype.h"
         "${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.h"
-        "${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.h"
+        #"${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.h"
+        "${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.h"
         )
 
 set(IMGUI_INC_PATH "${IMGUI_LIB_NAME}/")

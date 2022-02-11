@@ -1,0 +1,61 @@
+#pragma once
+
+#include "Device.hpp"
+
+namespace Fusion {
+    //class Window;
+    class SwapChain;
+    class AllocatedBuffer;
+    class DescriptorPool;
+    class DescriptorLayout;
+
+    struct FUSION_API UniformBufferObject {
+        alignas(16) glm::mat4 perspective;
+        alignas(16) glm::mat4 orthogonal;
+    };
+
+    class FUSION_API Renderer {
+    public:
+        Renderer(Window& window, Device& device);
+        ~Renderer();
+        Renderer(const Renderer&) = delete;
+        Renderer(Renderer&&) = delete;
+        Renderer& operator=(const Renderer&) = delete;
+        Renderer& operator=(Renderer&&) = delete;
+
+        const vk::DescriptorSetLayout& getGlobalLayoutSet() const;
+        const vk::RenderPass& getSwapChainRenderPass() const;
+        const vk::CommandBuffer& getCurrentCommandBuffer();
+        const vk::DescriptorSet& getCurrentDescriptorSet();
+        const std::unique_ptr<AllocatedBuffer>& getCurrentUniformBuffer();
+        uint32_t getFrameIndex() const;
+        bool isFrameInProgress() const;
+
+        vk::CommandBuffer beginFrame();
+        void beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer);
+        void endSwapChainRenderPass(vk::CommandBuffer& commandBuffer);
+        void endFrame(vk::CommandBuffer& commandBuffer);
+
+    private:
+        void createCommandBuffers();
+        void createUniformBuffers();
+        void createDescriptorSets();
+        void recreateSwapChain();
+
+        Window& window;
+        Device& device;
+
+        std::unique_ptr<SwapChain> swapChain;
+        std::vector<vk::CommandBuffer, std::allocator<vk::CommandBuffer>> commandBuffers;
+        std::vector<std::unique_ptr<AllocatedBuffer>> uniformBuffers;
+
+        std::vector<vk::DescriptorSet> globalDescriptorSets;
+        std::unique_ptr<DescriptorPool> globalPool;
+        std::unique_ptr<DescriptorLayout> globalLayout;
+
+        uint32_t currentImageIndex{0};
+        uint32_t currentFrameIndex{0};
+        bool isFrameStarted{false};
+    };
+}
+

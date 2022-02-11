@@ -3,7 +3,7 @@
 
 //#define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
+#include "backends/imgui_impl_vulkan.h"
 
 using namespace Fusion;
 
@@ -16,18 +16,6 @@ ImGuiLayer::~ImGuiLayer() {
 }
 
 void ImGuiLayer::onAttach() {
-    // Decide GL+GLSL versions
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-    // GL ES 2.0 + GLSL 100
-    const char* glsl_version = "#version 100";
-#elif defined(__APPLE__)
-    // GL 3.2 + GLSL 150
-    const char* glsl_version = "#version 150";
-#else
-    // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
-#endif
-
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -45,20 +33,34 @@ void ImGuiLayer::onAttach() {
     setDarkThemeColors();
 
     // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(Application::Instance().getWindow(), true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
+    ImGui_ImplGlfw_InitForVulkan(Application::Instance().getWindow(), true);
+    /*ImGui_ImplVulkan_InitInfo initInfo{};
+    initInfo.Instance = g_Instance;
+    initInfo.PhysicalDevice = g_PhysicalDevice;
+    initInfo.Device = g_Device;
+    initInfo.QueueFamily = g_QueueFamily;
+    initInfo.Queue = g_Queue;
+    initInfo.PipelineCache = g_PipelineCache;
+    initInfo.DescriptorPool = g_DescriptorPool;
+    initInfo.Subpass = 0;
+    initInfo.MinImageCount = g_MinImageCount;
+    initInfo.ImageCount = wd->ImageCount;
+    initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+    initInfo.Allocator = g_Allocator;
+    initInfo.CheckVkResultFn = check_vk_result;
+    ImGui_ImplVulkan_Init(&init_info, wd->RenderPass);*/
 }
 
 void ImGuiLayer::onDetach() {
     // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
 
 void ImGuiLayer::begin() {
     // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 }
@@ -73,7 +75,7 @@ void ImGuiLayer::end() {
 
     // Rendering
     ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void ImGuiLayer::setDarkThemeColors() {

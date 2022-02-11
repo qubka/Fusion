@@ -8,7 +8,7 @@ Sphere::Sphere() : center{0}, radius{0} {
 }
 
 Sphere::Sphere(const glm::vec3& center, float radius) : center{center}, radius{radius} {
-    FS_CORE_ASSERT(radius >= 0, "Radius cannot be negative");
+    FS_CORE_ASSERT(radius >= 0, "radius cannot be negative");
 }
 
 bool Sphere::intersects(const AABB& box) const {

@@ -17,7 +17,7 @@ public:
     }
 
     void onImGui() override {
-        const char* vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+        /*const char* vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
         const char* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
         const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
         const int totalMemory = glxGpuTotalMemory();
@@ -47,7 +47,7 @@ public:
 
         ImGui::End();
 
-        /*ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
         ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         auto& colors = ImGui::GetStyle().Colors;
