@@ -28,6 +28,9 @@
 #include "Fusion/Events/MouseEvents.hpp"
 #include "Fusion/Events/KeyEvents.hpp"
 
+#include "Fusion/Scene/Components.hpp"
+#include "Fusion/Scene/Scene.hpp"
+
 #include "Fusion/ImGui/ImGuiLayer.hpp"
 
 #include "Fusion/Utils/ProcessInfo.hpp"

@@ -6,7 +6,7 @@ using namespace Fusion;
 
 std::vector<KeyInput*> KeyInput::instances;
 
-KeyInput::KeyInput(const std::vector<KeyCode>& keysToMonitor) : Input<KeyCode>(keysToMonitor) {
+KeyInput::KeyInput(const std::vector<KeyCode>& keysToMonitor) : Input<KeyCode>{keysToMonitor} {
     instances.push_back(this);
 }
 

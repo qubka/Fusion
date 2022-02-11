@@ -65,8 +65,6 @@ void Window::init() {
 
 void Window::onUpdate() {
 #ifndef GLFW_INCLUDE_VULKAN
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0, 0, 0, 1);
     glfwSwapBuffers(window);
 #endif
 }
@@ -101,10 +99,8 @@ void Window::WindowResizeCallback(GLFWwindow* handle, int width, int height) {
     window.aspect = static_cast<float>(width) / static_cast<float>(height);
     window.minimize = width == 0 || height == 0;
 
-    window.bus().publish(new WindowResizeEvent{{}, width, height});
-#ifdef GLFW_INCLUDE_VULKAN
-    window.resized = true;
-#else
+    window.bus().publish(new WindowResizeEvent{});
+#ifndef GLFW_INCLUDE_VULKAN
     glViewport(0, 0, width, height);
 #endif
 }

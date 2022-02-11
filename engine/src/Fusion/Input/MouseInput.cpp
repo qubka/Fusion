@@ -6,7 +6,7 @@ using namespace Fusion;
 
 std::vector<MouseInput*> MouseInput::instances;
 
-MouseInput::MouseInput(const std::vector<MouseCode>& buttonsToMonitor) : Input<MouseCode>(buttonsToMonitor) {
+MouseInput::MouseInput(const std::vector<MouseCode>& buttonsToMonitor) : Input<MouseCode>{buttonsToMonitor} {
     instances.push_back(this);
 }
 

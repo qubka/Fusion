@@ -85,6 +85,18 @@ target_include_directories(${ENTT_LIB_NAME}
         ${ENTT_INC_PATH}
         )
 
+# magic_enum
+set(MAGIC_ENUM_LIB_NAME "magic_enum")
+set(MAGIC_ENUM_INC_PATH ${MAGIC_ENUM_LIB_NAME}/include)
+
+add_library(${MAGIC_ENUM_LIB_NAME} INTERFACE)
+
+target_include_directories(${MAGIC_ENUM_LIB_NAME}
+        INTERFACE
+        ${MAGIC_ENUM_INC_PATH}
+        )
+
+
 # OR
 #set(ENTT_LIB_NAME "ENTT")
 #set(ENTT_INC_PATH ${ENTT_LIB_NAME}/ENTT)

@@ -2,9 +2,9 @@
 
 using namespace Fusion;
 
-OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top) : Camera() {
+OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top) : Camera{} {
     setProjection(left, right, bottom, top);
-    updateViewMatrix();
+    updateView();
 }
 
 void OrthographicCamera::setProjection(float left, float right, float bottom, float top) {
@@ -28,7 +28,7 @@ void OrthographicCamera::setPositionAndRotation(const glm::vec3& pos, float rot)
     isDirty = true;
 }
 
-void OrthographicCamera::updateViewMatrix() {
+void OrthographicCamera::updateView() {
     if (!isDirty)
         return;
 

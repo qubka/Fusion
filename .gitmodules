@@ -16,3 +16,6 @@
 [submodule "engine/external/stb"]
 	path = engine/external/stb
 	url = https://github.com/nothings/stb.git
+[submodule "engine/external/magic_enum"]
+	path = engine/external/magic_enum
+	url = https://github.com/Neargye/magic_enum

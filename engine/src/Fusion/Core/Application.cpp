@@ -4,7 +4,9 @@
 
 #include "Fusion/Input/KeyInput.hpp"
 #include "Fusion/Input/MouseInput.hpp"
+
 #include "Fusion/ImGui/ImGuiLayer.hpp"
+#include "Fusion/Editor/EditorLayer.hpp"
 
 using namespace Fusion;
 
@@ -20,15 +22,20 @@ Application::Application(std::string name, CommandLineArgs args)
     KeyInput::Setup(window);
     MouseInput::Setup(window);
 
-    pushOverlay(new ImGuiLayer());
+    imGuiLayer = new ImGuiLayer();
+    pushOverlay(imGuiLayer);
+    pushOverlay(new EditorLayer());
 }
 
 Application::~Application() {
-    delete camera;
+
 }
 
 void Application::run() {
     while (!window.shouldClose()) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0, 0, 0, 1);
+
         Time::Tick();
 
         glfwPollEvents();
@@ -43,7 +50,7 @@ void Application::run() {
             }
 
             imGuiLayer->begin();
-            for (Layer* layer: layers)
+            for (auto* layer: layers)
                 layer->onImGui();
             imGuiLayer->end();
         }
