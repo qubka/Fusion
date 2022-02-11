@@ -10,10 +10,9 @@ find_package(${RENDERER_NAME} REQUIRED)
 
 file(GLOB_RECURSE COMMON_SRC src/Fusion/*.cpp)
 file(GLOB_RECURSE PLATFORM_SRC src/Platform/${CMAKE_SYSTEM_NAME}/*.cpp src/Platform/Shared/*.cpp)
-file(GLOB_RECURSE RENDERER_SRC src/Renderer/${RENDERER_NAME}/*.cpp)
 set(HEADER_FILES src/fspch.hpp)
 
-add_library(${PROJECT_NAME} STATIC ${COMMON_SRC} ${PLATFORM_SRC} ${RENDERER_SRC})
+add_library(${PROJECT_NAME} STATIC ${COMMON_SRC} ${PLATFORM_SRC})
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC ${HEADER_FILES})
 
