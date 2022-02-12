@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Device.hpp"
+#include "Vulkan.hpp"
 
 namespace Fusion {
     struct FUSION_API PipelineConfigInfo {
@@ -29,7 +29,7 @@ namespace Fusion {
 
     class FUSION_API Pipeline {
     public:
-        Pipeline(Device& device,
+        Pipeline(Vulkan& vulkan,
                  const std::string& vertPath,
                  const std::string& fragPath,
                  const PipelineConfigInfo& configInfo);
@@ -43,7 +43,7 @@ namespace Fusion {
 
         static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
     private:
-        Device& device;
+        Vulkan& vulkan;
         vk::ShaderModule vertShaderModule;
         vk::ShaderModule fragShaderModule;
         vk::Pipeline graphicsPipeline;

@@ -26,7 +26,7 @@ namespace FUSION_API Fusion {
             void loadModel(const std::string &filepath);
         };
 
-        Mesh(Device& device, const Builder& builder);
+        Mesh(Vulkan& vulkan, const Builder& builder);
         ~Mesh();
         Mesh(const Mesh&) = delete;
         Mesh(Mesh&&) = delete;
@@ -40,7 +40,7 @@ namespace FUSION_API Fusion {
         void createVertexBuffers(const std::vector<Vertex>& vertices);
         void createIndexBuffers(const std::vector<uint32_t>& indices);
 
-        Device& device;
+        Vulkan& vulkan;
         std::unique_ptr<AllocatedBuffer> vertexBuffer;
         uint32_t vertexCount;
         bool hasIndexBuffer{false};

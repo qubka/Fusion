@@ -2,7 +2,6 @@
 
 #include "Fusion/Core/Application.hpp"
 #include "Fusion/Core/Log.hpp"
-#include "Fusion/Core/Window.hpp"
 #include "Fusion/Core/Layer.hpp"
 #include "Fusion/Core/Time.hpp"
 
@@ -15,6 +14,16 @@
 #include "Fusion/Renderer/Camera.hpp"
 #include "Fusion/Renderer/PerspectiveCamera.hpp"
 #include "Fusion/Renderer/OrthographicCamera.hpp"
+#include "Fusion/Renderer/Window.hpp"
+#include "Fusion/Renderer/Vulkan.hpp"
+#include "Fusion/Renderer/Texture.hpp"
+#include "Fusion/Renderer/SwapChain.hpp"
+#include "Fusion/Renderer/Renderer.hpp"
+#include "Fusion/Renderer/Pipeline.hpp"
+#include "Fusion/Renderer/Mesh.hpp"
+#include "Fusion/Renderer/Image.hpp"
+#include "Fusion/Renderer/Descriptors.hpp"
+#include "Fusion/Renderer/AllocatedBuffer.hpp"
 
 #include "Fusion/Geometry/AABB.hpp"
 #include "Fusion/Geometry/Frustum.hpp"

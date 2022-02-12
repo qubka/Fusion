@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 project(engine)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-msse -msse2 -msse3")
 
 add_subdirectory(external)
 
@@ -20,6 +21,7 @@ target_link_libraries(${PROJECT_NAME}
         glm
         entt
         magic_enum
+        #stb
         #glad
         #glm_static    # if build with add_subdirectory
         spdlog::spdlog

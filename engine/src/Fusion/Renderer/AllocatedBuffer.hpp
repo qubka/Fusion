@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Device.hpp"
+#include "Vulkan.hpp"
 
 namespace Fusion {
     class FUSION_API AllocatedBuffer {
     public:
-        AllocatedBuffer(Device& device,
+        AllocatedBuffer(Vulkan& vulkan,
                         vk::DeviceSize instanceSize,
                         uint32_t instanceCount,
                         vk::BufferUsageFlags usageFlags,
@@ -41,7 +41,7 @@ namespace Fusion {
         vk::DeviceSize getBufferSize() const { return bufferSize; };
 
     private:
-        Device& device;
+        Vulkan& vulkan;
         void* mapped = nullptr;
         vk::Buffer buffer;
         vk::DeviceMemory memory;

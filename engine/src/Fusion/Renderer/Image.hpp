@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+/*namespace Fusion {
     struct FUSION_API Image {
         uint8_t* pixels;
         int width;
@@ -14,4 +14,4 @@ namespace Fusion {
         Image& operator=(const Image&) = delete;
         Image& operator=(Image&&) = delete;
     };
-}
+}*/

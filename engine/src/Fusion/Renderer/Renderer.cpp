@@ -5,7 +5,7 @@
 
 using namespace Fusion;
 
-Renderer::Renderer(Window& window, Device& device) : window{window}, device{device} {
+Renderer::Renderer(Vulkan& vulkan) : vulkan{vulkan} {
     recreateSwapChain();
     createUniformBuffers();
     createDescriptorSets();
@@ -13,17 +13,19 @@ Renderer::Renderer(Window& window, Device& device) : window{window}, device{devi
 }
 
 Renderer::~Renderer() {
-    device.getLogical().freeCommandBuffers(device.getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+    vulkan.getDevice().freeCommandBuffers(vulkan.getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
     commandBuffers.clear();
 }
 
 void Renderer::createCommandBuffers() {
+    commandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+
     vk::CommandBufferAllocateInfo allocInfo{};
-    allocInfo.commandPool = device.getCommandPool();
+    allocInfo.commandPool = vulkan.getCommandPool();
     allocInfo.level = vk::CommandBufferLevel::ePrimary;
     allocInfo.commandBufferCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
 
-    auto result = device.getLogical().allocateCommandBuffers(&allocInfo, nullptr, &commandBuffers);
+    auto result = vulkan.getDevice().allocateCommandBuffers(&allocInfo, commandBuffers.data());
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to allocateDescriptor command buffers!");
 }
 
@@ -32,10 +34,10 @@ void Renderer::createUniformBuffers() {
 
     for (int i = 0; i < SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
         auto buffer = std::make_unique<AllocatedBuffer>(
-            device,
-            sizeof(UniformBufferObject),
-            1,
-            vk::BufferUsageFlagBits::eUniformBuffer,
+                vulkan,
+                sizeof(UniformBufferObject),
+                1,
+                vk::BufferUsageFlagBits::eUniformBuffer,
             vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
         buffer->map();
         uniformBuffers.push_back(std::move(buffer));
@@ -43,12 +45,12 @@ void Renderer::createUniformBuffers() {
 }
 
 void Renderer::createDescriptorSets() {
-    globalPool = DescriptorPool::Builder(device)
+    globalPool = DescriptorPool::Builder(vulkan)
         .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(vk::DescriptorType::eUniformBuffer, SwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
 
-    globalLayout = DescriptorLayout::Builder(device)
+    globalLayout = DescriptorLayout::Builder(vulkan)
         .addBinding(0, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eVertex)
         .build();
 
@@ -65,23 +67,23 @@ void Renderer::createDescriptorSets() {
 }
 
 void Renderer::recreateSwapChain() {
-    auto extent = vk::Extent2D{static_cast<uint32_t>(window.getWidth()), static_cast<uint32_t>(window.getHeight())};
+    /*auto extent = vk::Extent2D{static_cast<uint32_t>(window.getWidth()), static_cast<uint32_t>(window.getHeight())};
     while (extent.width == 0 || extent.height == 0) {
         extent = vk::Extent2D{static_cast<uint32_t>(window.getWidth()), static_cast<uint32_t>(window.getHeight())};
         glfwWaitEvents();
-    }
+    }*/
+    auto extent = vk::Extent2D{1280, 720};
 
-    device.getLogical().waitIdle();
+    vulkan.getDevice().waitIdle();
 
     if (swapChain == nullptr) {
-        swapChain = std::make_unique<SwapChain>(device, extent);
+        swapChain = std::make_unique<SwapChain>(vulkan, extent);
     } else {
         std::shared_ptr<SwapChain> oldSwapChain = std::move(swapChain);
-        swapChain = std::make_unique<SwapChain>(device, extent, oldSwapChain);
+        swapChain = std::make_unique<SwapChain>(vulkan, extent, oldSwapChain);
 
-        if (!oldSwapChain->compareSwapFormats(*swapChain)) {
-            throw std::runtime_error("swap chain image(or depth) format has changed");
-        }
+        bool isComp = oldSwapChain->compareSwapFormats(*swapChain);
+        FS_CORE_ASSERT(isComp, "swap chain image(or depth) format has changed");
     }
 }
 
@@ -95,9 +97,7 @@ vk::CommandBuffer Renderer::beginFrame() {
         return nullptr;
     }
 
-    if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR) {
-        throw std::runtime_error("failed to acquire swap chain image");
-    }
+    FS_CORE_ASSERT(result == vk::Result::eSuccess || result == vk::Result::eSuboptimalKHR, "failed to acquire swap chain image");
 
     isFrameStarted = true;
 

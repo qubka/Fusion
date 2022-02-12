@@ -5,7 +5,7 @@
 
 using namespace Fusion;
 
-Mesh::Mesh(Device& device, const Builder& builder) : device{device} {
+Mesh::Mesh(Vulkan& vulkan, const Builder& builder) : vulkan{vulkan} {
     createVertexBuffers(builder.vertices);
     createIndexBuffers(builder.indices);
 }
@@ -20,10 +20,10 @@ void Mesh::createVertexBuffers(const std::vector<Vertex>& vertices) {
     uint32_t vertexSize = sizeof(vertices[0]);
 
     AllocatedBuffer stagingBuffer{
-        device,
-        vertexSize,
-        vertexCount,
-        vk::BufferUsageFlagBits::eTransferSrc,
+            vulkan,
+            vertexSize,
+            vertexCount,
+            vk::BufferUsageFlagBits::eTransferSrc,
         vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
     };
 
@@ -31,13 +31,13 @@ void Mesh::createVertexBuffers(const std::vector<Vertex>& vertices) {
     stagingBuffer.writeToBuffer((void *)vertices.data());
 
     vertexBuffer = std::make_unique<AllocatedBuffer>(
-        device,
-        vertexSize,
-        vertexCount,
+            vulkan,
+            vertexSize,
+            vertexCount,
         vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-        vk::MemoryPropertyFlagBits::eDeviceLocal);
+            vk::MemoryPropertyFlagBits::eDeviceLocal);
 
-    device.copyBuffer(stagingBuffer.get(), vertexBuffer->get(), bufferSize);
+    vulkan.copyBuffer(stagingBuffer.get(), vertexBuffer->get(), bufferSize);
 }
 
 void Mesh::createIndexBuffers(const std::vector<uint32_t>& indices) {
@@ -52,10 +52,10 @@ void Mesh::createIndexBuffers(const std::vector<uint32_t>& indices) {
     uint32_t indexSize = sizeof(indices[0]);
 
     AllocatedBuffer stagingBuffer {
-        device,
-        indexSize,
-        indexCount,
-        vk::BufferUsageFlagBits::eTransferSrc,
+            vulkan,
+            indexSize,
+            indexCount,
+            vk::BufferUsageFlagBits::eTransferSrc,
         vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
     };
 
@@ -63,13 +63,13 @@ void Mesh::createIndexBuffers(const std::vector<uint32_t>& indices) {
     stagingBuffer.writeToBuffer((void *)indices.data());
 
     indexBuffer = std::make_unique<AllocatedBuffer>(
-        device,
-        indexSize,
-        indexCount,
+            vulkan,
+            indexSize,
+            indexCount,
         vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-        vk::MemoryPropertyFlagBits::eDeviceLocal);
+            vk::MemoryPropertyFlagBits::eDeviceLocal);
 
-    device.copyBuffer(stagingBuffer.get(), indexBuffer->get(), bufferSize);
+    vulkan.copyBuffer(stagingBuffer.get(), indexBuffer->get(), bufferSize);
 }
 
 void Mesh::draw(const vk::CommandBuffer& commandBuffer) const {

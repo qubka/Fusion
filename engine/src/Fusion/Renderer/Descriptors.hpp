@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Device.hpp"
+#include "Vulkan.hpp"
 
 namespace Fusion {
     class FUSION_API DescriptorPool {
     public:
         class Builder {
         public:
-            explicit Builder(Device& device) : device{device} {}
+            explicit Builder(Vulkan& vulkan) : vulkan{vulkan} {}
 
             Builder& addPoolSize(vk::DescriptorType descriptorType, uint32_t count);
             Builder& setPoolFlags(vk::DescriptorPoolCreateFlags flags);
@@ -15,7 +15,7 @@ namespace Fusion {
             std::unique_ptr<DescriptorPool> build() const;
 
         private:
-            Device& device;
+            Vulkan& vulkan;
             std::vector<vk::DescriptorPoolSize> poolSizes;
             vk::DescriptorPoolCreateFlags poolFlags;
             uint32_t maxSets{1000};
@@ -35,7 +35,7 @@ namespace Fusion {
         void resetPool();
 
     private:
-        Device& device;
+        Vulkan& vulkan;
         vk::DescriptorPool descriptorPool;
 
         friend class DescriptorWriter;
@@ -45,12 +45,12 @@ namespace Fusion {
     public:
         class Builder {
         public:
-            explicit Builder(Device& device) : device{device} {}
+            explicit Builder(Vulkan& vulkan) : vulkan{vulkan} {}
             Builder& addBinding(uint32_t binding, vk::DescriptorType descriptorType, vk::ShaderStageFlags stageFlags, uint32_t count = 1);
             std::unique_ptr<DescriptorLayout> build() const;
 
         private:
-            Device& device;
+            Vulkan& vulkan;
             std::unordered_map<uint32_t, vk::DescriptorSetLayoutBinding> bindings;
 
             friend class DescriptorLayout;
@@ -66,7 +66,7 @@ namespace Fusion {
         const vk::DescriptorSetLayout& getDescriptorSetLayout() const { return descriptorSetLayout; }
 
     private:
-        Device& device;
+        Vulkan& vulkan;
         vk::DescriptorSetLayout descriptorSetLayout;
         std::unordered_map<uint32_t, vk::DescriptorSetLayoutBinding> bindings;
 

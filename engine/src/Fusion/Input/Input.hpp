@@ -2,6 +2,9 @@
 
 #include "GLFW/glfw3.h"
 
+#include "MouseCodes.hpp"
+#include "KeyCodes.hpp"
+
 namespace Fusion {
     class Window;
 
@@ -13,6 +16,10 @@ namespace Fusion {
         //! Takes a list of which keys to keep state for
         Input(const std::vector<T>& keysToMonitor);
         ~Input() = default;
+
+        /*virtual void onAttach() {}
+        virtual void onDetach() {}
+        virtual void onUpdate() { currentFrame++; }*/
 
         //! If disabled, Input.isKey_ always returns false
         bool isEnabled() const { return enabled; }
@@ -35,10 +42,6 @@ namespace Fusion {
         bool enabled{true};
     };
 
-    template class Input<uint8_t>;
-    template class Input<uint16_t>;
-    //template class Input<uint32_t>;
-    //template class Input<int8_t>;
-    //template class Input<int16_t>;
-    //template class Input<int32_t>;
+    template class Input<MouseCode>;
+    template class Input<KeyCode>;
 }

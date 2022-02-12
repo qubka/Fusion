@@ -3,26 +3,26 @@
 using namespace Fusion;
 
 AllocatedBuffer::AllocatedBuffer(
-        Device& device,
+        Vulkan& vulkan,
         vk::DeviceSize instanceSize,
         uint32_t instanceCount,
         vk::BufferUsageFlags usageFlags,
         vk::MemoryPropertyFlags memoryPropertyFlags,
         vk::DeviceSize minOffsetAlignment
-    ) : device{device},
+    ) : vulkan{vulkan},
         instanceSize{instanceSize},
         instanceCount{instanceCount},
         usageFlags{usageFlags},
         memoryPropertyFlags{memoryPropertyFlags} {
     alignmentSize = getAlignment(instanceSize, minOffsetAlignment);
     bufferSize = alignmentSize * instanceCount;
-    device.createBuffer(bufferSize, usageFlags, memoryPropertyFlags, buffer, memory);
+    vulkan.createBuffer(bufferSize, usageFlags, memoryPropertyFlags, buffer, memory);
 }
 
 AllocatedBuffer::~AllocatedBuffer() {
     unmap();
-    device.getLogical().destroyBuffer(buffer, nullptr);
-    device.getLogical().freeMemory(memory, nullptr);
+    vulkan.getDevice().destroyBuffer(buffer, nullptr);
+    vulkan.getDevice().freeMemory(memory, nullptr);
 }
 
 /**
@@ -36,7 +36,7 @@ AllocatedBuffer::~AllocatedBuffer() {
  */
 void AllocatedBuffer::map(vk::DeviceSize size, vk::DeviceSize offset) {
     FS_CORE_ASSERT(buffer && memory, "Called map on buffer before create");
-    auto result = device.getLogical().mapMemory(memory, offset, size, vk::MemoryMapFlagBits(), &mapped);
+    auto result = vulkan.getDevice().mapMemory(memory, offset, size, vk::MemoryMapFlagBits(), &mapped);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to map memory on the device!");
 }
 
@@ -47,7 +47,7 @@ void AllocatedBuffer::map(vk::DeviceSize size, vk::DeviceSize offset) {
  */
 void AllocatedBuffer::unmap() {
     if (mapped) {
-        device.getLogical().unmapMemory(memory);
+        vulkan.getDevice().unmapMemory(memory);
         mapped = nullptr;
     }
 }
@@ -86,7 +86,7 @@ void AllocatedBuffer::writeToBuffer(void* data, vk::DeviceSize size, vk::DeviceS
  */
 vk::Result AllocatedBuffer::flush(vk::DeviceSize size, vk::DeviceSize offset) {
     vk::MappedMemoryRange mappedRange{ memory, offset, size };
-    return device.getLogical().flushMappedMemoryRanges(1, &mappedRange);
+    return vulkan.getDevice().flushMappedMemoryRanges(1, &mappedRange);
 }
 
 /**
@@ -102,7 +102,7 @@ vk::Result AllocatedBuffer::flush(vk::DeviceSize size, vk::DeviceSize offset) {
  */
 vk::Result AllocatedBuffer::invalidate(vk::DeviceSize size, vk::DeviceSize offset) {
     vk::MappedMemoryRange mappedRange{ memory, offset, size };
-    return device.getLogical().invalidateMappedMemoryRanges(1, &mappedRange);
+    return vulkan.getDevice().invalidateMappedMemoryRanges(1, &mappedRange);
 }
 
 /**

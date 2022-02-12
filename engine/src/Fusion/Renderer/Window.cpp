@@ -10,12 +10,11 @@ static void GLFWErrorCallback(int error, const char* description) {
     FS_LOG_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 }
 
-Window::Window(std::string title, int width, int height, bool vsync) :
+Window::Window(std::string title, int width, int height) :
     title{std::move(title)},
     width{width},
     height{height},
     aspect{static_cast<float>(width) / static_cast<float>(height)},
-    vsync{vsync},
     minimize{width == 0 || height == 0}
 {
     FS_CORE_ASSERT(width >= 0 && height >= 0, "width or height cannot be negative");
@@ -41,21 +40,12 @@ Window::~Window() {
 void Window::init() {
     FS_LOG_CORE_INFO("Creating window: {0} ({1}, {2})", title, width, height);
 
-#ifdef GLFW_INCLUDE_VULKAN
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-#endif
 
     window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
     FS_CORE_ASSERT(window, "failed to create window!");
     GLFWwindowCount++;
-
-#ifndef GLFW_INCLUDE_VULKAN
-    glfwMakeContextCurrent(window);
-    int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    FS_CORE_ASSERT(status, "failed to initialize GLAD!");
-    glfwSwapInterval(vsync);
-#endif
 
     glfwSetWindowUserPointer(window, this);
 
@@ -63,10 +53,8 @@ void Window::init() {
     glfwSetWindowCloseCallback(window, WindowCloseCallback);
 }
 
-void Window::onUpdate() {
-#ifndef GLFW_INCLUDE_VULKAN
-    glfwSwapBuffers(window);
-#endif
+void Window::onUpdate() const {
+    glfwPollEvents();
 }
 
 bool Window::shouldClose() const {
@@ -75,13 +63,6 @@ bool Window::shouldClose() const {
 
 void Window::shouldClose(bool flag) const {
     glfwSetWindowShouldClose(window, flag);
-}
-
-void Window::vSync(bool flag) {
-#ifndef GLFW_INCLUDE_VULKAN
-    glfwSwapInterval(flag);
-#endif
-    vsync = flag;
 }
 
 glm::vec4 Window::getViewport() const {
@@ -100,9 +81,6 @@ void Window::WindowResizeCallback(GLFWwindow* handle, int width, int height) {
     window.minimize = width == 0 || height == 0;
 
     window.bus().publish(new WindowResizeEvent{});
-#ifndef GLFW_INCLUDE_VULKAN
-    glViewport(0, 0, width, height);
-#endif
 }
 
 void Window::WindowCloseCallback(GLFWwindow* handle) {

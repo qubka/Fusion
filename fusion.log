@@ -1,2 +1,26 @@
-[16:46:20] [info] GAME: Fusion Engine
-[16:46:20] [info] GAME: Creating window: Sandbox (1280, 720)
+[11:27:54] [info] GAME: Fusion Engine
+[11:27:54] [info] GAME: Creating window: Sandbox (1280, 720)
+[11:27:54] [trace] GAME: available extensions:
+[11:27:54] [trace] GAME: 	"VK_KHR_device_group_creation"
+[11:27:54] [trace] GAME: 	"VK_KHR_display"
+[11:27:54] [trace] GAME: 	"VK_KHR_external_fence_capabilities"
+[11:27:54] [trace] GAME: 	"VK_KHR_external_memory_capabilities"
+[11:27:54] [trace] GAME: 	"VK_KHR_external_semaphore_capabilities"
+[11:27:54] [trace] GAME: 	"VK_KHR_get_display_properties2"
+[11:27:54] [trace] GAME: 	"VK_KHR_get_physical_device_properties2"
+[11:27:54] [trace] GAME: 	"VK_KHR_get_surface_capabilities2"
+[11:27:54] [trace] GAME: 	"VK_KHR_surface"
+[11:27:54] [trace] GAME: 	"VK_KHR_surface_protected_capabilities"
+[11:27:54] [trace] GAME: 	"VK_KHR_wayland_surface"
+[11:27:54] [trace] GAME: 	"VK_KHR_xcb_surface"
+[11:27:54] [trace] GAME: 	"VK_KHR_xlib_surface"
+[11:27:54] [trace] GAME: 	"VK_EXT_acquire_xlib_display"
+[11:27:54] [trace] GAME: 	"VK_EXT_debug_report"
+[11:27:54] [trace] GAME: 	"VK_EXT_debug_utils"
+[11:27:54] [trace] GAME: 	"VK_EXT_direct_mode_display"
+[11:27:54] [trace] GAME: 	"VK_EXT_display_surface_counter"
+[11:27:54] [trace] GAME: 	"VK_EXT_acquire_drm_display"
+[11:27:54] [trace] GAME: required extensions:
+[11:27:54] [trace] GAME: 	"VK_KHR_surface"
+[11:27:54] [trace] GAME: 	"VK_KHR_xcb_surface"
+[11:27:54] [trace] GAME: physical device found: NVIDIA GeForce GTX 1070

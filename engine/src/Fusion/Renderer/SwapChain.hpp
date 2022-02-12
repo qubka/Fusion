@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Device.hpp"
+#include "Vulkan.hpp"
 
 namespace Fusion {
     class FUSION_API SwapChain {
     public:
-        SwapChain(Device& device, vk::Extent2D windowExtent);
-        SwapChain(Device& device, vk::Extent2D windowExtent, std::shared_ptr<SwapChain> oldSwapChain);
+        SwapChain(Vulkan& vulkan, vk::Extent2D windowExtent);
+        SwapChain(Vulkan& vulkan, vk::Extent2D windowExtent, std::shared_ptr<SwapChain> oldSwapChain);
         ~SwapChain();
         SwapChain(const SwapChain&) = delete;
         SwapChain(SwapChain&&) = delete;
@@ -34,7 +34,7 @@ namespace Fusion {
         void createFramebuffers();
         void createSyncObjects();
 
-        Device& device;
+        Vulkan& vulkan;
         vk::Extent2D windowExtent;
         vk::Extent2D swapChainExtent;
         vk::Format swapChainImageFormat;

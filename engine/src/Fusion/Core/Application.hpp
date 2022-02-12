@@ -1,7 +1,10 @@
 #pragma once
 
-#include "Window.hpp"
 #include "LayerStack.hpp"
+
+#include "Fusion/Renderer/Window.hpp"
+#include "Fusion/Renderer/Vulkan.hpp"
+#include "Fusion/Renderer/Renderer.hpp"
 
 int main(int argc, char** argv);
 
@@ -22,23 +25,24 @@ namespace Fusion {
     class FUSION_API Application {
     public:
         Application(std::string name = "Fusion App", CommandLineArgs args = CommandLineArgs{});
-        virtual ~Application();
+        virtual ~Application() = default;
 
         void run();
 
         void pushLayer(Layer* layer);
         void pushOverlay(Layer* overlay);
 
-        Window& getWindow() { return window; }
-        CommandLineArgs& getCommandLineArgs() { return commandLineArgs; }
-        ImGuiLayer& getGuiLayer() { return *imGuiLayer; }
-
-        static Application& Instance() { return *instance; }
+        //Window& getWindow() { return window; }
+        //CommandLineArgs& getCommandLineArgs() { return commandLineArgs; }
+        //ImGuiLayer& getGuiLayer() { return *imGuiLayer; }
+        //static Application& Instance() { return *instance; }
     private:
         Window window;
         CommandLineArgs commandLineArgs;
-        LayerStack layers;
+        Vulkan vulkan;
+        Renderer renderer;
 
+        LayerStack layers;
         ImGuiLayer* imGuiLayer;
 
         static Application* instance;

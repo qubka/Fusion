@@ -1,13 +1,19 @@
 #include "ImGuiLayer.hpp"
 #include "Fusion.hpp"
 
-//#define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
 
 using namespace Fusion;
 
-ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {
+static void check_vk_result(VkResult err) {
+    if (err == 0)
+        return;
+    FS_LOG_ERROR("[Imgui] Error: VkResult = {0}", err);
+    FS_CORE_ASSERT(err >= 0, "[Imgui] Fatal: Vulkan result!");
+}
+
+ImGuiLayer::ImGuiLayer(Renderer& renderer) : Layer{"ImGuiLayer"}, renderer{renderer} {
 
 }
 
@@ -16,15 +22,36 @@ ImGuiLayer::~ImGuiLayer() {
 }
 
 void ImGuiLayer::onAttach() {
+    // the size of the pool is very oversize, but it's copied from imgui demo itself.
+    vk::DescriptorPoolSize poolSizes[] =
+    {
+            { vk::DescriptorType::eSampler, 1000 },
+            { vk::DescriptorType::eCombinedImageSampler, 1000 },
+            { vk::DescriptorType::eSampledImage, 1000 },
+            { vk::DescriptorType::eStorageImage, 1000 },
+            { vk::DescriptorType::eUniformTexelBuffer, 1000 },
+            { vk::DescriptorType::eStorageTexelBuffer, 1000 },
+            { vk::DescriptorType::eUniformBuffer, 1000 },
+            { vk::DescriptorType::eStorageBuffer, 1000 },
+            { vk::DescriptorType::eUniformTexelBuffer, 1000 },
+            { vk::DescriptorType::eStorageBufferDynamic, 1000 },
+           { vk::DescriptorType::eInputAttachment, 1000 }
+    };
+
+    vk::DescriptorPoolCreateInfo poolInfo = {};
+    poolInfo.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet;
+    poolInfo.maxSets = 1000;
+    poolInfo.poolSizeCount = std::size(poolSizes);
+    poolInfo.pPoolSizes = poolSizes;
+
+    // Create Descriptor Pool
+    auto result = renderer.getVulkan().getDevice().createDescriptorPool(&poolInfo, nullptr, &imguiPool);
+    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create descriptor imgui pool!");
+
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    //io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Bold.ttf", 18.0f);
-    //io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Regular.ttf", 18.0f);
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -33,22 +60,31 @@ void ImGuiLayer::onAttach() {
     setDarkThemeColors();
 
     // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForVulkan(Application::Instance().getWindow(), true);
-    /*ImGui_ImplVulkan_InitInfo initInfo{};
-    initInfo.Instance = g_Instance;
-    initInfo.PhysicalDevice = g_PhysicalDevice;
-    initInfo.Device = g_Device;
-    initInfo.QueueFamily = g_QueueFamily;
-    initInfo.Queue = g_Queue;
-    initInfo.PipelineCache = g_PipelineCache;
-    initInfo.DescriptorPool = g_DescriptorPool;
+    ImGui_ImplGlfw_InitForVulkan(renderer.getVulkan().getWindow(), true);
+    auto& vulkan = renderer.getVulkan();
+
+    ImGui_ImplVulkan_InitInfo initInfo{};
+    initInfo.Instance = vulkan.getInstance();
+    initInfo.PhysicalDevice = vulkan.getPhysical();
+    initInfo.Device = vulkan.getDevice();
+    //initInfo.QueueFamily = g_QueueFamily;
+    initInfo.Queue = vulkan.getGraphicsQueue();
+    //initInfo.PipelineCache = g_PipelineCache;
+    initInfo.DescriptorPool = imguiPool;
     initInfo.Subpass = 0;
-    initInfo.MinImageCount = g_MinImageCount;
-    initInfo.ImageCount = wd->ImageCount;
+    initInfo.MinImageCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
+    initInfo.ImageCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
     initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-    initInfo.Allocator = g_Allocator;
     initInfo.CheckVkResultFn = check_vk_result;
-    ImGui_ImplVulkan_Init(&init_info, wd->RenderPass);*/
+    ImGui_ImplVulkan_Init(&initInfo, renderer.getSwapChainRenderPass());
+
+    //execute a gpu command to upload imgui font textures
+    renderer.getVulkan().submit([&](vk::CommandBuffer& cmd) {
+        ImGui_ImplVulkan_CreateFontsTexture(cmd);
+    });
+
+    //clear font textures from cpu data
+    ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
 void ImGuiLayer::onDetach() {
@@ -56,6 +92,7 @@ void ImGuiLayer::onDetach() {
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+    renderer.getVulkan().getDevice().destroyDescriptorPool(imguiPool, nullptr);
 }
 
 void ImGuiLayer::begin() {
@@ -65,17 +102,9 @@ void ImGuiLayer::begin() {
     ImGui::NewFrame();
 }
 
-void ImGuiLayer::end() {
-    ImGuiIO& io = ImGui::GetIO();
-    Window& window = Application::Instance().getWindow();
-    io.DisplaySize = ImVec2(
-            static_cast<float>(window.getWidth()),
-            static_cast<float>(window.getHeight())
-            );
-
-    // Rendering
+void ImGuiLayer::end(vk::CommandBuffer& commandBuffer) {
     ImGui::Render();
-    //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 }
 
 void ImGuiLayer::setDarkThemeColors() {

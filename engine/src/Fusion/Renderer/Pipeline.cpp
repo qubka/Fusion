@@ -1,17 +1,17 @@
 #include "Pipeline.hpp"
-#include "Device.hpp"
+#include "Vulkan.hpp"
 #include "Mesh.hpp"
 
 using namespace Fusion;
 
-Pipeline::Pipeline(Device& device, const std::string& vertPath, const std::string& fragPath, const PipelineConfigInfo& configInfo) : device{device} {
+Pipeline::Pipeline(Vulkan& vulkan, const std::string& vertPath, const std::string& fragPath, const PipelineConfigInfo& configInfo) : vulkan{vulkan} {
     createGraphicsPipeline(vertPath, fragPath, configInfo);
 }
 
 Pipeline::~Pipeline() {
-    device.getLogical().destroyShaderModule(vertShaderModule, nullptr);
-    device.getLogical().destroyShaderModule(fragShaderModule, nullptr);
-    device.getLogical().destroyPipeline(graphicsPipeline, nullptr);
+    vulkan.getDevice().destroyShaderModule(vertShaderModule, nullptr);
+    vulkan.getDevice().destroyShaderModule(fragShaderModule, nullptr);
+    vulkan.getDevice().destroyPipeline(graphicsPipeline, nullptr);
 }
 
 void Pipeline::createGraphicsPipeline(const std::string& vertPath, const std::string& fragPath, const PipelineConfigInfo& configInfo) {
@@ -60,7 +60,7 @@ void Pipeline::createGraphicsPipeline(const std::string& vertPath, const std::st
     pipelineInfo.subpass = configInfo.subpass;
     pipelineInfo.basePipelineHandle = nullptr;
 
-    auto result = device.getLogical().createGraphicsPipelines(nullptr, 1, &pipelineInfo, nullptr, &graphicsPipeline);
+    auto result = vulkan.getDevice().createGraphicsPipelines(nullptr, 1, &pipelineInfo, nullptr, &graphicsPipeline);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create pipeline layout!");
 }
 
@@ -70,7 +70,7 @@ void Pipeline::createShaderModule(const std::vector<char>& code, vk::ShaderModul
         code.size(),
         reinterpret_cast<const uint32_t*>(code.data())
     };
-    auto result = device.getLogical().createShaderModule(&createInfo, nullptr, &shaderModule);
+    auto result = vulkan.getDevice().createShaderModule(&createInfo, nullptr, &shaderModule);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create shader module!");
 }
 

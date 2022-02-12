@@ -13,8 +13,10 @@ using namespace Fusion;
 Application* Application::instance{nullptr};
 
 Application::Application(std::string name, CommandLineArgs args)
-    : window{std::move(name), 1280, 720, true},
-      commandLineArgs{args}
+    : commandLineArgs{args},
+      window{std::move(name), 1280, 720},
+      vulkan{window},
+      renderer{vulkan}
 {
     FS_CORE_ASSERT(!instance, "application already exists!");
     instance = this;
@@ -22,40 +24,41 @@ Application::Application(std::string name, CommandLineArgs args)
     KeyInput::Setup(window);
     MouseInput::Setup(window);
 
-    imGuiLayer = new ImGuiLayer();
+    imGuiLayer = new ImGuiLayer(renderer);
     pushOverlay(imGuiLayer);
     pushOverlay(new EditorLayer());
 }
 
-Application::~Application() {
-
-}
-
 void Application::run() {
     while (!window.shouldClose()) {
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //glClearColor(0, 0, 0, 1);
-
         Time::Tick();
 
-        glfwPollEvents();
+        window.onUpdate();
 
         for (auto* layer : layers) {
             layer->onUpdate();
         }
 
         if (!window.isMinimize()) {
-            for (auto* layer: layers) {
-                layer->onRender();
-            }
+            if (auto commandBuffer = renderer.beginFrame()) {
+                renderer.beginSwapChainRenderPass(commandBuffer);
 
-            /*imGuiLayer->begin();
-            for (auto* layer: layers)
-                layer->onImGui();
-            imGuiLayer->end();*/
+                for (auto* layer: layers) {
+                    layer->onRender();
+                }
+
+                imGuiLayer->begin();
+                for (auto* layer: layers) {
+                    layer->onImGui();
+                }
+                imGuiLayer->end(commandBuffer);
+
+                renderer.endSwapChainRenderPass(commandBuffer);
+                renderer.endFrame(commandBuffer);
+            }
         }
 
-        window.onUpdate();
+        vulkan.getDevice().waitIdle();
     }
 }
 

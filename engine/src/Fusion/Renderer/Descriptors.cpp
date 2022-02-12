@@ -25,19 +25,19 @@ std::unique_ptr<DescriptorPool> DescriptorPool::Builder::build() const {
 
 // *************** Descriptor Pool *********************
 
-DescriptorPool::DescriptorPool(const Builder& builder) : device{builder.device} {
+DescriptorPool::DescriptorPool(const Builder& builder) : vulkan{builder.vulkan} {
     vk::DescriptorPoolCreateInfo descriptorPoolInfo{};
     descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(builder.poolSizes.size());
     descriptorPoolInfo.pPoolSizes = builder.poolSizes.data();
     descriptorPoolInfo.maxSets = builder.maxSets;
     descriptorPoolInfo.flags = builder.poolFlags;
 
-    auto result = device.getLogical().createDescriptorPool(&descriptorPoolInfo, nullptr, &descriptorPool);
+    auto result = vulkan.getDevice().createDescriptorPool(&descriptorPoolInfo, nullptr, &descriptorPool);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create descriptor pool!");
 }
 
 DescriptorPool::~DescriptorPool() {
-    device.getLogical().destroyDescriptorPool(descriptorPool, nullptr);
+    vulkan.getDevice().destroyDescriptorPool(descriptorPool, nullptr);
 }
 
 bool DescriptorPool::allocateDescriptor(const vk::DescriptorSetLayout& setLayout, vk::DescriptorSet& descriptor) const {
@@ -48,7 +48,7 @@ bool DescriptorPool::allocateDescriptor(const vk::DescriptorSetLayout& setLayout
 
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
     // a new pool whenever an old pool fills up. But this is beyond our current scope
-    if (device.getLogical().allocateDescriptorSets(&allocInfo, &descriptor) != vk::Result::eSuccess) {
+    if (vulkan.getDevice().allocateDescriptorSets(&allocInfo, &descriptor) != vk::Result::eSuccess) {
         FS_LOG_CORE_ERROR("pools fills up!");
         return false;
     }
@@ -57,11 +57,11 @@ bool DescriptorPool::allocateDescriptor(const vk::DescriptorSetLayout& setLayout
 }
 
 void DescriptorPool::freeDescriptors(std::vector<vk::DescriptorSet>& descriptorSets) const {
-    device.getLogical().freeDescriptorSets(descriptorPool, static_cast<uint32_t>(descriptorSets.size()),descriptorSets.data());
+    vulkan.getDevice().freeDescriptorSets(descriptorPool, static_cast<uint32_t>(descriptorSets.size()),descriptorSets.data());
 }
 
 void DescriptorPool::resetPool() {
-    device.getLogical().resetDescriptorPool(descriptorPool, vk::DescriptorPoolResetFlags());
+    vulkan.getDevice().resetDescriptorPool(descriptorPool, vk::DescriptorPoolResetFlags());
 }
 
 // *************** Descriptor Set Layout Builder *********************
@@ -83,7 +83,7 @@ std::unique_ptr<DescriptorLayout> DescriptorLayout::Builder::build() const {
 
 // *************** Descriptor Set Layout *********************
 
-DescriptorLayout::DescriptorLayout(const Builder& builder) : device{builder.device}, bindings{builder.bindings} {
+DescriptorLayout::DescriptorLayout(const Builder& builder) : vulkan{builder.vulkan}, bindings{builder.bindings} {
     std::vector<vk::DescriptorSetLayoutBinding> setLayoutBindings;
     setLayoutBindings.reserve(bindings.size());
 
@@ -95,12 +95,12 @@ DescriptorLayout::DescriptorLayout(const Builder& builder) : device{builder.devi
     descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
     descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
 
-    auto result = device.getLogical().createDescriptorSetLayout(&descriptorSetLayoutInfo, nullptr, &descriptorSetLayout);
+    auto result = vulkan.getDevice().createDescriptorSetLayout(&descriptorSetLayoutInfo, nullptr, &descriptorSetLayout);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create descriptor set layout!");
 }
 
 DescriptorLayout::~DescriptorLayout() {
-    device.getLogical().destroyDescriptorSetLayout(descriptorSetLayout, nullptr);
+    vulkan.getDevice().destroyDescriptorSetLayout(descriptorSetLayout, nullptr);
 }
 
 // *************** Descriptor Writer *********************
@@ -152,5 +152,5 @@ void DescriptorWriter::overwrite(vk::DescriptorSet& set) {
         write.dstSet = set;
     }
 
-    pool.device.getLogical().updateDescriptorSets(static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
+    pool.vulkan.getDevice().updateDescriptorSets(static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
 }

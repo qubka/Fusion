@@ -2,41 +2,41 @@
 
 using namespace Fusion;
 
-SwapChain::SwapChain(Device& device, vk::Extent2D windowExtent) : device{device}, windowExtent{windowExtent} {
+SwapChain::SwapChain(Vulkan& vulkan, vk::Extent2D windowExtent) : vulkan{vulkan}, windowExtent{windowExtent} {
     init();
 }
 
-SwapChain::SwapChain(Device& device, vk::Extent2D windowExtent, std::shared_ptr<SwapChain> previous)
-        : device{device}, windowExtent{windowExtent}, oldSwapChain{std::move(previous)} {
+SwapChain::SwapChain(Vulkan& vulkan, vk::Extent2D windowExtent, std::shared_ptr<SwapChain> previous)
+        : vulkan{vulkan}, windowExtent{windowExtent}, oldSwapChain{std::move(previous)} {
     init();
     oldSwapChain = nullptr;
 }
 
 SwapChain::~SwapChain() {
     for (const auto& imageView : swapChainImageViews) {
-        device.getLogical().destroyImageView(imageView, nullptr);
+        vulkan.getDevice().destroyImageView(imageView, nullptr);
     }
     swapChainImageViews.clear();
 
-    device.getLogical().destroyImageView(depthImageView, nullptr);
-    device.getLogical().destroyImage(depthImage, nullptr);
-    device.getLogical().freeMemory(depthImageMemory, nullptr);
+    vulkan.getDevice().destroyImageView(depthImageView, nullptr);
+    vulkan.getDevice().destroyImage(depthImage, nullptr);
+    vulkan.getDevice().freeMemory(depthImageMemory, nullptr);
 
     if (swapChain) {
-        device.getLogical().destroySwapchainKHR(swapChain, nullptr);
+        vulkan.getDevice().destroySwapchainKHR(swapChain, nullptr);
         swapChain = nullptr;
     }
 
     for (const auto& framebuffer : swapChainFramebuffers) {
-        device.getLogical().destroyFramebuffer(framebuffer, nullptr);
+        vulkan.getDevice().destroyFramebuffer(framebuffer, nullptr);
     }
 
-    device.getLogical().destroyRenderPass(renderPass, nullptr);
+    vulkan.getDevice().destroyRenderPass(renderPass, nullptr);
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        device.getLogical().destroySemaphore(renderFinishedSemaphores[i], nullptr);
-        device.getLogical().destroySemaphore(imageAvailableSemaphores[i], nullptr);
-        device.getLogical().destroyFence(inFlightFences[i], nullptr);
+        vulkan.getDevice().destroySemaphore(renderFinishedSemaphores[i], nullptr);
+        vulkan.getDevice().destroySemaphore(imageAvailableSemaphores[i], nullptr);
+        vulkan.getDevice().destroyFence(inFlightFences[i], nullptr);
     }
 }
 
@@ -50,7 +50,7 @@ void SwapChain::init() {
 }
 
 void SwapChain::createSwapChain() {
-    SwapChainSupportDetails swapChainSupport = device.getSwapChainSupport();
+    SwapChainSupportDetails swapChainSupport = vulkan.getSwapChainSupport();
 
     vk::SurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
     vk::PresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
@@ -63,7 +63,7 @@ void SwapChain::createSwapChain() {
 
     vk::SwapchainCreateInfoKHR createInfo(
             vk::SwapchainCreateFlagsKHR(),
-            device.getSurface(),
+            vulkan.getSurface(),
             imageCount,
             surfaceFormat.format,
             surfaceFormat.colorSpace,
@@ -72,7 +72,7 @@ void SwapChain::createSwapChain() {
             vk::ImageUsageFlagBits::eColorAttachment
     );
 
-    QueueFamilyIndices indices = device.findPhysicalQueueFamilies();
+    QueueFamilyIndices indices = vulkan.findPhysicalQueueFamilies();
     uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 
     if (indices.graphicsFamily != indices.presentFamily) {
@@ -90,16 +90,16 @@ void SwapChain::createSwapChain() {
 
     createInfo.oldSwapchain = oldSwapChain == nullptr ? vk::SwapchainKHR(nullptr) : oldSwapChain->swapChain;
 
-    auto result = device.getLogical().createSwapchainKHR(&createInfo, nullptr, &swapChain);
+    auto result = vulkan.getDevice().createSwapchainKHR(&createInfo, nullptr, &swapChain);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create swap chain!");
 
     // we only specified a minimum number of images in the swap chain, so the implementation is
     // allowed to create a swap chain with more. That's why we'll first query the final number of
     // images with vkGetSwapchainImagesKHR, then resize the container and finally call it again to
     // retrieve the handles.
-    device.getLogical().getSwapchainImagesKHR(swapChain, &imageCount, nullptr);
+    vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, nullptr);
     swapChainImages.resize(imageCount);
-    device.getLogical().getSwapchainImagesKHR(swapChain, &imageCount, swapChainImages.data());
+    vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, swapChainImages.data());
 
     swapChainImageFormat = surfaceFormat.format;
     swapChainExtent = extent;
@@ -149,7 +149,7 @@ void SwapChain::createImageViews() {
     swapChainImageViews.resize(swapChainImages.size());
 
     for (int i = 0; i < swapChainImages.size(); i++) {
-        device.createImageView(swapChainImages[i], swapChainImageFormat, vk::ImageAspectFlagBits::eColor, swapChainImageViews[i]);
+        vulkan.createImageView(swapChainImages[i], swapChainImageFormat, vk::ImageAspectFlagBits::eColor, swapChainImageViews[i]);
     }
 }
 
@@ -205,12 +205,12 @@ void SwapChain::createRenderPass() {
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    auto result = device.getLogical().createRenderPass(&renderPassInfo, nullptr, &renderPass);
+    auto result = vulkan.getDevice().createRenderPass(&renderPassInfo, nullptr, &renderPass);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create render pass!");
 }
 
 void SwapChain::createDepthResources() {
-    device.createImage(
+    vulkan.createImage(
             swapChainExtent.width,
             swapChainExtent.height,
             swapChainDepthFormat,
@@ -220,7 +220,7 @@ void SwapChain::createDepthResources() {
             depthImage,
             depthImageMemory);
 
-    device.createImageView(depthImage, swapChainDepthFormat, vk::ImageAspectFlagBits::eDepth, depthImageView);
+    vulkan.createImageView(depthImage, swapChainDepthFormat, vk::ImageAspectFlagBits::eDepth, depthImageView);
 }
 
 void SwapChain::createFramebuffers() {
@@ -240,7 +240,7 @@ void SwapChain::createFramebuffers() {
         framebufferInfo.height = swapChainExtent.height;
         framebufferInfo.layers = 1;
 
-        auto result = device.getLogical().createFramebuffer(&framebufferInfo, nullptr, &swapChainFramebuffers[i]);
+        auto result = vulkan.getDevice().createFramebuffer(&framebufferInfo, nullptr, &swapChainFramebuffers[i]);
         FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create framebuffer!");
     }
 }
@@ -257,31 +257,29 @@ void SwapChain::createSyncObjects() {
 
     vk::Result result;
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        result = device.getLogical().createSemaphore(&semaphoreInfo, nullptr, &imageAvailableSemaphores[i]);
+        result = vulkan.getDevice().createSemaphore(&semaphoreInfo, nullptr, &imageAvailableSemaphores[i]);
         FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create synchronization objects for a frame!");
-        result = device.getLogical().createSemaphore(&semaphoreInfo, nullptr, &renderFinishedSemaphores[i]);
+        result = vulkan.getDevice().createSemaphore(&semaphoreInfo, nullptr, &renderFinishedSemaphores[i]);
         FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create synchronization objects for a frame!");
-        result = device.getLogical().createFence(&fenceInfo, nullptr, &inFlightFences[i]);
+        result = vulkan.getDevice().createFence(&fenceInfo, nullptr, &inFlightFences[i]);
         FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create synchronization objects for a frame!");
     }
 }
 
 vk::Format SwapChain::findDepthFormat() const {
-    return device.findSupportedFormat({
+    return vulkan.findSupportedFormat({
         vk::Format::eD32Sfloat,
         vk::Format::eD32SfloatS8Uint,
         vk::Format::eD24UnormS8Uint
     },
-    vk::ImageTiling::eOptimal,
-    vk::FormatFeatureFlagBits::eDepthStencilAttachment);
+                                      vk::ImageTiling::eOptimal,
+                                      vk::FormatFeatureFlagBits::eDepthStencilAttachment);
 }
 
 vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex) const {
-    auto result = device.getLogical().waitForFences(1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
+    auto result = vulkan.getDevice().waitForFences(1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to wait for fences");
-
-    result = device.getLogical().acquireNextImageKHR(swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], nullptr, &imageIndex);
-
+    result = vulkan.getDevice().acquireNextImageKHR(swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], nullptr, &imageIndex);
     return result;
 }
 
@@ -289,7 +287,7 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
     vk::Fence& fence = inFlightFences[currentFrame];
     vk::Fence* image = imagesInFlight[imageIndex];
     if (image != nullptr) {
-        auto result = device.getLogical().waitForFences(1, image, VK_TRUE, std::numeric_limits<uint64_t>::max());
+        auto result = vulkan.getDevice().waitForFences(1, image, VK_TRUE, std::numeric_limits<uint64_t>::max());
         FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to wait for fences");
     }
     imagesInFlight[imageIndex] = &fence;
@@ -309,10 +307,10 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    auto result = device.getLogical().resetFences(1, &fence);
+    auto result = vulkan.getDevice().resetFences(1, &fence);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to reset the fence");
 
-    result = device.getGraphicsQueue().submit(1, &submitInfo, fence);
+    result = vulkan.getGraphicsQueue().submit(1, &submitInfo, fence);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to reset the fence");
 
     vk::PresentInfoKHR presentInfo{};
@@ -325,7 +323,7 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
     presentInfo.pImageIndices = &imageIndex;
     presentInfo.pResults = nullptr; // Optional
 
-    result = device.getPresentQueue().presentKHR(&presentInfo);
+    result = vulkan.getPresentQueue().presentKHR(&presentInfo);
     //FS_CORE_ASSERT(result == vk::Result::eSuccess || result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR, "failed to present swap chain image!");
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;

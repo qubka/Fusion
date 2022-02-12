@@ -1,5 +1,6 @@
 #include "KeyInput.hpp"
-#include "Fusion/Core/Window.hpp"
+
+#include "Fusion/Renderer/Window.hpp"
 #include "Fusion/Events/KeyEvents.hpp"
 
 using namespace Fusion;

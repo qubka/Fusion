@@ -5,14 +5,14 @@
 namespace Fusion {
     class FUSION_API Texture {
     public:
-        Texture(Device& device,
+        Texture(Vulkan& vulkan,
                 std::string path,
                 vk::Format format,
                 vk::Filter magFilter = vk::Filter::eLinear,
                 vk::Filter minFilter = vk::Filter::eLinear,
                 vk::SamplerAddressMode addressMode = vk::SamplerAddressMode::eRepeat,
                 vk::SamplerMipmapMode minmapMode = vk::SamplerMipmapMode::eLinear);
-        Texture(Device& device,
+        Texture(Vulkan& vulkan,
                 void* pixels,
                 uint32_t width,
                 uint32_t height,
@@ -36,7 +36,7 @@ namespace Fusion {
         vk::Format getFormat() const { return format; };
 
     private:
-        Device& device;
+        Vulkan& vulkan;
         std::string path;
         vk::Image image;
         vk::DeviceMemory memory;

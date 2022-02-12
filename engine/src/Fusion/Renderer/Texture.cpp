@@ -4,8 +4,8 @@
 
 using namespace Fusion;
 
-Texture::Texture(Device& device, std::string path, vk::Format format, vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode) :
-    device{device},
+Texture::Texture(Vulkan& vulkan, std::string path, vk::Format format, vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode) :
+    vulkan{vulkan},
     path{std::move(path)},
     format{format}
 {
@@ -19,8 +19,8 @@ Texture::Texture(Device& device, std::string path, vk::Format format, vk::Filter
     createSampler(magFilter, minFilter, addressMode, minmapMode);
 }
 
-Texture::Texture(Device& device, void* pixels, uint32_t width, uint32_t height, vk::Format format, vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode) :
-    device{device},
+Texture::Texture(Vulkan& vulkan, void* pixels, uint32_t width, uint32_t height, vk::Format format, vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode) :
+    vulkan{vulkan},
     width{width},
     height{height},
     format{format}
@@ -30,10 +30,10 @@ Texture::Texture(Device& device, void* pixels, uint32_t width, uint32_t height, 
 }
 
 Texture::~Texture() {
-    device.getLogical().destroySampler(sampler);
-    device.getLogical().destroyImageView(view);
-    device.getLogical().destroyImage(image);
-    device.getLogical().freeMemory(memory);
+    vulkan.getDevice().destroySampler(sampler);
+    vulkan.getDevice().destroyImageView(view);
+    vulkan.getDevice().destroyImage(image);
+    vulkan.getDevice().freeMemory(memory);
 }
 
 void Texture::createImage(void* pixels) {
@@ -43,7 +43,7 @@ void Texture::createImage(void* pixels) {
     vk::DeviceSize size = width * height * componentCount(format);
 
     AllocatedBuffer stagingBuffer{
-            device,
+            vulkan,
             size,
             1,
             vk::BufferUsageFlagBits::eTransferSrc,
@@ -54,21 +54,20 @@ void Texture::createImage(void* pixels) {
     stagingBuffer.map();
     stagingBuffer.writeToBuffer(pixels);
 
-    device.createImage(width, height, format,
+    vulkan.createImage(width, height, format,
                        vk::ImageTiling::eOptimal,
                        vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
                        vk::MemoryPropertyFlagBits::eDeviceLocal,
                        image, memory);
 
-    device.transitionImageLayout(image, format, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
-    device.copyBufferToImage(*stagingBuffer, image, width, height, 1);
-    device.transitionImageLayout(image, format, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
-
-    view = device.createImageView(image, format, vk::ImageAspectFlagBits::eColor);
+    vulkan.transitionImageLayout(image, format, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
+    vulkan.copyBufferToImage(*stagingBuffer, image, width, height, 1);
+    vulkan.transitionImageLayout(image, format, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+    vulkan.createImageView(image, format, vk::ImageAspectFlagBits::eColor, view);
 }
 
 void Texture::createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode) {
-    vk::PhysicalDeviceProperties properties = device.getPhysical().getProperties();
+    vk::PhysicalDeviceProperties properties = vulkan.getPhysical().getProperties();
 
     vk::SamplerCreateInfo samplerInfo{};
     samplerInfo.magFilter = magFilter;
@@ -85,7 +84,7 @@ void Texture::createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::Samp
     samplerInfo.mipmapMode = minmapMode;
 
     try {
-        sampler = device.getLogical().createSampler(samplerInfo);
+        sampler = vulkan.getDevice().createSampler(samplerInfo);
     } catch (vk::SystemError& err) {
         throw std::runtime_error("failed to create texture sampler!");
     }

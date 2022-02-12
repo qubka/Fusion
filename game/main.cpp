@@ -7,7 +7,7 @@ using namespace Fusion;
 
 class ExampleLayer : public Layer {
 public:
-    ExampleLayer() : Layer("ExampleLayer"), info(getpid()) {
+    ExampleLayer() : Layer{"ExampleLayer"}, info(getpid()) {
     }
 
     void onUpdate() override {
@@ -80,7 +80,7 @@ public:
 
 class Sandbox : public Application {
 public:
-    Sandbox(CommandLineArgs args) : Application("Sandbox", args) {
+    Sandbox(CommandLineArgs args) : Application{"Sandbox", args} {
         pushLayer(new ExampleLayer());
     }
     ~Sandbox() override {

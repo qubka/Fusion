@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Device.hpp"
+#include "Vulkan.hpp"
 
 namespace Fusion {
-    //class Window;
     class SwapChain;
     class AllocatedBuffer;
     class DescriptorPool;
@@ -16,12 +15,14 @@ namespace Fusion {
 
     class FUSION_API Renderer {
     public:
-        Renderer(Window& window, Device& device);
+        Renderer(Vulkan& vulkan);
         ~Renderer();
         Renderer(const Renderer&) = delete;
         Renderer(Renderer&&) = delete;
         Renderer& operator=(const Renderer&) = delete;
         Renderer& operator=(Renderer&&) = delete;
+
+        const Vulkan& getVulkan() const { return vulkan; }
 
         const vk::DescriptorSetLayout& getGlobalLayoutSet() const;
         const vk::RenderPass& getSwapChainRenderPass() const;
@@ -42,11 +43,10 @@ namespace Fusion {
         void createDescriptorSets();
         void recreateSwapChain();
 
-        Window& window;
-        Device& device;
+        Vulkan& vulkan;
 
         std::unique_ptr<SwapChain> swapChain;
-        std::vector<vk::CommandBuffer, std::allocator<vk::CommandBuffer>> commandBuffers;
+        std::vector<vk::CommandBuffer> commandBuffers;
         std::vector<std::unique_ptr<AllocatedBuffer>> uniformBuffers;
 
         std::vector<vk::DescriptorSet> globalDescriptorSets;

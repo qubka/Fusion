@@ -7,10 +7,10 @@
 namespace Fusion {
     class FUSION_API Window {
     public:
-        Window(std::string title, int width, int height, bool vsync);
+        Window(std::string title, int width, int height);
         ~Window();
 
-        void onUpdate();
+        void onUpdate() const;
 
         operator GLFWwindow*() const { return window; }
         int getWidth() const { return width; }
@@ -22,9 +22,6 @@ namespace Fusion {
         bool shouldClose() const;
         void shouldClose(bool flag) const;
 
-        bool vSync() const  { return vsync; }
-        void vSync(bool flag);
-
         bool isMinimize() const { return minimize; }
         EventBus& bus() { return eventBus; }
 
@@ -34,7 +31,6 @@ namespace Fusion {
         int width;
         int height;
         float aspect;
-        bool vsync;
         bool minimize;
 
         EventBus eventBus;

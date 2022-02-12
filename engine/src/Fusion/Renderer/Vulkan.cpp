@@ -1,6 +1,5 @@
-#include "Device.hpp"
-
-#include "Fusion/Core/Window.hpp"
+#include "Vulkan.hpp"
+#include "Window.hpp"
 
 using namespace Fusion;
 
@@ -26,29 +25,29 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
     }
 }
 
-Device::Device(const Window& window) {
+Vulkan::Vulkan(Window& window) : window{window} {
     createInstance();
     setupDebugMessenger();
-    createSurface(window);
+    createSurface();
     pickPhysicalDevice();
     createLogicalDevice();
     createCommandPool();
 }
 
-Device::~Device() {
+Vulkan::~Vulkan() {
     instance.destroySurfaceKHR(surface, nullptr);
 
     if (enableValidationLayers) {
         DestroyDebugUtilsMessengerEXT(instance, callback, nullptr);
     }
 
-    logicalDevice.destroyCommandPool(commandPool, nullptr);
+    device.destroyCommandPool(commandPool, nullptr);
 
-    logicalDevice.destroy(nullptr);
+    device.destroy(nullptr);
     instance.destroy(nullptr);
 }
 
-void Device::createInstance() {
+void Vulkan::createInstance() {
     if (enableValidationLayers) {
         FS_CORE_ASSERT(checkValidationLayerSupport(), "validation layers requested, but not available!")
     }
@@ -64,7 +63,7 @@ void Device::createInstance() {
     version = VK_MAKE_VERSION(1, 0, 0);
 
     auto appInfo = vk::ApplicationInfo{
-            "Engine",
+            window.getTitle().c_str(),
             version,
             "Fusion",
             version,
@@ -93,7 +92,7 @@ void Device::createInstance() {
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create vulkan!");
 }
 
-std::vector<const char*> Device::getRequiredExtensions() const {
+std::vector<const char*> Vulkan::getRequiredExtensions() const {
     uint32_t glfwExtensionCount = 0;
     const char** glfwExtensions;
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -107,7 +106,7 @@ std::vector<const char*> Device::getRequiredExtensions() const {
     return extensions;
 }
 
-bool Device::checkValidationLayerSupport() const {
+bool Vulkan::checkValidationLayerSupport() const {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -132,7 +131,7 @@ bool Device::checkValidationLayerSupport() const {
     return true;
 }
 
-void Device::hasGflwRequiredInstanceExtensions() const {
+void Vulkan::hasGflwRequiredInstanceExtensions() const {
     uint32_t extensionCount = 0;
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
     std::vector<VkExtensionProperties> extensions(extensionCount);
@@ -149,11 +148,11 @@ void Device::hasGflwRequiredInstanceExtensions() const {
     auto requiredExtensions = getRequiredExtensions();
     for (const auto& required : requiredExtensions) {
         FS_LOG_CORE_TRACE("\t\"{0}\"", required);
-        FS_CORE_ASSERT(available.find(required) == available.end(), "missing required glfw extension");
+        FS_CORE_ASSERT(available.find(required) != available.end(), "missing required glfw extension");
     }
 }
 
-void Device::setupDebugMessenger() {
+void Vulkan::setupDebugMessenger() {
     if (!enableValidationLayers)
         return;
 
@@ -175,10 +174,10 @@ void Device::setupDebugMessenger() {
     FS_CORE_ASSERT(callback, "failed to set up debug callback!");
 }
 
-void Device::pickPhysicalDevice() {
+void Vulkan::pickPhysicalDevice() {
     uint32_t deviceCount;
     instance.enumeratePhysicalDevices(&deviceCount, nullptr);
-    FS_CORE_ASSERT(deviceCount == 0, "failed to find GPUs with Vulkan support!");
+    FS_CORE_ASSERT(deviceCount, "failed to find GPUs with Vulkan support!");
 
     std::vector<vk::PhysicalDevice> devices(deviceCount);
     instance.enumeratePhysicalDevices(&deviceCount, devices.data());
@@ -194,10 +193,10 @@ void Device::pickPhysicalDevice() {
 
     vk::PhysicalDeviceProperties props;
     physicalDevice.getProperties(&props);
-    FS_LOG_CORE_TRACE("physical device: {0}", props.deviceName);
+    FS_LOG_CORE_TRACE("physical device found: {0}", props.deviceName);
 }
 
-bool Device::isDeviceSuitable(const vk::PhysicalDevice& device) const {
+bool Vulkan::isDeviceSuitable(const vk::PhysicalDevice& device) const {
     QueueFamilyIndices indices = findQueueFamilies(device);
 
     bool extensionsSupported = checkDeviceExtensionSupport(device);
@@ -211,7 +210,7 @@ bool Device::isDeviceSuitable(const vk::PhysicalDevice& device) const {
     return indices.isComplete() && extensionsSupported && swapChainAdequate;
 }
 
-bool Device::checkDeviceExtensionSupport(const vk::PhysicalDevice& device) const {
+bool Vulkan::checkDeviceExtensionSupport(const vk::PhysicalDevice& device) const {
     std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
     uint32_t extensionCount;
@@ -227,7 +226,7 @@ bool Device::checkDeviceExtensionSupport(const vk::PhysicalDevice& device) const
     return requiredExtensions.empty();
 }
 
-QueueFamilyIndices Device::findQueueFamilies(const vk::PhysicalDevice& device) const {
+QueueFamilyIndices Vulkan::findQueueFamilies(const vk::PhysicalDevice& device) const {
     QueueFamilyIndices indices;
 
     uint32_t queueFamilyCount;
@@ -258,7 +257,7 @@ QueueFamilyIndices Device::findQueueFamilies(const vk::PhysicalDevice& device) c
     return indices;
 }
 
-void Device::createLogicalDevice() {
+void Vulkan::createLogicalDevice() {
     QueueFamilyIndices indices = findPhysicalQueueFamilies();
     std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
     std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
@@ -290,21 +289,21 @@ void Device::createLogicalDevice() {
         createInfo.ppEnabledLayerNames = validationLayers.data();
     }
 
-    auto result = physicalDevice.createDevice(&createInfo, nullptr, &logicalDevice);
+    auto result = physicalDevice.createDevice(&createInfo, nullptr, &device);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create logical device!");
 
-    logicalDevice.getQueue(indices.graphicsFamily.value(), 0, &graphicsQueue);
-    logicalDevice.getQueue(indices.presentFamily.value(), 0, &presentQueue);
+    device.getQueue(indices.graphicsFamily.value(), 0, &graphicsQueue);
+    device.getQueue(indices.presentFamily.value(), 0, &presentQueue);
 }
 
-void Device::createSurface(const Window& window) {
+void Vulkan::createSurface() {
     VkSurfaceKHR raw;
     glfwCreateWindowSurface(instance, window, nullptr, &raw);
     FS_CORE_ASSERT(raw, "failed to create window surface!");
     surface = raw;
 }
 
-SwapChainSupportDetails Device::querySwapChainSupport(const vk::PhysicalDevice& device) const {
+SwapChainSupportDetails Vulkan::querySwapChainSupport(const vk::PhysicalDevice& device) const {
     SwapChainSupportDetails details;
     device.getSurfaceCapabilitiesKHR(surface, &details.capabilities);
 
@@ -330,18 +329,18 @@ SwapChainSupportDetails Device::querySwapChainSupport(const vk::PhysicalDevice& 
     return details;
 }
 
-void Device::createCommandPool() {
+void Vulkan::createCommandPool() {
     QueueFamilyIndices queueFamilyIndices = findPhysicalQueueFamilies();
 
     vk::CommandPoolCreateInfo poolInfo{};
     poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
     poolInfo.flags = vk::CommandPoolCreateFlagBits::eTransient | vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
 
-    auto result = logicalDevice.createCommandPool(&poolInfo, nullptr, &commandPool);
+    auto result = device.createCommandPool(&poolInfo, nullptr, &commandPool);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create command pool!");
 }
 
-vk::Format Device::findSupportedFormat(const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const {
+vk::Format Vulkan::findSupportedFormat(const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const {
     for (const auto& format : candidates) {
         vk::FormatProperties props;
         physicalDevice.getFormatProperties(format, &props);
@@ -356,7 +355,7 @@ vk::Format Device::findSupportedFormat(const std::vector<vk::Format>& candidates
     return vk::Format::eUndefined;
 }
 
-uint32_t Device::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
+uint32_t Vulkan::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
     vk::PhysicalDeviceMemoryProperties memProperties;
     physicalDevice.getMemoryProperties(&memProperties);
 
@@ -370,29 +369,29 @@ uint32_t Device::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags pro
     return 0;
 }
 
-void Device::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Buffer& buffer, vk::DeviceMemory& bufferMemory) const {
+void Vulkan::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Buffer& buffer, vk::DeviceMemory& bufferMemory) const {
     vk::BufferCreateInfo bufferInfo{};
     bufferInfo.size = size;
     bufferInfo.usage = usage;
     bufferInfo.sharingMode = vk::SharingMode::eExclusive;
 
-    auto result = logicalDevice.createBuffer(&bufferInfo, nullptr, &buffer);
+    auto result = device.createBuffer(&bufferInfo, nullptr, &buffer);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create buffer!");
 
     vk::MemoryRequirements memRequirements;
-    logicalDevice.getBufferMemoryRequirements(buffer, &memRequirements);
+    device.getBufferMemoryRequirements(buffer, &memRequirements);
 
     vk::MemoryAllocateInfo allocInfo{};
     allocInfo.allocationSize = memRequirements.size;
     allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
-    result = logicalDevice.allocateMemory(&allocInfo, nullptr, &bufferMemory);
+    result = device.allocateMemory(&allocInfo, nullptr, &bufferMemory);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to allocateDescriptor buffer memory!");
 
-    logicalDevice.bindBufferMemory(buffer, bufferMemory, 0);
+    device.bindBufferMemory(buffer, bufferMemory, 0);
 }
 
-void Device::copyBuffer(const vk::Buffer& srcBuffer, vk::Buffer& dstBuffer, vk::DeviceSize size) const {
+void Vulkan::copyBuffer(const vk::Buffer& srcBuffer, vk::Buffer& dstBuffer, vk::DeviceSize size) const {
     vk::CommandBuffer commandBuffer = beginSingleTimeCommands();
 
     vk::BufferCopy copyRegion{};
@@ -404,7 +403,7 @@ void Device::copyBuffer(const vk::Buffer& srcBuffer, vk::Buffer& dstBuffer, vk::
     endSingleTimeCommands(commandBuffer);
 }
 
-void Device::copyBufferToImage(const vk::Buffer& buffer, const vk::Image& image, uint32_t width, uint32_t height, uint32_t layerCount) const {
+void Vulkan::copyBufferToImage(const vk::Buffer& buffer, const vk::Image& image, uint32_t width, uint32_t height, uint32_t layerCount) const {
     vk::CommandBuffer commandBuffer = beginSingleTimeCommands();
 
     vk::BufferImageCopy region{};
@@ -425,14 +424,23 @@ void Device::copyBufferToImage(const vk::Buffer& buffer, const vk::Image& image,
     endSingleTimeCommands(commandBuffer);
 }
 
-vk::CommandBuffer Device::beginSingleTimeCommands() const {
+void Vulkan::submit(std::function<void(vk::CommandBuffer& cmd)>&& function) const {
+    vk::CommandBuffer commandBuffer = beginSingleTimeCommands();
+
+    //execute the function
+    function(commandBuffer);
+
+    endSingleTimeCommands(commandBuffer);
+}
+
+vk::CommandBuffer Vulkan::beginSingleTimeCommands() const {
     vk::CommandBufferAllocateInfo allocInfo{};
     allocInfo.level = vk::CommandBufferLevel::ePrimary;
     allocInfo.commandPool = commandPool;
     allocInfo.commandBufferCount = 1;
 
     vk::CommandBuffer commandBuffer;
-    logicalDevice.allocateCommandBuffers(&allocInfo, &commandBuffer);
+    device.allocateCommandBuffers(&allocInfo, &commandBuffer);
 
     vk::CommandBufferBeginInfo beginInfo{};
     beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
@@ -442,7 +450,7 @@ vk::CommandBuffer Device::beginSingleTimeCommands() const {
     return commandBuffer;
 }
 
-void Device::endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const {
+void Vulkan::endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const {
     commandBuffer.end();
 
     vk::SubmitInfo submitInfo{};
@@ -452,10 +460,10 @@ void Device::endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const
     graphicsQueue.submit(1, &submitInfo, nullptr);
     graphicsQueue.waitIdle();
 
-    logicalDevice.freeCommandBuffers(commandPool, 1, &commandBuffer);
+    device.freeCommandBuffers(commandPool, 1, &commandBuffer);
 }
 
-void Device::transitionImageLayout(const vk::Image& image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) const {
+void Vulkan::transitionImageLayout(const vk::Image& image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) const {
     vk::CommandBuffer commandBuffer = beginSingleTimeCommands();
 
     vk::ImageMemoryBarrier barrier{};
@@ -521,7 +529,7 @@ void Device::transitionImageLayout(const vk::Image& image, vk::Format format, vk
     endSingleTimeCommands(commandBuffer);
 }
 
-void Device::createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Image& image, vk::DeviceMemory& imageMemory) const {
+void Vulkan::createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Image& image, vk::DeviceMemory& imageMemory) const {
     vk::ImageCreateInfo imageInfo{};
     imageInfo.imageType = vk::ImageType::e2D;
     imageInfo.extent.width = width;
@@ -536,23 +544,23 @@ void Device::createImage(uint32_t width, uint32_t height, vk::Format format, vk:
     imageInfo.samples = vk::SampleCountFlagBits::e1;
     imageInfo.sharingMode = vk::SharingMode::eExclusive;
 
-    auto result = logicalDevice.createImage(&imageInfo, nullptr, &image);
+    auto result = device.createImage(&imageInfo, nullptr, &image);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create image!");
 
     vk::MemoryRequirements memRequirements;
-    logicalDevice.getImageMemoryRequirements(image, &memRequirements);
+    device.getImageMemoryRequirements(image, &memRequirements);
 
     vk::MemoryAllocateInfo allocInfo{};
     allocInfo.allocationSize = memRequirements.size;
     allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
-    result = logicalDevice.allocateMemory(&allocInfo, nullptr, &imageMemory);
+    result = device.allocateMemory(&allocInfo, nullptr, &imageMemory);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to allocate descriptor's image memory!");
 
-    logicalDevice.bindImageMemory(image, imageMemory, 0);
+    device.bindImageMemory(image, imageMemory, 0);
 }
 
-void Device::createImageView(const vk::Image& image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::ImageView& view) const {
+void Vulkan::createImageView(const vk::Image& image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::ImageView& view) const {
     vk::ImageViewCreateInfo createInfo{};
     createInfo.image = image;
     createInfo.viewType = vk::ImageViewType::e2D;
@@ -567,10 +575,10 @@ void Device::createImageView(const vk::Image& image, vk::Format format, vk::Imag
     createInfo.subresourceRange.baseArrayLayer = 0;
     createInfo.subresourceRange.layerCount = 1;
 
-    auto result = logicalDevice.createImageView(&createInfo, nullptr, &view);
+    auto result = device.createImageView(&createInfo, nullptr, &view);
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create image views!");
 }
 
-bool Device::hasStencilComponent(vk::Format format) {
+bool Vulkan::hasStencilComponent(vk::Format format) {
     return format == vk::Format::eD32SfloatS8Uint || format == vk::Format::eD24UnormS8Uint;
 }
