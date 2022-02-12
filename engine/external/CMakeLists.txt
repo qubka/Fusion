@@ -55,7 +55,7 @@ target_include_directories(${GLM_LIB_NAME}
 
 #target_include_directories(${GLM_LIB_NAME}
 #    PUBLIC
-#        $(GLM_INC_PATH)
+#        ${GLM_INC_PATH}
 #)
 
 
@@ -107,7 +107,7 @@ target_include_directories(${MAGIC_ENUM_LIB_NAME}
 
 #target_include_directories(${ENTT_LIB_NAME}
 #    PUBLIC
-#        $(ENTT_INC_PATH)
+#        ${ENTT_INC_PATH}
 #)
 
 
@@ -155,4 +155,23 @@ target_include_directories(${IMGUI_LIB_NAME}
         "${IMGUI_INC_PATH}"
         "${GLFW_INC_PATH}"
         "${GLAD_INC_PATH}"
+        )
+
+
+# rapidjson
+set(RAPIDJSON_LIB_NAME "rapidjson")
+set(RAPIDJSON_INC_PATH ${RAPIDJSON_LIB_NAME}/include)
+
+#set(RAPIDJSON_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+#set(RAPIDJSON_BUILD_DOC OFF CACHE BOOL "" FORCE)
+#set(RAPIDJSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+#set(RAPIDJSON_BUILD_THIRDPARTY_GTEST OFF CACHE BOOL "" FORCE)
+#set(RAPIDJSON_BUILD_CXX17 OFF CACHE BOOL "" FORCE)
+#set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
+
+add_library(${RAPIDJSON_LIB_NAME} INTERFACE)
+
+target_include_directories(${RAPIDJSON_LIB_NAME}
+        INTERFACE
+        ${RAPIDJSON_INC_PATH}
         )

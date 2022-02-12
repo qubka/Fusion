@@ -17,10 +17,6 @@ namespace Fusion {
     public:
         Renderer(Vulkan& vulkan);
         ~Renderer();
-        Renderer(const Renderer&) = delete;
-        Renderer(Renderer&&) = delete;
-        Renderer& operator=(const Renderer&) = delete;
-        Renderer& operator=(Renderer&&) = delete;
 
         const Vulkan& getVulkan() const { return vulkan; }
 
@@ -29,6 +25,7 @@ namespace Fusion {
         const vk::CommandBuffer& getCurrentCommandBuffer();
         const vk::DescriptorSet& getCurrentDescriptorSet();
         const std::unique_ptr<AllocatedBuffer>& getCurrentUniformBuffer();
+        uint32_t imageCount() const;
         uint32_t getFrameIndex() const;
         bool isFrameInProgress() const;
 

@@ -50,7 +50,7 @@ void Window::init() {
     glfwSetWindowUserPointer(window, this);
 
     glfwSetFramebufferSizeCallback(window, WindowResizeCallback);
-    glfwSetWindowCloseCallback(window, WindowCloseCallback);
+    //glfwSetWindowCloseCallback(window, WindowCloseCallback);
 }
 
 void Window::onUpdate() const {

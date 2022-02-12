@@ -2,8 +2,9 @@
 
 using namespace Fusion;
 
-EditorLayer::EditorLayer() : Layer("EditorLayer"), contentBrowserPanel{"assets"} {
-
+EditorLayer::EditorLayer() : Layer("EditorLayer"), contentBrowserPanel{"assets"},
+    keyInput{{Key::Enter}}
+{
 }
 
 EditorLayer::~EditorLayer() {
@@ -74,7 +75,10 @@ void EditorLayer::onDetach() {
 }
 
 void EditorLayer::onUpdate() {
-
+    if (keyInput.getKeyDown(Key::Enter)) {
+        SceneSerializer serializer{activeScene};
+        serializer.serialize("assets/scene.json");
+    }
 }
 
 void EditorLayer::onImGui() {

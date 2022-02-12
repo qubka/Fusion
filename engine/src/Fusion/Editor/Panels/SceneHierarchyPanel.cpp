@@ -27,7 +27,7 @@ void SceneHierarchyPanel::onImGui() {
         if (ImGui::MenuItem("Create Empty Entity")) {
             auto entity = context->registry.create();
             context->registry.emplace<TagComponent>(entity, "Empty Entity");
-            context->registry.emplace<TransformCompositionComponent>(entity);
+            context->registry.emplace<TransformComponent>(entity);
         }
         ImGui::EndPopup();
     }
@@ -137,10 +137,10 @@ void SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PopID();
 }
 
-template<typename T, typename F>
-void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity entity, F func) {
+template<typename T>
+void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function) {
     const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
-    if (auto* component {context->registry.try_get<T>(entity)}; component != nullptr) {
+    if (auto* component = context->registry.try_get<T>(entity)) {
         ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
@@ -163,7 +163,7 @@ void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity en
         }
 
         if (opened) {
-            func(*component);
+            function(*component);
             ImGui::TreePop();
         }
 
@@ -202,7 +202,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
 
     ImGui::PopItemWidth();
 
-    drawComponent<TransformCompositionComponent>("Transform", entity, [this](auto& component)
+    drawComponent<TransformComponent>("Transform", entity, [&](auto& component)
     {
         drawVec3Control("Translation", component.translation);
         glm::vec3 rotation = glm::degrees(component.rotation);
@@ -211,7 +211,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
         drawVec3Control("Scale", component.scale, 1.0f);
     });
 
-    drawComponent<CameraComponent>("Camera", entity, [](CameraComponent& component)
+    drawComponent<CameraComponent>("Camera", entity, [&](CameraComponent& component)
     {
         auto& camera = component.camera;
 
@@ -270,7 +270,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
         }
     });
 
-    /*DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
+    /*DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [&](auto& component)
     {
         ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
     });*/

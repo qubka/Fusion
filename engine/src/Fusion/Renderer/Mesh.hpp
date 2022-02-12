@@ -28,10 +28,6 @@ namespace FUSION_API Fusion {
 
         Mesh(Vulkan& vulkan, const Builder& builder);
         ~Mesh();
-        Mesh(const Mesh&) = delete;
-        Mesh(Mesh&&) = delete;
-        Mesh& operator=(const Mesh&) = delete;
-        Mesh& operator=(Mesh&&) = delete;
 
         void bind(const vk::CommandBuffer& commandBuffer) const;
         void draw(const vk::CommandBuffer& commandBuffer) const;

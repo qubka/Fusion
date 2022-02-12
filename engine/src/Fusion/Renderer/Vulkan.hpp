@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vulkan/vulkan.hpp"
+#include <vulkan/vulkan.hpp>
 
 namespace Fusion {
     struct FUSION_API SwapChainSupportDetails {
@@ -22,17 +22,15 @@ namespace Fusion {
 
     class FUSION_API Vulkan {
 #ifdef FS_DEBUG
-        const bool enableValidationLayers = false;
-#else
         const bool enableValidationLayers = true;
+#else
+        const bool enableValidationLayers = false;
 #endif
     public:
         Vulkan(Window& window);
         ~Vulkan();
-        Vulkan(const Vulkan&) = delete;
-        Vulkan(Vulkan&&) = delete;
-        Vulkan& operator=(const Vulkan&) = delete;
-        Vulkan& operator=(Vulkan&&) = delete;
+
+        Window& getWindow() const { return window; }
 
         const vk::Instance& getInstance() const { return instance; }
         const vk::Device& getDevice() const { return device; };
@@ -41,7 +39,6 @@ namespace Fusion {
         const vk::Queue& getGraphicsQueue() const { return graphicsQueue; };
         const vk::Queue& getPresentQueue() const { return presentQueue; };
         const vk::CommandPool& getCommandPool() const { return commandPool; };
-        const Window& getWindow() const { return window; }
 
         SwapChainSupportDetails getSwapChainSupport() const { return querySwapChainSupport(physicalDevice); };
         QueueFamilyIndices findPhysicalQueueFamilies() const { return findQueueFamilies(physicalDevice); };

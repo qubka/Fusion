@@ -10,8 +10,5 @@ namespace Fusion {
     private:
         std::filesystem::path currentDirectory;
         std::filesystem::path root;
-
-        //std::shared_ptr<Texture2D> directoryIcon;
-        //std::shared_ptr<Texture2D> fileIcon;
     };
 }

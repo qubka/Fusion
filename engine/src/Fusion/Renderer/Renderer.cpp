@@ -2,6 +2,9 @@
 #include "SwapChain.hpp"
 #include "AllocatedBuffer.hpp"
 #include "Descriptors.hpp"
+#include "Window.hpp"
+
+#include "Fusion/Events/WindowEvents.hpp"
 
 using namespace Fusion;
 
@@ -10,11 +13,12 @@ Renderer::Renderer(Vulkan& vulkan) : vulkan{vulkan} {
     createUniformBuffers();
     createDescriptorSets();
     createCommandBuffers();
+    //vulkan.getWindow().bus().subscribe(this, &Renderer::onWindowResize);
 }
 
 Renderer::~Renderer() {
     vulkan.getDevice().freeCommandBuffers(vulkan.getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
-    commandBuffers.clear();
+    //vulkan.getWindow().bus().destroy<WindowResizeEvent>(this);
 }
 
 void Renderer::createCommandBuffers() {
@@ -67,14 +71,14 @@ void Renderer::createDescriptorSets() {
 }
 
 void Renderer::recreateSwapChain() {
-    /*auto extent = vk::Extent2D{static_cast<uint32_t>(window.getWidth()), static_cast<uint32_t>(window.getHeight())};
+    auto extent = vk::Extent2D(vulkan.getWindow().getWidth(), vulkan.getWindow().getHeight());
     while (extent.width == 0 || extent.height == 0) {
-        extent = vk::Extent2D{static_cast<uint32_t>(window.getWidth()), static_cast<uint32_t>(window.getHeight())};
+        extent = vk::Extent2D(vulkan.getWindow().getWidth(), vulkan.getWindow().getHeight());
         glfwWaitEvents();
-    }*/
-    auto extent = vk::Extent2D{1280, 720};
+    }
 
-    vulkan.getDevice().waitIdle();
+    auto result = vulkan.getDevice().waitIdle();
+    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to wait on the device!");
 
     if (swapChain == nullptr) {
         swapChain = std::make_unique<SwapChain>(vulkan, extent);
@@ -82,8 +86,8 @@ void Renderer::recreateSwapChain() {
         std::shared_ptr<SwapChain> oldSwapChain = std::move(swapChain);
         swapChain = std::make_unique<SwapChain>(vulkan, extent, oldSwapChain);
 
-        bool isComp = oldSwapChain->compareSwapFormats(*swapChain);
-        FS_CORE_ASSERT(isComp, "swap chain image(or depth) format has changed");
+        bool compatible = oldSwapChain->compareSwapFormats(*swapChain);
+        FS_CORE_ASSERT(compatible, "swap chain image(or depth) format has changed");
     }
 }
 
@@ -160,17 +164,18 @@ void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
     FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to record command buffer!");
 
     result = swapChain->submitCommandBuffers(commandBuffer, currentImageIndex);
-    if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR/* || window.wasResized()*/) {
+    if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
         FS_LOG_CORE_TRACE("swap chain out of date/suboptimal/window resized - recreating");
-        //window.resetResized();
         recreateSwapChain();
+    } else {
+        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to present swap chain image");
     }
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to present swap chain image");
-
 
     isFrameStarted = false;
     currentFrameIndex = (currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
 }
+
+/* Getters */
 
 const vk::DescriptorSetLayout& Renderer::getGlobalLayoutSet() const {
     return globalLayout->getDescriptorSetLayout();
@@ -178,6 +183,10 @@ const vk::DescriptorSetLayout& Renderer::getGlobalLayoutSet() const {
 
 const vk::RenderPass& Renderer::getSwapChainRenderPass() const {
     return swapChain->getRenderPass();
+}
+
+uint32_t Renderer::imageCount() const {
+    return swapChain->imageCount();
 }
 
 bool Renderer::isFrameInProgress() const {

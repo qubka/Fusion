@@ -13,7 +13,7 @@ Input<T>::Input(const std::vector<T>& keysToMonitor) {
 template<class T>
 bool Input<T>::isKey(T keycode) const {
     if (enabled) {
-        if (auto it { keys.find(keycode) }; it != keys.end()) {
+        if (auto it = keys.find(keycode); it != keys.end()) {
             const auto& key{ it->second };
             return key.pressed;
         }
@@ -24,7 +24,7 @@ bool Input<T>::isKey(T keycode) const {
 template<class T>
 bool Input<T>::isKeyUp(T keycode) const {
     if (enabled) {
-        if (auto it{ keys.find(keycode) }; it != keys.end()) {
+        if (auto it = keys.find(keycode); it != keys.end()) {
             const auto& key{ it->second };
             return !key.pressed && key.lastFrame == Time::FrameCount();
         }
@@ -35,7 +35,7 @@ bool Input<T>::isKeyUp(T keycode) const {
 template<class T>
 bool Input<T>::isKeyDown(T keycode) const {
     if (enabled) {
-        if (auto it{ keys.find(keycode) }; it != keys.end()) {
+        if (auto it = keys.find(keycode); it != keys.end()) {
             const auto& key{ it->second };
             return key.pressed && key.lastFrame == Time::FrameCount();
         }
@@ -48,7 +48,7 @@ void Input<T>::setKey(T keycode, uint8_t action) {
     if (action == GLFW_REPEAT)
         return;
 
-    if (auto it{ keys.find(keycode)}; it != keys.end()) {
+    if (auto it = keys.find(keycode); it != keys.end()) {
         auto& key{ it->second };
         switch (action) {
             case GLFW_PRESS:

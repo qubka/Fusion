@@ -32,7 +32,6 @@ Application::Application(std::string name, CommandLineArgs args)
 void Application::run() {
     while (!window.shouldClose()) {
         Time::Tick();
-
         window.onUpdate();
 
         for (auto* layer : layers) {
@@ -58,7 +57,8 @@ void Application::run() {
             }
         }
 
-        vulkan.getDevice().waitIdle();
+        auto result = vulkan.getDevice().waitIdle();
+        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to wait on the device!");
     }
 }
 

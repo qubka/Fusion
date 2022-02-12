@@ -1,12 +1,12 @@
 #include "ImGuiLayer.hpp"
 #include "Fusion.hpp"
 
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_vulkan.h"
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_vulkan.h>
 
 using namespace Fusion;
 
-static void check_vk_result(VkResult err) {
+static void ImGuiErrorCallback(VkResult err) {
     if (err == 0)
         return;
     FS_LOG_ERROR("[Imgui] Error: VkResult = {0}", err);
@@ -73,10 +73,23 @@ void ImGuiLayer::onAttach() {
     initInfo.DescriptorPool = imguiPool;
     initInfo.Subpass = 0;
     initInfo.MinImageCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
-    initInfo.ImageCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
+    initInfo.ImageCount = renderer.imageCount();
     initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-    initInfo.CheckVkResultFn = check_vk_result;
+    initInfo.CheckVkResultFn = ImGuiErrorCallback;
     ImGui_ImplVulkan_Init(&initInfo, renderer.getSwapChainRenderPass());
+
+    // Load a first font
+    ImFont* font = io.Fonts->AddFontDefault();
+
+    // Add character ranges and merge into the previous font
+    // The ranges array is not copied by the AddFont* functions and is used lazily
+    // so ensure it is available at the time of building or calling GetTexDataAsRGBA32().
+    static const ImWchar icons_ranges[] = { 0xf000, 0xf3ff, 0 }; // Will not be copied by AddFont* so keep in scope.
+    ImFontConfig config;
+    config.MergeMode = true;
+
+    io.Fonts->AddFontFromFileTTF("assets/fonts/fontawesome-webfont.ttf", 18.0f, &config, icons_ranges); // Merge into first font
+    io.Fonts->Build();
 
     //execute a gpu command to upload imgui font textures
     renderer.getVulkan().submit([&](vk::CommandBuffer& cmd) {
@@ -108,7 +121,7 @@ void ImGuiLayer::end(vk::CommandBuffer& commandBuffer) {
 }
 
 void ImGuiLayer::setDarkThemeColors() {
-    auto& colors = ImGui::GetStyle().Colors;
+    /*auto& colors = ImGui::GetStyle().Colors;
     colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 1.0f };
 
     // Headers
@@ -136,7 +149,7 @@ void ImGuiLayer::setDarkThemeColors() {
     // Title
     colors[ImGuiCol_TitleBg] = { 0.15f, 0.1505f, 0.151f, 1.0f };
     colors[ImGuiCol_TitleBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-    colors[ImGuiCol_TitleBgCollapsed] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_TitleBgCollapsed] = { 0.15f, 0.1505f, 0.151f, 1.0f };*/
 }
 
 

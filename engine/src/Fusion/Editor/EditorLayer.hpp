@@ -7,6 +7,8 @@
 
 #include "Fusion/Core/Layer.hpp"
 #include "Fusion/Scene/Scene.hpp"
+#include "Fusion/Scene/SceneSerializer.hpp"
+#include "Fusion/Input/KeyInput.hpp"
 
 namespace Fusion {
     class FUSION_API EditorLayer : public Layer {
@@ -26,6 +28,7 @@ namespace Fusion {
 
         std::shared_ptr<Scene> activeScene;
         EditorCamera editorCamera;
+        KeyInput keyInput;
 
         // Panels
         SceneHierarchyPanel sceneHierarchyPanel;

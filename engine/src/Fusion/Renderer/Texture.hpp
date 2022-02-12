@@ -22,10 +22,6 @@ namespace Fusion {
                 vk::SamplerAddressMode addressMode = vk::SamplerAddressMode::eRepeat,
                 vk::SamplerMipmapMode minmapMode = vk::SamplerMipmapMode::eLinear);
         ~Texture();
-        Texture(Texture&&) = delete;
-        Texture(const Texture&) = delete;
-        Texture& operator=(Texture&&) = delete;
-        Texture& operator=(const Texture&) = delete;
 
         const vk::Image& getImage() const { return image; };
         const vk::ImageView& getView() const { return view; };

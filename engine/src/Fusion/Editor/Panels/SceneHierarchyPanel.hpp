@@ -19,8 +19,8 @@ namespace Fusion {
         void drawComponents(entt::entity entity);
 
         void drawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
-        template<typename T, typename F>
-        void drawComponent(const std::string& name, entt::entity entity, F func);
+        template<typename T>
+        void drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function);
 
     private:
         std::shared_ptr<Scene> context;

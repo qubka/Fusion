@@ -4,13 +4,6 @@
 
 namespace Fusion {
     struct FUSION_API PipelineConfigInfo {
-        PipelineConfigInfo() = default;
-        ~PipelineConfigInfo() = default;
-        PipelineConfigInfo(const PipelineConfigInfo&) = delete;
-        PipelineConfigInfo(PipelineConfigInfo&&) = delete;
-        PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
-        PipelineConfigInfo& operator=(PipelineConfigInfo&&) = delete;
-
         std::vector<vk::VertexInputBindingDescription> bindingDescriptions{};
         std::vector<vk::VertexInputAttributeDescription> attributeDescriptions{};
         vk::PipelineViewportStateCreateInfo viewportInfo{};
@@ -34,10 +27,6 @@ namespace Fusion {
                  const std::string& fragPath,
                  const PipelineConfigInfo& configInfo);
         ~Pipeline();
-        Pipeline(const Pipeline&) = delete;
-        Pipeline(Pipeline&&) = delete;
-        Pipeline& operator=(const Pipeline&) = delete;
-        Pipeline& operator=(Pipeline&&) = delete;
 
         void bind(const vk::CommandBuffer& commandBuffer) const;
 

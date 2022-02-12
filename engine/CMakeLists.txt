@@ -21,6 +21,7 @@ target_link_libraries(${PROJECT_NAME}
         glm
         entt
         magic_enum
+        rapidjson
         #stb
         #glad
         #glm_static    # if build with add_subdirectory

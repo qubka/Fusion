@@ -12,10 +12,6 @@ namespace Fusion {
                         vk::MemoryPropertyFlags memoryPropertyFlags,
                         vk::DeviceSize minOffsetAlignment = 1);
         ~AllocatedBuffer();
-        AllocatedBuffer(const AllocatedBuffer&) = delete;
-        AllocatedBuffer(AllocatedBuffer&&) = delete;
-        AllocatedBuffer& operator=(const AllocatedBuffer&) = delete;
-        AllocatedBuffer& operator=(AllocatedBuffer&&) = delete;
 
         void map(vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize offset = 0);
         void unmap();

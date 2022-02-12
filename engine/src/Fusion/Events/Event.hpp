@@ -15,7 +15,7 @@ namespace Fusion {
     private:
         virtual void call(Event* event) = 0;
     };
-    
+
     template<class T, class EventType>
     class FUSION_API MemberFunctionHandler : public HandlerFunctionBase {
     public:
@@ -36,7 +36,7 @@ namespace Fusion {
         T* instance;
         MemberFunction memberFunction;
     };
-    
+
     typedef std::list<HandlerFunctionBase*> HandlerList;
     class FUSION_API EventBus {
     public:
@@ -70,8 +70,8 @@ namespace Fusion {
             handlers->push_back(new MemberFunctionHandler(instance, memberFunction));
         }
 
-        template<class T, class EventType>
-        void destroy(T* instance, void (T::*memberFunction)(const EventType&)) {
+        template<class EventType, class T>
+        void destroy(T* instance) {
             auto* handlers = subscribers[typeid(EventType)];
 
             if (handlers == nullptr) {

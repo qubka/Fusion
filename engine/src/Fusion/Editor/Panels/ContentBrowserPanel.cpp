@@ -12,13 +12,13 @@ void ContentBrowserPanel::onImGui() {
     ImGui::Begin("Content Browser");
 
     if (currentDirectory != root) {
-        if (ImGui::Button("<-")) {
+        if (ImGui::Button("\uF112")) {
             currentDirectory = currentDirectory.parent_path();
         }
     }
 
     static float padding = 16.0f;
-    static float thumbnailSize = 128.0f;
+    static float thumbnailSize = 64.0f;
     float cellSize = thumbnailSize + padding;
 
     float panelWidth = ImGui::GetContentRegionAvail().x;
@@ -34,10 +34,8 @@ void ContentBrowserPanel::onImGui() {
         std::string filename = relativePath.filename().string();
 
         ImGui::PushID(filename.c_str());
-        //auto& icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-        //ImGui::ImageButton((ImTextureID)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
-        ImGui::Button(directoryEntry.is_directory() ? "directory" : "file", { thumbnailSize, thumbnailSize });
+        ImGui::Button(directoryEntry.is_directory() ? "\uF07C" : "\uF15C", { thumbnailSize, thumbnailSize });
 
         if (ImGui::BeginDragDropSource()) {
             auto itemStr = relativePath.wstring();

@@ -12,7 +12,7 @@ namespace Fusion {
         operator std::string() const { return tag; };
     };
 
-    struct FUSION_API TransformCompositionComponent {
+    struct FUSION_API TransformComponent {
         glm::vec3 translation{0};
         glm::vec3 rotation{0};
         glm::vec3 scale{1};
@@ -25,7 +25,7 @@ namespace Fusion {
         };
     };
 
-    struct FUSION_API TransformComponent {
+    struct FUSION_API TranslateComponent {
         glm::mat4 transform{1};
 
         glm::mat4& operator*() { return transform; };

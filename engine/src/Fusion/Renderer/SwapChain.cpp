@@ -16,7 +16,6 @@ SwapChain::~SwapChain() {
     for (const auto& imageView : swapChainImageViews) {
         vulkan.getDevice().destroyImageView(imageView, nullptr);
     }
-    swapChainImageViews.clear();
 
     vulkan.getDevice().destroyImageView(depthImageView, nullptr);
     vulkan.getDevice().destroyImage(depthImage, nullptr);
@@ -97,9 +96,11 @@ void SwapChain::createSwapChain() {
     // allowed to create a swap chain with more. That's why we'll first query the final number of
     // images with vkGetSwapchainImagesKHR, then resize the container and finally call it again to
     // retrieve the handles.
-    vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, nullptr);
+    result = vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, nullptr);
+    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to get swap chain images count!");
     swapChainImages.resize(imageCount);
-    vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, swapChainImages.data());
+    result = vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, swapChainImages.data());
+    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to get swap chain images!");
 
     swapChainImageFormat = surfaceFormat.format;
     swapChainExtent = extent;
@@ -135,13 +136,17 @@ vk::PresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<vk::Presen
 }
 
 vk::Extent2D SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities) const {
-    if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
-        return capabilities.currentExtent;
-    } else {
-        return {
-            std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, windowExtent.width)),
-            std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, windowExtent.height))
+    if (capabilities.currentExtent.width == std::numeric_limits<uint32_t>::max() ||
+        capabilities.currentExtent.height == std::numeric_limits<std::uint32_t>::max()) {
+        VkExtent2D actualExtent {
+            std::max(capabilities.minImageExtent.width,
+                     std::min(capabilities.maxImageExtent.width, windowExtent.width)),
+            std::max(capabilities.minImageExtent.height,
+                     std::min(capabilities.maxImageExtent.height, windowExtent.height))
         };
+        return actualExtent;
+    } else {
+        return capabilities.currentExtent;
     }
 }
 
@@ -258,11 +263,11 @@ void SwapChain::createSyncObjects() {
     vk::Result result;
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         result = vulkan.getDevice().createSemaphore(&semaphoreInfo, nullptr, &imageAvailableSemaphores[i]);
-        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create synchronization objects for a frame!");
+        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create semaphore objects for a frame!");
         result = vulkan.getDevice().createSemaphore(&semaphoreInfo, nullptr, &renderFinishedSemaphores[i]);
-        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create synchronization objects for a frame!");
+        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create semaphore objects for a frame!");
         result = vulkan.getDevice().createFence(&fenceInfo, nullptr, &inFlightFences[i]);
-        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create synchronization objects for a frame!");
+        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create fence objects for a frame!");
     }
 }
 

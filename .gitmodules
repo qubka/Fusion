@@ -19,3 +19,6 @@
 [submodule "engine/external/magic_enum"]
 	path = engine/external/magic_enum
 	url = https://github.com/Neargye/magic_enum
+[submodule "engine/external/yaml-cpp"]
+	path = engine/external/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp
