@@ -2,6 +2,17 @@
 #include "Fusion/Core/Application.hpp"
 #include "Fusion/Core/Time.hpp"
 #include "Fusion/Input/Input.hpp"
+#include "Fusion/ImGui/ImGuiLayer.hpp"
+#include "Fusion/Renderer/Texture.hpp"
+#include "backends/imgui_impl_vulkan.h"
+
+#include <portable-file-dialogs.h>
+
+#if _WIN32
+#define DEFAULT_PATH "C:\\"
+#else
+#define DEFAULT_PATH "/tmp"
+#endif
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -36,53 +47,49 @@ void EditorLayer::onDetach() {
 }
 
 void EditorLayer::onUpdate() {
-    editorCamera.onUpdate();
+    switch (sceneState) {
+        case SceneState::Edit: {
+            editorCamera.onUpdate();
+            activeScene->onUpdateEditor(editorCamera);
+            break;
+        }
+
+        case SceneState::Play: {
+            activeScene->onUpdateRuntime();
+            break;
+        }
+    }
 }
 
 void EditorLayer::onImGui() {
+    // Note: Switch this to true to enable dockspace
+    static bool dockspaceOpen = true;
 
+    // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+    // because it would be confusing to have two docking targets within each others.
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize({viewport->Size.x, 15});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
+    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-    /*ImGuiIO& io = ImGui::GetIO();
-    float viewManipulateRight = io.DisplaySize.x;
-    float viewManipulateTop = 0;
-    static ImGuiWindowFlags gizmoWindowFlags = 0;
-    bool useWindow = false;
+    // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+    // This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+    // all active windows docked into it will lose their parent and become undocked.
+    // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+    // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0.0f, 0.0f});
+    ImGui::Begin("DockSpace", &dockspaceOpen, window_flags);
+    ImGui::PopStyleVar(3);
 
-
-    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-
-    glm::mat4 objectMatrix{1};
-    glm::mat4{1};
-
-    auto& cameraView = editorCamera.getView();
-    auto& cameraProjection = editorCamera.getProjection();
-
-    // Snapping
-    bool snap = Input::GetKey(Key::LeftControl);
-    float snapValue = 0.5f; // Snap to 0.5m for translation/scale
-    // Snap to 45 degrees for rotation
-    //if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
-    //    snapValue = 45.0f;
-
-    glm::mat4 transoform = glm::mat4{1};
-
-    float snapValues[3] = { snapValue, snapValue, snapValue };
-
-    ImGuizmo::DrawGrid(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), glm::value_ptr(transoform), 1000.0f);
-    ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                         ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transoform),
-                         nullptr, snap ? snapValues : nullptr);*/
-
-
-    /*ImGui::Begin("Settings");
-    ImGui::ColorEdit3("Sky Color", glm::value_ptr(Application::Instance().getRenderer().getColor()));
-    ImGui::End();*/
-
-    /*if (ImGui::BeginMenuBar()) {
+    if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             // Disabling fullscreen would allow the window to be moved to the front of other windows,
             // which we can't undo at the moment without finer window depth/z control.
-            // ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
+            //ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);1
             if (ImGui::MenuItem("New", "Ctrl+N"))
                 newScene();
 
@@ -92,26 +99,22 @@ void EditorLayer::onImGui() {
             if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
                 saveSceneAs();
 
-            if (ImGui::MenuItem("Exit"))
-                Application::Instance().getWindow().shouldClose(true);
-
+            if (ImGui::MenuItem("Exit")) Application::Instance().getWindow().shouldClose(true);
             ImGui::EndMenu();
         }
 
         ImGui::EndMenuBar();
     }
 
-    ImGui::Separator();
-
     sceneHierarchyPanel.onImGui();
     contentBrowserPanel.onImGui();
 
     ImGui::Begin("Stats");
 
-    std::string name = "None";
+    /*std::string name = "None";
     if (m_HoveredEntity)
         name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
-    ImGui::Text("Hovered Entity: %s", name.c_str());
+    ImGui::Text("Hovered Entity: %s", name.c_str());*/
 
     ImGui::Text("CPU: %f%%", info.getProcessCpuUsage());
     ImGui::Text("Mem: %fMB", info.getProcessMemoryUsed());
@@ -122,28 +125,145 @@ void EditorLayer::onImGui() {
     //ImGui::Text(version);
     ImGui::Text("FPS: %d", Time::FramesPerSecond());
     //ImGui::Text("XYZ: " + glm::to_string(camera.position());
-    ImGui::Text("Mouse Position: %s", glm::to_string(mouseInput.mousePosition()).c_str());
-    ImGui::Text("Mouse Delta: %s", glm::to_string(mouseInput.mouseDelta()).c_str());
-    ImGui::Text("Mouse Scroll: %s", glm::to_string(mouseInput.mouseScroll()).c_str());
+    ImGui::Text("Mouse Position: %s", glm::to_string(Input::MousePosition()).c_str());
+    ImGui::Text("Mouse Delta: %s", glm::to_string(Input::MouseDelta()).c_str());
+    ImGui::Text("Mouse Scroll: %s", glm::to_string(Input::MouseScroll()).c_str());
     //ImGui::Text("Renderer Stats:");
     //ImGui::Text("Draw Calls: %d", stats.DrawCalls);
     //ImGui::Text("Quads: %d", stats.QuadCount);
     //ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
     //ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
-    ImGui::End();*/
-}
+    ImGui::ColorEdit3("Background", glm::value_ptr(Application::Instance().getRenderer().getColor()));
 
-void EditorLayer::openScene() {
+    ImGui::End();
 
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
+    ImGui::Begin("Viewport");
+    auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+    auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+    auto viewportOffset = ImGui::GetWindowPos();
+    viewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+    viewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+
+    viewportFocused = ImGui::IsWindowFocused();
+    viewportHovered = ImGui::IsWindowHovered();
+    //Application::Instance().getImGuiLayer()->BlockEvents(!viewportFocused && !viewportHovered);
+
+    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+    viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+
+    auto& swapChain = Application::Instance().getRenderer().getSwapChain();
+
+    /*static ImTextureID textureId;
+    static bool f = false;
+    if (!f) {
+        texture = std::make_shared<Texture>(Application::Instance().getVulkan(), "assets/textures/texture.jpg",
+                                            vk::Format::eR8G8B8A8Srgb
+                                            );
+        textureId = (ImTextureID) ImGui_ImplVulkan_AddTexture(texture->getSampler(), swapChain->currentImage(0), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        f = true;
+    }
+
+    ImGui::Image(textureId, ImVec2{viewportSize.x, viewportSize.y}, ImVec2{0, 1}, ImVec2{1, 0});*/
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+            const auto* path = static_cast<const wchar_t*>(payload->Data);
+            openScene(std::filesystem::path(AssetPath) / path);
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    // Gizmos
+    /*auto selectedEntity = sceneHierarchyPanel.getSelectedEntity();
+    if (selectedEntity != entt::null && gizmoType != -1) {
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist();
+
+        ImGuizmo::SetRect(viewportBounds[0].x, viewportBounds[0].y, viewportBounds[1].x - viewportBounds[0].x, viewportBounds[1].y - viewportBounds[0].y);
+
+        // Camera
+
+        // Runtime camera from entity
+        // auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+        // const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+        // const glm::mat4& cameraProjection = camera.GetProjection();
+        // glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+        // Editor camera
+        const glm::mat4& cameraProjection = editorCamera.getProjection();
+        glm::mat4 cameraView = editorCamera.getView();
+
+        // Entity transform
+        auto& tc = selectedEntity.GetComponent<TransformComponent>();
+        glm::mat4 transform = tc.GetTransform();
+
+        // Snapping
+        bool snap = Input::IsKeyPressed(Key::LeftControl);
+        float snapValue = 0.5f; // Snap to 0.5m for translation/scale
+        // Snap to 45 degrees for rotation
+        if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+            snapValue = 45.0f;
+
+        float snapValues[3] = { snapValue, snapValue, snapValue };
+
+        ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+                             (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
+                             nullptr, snap ? snapValues : nullptr);
+
+        if (ImGuizmo::IsUsing()) {
+            glm::vec3 translation, rotation, scale;
+            Math::DecomposeTransform(transform, translation, rotation, scale);
+
+            glm::vec3 deltaRotation = rotation - tc.Rotation;
+            tc.Translation = translation;
+            tc.Rotation += deltaRotation;
+            tc.Scale = scale;
+        }
+    }*/
+
+    ImGui::End();
+    ImGui::PopStyleVar();
+
+    //UI_Toolbar();
+
+    ImGui::End();
 }
 
 void EditorLayer::newScene() {
+    activeScene = std::make_shared<Scene>();
+    //activeScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+    sceneHierarchyPanel.setContext(activeScene);
+}
 
+void EditorLayer::openScene() {
+    auto filepath = pfd::open_file("Choose scene file", DEFAULT_PATH, { "Scene Files (.scene)", "*.scene", "All Files", "*" }, pfd::opt::none).result();
+    if (!filepath.empty())
+        openScene(filepath[0]);
+}
+
+void EditorLayer::openScene(const std::filesystem::path& path) {
+    if (path.extension().string() != ".scene") {
+        FE_LOG_WARNING << "Could not load " << path.filename().string() << " - not a scene file";
+        return;
+    }
+
+    auto newScene = std::make_shared<Scene>();
+    SceneSerializer serializer(newScene);
+    if (serializer.deserialize(path)) {
+        activeScene = newScene;
+        //activeScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        sceneHierarchyPanel.setContext(activeScene);
+    }
 }
 
 void EditorLayer::saveSceneAs() {
-
+    auto filepath = pfd::save_file("Choose scene file", DEFAULT_PATH, { "Scene Files (.scene)", "*.scene", "All Files", "*" }, pfd::opt::force_overwrite).result();
+    if (!filepath.empty()) {
+        SceneSerializer serializer(activeScene);
+        serializer.serialize(filepath);
+    }
 }
 
 void EditorLayer::UI_Toolbar() {

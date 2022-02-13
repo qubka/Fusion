@@ -5,7 +5,7 @@ using namespace Fusion;
 
 // local callback functions
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
-    FE_CORE_ERROR << "[Vulkan] Validation layer: " << pCallbackData->pMessage;
+    FE__LOG_ERROR << "[Vulkan] Validation layer: " << pCallbackData->pMessage;
     return VK_FALSE;
 }
 
@@ -55,10 +55,10 @@ void Vulkan::createInstance() {
     uint32_t version;
     vkEnumerateInstanceVersion(&version);
 
-    FE_CORE_DEBUG << "System support vulkan variant: " << VK_API_VERSION_VARIANT(version)
-              << ", Major: " << VK_API_VERSION_MAJOR(version)
-              << ", Minor: " << VK_API_VERSION_MINOR(version)
-              << ", Patch: " << VK_API_VERSION_PATCH(version) << '\n';
+    FE_LOG_DEBUG << "System support vulkan variant: " << VK_API_VERSION_VARIANT(version)
+                 << ", Major: " << VK_API_VERSION_MAJOR(version)
+                 << ", Minor: " << VK_API_VERSION_MINOR(version)
+                 << ", Patch: " << VK_API_VERSION_PATCH(version) << '\n';
 
     version = VK_MAKE_VERSION(1, 0, 0);
 
@@ -137,17 +137,17 @@ void Vulkan::hasGflwRequiredInstanceExtensions() const {
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-    FE_CORE_DEBUG << "available extensions:";
+    FE_LOG_DEBUG << "available extensions:";
     std::unordered_set<std::string> available;
     for (const auto& extension : extensions) {
-        FE_CORE_DEBUG << "\t\"" << extension.extensionName << "\"";
+        FE_LOG_DEBUG << "\t\"" << extension.extensionName << "\"";
         available.insert(extension.extensionName);
     }
 
-    FE_CORE_DEBUG << "required extensions:";
+    FE_LOG_DEBUG << "required extensions:";
     auto requiredExtensions = getRequiredExtensions();
     for (const auto& required : requiredExtensions) {
-        FE_CORE_DEBUG << "\t\"" << required << "\"";
+        FE_LOG_DEBUG << "\t\"" << required << "\"";
         FE_ASSERT(available.find(required) != available.end() && "missing required glfw extension");
     }
 }
@@ -193,7 +193,7 @@ void Vulkan::pickPhysicalDevice() {
 
     vk::PhysicalDeviceProperties props;
     physicalDevice.getProperties(&props);
-    FE_CORE_DEBUG << "physical device found: " << props.deviceName;
+    FE_LOG_DEBUG << "physical device found: " << props.deviceName;
 }
 
 bool Vulkan::isDeviceSuitable(const vk::PhysicalDevice& device) const {
@@ -596,6 +596,8 @@ void Vulkan::createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::Sampl
     samplerInfo.compareEnable = VK_FALSE;
     samplerInfo.compareOp = vk::CompareOp::eAlways;
     samplerInfo.mipmapMode = minmapMode;
+    samplerInfo.minLod = -1000;
+    samplerInfo.maxLod = 1000;
 
     auto result = device.createSampler(&samplerInfo, nullptr, &sampler);
     FE_ASSERT(result == vk::Result::eSuccess && "failed to create texture sampler!");

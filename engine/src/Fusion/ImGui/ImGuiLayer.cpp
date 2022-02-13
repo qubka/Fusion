@@ -11,7 +11,7 @@ using namespace Fusion;
 static void ImGuiErrorCallback(VkResult err) {
     if (err == 0)
         return;
-    FE_CORE_ERROR << "[Imgui] Error: VkResult = " << err;
+    FE__LOG_ERROR << "[Imgui] Error: VkResult = " << err;
     FE_ASSERT(err >= 0 && "[Imgui] Fatal: Vulkan result!");
 }
 
@@ -65,6 +65,7 @@ void ImGuiLayer::onAttach() {
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForVulkan(renderer.getVulkan().getWindow(), true);
     auto& vulkan = renderer.getVulkan();
+    auto& swapChain = renderer.getSwapChain();
 
     ImGui_ImplVulkan_InitInfo initInfo{};
     initInfo.Instance = vulkan.getInstance();
@@ -76,13 +77,13 @@ void ImGuiLayer::onAttach() {
     initInfo.DescriptorPool = imguiPool;
     initInfo.Subpass = 0;
     initInfo.MinImageCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
-    initInfo.ImageCount = renderer.imageCount();
+    initInfo.ImageCount = swapChain->imageCount();
     initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     initInfo.CheckVkResultFn = ImGuiErrorCallback;
-    ImGui_ImplVulkan_Init(&initInfo, renderer.getSwapChainRenderPass());
+    ImGui_ImplVulkan_Init(&initInfo, swapChain->getRenderPass());
 
     // Load a first font
-    ImFont* font = io.Fonts->AddFontDefault();
+    io.Fonts->AddFontDefault();
 
     // Add character ranges and merge into the previous font
     // The ranges array is not copied by the AddFont* functions and is used lazily

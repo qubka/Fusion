@@ -27,6 +27,7 @@ target_link_libraries(${PROJECT_NAME}
         #glm_static    # if build with add_subdirectory
         plog
         yaml-cpp
+        portable_file_dialogs
 )
 
 # defines

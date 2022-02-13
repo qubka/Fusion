@@ -15,9 +15,11 @@ namespace Fusion {
 
         void begin();
         void end(vk::CommandBuffer& commandBuffer);
+
     private:
         Renderer& renderer;
         vk::DescriptorPool imguiPool;
+        //std::vector<ImTextureID> viewportImages;
 
         static void setDarkThemeColors();
     };

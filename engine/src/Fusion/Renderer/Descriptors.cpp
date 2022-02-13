@@ -49,7 +49,7 @@ bool DescriptorPool::allocateDescriptor(const vk::DescriptorSetLayout& setLayout
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
     // a new pool whenever an old pool fills up. But this is beyond our current scope
     if (vulkan.getDevice().allocateDescriptorSets(&allocInfo, &descriptor) != vk::Result::eSuccess) {
-        FE_CORE_ERROR << "pools fills up!";
+        FE__LOG_ERROR << "pools fills up!";
         return false;
     }
 

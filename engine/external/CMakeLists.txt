@@ -200,3 +200,11 @@ add_subdirectory(${YAML_LIB_NAME})
 
 set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "" FORCE)
 set(YAML_BUILD_SHARED_LIBS ON)
+
+
+# portfiledialog
+set(PFD_LIB_NAME "portable_file_dialogs")
+
+add_subdirectory(${PFD_LIB_NAME})
+
+

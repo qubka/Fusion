@@ -22,11 +22,11 @@ namespace Fusion {
         glm::vec3& getColor() { return color; }
 
         const vk::DescriptorSetLayout& getGlobalLayoutSet() const;
-        const vk::RenderPass& getSwapChainRenderPass() const;
+        const std::unique_ptr<SwapChain>& getSwapChain() const;
+
         const vk::CommandBuffer& getCurrentCommandBuffer();
         const vk::DescriptorSet& getCurrentDescriptorSet();
         const std::unique_ptr<AllocatedBuffer>& getCurrentUniformBuffer();
-        uint32_t imageCount() const;
         uint32_t getFrameIndex() const;
         bool isFrameInProgress() const;
 
@@ -51,7 +51,7 @@ namespace Fusion {
         std::unique_ptr<DescriptorPool> globalPool;
         std::unique_ptr<DescriptorLayout> globalLayout;
 
-        glm::vec3 color{0};
+        glm::vec3 color{0.7f, 0.85f, 1.0f};
 
         uint32_t currentImageIndex{0};
         uint32_t currentFrameIndex{0};

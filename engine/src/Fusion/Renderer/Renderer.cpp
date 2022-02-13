@@ -165,7 +165,7 @@ void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
 
     result = swapChain->submitCommandBuffers(commandBuffer, currentImageIndex);
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
-        FE_CORE_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
+        FE_LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
         recreateSwapChain();
     } else {
         FE_ASSERT(result == vk::Result::eSuccess && "failed to present swap chain image");
@@ -181,12 +181,8 @@ const vk::DescriptorSetLayout& Renderer::getGlobalLayoutSet() const {
     return globalLayout->getDescriptorSetLayout();
 }
 
-const vk::RenderPass& Renderer::getSwapChainRenderPass() const {
-    return swapChain->getRenderPass();
-}
-
-uint32_t Renderer::imageCount() const {
-    return swapChain->imageCount();
+const std::unique_ptr<SwapChain>& Renderer::getSwapChain() const {
+    return swapChain;
 }
 
 bool Renderer::isFrameInProgress() const {

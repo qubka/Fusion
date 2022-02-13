@@ -12,6 +12,7 @@
 #include "Fusion/Utils/ProcessInfo.hpp"
 
 namespace Fusion {
+    class Texture;
     class FUSION_API EditorLayer : public Layer {
     public:
         EditorLayer();
@@ -25,6 +26,7 @@ namespace Fusion {
     private:
         void newScene();
         void openScene();
+        void openScene(const std::filesystem::path& path);
         void saveSceneAs();
 
         void UI_Toolbar();
@@ -45,6 +47,8 @@ namespace Fusion {
         bool firstFrame{false};
         int gizmoType = -1;
         float camDistance;
+
+        std::shared_ptr<Texture> texture;
 
         enum class SceneState {
             Edit = 0, Play = 1

@@ -1,7 +1,5 @@
 #include "EditorCamera.hpp"
-#include "Fusion/Core/Time.hpp"
 #include "Fusion/Input/Input.hpp"
-#include "Fusion/Core/Application.hpp"
 
 using namespace Fusion;
 
@@ -14,53 +12,19 @@ EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : Per
 }
 
 void EditorCamera::onUpdate() {
-    /*if (Input::GetKey(Key::W)) {
-        position += getForward() * speed * Time::ElapsedTime();
-        isDirty = true;
-    }
-    if (Input::GetKey(Key::S)) {
-        position -= getForward() * speed * Time::ElapsedTime();
-        isDirty = true;
-    }
-    if (Input::GetKey(Key::D)) {
-        position += getRight() * speed * Time::ElapsedTime();
-        isDirty = true;
-    }
-    if (Input::GetKey(Key::A)) {
-        position -= getRight() * speed * Time::ElapsedTime();
-        isDirty = true;
-    }
-
     if (Input::GetKey(Key::LeftAlt)) {
-        glm::vec2 delta = Input::MouseDelta() / (static_cast<float>(Application::Instance().getWindow().getHeight()) * 2);
-        yaw += delta.x;
-        pitch -= delta.y;
-
-        static constexpr float limit = glm::radians(89.0f);
-        if (pitch > limit) {
-            pitch = limit;
-        }
-        if (pitch < -limit) {
-            pitch = -limit;
-        }
-
-        setRotation(glm::quat{glm::vec3(pitch, yaw, 0)});
-        glfwSetInputMode(Application::Instance().getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    } else {
-        glfwSetInputMode(Application::Instance().getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    }*/
-
-    if (Input::GetKey(Key::LeftAlt)) {
-        auto delta = Input::MouseDelta() * 0.003f;
         if (Input::GetMouseButton(Mouse::ButtonMiddle))
-            mousePan(delta);
+            mousePan( Input::MouseDelta() * 0.003f);
         else if (Input::GetMouseButton(Mouse::ButtonLeft))
-            mouseRotate(delta);
+            mouseRotate( Input::MouseDelta() * 0.003f);
         else if (Input::GetMouseButton(Mouse::ButtonRight))
-            mouseZoom(delta.y);
-        /*else if (*scroll*)
-            float delta = ;
-            MouseZoom(e.GetYOffset() * 0.1f);*/
+            mouseZoom(Input::MouseDelta().y * 0.003f);
+        else {
+            auto scroll = Input::MouseScroll().y;
+            if (scroll != 0.0f) {
+                mouseZoom(scroll * 0.1f);
+            }
+        }
 
         setPositionAndRotation(calculatePosition(), glm::quat{glm::vec3(pitch, yaw, 0)});
     }
@@ -69,9 +33,9 @@ void EditorCamera::onUpdate() {
 }
 
 void EditorCamera::mousePan(const glm::vec2& delta) {
-    auto [xSpeed, ySpeed] = panSpeed();
-    focalPoint += -right * delta.x * xSpeed * distance;
-    focalPoint += up * delta.y * ySpeed * distance;
+    auto speed = panSpeed();
+    focalPoint += -right * delta.x * speed.x * distance;
+    focalPoint += up * delta.y * speed.y * distance;
 }
 
 void EditorCamera::mouseRotate(const glm::vec2& delta) {

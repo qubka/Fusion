@@ -18,6 +18,8 @@ MouseInput::~MouseInput() {
 void MouseInput::onUpdate() {
     delta.x = 0;
     delta.y = 0;
+    scroll.x = 0;
+    scroll.y = 0;
     BaseInput::onUpdate();
 }
 

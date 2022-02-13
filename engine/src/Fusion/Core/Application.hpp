@@ -5,6 +5,8 @@
 #include "Fusion/Renderer/Window.hpp"
 #include "Fusion/Renderer/Vulkan.hpp"
 #include "Fusion/Renderer/Renderer.hpp"
+#include "Fusion/Input/Input.hpp"
+
 
 int main(int argc, char** argv);
 

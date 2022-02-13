@@ -208,7 +208,7 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
         return false;
 
     auto sceneName = data["Scene"].as<std::string>();
-    FE_CORE_DEBUG << "Deserializing scene:" << sceneName;
+    FE_LOG_DEBUG << "Deserializing scene:" << sceneName;
 
     if (const auto& entities = data["Entities"]) {
         for (const auto& entity : entities) {
@@ -221,7 +221,7 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
                 scene->registry.emplace<TagComponent>(deserializedEntity, name);
             }
 
-            FE_CORE_DEBUG << "Deserialized entity with ID = " <<  uuid << ", name = " << name;
+            FE_LOG_DEBUG << "Deserialized entity with ID = " << uuid << ", name = " << name;
 
             if (const auto& transformComponent = entity["TransformComponent"]) {
                 scene->registry.emplace<TransformComponent>(deserializedEntity,
