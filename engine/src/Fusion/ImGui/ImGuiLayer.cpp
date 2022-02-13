@@ -1,6 +1,8 @@
 #include "ImGuiLayer.hpp"
 #include "Fusion.hpp"
 
+#include <imguizmo/ImGuizmo.h>
+
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
 
@@ -9,8 +11,8 @@ using namespace Fusion;
 static void ImGuiErrorCallback(VkResult err) {
     if (err == 0)
         return;
-    FS_LOG_ERROR("[Imgui] Error: VkResult = {0}", err);
-    FS_CORE_ASSERT(err >= 0, "[Imgui] Fatal: Vulkan result!");
+    FE_CORE_ERROR << "[Imgui] Error: VkResult = " << err;
+    FE_ASSERT(err >= 0 && "[Imgui] Fatal: Vulkan result!");
 }
 
 ImGuiLayer::ImGuiLayer(Renderer& renderer) : Layer{"ImGuiLayer"}, renderer{renderer} {
@@ -23,8 +25,7 @@ ImGuiLayer::~ImGuiLayer() {
 
 void ImGuiLayer::onAttach() {
     // the size of the pool is very oversize, but it's copied from imgui demo itself.
-    vk::DescriptorPoolSize poolSizes[] =
-    {
+    vk::DescriptorPoolSize poolSizes[] = {
             { vk::DescriptorType::eSampler, 1000 },
             { vk::DescriptorType::eCombinedImageSampler, 1000 },
             { vk::DescriptorType::eSampledImage, 1000 },
@@ -46,12 +47,14 @@ void ImGuiLayer::onAttach() {
 
     // Create Descriptor Pool
     auto result = renderer.getVulkan().getDevice().createDescriptorPool(&poolInfo, nullptr, &imguiPool);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create descriptor imgui pool!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor imgui pool!");
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -113,6 +116,8 @@ void ImGuiLayer::begin() {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::BeginFrame();
 }
 
 void ImGuiLayer::end(vk::CommandBuffer& commandBuffer) {
@@ -151,5 +156,3 @@ void ImGuiLayer::setDarkThemeColors() {
     colors[ImGuiCol_TitleBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
     colors[ImGuiCol_TitleBgCollapsed] = { 0.15f, 0.1505f, 0.151f, 1.0f };*/
 }
-
-

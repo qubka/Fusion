@@ -33,7 +33,7 @@ DescriptorPool::DescriptorPool(const Builder& builder) : vulkan{builder.vulkan} 
     descriptorPoolInfo.flags = builder.poolFlags;
 
     auto result = vulkan.getDevice().createDescriptorPool(&descriptorPoolInfo, nullptr, &descriptorPool);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create descriptor pool!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor pool!");
 }
 
 DescriptorPool::~DescriptorPool() {
@@ -49,7 +49,7 @@ bool DescriptorPool::allocateDescriptor(const vk::DescriptorSetLayout& setLayout
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
     // a new pool whenever an old pool fills up. But this is beyond our current scope
     if (vulkan.getDevice().allocateDescriptorSets(&allocInfo, &descriptor) != vk::Result::eSuccess) {
-        FS_LOG_CORE_ERROR("pools fills up!");
+        FE_CORE_ERROR << "pools fills up!";
         return false;
     }
 
@@ -67,7 +67,7 @@ void DescriptorPool::resetPool() {
 // *************** Descriptor Set Layout Builder *********************
 
 DescriptorLayout::Builder& DescriptorLayout::Builder::addBinding(uint32_t binding, vk::DescriptorType descriptorType, vk::ShaderStageFlags stageFlags, uint32_t count) {
-    FS_CORE_ASSERT(bindings.count(binding) == 0, "binding already in use");
+    FE_ASSERT(bindings.count(binding) == 0 && "binding already in use");
     vk::DescriptorSetLayoutBinding layoutBinding{};
     layoutBinding.binding = binding;
     layoutBinding.descriptorType = descriptorType;
@@ -96,7 +96,7 @@ DescriptorLayout::DescriptorLayout(const Builder& builder) : vulkan{builder.vulk
     descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
 
     auto result = vulkan.getDevice().createDescriptorSetLayout(&descriptorSetLayoutInfo, nullptr, &descriptorSetLayout);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create descriptor set layout!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor set layout!");
 }
 
 DescriptorLayout::~DescriptorLayout() {
@@ -109,9 +109,9 @@ DescriptorWriter::DescriptorWriter(DescriptorLayout& layout, DescriptorPool& poo
 }
 
 DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, const vk::DescriptorBufferInfo& bufferInfo) {
-    FS_CORE_ASSERT(layout.bindings.count(binding) == 1, "layout does not contain specified binding");
+    FE_ASSERT(layout.bindings.count(binding) == 1 && "layout does not contain specified binding");
     const auto& bindingDescription = layout.bindings[binding];
-    FS_CORE_ASSERT(bindingDescription.descriptorCount == 1, "binding single descriptor info, but binding expects multiple");
+    FE_ASSERT(bindingDescription.descriptorCount == 1 && "binding single descriptor info, but binding expects multiple");
 
     vk::WriteDescriptorSet write{};
     write.descriptorType = bindingDescription.descriptorType;
@@ -124,9 +124,9 @@ DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, const vk::Desc
 }
 
 DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, const vk::DescriptorImageInfo& imageInfo) {
-    FS_CORE_ASSERT(layout.bindings.count(binding) == 1, "layout does not contain specified binding");
+    FE_ASSERT(layout.bindings.count(binding) == 1 && "layout does not contain specified binding");
     const auto& bindingDescription = layout.bindings[binding];
-    FS_CORE_ASSERT(bindingDescription.descriptorCount == 1, "binding single descriptor info, but binding expects multiple");
+    FE_ASSERT(bindingDescription.descriptorCount == 1 && "binding single descriptor info, but binding expects multiple");
 
     vk::WriteDescriptorSet write{};
     write.descriptorType = bindingDescription.descriptorType;
@@ -197,7 +197,7 @@ vk::DescriptorPool DescriptorAllocator::createPool(uint32_t count, vk::Descripto
     vk::DescriptorPool descriptorPool;
 
     auto result = vulkan.getDevice().createDescriptorPool(&poolInfo, nullptr, &descriptorPool);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create descriptor pool!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor pool!");
 
     return descriptorPool;
 }
@@ -306,7 +306,7 @@ vk::DescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(vk::Descri
         vk::DescriptorSetLayout layout;
 
         auto result = vulkan.getDevice().createDescriptorSetLayout(&info, nullptr, &layout);
-        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create descriptor set layout!");
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor set layout!");
 
         //add to cache
         layoutCache[layoutinfo] = layout;

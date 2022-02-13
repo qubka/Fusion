@@ -8,7 +8,8 @@
 #include "Fusion/Core/Layer.hpp"
 #include "Fusion/Scene/Scene.hpp"
 #include "Fusion/Scene/SceneSerializer.hpp"
-#include "Fusion/Input/KeyInput.hpp"
+#include "Fusion/Input/BaseInput.hpp"
+#include "Fusion/Utils/ProcessInfo.hpp"
 
 namespace Fusion {
     class FUSION_API EditorLayer : public Layer {
@@ -26,12 +27,28 @@ namespace Fusion {
         void openScene();
         void saveSceneAs();
 
+        void UI_Toolbar();
+
         std::shared_ptr<Scene> activeScene;
         EditorCamera editorCamera;
-        KeyInput keyInput;
+
+        ProcessInfo info{static_cast<unsigned int>(getpid())};
 
         // Panels
         SceneHierarchyPanel sceneHierarchyPanel;
         ContentBrowserPanel contentBrowserPanel;
+
+        bool viewportFocused{false};
+        bool viewportHovered{false};
+        glm::vec2 viewportSize{};
+        glm::vec2 viewportBounds[2]{};
+        bool firstFrame{false};
+        int gizmoType = -1;
+        float camDistance;
+
+        enum class SceneState {
+            Edit = 0, Play = 1
+        };
+        SceneState sceneState = SceneState::Edit;
     };
 }

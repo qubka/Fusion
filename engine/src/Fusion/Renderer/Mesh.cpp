@@ -15,7 +15,7 @@ Mesh::~Mesh() {
 
 void Mesh::createVertexBuffers(const std::vector<Vertex>& vertices) {
     vertexCount = static_cast<uint32_t>(vertices.size());
-    FS_CORE_ASSERT(vertexCount >= 3, "Vertex count must be at least 3");
+    FE_ASSERT(vertexCount >= 3 && "Vertex count must be at least 3");
     vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
     uint32_t vertexSize = sizeof(vertices[0]);
 
@@ -123,7 +123,7 @@ void Mesh::Builder::loadModel(const std::string &filepath) {
     std::string warn, err;
 
     if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
-        /FS_ASSERT(warn + err);
+        /FE_ASSERT(warn + err);
     }
 
     vertices.clear();

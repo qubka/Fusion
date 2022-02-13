@@ -13,6 +13,7 @@ add_library(${PROJECT_NAME} STATIC ${COMMON_SRC} ${PLATFORM_SRC})
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC ${HEADER_FILES})
 
+message("${YAML_LIB_INC_PATH}")
 target_include_directories(${PROJECT_NAME} PUBLIC external src)
 target_link_libraries(${PROJECT_NAME}
         PUBLIC
@@ -21,12 +22,12 @@ target_link_libraries(${PROJECT_NAME}
         glm
         entt
         magic_enum
-        rapidjson
-        #stb
+        stb
         #glad
         #glm_static    # if build with add_subdirectory
-        spdlog::spdlog
+        plog
+        yaml-cpp
 )
 
 # defines
-target_compile_definitions(${PROJECT_NAME} PUBLIC FS_DEBUG GLFW_INCLUDE_VULKAN VULKAN_HPP_DISABLE_ENHANCED_MODE)
+target_compile_definitions(${PROJECT_NAME} PUBLIC FE_DEBUG GLFW_INCLUDE_VULKAN VULKAN_HPP_DISABLE_ENHANCED_MODE)

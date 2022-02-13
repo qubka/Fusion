@@ -7,7 +7,7 @@ using namespace Fusion;
 uint8_t Window::GLFWwindowCount{0};
 
 static void GLFWErrorCallback(int error, const char* description) {
-    FS_LOG_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+    FE_CORE_ERROR << "[GLFW] Error (" << error << "): " << description;
 }
 
 Window::Window(std::string title, int width, int height) :
@@ -17,11 +17,11 @@ Window::Window(std::string title, int width, int height) :
     aspect{static_cast<float>(width) / static_cast<float>(height)},
     minimize{width == 0 || height == 0}
 {
-    FS_CORE_ASSERT(width >= 0 && height >= 0, "width or height cannot be negative");
+    FE_ASSERT(width >= 0 && height >= 0 && "width or height cannot be negative");
 
     if (GLFWwindowCount == 0) {
         int success = glfwInit();
-        FS_CORE_ASSERT(success, "could not initialize GLFW!");
+        FE_ASSERT(success && "could not initialize GLFW!");
         glfwSetErrorCallback(GLFWErrorCallback);
     }
 
@@ -38,13 +38,13 @@ Window::~Window() {
 }
 
 void Window::init() {
-    FS_LOG_CORE_INFO("Creating window: {0} ({1}, {2})", title, width, height);
+    FE_CORE_INFO << "Creating window: " << title << " [" << width << " " << height << "]";
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
     window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
-    FS_CORE_ASSERT(window, "failed to create window!");
+    FE_ASSERT(window && "failed to create window!");
     GLFWwindowCount++;
 
     glfwSetWindowUserPointer(window, this);

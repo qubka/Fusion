@@ -1,47 +1,39 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-
 #include "MouseCodes.hpp"
 #include "KeyCodes.hpp"
 
-namespace Fusion {
-    class Window;
+#include "Fusion/Renderer/Window.hpp"
 
-    /// Regards to Jonathan Heard
-    /// @link https://stackoverflow.com/questions/55573238/how-do-i-do-a-proper-input-class-in-glfw-for-a-game-engine
-    template<class T>
+namespace Fusion {
+    /* Global class */
+
     class FUSION_API Input {
     public:
-        //! Takes a list of which keys to keep state for
-        Input(const std::vector<T>& keysToMonitor);
-        ~Input() = default;
+        static bool GetKey(int keycode);
+        static bool GetKeyDown(int keycode);
 
-        /*virtual void onAttach() {}
-        virtual void onDetach() {}
-        virtual void onUpdate() { currentFrame++; }*/
+        static bool GetMouseButton(int button);
+        static bool GetMouseButtonDown(int button);
 
-        //! If disabled, Input.isKey_ always returns false
-        bool isEnabled() const { return enabled; }
-        void isEnabled(bool flag) { enabled = flag; }
+        static glm::vec2& MousePosition();
+        static glm::vec2& MouseDelta();
+
+    private:
+        static bool keys[1032];
+        static uint32_t frames[1032];
+        static uint32_t current;
+        static glm::vec2 delta;
+        static glm::vec2 position;
+
+        static void Init(Window& window);
+        static void Update();
+
+        friend class Application;
+
     protected:
-        bool isKey(T keycode) const;
-        bool isKeyUp(T keycode) const;
-        bool isKeyDown(T keycode) const;
-
-        //! Used internally to update key states. Should be called by the GLFW callbacks
-        void setKey(T keycode, uint8_t action);
-
-        struct Key {
-            bool pressed{false};
-            uint64_t lastFrame{std::numeric_limits<uint64_t>::max()};
-        };
-
-        std::map<T, Key> keys;
-        //uint32_t currentFrame{0}; // can be used instead of global if needed
-        bool enabled{true};
+        static void CursorPositionCallback(GLFWwindow* window, double mouseX, double mouseY);
+        static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mode);
+        static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
     };
-
-    template class Input<MouseCode>;
-    template class Input<KeyCode>;
 }

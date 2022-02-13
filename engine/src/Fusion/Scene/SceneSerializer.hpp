@@ -3,7 +3,7 @@
 namespace Fusion {
     class Scene;
 
-    class SceneSerializer {
+    class FUSION_API SceneSerializer {
     public:
         SceneSerializer(const std::shared_ptr<Scene>& scene);
         ~SceneSerializer() = default;

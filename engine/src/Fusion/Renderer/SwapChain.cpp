@@ -90,17 +90,17 @@ void SwapChain::createSwapChain() {
     createInfo.oldSwapchain = oldSwapChain == nullptr ? vk::SwapchainKHR(nullptr) : oldSwapChain->swapChain;
 
     auto result = vulkan.getDevice().createSwapchainKHR(&createInfo, nullptr, &swapChain);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create swap chain!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create swap chain!");
 
     // we only specified a minimum number of images in the swap chain, so the implementation is
     // allowed to create a swap chain with more. That's why we'll first query the final number of
     // images with vkGetSwapchainImagesKHR, then resize the container and finally call it again to
     // retrieve the handles.
     result = vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, nullptr);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to get swap chain images count!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to get swap chain images count!");
     swapChainImages.resize(imageCount);
     result = vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, swapChainImages.data());
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to get swap chain images!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to get swap chain images!");
 
     swapChainImageFormat = surfaceFormat.format;
     swapChainExtent = extent;
@@ -211,7 +211,7 @@ void SwapChain::createRenderPass() {
     renderPassInfo.pDependencies = &dependency;
 
     auto result = vulkan.getDevice().createRenderPass(&renderPassInfo, nullptr, &renderPass);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create render pass!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create render pass!");
 }
 
 void SwapChain::createDepthResources() {
@@ -246,7 +246,7 @@ void SwapChain::createFramebuffers() {
         framebufferInfo.layers = 1;
 
         auto result = vulkan.getDevice().createFramebuffer(&framebufferInfo, nullptr, &swapChainFramebuffers[i]);
-        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create framebuffer!");
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to create framebuffer!");
     }
 }
 
@@ -263,11 +263,11 @@ void SwapChain::createSyncObjects() {
     vk::Result result;
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         result = vulkan.getDevice().createSemaphore(&semaphoreInfo, nullptr, &imageAvailableSemaphores[i]);
-        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create semaphore objects for a frame!");
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to create semaphore objects for a frame!");
         result = vulkan.getDevice().createSemaphore(&semaphoreInfo, nullptr, &renderFinishedSemaphores[i]);
-        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create semaphore objects for a frame!");
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to create semaphore objects for a frame!");
         result = vulkan.getDevice().createFence(&fenceInfo, nullptr, &inFlightFences[i]);
-        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create fence objects for a frame!");
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to create fence objects for a frame!");
     }
 }
 
@@ -283,7 +283,7 @@ vk::Format SwapChain::findDepthFormat() const {
 
 vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex) const {
     auto result = vulkan.getDevice().waitForFences(1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to wait for fences");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to wait for fences");
     result = vulkan.getDevice().acquireNextImageKHR(swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], nullptr, &imageIndex);
     return result;
 }
@@ -293,7 +293,7 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
     vk::Fence* image = imagesInFlight[imageIndex];
     if (image != nullptr) {
         auto result = vulkan.getDevice().waitForFences(1, image, VK_TRUE, std::numeric_limits<uint64_t>::max());
-        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to wait for fences");
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to wait for fences");
     }
     imagesInFlight[imageIndex] = &fence;
 
@@ -313,10 +313,10 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
     submitInfo.pSignalSemaphores = signalSemaphores;
 
     auto result = vulkan.getDevice().resetFences(1, &fence);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to reset the fence");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to reset the fence");
 
     result = vulkan.getGraphicsQueue().submit(1, &submitInfo, fence);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to reset the fence");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to reset the fence");
 
     vk::PresentInfoKHR presentInfo{};
     presentInfo.waitSemaphoreCount = 1;
@@ -329,7 +329,7 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
     presentInfo.pResults = nullptr; // Optional
 
     result = vulkan.getPresentQueue().presentKHR(&presentInfo);
-    //FS_CORE_ASSERT(result == vk::Result::eSuccess || result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR, "failed to present swap chain image!");
+    //FE_ASSERT((result == vk::Result::eSuccess || result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) && "failed to present swap chain image!");
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 

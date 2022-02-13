@@ -1,6 +1,6 @@
 #pragma once
 
-/*#include "Device.hpp"
+#include "Vulkan.hpp"
 
 namespace Fusion {
     class FUSION_API Texture {
@@ -42,7 +42,6 @@ namespace Fusion {
         vk::Format format;
         vk::Sampler sampler;
 
-        void createImage(void* pixels);
-        void createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode);
+        void createImage(void* pixels, vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode);
     };
-}*/
+}

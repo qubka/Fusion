@@ -61,7 +61,7 @@ void Pipeline::createGraphicsPipeline(const std::string& vertPath, const std::st
     pipelineInfo.basePipelineHandle = nullptr;
 
     auto result = vulkan.getDevice().createGraphicsPipelines(nullptr, 1, &pipelineInfo, nullptr, &graphicsPipeline);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create pipeline layout!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create pipeline layout!");
 }
 
 void Pipeline::createShaderModule(const std::vector<char>& code, vk::ShaderModule& shaderModule) {
@@ -71,14 +71,14 @@ void Pipeline::createShaderModule(const std::vector<char>& code, vk::ShaderModul
         reinterpret_cast<const uint32_t*>(code.data())
     };
     auto result = vulkan.getDevice().createShaderModule(&createInfo, nullptr, &shaderModule);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create shader module!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create shader module!");
 }
 
 std::vector<char> Pipeline::readFile(const std::string& path) {
     std::ifstream file {path, std::ios::ate | std::ios::binary};
 
     if (!file.is_open()) {
-        FS_LOG_CORE_ERROR("Failed to open file: {0}", path);
+        FE_CORE_ERROR << "Failed to open file: " << path;
         return {};
     }
 

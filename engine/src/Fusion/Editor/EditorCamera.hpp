@@ -3,9 +3,10 @@
 #include "Fusion/Renderer/PerspectiveCamera.hpp"
 
 namespace Fusion {
+    class KeyInput;
+    class MouseInput;
 
-    class FUSION_API EditorCamera : public PerspectiveCamera
-    {
+    class FUSION_API EditorCamera : public PerspectiveCamera {
     public:
         EditorCamera();
         EditorCamera(float fov, float aspect, float near, float far);
@@ -15,8 +16,10 @@ namespace Fusion {
 
         float getPitch() const { return pitch; }
         float getYaw() const { return yaw; }
-        inline float getDistance() const { return distance; }
-        inline void setDistance(float value) { distance = value; }
+        float getDistance() const { return distance; }
+        void setDistance(float value) { distance = value; }
+        float getSpeed() const { return speed; }
+        void setSpeed(float value) { speed = value; }
 
         //inline void SetViewportSize(float width, float height) { m_ViewportWidth = width; m_ViewportHeight = height; UpdateProjection(); }
 
@@ -34,6 +37,7 @@ namespace Fusion {
         glm::vec3 focalPoint = { 0.0f, 0.0f, 0.0f };
 
         float distance{10.0f};
+        float speed{1.0f};
         float pitch{0.0f};
         float yaw{0.0f};
     };

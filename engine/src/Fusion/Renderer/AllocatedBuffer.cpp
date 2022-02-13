@@ -35,9 +35,9 @@ AllocatedBuffer::~AllocatedBuffer() {
  * @return VkResult of the buffer mapping call
  */
 void AllocatedBuffer::map(vk::DeviceSize size, vk::DeviceSize offset) {
-    FS_CORE_ASSERT(buffer && memory, "Called map on buffer before create");
+    FE_ASSERT(buffer && memory && "Called map on buffer before create");
     auto result = vulkan.getDevice().mapMemory(memory, offset, size, vk::MemoryMapFlagBits(), &mapped);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to map memory on the device!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to map memory on the device!");
 }
 
 /**
@@ -62,7 +62,7 @@ void AllocatedBuffer::unmap() {
  *
  */
 void AllocatedBuffer::writeToBuffer(void* data, vk::DeviceSize size, vk::DeviceSize offset) {
-    FS_CORE_ASSERT(mapped, "Cannot copy to unmapped buffer");
+    FE_ASSERT(mapped && "Cannot copy to unmapped buffer");
 
     if (size == VK_WHOLE_SIZE) {
         memcpy(mapped, data, bufferSize);

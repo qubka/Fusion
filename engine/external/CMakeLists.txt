@@ -12,12 +12,20 @@ set(GLFW_INSTALL        OFF CACHE BOOL "" FORCE)
 add_subdirectory(${GLFW_LIB_NAME})
 
 
+# plog
+set(PLOG_LIB_NAME "plog")
+
+set(PLOG_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(${PLOG_LIB_NAME})
+
+
 # spdlog
-set(SPDLOG_LIB_NAME "spdlog")
+#set(SPDLOG_LIB_NAME "spdlog")
 
-set(SPDLOG_MASTER_PROJECT OFF CACHE BOOL "" FORCE)
+#set(SPDLOG_MASTER_PROJECT OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(${SPDLOG_LIB_NAME})
+#add_subdirectory(${SPDLOG_LIB_NAME})
 
 # OR
 #set(SPDLOG_LIB_NAME "spdlog")
@@ -74,6 +82,7 @@ target_include_directories(${GLAD_LIB_NAME}
         "${GLAD_INC_PATH}"
         )
 
+
 # entt
 set(ENTT_LIB_NAME "entt")
 set(ENTT_INC_PATH ${ENTT_LIB_NAME}/src)
@@ -85,6 +94,7 @@ target_include_directories(${ENTT_LIB_NAME}
         ${ENTT_INC_PATH}
         )
 
+
 # magic_enum
 set(MAGIC_ENUM_LIB_NAME "magic_enum")
 set(MAGIC_ENUM_INC_PATH ${MAGIC_ENUM_LIB_NAME}/include)
@@ -95,7 +105,6 @@ target_include_directories(${MAGIC_ENUM_LIB_NAME}
         INTERFACE
         ${MAGIC_ENUM_INC_PATH}
         )
-
 
 # OR
 #set(ENTT_LIB_NAME "ENTT")
@@ -111,8 +120,20 @@ target_include_directories(${MAGIC_ENUM_LIB_NAME}
 #)
 
 
-# imgui
+# entt
+set(STB_LIB_NAME "stb")
+set(STB_INC_PATH ${STB_LIB_NAME}/)
+
+add_library(${STB_LIB_NAME} INTERFACE)
+
+target_include_directories(${STB_LIB_NAME}
+        INTERFACE
+        ${STB_INC_PATH}
+        )
+
+# imgui and imguizmo
 set(IMGUI_LIB_NAME "imgui")
+set(IMGUIZO_LIB_NAME "imguizmo")
 
 set(IMGUI_SOURCES
         "${IMGUI_LIB_NAME}/imgui.cpp"
@@ -123,6 +144,12 @@ set(IMGUI_SOURCES
         "${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.cpp"
         #"${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.cpp"
         "${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.cpp"
+
+        "${IMGUIZO_LIB_NAME}/GraphEditor.cpp"
+        "${IMGUIZO_LIB_NAME}/ImCurveEdit.cpp"
+        "${IMGUIZO_LIB_NAME}/ImGradient.cpp"
+        "${IMGUIZO_LIB_NAME}/ImGuizmo.cpp"
+        "${IMGUIZO_LIB_NAME}/ImSequencer.cpp"
         )
 
 set(IMGUI_HEADERS
@@ -135,6 +162,13 @@ set(IMGUI_HEADERS
         "${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.h"
         #"${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.h"
         "${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.h"
+
+        "${IMGUIZO_LIB_NAME}/GraphEditor.h"
+        "${IMGUIZO_LIB_NAME}/ImCurveEdit.h"
+        "${IMGUIZO_LIB_NAME}/ImGradient.h"
+        "${IMGUIZO_LIB_NAME}/ImGuizmo.h"
+        "${IMGUIZO_LIB_NAME}/ImSequencer.h"
+        "${IMGUIZO_LIB_NAME}/ImZoomSlider.h"
         )
 
 set(IMGUI_INC_PATH "${IMGUI_LIB_NAME}/")
@@ -147,7 +181,8 @@ add_library(${IMGUI_LIB_NAME}
 
 target_compile_definitions(${IMGUI_LIB_NAME}
         PRIVATE
-        IMGUI_IMPL_OPENGL_LOADER_GLAD=1
+        #IMGUI_IMPL_OPENGL_LOADER_GLAD=1
+        USE_IMGUI_API
         )
 
 target_include_directories(${IMGUI_LIB_NAME}
@@ -158,20 +193,10 @@ target_include_directories(${IMGUI_LIB_NAME}
         )
 
 
-# rapidjson
-set(RAPIDJSON_LIB_NAME "rapidjson")
-set(RAPIDJSON_INC_PATH ${RAPIDJSON_LIB_NAME}/include)
+# yaml-cpp
+set(YAML_LIB_NAME "yaml-cpp")
 
-#set(RAPIDJSON_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-#set(RAPIDJSON_BUILD_DOC OFF CACHE BOOL "" FORCE)
-#set(RAPIDJSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-#set(RAPIDJSON_BUILD_THIRDPARTY_GTEST OFF CACHE BOOL "" FORCE)
-#set(RAPIDJSON_BUILD_CXX17 OFF CACHE BOOL "" FORCE)
-#set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
+add_subdirectory(${YAML_LIB_NAME})
 
-add_library(${RAPIDJSON_LIB_NAME} INTERFACE)
-
-target_include_directories(${RAPIDJSON_LIB_NAME}
-        INTERFACE
-        ${RAPIDJSON_INC_PATH}
-        )
+set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "" FORCE)
+set(YAML_BUILD_SHARED_LIBS ON)

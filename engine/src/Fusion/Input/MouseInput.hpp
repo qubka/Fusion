@@ -1,15 +1,17 @@
 #pragma once
 
-#include "Input.hpp"
+#include "BaseInput.hpp"
 #include "MouseCodes.hpp"
 
 namespace Fusion {
     class Window;
 
-    class FUSION_API MouseInput : public Input<MouseCode> {
+    class FUSION_API MouseInput : public BaseInput<MouseCode> {
     public:
         MouseInput(const std::vector<MouseCode>& buttonsToMonitor);
         ~MouseInput();
+
+        void onUpdate() override;
 
         //! Returns whether the given mouse button is held down.
         bool getMouseButton(MouseCode button) const { return isKey(button); };

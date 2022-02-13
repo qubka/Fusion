@@ -7,7 +7,7 @@ using namespace Fusion;
 
 std::vector<MouseInput*> MouseInput::instances;
 
-MouseInput::MouseInput(const std::vector<MouseCode>& buttonsToMonitor) : Input<MouseCode>{buttonsToMonitor} {
+MouseInput::MouseInput(const std::vector<MouseCode>& buttonsToMonitor) : BaseInput<MouseCode>{buttonsToMonitor} {
     instances.push_back(this);
 }
 
@@ -15,8 +15,14 @@ MouseInput::~MouseInput() {
     instances.erase(std::remove(instances.begin(), instances.end(), this), instances.end());
 }
 
+void MouseInput::onUpdate() {
+    delta.x = 0;
+    delta.y = 0;
+    BaseInput::onUpdate();
+}
+
 void MouseInput::setCursorPosition(const glm::vec2& pos) {
-    delta = pos - position;
+    delta += pos - position;
     position = pos;
 }
 

@@ -19,6 +19,7 @@ namespace Fusion {
         ~Renderer();
 
         const Vulkan& getVulkan() const { return vulkan; }
+        glm::vec3& getColor() { return color; }
 
         const vk::DescriptorSetLayout& getGlobalLayoutSet() const;
         const vk::RenderPass& getSwapChainRenderPass() const;
@@ -49,6 +50,8 @@ namespace Fusion {
         std::vector<vk::DescriptorSet> globalDescriptorSets;
         std::unique_ptr<DescriptorPool> globalPool;
         std::unique_ptr<DescriptorLayout> globalLayout;
+
+        glm::vec3 color{0};
 
         uint32_t currentImageIndex{0};
         uint32_t currentFrameIndex{0};

@@ -1,28 +1,28 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
+#include <plog/Log.h>
 
 namespace Fusion {
+    // Define log instances. Default is 0 and is omitted from this enum.
+    enum {
+        EngineLog = 0,
+        GameLog = 1
+    };
+
     class FUSION_API Log {
     public:
         static void Init();
-
-        static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return coreLogger; }
-        static std::shared_ptr<spdlog::logger>& GetGameLogger() { return gameLogger; }
-    private:
-        static std::shared_ptr<spdlog::logger> coreLogger;
-        static std::shared_ptr<spdlog::logger> gameLogger;
     };
 }
 
-#define FS_LOG_CORE_TRACE(...) ::Fusion::Log::GetCoreLogger()->trace(__VA_ARGS__)
-#define FS_LOG_CORE_INFO(...) ::Fusion::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define FS_LOG_CORE_WARN(...) ::Fusion::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define FS_LOG_CORE_ERROR(...) ::Fusion::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define FS_LOG_CORE_FATAL(...) ::Fusion::Log::GetCoreLogger()->critical(__VA_ARGS__)
+#define FE_CORE_DEBUG PLOG_DEBUG
+#define FE_CORE_INFO  PLOG_INFO
+#define FE_CORE_WARNING PLOG_WARNING
+#define FE_CORE_ERROR PLOG_ERROR
+#define FE_CORE_FATAL PLOG_FATAL
 
-#define FS_LOG_TRACE(...) ::Fusion::Log::GetGameLogger()->trace(__VA_ARGS__)
-#define FS_LOG_INFO(...) ::Fusion::Log::GetGameLogger()->info(__VA_ARGS__)
-#define FS_LOG_WARN(...) ::Fusion::Log::GetGameLogger()->warn(__VA_ARGS__)
-#define FS_LOG_ERROR(...) ::Fusion::Log::GetGameLogger()->error(__VA_ARGS__)
-#define FS_LOG_FATAL(...) ::Fusion::Log::GetGameLogger()->critical(__VA_ARGS__)
+#define FE_LOG_DEBUG PLOGD_(Fusion::GameLog, plog::debug)
+#define FE_LOG_INFO PLOG_(Fusion::GameLog, plog::info)
+#define FE_LOG_WARNING PLOGD_(Fusion::GameLog, plog::warning)
+#define FE_LOG_ERROR PLOGD_(Fusion::GameLog, plog::error)
+#define FE_LOG_FATAL PLOGD_(Fusion::GameLog, plog::fatal)

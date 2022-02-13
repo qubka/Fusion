@@ -6,6 +6,7 @@
 #include "Fusion/Core/Time.hpp"
 
 #include "Fusion/Input/Input.hpp"
+#include "Fusion/Input/BaseInput.hpp"
 #include "Fusion/Input/KeyInput.hpp"
 #include "Fusion/Input/KeyCodes.hpp"
 #include "Fusion/Input/MouseInput.hpp"
@@ -39,6 +40,7 @@
 
 #include "Fusion/Scene/Components.hpp"
 #include "Fusion/Scene/Scene.hpp"
+#include "Fusion/Scene/SceneSerializer.hpp"
 
 #include "Fusion/ImGui/ImGuiLayer.hpp"
 

@@ -20,12 +20,12 @@ namespace Fusion {
         operator glm::mat4() const {
             glm::mat4 m{1};
             return glm::translate(m, translation)
-                   * glm::mat4_cast(glm::quat(rotation))
+                   * glm::mat4_cast(glm::quat(glm::radians(rotation)))
                    * glm::scale(m, scale);
         };
     };
 
-    struct FUSION_API TranslateComponent {
+    /*struct FUSION_API TranslateComponent {
         glm::mat4 transform{1};
 
         glm::mat4& operator*() { return transform; };
@@ -55,7 +55,7 @@ namespace Fusion {
         glm::vec3& operator*() { return scale; };
         const glm::vec3& operator*() const { return scale; };
         operator glm::vec3() const { return scale; };
-    };
+    };*/
 
     struct FUSION_API CameraComponent {
         SceneCamera camera;

@@ -11,7 +11,7 @@ uint64_t Time::frameCount{};
 uint32_t Time::frameNumber{};
 uint32_t Time::framesPerSecond{};
 
-void Time::Tick() {
+void Time::Update() {
     double currentTime = glfwGetTime();
     elapsedTime = static_cast<float>(currentTime - time);
     time = currentTime;

@@ -1,6 +1,6 @@
 #pragma once
 
-/*namespace Fusion {
+namespace Fusion {
     struct FUSION_API Image {
         uint8_t* pixels;
         int width;
@@ -10,4 +10,4 @@
         Image(const std::string& path, int channels = 4, bool flip = true);
         ~Image();
     };
-}*/
+}

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Input.hpp"
+#include "BaseInput.hpp"
 #include "KeyCodes.hpp"
 
 namespace Fusion {
     class Window;
 
-    class FUSION_API KeyInput : public Input<KeyCode> {
+    class FUSION_API KeyInput : public BaseInput<KeyCode> {
     public:
         KeyInput(const std::vector<KeyCode>& keysToMonitor);
         ~KeyInput();

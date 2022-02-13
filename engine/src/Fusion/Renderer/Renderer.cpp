@@ -30,7 +30,7 @@ void Renderer::createCommandBuffers() {
     allocInfo.commandBufferCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
 
     auto result = vulkan.getDevice().allocateCommandBuffers(&allocInfo, commandBuffers.data());
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to allocateDescriptor command buffers!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to allocateDescriptor command buffers!");
 }
 
 void Renderer::createUniformBuffers() {
@@ -78,7 +78,7 @@ void Renderer::recreateSwapChain() {
     }
 
     auto result = vulkan.getDevice().waitIdle();
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to wait on the device!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to wait on the device!");
 
     if (swapChain == nullptr) {
         swapChain = std::make_unique<SwapChain>(vulkan, extent);
@@ -87,12 +87,12 @@ void Renderer::recreateSwapChain() {
         swapChain = std::make_unique<SwapChain>(vulkan, extent, oldSwapChain);
 
         bool compatible = oldSwapChain->compareSwapFormats(*swapChain);
-        FS_CORE_ASSERT(compatible, "swap chain image(or depth) format has changed");
+        FE_ASSERT(compatible && "swap chain image(or depth) format has changed");
     }
 }
 
 vk::CommandBuffer Renderer::beginFrame() {
-    FS_CORE_ASSERT(!isFrameStarted, "cannot call beginFrame while already in progress");
+    FE_ASSERT(!isFrameStarted && "cannot call beginFrame while already in progress");
 
     auto result = swapChain->acquireNextImage(currentImageIndex);
 
@@ -101,7 +101,7 @@ vk::CommandBuffer Renderer::beginFrame() {
         return nullptr;
     }
 
-    FS_CORE_ASSERT(result == vk::Result::eSuccess || result == vk::Result::eSuboptimalKHR, "failed to acquire swap chain image");
+    FE_ASSERT((result == vk::Result::eSuccess || result == vk::Result::eSuboptimalKHR) && "failed to acquire swap chain image");
 
     isFrameStarted = true;
 
@@ -110,14 +110,14 @@ vk::CommandBuffer Renderer::beginFrame() {
     beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 
     result = commandBuffer.begin(&beginInfo);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to begin recording command buffer!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to begin recording command buffer!");
 
     return commandBuffer;
 }
 
 void Renderer::beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
-    FS_CORE_ASSERT(isFrameStarted, "cannot call beginSwapChainRenderPass if frame is not in progress");
-    FS_CORE_ASSERT(commandBuffer == getCurrentCommandBuffer(), "cannot begin render pass on command buffer from a different frame");
+    FE_ASSERT(isFrameStarted && "cannot call beginSwapChainRenderPass if frame is not in progress");
+    FE_ASSERT(commandBuffer == getCurrentCommandBuffer() && "cannot begin render pass on command buffer from a different frame");
 
     const auto& extent = swapChain->getSwapChainExtent();
     vk::RenderPassBeginInfo renderPassInfo{};
@@ -127,7 +127,7 @@ void Renderer::beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
     renderPassInfo.renderArea.extent = extent;
 
     std::array<vk::ClearValue, 2> clearValues{};
-    clearValues[0].color = std::array<float, 4>{ 0, 0, 0, 1 };
+    clearValues[0].color = std::array<float, 4>{ color.x, color.y, color.z, 1 };
     clearValues[1].depthStencil.depth = 1.0f;
     clearValues[1].depthStencil.stencil = 0;
 
@@ -150,25 +150,25 @@ void Renderer::beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
 }
 
 void Renderer::endSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
-    FS_CORE_ASSERT(isFrameStarted, "cannot call endSwapChainRenderPass if frame is not in progress");
-    FS_CORE_ASSERT(commandBuffer == getCurrentCommandBuffer(), "cannot end render pass on command buffer from a different frame");
+    FE_ASSERT(isFrameStarted && "cannot call endSwapChainRenderPass if frame is not in progress");
+    FE_ASSERT(commandBuffer == getCurrentCommandBuffer() && "cannot end render pass on command buffer from a different frame");
 
     commandBuffer.endRenderPass();
 }
 
 void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
-    FS_CORE_ASSERT(isFrameStarted, "cannot call endFrame if frame is not in progress");
-    FS_CORE_ASSERT(commandBuffer == getCurrentCommandBuffer(), "cannot end command buffer from a different frame");
+    FE_ASSERT(isFrameStarted && "cannot call endFrame if frame is not in progress");
+    FE_ASSERT(commandBuffer == getCurrentCommandBuffer() && "cannot end command buffer from a different frame");
 
     auto result = commandBuffer.end();
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to record command buffer!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to record command buffer!");
 
     result = swapChain->submitCommandBuffers(commandBuffer, currentImageIndex);
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
-        FS_LOG_CORE_TRACE("swap chain out of date/suboptimal/window resized - recreating");
+        FE_CORE_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
         recreateSwapChain();
     } else {
-        FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to present swap chain image");
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to present swap chain image");
     }
 
     isFrameStarted = false;
@@ -194,21 +194,21 @@ bool Renderer::isFrameInProgress() const {
 }
 
 const vk::CommandBuffer& Renderer::getCurrentCommandBuffer() {
-    FS_CORE_ASSERT(isFrameStarted, "cannot get command buffer when frame not in progress");
+    FE_ASSERT(isFrameStarted && "cannot get command buffer when frame not in progress");
     return commandBuffers[currentFrameIndex];
 }
 
 const std::unique_ptr<AllocatedBuffer>& Renderer::getCurrentUniformBuffer() {
-    FS_CORE_ASSERT(isFrameStarted, "cannot get uniform buffer when frame not in progress");
+    FE_ASSERT(isFrameStarted && "cannot get uniform buffer when frame not in progress");
     return uniformBuffers[currentFrameIndex];
 }
 
 const vk::DescriptorSet& Renderer::getCurrentDescriptorSet() {
-    FS_CORE_ASSERT(isFrameStarted, "cannot get descriptor set when frame not in progress");
+    FE_ASSERT(isFrameStarted && "cannot get descriptor set when frame not in progress");
     return globalDescriptorSets[currentFrameIndex];
 }
 
 uint32_t Renderer::getFrameIndex() const {
-    FS_CORE_ASSERT(isFrameStarted, "cannot get frame index when frame not in progress");
+    FE_ASSERT(isFrameStarted && "cannot get frame index when frame not in progress");
     return currentFrameIndex;
 }

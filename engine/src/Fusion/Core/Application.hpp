@@ -17,7 +17,7 @@ namespace Fusion {
         char** args{nullptr};
 
         const char* operator[](int index) const {
-            FS_CORE_ASSERT(index < count, "invalid argument index");
+            FE_ASSERT(index < count && "invalid argument index");
             return args[index];
         }
     };
@@ -32,10 +32,13 @@ namespace Fusion {
         void pushLayer(Layer* layer);
         void pushOverlay(Layer* overlay);
 
-        //Window& getWindow() { return window; }
-        //CommandLineArgs& getCommandLineArgs() { return commandLineArgs; }
-        //ImGuiLayer& getGuiLayer() { return *imGuiLayer; }
-        //static Application& Instance() { return *instance; }
+        Window& getWindow() { return window; }
+        Vulkan& getVulkan() { return vulkan; }
+        Renderer& getRenderer() { return renderer; }
+
+        CommandLineArgs& getCommandLineArgs() { return commandLineArgs; }
+        ImGuiLayer& getImGuiLayer() { return *imGuiLayer; }
+        static Application& Instance() { return *instance; }
     private:
         Window window;
         CommandLineArgs commandLineArgs;
@@ -44,6 +47,7 @@ namespace Fusion {
 
         LayerStack layers;
         ImGuiLayer* imGuiLayer;
+        //std::vector<Input*> inputs;
 
         static Application* instance;
         friend int ::main(int argc, char** argv);

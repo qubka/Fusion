@@ -1,66 +1,80 @@
 #include "Input.hpp"
-#include "Fusion/Core/Time.hpp"
+
+#define MOUSE_BUTTONS 1024
 
 using namespace Fusion;
 
-template<class T>
-Input<T>::Input(const std::vector<T>& keysToMonitor) {
-    for (T keycode : keysToMonitor) {
-        keys.emplace(keycode, Key{});
-    }
+bool Input::keys[]{};
+uint32_t Input::frames[]{std::numeric_limits<uint32_t>::max()};
+uint32_t Input::current{};
+glm::vec2 Input::delta{};
+glm::vec2 Input::position{};
+
+void Input::Init(Window& window) {
+    glfwSetKeyCallback(window, KeyCallback);
+    glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    glfwSetCursorPosCallback(window, CursorPositionCallback);
+    //glfwSetScrollCallback
 }
 
-template<class T>
-bool Input<T>::isKey(T keycode) const {
-    if (enabled) {
-        if (auto it = keys.find(keycode); it != keys.end()) {
-            const auto& key{ it->second };
-            return key.pressed;
-        }
-    }
-    return false;
+bool Input::GetKey(int keycode) {
+    if (keycode < 0 || keycode >= MOUSE_BUTTONS)
+        return false;
+    return keys[keycode];
 }
 
-template<class T>
-bool Input<T>::isKeyUp(T keycode) const {
-    if (enabled) {
-        if (auto it = keys.find(keycode); it != keys.end()) {
-            const auto& key{ it->second };
-            return !key.pressed && key.lastFrame == Time::FrameCount();
-        }
-    }
-    return false;
+bool Input::GetKeyDown(int keycode) {
+    if (keycode < 0 || keycode >= MOUSE_BUTTONS)
+        return false;
+    return keys[keycode] && frames[keycode] == current;
 }
 
-template<class T>
-bool Input<T>::isKeyDown(T keycode) const {
-    if (enabled) {
-        if (auto it = keys.find(keycode); it != keys.end()) {
-            const auto& key{ it->second };
-            return key.pressed && key.lastFrame == Time::FrameCount();
-        }
-    }
-    return false;
+bool Input::GetMouseButton(int button) {
+    int index = MOUSE_BUTTONS + button;
+    return keys[index];
 }
 
-template<class T>
-void Input<T>::setKey(T keycode, uint8_t action) {
-    if (action == GLFW_REPEAT)
-        return;
+bool Input::GetMouseButtonDown(int button) {
+    int index = MOUSE_BUTTONS + button;
+    return keys[index] && frames[index] == current;
+}
 
-    if (auto it = keys.find(keycode); it != keys.end()) {
-        auto& key{ it->second };
-        switch (action) {
-            case GLFW_PRESS:
-                key.pressed = true;
-                key.lastFrame = Time::FrameCount();
-                break;
-            case GLFW_RELEASE:
-                key.pressed = false;
-                key.lastFrame = Time::FrameCount();
-                break;
-            default: // GLFW_REPEAT
-                break;
-        }
+void Input::Update() {
+    current++;
+    delta.x = 0;
+    delta.y = 0;
+}
+
+glm::vec2& Input::MousePosition() {
+    return position;
+}
+
+glm::vec2& Input::MouseDelta() {
+    return delta;
+}
+
+void Input::CursorPositionCallback(GLFWwindow* window, double mouseX, double mouseY) {
+    glm::vec2 mouse {mouseX, mouseY};
+    delta += mouse - position;
+    position = mouse;
+}
+
+void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mode) {
+    int key = MOUSE_BUTTONS + button;
+    Input::KeyCallback(window, key, 0, action, mode);
+}
+
+void Input::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+    switch (action) {
+        case GLFW_PRESS:
+            keys[key] = true;
+            frames[key] = current;
+            break;
+        case GLFW_RELEASE:
+            keys[key] = false;
+            frames[key] = current;
+            break;
+        default: // GLFW_REPEAT
+            break;
     }
 }

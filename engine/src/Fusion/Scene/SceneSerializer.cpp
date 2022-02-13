@@ -3,9 +3,129 @@
 #include "Components.hpp"
 #include "Scene.hpp"
 
-#include <rapidjson/document.h>
-#include <rapidjson/prettywriter.h>
+#include <yaml-cpp/yaml.h>
 #include <magic_enum.hpp>
+
+namespace YAML {
+
+    template<>
+    struct convert<glm::vec2>
+    {
+        static Node encode(const glm::vec2& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::vec2& rhs) {
+            if (!node.IsSequence() || node.size() != 3)
+                return false;
+
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<glm::vec3>
+    {
+        static Node encode(const glm::vec3& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::vec3& rhs) {
+            if (!node.IsSequence() || node.size() != 3)
+                return false;
+
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
+            rhs.z = node[2].as<float>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<glm::vec4>
+    {
+        static Node encode(const glm::vec4& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.push_back(rhs.w);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::vec4& rhs) {
+            if (!node.IsSequence() || node.size() != 4)
+                return false;
+
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
+            rhs.z = node[2].as<float>();
+            rhs.w = node[3].as<float>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<glm::quat>
+    {
+        static Node encode(const glm::quat& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.push_back(rhs.w);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::vec4& rhs) {
+            if (!node.IsSequence() || node.size() != 4)
+                return false;
+
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
+            rhs.z = node[2].as<float>();
+            rhs.w = node[3].as<float>();
+            return true;
+        }
+    };
+
+    Emitter& operator<<(Emitter& out, const glm::vec2& v) {
+        out << Flow;
+        out << BeginSeq << v.x << v.y << EndSeq;
+        return out;
+    }
+
+    Emitter& operator<<(Emitter& out, const glm::vec3& v) {
+        out << Flow;
+        out << BeginSeq << v.x << v.y << v.z << EndSeq;
+        return out;
+    }
+
+    Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
+        out << Flow;
+        out << BeginSeq << v.x << v.y << v.z << v.w << EndSeq;
+        return out;
+    }
+
+    Emitter& operator<<(YAML::Emitter& out, const glm::quat& q) {
+        out << Flow;
+        out << BeginSeq << q.x << q.y << q.z << q.w << EndSeq;
+        return out;
+    }
+}
 
 using namespace Fusion;
 
@@ -13,170 +133,123 @@ SceneSerializer::SceneSerializer(const std::shared_ptr<Scene>& scene) : scene{sc
 
 }
 
-namespace rapidjson {
-    struct Key {
-        std::string key;
-    };
-
-    enum CmdType {
-        StartObject,
-        EndObject,
-        StartArray,
-        EndArray
-    };
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, const CmdType& t) {
-        switch (t) {
-            case StartObject:
-                out.StartObject();
-                break;
-            case EndObject:
-                out.EndObject();
-                break;
-            case StartArray:
-                out.StartArray();
-                break;
-            case EndArray:
-                out.EndArray();
-                break;
-        }
-        return out;
-    }
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, const Key& k) {
-        out.Key(k.key.c_str());
-        return out;
-    }
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, const glm::vec2& v){
-        out.StartArray();
-        out.Double(v.x);
-        out.Double(v.y);
-        out.EndArray();
-        return out;
-    }
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, const glm::vec3& v) {
-        out.StartArray();
-        out.Double(v.x);
-        out.Double(v.y);
-        out.Double(v.z);
-        out.EndArray();
-        return out;
-    }
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, const glm::vec4& v) {
-        out.StartArray();
-        out.Double(v.x);
-        out.Double(v.y);
-        out.Double(v.z);
-        out.Double(v.w);
-        out.EndArray();
-        return out;
-    }
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, const glm::quat& q) {
-        out.StartArray();
-        out.Double(q.w);
-        out.Double(q.x);
-        out.Double(q.y);
-        out.Double(q.z);
-        out.EndArray();
-        return out;
-    }
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, const char* s) {
-        out.String(s);
-        return out;
-    }
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, const std::string& s) {
-        out.String(s.c_str());
-        return out;
-    }
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, int i) {
-        out.Int(i);
-        return out;
-    }
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, float f) {
-        out.Double(static_cast<float>(f));
-        return out;
-    }
-
-    static inline Writer<StringBuffer>& operator<<(Writer<StringBuffer>& out, bool b) {
-        out.Bool(b);
-        return out;
-    }
-}
-
-void serializeEntity(rapidjson::Writer<rapidjson::StringBuffer>& out, entt::registry& registry, entt::entity entity)
-{
-    out << rapidjson::StartObject; // Entity
-    out << rapidjson::Key{"Entity"} << "12837192831273"; // TODO: Entity ID goes here
+void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity entity) {
+    out << YAML::BeginMap; // Entity
+    out << YAML::Key << "Entity" << YAML::Value << "12837192831273"; // TODO: Entity ID goes here
 
     if (auto* component = registry.try_get<TagComponent>(entity)) {
-        out << rapidjson::Key{"TagComponent"};
-        out << rapidjson::StartObject; // TagComponent
-        out << rapidjson::Key{"Tag"} << component->tag;
-        out << rapidjson::EndObject; // TagComponent
+        out << YAML::Key << "TagComponent";
+        out << YAML::BeginMap; // TagComponent
+        out << YAML::Key << "tag" << YAML::Value << component->tag;
+        out << YAML::EndMap; // TagComponent
     }
 
     if (auto* component = registry.try_get<TransformComponent>(entity)) {
-        out << rapidjson::Key{"TransformComponent"};
-        out << rapidjson::StartObject; // TransformComponent
+        out << YAML::Key << "TransformComponent";
+        out << YAML::BeginMap; // TransformComponent
 
-        out << rapidjson::Key{"Translation"} << component->translation;
-        out << rapidjson::Key{"Rotation"} << component->rotation;
-        out << rapidjson::Key{"Scale"} << component->scale;
+        out << YAML::Key << "translation" << YAML::Value << component->translation;
+        out << YAML::Key << "rotation" << YAML::Value << component->rotation;
+        out << YAML::Key << "scale" << YAML::Value << component->scale;
 
-        out << rapidjson::EndObject; // TransformComponent
+        out << YAML::EndMap; // TransformComponent
     }
 
     if (auto* component = registry.try_get<CameraComponent>(entity)) {
-        out << rapidjson::Key{"CameraComponent"};
-        out << rapidjson::StartObject; // CameraComponent
+        out << YAML::Key << "CameraComponent";
+        out << YAML::BeginMap; // CameraComponent
 
-        out << rapidjson::Key{"Camera"};
-        out << rapidjson::StartObject; // Camera
         auto& camera = component->camera;
-        out << rapidjson::Key{"ProjectionType"} << magic_enum::enum_integer(camera.getProjectionType());
-        out << rapidjson::Key{"PerspectiveFOV"} << camera.getPerspectiveVerticalFOV();
-        out << rapidjson::Key{"PerspectiveNear"} << camera.getPerspectiveNearClip();
-        out << rapidjson::Key{"PerspectiveFar"} << camera.getPerspectiveFarClip();
-        out << rapidjson::Key{"OrthographicSize"} << camera.getOrthographicSize();
-        out << rapidjson::Key{"OrthographicNear"} << camera.getOrthographicNearClip();
-        out << rapidjson::Key{"OrthographicFar"} << camera.getOrthographicFarClip();
-        out << rapidjson::EndObject; // Camera
 
-        out << rapidjson::Key{"Primary"} << component->primary;
-        out << rapidjson::Key{"FixedAspectRatio"} << component->fixedAspectRatio;
+        out << YAML::Key << "Camera" << YAML::Value;
+        out << YAML::BeginMap; // Camera
+        out << YAML::Key << "projectionType" << YAML::Value << magic_enum::enum_integer(camera.getProjectionType());;
+        out << YAML::Key << "perspectiveFOV" << YAML::Value << camera.getPerspectiveVerticalFOV();
+        out << YAML::Key << "perspectiveNear" << YAML::Value << camera.getPerspectiveNearClip();
+        out << YAML::Key << "perspectiveFar" << YAML::Value << camera.getPerspectiveFarClip();
+        out << YAML::Key << "orthographicSize" << YAML::Value << camera.getOrthographicSize();
+        out << YAML::Key << "orthographicNear" << YAML::Value << camera.getOrthographicNearClip();
+        out << YAML::Key << "orthographicFar" << YAML::Value << camera.getOrthographicFarClip();
+        out << YAML::EndMap; // Camera
 
-        out << rapidjson::EndObject; // CameraComponent
+        out << YAML::Key << "primary" << YAML::Value << component->primary;
+        out << YAML::Key << "fixedAspectRatio" << YAML::Value << component->fixedAspectRatio;
+
+        out << YAML::EndMap; // CameraComponent
     }
 
-    out << rapidjson::EndObject; // Entity
+    out << YAML::EndMap; // Entity
 }
 
-void SceneSerializer::serialize(const std::string& filepath)
-{
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter out{buffer};
-    out.SetMaxDecimalPlaces(2);
-
-    out << rapidjson::StartObject;
-    out << rapidjson::Key{"Scene"} << "Untitled";
-    out << rapidjson::Key{"Entities"};
-    out << rapidjson::StartArray;
+void SceneSerializer::serialize(const std::string& filepath) {
+    YAML::Emitter out;
+    out << YAML::BeginMap;
+    out << YAML::Key << "Scene" << YAML::Value << "Untitled";
+    out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
     scene->registry.each([&](auto entity) {
         serializeEntity(out, scene->registry, entity);
     });
-    out << rapidjson::EndArray;
-    out << rapidjson::EndObject;
+    out << YAML::EndSeq;
+    out << YAML::EndMap;
 
-    //std::ofstream fout(filepath);
-    //fout << out.c_str();
+    std::ofstream fout(filepath);
+    fout << out.c_str();
+}
 
-    std::cout << printf("%s", buffer.GetString()) << std::endl;
+bool SceneSerializer::deserialize(const std::string& filepath) {
+    YAML::Node data;
+    try {
+        data = YAML::LoadFile(filepath);
+    } catch (YAML::ParserException& e) {
+        return false;
+    }
+
+    if (!data["Scene"])
+        return false;
+
+    auto sceneName = data["Scene"].as<std::string>();
+    FE_CORE_DEBUG << "Deserializing scene:" << sceneName;
+
+    if (const auto& entities = data["Entities"]) {
+        for (const auto& entity : entities) {
+            auto uuid = entity["Entity"].as<uint64_t>(); // TODO
+            auto deserializedEntity = scene->registry.create(/*uuid*/);
+
+            std::string name{"<blank>"};
+            if (const auto& tagComponent = entity["TagComponent"]) {
+                name = tagComponent["tag"].as<std::string>();
+                scene->registry.emplace<TagComponent>(deserializedEntity, name);
+            }
+
+            FE_CORE_DEBUG << "Deserialized entity with ID = " <<  uuid << ", name = " << name;
+
+            if (const auto& transformComponent = entity["TransformComponent"]) {
+                scene->registry.emplace<TransformComponent>(deserializedEntity,
+                       transformComponent["translation"].as<glm::vec3>(),
+                       transformComponent["rotation"].as<glm::vec3>(),
+                       transformComponent["scale"].as<glm::vec3>());
+            }
+
+            if (const auto& cameraComponent = entity["CameraComponent"]) {
+                const auto& cameraProps = cameraComponent["Camera"];
+
+                SceneCamera camera;
+                camera.setProjectionType(magic_enum::enum_value<SceneCamera::ProjectionType>(cameraProps["ProjectionType"].as<int>()));
+                camera.setPerspectiveVerticalFOV(cameraProps["PerspectiveFOV"].as<float>());
+                camera.setPerspectiveNearClip(cameraProps["PerspectiveNear"].as<float>());
+                camera.setPerspectiveFarClip(cameraProps["PerspectiveFar"].as<float>());
+                camera.setOrthographicSize(cameraProps["OrthographicSize"].as<float>());
+                camera.setOrthographicNearClip(cameraProps["OrthographicNear"].as<float>());
+                camera.setOrthographicFarClip(cameraProps["OrthographicFar"].as<float>());
+
+                scene->registry.emplace<CameraComponent>(deserializedEntity,
+                        camera,
+                        cameraComponent["Primary"].as<bool>(),
+                        cameraComponent["FixedAspectRatio"].as<bool>()
+                );
+            }
+        }
+    }
+
+    return true;
 }

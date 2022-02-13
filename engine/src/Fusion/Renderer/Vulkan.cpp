@@ -5,7 +5,7 @@ using namespace Fusion;
 
 // local callback functions
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
-    FS_LOG_CORE_ERROR("validation layer: {0}", pCallbackData->pMessage);
+    FE_CORE_ERROR << "[Vulkan] Validation layer: " << pCallbackData->pMessage;
     return VK_FALSE;
 }
 
@@ -49,16 +49,16 @@ Vulkan::~Vulkan() {
 
 void Vulkan::createInstance() {
     if (enableValidationLayers) {
-        FS_CORE_ASSERT(checkValidationLayerSupport(), "validation layers requested, but not available!")
+        FE_ASSERT(checkValidationLayerSupport() && "validation layers requested, but not available!");
     }
 
     uint32_t version;
     vkEnumerateInstanceVersion(&version);
 
-    FS_LOG_CORE_TRACE("System support vulkan variant {0}, Major: {1}, Minor: {2}, Patch {3}",
-                      VK_API_VERSION_VARIANT(version),
-                      VK_API_VERSION_MINOR(version),
-                      VK_API_VERSION_PATCH(version));
+    FE_CORE_DEBUG << "System support vulkan variant: " << VK_API_VERSION_VARIANT(version)
+              << ", Major: " << VK_API_VERSION_MAJOR(version)
+              << ", Minor: " << VK_API_VERSION_MINOR(version)
+              << ", Patch: " << VK_API_VERSION_PATCH(version) << '\n';
 
     version = VK_MAKE_VERSION(1, 0, 0);
 
@@ -89,7 +89,7 @@ void Vulkan::createInstance() {
     }
 
     auto result = vk::createInstance(&createInfo, nullptr, &instance);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create vulkan!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create vulkan!");
 }
 
 std::vector<const char*> Vulkan::getRequiredExtensions() const {
@@ -137,18 +137,18 @@ void Vulkan::hasGflwRequiredInstanceExtensions() const {
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-    FS_LOG_CORE_TRACE("available extensions:");
+    FE_CORE_DEBUG << "available extensions:";
     std::unordered_set<std::string> available;
     for (const auto& extension : extensions) {
-        FS_LOG_CORE_TRACE("\t\"{0}\"", extension.extensionName);
+        FE_CORE_DEBUG << "\t\"" << extension.extensionName << "\"";
         available.insert(extension.extensionName);
     }
 
-    FS_LOG_CORE_TRACE("required extensions:");
+    FE_CORE_DEBUG << "required extensions:";
     auto requiredExtensions = getRequiredExtensions();
     for (const auto& required : requiredExtensions) {
-        FS_LOG_CORE_TRACE("\t\"{0}\"", required);
-        FS_CORE_ASSERT(available.find(required) != available.end(), "missing required glfw extension");
+        FE_CORE_DEBUG << "\t\"" << required << "\"";
+        FE_ASSERT(available.find(required) != available.end() && "missing required glfw extension");
     }
 }
 
@@ -171,13 +171,13 @@ void Vulkan::setupDebugMessenger() {
 
     // NOTE: reinterpret_cast is also used by vulkan.hpp internally for all these structs
     CreateDebugUtilsMessengerEXT(instance, reinterpret_cast<const VkDebugUtilsMessengerCreateInfoEXT*>(&createInfo), nullptr, &callback);
-    FS_CORE_ASSERT(callback, "failed to set up debug callback!");
+    FE_ASSERT(callback && "failed to set up debug callback!");
 }
 
 void Vulkan::pickPhysicalDevice() {
     uint32_t deviceCount;
     instance.enumeratePhysicalDevices(&deviceCount, nullptr);
-    FS_CORE_ASSERT(deviceCount, "failed to find GPUs with Vulkan support!");
+    FE_ASSERT(deviceCount && "failed to find GPUs with Vulkan support!");
 
     std::vector<vk::PhysicalDevice> devices(deviceCount);
     instance.enumeratePhysicalDevices(&deviceCount, devices.data());
@@ -189,11 +189,11 @@ void Vulkan::pickPhysicalDevice() {
         }
     }
 
-    FS_CORE_ASSERT(physicalDevice, "failed to find a suitable GPU!");
+    FE_ASSERT(physicalDevice && "failed to find a suitable GPU!");
 
     vk::PhysicalDeviceProperties props;
     physicalDevice.getProperties(&props);
-    FS_LOG_CORE_TRACE("physical device found: {0}", props.deviceName);
+    FE_CORE_DEBUG << "physical device found: " << props.deviceName;
 }
 
 bool Vulkan::isDeviceSuitable(const vk::PhysicalDevice& device) const {
@@ -290,7 +290,7 @@ void Vulkan::createLogicalDevice() {
     }
 
     auto result = physicalDevice.createDevice(&createInfo, nullptr, &device);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create logical device!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create logical device!");
 
     device.getQueue(indices.graphicsFamily.value(), 0, &graphicsQueue);
     device.getQueue(indices.presentFamily.value(), 0, &presentQueue);
@@ -299,7 +299,7 @@ void Vulkan::createLogicalDevice() {
 void Vulkan::createSurface() {
     VkSurfaceKHR raw;
     glfwCreateWindowSurface(instance, window, nullptr, &raw);
-    FS_CORE_ASSERT(raw, "failed to create window surface!");
+    FE_ASSERT(raw && "failed to create window surface!");
     surface = raw;
 }
 
@@ -337,7 +337,7 @@ void Vulkan::createCommandPool() {
     poolInfo.flags = vk::CommandPoolCreateFlagBits::eTransient | vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
 
     auto result = device.createCommandPool(&poolInfo, nullptr, &commandPool);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create command pool!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create command pool!");
 }
 
 vk::Format Vulkan::findSupportedFormat(const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const {
@@ -351,7 +351,7 @@ vk::Format Vulkan::findSupportedFormat(const std::vector<vk::Format>& candidates
         }
     }
 
-    FS_CORE_ASSERT(false, "failed to find supported format!");
+    FE_ASSERT(false && "failed to find supported format!");
     return vk::Format::eUndefined;
 }
 
@@ -365,7 +365,7 @@ uint32_t Vulkan::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags pro
         }
     }
 
-    FS_CORE_ASSERT(false, "failed to find suitable memory type!");
+    FE_ASSERT(false && "failed to find suitable memory type!");
     return 0;
 }
 
@@ -376,7 +376,7 @@ void Vulkan::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::M
     bufferInfo.sharingMode = vk::SharingMode::eExclusive;
 
     auto result = device.createBuffer(&bufferInfo, nullptr, &buffer);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create buffer!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create buffer!");
 
     vk::MemoryRequirements memRequirements;
     device.getBufferMemoryRequirements(buffer, &memRequirements);
@@ -386,7 +386,7 @@ void Vulkan::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::M
     allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
     result = device.allocateMemory(&allocInfo, nullptr, &bufferMemory);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to allocateDescriptor buffer memory!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to allocateDescriptor buffer memory!");
 
     device.bindBufferMemory(buffer, bufferMemory, 0);
 }
@@ -512,7 +512,7 @@ void Vulkan::transitionImageLayout(const vk::Image& image, vk::Format format, vk
         destinationStage = vk::PipelineStageFlagBits::eEarlyFragmentTests;
 
     } else {
-        FS_CORE_ASSERT(false, "unsupported layout transition!");
+        FE_ASSERT(false && "unsupported layout transition!");
         return;
     }
 
@@ -545,7 +545,7 @@ void Vulkan::createImage(uint32_t width, uint32_t height, vk::Format format, vk:
     imageInfo.sharingMode = vk::SharingMode::eExclusive;
 
     auto result = device.createImage(&imageInfo, nullptr, &image);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create image!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create image!");
 
     vk::MemoryRequirements memRequirements;
     device.getImageMemoryRequirements(image, &memRequirements);
@@ -555,7 +555,7 @@ void Vulkan::createImage(uint32_t width, uint32_t height, vk::Format format, vk:
     allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
     result = device.allocateMemory(&allocInfo, nullptr, &imageMemory);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to allocate descriptor's image memory!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to allocate descriptor's image memory!");
 
     device.bindImageMemory(image, imageMemory, 0);
 }
@@ -576,7 +576,29 @@ void Vulkan::createImageView(const vk::Image& image, vk::Format format, vk::Imag
     createInfo.subresourceRange.layerCount = 1;
 
     auto result = device.createImageView(&createInfo, nullptr, &view);
-    FS_CORE_ASSERT(result == vk::Result::eSuccess, "failed to create image views!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create image views!");
+}
+
+void Vulkan::createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode, vk::Sampler& sampler) const {
+    vk::PhysicalDeviceProperties props;
+    physicalDevice.getProperties(&props);
+
+    vk::SamplerCreateInfo samplerInfo{};
+    samplerInfo.magFilter = magFilter;
+    samplerInfo.minFilter = minFilter;
+    samplerInfo.addressModeU = addressMode;
+    samplerInfo.addressModeV = addressMode;
+    samplerInfo.addressModeW = addressMode;
+    samplerInfo.anisotropyEnable = VK_FALSE;
+    samplerInfo.maxAnisotropy = props.limits.maxSamplerAnisotropy;
+    samplerInfo.borderColor = vk::BorderColor::eIntOpaqueBlack;
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+    samplerInfo.compareEnable = VK_FALSE;
+    samplerInfo.compareOp = vk::CompareOp::eAlways;
+    samplerInfo.mipmapMode = minmapMode;
+
+    auto result = device.createSampler(&samplerInfo, nullptr, &sampler);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create texture sampler!");
 }
 
 bool Vulkan::hasStencilComponent(vk::Format format) {

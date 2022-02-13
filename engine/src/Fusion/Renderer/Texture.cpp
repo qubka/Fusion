@@ -1,5 +1,5 @@
 #include "Texture.hpp"
-/*#include "Image.hpp"
+#include "Image.hpp"
 #include "AllocatedBuffer.hpp"
 
 using namespace Fusion;
@@ -15,8 +15,7 @@ Texture::Texture(Vulkan& vulkan, std::string path, vk::Format format, vk::Filter
     width = static_cast<uint32_t>(image.width);
     height = static_cast<uint32_t>(image.height);
 
-    createImage(image.pixels);
-    createSampler(magFilter, minFilter, addressMode, minmapMode);
+    createImage(image.pixels, magFilter, minFilter, addressMode, minmapMode);
 }
 
 Texture::Texture(Vulkan& vulkan, void* pixels, uint32_t width, uint32_t height, vk::Format format, vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode) :
@@ -25,20 +24,19 @@ Texture::Texture(Vulkan& vulkan, void* pixels, uint32_t width, uint32_t height, 
     height{height},
     format{format}
 {
-    createImage(pixels);
-    createSampler(magFilter, minFilter, addressMode, minmapMode);
+    createImage(pixels, magFilter, minFilter, addressMode, minmapMode);
 }
 
 Texture::~Texture() {
-    vulkan.getDevice().destroySampler(sampler);
-    vulkan.getDevice().destroyImageView(view);
-    vulkan.getDevice().destroyImage(image);
-    vulkan.getDevice().freeMemory(memory);
+    vulkan.getDevice().destroySampler(sampler, nullptr);
+    vulkan.getDevice().destroyImageView(view, nullptr);
+    vulkan.getDevice().destroyImage(image, nullptr);
+    vulkan.getDevice().freeMemory(memory, nullptr);
 }
 
-void Texture::createImage(void* pixels) {
-    FS_CORE_FS_CORE_ASSERT(width > 0 && height > 0 && "Width and height must be greater than zero!");
-    FS_CORE_FS_CORE_ASSERT(pixels && "Pixels data can be null");
+void Texture::createImage(void* pixels, vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode) {
+    FE_ASSERT(width > 0 && height > 0 && "Width and height must be greater than zero!");
+    FE_ASSERT(pixels && "Pixels data can be null");
 
     vk::DeviceSize size = width * height * componentCount(format);
 
@@ -64,29 +62,5 @@ void Texture::createImage(void* pixels) {
     vulkan.copyBufferToImage(*stagingBuffer, image, width, height, 1);
     vulkan.transitionImageLayout(image, format, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
     vulkan.createImageView(image, format, vk::ImageAspectFlagBits::eColor, view);
+    vulkan.createSampler(magFilter, minFilter, addressMode, minmapMode, sampler);
 }
-
-void Texture::createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode) {
-    vk::PhysicalDeviceProperties properties = vulkan.getPhysical().getProperties();
-
-    vk::SamplerCreateInfo samplerInfo{};
-    samplerInfo.magFilter = magFilter;
-    samplerInfo.minFilter = minFilter;
-    samplerInfo.addressModeU = addressMode;
-    samplerInfo.addressModeV = addressMode;
-    samplerInfo.addressModeW = addressMode;
-    samplerInfo.anisotropyEnable = VK_FALSE;
-    samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
-    samplerInfo.borderColor = vk::BorderColor::eIntOpaqueBlack;
-    samplerInfo.unnormalizedCoordinates = VK_FALSE;
-    samplerInfo.compareEnable = VK_FALSE;
-    samplerInfo.compareOp = vk::CompareOp::eAlways;
-    samplerInfo.mipmapMode = minmapMode;
-
-    try {
-        sampler = vulkan.getDevice().createSampler(samplerInfo);
-    } catch (vk::SystemError& err) {
-        throw std::runtime_error("failed to create texture sampler!");
-    }
-}
-*/

@@ -4,14 +4,14 @@
 
 using namespace Fusion;
 
-ContentBrowserPanel::ContentBrowserPanel(const std::filesystem::path& path) : root{path}, currentDirectory{path} {
+ContentBrowserPanel::ContentBrowserPanel() : currentDirectory{AssetPath} {
 
 }
 
 void ContentBrowserPanel::onImGui() {
     ImGui::Begin("Content Browser");
 
-    if (currentDirectory != root) {
+    if (currentDirectory != AssetPath) {
         if (ImGui::Button("\uF112")) {
             currentDirectory = currentDirectory.parent_path();
         }
@@ -30,7 +30,7 @@ void ContentBrowserPanel::onImGui() {
 
     for (auto& directoryEntry : std::filesystem::directory_iterator(currentDirectory)) {
         const auto& path = directoryEntry.path();
-        auto relativePath = std::filesystem::relative(path, root);
+        auto relativePath = std::filesystem::relative(path, AssetPath);
         std::string filename = relativePath.filename().string();
 
         ImGui::PushID(filename.c_str());

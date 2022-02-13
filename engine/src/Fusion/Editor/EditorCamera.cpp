@@ -1,4 +1,7 @@
 #include "EditorCamera.hpp"
+#include "Fusion/Core/Time.hpp"
+#include "Fusion/Input/Input.hpp"
+#include "Fusion/Core/Application.hpp"
 
 using namespace Fusion;
 
@@ -11,17 +14,56 @@ EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : Per
 }
 
 void EditorCamera::onUpdate() {
-    /*if (Input::getKeyDown(Key::LeftAlt)) {
-        if (Input::IsMouseButtonPressed(Mouse::ButtonMiddle))
-            mousePan(delta);
-        else if (Input::getMouseButtonDown(Mouse::ButtonLeft))
-            mouseRotate(delta);
-        else if (Input::getMouseButtonDown(Mouse::ButtonRight))
-            mouseZoom(delta.y);
-        else if (*scroll*)
-            float delta = ;
-            MouseZoom(e.GetYOffset() * 0.1f);
+    /*if (Input::GetKey(Key::W)) {
+        position += getForward() * speed * Time::ElapsedTime();
+        isDirty = true;
+    }
+    if (Input::GetKey(Key::S)) {
+        position -= getForward() * speed * Time::ElapsedTime();
+        isDirty = true;
+    }
+    if (Input::GetKey(Key::D)) {
+        position += getRight() * speed * Time::ElapsedTime();
+        isDirty = true;
+    }
+    if (Input::GetKey(Key::A)) {
+        position -= getRight() * speed * Time::ElapsedTime();
+        isDirty = true;
+    }
+
+    if (Input::GetKey(Key::LeftAlt)) {
+        glm::vec2 delta = Input::MouseDelta() / (static_cast<float>(Application::Instance().getWindow().getHeight()) * 2);
+        yaw += delta.x;
+        pitch -= delta.y;
+
+        static constexpr float limit = glm::radians(89.0f);
+        if (pitch > limit) {
+            pitch = limit;
+        }
+        if (pitch < -limit) {
+            pitch = -limit;
+        }
+
+        setRotation(glm::quat{glm::vec3(pitch, yaw, 0)});
+        glfwSetInputMode(Application::Instance().getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    } else {
+        glfwSetInputMode(Application::Instance().getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }*/
+
+    if (Input::GetKey(Key::LeftAlt)) {
+        auto delta = Input::MouseDelta() * 0.003f;
+        if (Input::GetMouseButton(Mouse::ButtonMiddle))
+            mousePan(delta);
+        else if (Input::GetMouseButton(Mouse::ButtonLeft))
+            mouseRotate(delta);
+        else if (Input::GetMouseButton(Mouse::ButtonRight))
+            mouseZoom(delta.y);
+        /*else if (*scroll*)
+            float delta = ;
+            MouseZoom(e.GetYOffset() * 0.1f);*/
+
+        setPositionAndRotation(calculatePosition(), glm::quat{glm::vec3(pitch, yaw, 0)});
+    }
 
     PerspectiveCamera::onUpdate();
 }

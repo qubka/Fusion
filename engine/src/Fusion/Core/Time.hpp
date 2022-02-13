@@ -19,7 +19,7 @@ namespace Fusion {
 
     private:
         //! Should be called in the application run loop
-        static void Tick();
+        static void Update();
 
         static double time;
         static float elapsedTime;
