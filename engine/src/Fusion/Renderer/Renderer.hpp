@@ -18,17 +18,17 @@ namespace Fusion {
         Renderer(Vulkan& vulkan);
         ~Renderer();
 
-        const Vulkan& getVulkan() const { return vulkan; }
         glm::vec3& getColor() { return color; }
 
         const vk::DescriptorSetLayout& getGlobalLayoutSet() const;
-        const std::unique_ptr<SwapChain>& getSwapChain() const;
+        const std::unique_ptr<SwapChain>& getSwapChain() const { return swapChain; };
 
-        const vk::CommandBuffer& getCurrentCommandBuffer();
-        const vk::DescriptorSet& getCurrentDescriptorSet();
-        const std::unique_ptr<AllocatedBuffer>& getCurrentUniformBuffer();
-        uint32_t getFrameIndex() const;
-        bool isFrameInProgress() const;
+        const vk::CommandBuffer& getCommandBuffers(size_t index) const { return commandBuffers[index]; };
+        const vk::DescriptorSet& getGlobalDescriptors(size_t index) const { return globalDescriptorSets[index]; };
+        const std::unique_ptr<AllocatedBuffer>& getUniformBuffers(size_t index) const { return uniformBuffers[index]; };
+
+        uint32_t getFrameIndex() const { FE_ASSERT(isFrameStarted && "cannot get frame index when frame not in progress"); return currentFrame; };
+        bool isFrameInProgress() const { FE_ASSERT(isFrameStarted && "cannot get frame index when frame not in progress"); return isFrameStarted; };
 
         vk::CommandBuffer beginFrame();
         void beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer);

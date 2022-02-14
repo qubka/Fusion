@@ -2,10 +2,10 @@
 
 #include "AllocatedBuffer.hpp"
 
-namespace FUSION_API Fusion {
-    class Mesh {
+namespace Fusion {
+    class FUSION_API Mesh {
     public:
-        struct Vertex {
+        struct FUSION_API Vertex {
             glm::vec3 position{};
             glm::vec3 color{};
             glm::vec3 normal{};
@@ -19,7 +19,7 @@ namespace FUSION_API Fusion {
             }
         };
 
-        struct Builder {
+        struct FUSION_API Builder {
             std::vector<Vertex> vertices;
             std::vector<uint32_t> indices;
 

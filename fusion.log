@@ -1,6 +1,6 @@
 ﻿2022-02-13 20:39:25.889 INFO  [110704] [main@7] Fusion Engine
 2022-02-13 20:39:25.889 INFO  [110704] [main@8] Game Started
-2022-02-13 20:39:25.910 INFO  [110704] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 20:39:25.910 INFO  [110704] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 20:39:25.914 DEBUG [110704] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 20:39:25.940 DEBUG [110704] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -29,7 +29,7 @@
 2022-02-13 20:39:25.959 DEBUG [110704] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
 2022-02-13 20:40:15.777 INFO  [110810] [main@7] Fusion Engine
 2022-02-13 20:40:15.777 INFO  [110810] [main@8] Game Started
-2022-02-13 20:40:15.797 INFO  [110810] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 20:40:15.797 INFO  [110810] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 20:40:15.801 DEBUG [110810] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 20:40:15.822 DEBUG [110810] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -59,7 +59,7 @@
 2022-02-13 20:40:20.223 DEBUG [110810] [Fusion::Renderer::endFrame@168] swap chain out of date/suboptimal/window resized - recreating
 2022-02-13 20:40:55.343 INFO  [110922] [main@7] Fusion Engine
 2022-02-13 20:40:55.343 INFO  [110922] [main@8] Game Started
-2022-02-13 20:40:55.363 INFO  [110922] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 20:40:55.363 INFO  [110922] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 20:40:55.367 DEBUG [110922] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 20:40:55.390 DEBUG [110922] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -88,7 +88,7 @@
 2022-02-13 20:40:55.403 DEBUG [110922] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
 2022-02-13 20:43:04.758 INFO  [112184] [main@7] Fusion Engine
 2022-02-13 20:43:04.758 INFO  [112184] [main@8] Game Started
-2022-02-13 20:43:04.778 INFO  [112184] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 20:43:04.778 INFO  [112184] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 20:43:04.791 DEBUG [112184] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 20:43:04.815 DEBUG [112184] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -118,7 +118,7 @@
 2022-02-13 20:43:06.694 DEBUG [112184] [Fusion::Renderer::endFrame@168] swap chain out of date/suboptimal/window resized - recreating
 2022-02-13 20:47:22.925 INFO  [112728] [main@7] Fusion Engine
 2022-02-13 20:47:22.926 INFO  [112728] [main@8] Game Started
-2022-02-13 20:47:22.946 INFO  [112728] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 20:47:22.946 INFO  [112728] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 20:47:22.949 DEBUG [112728] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 20:47:22.967 DEBUG [112728] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -148,7 +148,7 @@
 2022-02-13 20:47:23.515 ERROR [112728] [ImGuiErrorCallback@14] [Imgui] Error: VkResult = -2
 2022-02-13 20:48:00.098 INFO  [112862] [main@7] Fusion Engine
 2022-02-13 20:48:00.098 INFO  [112862] [main@8] Game Started
-2022-02-13 20:48:00.136 INFO  [112862] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 20:48:00.136 INFO  [112862] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 20:48:00.140 DEBUG [112862] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 20:48:00.260 DEBUG [112862] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -178,7 +178,7 @@
 2022-02-13 20:48:00.821 ERROR [112862] [ImGuiErrorCallback@14] [Imgui] Error: VkResult = -2
 2022-02-13 20:49:26.966 INFO  [113018] [main@7] Fusion Engine
 2022-02-13 20:49:26.966 INFO  [113018] [main@8] Game Started
-2022-02-13 20:49:26.987 INFO  [113018] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 20:49:26.987 INFO  [113018] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 20:49:26.990 DEBUG [113018] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 20:49:27.008 DEBUG [113018] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -235,7 +235,7 @@
 2022-02-13 20:49:40.490 DEBUG [113018] [Fusion::Renderer::endFrame@168] swap chain out of date/suboptimal/window resized - recreating
 2022-02-13 20:51:17.568 INFO  [113238] [main@7] Fusion Engine
 2022-02-13 20:51:17.568 INFO  [113238] [main@8] Game Started
-2022-02-13 20:51:17.588 INFO  [113238] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 20:51:17.588 INFO  [113238] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 20:51:17.592 DEBUG [113238] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 20:51:17.622 DEBUG [113238] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -265,7 +265,7 @@
 2022-02-13 20:51:18.221 ERROR [113238] [ImGuiErrorCallback@14] [Imgui] Error: VkResult = -2
 2022-02-13 20:59:36.105 INFO  [114062] [main@7] Fusion Engine
 2022-02-13 20:59:36.105 INFO  [114062] [main@8] Game Started
-2022-02-13 20:59:36.126 INFO  [114062] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 20:59:36.126 INFO  [114062] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 20:59:36.142 DEBUG [114062] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 20:59:36.167 DEBUG [114062] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -295,7 +295,7 @@
 2022-02-13 20:59:36.754 ERROR [114062] [ImGuiErrorCallback@14] [Imgui] Error: VkResult = -2
 2022-02-13 21:03:47.699 INFO  [114392] [main@7] Fusion Engine
 2022-02-13 21:03:47.699 INFO  [114392] [main@8] Game Started
-2022-02-13 21:03:47.740 INFO  [114392] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 21:03:47.740 INFO  [114392] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 21:03:47.753 DEBUG [114392] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 21:03:47.875 DEBUG [114392] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -325,7 +325,7 @@
 2022-02-13 21:03:59.096 DEBUG [114392] [Fusion::Renderer::endFrame@168] swap chain out of date/suboptimal/window resized - recreating
 2022-02-13 21:29:42.027 INFO  [117868] [main@7] Fusion Engine
 2022-02-13 21:29:42.027 INFO  [117868] [main@8] Game Started
-2022-02-13 21:29:42.053 INFO  [117868] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 21:29:42.053 INFO  [117868] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 21:29:42.071 DEBUG [117868] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 21:29:42.126 DEBUG [117868] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -354,7 +354,7 @@
 2022-02-13 21:29:42.156 DEBUG [117868] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
 2022-02-13 22:02:32.636 INFO  [122345] [main@7] Fusion Engine
 2022-02-13 22:02:32.636 INFO  [122345] [main@8] Game Started
-2022-02-13 22:02:32.658 INFO  [122345] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 22:02:32.658 INFO  [122345] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 22:02:32.664 DEBUG [122345] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 22:02:32.699 DEBUG [122345] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -384,7 +384,7 @@
 2022-02-13 22:02:34.916 DEBUG [122345] [Fusion::Renderer::endFrame@168] swap chain out of date/suboptimal/window resized - recreating
 2022-02-13 22:03:23.605 INFO  [122420] [main@7] Fusion Engine
 2022-02-13 22:03:23.605 INFO  [122420] [main@8] Game Started
-2022-02-13 22:03:23.629 INFO  [122420] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 22:03:23.629 INFO  [122420] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 22:03:23.640 DEBUG [122420] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 22:03:23.659 DEBUG [122420] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -414,7 +414,7 @@
 2022-02-13 22:03:31.752 DEBUG [122420] [Fusion::Renderer::endFrame@168] swap chain out of date/suboptimal/window resized - recreating
 2022-02-13 22:03:52.453 INFO  [122439] [main@7] Fusion Engine
 2022-02-13 22:03:52.453 INFO  [122439] [main@8] Game Started
-2022-02-13 22:03:52.473 INFO  [122439] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 22:03:52.473 INFO  [122439] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 22:03:52.477 DEBUG [122439] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 22:03:52.494 DEBUG [122439] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -443,7 +443,7 @@
 2022-02-13 22:03:52.508 DEBUG [122439] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
 2022-02-13 22:16:54.006 INFO  [124016] [main@7] Fusion Engine
 2022-02-13 22:16:54.006 INFO  [124016] [main@8] Game Started
-2022-02-13 22:16:54.030 INFO  [124016] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 22:16:54.030 INFO  [124016] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 22:16:54.033 DEBUG [124016] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 22:16:54.052 DEBUG [124016] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -473,7 +473,7 @@
 2022-02-13 22:16:55.665 DEBUG [124016] [Fusion::Renderer::endFrame@168] swap chain out of date/suboptimal/window resized - recreating
 2022-02-13 22:19:09.311 INFO  [124395] [main@7] Fusion Engine
 2022-02-13 22:19:09.311 INFO  [124395] [main@8] Game Started
-2022-02-13 22:19:09.331 INFO  [124395] [Fusion::Window::init@41] Creating window: Sandbox [1280 720]
+2022-02-13 22:19:09.331 INFO  [124395] [Fusion::Window::init@41] Creating window: SandboxApp [1280 720]
 2022-02-13 22:19:09.338 DEBUG [124395] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
 
 2022-02-13 22:19:09.358 DEBUG [124395] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
@@ -501,3 +501,32 @@
 2022-02-13 22:19:09.359 DEBUG [124395] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
 2022-02-13 22:19:09.371 DEBUG [124395] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
 2022-02-13 22:19:11.960 DEBUG [124395] [Fusion::Renderer::endFrame@168] swap chain out of date/suboptimal/window resized - recreating
+2022-02-14 09:41:58.467 INFO  [7634] [main@7] Fusion Engine
+2022-02-14 09:41:58.468 INFO  [7634] [main@8] Game Started
+2022-02-14 09:41:58.487 INFO  [7634] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 09:41:58.489 DEBUG [7634] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 09:41:58.507 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 09:41:58.508 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 09:41:58.508 DEBUG [7634] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 09:41:58.520 DEBUG [7634] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070

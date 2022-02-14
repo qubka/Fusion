@@ -40,7 +40,11 @@
 
 #include "Fusion/Scene/Components.hpp"
 #include "Fusion/Scene/Scene.hpp"
+#include "Fusion/Scene/SceneCamera.hpp"
 #include "Fusion/Scene/SceneSerializer.hpp"
+
+#include "Fusion/Systems/RendererSystemBase.hpp"
+#include "Fusion/Systems/MeshRenderer.hpp"
 
 #include "Fusion/ImGui/ImGuiLayer.hpp"
 

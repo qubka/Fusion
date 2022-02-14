@@ -12,7 +12,6 @@
 #include "Fusion/Utils/ProcessInfo.hpp"
 
 namespace Fusion {
-    class Texture;
     class FUSION_API EditorLayer : public Layer {
     public:
         EditorLayer();
@@ -21,6 +20,7 @@ namespace Fusion {
         void onAttach() override;
         void onDetach() override;
         void onUpdate() override;
+        void onRender() override;
         void onImGui() override;
 
     private:
@@ -40,15 +40,15 @@ namespace Fusion {
         SceneHierarchyPanel sceneHierarchyPanel;
         ContentBrowserPanel contentBrowserPanel;
 
-        bool viewportFocused{false};
+        /*bool viewportFocused{false};
         bool viewportHovered{false};
         glm::vec2 viewportSize{};
         glm::vec2 viewportBounds[2]{};
         bool firstFrame{false};
         int gizmoType = -1;
-        float camDistance;
+        float camDistance;*/
 
-        std::shared_ptr<Texture> texture;
+        //std::shared_ptr<Texture> texture;
 
         enum class SceneState {
             Edit = 0, Play = 1

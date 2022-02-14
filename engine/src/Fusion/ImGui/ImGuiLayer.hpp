@@ -7,7 +7,7 @@
 namespace Fusion {
     class FUSION_API ImGuiLayer : public Layer {
     public:
-        ImGuiLayer(Renderer& renderer);
+        ImGuiLayer(Vulkan& vulkan, Renderer& renderer);
         ~ImGuiLayer() override;
 
         void onAttach() override;
@@ -17,7 +17,9 @@ namespace Fusion {
         void end(vk::CommandBuffer& commandBuffer);
 
     private:
+        Vulkan& vulkan;
         Renderer& renderer;
+
         vk::DescriptorPool imguiPool;
         //std::vector<ImTextureID> viewportImages;
 

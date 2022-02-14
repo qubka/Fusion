@@ -1,9 +1,9 @@
 #include "SceneHierarchyPanel.hpp"
 #include "Fusion/Scene/Components.hpp"
 
-#include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
-#include <magic_enum.hpp>
+#include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
+#include "magic_enum/include/magic_enum.hpp"
 
 using namespace Fusion;
 

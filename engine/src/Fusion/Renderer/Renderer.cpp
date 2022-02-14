@@ -4,8 +4,6 @@
 #include "Descriptors.hpp"
 #include "Window.hpp"
 
-#include "Fusion/Events/WindowEvents.hpp"
-
 using namespace Fusion;
 
 Renderer::Renderer(Vulkan& vulkan) : vulkan{vulkan} {
@@ -105,7 +103,7 @@ vk::CommandBuffer Renderer::beginFrame() {
 
     isFrameStarted = true;
 
-    const auto& commandBuffer = getCurrentCommandBuffer();
+    const auto& commandBuffer = commandBuffers[currentFrame];
     vk::CommandBufferBeginInfo beginInfo{};
     beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 
@@ -117,7 +115,7 @@ vk::CommandBuffer Renderer::beginFrame() {
 
 void Renderer::beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
     FE_ASSERT(isFrameStarted && "cannot call beginSwapChainRenderPass if frame is not in progress");
-    FE_ASSERT(commandBuffer == getCurrentCommandBuffer() && "cannot begin render pass on command buffer from a different frame");
+    FE_ASSERT(commandBuffer == commandBuffers[currentFrame] && "cannot begin render pass on command buffer from a different frame");
 
     const auto& extent = swapChain->getSwapChainExtent();
     auto offset = vk::Offset2D{0, 0};
@@ -154,14 +152,14 @@ void Renderer::beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
 
 void Renderer::endSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
     FE_ASSERT(isFrameStarted && "cannot call endSwapChainRenderPass if frame is not in progress");
-    FE_ASSERT(commandBuffer == getCurrentCommandBuffer() && "cannot end render pass on command buffer from a different frame");
+    FE_ASSERT(commandBuffer == commandBuffers[currentFrame] && "cannot end render pass on command buffer from a different frame");
 
     commandBuffer.endRenderPass();
 }
 
 void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
     FE_ASSERT(isFrameStarted && "cannot call endFrame if frame is not in progress");
-    FE_ASSERT(commandBuffer == getCurrentCommandBuffer() && "cannot end command buffer from a different frame");
+    FE_ASSERT(commandBuffer == commandBuffers[currentFrame] && "cannot end command buffer from a different frame");
 
     auto result = commandBuffer.end();
     FE_ASSERT(result == vk::Result::eSuccess && "failed to record command buffer!");
@@ -178,36 +176,6 @@ void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
     currentFrame = (currentFrame + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
 }
 
-/* Getters */
-
 const vk::DescriptorSetLayout& Renderer::getGlobalLayoutSet() const {
     return globalLayout->getDescriptorSetLayout();
-}
-
-const std::unique_ptr<SwapChain>& Renderer::getSwapChain() const {
-    return swapChain;
-}
-
-bool Renderer::isFrameInProgress() const {
-    return isFrameStarted;
-}
-
-const vk::CommandBuffer& Renderer::getCurrentCommandBuffer() {
-    FE_ASSERT(isFrameStarted && "cannot get command buffer when frame not in progress");
-    return commandBuffers[currentFrame];
-}
-
-const std::unique_ptr<AllocatedBuffer>& Renderer::getCurrentUniformBuffer() {
-    FE_ASSERT(isFrameStarted && "cannot get uniform buffer when frame not in progress");
-    return uniformBuffers[currentFrame];
-}
-
-const vk::DescriptorSet& Renderer::getCurrentDescriptorSet() {
-    FE_ASSERT(isFrameStarted && "cannot get descriptor set when frame not in progress");
-    return globalDescriptorSets[currentFrame];
-}
-
-uint32_t Renderer::getFrameIndex() const {
-    FE_ASSERT(isFrameStarted && "cannot get frame index when frame not in progress");
-    return currentFrame;
 }

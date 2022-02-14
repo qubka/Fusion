@@ -18,15 +18,15 @@ public:
     }
 };
 
-class Sandbox : public Fusion::Application {
+class SandboxApp : public Fusion::Application {
 public:
-    Sandbox(Fusion::CommandLineArgs args) : Application{"Sandbox", args} {
+    SandboxApp(Fusion::CommandLineArgs args) : Application{"Sandbox", args} {
         pushLayer(new ExampleLayer());
     }
-    ~Sandbox() override {
+    ~SandboxApp() override {
     }
 };
 
 Fusion::Application* Fusion::CreateApplication(CommandLineArgs args) {
-    return new Sandbox(args);
+    return new SandboxApp(args);
 }

@@ -11,9 +11,13 @@ namespace Fusion {
         ~Scene();
 
         void onUpdateRuntime();
-        void onUpdateEditor(EditorCamera& camera);
+        void onUpdateEditor();
 
-        entt::entity getPrimaryCameraEntity();
+        void onRenderRuntime();
+        void onRenderEditor(EditorCamera& camera);
+
+        entt::entity getPrimaryCameraEntity() const { return entt::null; };
+        //entt::registry& getEntityRegistry() { return registry; };
 
     private:
         entt::registry registry;

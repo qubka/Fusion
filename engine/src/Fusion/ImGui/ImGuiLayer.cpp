@@ -15,7 +15,7 @@ static void ImGuiErrorCallback(VkResult err) {
     FE_ASSERT(err >= 0 && "[Imgui] Fatal: Vulkan result!");
 }
 
-ImGuiLayer::ImGuiLayer(Renderer& renderer) : Layer{"ImGuiLayer"}, renderer{renderer} {
+ImGuiLayer::ImGuiLayer(Vulkan& vulkan, Renderer& renderer) : Layer{"ImGuiLayer"}, vulkan{vulkan}, renderer{renderer} {
 
 }
 
@@ -46,7 +46,7 @@ void ImGuiLayer::onAttach() {
     poolInfo.pPoolSizes = poolSizes;
 
     // Create Descriptor Pool
-    auto result = renderer.getVulkan().getDevice().createDescriptorPool(&poolInfo, nullptr, &imguiPool);
+    auto result = vulkan.getDevice().createDescriptorPool(&poolInfo, nullptr, &imguiPool);
     FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor imgui pool!");
 
     // Setup Dear ImGui context
@@ -63,8 +63,7 @@ void ImGuiLayer::onAttach() {
     setDarkThemeColors();
 
     // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForVulkan(renderer.getVulkan().getWindow(), true);
-    auto& vulkan = renderer.getVulkan();
+    ImGui_ImplGlfw_InitForVulkan(vulkan.getWindow(), true);
     auto& swapChain = renderer.getSwapChain();
 
     ImGui_ImplVulkan_InitInfo initInfo{};
@@ -96,7 +95,7 @@ void ImGuiLayer::onAttach() {
     io.Fonts->Build();
 
     //execute a gpu command to upload imgui font textures
-    renderer.getVulkan().submit([&](vk::CommandBuffer& cmd) {
+    vulkan.submit([&](vk::CommandBuffer& cmd) {
         ImGui_ImplVulkan_CreateFontsTexture(cmd);
     });
 
@@ -109,7 +108,7 @@ void ImGuiLayer::onDetach() {
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-    renderer.getVulkan().getDevice().destroyDescriptorPool(imguiPool, nullptr);
+    vulkan.getDevice().destroyDescriptorPool(imguiPool, nullptr);
 }
 
 void ImGuiLayer::begin() {

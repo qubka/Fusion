@@ -3,7 +3,6 @@
 #include "Time.hpp"
 
 #include "Fusion/ImGui/ImGuiLayer.hpp"
-#include "Fusion/Editor/EditorLayer.hpp"
 #include "Fusion/Input/Input.hpp"
 
 using namespace Fusion;
@@ -23,9 +22,8 @@ Application::Application(std::string name, CommandLineArgs args)
     //MouseInput::Setup(window);
     Input::Init(window);
 
-    imGuiLayer = new ImGuiLayer(renderer);
+    imGuiLayer = new ImGuiLayer{vulkan, renderer};
     pushOverlay(imGuiLayer);
-    pushOverlay(new EditorLayer());
 }
 
 void Application::run() {

@@ -25,6 +25,11 @@ namespace Fusion {
         };
     };
 
+    class Mesh;
+    struct FUSION_API MeshRendererComponent {
+        std::shared_ptr<Mesh> mesh;
+    };
+
     /*struct FUSION_API TranslateComponent {
         glm::mat4 transform{1};
 

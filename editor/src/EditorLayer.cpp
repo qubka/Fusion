@@ -6,7 +6,7 @@
 #include "Fusion/Renderer/Texture.hpp"
 #include "backends/imgui_impl_vulkan.h"
 
-#include <portable-file-dialogs.h>
+#include "portable-file-dialogs/portable-file-dialogs.h"
 
 #if _WIN32
 #define DEFAULT_PATH "C:\\"
@@ -14,19 +14,18 @@
 #define DEFAULT_PATH "/tmp"
 #endif
 
-#include <imgui.h>
-#include <imgui_internal.h>
-#include <imguizmo/ImGuizmo.h>
+#include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
+#include "imguizmo/ImGuizmo.h"
 
 using namespace Fusion;
 
-EditorLayer::EditorLayer() : Layer("EditorLayer") {
+EditorLayer::EditorLayer() : Layer{"EditorLayer"} {
 }
 
 EditorLayer::~EditorLayer() {
 
 }
-
 
 void EditorLayer::onAttach() {
     activeScene = std::make_shared<Scene>();
@@ -50,12 +49,26 @@ void EditorLayer::onUpdate() {
     switch (sceneState) {
         case SceneState::Edit: {
             editorCamera.onUpdate();
-            activeScene->onUpdateEditor(editorCamera);
+            activeScene->onUpdateEditor();
             break;
         }
 
         case SceneState::Play: {
             activeScene->onUpdateRuntime();
+            break;
+        }
+    }
+}
+
+void EditorLayer::onRender() {
+    switch (sceneState) {
+        case SceneState::Edit: {
+            activeScene->onRenderEditor(editorCamera);
+            break;
+        }
+
+        case SceneState::Play: {
+            activeScene->onRenderRuntime();
             break;
         }
     }

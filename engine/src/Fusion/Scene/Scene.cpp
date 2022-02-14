@@ -15,11 +15,22 @@ void Scene::onUpdateRuntime() {
 
 }
 
-void Scene::onUpdateEditor(EditorCamera& camera) {
+void Scene::onUpdateEditor() {
 
 }
 
-entt::entity Scene::getPrimaryCameraEntity() {
-    entt::entity result;
-    return result;
+void Scene::onRenderRuntime() {
+
+}
+
+void Scene::onRenderEditor(EditorCamera& camera) {
+    meshRenderer.beginScene(camera);
+
+    auto group = registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
+    for (auto entity : group) {
+        auto [transform, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
+        meshRenderer.drawMesh(transform, mesh.mesh);
+    }
+
+    meshRenderer.endScene();
 }
