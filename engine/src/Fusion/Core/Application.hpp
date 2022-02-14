@@ -7,7 +7,6 @@
 #include "Fusion/Renderer/Renderer.hpp"
 #include "Fusion/Input/Input.hpp"
 
-
 int main(int argc, char** argv);
 
 namespace Fusion {
@@ -26,7 +25,7 @@ namespace Fusion {
 
     class FUSION_API Application {
     public:
-        Application(std::string name = "Fusion App", CommandLineArgs args = CommandLineArgs{});
+        Application(std::string name = "Fusion", CommandLineArgs args = CommandLineArgs{});
         virtual ~Application() = default;
 
         void run();
@@ -41,15 +40,16 @@ namespace Fusion {
         CommandLineArgs& getCommandLineArgs() { return commandLineArgs; }
         ImGuiLayer& getImGuiLayer() { return *imGuiLayer; }
         static Application& Instance() { return *instance; }
-    private:
+
+    protected:
         Window window;
         CommandLineArgs commandLineArgs;
         Vulkan vulkan;
         Renderer renderer;
 
+    private:
         LayerStack layers;
         ImGuiLayer* imGuiLayer;
-        //std::vector<Input*> inputs;
 
         static Application* instance;
         friend int ::main(int argc, char** argv);

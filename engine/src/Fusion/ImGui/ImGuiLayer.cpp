@@ -1,8 +1,10 @@
 #include "ImGuiLayer.hpp"
-#include "Fusion.hpp"
+
+#include "Fusion/Renderer/Window.hpp"
+#include "Fusion/Renderer/Renderer.hpp"
+#include "Fusion/Renderer/SwapChain.hpp"
 
 #include <imguizmo/ImGuizmo.h>
-
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
 

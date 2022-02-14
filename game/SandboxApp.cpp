@@ -21,12 +21,12 @@ public:
 class SandboxApp : public Fusion::Application {
 public:
     SandboxApp(Fusion::CommandLineArgs args) : Application{"Sandbox", args} {
-        pushLayer(new ExampleLayer());
+        pushLayer(new ExampleLayer{});
     }
     ~SandboxApp() override {
     }
 };
 
 Fusion::Application* Fusion::CreateApplication(CommandLineArgs args) {
-    return new SandboxApp(args);
+    return new SandboxApp{args};
 }

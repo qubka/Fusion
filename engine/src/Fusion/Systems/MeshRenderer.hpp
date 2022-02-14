@@ -4,7 +4,6 @@
 #include "Fusion/Renderer/Renderer.hpp"
 
 namespace Fusion {
-    class Camera;
     class Mesh;
     class Texture;
     class Pipeline;
@@ -20,7 +19,7 @@ namespace Fusion {
         MeshRenderer(Vulkan& vulkan, Renderer& renderer);
         ~MeshRenderer() override;
 
-        void beginScene(const Camera& camera) override;
+        void beginScene() override;
         void drawMesh(const glm::mat4& transform, const std::shared_ptr<Mesh>& mesh);
         void endScene() override;
 
@@ -38,7 +37,6 @@ namespace Fusion {
         std::unique_ptr<Texture> texture;
         std::unique_ptr<Pipeline> pipeline;
         vk::PipelineLayout pipelineLayout;
-
-        const vk::CommandBuffer* commandBuffer;
+        const vk::CommandBuffer* commandBuffer{nullptr};
     };
 }

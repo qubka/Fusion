@@ -1,6 +1,8 @@
 #include "Scene.hpp"
 #include "Components.hpp"
 
+#include "Fusion/Systems/MeshRenderer.hpp"
+
 using namespace Fusion;
 
 Scene::Scene() {
@@ -19,12 +21,12 @@ void Scene::onUpdateEditor() {
 
 }
 
-void Scene::onRenderRuntime() {
+void Scene::onRenderRuntime(MeshRenderer& meshRenderer) {
 
 }
 
-void Scene::onRenderEditor(EditorCamera& camera) {
-    meshRenderer.beginScene(camera);
+void Scene::onRenderEditor(MeshRenderer& meshRenderer) {
+    meshRenderer.beginScene();
 
     auto group = registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
     for (auto entity : group) {

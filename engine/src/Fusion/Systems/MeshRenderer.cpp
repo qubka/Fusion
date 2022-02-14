@@ -30,7 +30,7 @@ void MeshRenderer::createDescriptorSets() {
 
     textureDescriptorSets.reserve(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
-    texture = std::make_unique<Texture>(vulkan, "textures/texture.jpg", vk::Format::eR8G8B8A8Srgb);
+    texture = std::make_unique<Texture>(vulkan, "assets/textures/texture.jpg", vk::Format::eR8G8B8A8Srgb);
 
     vk::DescriptorImageInfo imageInfo{};
     imageInfo.sampler = texture->getSampler();
@@ -70,11 +70,11 @@ void MeshRenderer::createPipeline() {
     configInfo.pipelineLayout = pipelineLayout;
     configInfo.renderPass = renderer.getSwapChain()->getRenderPass();
     configInfo.subpass = 0;
-    pipeline = std::make_unique<Pipeline>(vulkan, "shaders/mesh.vert.spv", "shaders/mesh.frag.spv", configInfo);
+    pipeline = std::make_unique<Pipeline>(vulkan, "assets/shaders/mesh.vert.spv", "assets/shaders/mesh.frag.spv", configInfo);
 }
 
-void MeshRenderer::beginScene(const Camera& camera) {
-    FE_ASSERT(commandBuffer && "pipeline already was bind");
+void MeshRenderer::beginScene() {
+    FE_ASSERT(!commandBuffer && "pipeline already was bind");
 
     uint32_t frameIndex = renderer.getFrameIndex();
 
@@ -95,7 +95,7 @@ void MeshRenderer::beginScene(const Camera& camera) {
 }
 
 void MeshRenderer::drawMesh(const glm::mat4& transform, const std::shared_ptr<Mesh>& mesh) {
-    FE_ASSERT(!commandBuffer && "cannot draw mesh when pipeline not bind");
+    FE_ASSERT(commandBuffer && "cannot draw mesh when pipeline not bind");
 
     PushConstantData push { transform };
 

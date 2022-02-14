@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fusion/Renderer/PerspectiveCamera.hpp"
+#include "PerspectiveCamera.hpp"
 
 namespace Fusion {
     class KeyInput;

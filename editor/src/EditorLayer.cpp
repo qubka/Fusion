@@ -4,9 +4,11 @@
 #include "Fusion/Input/Input.hpp"
 #include "Fusion/ImGui/ImGuiLayer.hpp"
 #include "Fusion/Renderer/Texture.hpp"
-#include "backends/imgui_impl_vulkan.h"
+#include "Fusion/Renderer/Renderer.hpp"
+#include "Fusion/Renderer/AllocatedBuffer.hpp"
 
-#include "portable-file-dialogs/portable-file-dialogs.h"
+#include <backends/imgui_impl_vulkan.h>
+#include <portable-file-dialogs/portable-file-dialogs.h>
 
 #if _WIN32
 #define DEFAULT_PATH "C:\\"
@@ -20,7 +22,7 @@
 
 using namespace Fusion;
 
-EditorLayer::EditorLayer() : Layer{"EditorLayer"} {
+EditorLayer::EditorLayer(Vulkan& vulkan, Renderer& renderer) : Layer{"EditorLayer"}, vulkan{vulkan}, renderer{renderer}, meshRenderer{vulkan, renderer} {
 }
 
 EditorLayer::~EditorLayer() {
@@ -61,14 +63,22 @@ void EditorLayer::onUpdate() {
 }
 
 void EditorLayer::onRender() {
+    // update
+    UniformBufferObject ubo{};
+    ubo.perspective = editorCamera.getViewProjection();
+    ubo.orthogonal = glm::ortho(0, vulkan.getWindow().getWidth(), 0, vulkan.getWindow().getHeight());
+    auto& buffer = renderer.getUniformBuffers(renderer.getFrameIndex());
+    buffer->writeToBuffer(&ubo);
+    buffer->flush();
+
     switch (sceneState) {
         case SceneState::Edit: {
-            activeScene->onRenderEditor(editorCamera);
+            activeScene->onRenderEditor(meshRenderer);
             break;
         }
 
         case SceneState::Play: {
-            activeScene->onRenderRuntime();
+            activeScene->onRenderRuntime(meshRenderer);
             break;
         }
     }

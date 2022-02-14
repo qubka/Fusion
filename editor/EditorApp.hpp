@@ -5,12 +5,12 @@
 class EditorApp : public Fusion::Application {
 public:
     EditorApp(Fusion::CommandLineArgs args) : Application{"Editor", args} {
-        pushLayer(new Fusion::EditorLayer{});
+        pushLayer(new Fusion::EditorLayer{vulkan, renderer});
     }
     ~EditorApp() override {
     }
 };
 
 Fusion::Application* Fusion::CreateApplication(Fusion::CommandLineArgs args) {
-    return new EditorApp(args);
+    return new EditorApp{args};
 }

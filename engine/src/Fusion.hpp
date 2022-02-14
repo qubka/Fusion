@@ -15,6 +15,7 @@
 #include "Fusion/Renderer/Camera.hpp"
 #include "Fusion/Renderer/PerspectiveCamera.hpp"
 #include "Fusion/Renderer/OrthographicCamera.hpp"
+#include "Fusion/Renderer/EditorCamera.hpp"
 #include "Fusion/Renderer/Window.hpp"
 #include "Fusion/Renderer/Vulkan.hpp"
 #include "Fusion/Renderer/Texture.hpp"

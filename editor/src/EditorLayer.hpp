@@ -1,20 +1,20 @@
 #pragma once
 
-#include "EditorCamera.hpp"
-
 #include "Panels/SceneHierarchyPanel.hpp"
 #include "Panels/ContentBrowserPanel.hpp"
 
 #include "Fusion/Core/Layer.hpp"
+#include "Fusion/Input/BaseInput.hpp"
 #include "Fusion/Scene/Scene.hpp"
 #include "Fusion/Scene/SceneSerializer.hpp"
-#include "Fusion/Input/BaseInput.hpp"
+#include "Fusion/Renderer/EditorCamera.hpp"
+#include "Fusion/Systems/MeshRenderer.hpp"
 #include "Fusion/Utils/ProcessInfo.hpp"
 
 namespace Fusion {
     class FUSION_API EditorLayer : public Layer {
     public:
-        EditorLayer();
+        EditorLayer(Vulkan& vulkan, Renderer& renderer);
         ~EditorLayer() override;
 
         void onAttach() override;
@@ -54,5 +54,9 @@ namespace Fusion {
             Edit = 0, Play = 1
         };
         SceneState sceneState = SceneState::Edit;
+
+        Vulkan& vulkan;
+        Renderer& renderer;
+        MeshRenderer meshRenderer;
     };
 }

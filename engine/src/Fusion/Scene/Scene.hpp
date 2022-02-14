@@ -4,6 +4,7 @@
 
 namespace Fusion {
     class EditorCamera;
+    class MeshRenderer;
 
     class FUSION_API Scene {
     public:
@@ -13,8 +14,8 @@ namespace Fusion {
         void onUpdateRuntime();
         void onUpdateEditor();
 
-        void onRenderRuntime();
-        void onRenderEditor(EditorCamera& camera);
+        void onRenderRuntime(MeshRenderer& meshRenderer);
+        void onRenderEditor(MeshRenderer& meshRenderer);
 
         entt::entity getPrimaryCameraEntity() const { return entt::null; };
         //entt::registry& getEntityRegistry() { return registry; };

@@ -3,9 +3,10 @@
 #include "Fusion/Scene/Scene.hpp"
 
 namespace Fusion {
+    class Mesh;
     class FUSION_API SceneHierarchyPanel {
     public:
-        SceneHierarchyPanel() = default;
+        SceneHierarchyPanel();
         ~SceneHierarchyPanel() = default;
 
         void setContext(const std::shared_ptr<Scene>& scene);
@@ -24,6 +25,7 @@ namespace Fusion {
 
     private:
         std::shared_ptr<Scene> context;
+        std::shared_ptr<Mesh> mesh;
         entt::entity selectionContext;
     };
 
