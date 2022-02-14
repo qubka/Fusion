@@ -90,7 +90,7 @@ namespace YAML {
             return node;
         }
 
-        static bool decode(const Node& node, glm::vec4& rhs) {
+        static bool decode(const Node& node, glm::quat& rhs) {
             if (!node.IsSequence() || node.size() != 4)
                 return false;
 
@@ -215,7 +215,7 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
             auto uuid = entity["Entity"].as<uint64_t>(); // TODO
             auto deserializedEntity = scene->registry.create(/*uuid*/);
 
-            std::string name{"<blank>"};
+            std::string name;
             if (const auto& tagComponent = entity["TagComponent"]) {
                 name = tagComponent["tag"].as<std::string>();
                 scene->registry.emplace<TagComponent>(deserializedEntity, name);

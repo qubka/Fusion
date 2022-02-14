@@ -20,6 +20,7 @@ namespace Fusion {
         vk::Result submitCommandBuffers(const vk::CommandBuffer& buffers, const uint32_t& imageIndex);
 
         bool compareSwapFormats(const SwapChain& other) const;
+        void saveScreenshot(const std::string& path) const;
 
     private:
         void init();
@@ -44,7 +45,8 @@ namespace Fusion {
         std::vector<vk::Semaphore> renderFinishedSemaphores;
         std::vector<vk::Fence> inFlightFences;
         std::vector<vk::Fence*> imagesInFlight;
-        uint32_t currentFrame = 0;
+        uint32_t currentFrame{0};
+        uint32_t prevFrame{0};
 
         vk::Image depthImage;
         vk::DeviceMemory depthImageMemory;

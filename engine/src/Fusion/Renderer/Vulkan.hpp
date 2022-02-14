@@ -57,6 +57,9 @@ namespace Fusion {
 
         void submit(std::function<void(vk::CommandBuffer& cmd)>&& function) const;
 
+        vk::CommandBuffer beginSingleTimeCommands() const;
+        void endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const;
+
     private:
         void createInstance();
         void setupDebugMessenger();
@@ -73,8 +76,6 @@ namespace Fusion {
         QueueFamilyIndices findQueueFamilies(const vk::PhysicalDevice& device) const;
         SwapChainSupportDetails querySwapChainSupport(const vk::PhysicalDevice& device) const;
 
-        vk::CommandBuffer beginSingleTimeCommands() const;
-        void endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const;
         uint32_t findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const;
 
         static bool hasStencilComponent(vk::Format format);

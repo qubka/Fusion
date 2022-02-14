@@ -351,7 +351,7 @@ vk::Format Vulkan::findSupportedFormat(const std::vector<vk::Format>& candidates
         }
     }
 
-    FE_ASSERT(false && "failed to find supported format!");
+    FE_ASSERT(0 && "failed to find supported format!");
     return vk::Format::eUndefined;
 }
 
@@ -365,7 +365,7 @@ uint32_t Vulkan::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags pro
         }
     }
 
-    FE_ASSERT(false && "failed to find suitable memory type!");
+    FE_ASSERT(0 && "failed to find suitable memory type!");
     return 0;
 }
 
@@ -512,7 +512,7 @@ void Vulkan::transitionImageLayout(const vk::Image& image, vk::Format format, vk
         destinationStage = vk::PipelineStageFlagBits::eEarlyFragmentTests;
 
     } else {
-        FE_ASSERT(false && "unsupported layout transition!");
+        FE_ASSERT(0 && "unsupported layout transition!");
         return;
     }
 

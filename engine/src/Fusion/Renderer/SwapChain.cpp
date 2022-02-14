@@ -1,4 +1,5 @@
 #include "SwapChain.hpp"
+#include "VulkanTools.hpp"
 
 using namespace Fusion;
 
@@ -105,6 +106,27 @@ void SwapChain::createSwapChain() {
     swapChainImageFormat = surfaceFormat.format;
     swapChainExtent = extent;
     swapChainDepthFormat = findDepthFormat();
+
+    /*if (vulkan.findSupportedFormat({swapChainImageFormat}, vk::ImageTiling::eOptimal, vk::FormatFeatureFlagBits::eBlitSrc) == vk::Format::eUndefined ||
+       vulkan.findSupportedFormat({vk::Format::eR8G8B8A8Unorm}, vk::ImageTiling::eLinear, vk::FormatFeatureFlagBits::eBlitDst) == vk::Format::eUndefined) {
+        FE_LOG_ERROR << "Device does not support blitting to optimal or linear tiled images, using copy instead of blit!";
+        supportsBlit = false;
+    }*/
+
+    // Check if the device supports blitting from optimal images (the swapchain images are in optimal format)
+    /*vk::FormatProperties formatProps;
+    vulkan.getPhysical().getFormatProperties(swapChainImageFormat, &formatProps);
+    if (!(formatProps.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitSrc)) {
+        std::cerr << "Device does not support blitting from optimal tiled images, using copy instead of blit!" << std::endl;
+        supportsBlit = false;
+    }
+
+    // Check if the device supports blitting to linear images
+    vulkan.getPhysical().getFormatProperties(vk::Format::eB8G8R8A8Unorm, &formatProps);
+    if (!(formatProps.linearTilingFeatures & vk::FormatFeatureFlagBits::eBlitDst)) {
+        std::cerr << "Device does not support blitting to linear tiled images, using copy instead of blit!" << std::endl;
+        supportsBlit = false;
+    }*/
 }
 
 vk::SurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats) const {
@@ -138,13 +160,12 @@ vk::PresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<vk::Presen
 vk::Extent2D SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities) const {
     if (capabilities.currentExtent.width == std::numeric_limits<uint32_t>::max() ||
         capabilities.currentExtent.height == std::numeric_limits<std::uint32_t>::max()) {
-        VkExtent2D actualExtent {
-            std::max(capabilities.minImageExtent.width,
-                     std::min(capabilities.maxImageExtent.width, windowExtent.width)),
-            std::max(capabilities.minImageExtent.height,
-                     std::min(capabilities.maxImageExtent.height, windowExtent.height))
+        return {
+                std::max(capabilities.minImageExtent.width,
+                         std::min(capabilities.maxImageExtent.width, windowExtent.width)),
+                std::max(capabilities.minImageExtent.height,
+                         std::min(capabilities.maxImageExtent.height, windowExtent.height))
         };
-        return actualExtent;
     } else {
         return capabilities.currentExtent;
     }
@@ -331,6 +352,7 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
     result = vulkan.getPresentQueue().presentKHR(&presentInfo);
     //FE_ASSERT((result == vk::Result::eSuccess || result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) && "failed to present swap chain image!");
 
+    prevFrame = currentFrame;
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
     return result;
@@ -339,4 +361,183 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
 bool SwapChain::compareSwapFormats(const SwapChain& other) const {
     return other.swapChainDepthFormat == swapChainDepthFormat &&
             other.swapChainImageFormat == swapChainImageFormat;
+}
+
+void SwapChain::saveScreenshot(const std::string& path) const{
+    //screenshotSaved = false;
+    bool supportsBlit = true;
+    
+    uint32_t height = swapChainExtent.height;
+    uint32_t width = swapChainExtent.width;
+
+    // Check if the device supports blitting from optimal images (the swapchain images are in optimal format)
+    // Check if the device supports blitting to linear images
+    if (vulkan.findSupportedFormat({swapChainImageFormat}, vk::ImageTiling::eOptimal, vk::FormatFeatureFlagBits::eBlitSrc) == vk::Format::eUndefined ||
+        vulkan.findSupportedFormat({vk::Format::eR8G8B8A8Unorm}, vk::ImageTiling::eLinear, vk::FormatFeatureFlagBits::eBlitDst) == vk::Format::eUndefined) {
+        FE_LOG_ERROR << "Device does not support blitting to optimal or linear tiled images, using copy instead of blit!";
+        supportsBlit = false;
+    }
+
+    // Source for the copy is the last rendered swapchain image
+    vk::Image srcImage = swapChainImages[prevFrame];
+
+    // Create the image
+    vk::Image dstImage;
+    vk::DeviceMemory dstImageMemory;
+    vulkan.createImage(width,
+                       height,
+                    vk::Format::eR8G8B8A8Unorm,
+                    vk::ImageTiling::eLinear,
+                    vk::ImageUsageFlagBits::eTransferDst,
+                    vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
+                    dstImage,
+                    dstImageMemory);
+
+    // Do the actual blit from the swapchain image to our host visible destination image
+    vk::CommandBuffer copyCmd = vulkan.beginSingleTimeCommands();
+
+    // Transition destination image to transfer destination layout
+    vk::tools::InsertImageMemoryBarrier(
+            copyCmd,
+            dstImage,
+            vk::AccessFlagBits::eNone,
+            vk::AccessFlagBits::eTransferWrite,
+            vk::ImageLayout::eUndefined,
+            vk::ImageLayout::eTransferDstOptimal,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::ImageSubresourceRange{ vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+
+    // Transition swapchain image from present to transfer source layout
+    vk::tools::InsertImageMemoryBarrier(
+            copyCmd,
+            srcImage,
+            vk::AccessFlagBits::eMemoryRead,
+            vk::AccessFlagBits::eTransferRead,
+            vk::ImageLayout::ePresentSrcKHR,
+            vk::ImageLayout::eTransferSrcOptimal,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::ImageSubresourceRange{ vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+
+    // If source and destination support blit we'll blit as this also does automatic format conversion (e.g. from BGR to RGB)
+    if (supportsBlit) {
+        // Define the region to blit (we will blit the whole swapchain image)
+        vk::Offset3D blitSize;
+        blitSize.x = width;
+        blitSize.y = height;
+        blitSize.z = 1;
+        vk::ImageBlit imageBlitRegion{};
+        imageBlitRegion.srcSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+        imageBlitRegion.srcSubresource.layerCount = 1;
+        imageBlitRegion.srcOffsets[1] = blitSize;
+        imageBlitRegion.dstSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+        imageBlitRegion.dstSubresource.layerCount = 1;
+        imageBlitRegion.dstOffsets[1] = blitSize;
+
+        // Issue the blit command
+        copyCmd.blitImage(
+                srcImage, 
+                vk::ImageLayout::eTransferSrcOptimal,
+                dstImage, 
+                vk::ImageLayout::eTransferDstOptimal,
+                1,
+                &imageBlitRegion,
+                vk::Filter::eNearest);
+    } else {
+        // Otherwise use image copy (requires us to manually flip components)
+        vk::ImageCopy imageCopyRegion{};
+        imageCopyRegion.srcSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+        imageCopyRegion.srcSubresource.layerCount = 1;
+        imageCopyRegion.dstSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+        imageCopyRegion.dstSubresource.layerCount = 1;
+        imageCopyRegion.extent.width = width;
+        imageCopyRegion.extent.height = height;
+        imageCopyRegion.extent.depth = 1;
+
+        // Issue the copy command
+        copyCmd.copyImage(
+                srcImage, 
+                vk::ImageLayout::eTransferSrcOptimal,
+                dstImage, 
+                vk::ImageLayout::eTransferDstOptimal,
+                1,
+                &imageCopyRegion);
+    }
+
+    // Transition destination image to general layout, which is the required layout for mapping the image memory later on
+    vk::tools::InsertImageMemoryBarrier(
+            copyCmd,
+            dstImage,
+            vk::AccessFlagBits::eTransferWrite, 
+            vk::AccessFlagBits::eMemoryRead,
+            vk::ImageLayout::eTransferDstOptimal,
+            vk::ImageLayout::eGeneral,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::ImageSubresourceRange{ vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+
+    // Transition back the swap chain image after the blit is done
+    vk::tools::InsertImageMemoryBarrier(
+            copyCmd,
+            srcImage,
+            vk::AccessFlagBits::eTransferRead,
+            vk::AccessFlagBits::eMemoryRead,
+            vk::ImageLayout::eTransferSrcOptimal,
+            vk::ImageLayout::ePresentSrcKHR,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::ImageSubresourceRange{ vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+    
+    vulkan.endSingleTimeCommands(copyCmd);
+
+    // Get layout of the image (including row pitch)
+    vk::ImageSubresource subResource { vk::ImageAspectFlagBits::eColor, 0, 0 };
+    vk::SubresourceLayout subResourceLayout;
+    vulkan.getDevice().getImageSubresourceLayout(dstImage, &subResource, &subResourceLayout);
+
+    // Map image memory so we can start copying from it
+    const char* data;
+    vkMapMemory(vulkan.getDevice(), dstImageMemory, 0, VK_WHOLE_SIZE, 0, (void**)&data);
+    data += subResourceLayout.offset;
+
+    std::ofstream file(path, std::ios::out | std::ios::binary);
+
+    // ppm header
+    file << "P6\n" << width << "\n" << height << "\n" << 255 << "\n";
+
+    // If source is BGR (destination is always RGB) and we can't use blit (which does automatic conversion), we'll have to manually swizzle color components
+    bool colorSwizzle = false;
+    // Check if source is BGR
+    // Note: Not complete, only contains most common and basic BGR surface formats for demonstration purposes
+    if (!supportsBlit) {
+        std::vector<vk::Format> formatsBGR = { vk::Format::eB8G8R8A8Srgb, vk::Format::eB8G8R8A8Unorm, vk::Format::eB8G8R8A8Snorm };
+        colorSwizzle = (std::find(formatsBGR.begin(), formatsBGR.end(), swapChainImageFormat) != formatsBGR.end());
+    }
+
+    // ppm binary pixel data
+    for (uint32_t y = 0; y < height; y++) {
+        unsigned int *row = (unsigned int*)data;
+        for (uint32_t x = 0; x < width; x++) {
+            if (colorSwizzle) {
+                file.write((char*)row+2, 1);
+                file.write((char*)row+1, 1);
+                file.write((char*)row, 1);
+            } else {
+                file.write((char*)row, 3);
+            }
+            row++;
+        }
+        data += subResourceLayout.rowPitch;
+    }
+    file.close();
+
+    std::cout << "Screenshot saved to disk" << std::endl;
+
+    // Clean up resources
+    vkUnmapMemory(vulkan.getDevice(), dstImageMemory);
+    vkFreeMemory(vulkan.getDevice(), dstImageMemory, nullptr);
+    vkDestroyImage(vulkan.getDevice(), dstImage, nullptr);
+
+    //screenshotSaved = true;
 }

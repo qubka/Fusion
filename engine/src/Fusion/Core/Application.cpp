@@ -44,6 +44,10 @@ void Application::run() {
                     layer->onRender();
                 }
 
+                if (Input::GetKeyDown(Key::Enter)) {
+                    renderer.getSwapChain()->saveScreenshot("assets/file.png");
+                }
+
                 imGuiLayer->begin();
                 for (auto* layer: layers) {
                     layer->onImGui();
