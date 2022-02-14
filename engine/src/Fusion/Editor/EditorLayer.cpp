@@ -35,7 +35,7 @@ void EditorLayer::onAttach() {
     auto commandLineArgs = Application::Instance().getCommandLineArgs();
     if (commandLineArgs.count > 1) {
         auto sceneFilePath = commandLineArgs[1];
-        SceneSerializer serializer(activeScene);
+        SceneSerializer serializer{activeScene};
         serializer.deserialize(sceneFilePath);
     }
 
@@ -69,7 +69,7 @@ void EditorLayer::onImGui() {
     // because it would be confusing to have two docking targets within each others.
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->Pos);
-    ImGui::SetNextWindowSize({viewport->Size.x, 15});
+    ImGui::SetNextWindowSize({viewport->Size.x, 0});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
@@ -115,7 +115,6 @@ void EditorLayer::onImGui() {
     if (m_HoveredEntity)
         name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
     ImGui::Text("Hovered Entity: %s", name.c_str());*/
-
     ImGui::Text("CPU: %f%%", info.getProcessCpuUsage());
     ImGui::Text("Mem: %fMB", info.getProcessMemoryUsed());
     ImGui::Text("Threads: %lu", info.getProcessThreadCount());
@@ -133,12 +132,26 @@ void EditorLayer::onImGui() {
     //ImGui::Text("Quads: %d", stats.QuadCount);
     //ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
     //ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-
     ImGui::ColorEdit3("Background", glm::value_ptr(Application::Instance().getRenderer().getColor()));
 
     ImGui::End();
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
     ImGui::Begin("Viewport");
     auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
     auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
@@ -153,9 +166,7 @@ void EditorLayer::onImGui() {
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
     viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-    auto& swapChain = Application::Instance().getRenderer().getSwapChain();
-
-    /*static ImTextureID textureId;
+    static ImTextureID textureId;
     static bool f = false;
     if (!f) {
         texture = std::make_shared<Texture>(Application::Instance().getVulkan(), "assets/textures/texture.jpg",
@@ -165,7 +176,7 @@ void EditorLayer::onImGui() {
         f = true;
     }
 
-    ImGui::Image(textureId, ImVec2{viewportSize.x, viewportSize.y}, ImVec2{0, 1}, ImVec2{1, 0});*/
+    ImGui::Image(textureId, ImVec2{viewportSize.x, viewportSize.y}, ImVec2{0, 1}, ImVec2{1, 0});
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -173,7 +184,7 @@ void EditorLayer::onImGui() {
             openScene(std::filesystem::path(AssetPath) / path);
         }
         ImGui::EndDragDropTarget();
-    }
+    }*/
 
     // Gizmos
     /*auto selectedEntity = sceneHierarchyPanel.getSelectedEntity();
@@ -223,8 +234,8 @@ void EditorLayer::onImGui() {
         }
     }*/
 
-    ImGui::End();
-    ImGui::PopStyleVar();
+    //ImGui::End();
+    //ImGui::PopStyleVar();
 
     //UI_Toolbar();
 
@@ -250,7 +261,7 @@ void EditorLayer::openScene(const std::filesystem::path& path) {
     }
 
     auto newScene = std::make_shared<Scene>();
-    SceneSerializer serializer(newScene);
+    SceneSerializer serializer{newScene};
     if (serializer.deserialize(path)) {
         activeScene = newScene;
         //activeScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
@@ -261,7 +272,7 @@ void EditorLayer::openScene(const std::filesystem::path& path) {
 void EditorLayer::saveSceneAs() {
     auto filepath = pfd::save_file("Choose scene file", DEFAULT_PATH, { "Scene Files (.scene)", "*.scene", "All Files", "*" }, pfd::opt::force_overwrite).result();
     if (!filepath.empty()) {
-        SceneSerializer serializer(activeScene);
+        SceneSerializer serializer{activeScene};
         serializer.serialize(filepath);
     }
 }

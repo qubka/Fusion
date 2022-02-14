@@ -277,8 +277,8 @@ vk::Format SwapChain::findDepthFormat() const {
         vk::Format::eD32SfloatS8Uint,
         vk::Format::eD24UnormS8Uint
     },
-                                      vk::ImageTiling::eOptimal,
-                                      vk::FormatFeatureFlagBits::eDepthStencilAttachment);
+    vk::ImageTiling::eOptimal,
+    vk::FormatFeatureFlagBits::eDepthStencilAttachment);
 }
 
 vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex) const {

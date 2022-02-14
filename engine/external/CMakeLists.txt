@@ -203,7 +203,7 @@ set(YAML_BUILD_SHARED_LIBS ON)
 
 
 # portfiledialog
-set(PFD_LIB_NAME "portable_file_dialogs")
+set(PFD_LIB_NAME "portable-file-dialogs")
 
 add_subdirectory(${PFD_LIB_NAME})
 

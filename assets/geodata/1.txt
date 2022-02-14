@@ -1,1 +1,0 @@
-mapshaper gadm36_FRA_2.geojson -simplify dp 10% keep-shapes -o format=geojson new.geojson      

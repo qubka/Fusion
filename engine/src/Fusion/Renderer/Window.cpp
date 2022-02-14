@@ -7,7 +7,7 @@ using namespace Fusion;
 uint8_t Window::GLFWwindowCount{0};
 
 static void GLFWErrorCallback(int error, const char* description) {
-    FE__LOG_ERROR << "[GLFW] Error (" << error << "): " << description;
+    FE_LOG_ERROR << "[GLFW] Error (" << error << "): " << description;
 }
 
 Window::Window(std::string title, int width, int height) :

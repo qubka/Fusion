@@ -53,8 +53,8 @@ namespace Fusion {
 
         glm::vec3 color{0.7f, 0.85f, 1.0f};
 
-        uint32_t currentImageIndex{0};
-        uint32_t currentFrameIndex{0};
+        uint32_t currentImage{0};
+        uint32_t currentFrame{0};
         bool isFrameStarted{false};
     };
 }

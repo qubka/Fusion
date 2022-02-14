@@ -11,7 +11,7 @@ using namespace Fusion;
 static void ImGuiErrorCallback(VkResult err) {
     if (err == 0)
         return;
-    FE__LOG_ERROR << "[Imgui] Error: VkResult = " << err;
+    FE_LOG_ERROR << "[Imgui] Error: VkResult = " << err;
     FE_ASSERT(err >= 0 && "[Imgui] Fatal: Vulkan result!");
 }
 

@@ -78,7 +78,7 @@ std::vector<char> Pipeline::readFile(const std::string& path) {
     std::ifstream file {path, std::ios::ate | std::ios::binary};
 
     if (!file.is_open()) {
-        FE__LOG_ERROR << "Failed to open file: " << path;
+        FE_LOG_ERROR << "Failed to open file: " << path;
         return {};
     }
 

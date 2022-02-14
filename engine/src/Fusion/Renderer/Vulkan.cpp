@@ -5,7 +5,7 @@ using namespace Fusion;
 
 // local callback functions
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
-    FE__LOG_ERROR << "[Vulkan] Validation layer: " << pCallbackData->pMessage;
+    FE_LOG_ERROR << "[Vulkan] Validation layer: " << pCallbackData->pMessage;
     return VK_FALSE;
 }
 

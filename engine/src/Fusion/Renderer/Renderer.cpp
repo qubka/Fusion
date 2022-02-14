@@ -30,7 +30,7 @@ void Renderer::createCommandBuffers() {
     allocInfo.commandBufferCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
 
     auto result = vulkan.getDevice().allocateCommandBuffers(&allocInfo, commandBuffers.data());
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to allocateDescriptor command buffers!");
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to allocate descriptor command buffers!");
 }
 
 void Renderer::createUniformBuffers() {
@@ -42,7 +42,7 @@ void Renderer::createUniformBuffers() {
                 sizeof(UniformBufferObject),
                 1,
                 vk::BufferUsageFlagBits::eUniformBuffer,
-            vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+                vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
         buffer->map();
         uniformBuffers.push_back(std::move(buffer));
     }
@@ -94,7 +94,7 @@ void Renderer::recreateSwapChain() {
 vk::CommandBuffer Renderer::beginFrame() {
     FE_ASSERT(!isFrameStarted && "cannot call beginFrame while already in progress");
 
-    auto result = swapChain->acquireNextImage(currentImageIndex);
+    auto result = swapChain->acquireNextImage(currentImage);
 
     if (result == vk::Result::eErrorOutOfDateKHR) {
         recreateSwapChain();
@@ -120,10 +120,12 @@ void Renderer::beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
     FE_ASSERT(commandBuffer == getCurrentCommandBuffer() && "cannot begin render pass on command buffer from a different frame");
 
     const auto& extent = swapChain->getSwapChainExtent();
+    auto offset = vk::Offset2D{0, 0};
+
     vk::RenderPassBeginInfo renderPassInfo{};
     renderPassInfo.renderPass = swapChain->getRenderPass();
-    renderPassInfo.framebuffer = swapChain->getFrameBuffer(currentImageIndex);
-    renderPassInfo.renderArea.offset = vk::Offset2D{ 0, 0 };
+    renderPassInfo.framebuffer = swapChain->getFrameBuffer(currentImage);
+    renderPassInfo.renderArea.offset = offset;
     renderPassInfo.renderArea.extent = extent;
 
     std::array<vk::ClearValue, 2> clearValues{};
@@ -143,7 +145,8 @@ void Renderer::beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
     viewport.height = static_cast<float>(extent.height);
     viewport.minDepth = 0;
     viewport.maxDepth = 1;
-    vk::Rect2D scissor{{0, 0}, extent};
+
+    vk::Rect2D scissor{offset, extent};
 
     commandBuffer.setViewport(0, 1, &viewport);
     commandBuffer.setScissor(0, 1, &scissor);
@@ -163,7 +166,7 @@ void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
     auto result = commandBuffer.end();
     FE_ASSERT(result == vk::Result::eSuccess && "failed to record command buffer!");
 
-    result = swapChain->submitCommandBuffers(commandBuffer, currentImageIndex);
+    result = swapChain->submitCommandBuffers(commandBuffer, currentImage);
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
         FE_LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
         recreateSwapChain();
@@ -172,7 +175,7 @@ void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
     }
 
     isFrameStarted = false;
-    currentFrameIndex = (currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
+    currentFrame = (currentFrame + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
 }
 
 /* Getters */
@@ -191,20 +194,20 @@ bool Renderer::isFrameInProgress() const {
 
 const vk::CommandBuffer& Renderer::getCurrentCommandBuffer() {
     FE_ASSERT(isFrameStarted && "cannot get command buffer when frame not in progress");
-    return commandBuffers[currentFrameIndex];
+    return commandBuffers[currentFrame];
 }
 
 const std::unique_ptr<AllocatedBuffer>& Renderer::getCurrentUniformBuffer() {
     FE_ASSERT(isFrameStarted && "cannot get uniform buffer when frame not in progress");
-    return uniformBuffers[currentFrameIndex];
+    return uniformBuffers[currentFrame];
 }
 
 const vk::DescriptorSet& Renderer::getCurrentDescriptorSet() {
     FE_ASSERT(isFrameStarted && "cannot get descriptor set when frame not in progress");
-    return globalDescriptorSets[currentFrameIndex];
+    return globalDescriptorSets[currentFrame];
 }
 
 uint32_t Renderer::getFrameIndex() const {
     FE_ASSERT(isFrameStarted && "cannot get frame index when frame not in progress");
-    return currentFrameIndex;
+    return currentFrame;
 }

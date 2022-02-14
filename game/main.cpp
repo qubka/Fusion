@@ -1,9 +1,7 @@
 #include <Fusion.hpp>
 #include "Fusion/Core/EntryPoint.hpp"
 
-using namespace Fusion;
-
-class ExampleLayer : public Layer {
+class ExampleLayer : public Fusion::Layer {
 public:
     ExampleLayer() : Layer{"ExampleLayer"} {
     }
@@ -12,23 +10,20 @@ public:
     }
 
     void onRender() override {
+
     }
 
     void onImGui() override {
 
     }
-
-    //MouseInput mouseInput{{Mouse::ButtonLeft, Mouse::ButtonRight, Mouse::ButtonMiddle}};
-    //KeyInput keyInput{{Key::Escape}};
 };
 
-class Sandbox : public Application {
+class Sandbox : public Fusion::Application {
 public:
-    Sandbox(CommandLineArgs args) : Application{"Sandbox", args} {
+    Sandbox(Fusion::CommandLineArgs args) : Application{"Sandbox", args} {
         pushLayer(new ExampleLayer());
     }
     ~Sandbox() override {
-
     }
 };
 
