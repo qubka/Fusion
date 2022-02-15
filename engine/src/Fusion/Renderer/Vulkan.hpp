@@ -21,7 +21,7 @@ namespace Fusion {
     class Window;
 
     class FUSION_API Vulkan {
-#ifdef FS_DEBUG
+#ifdef FE_DEBUG
         const bool enableValidationLayers = true;
 #else
         const bool enableValidationLayers = false;
@@ -39,6 +39,7 @@ namespace Fusion {
         const vk::Queue& getGraphicsQueue() const { return graphicsQueue; };
         const vk::Queue& getPresentQueue() const { return presentQueue; };
         const vk::CommandPool& getCommandPool() const { return commandPool; };
+        const vk::PhysicalDeviceProperties& getPhysicalProperties() const { return deviceProperties; }
 
         SwapChainSupportDetails getSwapChainSupport() const { return querySwapChainSupport(physicalDevice); };
         QueueFamilyIndices findPhysicalQueueFamilies() const { return findQueueFamilies(physicalDevice); };
@@ -57,9 +58,6 @@ namespace Fusion {
 
         vk::CommandBuffer beginSingleTimeCommands() const;
         void endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const;
-
-        vk::CommandBuffer createCommandBuffer(vk::CommandBufferLevel level, bool begin = false) const;
-        void flushCommandBuffer(const vk::CommandBuffer& commandBuffer, bool free = false) const;
 
     private:
         void createInstance();
@@ -90,8 +88,10 @@ namespace Fusion {
         vk::Queue presentQueue;
         vk::SurfaceKHR surface;
         vk::CommandPool commandPool;
+        vk::DebugUtilsMessengerEXT callback{nullptr};
+        vk::DispatchLoaderDynamic dldi;
 
-        VkDebugUtilsMessengerEXT callback{nullptr};
+        vk::PhysicalDeviceProperties deviceProperties;
 
         const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
         const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};

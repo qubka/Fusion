@@ -6,6 +6,28 @@ namespace Fusion {
     class FUSION_API Event {
     };
 
+    class FUSION_API EventQueue {
+        /// Send events to other handlers
+        void dispatch_event(const Event* event) {
+            for (auto& recipient : event_recipients) {
+                recipient->event_queue.push(event);
+            }
+        }
+
+        /// Invoke processing for events in queue when the time has come (oversimplified)
+        void process_event_queue() {
+            while (!event_queue.empty()) {
+                event_callback(event_queue.front());
+                event_queue.pop();
+            }
+        }
+
+        /// Push to queue manually
+        void push_queue(const IEvent* event) {
+            event_queue.push(event);
+        }
+    };
+
     class FUSION_API HandlerFunctionBase {
     public:
         void exec(Event* event) {
@@ -50,7 +72,7 @@ namespace Fusion {
 
             for (auto& handler : *handlers) {
                 if (handler != nullptr) {
-                    handler->exec(event);
+                    //handler->exec(event);
                 }
             }
 
@@ -83,4 +105,6 @@ namespace Fusion {
     private:
         std::map<std::type_index, HandlerList*> subscribers;
     };
+
+
 }

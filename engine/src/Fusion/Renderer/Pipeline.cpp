@@ -23,16 +23,16 @@ void Pipeline::createGraphicsPipeline(const std::string& vertPath, const std::st
 
     vk::PipelineShaderStageCreateInfo shaderStages[] = {
         {
-            vk::PipelineShaderStageCreateFlags(),
-            vk::ShaderStageFlagBits::eVertex,
-            vertShaderModule,
-            "main"
+        {},
+        vk::ShaderStageFlagBits::eVertex,
+        vertShaderModule,
+        "main"
         },
         {
-            vk::PipelineShaderStageCreateFlags(),
-            vk::ShaderStageFlagBits::eFragment,
-            fragShaderModule,
-            "main"
+        {},
+        vk::ShaderStageFlagBits::eFragment,
+        fragShaderModule,
+        "main"
         }
     };
 
@@ -66,7 +66,7 @@ void Pipeline::createGraphicsPipeline(const std::string& vertPath, const std::st
 
 void Pipeline::createShaderModule(const std::vector<char>& code, vk::ShaderModule& shaderModule) {
     vk::ShaderModuleCreateInfo createInfo {
-        vk::ShaderModuleCreateFlags(),
+        {},
         code.size(),
         reinterpret_cast<const uint32_t*>(code.data())
     };

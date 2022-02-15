@@ -238,7 +238,7 @@ void EditorLayer::onImGui() {
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist();
 
-        ImGuizmo::SetRect(viewportBounds[0].x, viewportBounds[0].y, viewportBounds[1].x - viewportBounds[0].x, viewportBounds[1].y - viewportBounds[0].y);
+        ImGuizmo::SetRect(0, 0, vulkan.getWindow().getWidth(), vulkan.getWindow().getHeight());
 
         // Camera
 
@@ -262,7 +262,6 @@ void EditorLayer::onImGui() {
         float snapValues[3] = { snapValue, snapValue, snapValue };
 
         auto cameraView = glm::lookAtLH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
-
         auto cameraProjection = glm::perspectiveLH(
                 glm::radians(editorCamera.getFov()),
                 editorCamera.getAspect(),
@@ -272,9 +271,6 @@ void EditorLayer::onImGui() {
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                              (ImGuizmo::OPERATION)gizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
                              nullptr, snap ? snapValues : nullptr);
-
-        //glm::mat4 identity{1};
-        //ImGuizmo::DrawGrid(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),  glm::value_ptr(identity), 100.f);
 
         if (ImGuizmo::IsUsing()) {
             glm::vec3 translation, rotation, scale;

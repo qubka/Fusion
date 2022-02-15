@@ -61,7 +61,7 @@ void DescriptorPool::freeDescriptors(std::vector<vk::DescriptorSet>& descriptorS
 }
 
 void DescriptorPool::resetPool() {
-    vulkan.getDevice().resetDescriptorPool(descriptorPool, vk::DescriptorPoolResetFlags());
+    vulkan.getDevice().resetDescriptorPool(descriptorPool, {});
 }
 
 // *************** Descriptor Set Layout Builder *********************
@@ -176,7 +176,7 @@ vk::DescriptorPool DescriptorAllocator::grabPool() {
         return pool;
     } else {
         //no pools availible, so create a new one
-        return createPool(1000, vk::DescriptorPoolCreateFlags());
+        return createPool(1000, {});
     }
 }
 
@@ -246,7 +246,7 @@ bool DescriptorAllocator::allocateDescriptor(const vk::DescriptorSetLayout& layo
 void DescriptorAllocator::resetPools() {
     //reset all used pools and add them to the free pools
     for (const auto& p : usedPools) {
-        vulkan.getDevice().resetDescriptorPool(p, vk::DescriptorPoolResetFlags());
+        vulkan.getDevice().resetDescriptorPool(p, {});
         freePools.push_back(p);
     }
 

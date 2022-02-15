@@ -6,23 +6,8 @@ using namespace Fusion;
 // local callback functions
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
     FE_LOG_ERROR << "[Vulkan] Validation layer: " << pCallbackData->pMessage;
+    std::cout << "[Vulkan] Validation layer: " << pCallbackData->pMessage;
     return VK_FALSE;
-}
-
-VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pCallback) {
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        return func(instance, pCreateInfo, pAllocator, pCallback);
-    } else {
-        return VK_ERROR_EXTENSION_NOT_PRESENT;
-    }
-}
-
-void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator) {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        func(instance, callback, pAllocator);
-    }
 }
 
 Vulkan::Vulkan(Window& window) : window{window} {
@@ -38,7 +23,7 @@ Vulkan::~Vulkan() {
     instance.destroySurfaceKHR(surface, nullptr);
 
     if (enableValidationLayers) {
-        DestroyDebugUtilsMessengerEXT(instance, callback, nullptr);
+        instance.destroyDebugUtilsMessengerEXT(callback, nullptr, dldi);
     }
 
     device.destroyCommandPool(commandPool, nullptr);
@@ -75,7 +60,7 @@ void Vulkan::createInstance() {
     auto extensions = getRequiredExtensions();
 
     auto createInfo = vk::InstanceCreateInfo{
-            vk::InstanceCreateFlags(),
+            {},
             &appInfo,
             0,
             nullptr,
@@ -156,7 +141,7 @@ void Vulkan::setupDebugMessenger() {
     if (!enableValidationLayers)
         return;
 
-    //auto dldi = vk::DispatchLoaderDynamic(*instance, vkGetInstanceProcAddr);
+    dldi = vk::DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
 
     auto createInfo = vk::DebugUtilsMessengerCreateInfoEXT(
         vk::DebugUtilsMessengerCreateFlagsEXT(),
@@ -166,12 +151,8 @@ void Vulkan::setupDebugMessenger() {
     );
 
     // NOTE: Vulkan-hpp has methods for this, but they trigger linking errors...
-    //instance.createDebugUtilsMessengerEXT(createInfo);
-    //instance->createDebugUtilsMessengerEXTUnique(createInfo, nullptr, dldi);
-
-    // NOTE: reinterpret_cast is also used by vulkan.hpp internally for all these structs
-    CreateDebugUtilsMessengerEXT(instance, reinterpret_cast<const VkDebugUtilsMessengerCreateInfoEXT*>(&createInfo), nullptr, &callback);
-    FE_ASSERT(callback && "failed to set up debug callback!");
+    auto result = instance.createDebugUtilsMessengerEXT(&createInfo, nullptr, &callback, dldi);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to set up debug callback!");
 }
 
 void Vulkan::pickPhysicalDevice() {
@@ -192,9 +173,9 @@ void Vulkan::pickPhysicalDevice() {
 
     FE_ASSERT(physicalDevice && "failed to find a suitable GPU!");
 
-    vk::PhysicalDeviceProperties props;
-    physicalDevice.getProperties(&props);
-    FE_LOG_DEBUG << "physical device found: " << props.deviceName;
+    physicalDevice.getProperties(&deviceProperties);
+
+    FE_LOG_DEBUG << "physical device found: " << deviceProperties.deviceName;
 }
 
 bool Vulkan::isDeviceSuitable(const vk::PhysicalDevice& device) const {
@@ -279,11 +260,11 @@ void Vulkan::createLogicalDevice() {
     }
 
     auto deviceFeatures = vk::PhysicalDeviceFeatures();
-    auto createInfo = vk::DeviceCreateInfo(
-        vk::DeviceCreateFlags(),
+    auto createInfo = vk::DeviceCreateInfo{
+        {},
         static_cast<uint32_t>(queueCreateInfos.size()),
         queueCreateInfos.data()
-    );
+    };
     createInfo.pEnabledFeatures = &deviceFeatures;
     createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
     createInfo.ppEnabledExtensionNames = deviceExtensions.data();
@@ -470,52 +451,6 @@ void Vulkan::endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const
     device.freeCommandBuffers(commandPool, 1, &commandBuffer);
 }
 
-vk::CommandBuffer Vulkan::createCommandBuffer(vk::CommandBufferLevel level, bool begin) const {
-    vk::CommandBufferAllocateInfo allocInfo{};
-    allocInfo.level = level;
-    allocInfo.commandPool = commandPool;
-    allocInfo.commandBufferCount = 1;
-
-    vk::CommandBuffer commandBuffer;
-    auto result = device.allocateCommandBuffers(&allocInfo, &commandBuffer);
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to allocate command buffers!");
-
-    // If requested, also start recording for the new command buffer
-    if (begin) {
-        vk::CommandBufferBeginInfo beginInfo{};
-        result = commandBuffer.begin(&beginInfo);
-        FE_ASSERT(result == vk::Result::eSuccess && "failed to begin command buffer!");
-    }
-    return commandBuffer;
-}
-
-void Vulkan::flushCommandBuffer(const vk::CommandBuffer& commandBuffer, bool free) const {
-    auto result = commandBuffer.end();
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to end command buffer!");
-
-    vk::SubmitInfo submitInfo{};
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffer;
-
-    // Create fence to ensure that the command buffer has finished executing
-    vk::FenceCreateInfo fenceInfo{};
-    vk::Fence fence;
-    result = device.createFence(&fenceInfo, nullptr, &fence);
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to create fence!");
-
-    // Submit to the queue
-    result = graphicsQueue.submit(1, &submitInfo, fence);
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to create fence!");
-
-    // Wait for the fence to signal that command buffer has finished executing
-    result = device.waitForFences(1, &fence, VK_TRUE, std::numeric_limits<uint64_t>::max());
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to wait for fences");
-    device.destroyFence(fence, nullptr);
-    if (free) {
-        device.freeCommandBuffers(commandPool, 1, &commandBuffer);
-    }
-}
-
 void Vulkan::transitionImageLayout(const vk::Image& image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) const {
     vk::CommandBuffer commandBuffer = beginSingleTimeCommands();
 
@@ -634,9 +569,6 @@ void Vulkan::createImageView(const vk::Image& image, vk::Format format, vk::Imag
 }
 
 void Vulkan::createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode, vk::Sampler& sampler) const {
-    vk::PhysicalDeviceProperties props;
-    physicalDevice.getProperties(&props);
-
     vk::SamplerCreateInfo samplerInfo{};
     samplerInfo.magFilter = magFilter;
     samplerInfo.minFilter = minFilter;
@@ -644,7 +576,7 @@ void Vulkan::createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::Sampl
     samplerInfo.addressModeV = addressMode;
     samplerInfo.addressModeW = addressMode;
     samplerInfo.anisotropyEnable = VK_FALSE;
-    samplerInfo.maxAnisotropy = props.limits.maxSamplerAnisotropy;
+    samplerInfo.maxAnisotropy = deviceProperties.limits.maxSamplerAnisotropy;
     samplerInfo.borderColor = vk::BorderColor::eIntOpaqueBlack;
     samplerInfo.unnormalizedCoordinates = VK_FALSE;
     samplerInfo.compareEnable = VK_FALSE;

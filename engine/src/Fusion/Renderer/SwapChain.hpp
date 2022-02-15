@@ -46,7 +46,6 @@ namespace Fusion {
         std::vector<vk::Fence> inFlightFences;
         std::vector<vk::Fence*> imagesInFlight;
         uint32_t currentFrame{0};
-        uint32_t prevFrame{0};
 
         vk::Image depthImage;
         vk::DeviceMemory depthImageMemory;
