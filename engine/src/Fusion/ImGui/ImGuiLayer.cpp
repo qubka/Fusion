@@ -106,10 +106,12 @@ void ImGuiLayer::onAttach() {
     io.Fonts->AddFontFromFileTTF("assets/fonts/fontawesome-webfont.ttf", 18.0f, &config, icons_ranges); // Merge into first font
     io.Fonts->Build();
 
+    vk::CommandBuffer commandBuffer = vulkan.beginSingleTimeCommands();
+
     //execute a gpu command to upload imgui font textures
-    vulkan.submit([&](vk::CommandBuffer& cmd) {
-        ImGui_ImplVulkan_CreateFontsTexture(cmd);
-    });
+    ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
+
+    vulkan.endSingleTimeCommands(commandBuffer);
 
     //clear font textures from cpu data
     ImGui_ImplVulkan_DestroyFontUploadObjects();

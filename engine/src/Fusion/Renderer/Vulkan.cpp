@@ -176,11 +176,12 @@ void Vulkan::setupDebugMessenger() {
 
 void Vulkan::pickPhysicalDevice() {
     uint32_t deviceCount;
-    instance.enumeratePhysicalDevices(&deviceCount, nullptr);
-    FE_ASSERT(deviceCount && "failed to find GPUs with Vulkan support!");
+    auto result = instance.enumeratePhysicalDevices(&deviceCount, nullptr);
+    FE_ASSERT((result == vk::Result::eSuccess || deviceCount) && "failed to find GPUs with Vulkan support!");
 
     std::vector<vk::PhysicalDevice> devices(deviceCount);
-    instance.enumeratePhysicalDevices(&deviceCount, devices.data());
+    result = instance.enumeratePhysicalDevices(&deviceCount, devices.data());
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to find GPUs with Vulkan support!");
 
     for (const auto& device : devices) {
         if (isDeviceSuitable(device)) {
@@ -214,10 +215,12 @@ bool Vulkan::checkDeviceExtensionSupport(const vk::PhysicalDevice& device) const
     std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
     uint32_t extensionCount;
-    device.enumerateDeviceExtensionProperties(nullptr, &extensionCount, nullptr);
+    auto result = device.enumerateDeviceExtensionProperties(nullptr, &extensionCount, nullptr);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to find device extension properties!");
 
     std::vector<vk::ExtensionProperties> availableExtensions(extensionCount);
-    device.enumerateDeviceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
+    result = device.enumerateDeviceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to find device extension properties!");
 
     for (const auto& extension : availableExtensions) {
         requiredExtensions.erase(extension.extensionName);
@@ -242,7 +245,8 @@ QueueFamilyIndices Vulkan::findQueueFamilies(const vk::PhysicalDevice& device) c
         }
 
         VkBool32 presentSupport;
-        device.getSurfaceSupportKHR(i, surface, &presentSupport);
+        auto result  = device.getSurfaceSupportKHR(i, surface, &presentSupport);
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to get surface support KHR!");
         if (queueFamily.queueCount > 0 && presentSupport) {
             indices.presentFamily = i;
         }
@@ -305,25 +309,30 @@ void Vulkan::createSurface() {
 
 SwapChainSupportDetails Vulkan::querySwapChainSupport(const vk::PhysicalDevice& device) const {
     SwapChainSupportDetails details;
-    device.getSurfaceCapabilitiesKHR(surface, &details.capabilities);
+    auto result = device.getSurfaceCapabilitiesKHR(surface, &details.capabilities);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to get surface capabilities KHR!");
 
     uint32_t formatCount;
-    device.getSurfaceFormatsKHR(surface, &formatCount, nullptr);
+    result = device.getSurfaceFormatsKHR(surface, &formatCount, nullptr);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to get surface formats KHR!");
 
     if (formatCount != 0) {
         details.formats.resize(formatCount);
-        device.getSurfaceFormatsKHR(surface, &formatCount, details.formats.data());
+        result = device.getSurfaceFormatsKHR(surface, &formatCount, details.formats.data());
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to get surface formats KHR!");
     }
 
     uint32_t presentModeCount;
-    device.getSurfacePresentModesKHR(surface, &presentModeCount, nullptr);
+    result = device.getSurfacePresentModesKHR(surface, &presentModeCount, nullptr);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to get surface present modes KHR!");
 
     if (presentModeCount != 0) {
         details.presentModes.resize(presentModeCount);
-        device.getSurfacePresentModesKHR(
+        result = device.getSurfacePresentModesKHR(
                 surface,
                 &presentModeCount,
                 details.presentModes.data());
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to get surface present modes KHR!");
     }
 
     return details;
@@ -351,7 +360,8 @@ vk::Format Vulkan::findSupportedFormat(const std::vector<vk::Format>& candidates
         }
     }
 
-    FE_ASSERT(0 && "failed to find supported format!");
+    //FE_ASSERT(0 && "failed to find supported format!");
+    FE_LOG_ERROR << "failed to find supported format!";
     return vk::Format::eUndefined;
 }
 
@@ -388,7 +398,8 @@ void Vulkan::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::M
     result = device.allocateMemory(&allocInfo, nullptr, &bufferMemory);
     FE_ASSERT(result == vk::Result::eSuccess && "failed to allocateDescriptor buffer memory!");
 
-    device.bindBufferMemory(buffer, bufferMemory, 0);
+    result = device.bindBufferMemory(buffer, bufferMemory, 0);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to bind buffer memory!");
 }
 
 void Vulkan::copyBuffer(const vk::Buffer& srcBuffer, vk::Buffer& dstBuffer, vk::DeviceSize size) const {
@@ -424,15 +435,6 @@ void Vulkan::copyBufferToImage(const vk::Buffer& buffer, const vk::Image& image,
     endSingleTimeCommands(commandBuffer);
 }
 
-void Vulkan::submit(std::function<void(vk::CommandBuffer& cmd)>&& function) const {
-    vk::CommandBuffer commandBuffer = beginSingleTimeCommands();
-
-    //execute the function
-    function(commandBuffer);
-
-    endSingleTimeCommands(commandBuffer);
-}
-
 vk::CommandBuffer Vulkan::beginSingleTimeCommands() const {
     vk::CommandBufferAllocateInfo allocInfo{};
     allocInfo.level = vk::CommandBufferLevel::ePrimary;
@@ -440,27 +442,78 @@ vk::CommandBuffer Vulkan::beginSingleTimeCommands() const {
     allocInfo.commandBufferCount = 1;
 
     vk::CommandBuffer commandBuffer;
-    device.allocateCommandBuffers(&allocInfo, &commandBuffer);
+    auto result = device.allocateCommandBuffers(&allocInfo, &commandBuffer);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to allocate command buffers!");
 
     vk::CommandBufferBeginInfo beginInfo{};
     beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 
-    commandBuffer.begin(&beginInfo);
+    result = commandBuffer.begin(&beginInfo);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to begin command buffer!");
 
     return commandBuffer;
 }
 
 void Vulkan::endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const {
-    commandBuffer.end();
+    auto result = commandBuffer.end();
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to end command buffer!");
 
     vk::SubmitInfo submitInfo{};
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffer;
 
-    graphicsQueue.submit(1, &submitInfo, nullptr);
-    graphicsQueue.waitIdle();
+    result = graphicsQueue.submit(1, &submitInfo, nullptr);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to submit the queue!");
+    result = graphicsQueue.waitIdle();
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to wait on the queue!");
 
     device.freeCommandBuffers(commandPool, 1, &commandBuffer);
+}
+
+vk::CommandBuffer Vulkan::createCommandBuffer(vk::CommandBufferLevel level, bool begin) const {
+    vk::CommandBufferAllocateInfo allocInfo{};
+    allocInfo.level = level;
+    allocInfo.commandPool = commandPool;
+    allocInfo.commandBufferCount = 1;
+
+    vk::CommandBuffer commandBuffer;
+    auto result = device.allocateCommandBuffers(&allocInfo, &commandBuffer);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to allocate command buffers!");
+
+    // If requested, also start recording for the new command buffer
+    if (begin) {
+        vk::CommandBufferBeginInfo beginInfo{};
+        result = commandBuffer.begin(&beginInfo);
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to begin command buffer!");
+    }
+    return commandBuffer;
+}
+
+void Vulkan::flushCommandBuffer(const vk::CommandBuffer& commandBuffer, bool free) const {
+    auto result = commandBuffer.end();
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to end command buffer!");
+
+    vk::SubmitInfo submitInfo{};
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    // Create fence to ensure that the command buffer has finished executing
+    vk::FenceCreateInfo fenceInfo{};
+    vk::Fence fence;
+    result = device.createFence(&fenceInfo, nullptr, &fence);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create fence!");
+
+    // Submit to the queue
+    result = graphicsQueue.submit(1, &submitInfo, fence);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create fence!");
+
+    // Wait for the fence to signal that command buffer has finished executing
+    result = device.waitForFences(1, &fence, VK_TRUE, std::numeric_limits<uint64_t>::max());
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to wait for fences");
+    device.destroyFence(fence, nullptr);
+    if (free) {
+        device.freeCommandBuffers(commandPool, 1, &commandBuffer);
+    }
 }
 
 void Vulkan::transitionImageLayout(const vk::Image& image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) const {
@@ -557,7 +610,8 @@ void Vulkan::createImage(uint32_t width, uint32_t height, vk::Format format, vk:
     result = device.allocateMemory(&allocInfo, nullptr, &imageMemory);
     FE_ASSERT(result == vk::Result::eSuccess && "failed to allocate descriptor's image memory!");
 
-    device.bindImageMemory(image, imageMemory, 0);
+    result = device.bindImageMemory(image, imageMemory, 0);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to bind image memory!");
 }
 
 void Vulkan::createImageView(const vk::Image& image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::ImageView& view) const {

@@ -1492,3 +1492,341 @@
 2022-02-14 19:45:59.530 DEBUG [14559] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
 2022-02-14 19:45:59.531 DEBUG [14559] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
 2022-02-14 19:45:59.542 DEBUG [14559] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 21:38:27.679 INFO  [3798] [main@7] Fusion Engine
+2022-02-14 21:38:27.679 INFO  [3798] [main@8] Game Started
+2022-02-14 21:38:27.699 INFO  [3798] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 21:38:27.701 DEBUG [3798] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 21:38:27.727 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 21:38:27.729 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 21:38:27.729 DEBUG [3798] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 21:38:27.744 DEBUG [3798] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 21:39:08.982 INFO  [3971] [main@7] Fusion Engine
+2022-02-14 21:39:08.982 INFO  [3971] [main@8] Game Started
+2022-02-14 21:39:09.002 INFO  [3971] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 21:39:09.004 DEBUG [3971] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 21:39:09.021 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 21:39:09.023 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 21:39:09.023 DEBUG [3971] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 21:39:09.034 DEBUG [3971] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 21:39:39.293 ERROR [3971] [Fusion::Vulkan::findSupportedFormat@355] failed to find supported format!
+2022-02-14 21:39:39.293 ERROR [3971] [Fusion::SwapChain::saveScreenshot@377] Device does not support blitting to optimal or linear tiled images, using copy instead of blit!
+2022-02-14 23:09:29.588 INFO  [1721] [main@7] Fusion Engine
+2022-02-14 23:09:29.589 INFO  [1721] [main@8] Game Started
+2022-02-14 23:09:29.608 INFO  [1721] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 23:09:29.611 DEBUG [1721] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 23:09:29.642 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 23:09:29.643 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 23:09:29.643 DEBUG [1721] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 23:09:29.667 DEBUG [1721] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 23:10:20.293 INFO  [1821] [main@7] Fusion Engine
+2022-02-14 23:10:20.293 INFO  [1821] [main@8] Game Started
+2022-02-14 23:10:20.312 INFO  [1821] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 23:10:20.314 DEBUG [1821] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 23:10:20.333 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 23:10:20.334 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 23:10:20.334 DEBUG [1821] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 23:10:20.347 DEBUG [1821] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 23:10:22.052 ERROR [1821] [Fusion::Vulkan::findSupportedFormat@355] failed to find supported format!
+2022-02-14 23:10:22.052 ERROR [1821] [Fusion::SwapChain::saveScreenshot@377] Device does not support blitting to optimal or linear tiled images, using copy instead of blit!
+2022-02-14 23:11:01.618 INFO  [1997] [main@7] Fusion Engine
+2022-02-14 23:11:01.618 INFO  [1997] [main@8] Game Started
+2022-02-14 23:11:01.638 INFO  [1997] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 23:11:01.640 DEBUG [1997] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 23:11:01.658 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 23:11:01.660 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 23:11:01.660 DEBUG [1997] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 23:11:01.671 DEBUG [1997] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 23:11:02.978 ERROR [1997] [Fusion::Vulkan::findSupportedFormat@355] failed to find supported format!
+2022-02-14 23:11:02.978 ERROR [1997] [Fusion::SwapChain::saveScreenshot@377] Device does not support blitting to optimal or linear tiled images, using copy instead of blit!
+2022-02-14 23:12:35.702 INFO  [2205] [main@7] Fusion Engine
+2022-02-14 23:12:35.702 INFO  [2205] [main@8] Game Started
+2022-02-14 23:12:35.722 INFO  [2205] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 23:12:35.724 DEBUG [2205] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 23:12:35.744 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 23:12:35.745 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 23:12:35.745 DEBUG [2205] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 23:12:35.759 DEBUG [2205] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 23:12:38.176 ERROR [2205] [Fusion::Vulkan::findSupportedFormat@355] failed to find supported format!
+2022-02-14 23:12:38.176 ERROR [2205] [Fusion::SwapChain::saveScreenshot@377] Device does not support blitting to optimal or linear tiled images, using copy instead of blit!
+2022-02-14 23:13:09.814 INFO  [2313] [main@7] Fusion Engine
+2022-02-14 23:13:09.814 INFO  [2313] [main@8] Game Started
+2022-02-14 23:13:09.834 INFO  [2313] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 23:13:09.844 DEBUG [2313] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 23:13:09.893 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 23:13:09.894 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 23:13:09.894 DEBUG [2313] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 23:13:09.905 DEBUG [2313] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 23:13:11.987 ERROR [2313] [Fusion::Vulkan::findSupportedFormat@355] failed to find supported format!
+2022-02-14 23:13:11.987 ERROR [2313] [Fusion::SwapChain::saveScreenshot@377] Device does not support blitting to optimal or linear tiled images, using copy instead of blit!
+2022-02-14 23:13:15.194 ERROR [2313] [Fusion::Vulkan::findSupportedFormat@355] failed to find supported format!
+2022-02-14 23:13:15.194 ERROR [2313] [Fusion::SwapChain::saveScreenshot@377] Device does not support blitting to optimal or linear tiled images, using copy instead of blit!
+2022-02-14 23:13:20.621 ERROR [2313] [Fusion::Vulkan::findSupportedFormat@355] failed to find supported format!
+2022-02-14 23:13:20.621 ERROR [2313] [Fusion::SwapChain::saveScreenshot@377] Device does not support blitting to optimal or linear tiled images, using copy instead of blit!
+2022-02-14 23:13:23.869 ERROR [2313] [Fusion::Vulkan::findSupportedFormat@355] failed to find supported format!
+2022-02-14 23:13:23.869 ERROR [2313] [Fusion::SwapChain::saveScreenshot@377] Device does not support blitting to optimal or linear tiled images, using copy instead of blit!
+2022-02-14 23:14:20.638 INFO  [2944] [main@7] Fusion Engine
+2022-02-14 23:14:20.638 INFO  [2944] [main@8] Game Started
+2022-02-14 23:14:20.658 INFO  [2944] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 23:14:20.659 DEBUG [2944] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 23:14:20.679 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 23:14:20.680 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 23:14:20.680 DEBUG [2944] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 23:14:20.697 DEBUG [2944] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 23:15:28.595 INFO  [3391] [main@7] Fusion Engine
+2022-02-14 23:15:28.595 INFO  [3391] [main@8] Game Started
+2022-02-14 23:15:28.615 INFO  [3391] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 23:15:28.617 DEBUG [3391] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 23:15:28.640 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 23:15:28.642 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 23:15:28.643 DEBUG [3391] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 23:15:28.656 DEBUG [3391] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 23:16:04.781 INFO  [3436] [main@7] Fusion Engine
+2022-02-14 23:16:04.781 INFO  [3436] [main@8] Game Started
+2022-02-14 23:16:04.800 INFO  [3436] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-14 23:16:04.805 DEBUG [3436] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-14 23:16:04.823 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-14 23:16:04.825 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-14 23:16:04.825 DEBUG [3436] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-14 23:16:04.836 DEBUG [3436] [Fusion::Vulkan::pickPhysicalDevice@196] physical device found: NVIDIA GeForce GTX 1070
+2022-02-14 23:16:16.448 DEBUG [3436] [Fusion::Renderer::endFrame@169] swap chain out of date/suboptimal/window resized - recreating
+2022-02-15 09:23:51.484 INFO  [5629] [main@7] Fusion Engine
+2022-02-15 09:23:51.484 INFO  [5629] [main@8] Game Started
+2022-02-15 09:23:51.509 INFO  [5629] [Fusion::Window::init@41] Creating window: Editor [1280 720]
+2022-02-15 09:23:51.520 DEBUG [5629] [Fusion::Vulkan::createInstance@58] System support vulkan variant: 0, Major: 1, Minor: 2, Patch: 203
+
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@140] available extensions:
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_device_group_creation"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_display"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_fence_capabilities"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_memory_capabilities"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_external_semaphore_capabilities"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_display_properties2"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_physical_device_properties2"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_get_surface_capabilities2"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_surface_protected_capabilities"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_wayland_surface"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xcb_surface"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_KHR_xlib_surface"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_xlib_display"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_report"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_debug_utils"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_direct_mode_display"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_display_surface_counter"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@143] 	"VK_EXT_acquire_drm_display"
+2022-02-15 09:23:51.561 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@147] required extensions:
+2022-02-15 09:23:51.563 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_surface"
+2022-02-15 09:23:51.563 DEBUG [5629] [Fusion::Vulkan::hasGflwRequiredInstanceExtensions@150] 	"VK_KHR_xcb_surface"
+2022-02-15 09:23:51.588 DEBUG [5629] [Fusion::Vulkan::pickPhysicalDevice@197] physical device found: NVIDIA GeForce GTX 1070
+2022-02-15 09:23:53.584 ERROR [5629] [Fusion::Vulkan::findSupportedFormat@364] failed to find supported format!
+2022-02-15 09:23:53.584 ERROR [5629] [Fusion::SwapChain::saveScreenshot@377] Device does not support blitting to optimal or linear tiled images, using copy instead of blit!

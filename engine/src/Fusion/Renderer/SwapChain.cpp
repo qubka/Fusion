@@ -394,11 +394,11 @@ void SwapChain::saveScreenshot(const std::string& path) const{
                     dstImageMemory);
 
     // Do the actual blit from the swapchain image to our host visible destination image
-    vk::CommandBuffer copyCmd = vulkan.beginSingleTimeCommands();
+    vk::CommandBuffer commandBuffer = vulkan.beginSingleTimeCommands();
 
     // Transition destination image to transfer destination layout
     vk::tools::InsertImageMemoryBarrier(
-            copyCmd,
+            commandBuffer,
             dstImage,
             vk::AccessFlagBits::eNone,
             vk::AccessFlagBits::eTransferWrite,
@@ -410,7 +410,7 @@ void SwapChain::saveScreenshot(const std::string& path) const{
 
     // Transition swapchain image from present to transfer source layout
     vk::tools::InsertImageMemoryBarrier(
-            copyCmd,
+            commandBuffer,
             srcImage,
             vk::AccessFlagBits::eMemoryRead,
             vk::AccessFlagBits::eTransferRead,
@@ -424,8 +424,8 @@ void SwapChain::saveScreenshot(const std::string& path) const{
     if (supportsBlit) {
         // Define the region to blit (we will blit the whole swapchain image)
         vk::Offset3D blitSize;
-        blitSize.x = width;
-        blitSize.y = height;
+        blitSize.x = static_cast<int32_t>(width);
+        blitSize.y = static_cast<int32_t>(height);
         blitSize.z = 1;
         vk::ImageBlit imageBlitRegion{};
         imageBlitRegion.srcSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
@@ -436,7 +436,7 @@ void SwapChain::saveScreenshot(const std::string& path) const{
         imageBlitRegion.dstOffsets[1] = blitSize;
 
         // Issue the blit command
-        copyCmd.blitImage(
+        commandBuffer.blitImage(
                 srcImage, 
                 vk::ImageLayout::eTransferSrcOptimal,
                 dstImage, 
@@ -456,7 +456,7 @@ void SwapChain::saveScreenshot(const std::string& path) const{
         imageCopyRegion.extent.depth = 1;
 
         // Issue the copy command
-        copyCmd.copyImage(
+        commandBuffer.copyImage(
                 srcImage, 
                 vk::ImageLayout::eTransferSrcOptimal,
                 dstImage, 
@@ -467,9 +467,9 @@ void SwapChain::saveScreenshot(const std::string& path) const{
 
     // Transition destination image to general layout, which is the required layout for mapping the image memory later on
     vk::tools::InsertImageMemoryBarrier(
-            copyCmd,
+            commandBuffer,
             dstImage,
-            vk::AccessFlagBits::eTransferWrite, 
+            vk::AccessFlagBits::eTransferWrite,
             vk::AccessFlagBits::eMemoryRead,
             vk::ImageLayout::eTransferDstOptimal,
             vk::ImageLayout::eGeneral,
@@ -479,7 +479,7 @@ void SwapChain::saveScreenshot(const std::string& path) const{
 
     // Transition back the swap chain image after the blit is done
     vk::tools::InsertImageMemoryBarrier(
-            copyCmd,
+            commandBuffer,
             srcImage,
             vk::AccessFlagBits::eTransferRead,
             vk::AccessFlagBits::eMemoryRead,
@@ -488,8 +488,9 @@ void SwapChain::saveScreenshot(const std::string& path) const{
             vk::PipelineStageFlagBits::eTransfer,
             vk::PipelineStageFlagBits::eTransfer,
             vk::ImageSubresourceRange{ vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
-    
-    vulkan.endSingleTimeCommands(copyCmd);
+
+    //vulkan.endSingleTimeCommands(commandBuffer);
+    vulkan.flushCommandBuffer(commandBuffer, false);
 
     // Get layout of the image (including row pitch)
     vk::ImageSubresource subResource { vk::ImageAspectFlagBits::eColor, 0, 0 };

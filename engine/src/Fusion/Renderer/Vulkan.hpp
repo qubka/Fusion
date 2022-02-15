@@ -55,10 +55,11 @@ namespace Fusion {
 
         void transitionImageLayout(const vk::Image& image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) const;
 
-        void submit(std::function<void(vk::CommandBuffer& cmd)>&& function) const;
-
         vk::CommandBuffer beginSingleTimeCommands() const;
         void endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const;
+
+        vk::CommandBuffer createCommandBuffer(vk::CommandBufferLevel level, bool begin = false) const;
+        void flushCommandBuffer(const vk::CommandBuffer& commandBuffer, bool free = false) const;
 
     private:
         void createInstance();
