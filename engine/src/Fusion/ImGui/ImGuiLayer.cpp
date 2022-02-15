@@ -146,8 +146,8 @@ void ImGuiLayer::end(vk::CommandBuffer& commandBuffer) {
 }
 
 void ImGuiLayer::setDarkThemeColors() {
-    /*auto& colors = ImGui::GetStyle().Colors;
-    colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 1.0f };
+    auto& colors = ImGui::GetStyle().Colors;
+    colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 0.0f };
 
     // Headers
     colors[ImGuiCol_Header] = { 0.2f, 0.205f, 0.21f, 1.0f };
@@ -174,5 +174,5 @@ void ImGuiLayer::setDarkThemeColors() {
     // Title
     colors[ImGuiCol_TitleBg] = { 0.15f, 0.1505f, 0.151f, 1.0f };
     colors[ImGuiCol_TitleBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-    colors[ImGuiCol_TitleBgCollapsed] = { 0.15f, 0.1505f, 0.151f, 1.0f };*/
+    colors[ImGuiCol_TitleBgCollapsed] = { 0.15f, 0.1505f, 0.151f, 1.0f };
 }
