@@ -6,9 +6,8 @@
 #include "Fusion/Renderer/Texture.hpp"
 #include "Fusion/Renderer/Renderer.hpp"
 #include "Fusion/Renderer/AllocatedBuffer.hpp"
-
-#include <backends/imgui_impl_vulkan.h>
-#include <portable-file-dialogs/portable-file-dialogs.h>
+#include "Fusion/Scene/Components.hpp"
+#include "Fusion/Utils/Math.hpp"
 
 #if _WIN32
 #define DEFAULT_PATH "C:\\"
@@ -16,9 +15,12 @@
 #define DEFAULT_PATH "/tmp"
 #endif
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
-#include "imguizmo/ImGuizmo.h"
+#include <backends/imgui_impl_vulkan.h>
+#include <portable-file-dialogs/portable-file-dialogs.h>
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imguizmo/ImGuizmo.h>
 
 using namespace Fusion;
 
@@ -60,6 +62,19 @@ void EditorLayer::onUpdate() {
             break;
         }
     }
+
+    if (!ImGuizmo::IsUsing()) {
+        if (Input::GetKeyDown(Key::Q)) {
+            gizmoType = -1;
+        } else if (Input::GetKeyDown(Key::W)) {
+            gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+        } else if (Input::GetKeyDown(Key::E)) {
+            gizmoType = ImGuizmo::OPERATION::ROTATE;
+        } else if (Input::GetKeyDown(Key::R)) {
+            gizmoType = ImGuizmo::OPERATION::SCALE;
+        }
+    }
+
 }
 
 void EditorLayer::onRender() {
@@ -85,6 +100,9 @@ void EditorLayer::onRender() {
 }
 
 void EditorLayer::onImGui() {
+    // TODO: Find solution for viewport. Currently we use global transparent background and set the color for each window to make it non transparent.
+    /// Better to force vulkan generate image before imgui render and render it as an image in non-transparent viewport but it will require a lot of additional work to implement back buffer.
+
     // Note: Switch this to true to enable dockspace
     static bool dockspaceOpen = true;
     static bool opt_fullscreen_persistant = true;
@@ -159,6 +177,7 @@ void EditorLayer::onImGui() {
     sceneHierarchyPanel.onImGui();
     contentBrowserPanel.onImGui();
 
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.1f, 0.105f, 0.11f, 1.0f });
     ImGui::Begin("Stats");
 
     std::string name = "None";
@@ -184,6 +203,7 @@ void EditorLayer::onImGui() {
     //ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
     ImGui::ColorEdit3("Background", glm::value_ptr(Application::Instance().getRenderer().getColor()));
 
+    ImGui::PopStyleColor();
     ImGui::End();
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
@@ -212,59 +232,8 @@ void EditorLayer::onImGui() {
         ImGui::EndDragDropTarget();
     }
 
-    ImGui::PopStyleVar();
-    ImGui::End();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-    ImGui::Begin("Viewport");
-    auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-    auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-    auto viewportOffset = ImGui::GetWindowPos();
-    viewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
-    viewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
-
-    viewportFocused = ImGui::IsWindowFocused();
-    viewportHovered = ImGui::IsWindowHovered();
-    //Application::Instance().getImGuiLayer()->BlockEvents(!viewportFocused && !viewportHovered);
-
-    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-    viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-
-    static ImTextureID textureId;
-    static bool f = false;
-    if (!f) {
-        texture = std::make_shared<Texture>(Application::Instance().getVulkan(), "assets/textures/texture.jpg",
-                                            vk::Format::eR8G8B8A8Srgb
-                                            );
-        textureId = (ImTextureID) ImGui_ImplVulkan_AddTexture(texture->getSampler(), swapChain->currentImage(0), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-        f = true;
-    }
-
-    ImGui::Image(textureId, ImVec2{viewportSize.x, viewportSize.y}, ImVec2{0, 1}, ImVec2{1, 0});
-
-    if (ImGui::BeginDragDropTarget()) {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            const auto* path = static_cast<const wchar_t*>(payload->Data);
-            openScene(std::filesystem::path(AssetPath) / path);
-        }
-        ImGui::EndDragDropTarget();
-    }*/
-
     // Gizmos
-    /*auto selectedEntity = sceneHierarchyPanel.getSelectedEntity();
+    auto selectedEntity = sceneHierarchyPanel.getSelectedEntity();
     if (selectedEntity != entt::null && gizmoType != -1) {
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist();
@@ -279,40 +248,47 @@ void EditorLayer::onImGui() {
         // const glm::mat4& cameraProjection = camera.GetProjection();
         // glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
 
-        // Editor camera
-        const glm::mat4& cameraProjection = editorCamera.getProjection();
-        glm::mat4 cameraView = editorCamera.getView();
-
         // Entity transform
-        auto& tc = selectedEntity.GetComponent<TransformComponent>();
-        glm::mat4 transform = tc.GetTransform();
+        auto& component = activeScene->getEntityRegistry().get<TransformComponent>(selectedEntity);
+        glm::mat4 transform = component;
 
         // Snapping
-        bool snap = Input::IsKeyPressed(Key::LeftControl);
+        bool snap = Input::GetKey(Key::LeftControl);
         float snapValue = 0.5f; // Snap to 0.5m for translation/scale
         // Snap to 45 degrees for rotation
-        if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+        if (gizmoType == ImGuizmo::OPERATION::ROTATE)
             snapValue = 45.0f;
 
         float snapValues[3] = { snapValue, snapValue, snapValue };
 
+        auto cameraView = glm::lookAtLH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
+
+        auto cameraProjection = glm::perspectiveLH(
+                glm::radians(editorCamera.getFov()),
+                editorCamera.getAspect(),
+                editorCamera.getNearClip(),
+                editorCamera.getFarClip());
+
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                             (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
+                             (ImGuizmo::OPERATION)gizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
                              nullptr, snap ? snapValues : nullptr);
+
+        //glm::mat4 identity{1};
+        //ImGuizmo::DrawGrid(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),  glm::value_ptr(identity), 100.f);
 
         if (ImGuizmo::IsUsing()) {
             glm::vec3 translation, rotation, scale;
-            Math::DecomposeTransform(transform, translation, rotation, scale);
+            glm::decompose(transform, translation, rotation, scale);
 
-            glm::vec3 deltaRotation = rotation - tc.Rotation;
-            tc.Translation = translation;
-            tc.Rotation += deltaRotation;
-            tc.Scale = scale;
+            glm::vec3 deltaRotation = rotation - component.rotation;
+            component.translation = translation;
+            component.rotation += deltaRotation;
+            component.scale = scale;
         }
-    }*/
+    }
 
-    //ImGui::End();
-    //ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
+    ImGui::End();
 
     //UI_Toolbar();
 

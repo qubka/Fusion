@@ -1,9 +1,9 @@
 #include "SceneHierarchyPanel.hpp"
 #include "Fusion/Scene/Components.hpp"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
-#include "magic_enum/include/magic_enum.hpp"
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <magic_enum/include/magic_enum.hpp>
 
 // TEMP
 #include "Fusion/Core/Application.hpp"
@@ -70,6 +70,7 @@ void SceneHierarchyPanel::setContext(const std::shared_ptr<Scene>& scene) {
 }
 
 void SceneHierarchyPanel::onImGui() {
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.1f, 0.105f, 0.11f, 1.0f });
     ImGui::Begin("Scene Hierarchy");
 
     context->registry.each([&](auto entity) {
@@ -90,13 +91,16 @@ void SceneHierarchyPanel::onImGui() {
         ImGui::EndPopup();
     }
 
+    ImGui::PopStyleColor();
     ImGui::End();
 
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.1f, 0.105f, 0.11f, 1.0f });
     ImGui::Begin("Properties");
     if (selectionContext != entt::null) {
         drawComponents(selectionContext);
     }
 
+    ImGui::PopStyleColor();
     ImGui::End();
 }
 

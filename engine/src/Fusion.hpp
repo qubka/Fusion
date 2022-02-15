@@ -52,5 +52,6 @@
 
 #include "Fusion/Utils/ProcessInfo.hpp"
 #include "Fusion/Utils/Extentions.hpp"
+#include "Fusion/Utils/Math.hpp"
 
 //#include "Fusion/EntryPoint.hpp" add for dynamic linking

@@ -29,7 +29,7 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_XYZW_ONLY
-//#define GLM_ENABLE_EXPERIMENTAL
+#define GLM_ENABLE_EXPERIMENTAL
 
 #include <glm.hpp>
 #include <ext.hpp>
@@ -39,6 +39,7 @@
 #include <gtx/string_cast.hpp>
 #include <gtx/norm.hpp>
 #include <gtx/hash.hpp>
+#include <gtx/matrix_decompose.hpp>
 
 #include "Fusion/Core/Base.hpp"
 #include "Fusion/Core/Log.hpp"

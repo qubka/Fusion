@@ -20,7 +20,7 @@ namespace Fusion {
         operator glm::mat4() const {
             glm::mat4 m{1};
             return glm::translate(m, translation)
-                   * glm::mat4_cast(glm::quat(glm::radians(rotation)))
+                   * glm::mat4_cast(glm::quat(rotation))
                    * glm::scale(m, scale);
         };
     };

@@ -1,6 +1,6 @@
 #include "ContentBrowserPanel.hpp"
 
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
 
 using namespace Fusion;
 
@@ -9,6 +9,7 @@ ContentBrowserPanel::ContentBrowserPanel() : currentDirectory{AssetPath} {
 }
 
 void ContentBrowserPanel::onImGui() {
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.1f, 0.105f, 0.11f, 1.0f });
     ImGui::Begin("Content Browser");
 
     if (currentDirectory != AssetPath) {
@@ -61,5 +62,6 @@ void ContentBrowserPanel::onImGui() {
     ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
     ImGui::SliderFloat("Padding", &padding, 0, 32);
 
+    ImGui::PopStyleColor();
     ImGui::End();
 }
