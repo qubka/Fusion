@@ -27,25 +27,25 @@ ImGuiLayer::~ImGuiLayer() {
 
 void ImGuiLayer::onAttach() {
     // the size of the pool is very oversize, but it's copied from imgui demo itself.
-    vk::DescriptorPoolSize poolSizes[] = {
-            { vk::DescriptorType::eSampler, 1000 },
-            { vk::DescriptorType::eCombinedImageSampler, 1000 },
-            { vk::DescriptorType::eSampledImage, 1000 },
-            { vk::DescriptorType::eStorageImage, 1000 },
-            { vk::DescriptorType::eUniformTexelBuffer, 1000 },
-            { vk::DescriptorType::eStorageTexelBuffer, 1000 },
-            { vk::DescriptorType::eUniformBuffer, 1000 },
-            { vk::DescriptorType::eStorageBuffer, 1000 },
-            { vk::DescriptorType::eUniformTexelBuffer, 1000 },
-            { vk::DescriptorType::eStorageBufferDynamic, 1000 },
-           { vk::DescriptorType::eInputAttachment, 1000 }
-    };
+    std::array<vk::DescriptorPoolSize, 11> poolSizes = {{
+        { vk::DescriptorType::eSampler, 1000 },
+        { vk::DescriptorType::eCombinedImageSampler, 1000 },
+        { vk::DescriptorType::eSampledImage, 1000 },
+        { vk::DescriptorType::eStorageImage, 1000 },
+        { vk::DescriptorType::eUniformTexelBuffer, 1000 },
+        { vk::DescriptorType::eStorageTexelBuffer, 1000 },
+        { vk::DescriptorType::eUniformBuffer, 1000 },
+        { vk::DescriptorType::eStorageBuffer, 1000 },
+        { vk::DescriptorType::eUniformTexelBuffer, 1000 },
+        { vk::DescriptorType::eStorageBufferDynamic, 1000 },
+        { vk::DescriptorType::eInputAttachment, 1000 }
+    }};
 
     vk::DescriptorPoolCreateInfo poolInfo = {};
     poolInfo.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet;
     poolInfo.maxSets = 1000;
-    poolInfo.poolSizeCount = std::size(poolSizes);
-    poolInfo.pPoolSizes = poolSizes;
+    poolInfo.poolSizeCount = static_cast<uint32_t >(poolSizes.size());
+    poolInfo.pPoolSizes = poolSizes.data();
 
     // Create Descriptor Pool
     auto result = vulkan.getDevice().createDescriptorPool(&poolInfo, nullptr, &imguiPool);

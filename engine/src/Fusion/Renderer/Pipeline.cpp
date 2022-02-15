@@ -21,7 +21,7 @@ void Pipeline::createGraphicsPipeline(const std::string& vertPath, const std::st
     createShaderModule(vertShaderCode, vertShaderModule);
     createShaderModule(fragShaderCode, fragShaderModule);
 
-    vk::PipelineShaderStageCreateInfo shaderStages[] = {
+    std::array<vk::PipelineShaderStageCreateInfo, 2> shaderStages = {{
         {
         {},
         vk::ShaderStageFlagBits::eVertex,
@@ -34,7 +34,7 @@ void Pipeline::createGraphicsPipeline(const std::string& vertPath, const std::st
         fragShaderModule,
         "main"
         }
-    };
+    }};
 
     const auto& bindingDescriptions = configInfo.bindingDescriptions;
     const auto& attributeDescriptions = configInfo.attributeDescriptions;
@@ -45,8 +45,8 @@ void Pipeline::createGraphicsPipeline(const std::string& vertPath, const std::st
     vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 
     vk::GraphicsPipelineCreateInfo pipelineInfo{};
-    pipelineInfo.stageCount = 2;
-    pipelineInfo.pStages = shaderStages;
+    pipelineInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
+    pipelineInfo.pStages = shaderStages.data();
     pipelineInfo.pVertexInputState = &vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
     pipelineInfo.pViewportState = &configInfo.viewportInfo;

@@ -6,7 +6,8 @@ namespace Fusion {
     class FUSION_API Event {
     };
 
-    class FUSION_API EventQueue {
+    /*class FUSION_API EventQueue {
+     * https://codereview.stackexchange.com/questions/259265/c-event-system-for-game-engine
         /// Send events to other handlers
         void dispatch_event(const Event* event) {
             for (auto& recipient : event_recipients) {
@@ -26,7 +27,7 @@ namespace Fusion {
         void push_queue(const IEvent* event) {
             event_queue.push(event);
         }
-    };
+    };*/
 
     class FUSION_API HandlerFunctionBase {
     public:
