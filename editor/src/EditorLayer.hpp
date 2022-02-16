@@ -40,14 +40,7 @@ namespace Fusion {
         SceneHierarchyPanel sceneHierarchyPanel;
         ContentBrowserPanel contentBrowserPanel;
 
-        bool viewportFocused{false};
-        bool viewportHovered{false};
-        glm::vec2 viewportSize{};
-        glm::vec2 viewportBounds[2]{};
         int gizmoType = -1;
-
-        //std::shared_ptr<Texture> texture;
-
         enum class SceneState {
             Edit = 0, Play = 1
         };

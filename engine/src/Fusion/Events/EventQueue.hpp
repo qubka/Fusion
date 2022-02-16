@@ -6,8 +6,9 @@ namespace Fusion {
     class FUSION_API Event {
     };
 
-    typedef std::queue<Event*> EventList;
     class FUSION_API EventQueue {
+        typedef std::queue<Event*> Queue;
+
     public:
         EventQueue() = default;
         ~EventQueue() {
@@ -20,7 +21,7 @@ namespace Fusion {
 
             // First time initialization
             if (list == nullptr) {
-                list = new EventList();
+                list = new Queue();
                 events[typeid(EventType)] = list;
             }
 
@@ -48,6 +49,6 @@ namespace Fusion {
         }
 
     private:
-        std::map<std::type_index, EventList*> events;
+        std::map<std::type_index, Queue*> events;
     };
 }

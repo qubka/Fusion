@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Event.hpp"
+#include "EventQueue.hpp"
 
 namespace Fusion {
 

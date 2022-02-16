@@ -16,7 +16,7 @@
 #define DEFAULT_PATH "/tmp"
 #endif
 
-#include <backends/imgui_impl_vulkan.h>
+//#include <backends/imgui_impl_vulkan.h>
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
 #include <imgui/imgui.h>
@@ -87,7 +87,7 @@ void EditorLayer::onRender() {
     // update
     UniformBufferObject ubo{};
     ubo.perspective = editorCamera.getViewProjection();
-    ubo.orthogonal = glm::ortho(0, vulkan.getWindow().getWidth(), 0, vulkan.getWindow().getHeight());
+    //ubo.orthogonal = glm::ortho(0, vulkan.getWindow().getWidth(), 0, vulkan.getWindow().getHeight());
     auto& buffer = renderer.getUniformBuffers(renderer.getFrameIndex());
     buffer->writeToBuffer(&ubo);
     buffer->flush();
@@ -173,7 +173,12 @@ void EditorLayer::onImGui() {
             if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
                 saveSceneAs();
 
-            if (ImGui::MenuItem("Exit")) Application::Instance().getWindow().shouldClose(true);
+            if (ImGui::MenuItem("Screenshot", "F12"))
+                renderer.getSwapChain()->saveScreenshot("assets/screenshot.png");
+
+            if (ImGui::MenuItem("Exit"))
+                Application::Instance().getWindow().shouldClose(true);
+
             ImGui::EndMenu();
         }
 
@@ -215,20 +220,20 @@ void EditorLayer::onImGui() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
     ImGui::Begin("Viewport");
 
-    auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+    /*auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
     auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
     auto viewportOffset = ImGui::GetWindowPos();
     viewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
     viewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-    //viewportFocused = ImGui::IsWindowFocused();
-    //viewportHovered = ImGui::IsWindowHovered();
-    //Application::Instance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+    viewportFocused = ImGui::IsWindowFocused();
+    viewportHovered = ImGui::IsWindowHovered();
+    Application::Instance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
     viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-    //ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+    ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });*/
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -267,6 +272,7 @@ void EditorLayer::onImGui() {
 
         float snapValues[3] = { snapValue, snapValue, snapValue };
 
+        /* Imguimo fix for Vulkan projection */
         auto cameraView = glm::lookAtLH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
         auto cameraProjection = glm::perspectiveLH(
                 glm::radians(editorCamera.getFov()),

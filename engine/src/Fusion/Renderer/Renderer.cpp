@@ -12,12 +12,10 @@ Renderer::Renderer(Vulkan& vulkan) : vulkan{vulkan} {
     createUniformBuffers();
     createDescriptorSets();
     createCommandBuffers();
-    //vulkan.getWindow().bus().subscribe(this, &Renderer::onWindowResize);
 }
 
 Renderer::~Renderer() {
     vulkan.getDevice().freeCommandBuffers(vulkan.getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
-    //vulkan.getWindow().bus().destroy<WindowResizeEvent>(this);
 }
 
 void Renderer::createCommandBuffers() {

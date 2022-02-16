@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Event.hpp"
+#include "EventQueue.hpp"
 #include "Fusion/Input/KeyCodes.hpp"
 
 namespace Fusion {

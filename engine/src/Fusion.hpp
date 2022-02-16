@@ -34,7 +34,7 @@
 #include "Fusion/Geometry/Sphere.hpp"
 #include "Fusion/Geometry/Geometry.hpp"
 
-#include "Fusion/Events/Event.hpp"
+#include "Fusion/Events/EventQueue.hpp"
 #include "Fusion/Events/ApplicationEvents.hpp"
 #include "Fusion/Events/WindowEvents.hpp"
 #include "Fusion/Events/MouseEvents.hpp"

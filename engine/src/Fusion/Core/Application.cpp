@@ -36,10 +36,6 @@ void Application::run() {
             layer->onUpdate();
         }
 
-        if (Input::GetKeyDown(Key::Enter)) {
-            renderer.getSwapChain()->saveScreenshot("assets/file.png");
-        }
-
         if (!window.isMinimize()) {
             if (auto commandBuffer = renderer.beginFrame()) {
                 renderer.beginSwapChainRenderPass(commandBuffer);

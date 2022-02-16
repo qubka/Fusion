@@ -2,7 +2,7 @@
 
 #include "glfw/include/GLFW/glfw3.h"
 
-#include "Fusion/Events/Event.hpp"
+#include "Fusion/Events/EventQueue.hpp"
 
 namespace Fusion {
     class FUSION_API Window {
@@ -40,9 +40,6 @@ namespace Fusion {
         static uint8_t GLFWwindowCount;
         static std::vector<GLFWwindow*> instances;
 
-        static void ErrorCallback(int error, const char* description);
-        static void MonitorCallback(GLFWmonitor* monitor, int action);
-
         static void PosCallback(GLFWwindow* handle, int x, int y);
         static void SizeCallback(GLFWwindow* handle, int width, int height);
         static void CloseCallback(GLFWwindow* handle);
@@ -60,5 +57,7 @@ namespace Fusion {
         static void MaximizeCallback(GLFWwindow* handle, int maximized);
         static void ContentScaleCallback(GLFWwindow* handle, float scaleX, float scaleY);
 #endif
+        static void ErrorCallback(int error, const char* description);
+        static void MonitorCallback(GLFWmonitor* monitor, int action);
     };
 }
