@@ -26,6 +26,7 @@ namespace Fusion {
     public:
         Application(std::string name = "Fusion", CommandLineArgs args = CommandLineArgs{});
         virtual ~Application() = default;
+        FE_NONCOPYABLE(Application);
 
         void run();
 

@@ -8,6 +8,7 @@ namespace Fusion {
         SwapChain(Vulkan& vulkan, vk::Extent2D windowExtent);
         SwapChain(Vulkan& vulkan, vk::Extent2D windowExtent, std::shared_ptr<SwapChain> oldSwapChain);
         ~SwapChain();
+        FE_NONCOPYABLE(SwapChain);
 
         const vk::Framebuffer& getFrameBuffer(size_t index) const { return swapChainFramebuffers[index]; };
         const vk::RenderPass& getRenderPass() const { return renderPass; };

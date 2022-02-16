@@ -22,6 +22,7 @@ namespace Fusion {
                 vk::SamplerAddressMode addressMode = vk::SamplerAddressMode::eRepeat,
                 vk::SamplerMipmapMode minmapMode = vk::SamplerMipmapMode::eLinear);
         ~Texture();
+        FE_NONCOPYABLE(Texture);
 
         const vk::Image& getImage() const { return image; };
         const vk::ImageView& getView() const { return view; };

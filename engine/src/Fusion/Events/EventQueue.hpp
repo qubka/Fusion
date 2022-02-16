@@ -8,12 +8,12 @@ namespace Fusion {
 
     class FUSION_API EventQueue {
         typedef std::queue<Event*> Queue;
-
     public:
         EventQueue() = default;
         ~EventQueue() {
             free();
         }
+        //FE_NONCOPYABLE(EventQueue);
 
         template<typename EventType>
         void submit(EventType* event) {

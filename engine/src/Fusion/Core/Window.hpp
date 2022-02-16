@@ -9,6 +9,7 @@ namespace Fusion {
     public:
         Window(std::string title, int width, int height);
         ~Window();
+        FE_NONCOPYABLE(Window);
 
         void onUpdate();
 

@@ -2,160 +2,7 @@
 
 using namespace Fusion;
 
-// *************** Descriptor Pool Builder *********************
-
-DescriptorPool::Builder& DescriptorPool::Builder::addPoolSize(vk::DescriptorType descriptorType, uint32_t count) {
-    poolSizes.emplace_back(descriptorType, count);
-    return *this;
-}
-
-DescriptorPool::Builder& DescriptorPool::Builder::setPoolFlags(vk::DescriptorPoolCreateFlags flags) {
-    poolFlags = flags;
-    return *this;
-}
-
-DescriptorPool::Builder& DescriptorPool::Builder::setMaxSets(uint32_t count) {
-    maxSets = count;
-    return *this;
-}
-
-std::unique_ptr<DescriptorPool> DescriptorPool::Builder::build() const {
-    return std::make_unique<DescriptorPool>(*this);
-}
-
-// *************** Descriptor Pool *********************
-
-DescriptorPool::DescriptorPool(const Builder& builder) : vulkan{builder.vulkan} {
-    vk::DescriptorPoolCreateInfo descriptorPoolInfo{};
-    descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(builder.poolSizes.size());
-    descriptorPoolInfo.pPoolSizes = builder.poolSizes.data();
-    descriptorPoolInfo.maxSets = builder.maxSets;
-    descriptorPoolInfo.flags = builder.poolFlags;
-
-    auto result = vulkan.getDevice().createDescriptorPool(&descriptorPoolInfo, nullptr, &descriptorPool);
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor pool!");
-}
-
-DescriptorPool::~DescriptorPool() {
-    vulkan.getDevice().destroyDescriptorPool(descriptorPool, nullptr);
-}
-
-bool DescriptorPool::allocateDescriptor(const vk::DescriptorSetLayout& setLayout, vk::DescriptorSet& descriptor) const {
-    vk::DescriptorSetAllocateInfo allocInfo{};
-    allocInfo.descriptorPool = descriptorPool;
-    allocInfo.pSetLayouts = &setLayout;
-    allocInfo.descriptorSetCount = 1;
-
-    // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
-    // a new pool whenever an old pool fills up. But this is beyond our current scope
-    if (vulkan.getDevice().allocateDescriptorSets(&allocInfo, &descriptor) != vk::Result::eSuccess) {
-        FE_LOG_ERROR << "pools fills up!";
-        return false;
-    }
-
-    return true;
-}
-
-void DescriptorPool::freeDescriptors(std::vector<vk::DescriptorSet>& descriptorSets) const {
-    vulkan.getDevice().freeDescriptorSets(descriptorPool, static_cast<uint32_t>(descriptorSets.size()),descriptorSets.data());
-}
-
-void DescriptorPool::resetPool() {
-    vulkan.getDevice().resetDescriptorPool(descriptorPool, {});
-}
-
-// *************** Descriptor Set Layout Builder *********************
-
-DescriptorLayout::Builder& DescriptorLayout::Builder::addBinding(uint32_t binding, vk::DescriptorType descriptorType, vk::ShaderStageFlags stageFlags, uint32_t count) {
-    FE_ASSERT(bindings.count(binding) == 0 && "binding already in use");
-    vk::DescriptorSetLayoutBinding layoutBinding{};
-    layoutBinding.binding = binding;
-    layoutBinding.descriptorType = descriptorType;
-    layoutBinding.descriptorCount = count;
-    layoutBinding.stageFlags = stageFlags;
-    bindings[binding] = layoutBinding;
-    return *this;
-}
-
-std::unique_ptr<DescriptorLayout> DescriptorLayout::Builder::build() const {
-    return std::make_unique<DescriptorLayout>(*this);
-}
-
-// *************** Descriptor Set Layout *********************
-
-DescriptorLayout::DescriptorLayout(const Builder& builder) : vulkan{builder.vulkan}, bindings{builder.bindings} {
-    std::vector<vk::DescriptorSetLayoutBinding> setLayoutBindings;
-    setLayoutBindings.reserve(bindings.size());
-
-    for (const auto& b : bindings) {
-        setLayoutBindings.push_back(b.second);
-    }
-
-    vk::DescriptorSetLayoutCreateInfo descriptorSetLayoutInfo{};
-    descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
-    descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
-
-    auto result = vulkan.getDevice().createDescriptorSetLayout(&descriptorSetLayoutInfo, nullptr, &descriptorSetLayout);
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor set layout!");
-}
-
-DescriptorLayout::~DescriptorLayout() {
-    vulkan.getDevice().destroyDescriptorSetLayout(descriptorSetLayout, nullptr);
-}
-
-// *************** Descriptor Writer *********************
-
-DescriptorWriter::DescriptorWriter(DescriptorLayout& layout, DescriptorPool& pool) : layout{layout}, pool{pool} {
-}
-
-DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, const vk::DescriptorBufferInfo& bufferInfo) {
-    FE_ASSERT(layout.bindings.count(binding) == 1 && "layout does not contain specified binding");
-    const auto& bindingDescription = layout.bindings[binding];
-    FE_ASSERT(bindingDescription.descriptorCount == 1 && "binding single descriptor info, but binding expects multiple");
-
-    vk::WriteDescriptorSet write{};
-    write.descriptorType = bindingDescription.descriptorType;
-    write.dstBinding = binding;
-    write.pBufferInfo = &bufferInfo;
-    write.descriptorCount = 1;
-
-    writes.push_back(write);
-    return *this;
-}
-
-DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, const vk::DescriptorImageInfo& imageInfo) {
-    FE_ASSERT(layout.bindings.count(binding) == 1 && "layout does not contain specified binding");
-    const auto& bindingDescription = layout.bindings[binding];
-    FE_ASSERT(bindingDescription.descriptorCount == 1 && "binding single descriptor info, but binding expects multiple");
-
-    vk::WriteDescriptorSet write{};
-    write.descriptorType = bindingDescription.descriptorType;
-    write.dstBinding = binding;
-    write.pImageInfo = &imageInfo;
-    write.descriptorCount = 1;
-
-    writes.push_back(write);
-    return *this;
-}
-
-bool DescriptorWriter::build(vk::DescriptorSet& set) {
-    bool success = pool.allocateDescriptor(layout.getDescriptorSetLayout(), set);
-    if (!success) {
-        return false;
-    }
-    overwrite(set);
-    return true;
-}
-
-void DescriptorWriter::overwrite(vk::DescriptorSet& set) {
-    for (auto& write: writes) {
-        write.dstSet = set;
-    }
-
-    pool.vulkan.getDevice().updateDescriptorSets(static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
-}
-
-/*DescriptorAllocator::DescriptorAllocator(Vulkan& vulkan) : vulkan{vulkan} {
+DescriptorAllocator::DescriptorAllocator(Vulkan& vulkan) : vulkan{vulkan} {
 }
 
 DescriptorAllocator::~DescriptorAllocator() {
@@ -231,15 +78,16 @@ bool DescriptorAllocator::allocateDescriptor(const vk::DescriptorSetLayout& layo
             result = vulkan.getDevice().allocateDescriptorSets(&allocInfo, &set);
 
             //if it still fails then we have big issues
-            if (result == vk::Result::eSuccess){
+            if (result == vk::Result::eSuccess) {
                 return true;
             }
             break;
-        default:
+        /*default:
             //unrecoverable error
-            return false;
+            return false;*/
     }
 
+    FE_ASSERT(0 && "failed to allocate the descriptor set");
     return false;
 }
 
@@ -272,14 +120,14 @@ DescriptorLayoutCache::~DescriptorLayoutCache() {
 }
 
 vk::DescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(vk::DescriptorSetLayoutCreateInfo& info) {
-    DescriptorLayoutInfo layoutinfo;
-    layoutinfo.bindings.reserve(info.bindingCount);
+    DescriptorLayoutInfo layoutInfo;
+    layoutInfo.bindings.reserve(info.bindingCount);
     bool isSorted = true;
     int32_t lastBinding = -1;
 
     //copy from the direct info struct into our own one
     for (int i = 0; i < info.bindingCount; i++) {
-        layoutinfo.bindings.push_back(info.pBindings[i]);
+        layoutInfo.bindings.push_back(info.pBindings[i]);
 
         //check that the bindings are in strict increasing order
         int binding = static_cast<int32_t>(info.pBindings[i].binding);
@@ -289,16 +137,17 @@ vk::DescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(vk::Descri
             isSorted = false;
         }
     }
+
     //sort the bindings if they aren't in order
     if (!isSorted) {
-        std::sort(layoutinfo.bindings.begin(), layoutinfo.bindings.end(),
+        std::sort(layoutInfo.bindings.begin(), layoutInfo.bindings.end(),
                   [](const vk::DescriptorSetLayoutBinding& a, const vk::DescriptorSetLayoutBinding& b) {
                       return a.binding < b.binding;
                   });
     }
 
     //try to grab from cache
-    auto it = layoutCache.find(layoutinfo);
+    auto it = layoutCache.find(layoutInfo);
     if (it != layoutCache.end()) {
         return (*it).second;
     } else {
@@ -309,7 +158,7 @@ vk::DescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(vk::Descri
         FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor set layout!");
 
         //add to cache
-        layoutCache[layoutinfo] = layout;
+        layoutCache[layoutInfo] = layout;
         return layout;
     }
 }
@@ -442,4 +291,4 @@ bool DescriptorBuilder::build(vk::DescriptorSet& set) {
 
     allocator.updateDescriptor(writes);
     return true;
-}*/
+}

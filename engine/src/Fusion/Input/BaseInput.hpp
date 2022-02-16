@@ -18,6 +18,7 @@ namespace Fusion {
         //! Takes a list of which keys to keep state for
         BaseInput(const std::vector<T>& keysToMonitor);
         ~BaseInput() = default;
+        FE_NONCOPYABLE(BaseInput);
 
         virtual void onAttach() {}
         virtual void onDetach() {}

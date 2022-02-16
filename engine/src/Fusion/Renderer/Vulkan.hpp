@@ -29,6 +29,7 @@ namespace Fusion {
     public:
         Vulkan(Window& window);
         ~Vulkan();
+        FE_NONCOPYABLE(Vulkan);
 
         Window& getWindow() const { return window; }
 

@@ -5,6 +5,7 @@ namespace Fusion {
     public:
         Camera() = default;
         virtual ~Camera() = default;
+        FE_NONCOPYABLE(Camera);
 
         glm::mat4& getProjection() { return projectionMatrix; };
         glm::mat4& getView() { return viewMatrix; };

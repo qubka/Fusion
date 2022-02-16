@@ -26,6 +26,11 @@
 #define FE_ASSERT(...)
 #endif
 
+#define FE_NONCOPYABLE(x) x(const x&) = delete; \
+                          x(x&&) = delete; \
+                          x& operator=(const x&) = delete; \
+                          x& operator=(x&&) = delete; \
+
 namespace Fusion {
     static const std::filesystem::path AssetPath = "assets";
 }

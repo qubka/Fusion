@@ -8,6 +8,7 @@ namespace Fusion {
     public:
         LayerStack() = default;
         ~LayerStack();
+        FE_NONCOPYABLE(LayerStack);
 
         //! Inserts the specified element at the front of this deque if it is possible to do so immediately without violating capacity restrictions.
         void pushFront(Layer* layer);

@@ -10,7 +10,7 @@ Texture::Texture(Vulkan& vulkan, std::string path, vk::Format format, vk::Filter
     format{format}
 {
     int channels = componentCount(format);
-    Image image{getPath(), channels};
+    Image image {getPath(), channels};
 
     width = static_cast<uint32_t>(image.width);
     height = static_cast<uint32_t>(image.height);

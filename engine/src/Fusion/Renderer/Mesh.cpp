@@ -31,11 +31,11 @@ void Mesh::createVertexBuffers(const std::vector<Vertex>& vertices) {
     stagingBuffer.writeToBuffer((void *)vertices.data());
 
     vertexBuffer = std::make_unique<AllocatedBuffer>(
-            vulkan,
-            vertexSize,
-            vertexCount,
+        vulkan,
+        vertexSize,
+        vertexCount,
         vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-            vk::MemoryPropertyFlagBits::eDeviceLocal);
+        vk::MemoryPropertyFlagBits::eDeviceLocal);
 
     vulkan.copyBuffer(stagingBuffer.get(), vertexBuffer->get(), bufferSize);
 }
@@ -99,9 +99,8 @@ std::vector<vk::VertexInputBindingDescription> Mesh::Vertex::getBindingDescripti
 std::vector<vk::VertexInputAttributeDescription> Mesh::Vertex::getAttributeDescriptions() {
     return {
         {0, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, position)},
-        {1, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, color)},
-        {2, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, normal)},
-        {3, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, ui)},
+        {1, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, normal)},
+        {2, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, ui)},
     };
 }
 
@@ -110,7 +109,7 @@ namespace std {
     struct hash<Mesh::Vertex> {
         size_t operator()(Mesh::Vertex const &vertex) const {
             size_t seed = 0;
-            hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.ui);
+            hashCombine(seed, vertex.position, vertex.normal, vertex.ui);
             return seed;
         }
     };

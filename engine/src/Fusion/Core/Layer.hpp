@@ -5,6 +5,7 @@ namespace Fusion {
     public:
         Layer(std::string name = "Layer") : name{std::move(name)} {}
         virtual ~Layer() = default;
+        FE_NONCOPYABLE(Layer);
 
         virtual void onAttach() {}
         virtual void onDetach() {}

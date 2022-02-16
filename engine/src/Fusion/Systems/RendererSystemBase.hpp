@@ -4,6 +4,7 @@ namespace Fusion {
 	class FUSION_API RendererSystemBase {
 	public:
         virtual ~RendererSystemBase() = default;
+        FE_NONCOPYABLE(RendererSystemBase);
 
 		virtual void beginScene() = 0;
 		virtual void endScene() = 0;

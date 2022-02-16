@@ -284,6 +284,9 @@ void EditorLayer::onImGui() {
                              (ImGuizmo::OPERATION)gizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
                              nullptr, snap ? snapValues : nullptr);
 
+        //glm::mat4 m{1};
+        //ImGuizmo::DrawGrid(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), glm::value_ptr(m), 100.0f);
+
         if (ImGuizmo::IsUsing()) {
             glm::vec3 translation, rotation, scale;
             glm::decompose(transform, translation, rotation, scale);
