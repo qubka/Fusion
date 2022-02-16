@@ -31,7 +31,7 @@ namespace Fusion {
         Vulkan& vulkan;
         Renderer& renderer;
 
-        std::vector<vk::DescriptorSet> textureDescriptorSets;
+        vk::DescriptorSet textureDescriptorSet;
         std::unique_ptr<DescriptorPool> texturePool;
         std::unique_ptr<DescriptorLayout> textureLayout;
         std::unique_ptr<Texture> texture;

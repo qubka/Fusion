@@ -4,7 +4,6 @@
 #include "Scene.hpp"
 
 #include <yaml-cpp/yaml.h>
-#include <magic_enum.hpp>
 
 namespace YAML {
 

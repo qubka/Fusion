@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Vulkan.hpp"
+#include "AllocatedBuffer.hpp"
 
 namespace Fusion {
     class SwapChain;
-    class AllocatedBuffer;
     class DescriptorPool;
     class DescriptorLayout;
 
@@ -25,7 +25,7 @@ namespace Fusion {
 
         const vk::CommandBuffer& getCommandBuffers(size_t index) const { return commandBuffers[index]; };
         const vk::DescriptorSet& getGlobalDescriptors(size_t index) const { return globalDescriptorSets[index]; };
-        const std::unique_ptr<AllocatedBuffer>& getUniformBuffers(size_t index) const { return uniformBuffers[index]; };
+        AllocatedBuffer& getUniformBuffers(size_t index) { return uniformBuffers[index]; };
 
         uint32_t getFrameIndex() const { FE_ASSERT(isFrameStarted && "cannot get frame index when frame not in progress"); return currentFrame; };
         bool isFrameInProgress() const { FE_ASSERT(isFrameStarted && "cannot get frame index when frame not in progress"); return isFrameStarted; };
@@ -45,7 +45,7 @@ namespace Fusion {
 
         std::unique_ptr<SwapChain> swapChain;
         std::vector<vk::CommandBuffer> commandBuffers;
-        std::vector<std::unique_ptr<AllocatedBuffer>> uniformBuffers;
+        std::vector<AllocatedBuffer> uniformBuffers;
 
         std::vector<vk::DescriptorSet> globalDescriptorSets;
         std::unique_ptr<DescriptorPool> globalPool;

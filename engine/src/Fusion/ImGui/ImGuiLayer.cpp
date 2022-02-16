@@ -1,8 +1,6 @@
 #include "ImGuiLayer.hpp"
 
 #include "Fusion/Core/Window.hpp"
-#include "Fusion/Renderer/Renderer.hpp"
-#include "Fusion/Renderer/SwapChain.hpp"
 
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
@@ -11,8 +9,7 @@
 using namespace Fusion;
 
 static void ImGuiErrorCallback(VkResult err) {
-    if (err == 0)
-        return;
+    if (err == 0) return;
     FE_LOG_ERROR << "[Imgui] Error: VkResult = " << err;
     FE_ASSERT(err >= 0 && "[Imgui] Fatal: Vulkan result!");
 }

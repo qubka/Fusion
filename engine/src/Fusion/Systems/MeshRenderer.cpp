@@ -28,8 +28,6 @@ void MeshRenderer::createDescriptorSets() {
             .addBinding(0, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
             .build();
 
-    textureDescriptorSets.reserve(SwapChain::MAX_FRAMES_IN_FLIGHT);
-
     texture = std::make_unique<Texture>(vulkan, "assets/textures/texture.jpg", vk::Format::eR8G8B8A8Srgb);
 
     vk::DescriptorImageInfo imageInfo{};
@@ -37,13 +35,9 @@ void MeshRenderer::createDescriptorSets() {
     imageInfo.imageView = texture->getView();
     imageInfo.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 
-    for (int i = 0; i < SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::DescriptorSet descriptorSet;
-        DescriptorWriter(*textureLayout, *texturePool)
-                .writeImage(0, imageInfo)
-                .build(descriptorSet);
-        textureDescriptorSets.push_back(descriptorSet);
-    }
+    DescriptorWriter(*textureLayout, *texturePool)
+            .writeImage(0, imageInfo)
+            .build(textureDescriptorSet);
 }
 
 void MeshRenderer::createPipelineLayout() {
@@ -82,7 +76,7 @@ void MeshRenderer::beginScene() {
 
     pipeline->bind(*commandBuffer);
 
-    std::array<vk::DescriptorSet, 2> descriptorSets{renderer.getGlobalDescriptors(frameIndex), textureDescriptorSets[frameIndex]};
+    std::array<vk::DescriptorSet, 2> descriptorSets{renderer.getGlobalDescriptors(frameIndex), textureDescriptorSet};
 
     commandBuffer->bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics,

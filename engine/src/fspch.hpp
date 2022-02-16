@@ -42,6 +42,8 @@
 #include <gtx/hash.hpp>
 #include <gtx/matrix_decompose.hpp>
 
+#include <magic_enum.hpp>
+
 #include "Fusion/Core/Base.hpp"
 #include "Fusion/Core/Log.hpp"
 #include "Fusion/Utils/Extentions.hpp"

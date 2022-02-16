@@ -89,8 +89,8 @@ void EditorLayer::onRender() {
     ubo.perspective = editorCamera.getViewProjection();
     //ubo.orthogonal = glm::ortho(0, vulkan.getWindow().getWidth(), 0, vulkan.getWindow().getHeight());
     auto& buffer = renderer.getUniformBuffers(renderer.getFrameIndex());
-    buffer->writeToBuffer(&ubo);
-    buffer->flush();
+    buffer.writeToBuffer(&ubo);
+    buffer.flush();
 
     switch (sceneState) {
         case SceneState::Edit: {

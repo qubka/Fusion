@@ -34,14 +34,13 @@ void Renderer::createUniformBuffers() {
     uniformBuffers.reserve(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
     for (int i = 0; i < SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
-        auto buffer = std::make_unique<AllocatedBuffer>(
+        uniformBuffers.emplace_back(
                 vulkan,
                 sizeof(UniformBufferObject),
                 1,
                 vk::BufferUsageFlagBits::eUniformBuffer,
-                vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
-        buffer->map();
-        uniformBuffers.push_back(std::move(buffer));
+                vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
+        ).map();
     }
 }
 
@@ -59,7 +58,7 @@ void Renderer::createDescriptorSets() {
 
     for (int i = 0; i < SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
         vk::DescriptorSet descriptorSet;
-        auto bufferInfo = uniformBuffers[i]->descriptorInfo();
+        auto bufferInfo = uniformBuffers[i].descriptorInfo();
         DescriptorWriter(*globalLayout, *globalPool)
             .writeBuffer(0, bufferInfo)
             .build(descriptorSet);
