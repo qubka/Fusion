@@ -13,6 +13,12 @@ namespace Fusion {
         glm::vec2 offset;
     };
 
+    struct FUSION_API MouseCursorEnterEvent : public Event {
+    };
+
+    struct FUSION_API MouseCursorLeftEvent : public Event {
+    };
+
     struct FUSION_API MouseButtonEvent : public Event {
         MouseCode button;
     };

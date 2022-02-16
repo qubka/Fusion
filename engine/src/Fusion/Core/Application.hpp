@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Window.hpp"
 #include "LayerStack.hpp"
 
-#include "Fusion/Renderer/Window.hpp"
 #include "Fusion/Renderer/Vulkan.hpp"
 #include "Fusion/Renderer/Renderer.hpp"
 #include "Fusion/Input/Input.hpp"

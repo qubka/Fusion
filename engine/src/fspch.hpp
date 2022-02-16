@@ -16,6 +16,7 @@
 #include <cstring>
 #include <string>
 #include <deque>
+#include <queue>
 #include <array>
 #include <vector>
 #include <map>

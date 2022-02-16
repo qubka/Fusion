@@ -1,5 +1,6 @@
 #include "Vulkan.hpp"
-#include "Window.hpp"
+
+#include "Fusion/Core/Window.hpp"
 
 using namespace Fusion;
 

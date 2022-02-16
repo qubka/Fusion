@@ -1,6 +1,6 @@
 #include "MouseInput.hpp"
 
-#include "Fusion/Renderer/Window.hpp"
+#include "Fusion/Core/Window.hpp"
 #include "Fusion/Events/MouseEvents.hpp"
 
 using namespace Fusion;
@@ -16,10 +16,8 @@ MouseInput::~MouseInput() {
 }
 
 void MouseInput::onUpdate() {
-    delta.x = 0;
-    delta.y = 0;
-    scroll.x = 0;
-    scroll.y = 0;
+    delta = {};
+    scroll = {};
     BaseInput::onUpdate();
 }
 
@@ -35,12 +33,13 @@ void MouseInput::setScrollOffset(const glm::vec2& offset) {
 void MouseInput::Setup(Window& window) {
     glfwSetMouseButtonCallback(window, MouseButtonCallback);
     glfwSetCursorPosCallback(window, CursorPositionCallback);
-    glfwSetScrollCallback(window, MouseScrollCallback);
+    glfwSetCursorEnterCallback(window, CursorEnterCallback);
+    glfwSetScrollCallback(window, ScrollCallback);
 }
 
 void MouseInput::CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.bus().publish(new MouseMovedEvent{{}, {mouseX, mouseY}});
+    window.getEventQueue().submit(new MouseMovedEvent{{},{mouseX, mouseY}});
 
     // Polling system
     for (auto* input : instances) {
@@ -48,9 +47,17 @@ void MouseInput::CursorPositionCallback(GLFWwindow* handle, double mouseX, doubl
     }
 }
 
-void MouseInput::MouseScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
+void MouseInput::CursorEnterCallback(GLFWwindow* handle, int entered) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.bus().publish(new MouseScrollEvent{{}, {offsetX, offsetY}});
+    if (entered)
+        window.getEventQueue().submit(new MouseCursorEnterEvent{});
+    else
+        window.getEventQueue().submit(new MouseCursorLeftEvent{});
+}
+
+void MouseInput::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
+    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    window.getEventQueue().submit(new MouseScrollEvent{{},{offsetX, offsetY}});
 
     // Polling system
     for (auto* input : instances) {
@@ -64,10 +71,10 @@ void MouseInput::MouseButtonCallback(GLFWwindow* handle, int button, int action,
     // Event system
     switch (action) {
         case GLFW_PRESS:
-            window.bus().publish(new MouseButtonPressedEvent{{{}, static_cast<MouseCode>(button)}});
+            window.getEventQueue().submit(new MouseButtonPressedEvent{{{}, static_cast<MouseCode>(button)}});
             break;
         case GLFW_RELEASE:
-            window.bus().publish(new MouseButtonReleasedEvent{{{}, static_cast<MouseCode>(button)}});
+            window.getEventQueue().submit(new MouseButtonReleasedEvent{{{}, static_cast<MouseCode>(button)}});
             break;
     }
 

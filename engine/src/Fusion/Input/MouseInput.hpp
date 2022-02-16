@@ -40,7 +40,8 @@ namespace Fusion {
 
         /// Workaround for C++ class using a c-style-callback
         static void CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY);
-        static void MouseScrollCallback(GLFWwindow* handle, double offsetX, double offsetY);
+        static void CursorEnterCallback(GLFWwindow* handle, int entered);
+        static void ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY);
         static void MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode);
 
         static std::vector<MouseInput*> instances;

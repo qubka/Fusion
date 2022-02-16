@@ -16,7 +16,7 @@
 #include "Fusion/Renderer/PerspectiveCamera.hpp"
 #include "Fusion/Renderer/OrthographicCamera.hpp"
 #include "Fusion/Renderer/EditorCamera.hpp"
-#include "Fusion/Renderer/Window.hpp"
+#include "Fusion/Core/Window.hpp"
 #include "Fusion/Renderer/Vulkan.hpp"
 #include "Fusion/Renderer/Texture.hpp"
 #include "Fusion/Renderer/SwapChain.hpp"
@@ -35,6 +35,7 @@
 #include "Fusion/Geometry/Geometry.hpp"
 
 #include "Fusion/Events/Event.hpp"
+#include "Fusion/Events/ApplicationEvents.hpp"
 #include "Fusion/Events/WindowEvents.hpp"
 #include "Fusion/Events/MouseEvents.hpp"
 #include "Fusion/Events/KeyEvents.hpp"

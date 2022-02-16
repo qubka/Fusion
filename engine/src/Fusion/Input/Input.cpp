@@ -18,8 +18,9 @@ void Input::Init(Window& window) {
     glfwSetKeyCallback(window, KeyCallback);
     glfwSetMouseButtonCallback(window, MouseButtonCallback);
     glfwSetCursorPosCallback(window, CursorPositionCallback);
+    glfwSetCursorEnterCallback(window, CursorEnterCallback);
     glfwSetCharCallback(window, CharCallback);
-    glfwSetScrollCallback(window, MouseScrollCallback);
+    glfwSetScrollCallback(window, ScrollCallback);
 }
 
 bool Input::GetKey(KeyCode keycode) {
@@ -50,28 +51,34 @@ bool Input::GetMouseButtonUp(MouseCode button) {
 }
 
 void Input::Update() {
+    delta = {};
+    scroll = {};
     current++;
-    delta.x = 0;
-    delta.y = 0;
-    scroll.x = 0;
-    scroll.y = 0;
 }
 
 void Input::CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY) {
     glm::vec2 mouse {mouseX, mouseY};
 
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.bus().publish(new MouseMovedEvent{{}, mouse});
+    window.getEventQueue().submit(new MouseMovedEvent{{}, mouse});
 
     delta += mouse - position;
     position = mouse;
 }
 
-void Input::MouseScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
+void Input::CursorEnterCallback(GLFWwindow* handle, int entered) {
+    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    if (entered)
+        window.getEventQueue().submit(new MouseCursorLeftEvent{});
+    else
+        window.getEventQueue().submit(new MouseCursorLeftEvent{});
+}
+
+void Input::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
     glm::vec2 offset {offsetX, offsetY};
 
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.bus().publish(new MouseScrollEvent{{}, offset});
+    window.getEventQueue().submit(new MouseScrollEvent{{}, offset});
 
     scroll = offset;
 }
@@ -82,10 +89,10 @@ void Input::MouseButtonCallback(GLFWwindow* handle, int button, int action, int 
     // Event system
     switch (action) {
         case GLFW_PRESS:
-            window.bus().publish(new MouseButtonPressedEvent{{{}, static_cast<MouseCode>(button)}});
+            window.getEventQueue().submit(new MouseButtonPressedEvent{{{}, static_cast<MouseCode>(button)}});
             break;
         case GLFW_RELEASE:
-            window.bus().publish(new MouseButtonReleasedEvent{{{}, static_cast<MouseCode>(button)}});
+            window.getEventQueue().submit(new MouseButtonReleasedEvent{{{}, static_cast<MouseCode>(button)}});
             break;
     }
 
@@ -111,13 +118,13 @@ void Input::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, i
     // Event system
     switch (action) {
         case GLFW_PRESS:
-            window.bus().publish(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, false});
+            window.getEventQueue().submit(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, false});
             break;
         case GLFW_RELEASE:
-            window.bus().publish(new KeyReleasedEvent{{{}, static_cast<KeyCode>(key)}});
+            window.getEventQueue().submit(new KeyReleasedEvent{{{}, static_cast<KeyCode>(key)}});
             break;
         case GLFW_REPEAT:
-            window.bus().publish(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, true});
+            window.getEventQueue().submit(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, true});
             break;
     }
 
@@ -139,5 +146,5 @@ void Input::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, i
 void Input::CharCallback(GLFWwindow* handle, unsigned int keycode) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.bus().publish(new KeyTypedEvent{{{}, static_cast<KeyCode>(keycode)}});
+    window.getEventQueue().submit(new KeyTypedEvent{{{}, static_cast<KeyCode>(keycode)}});
 }

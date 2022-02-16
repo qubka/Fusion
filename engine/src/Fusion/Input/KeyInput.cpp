@@ -1,6 +1,6 @@
 #include "KeyInput.hpp"
 
-#include "Fusion/Renderer/Window.hpp"
+#include "Fusion/Core/Window.hpp"
 #include "Fusion/Events/KeyEvents.hpp"
 
 using namespace Fusion;
@@ -16,8 +16,8 @@ KeyInput::~KeyInput() {
 }
 
 void KeyInput::Setup(Window& window) {
-    glfwSetKeyCallback(window, KeyInput::KeyCallback);
-    glfwSetCharCallback(window, KeyInput::CharCallback);
+    glfwSetKeyCallback(window, KeyCallback);
+    glfwSetCharCallback(window, CharCallback);
 }
 
 void KeyInput::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mods) {
@@ -26,13 +26,13 @@ void KeyInput::KeyCallback(GLFWwindow* handle, int key, int scancode, int action
     // Event system
     switch (action) {
         case GLFW_PRESS:
-            window.bus().publish(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, false});
+            window.getEventQueue().submit(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, false});
             break;
         case GLFW_RELEASE:
-            window.bus().publish(new KeyReleasedEvent{{{}, static_cast<KeyCode>(key)}});
+            window.getEventQueue().submit(new KeyReleasedEvent{{{}, static_cast<KeyCode>(key)}});
             break;
         case GLFW_REPEAT:
-            window.bus().publish(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, true});
+            window.getEventQueue().submit(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, true});
             break;
     }
 
@@ -45,5 +45,5 @@ void KeyInput::KeyCallback(GLFWwindow* handle, int key, int scancode, int action
 void KeyInput::CharCallback(GLFWwindow* handle, unsigned int keycode) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.bus().publish(new KeyTypedEvent{{{}, static_cast<KeyCode>(keycode)}});
+    window.getEventQueue().submit(new KeyTypedEvent{{{}, static_cast<KeyCode>(keycode)}});
 }

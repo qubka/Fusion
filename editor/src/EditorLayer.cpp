@@ -6,8 +6,9 @@
 #include "Fusion/Renderer/Texture.hpp"
 #include "Fusion/Renderer/Renderer.hpp"
 #include "Fusion/Renderer/AllocatedBuffer.hpp"
-#include "Fusion/Scene/Components.hpp"
 #include "Fusion/Utils/Math.hpp"
+#include "Fusion/Events/WindowEvents.hpp"
+#include "Fusion/Scene/Components.hpp"
 
 #if _WIN32
 #define DEFAULT_PATH "C:\\"
@@ -50,6 +51,11 @@ void EditorLayer::onDetach() {
 }
 
 void EditorLayer::onUpdate() {
+    auto& window = vulkan.getWindow();
+    if (auto* event = window.getEventQueue().next<WindowFramebufferSizeEvent>()) {
+        editorCamera.setViewport(event->width, event->height);
+    }
+
     switch (sceneState) {
         case SceneState::Edit: {
             editorCamera.onUpdate();

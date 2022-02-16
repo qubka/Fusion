@@ -2,7 +2,8 @@
 #include "SwapChain.hpp"
 #include "AllocatedBuffer.hpp"
 #include "Descriptors.hpp"
-#include "Window.hpp"
+
+#include "Fusion/Core/Window.hpp"
 
 using namespace Fusion;
 
@@ -69,9 +70,11 @@ void Renderer::createDescriptorSets() {
 }
 
 void Renderer::recreateSwapChain() {
-    auto extent = vk::Extent2D(vulkan.getWindow().getWidth(), vulkan.getWindow().getHeight());
+    auto& window = vulkan.getWindow();
+
+    auto extent = vk::Extent2D(window.getWidth(), window.getHeight());
     while (extent.width == 0 || extent.height == 0) {
-        extent = vk::Extent2D(vulkan.getWindow().getWidth(), vulkan.getWindow().getHeight());
+        extent = vk::Extent2D(window.getWidth(), window.getHeight());
         glfwWaitEvents();
     }
 

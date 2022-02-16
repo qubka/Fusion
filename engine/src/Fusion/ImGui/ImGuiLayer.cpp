@@ -1,6 +1,6 @@
 #include "ImGuiLayer.hpp"
 
-#include "Fusion/Renderer/Window.hpp"
+#include "Fusion/Core/Window.hpp"
 #include "Fusion/Renderer/Renderer.hpp"
 #include "Fusion/Renderer/SwapChain.hpp"
 

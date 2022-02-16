@@ -3,11 +3,12 @@
 #include "MouseCodes.hpp"
 #include "KeyCodes.hpp"
 
-#include "Fusion/Renderer/Window.hpp"
+#include "Fusion/Core/Window.hpp"
 
 namespace Fusion {
-    /* Global class */
+    /* Global class (Testing purpose_ */
 
+    // if you want use individual inputs, not called init here, use BaseInput's classes
     class FUSION_API Input {
     public:
         //! Returns true while the user holds down the key identified by GLFW code.
@@ -46,7 +47,8 @@ namespace Fusion {
 
     protected:
         static void CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY);
-        static void MouseScrollCallback(GLFWwindow* handle, double offsetX, double offsetY);
+        static void CursorEnterCallback(GLFWwindow* handle, int entered);
+        static void ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY);
         static void MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode);
         static void KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mode);
         static void CharCallback(GLFWwindow* handle, unsigned int keycode);
