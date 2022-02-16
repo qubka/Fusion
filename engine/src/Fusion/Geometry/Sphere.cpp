@@ -17,7 +17,7 @@ bool Sphere::intersects(const AABB& box) const {
 
 bool Sphere::intersects(const Ray& ray) const {
     float t;
-    glm::vec3 temp = ray.getOrigin() - center;
+    glm::vec3 temp {ray.getOrigin() - center};
     float a = glm::dot(ray.getDirection(), ray.getDirection());
     float b = 2 * glm::dot(temp, ray.getDirection());
     float c = glm::dot(temp, temp) - radius * radius;
@@ -45,7 +45,7 @@ bool Sphere::intersects(const Ray& ray) const {
 
 int Sphere::intersect(const Ray& ray, float& intersection) const {
     float t;
-    glm::vec3 temp = ray.getOrigin() - center;
+    glm::vec3 temp {ray.getOrigin() - center};
     float a = glm::dot(ray.getDirection(), ray.getDirection());
     float b = 2 * glm::dot(temp, ray.getDirection());
     float c = glm::dot(temp, temp) - radius * radius;
@@ -74,7 +74,7 @@ int Sphere::intersect(const Ray& ray, float& intersection) const {
 }
 
 int Sphere::intersect(const Ray& ray, float& min, float& max) const {
-    glm::vec3 temp = ray.getOrigin() - center;
+    glm::vec3 temp {ray.getOrigin() - center};
     float a = glm::dot(ray.getDirection(), ray.getDirection());
     float b = 2 * glm::dot(temp, ray.getDirection());
     float c = glm::dot(temp, temp) - radius * radius;
@@ -105,7 +105,7 @@ int Sphere::intersect(const Ray& ray, float& min, float& max) const {
 
 glm::vec3 Sphere::closestPoint(const Ray& ray) const {
     float t;
-    glm::vec3 diff = ray.getOrigin() - center;
+    glm::vec3 diff {ray.getOrigin() - center};
     float a = glm::dot(ray.getDirection(), ray.getDirection());
     float b = 2 * glm::dot(diff, ray.getDirection());
     float c = glm::dot(diff, diff) - radius * radius;
@@ -125,7 +125,7 @@ glm::vec3 Sphere::closestPoint(const Ray& ray) const {
     }
 
     t = glm::dot(-diff, glm::normalize(ray.getDirection()));
-    glm::vec3 onRay = ray.getPoint(t);
+    glm::vec3 onRay {ray.getPoint(t)};
     return center + glm::normalize(onRay - center) * radius;
 }
 
@@ -166,7 +166,7 @@ Sphere Sphere::calculateBoundingSphere(const glm::vec3* points, size_t size) {
             max.z = points[i].z;
     }
     // compute center and radius
-    glm::vec3 center = 0.5f * (min + max);
+    glm::vec3 center {0.5f * (min + max)};
     float maxDistance = glm::distance2(center, points[0]);
     for (size_t i = 1; i < size; ++i) {
         float dist = glm::distance2(center, points[i]);

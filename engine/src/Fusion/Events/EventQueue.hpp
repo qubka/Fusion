@@ -30,7 +30,7 @@ namespace Fusion {
 
         template<typename EventType>
         EventType* next(bool handle = false) {
-            if (auto it = events.find(typeid(EventType)); it != events.end()) {
+            if (auto it {events.find(typeid(EventType))}; it != events.end()) {
                 auto& queue{ *it->second };
                 if (!queue.empty()) {
                     auto* event = queue.front();

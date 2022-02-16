@@ -69,4 +69,46 @@ namespace glm {
 
         return true;
     }
+
+    // Gradually changes a vector towards a desired goal over time.
+    glm::vec3 smoothdamp(const glm::vec3& current, const glm::vec3& target, glm::vec3& currentVelocity, float smoothTime, float maxSpeed, float deltaTime) {
+        glm::vec3 output{0};
+
+        // Based on Game Programming Gems 4 Chapter 1.10
+        smoothTime = std::max(0.0001f, smoothTime);
+        float omega = 2 / smoothTime;
+
+        float x = omega * deltaTime;
+        float exp = 1 / (1 + x + 0.48f * x * x + 0.235f * x * x * x);
+
+        glm::vec3 change {current - target};
+
+        // Clamp maximum speed
+        float maxChange = maxSpeed * smoothTime;
+
+        float maxChangeSq = maxChange * maxChange;
+        float sqrMag = length2(change);
+        if (sqrMag > maxChangeSq) {
+            change /= std::sqrt(sqrMag) * maxChange;
+        }
+
+        glm::vec3 dest { current - change };
+
+        glm::vec3 temp { (currentVelocity + omega * change) * deltaTime };
+
+        currentVelocity = (currentVelocity - omega * temp) * exp;
+
+        output = dest + (change + temp) * exp;
+
+        // Prevent overshooting
+        glm::vec3 origMinusCurrent {target - current};
+        glm::vec3 outMinusOrig {output - target};
+
+        if (glm::dot(origMinusCurrent, outMinusOrig) > 0) {
+            output = target;
+            currentVelocity = {};
+        }
+
+        return output;
+    }
 }

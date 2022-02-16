@@ -13,7 +13,7 @@ bool Ray::triangleIntersection(const glm::vec3& v0, const glm::vec3& v1, const g
     glm::vec3 e1 {v1 - v0};
     glm::vec3 e2 {v2 - v0};
 
-    glm::vec3 p = glm::cross(direction, e2);
+    glm::vec3 p {glm::cross(direction, e2)};
     float det = glm::dot(e1, p);
 
 #if 0 // we don't want to backface cull
@@ -26,7 +26,7 @@ bool Ray::triangleIntersection(const glm::vec3& v0, const glm::vec3& v1, const g
 	if (u < 0 || u > det)
 		return false;
 
-    glm::vec3 q = glm::cross(t, e1);
+    glm::vec3 q {glm::cross(t, e1)};
 	float v = glm::dot(direction, q);
 	if (v < 0 || u + v > det)
 		return false;
@@ -45,7 +45,7 @@ bool Ray::triangleIntersection(const glm::vec3& v0, const glm::vec3& v1, const g
     if (u < 0 || u > 1)
         return false;
 
-    glm::vec3 q = glm::cross(t, e1);
+    glm::vec3 q {glm::cross(t, e1)};
 
     float v = glm::dot(direction, q) * invDet;
     if (v < 0 || u + v > 1)

@@ -43,7 +43,7 @@ Layer* LayerStack::removeBack() {
 }
 
 void LayerStack::remove(Layer* layer) {
-    auto it = std::find(layers.begin(), layers.end(), layer);
+    auto it {std::find(layers.begin(), layers.end(), layer)};
     if (it != layers.end()) {
         layer->onDetach();
         layers.erase(it);

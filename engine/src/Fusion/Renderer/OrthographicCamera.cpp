@@ -33,11 +33,11 @@ void OrthographicCamera::updateView() {
         return;
 
     glm::mat4 m{1};
-    glm::mat4 transform = glm::translate(m, position) *
+    glm::mat4 transform {glm::translate(m, position) *
 #ifdef GLFW_INCLUDE_VULKAN
-            glm::rotate(m, glm::radians(rotation), vec3::down);
+            glm::rotate(m, glm::radians(rotation), vec3::down)};
 #else
-            glm::rotate(m, glm::radians(rotation), vec3::up);
+            glm::rotate(m, glm::radians(rotation), vec3::up)};
 #endif
     viewMatrix = glm::inverse(transform);
     viewProjectionMatrix = projectionMatrix * viewMatrix;

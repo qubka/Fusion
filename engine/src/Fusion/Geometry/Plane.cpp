@@ -31,7 +31,7 @@ void Plane::set(const glm::vec3& n, const glm::vec3& p) {
 }
 
 void Plane::set(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
-    glm::vec3 n = glm::cross(b - a, c - a);
+    glm::vec3 n {glm::cross(b - a, c - a)};
 
     if (glm::length2(n) == 0)
         throw std::invalid_argument("Degenerate сase exception");
@@ -41,7 +41,7 @@ void Plane::set(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
 }
 
 void Plane::set(const glm::vec4& m) {
-    auto n = glm::vec3{m};
+    glm::vec3 n{m};
 
     float length = glm::length2(n);
     if (length == 0)

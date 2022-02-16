@@ -1,24 +1,23 @@
 #include "EditorCamera.hpp"
 #include "Fusion/Input/Input.hpp"
+#include "Fusion/Core/Time.hpp"
 
 using namespace Fusion;
 
 EditorCamera::EditorCamera() : PerspectiveCamera{45.0f, 1.778f, 0.1f, 1000.0f} {
-
 }
 
 EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : PerspectiveCamera{fov,aspect,near,far} {
-
 }
 
 void EditorCamera::onUpdate() {
     if (Input::GetKey(Key::LeftAlt)) {
         if (Input::GetMouseButton(Mouse::ButtonMiddle))
-            mousePan( Input::MouseDelta() * 0.003f);
+            mousePan( Input::MouseDelta() * Time::ElapsedTime());
         else if (Input::GetMouseButton(Mouse::ButtonLeft))
-            mouseRotate( Input::MouseDelta() * 0.003f);
+            mouseRotate( Input::MouseDelta() * Time::ElapsedTime());
         else if (Input::GetMouseButton(Mouse::ButtonRight))
-            mouseZoom(Input::MouseDelta().y * 0.003f);
+            mouseZoom(Input::MouseDelta().y * Time::ElapsedTime());
         else {
             auto scroll = Input::MouseScroll().y;
             if (scroll != 0.0f) {
@@ -39,9 +38,9 @@ void EditorCamera::mousePan(const glm::vec2& delta) {
 }
 
 void EditorCamera::mouseRotate(const glm::vec2& delta) {
-    float yawSign = up.y < 0 ? -1.0f : 1.0f;
-    yaw += yawSign * delta.x * rotationSpeed();
-    pitch += delta.y * rotationSpeed();
+    float yawSign = up.y > 0 ? -1.0f : 1.0f;
+    yaw += yawSign * delta.x;
+    pitch += delta.y;
 }
 
 void EditorCamera::mouseZoom(float delta) {
@@ -62,10 +61,6 @@ glm::vec2 EditorCamera::panSpeed() const {
     return { xFactor, yFactor };
 }
 
-float EditorCamera::rotationSpeed() const {
-    return 0.8f;
-}
-
 float EditorCamera::zoomSpeed() const {
     float dist = distance * 0.2f;
     dist = std::max(dist, 0.0f);
@@ -75,5 +70,5 @@ float EditorCamera::zoomSpeed() const {
 }
 
 glm::vec3 EditorCamera::calculatePosition() const {
-    return focalPoint - forward * distance;
+    return (focalPoint - forward * distance);
 }
