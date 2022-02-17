@@ -8,7 +8,7 @@ namespace Fusion {
         PerspectiveCamera(float aspect, float fov, float near, float far);
         ~PerspectiveCamera() override = default;
 
-        virtual void onUpdate() { updateView(); };
+        virtual void onUpdate() { updateView(); }
 
         void setViewport(int width, int height);
         void setProjection(float aspect, float fov, float near, float far);
@@ -18,13 +18,13 @@ namespace Fusion {
         const glm::vec3& getRight() const { return right; }
         const glm::vec3& getUp() const { return up; }
 
-        float getAspect() const { return aspect; };
+        float getAspect() const { return aspect; }
         void setAspect(float value) { aspect = value; updateProjection(); }
-        float getFov() const { return fovy; };
+        float getFov() const { return fovy; }
         void setFov(float value) { fovy = value; updateProjection(); }
-        float getNearClip() const { return near; };
+        float getNearClip() const { return near; }
         void setNearClip(float zNear) { near = zNear; updateProjection(); }
-        float getFarClip() const { return far; };
+        float getFarClip() const { return far; }
         void setFarClip(float zFar) { far = zFar; updateProjection(); }
 
         const glm::vec3& getPosition() const { return position; }

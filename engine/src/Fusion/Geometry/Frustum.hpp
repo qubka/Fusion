@@ -48,8 +48,8 @@ namespace Fusion {
         bool intersects(const AABB& box) const;
 
         //! Returns a const reference to the Plane associated with /a section of the Frustum.
-        Plane& operator[](FrustumSection section) { return planes[section]; };
+        Plane& operator[](FrustumSection section) { return planes[section]; }
         //! Returns a const reference to the Plane associated with /a section of the Frustum.
-        const Plane& operator[](FrustumSection section) const { return planes[section]; };
+        const Plane& operator[](FrustumSection section) const { return planes[section]; }
     };
 }

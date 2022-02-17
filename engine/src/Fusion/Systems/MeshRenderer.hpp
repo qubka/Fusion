@@ -7,12 +7,10 @@ namespace Fusion {
     class Mesh;
     class Texture;
     class Pipeline;
-    class DescriptorPool;
-    class DescriptorLayout;
 
     struct PushConstantData {
-        glm::mat4 model{1};
-        glm::mat4 normal{1};
+        alignas(16) glm::mat4 model{1};
+        alignas(16) glm::mat4 normal{1};
     };
 
     class MeshRenderer : public RendererSystemBase {
@@ -32,10 +30,7 @@ namespace Fusion {
         Vulkan& vulkan;
         Renderer& renderer;
 
-        vk::DescriptorSet textureDescriptorSet;
-        std::unique_ptr<DescriptorPool> texturePool;
-        std::unique_ptr<DescriptorLayout> textureLayout;
-        std::unique_ptr<Texture> texture;
+        //std::unique_ptr<Texture> texture;
         std::unique_ptr<Pipeline> pipeline;
         vk::PipelineLayout pipelineLayout;
         const vk::CommandBuffer* commandBuffer{nullptr};

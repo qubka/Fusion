@@ -26,11 +26,11 @@ namespace Fusion {
         static bool GetMouseButtonUp(MouseCode button);
 
         //! The current mouse position in pixel coordinates.
-        static glm::vec2& MousePosition() { return position; };
+        static glm::vec2& MousePosition() { return position; }
         //! The current mouse position delta.
-        static glm::vec2& MouseDelta() { return delta; };
+        static glm::vec2& MouseDelta() { return delta; }
         //! The current mouse scroll delta.
-        static glm::vec2& MouseScroll() { return scroll; };
+        static glm::vec2& MouseScroll() { return scroll; }
 
     private:
         static bool keys[1032];

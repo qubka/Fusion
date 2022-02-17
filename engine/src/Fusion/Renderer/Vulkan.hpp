@@ -34,16 +34,16 @@ namespace Fusion {
         Window& getWindow() const { return window; }
 
         const vk::Instance& getInstance() const { return instance; }
-        const vk::Device& getDevice() const { return device; };
-        const vk::PhysicalDevice& getPhysical() const { return physicalDevice; };
-        const vk::SurfaceKHR& getSurface() const { return surface; };
-        const vk::Queue& getGraphicsQueue() const { return graphicsQueue; };
-        const vk::Queue& getPresentQueue() const { return presentQueue; };
-        const vk::CommandPool& getCommandPool() const { return commandPool; };
+        const vk::Device& getDevice() const { return device; }
+        const vk::PhysicalDevice& getPhysical() const { return physicalDevice; }
+        const vk::SurfaceKHR& getSurface() const { return surface; }
+        const vk::Queue& getGraphicsQueue() const { return graphicsQueue; }
+        const vk::Queue& getPresentQueue() const { return presentQueue; }
+        const vk::CommandPool& getCommandPool() const { return commandPool; }
         const vk::PhysicalDeviceProperties& getPhysicalProperties() const { return deviceProperties; }
 
-        SwapChainSupportDetails getSwapChainSupport() const { return querySwapChainSupport(physicalDevice); };
-        QueueFamilyIndices findPhysicalQueueFamilies() const { return findQueueFamilies(physicalDevice); };
+        SwapChainSupportDetails getSwapChainSupport() const { return querySwapChainSupport(physicalDevice); }
+        QueueFamilyIndices findPhysicalQueueFamilies() const { return findQueueFamilies(physicalDevice); }
 
         vk::Format findSupportedFormat(const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const;
 

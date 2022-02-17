@@ -2,13 +2,12 @@
 
 #include "Vulkan.hpp"
 #include "AllocatedBuffer.hpp"
+#include "Descriptors.hpp"
 
 namespace Fusion {
     class SwapChain;
-    class DescriptorPool;
-    class DescriptorLayout;
 
-    struct FUSION_API UniformBufferObject {
+    struct FUSION_API GlobalUbo {
         alignas(16) glm::mat4 projection;
         alignas(16) glm::mat4 view;
         alignas(16) glm::vec3 lightDirection;
@@ -21,15 +20,19 @@ namespace Fusion {
 
         glm::vec3& getColor() { return color; }
 
-        const vk::DescriptorSetLayout& getGlobalLayoutSet() const;
-        const std::unique_ptr<SwapChain>& getSwapChain() const { return swapChain; };
+        DescriptorLayoutCache& getDescriptorLayoutCache() { return descriptorLayoutCache; };
+        DescriptorAllocator& getGlobalAllocator() { return globalAllocator; }
+        DescriptorAllocator& getCurrentDynamicAllocator() { return dynamicAllocators[currentFrame]; }
+        vk::CommandBuffer& getCurrentCommandBuffer() { return commandBuffers[currentFrame]; }
+        AllocatedBuffer& getCurrentUniformBuffer() { return uniformBuffers[currentFrame]; }
 
-        const vk::CommandBuffer& getCommandBuffers(size_t index) const { return commandBuffers[index]; };
-        const vk::DescriptorSet& getGlobalDescriptors(size_t index) const { return globalDescriptorSets[index]; };
-        AllocatedBuffer& getUniformBuffers(size_t index) { return uniformBuffers[index]; };
+        const vk::DescriptorSet getCurrentGlobalDescriptorSets() const { return globalDescriptorSets[currentFrame]; }
+        const vk::DescriptorSetLayout& getGlobalDescriptorLayoutSet() const { return globalDescriptorSetLayout; }
 
-        uint32_t getFrameIndex() const { FE_ASSERT(isFrameStarted && "cannot get frame index when frame not in progress"); return currentFrame; };
-        bool isFrameInProgress() const { FE_ASSERT(isFrameStarted && "cannot get frame index when frame not in progress"); return isFrameStarted; };
+        const std::unique_ptr<SwapChain>& getSwapChain() const { return swapChain; }
+
+        uint32_t getFrameIndex() const { return currentFrame; }
+        bool isFrameInProgress() const { return isFrameStarted; }
 
         vk::CommandBuffer beginFrame();
         void beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer);
@@ -47,10 +50,18 @@ namespace Fusion {
         std::unique_ptr<SwapChain> swapChain;
         std::vector<vk::CommandBuffer> commandBuffers;
         std::vector<AllocatedBuffer> uniformBuffers;
-
+        vk::DescriptorSetLayout globalDescriptorSetLayout;
         std::vector<vk::DescriptorSet> globalDescriptorSets;
-        std::unique_ptr<DescriptorPool> globalPool;
-        std::unique_ptr<DescriptorLayout> globalLayout;
+
+        /*
+
+        vk::DescriptorSet textureDescriptorSet;
+        vk::DescriptorSetLayout textureDescriptorLayout;*/
+
+
+        DescriptorAllocator globalAllocator;
+        std::vector<DescriptorAllocator> dynamicAllocators;
+        DescriptorLayoutCache descriptorLayoutCache;
 
         glm::vec3 color{0.7f, 0.85f, 1.0f};
 

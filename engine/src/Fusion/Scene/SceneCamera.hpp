@@ -14,7 +14,7 @@ namespace Fusion {
         void setPerspective(float fov, float nearClip, float farClip);
         void setOrthographic(float size, float nearClip, float farClip);
 
-        const glm::mat4& getProjection() const { return projectionMatrix; };
+        const glm::mat4& getProjection() const { return projectionMatrix; }
 
         //void setViewportSize(uint32_t width, uint32_t height);
 

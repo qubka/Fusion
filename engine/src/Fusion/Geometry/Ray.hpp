@@ -9,11 +9,11 @@ namespace Fusion {
         Ray(const glm::vec3& origin, const glm::vec3& direction);
 
         //! The origin point of the ray.
-        const glm::vec3& getOrigin() const { return origin; };
+        const glm::vec3& getOrigin() const { return origin; }
         //! The direction of the ray.
-        const glm::vec3& getDirection() const  { return direction; };
+        const glm::vec3& getDirection() const  { return direction; }
         //! Returns a point at /distance/ units along the ray.
-        glm::vec3 getPoint(float distance) const  { return origin + direction * distance; };
+        glm::vec3 getPoint(float distance) const  { return origin + direction * distance; }
 
         //! Converts sphere to another coordinate system. Note that it will not return correct results if there are non-uniform scaling, shears, or other unusual transforms in \a transform.
         void transform(const glm::mat4& transform);

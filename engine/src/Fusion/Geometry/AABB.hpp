@@ -12,15 +12,15 @@ namespace Fusion {
         AABB(const glm::vec3& min, const glm::vec3& max);
 
         //! Returns the center of the axis-aligned box.
-        const glm::vec3& getCenter() const { return center; };
+        const glm::vec3& getCenter() const { return center; }
         //! Returns the extents of the axis-aligned box.
-        const glm::vec3& getExtents() const { return extents; };
+        const glm::vec3& getExtents() const { return extents; }
         //! Returns the size of the axis-aligned box.
-        glm::vec3 getSize() const { return 2.0f * extents; };
+        glm::vec3 getSize() const { return 2.0f * extents; }
         //! Returns the corner of the axis-aligned box with the smallest x, y and z coordinates.
-        glm::vec3 getMin() const { return center - extents; };
+        glm::vec3 getMin() const { return center - extents; }
         //! Returns the corner of the axis-aligned box with the largest x, y and z coordinates.
-        glm::vec3 getMax() const { return center + extents; };
+        glm::vec3 getMax() const { return center + extents; }
 
         //! Construct an axis-aligned box by specifying two opposite corners.
         void set(const glm::vec3& min, const glm::vec3& max);

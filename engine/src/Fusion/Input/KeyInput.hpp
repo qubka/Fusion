@@ -12,11 +12,11 @@ namespace Fusion {
         ~KeyInput();
 
         //! Returns true while the user holds down the key identified by GLFW code.
-        bool getKey(KeyCode key) const { return isKey(key); };
+        bool getKey(KeyCode key) const { return isKey(key); }
         //! Returns true during the frame the user releases the key identified by GLFW code.
-        bool getKeyUp(KeyCode key) const { return isKeyUp(key); };
+        bool getKeyUp(KeyCode key) const { return isKeyUp(key); }
         //! Returns true during the frame the user starts pressing down the key identified by GLFW code.
-        bool getKeyDown(KeyCode key) const { return isKeyDown(key); };
+        bool getKeyDown(KeyCode key) const { return isKeyDown(key); }
 
         //! Must be called before any KeyInput instances will work
         static void Setup(Window& window);

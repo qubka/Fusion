@@ -25,7 +25,7 @@ void main() {
 
     vec3 normalWorldSpace = normalize(mat3(push.normal) * normal);
 
-    float lightIntensity = AMBIENT + max(dot(normalWorldSpace, lightDirection), 0);
+    float lightIntensity = AMBIENT + max(dot(normalWorldSpace, ubo.lightDirection), 0);
 
     fragColor = lightIntensity * vec3(1.0, 1.0, 1.0);
     fragTexCoord = uv;

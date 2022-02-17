@@ -14,18 +14,18 @@ namespace Fusion {
         void onUpdate() override;
 
         //! Returns whether the given mouse button is held down.
-        bool getMouseButton(MouseCode button) const { return isKey(button); };
+        bool getMouseButton(MouseCode button) const { return isKey(button); }
         //!	Returns true during the frame the user releases the given mouse button.
-        bool getMouseButtonUp(MouseCode button) const { return isKeyUp(button); };
+        bool getMouseButtonUp(MouseCode button) const { return isKeyUp(button); }
         //! Returns true during the frame the user pressed the given mouse button.
-        bool getMouseButtonDown(MouseCode button) const { return isKeyDown(button); };
+        bool getMouseButtonDown(MouseCode button) const { return isKeyDown(button); }
 
         //! The current mouse position in pixel coordinates.
-        const glm::vec2& mousePosition() const { return position; };
+        const glm::vec2& mousePosition() const { return position; }
         //! The current mouse position delta.
-        const glm::vec2& mouseDelta() const { return delta; };
+        const glm::vec2& mouseDelta() const { return delta; }
         //! The current mouse scroll delta.
-        const glm::vec2& mouseScroll() const { return scroll; };
+        const glm::vec2& mouseScroll() const { return scroll; }
 
         //! Must be called before any MouseInput instances will work
         static void Setup(Window& window);

@@ -23,11 +23,11 @@ namespace Fusion {
         void set(const glm::vec3& normal, float distance);
 
         //! Point from the plane
-        glm::vec3 getPoint() const { return normal * distance; };
+        glm::vec3 getPoint() const { return normal * distance; }
         //! Normal vector of the plane.
-        const glm::vec3& getNormal() const { return normal; };
+        const glm::vec3& getNormal() const { return normal; }
         //! Distance from the origin to the plane.
-        float getDistance() const { return distance; };
+        float getDistance() const { return distance; }
 
         //! Translates the plane into a given direction.
         void translate(const glm::vec3& translation);

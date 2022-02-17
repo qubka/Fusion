@@ -6,9 +6,9 @@ namespace Fusion {
         Camera() = default;
         virtual ~Camera() = default;
 
-        glm::mat4& getProjection() { return projectionMatrix; };
-        glm::mat4& getView() { return viewMatrix; };
-        glm::mat4& getViewProjection() { return viewProjectionMatrix; };
+        glm::mat4& getProjection() { return projectionMatrix; }
+        glm::mat4& getView() { return viewMatrix; }
+        glm::mat4& getViewProjection() { return viewProjectionMatrix; }
 
     protected:
         glm::mat4 projectionMatrix{1};

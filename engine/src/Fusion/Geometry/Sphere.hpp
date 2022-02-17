@@ -12,9 +12,9 @@ namespace Fusion {
         Sphere(const glm::vec3& center, float radius);
 
         //! Radius of the sphere.
-        float getRadius() const { return radius; };
+        float getRadius() const { return radius; }
         //! Center of the sphere.
-        const glm::vec3& getCenter() const { return center; };
+        const glm::vec3& getCenter() const { return center; }
 
         //! Returns \c true if the sphere intersects \a axis-aligned box.
         bool intersects(const AABB& box) const;

@@ -7,7 +7,7 @@
 
 using namespace Fusion;
 
-Renderer::Renderer(Vulkan& vulkan) : vulkan{vulkan} {
+Renderer::Renderer(Vulkan& vulkan) : vulkan{vulkan}, globalAllocator{vulkan}, descriptorLayoutCache{vulkan} {
     recreateSwapChain();
     createUniformBuffers();
     createDescriptorSets();
@@ -16,6 +16,40 @@ Renderer::Renderer(Vulkan& vulkan) : vulkan{vulkan} {
 
 Renderer::~Renderer() {
     vulkan.getDevice().freeCommandBuffers(vulkan.getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+}
+
+void Renderer::createUniformBuffers() {
+    uniformBuffers.reserve(SwapChain::MAX_FRAMES_IN_FLIGHT);
+
+    /* Global Ubo */
+    for (int i = 0; i < SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
+        uniformBuffers.emplace_back(
+                vulkan,
+                sizeof(GlobalUbo),
+                1,
+                vk::BufferUsageFlagBits::eUniformBuffer,
+                vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
+        ).map();
+    }
+}
+
+void Renderer::createDescriptorSets() {
+    dynamicAllocators.reserve(SwapChain::MAX_FRAMES_IN_FLIGHT);
+    globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+
+    for (int i = 0; i < SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
+        auto& descriptorAllocator = dynamicAllocators.emplace_back(vulkan);
+        auto bufferInfo = uniformBuffers[i].descriptorInfo();
+
+        DescriptorBuilder{descriptorLayoutCache, descriptorAllocator}
+                .bindBuffer(0, &bufferInfo, vk::DescriptorType::eUniformBuffer,vk::ShaderStageFlagBits::eVertex)
+                .build(globalDescriptorSets[i], globalDescriptorSetLayout);
+    }
+
+    /*vk::DescriptorSet textureSet;
+    DescriptorBuilder(descriptorLayoutCache, globalAllocator)
+            .bindImage(0, nullptr, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
+            .build(textureSet, textureLayoutSet);*/
 }
 
 void Renderer::createCommandBuffers() {
@@ -28,42 +62,6 @@ void Renderer::createCommandBuffers() {
 
     auto result = vulkan.getDevice().allocateCommandBuffers(&allocInfo, commandBuffers.data());
     FE_ASSERT(result == vk::Result::eSuccess && "failed to allocate descriptor command buffers!");
-}
-
-void Renderer::createUniformBuffers() {
-    uniformBuffers.reserve(SwapChain::MAX_FRAMES_IN_FLIGHT);
-
-    for (int i = 0; i < SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
-        uniformBuffers.emplace_back(
-                vulkan,
-                sizeof(UniformBufferObject),
-                1,
-                vk::BufferUsageFlagBits::eUniformBuffer,
-                vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
-        ).map();
-    }
-}
-
-void Renderer::createDescriptorSets() {
-    globalPool = DescriptorPool::Builder(vulkan)
-        .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
-        .addPoolSize(vk::DescriptorType::eUniformBuffer, SwapChain::MAX_FRAMES_IN_FLIGHT)
-        .build();
-
-    globalLayout = DescriptorLayout::Builder(vulkan)
-        .addBinding(0, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eVertex)
-        .build();
-
-    globalDescriptorSets.reserve(SwapChain::MAX_FRAMES_IN_FLIGHT);
-
-    for (int i = 0; i < SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::DescriptorSet descriptorSet;
-        auto bufferInfo = uniformBuffers[i].descriptorInfo();
-        DescriptorWriter(*globalLayout, *globalPool)
-            .writeBuffer(0, bufferInfo)
-            .build(descriptorSet);
-        globalDescriptorSets.push_back(descriptorSet);
-    }
 }
 
 void Renderer::recreateSwapChain() {
@@ -174,8 +172,4 @@ void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
 
     isFrameStarted = false;
     currentFrame = (currentFrame + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
-}
-
-const vk::DescriptorSetLayout& Renderer::getGlobalLayoutSet() const {
-    return globalLayout->getDescriptorSetLayout();
 }

@@ -27,15 +27,15 @@ namespace Fusion {
         vk::DescriptorBufferInfo descriptorInfoForIndex(int index);
         vk::Result invalidateIndex(int index);
 
-        vk::Buffer& operator*() { return buffer; };
-        vk::Buffer& get() { return buffer; };
-        void* getMappedMemory() { return mapped; };
-        uint32_t getInstanceCount() const { return instanceSize; };
-        vk::DeviceSize getInstanceSize() const { return instanceSize; };
-        vk::DeviceSize getAlignmentSize() const { return alignmentSize; };
-        vk::BufferUsageFlags getUsageFlags() const { return usageFlags; };
-        vk::MemoryPropertyFlags getMemoryPropertyFlags()  { return memoryPropertyFlags; };
-        vk::DeviceSize getBufferSize() const { return bufferSize; };
+        vk::Buffer& operator*() { return buffer; }
+        vk::Buffer& get() { return buffer; }
+        void* getMappedMemory() { return mapped; }
+        uint32_t getInstanceCount() const { return instanceSize; }
+        vk::DeviceSize getInstanceSize() const { return instanceSize; }
+        vk::DeviceSize getAlignmentSize() const { return alignmentSize; }
+        vk::BufferUsageFlags getUsageFlags() const { return usageFlags; }
+        vk::MemoryPropertyFlags getMemoryPropertyFlags()  { return memoryPropertyFlags; }
+        vk::DeviceSize getBufferSize() const { return bufferSize; }
 
     private:
         Vulkan& vulkan;

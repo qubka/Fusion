@@ -18,8 +18,8 @@ namespace Fusion {
         void onRenderRuntime(MeshRenderer& meshRenderer);
         void onRenderEditor(MeshRenderer& meshRenderer);
 
-        entt::entity getPrimaryCameraEntity() const { return entt::null; };
-        entt::registry& getEntityRegistry() { return registry; };
+        entt::entity getPrimaryCameraEntity() const { return entt::null; }
+        entt::registry& getEntityRegistry() { return registry; }
 
     private:
         entt::registry registry;

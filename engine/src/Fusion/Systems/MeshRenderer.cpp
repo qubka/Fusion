@@ -19,16 +19,7 @@ MeshRenderer::~MeshRenderer() {
 }
 
 void MeshRenderer::createDescriptorSets() {
-    texturePool = DescriptorPool::Builder(vulkan)
-            .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
-            .addPoolSize(vk::DescriptorType::eCombinedImageSampler, SwapChain::MAX_FRAMES_IN_FLIGHT)
-            .build();
-
-    textureLayout = DescriptorLayout::Builder(vulkan)
-            .addBinding(0, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
-            .build();
-
-    texture = std::make_unique<Texture>(vulkan, "assets/textures/texture.jpg", vk::Format::eR8G8B8A8Srgb);
+    /*texture = std::make_unique<Texture>(vulkan, "assets/textures/texture.jpg", vk::Format::eR8G8B8A8Srgb);
 
     vk::DescriptorImageInfo imageInfo{};
     imageInfo.sampler = texture->getSampler();
@@ -37,7 +28,7 @@ void MeshRenderer::createDescriptorSets() {
 
     DescriptorWriter(*textureLayout, *texturePool)
             .writeImage(0, imageInfo)
-            .build(textureDescriptorSet);
+            .build(textureDescriptorSet);*/
 }
 
 void MeshRenderer::createPipelineLayout() {
@@ -46,7 +37,7 @@ void MeshRenderer::createPipelineLayout() {
     pushConstantRange.offset = 0;
     pushConstantRange.size = sizeof(PushConstantData);
 
-    std::array<vk::DescriptorSetLayout, 2> descriptorSetLayouts{renderer.getGlobalLayoutSet(), textureLayout->getDescriptorSetLayout()};
+    std::array<vk::DescriptorSetLayout, 1> descriptorSetLayouts{renderer.getGlobalDescriptorLayoutSet()};
 
     vk::PipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
@@ -70,13 +61,11 @@ void MeshRenderer::createPipeline() {
 void MeshRenderer::beginScene() {
     FE_ASSERT(!commandBuffer && "pipeline already was bind");
 
-    uint32_t frameIndex = renderer.getFrameIndex();
-
-    commandBuffer = &renderer.getCommandBuffers(frameIndex);
+    commandBuffer = &renderer.getCurrentCommandBuffer();
 
     pipeline->bind(*commandBuffer);
 
-    std::array<vk::DescriptorSet, 2> descriptorSets{renderer.getGlobalDescriptors(frameIndex), textureDescriptorSet};
+    std::array<vk::DescriptorSet, 1> descriptorSets { renderer.getCurrentGlobalDescriptorSets() };
 
     commandBuffer->bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics,

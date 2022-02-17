@@ -85,12 +85,11 @@ void EditorLayer::onUpdate() {
 
 void EditorLayer::onRender() {
     // update
-    UniformBufferObject ubo{};
+    GlobalUbo ubo{};
     ubo.projection = editorCamera.getProjection();
     ubo.view = editorCamera.getView();
     ubo.lightDirection = glm::normalize(glm::vec3{1, -3, -1});
-    //ubo.orthogonal = glm::ortho(0, vulkan.getWindow().getWidth(), 0, vulkan.getWindow().getHeight());
-    auto& buffer = renderer.getUniformBuffers(renderer.getFrameIndex());
+    auto& buffer = renderer.getCurrentUniformBuffer();
     buffer.writeToBuffer(&ubo);
     buffer.flush();
 

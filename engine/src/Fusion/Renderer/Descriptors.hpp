@@ -3,84 +3,7 @@
 #include "Vulkan.hpp"
 
 namespace Fusion {
-    class FUSION_API DescriptorPool {
-    public:
-        class Builder {
-        public:
-            explicit Builder(Vulkan& vulkan) : vulkan{vulkan} {}
-
-            Builder& addPoolSize(vk::DescriptorType descriptorType, uint32_t count);
-            Builder& setPoolFlags(vk::DescriptorPoolCreateFlags flags);
-            Builder& setMaxSets(uint32_t count);
-            std::unique_ptr<DescriptorPool> build() const;
-
-        private:
-            Vulkan& vulkan;
-            std::vector<vk::DescriptorPoolSize> poolSizes;
-            vk::DescriptorPoolCreateFlags poolFlags;
-            uint32_t maxSets{1000};
-
-            friend class DescriptorPool;
-        };
-
-        DescriptorPool(const Builder& builder);
-        ~DescriptorPool();
-
-        bool allocateDescriptor(const vk::DescriptorSetLayout& setLayout, vk::DescriptorSet& descriptor) const;
-        void freeDescriptors(std::vector<vk::DescriptorSet>& descriptors) const;
-        void resetPool();
-
-    private:
-        Vulkan& vulkan;
-        vk::DescriptorPool descriptorPool;
-
-        friend class DescriptorWriter;
-    };
-
-    class FUSION_API DescriptorLayout {
-    public:
-        class Builder {
-        public:
-            explicit Builder(Vulkan& vulkan) : vulkan{vulkan} {}
-            Builder& addBinding(uint32_t binding, vk::DescriptorType descriptorType, vk::ShaderStageFlags stageFlags, uint32_t count = 1);
-            std::unique_ptr<DescriptorLayout> build() const;
-
-        private:
-            Vulkan& vulkan;
-            std::unordered_map<uint32_t, vk::DescriptorSetLayoutBinding> bindings;
-
-            friend class DescriptorLayout;
-        };
-
-        DescriptorLayout(const Builder& builder);
-        ~DescriptorLayout();
-
-        const vk::DescriptorSetLayout& getDescriptorSetLayout() const { return descriptorSetLayout; }
-
-    private:
-        Vulkan& vulkan;
-        vk::DescriptorSetLayout descriptorSetLayout;
-        std::unordered_map<uint32_t, vk::DescriptorSetLayoutBinding> bindings;
-
-        friend class DescriptorWriter;
-    };
-
-    class FUSION_API DescriptorWriter {
-    public:
-        DescriptorWriter(DescriptorLayout& layout, DescriptorPool& pool);
-        DescriptorWriter& writeBuffer(uint32_t binding, const vk::DescriptorBufferInfo& bufferInfo);
-        DescriptorWriter& writeImage(uint32_t binding, const vk::DescriptorImageInfo& imageInfo);
-
-        bool build(vk::DescriptorSet& set);
-        void overwrite(vk::DescriptorSet& set);
-
-    private:
-        DescriptorLayout& layout;
-        DescriptorPool& pool;
-        std::vector<vk::WriteDescriptorSet> writes;
-    };
-
-    /*class FUSION_API DescriptorAllocator {
+    class FUSION_API DescriptorAllocator {
     public:
         struct PoolSizes {
             std::vector<std::pair<vk::DescriptorType, float>> sizes =
@@ -101,6 +24,7 @@ namespace Fusion {
 
         DescriptorAllocator(Vulkan& vulkan);
         ~DescriptorAllocator();
+        //FE_NONCOPYABLE(DescriptorAllocator)
 
         vk::DescriptorPool grabPool();
         void resetPools();
@@ -116,12 +40,15 @@ namespace Fusion {
         std::vector<vk::DescriptorPool> freePools;
 
         Vulkan& vulkan;
+
+        static constexpr int INITIAL_POOL_SIZE = 1000;
     };
 
     class FUSION_API DescriptorLayoutCache {
     public:
         DescriptorLayoutCache(Vulkan& vulkan);
         ~DescriptorLayoutCache();
+        FE_NONCOPYABLE(DescriptorLayoutCache)
 
         vk::DescriptorSetLayout createDescriptorLayout(vk::DescriptorSetLayoutCreateInfo& info);
 
@@ -145,9 +72,10 @@ namespace Fusion {
     public:
         DescriptorBuilder(DescriptorLayoutCache& cache, DescriptorAllocator& allocator);
         ~DescriptorBuilder();
+        FE_NONCOPYABLE(DescriptorBuilder)
 
-        DescriptorBuilder& bindBuffer(uint32_t binding, vk::DescriptorBufferInfo& bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
-        DescriptorBuilder& bindImage(uint32_t binding, vk::DescriptorImageInfo& imageInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
+        DescriptorBuilder& bindBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
+        DescriptorBuilder& bindImage(uint32_t binding, vk::DescriptorImageInfo* imageInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
 
         bool build(vk::DescriptorSet& set, vk::DescriptorSetLayout& layout);
         bool build(vk::DescriptorSet& set);
@@ -158,5 +86,5 @@ namespace Fusion {
 
         DescriptorLayoutCache& cache;
         DescriptorAllocator& allocator;
-    };*/
+    };
 };

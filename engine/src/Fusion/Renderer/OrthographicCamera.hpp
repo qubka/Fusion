@@ -8,13 +8,13 @@ namespace Fusion {
         OrthographicCamera(float left, float right, float bottom, float top);
          ~OrthographicCamera() override = default;
 
-        virtual void onUpdate() { updateView(); };
+        virtual void onUpdate() { updateView(); }
 
         void setProjection(float left, float right, float bottom, float top);
 
-        const glm::vec3& getPosition() const { return position; };
+        const glm::vec3& getPosition() const { return position; }
         void setPosition(const glm::vec3& pos);
-        float getRotation() const { return rotation; };
+        float getRotation() const { return rotation; }
         void setRotation(float rot);
         void setPositionAndRotation(const glm::vec3& pos, float rot);
 

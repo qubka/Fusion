@@ -24,13 +24,13 @@ namespace Fusion {
         ~Texture();
         FE_NONCOPYABLE(Texture);
 
-        const vk::Image& getImage() const { return image; };
-        const vk::ImageView& getView() const { return view; };
-        const vk::Sampler& getSampler() const { return sampler; };
-        const std::string& getPath() const { return path; };
-        uint32_t getWidth() const { return width; };
-        uint32_t getHeight() const { return height; };
-        vk::Format getFormat() const { return format; };
+        const vk::Image& getImage() const { return image; }
+        const vk::ImageView& getView() const { return view; }
+        const vk::Sampler& getSampler() const { return sampler; }
+        const std::string& getPath() const { return path; }
+        uint32_t getWidth() const { return width; }
+        uint32_t getHeight() const { return height; }
+        vk::Format getFormat() const { return format; }
 
     private:
         Vulkan& vulkan;
