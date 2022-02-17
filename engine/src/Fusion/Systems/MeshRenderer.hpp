@@ -12,6 +12,7 @@ namespace Fusion {
 
     struct PushConstantData {
         glm::mat4 model{1};
+        glm::mat4 normal{1};
     };
 
     class MeshRenderer : public RendererSystemBase {

@@ -91,7 +91,7 @@ void MeshRenderer::beginScene() {
 void MeshRenderer::drawMesh(const glm::mat4& transform, const std::shared_ptr<Mesh>& mesh) {
     FE_ASSERT(commandBuffer && "cannot draw mesh when pipeline not bind");
 
-    PushConstantData push { transform };
+    PushConstantData push { transform, glm::transpose(glm::inverse(glm::mat3{transform})) };
 
     commandBuffer->pushConstants(pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(PushConstantData), &push);
 

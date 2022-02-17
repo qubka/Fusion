@@ -23,6 +23,10 @@ namespace Fusion {
                    * glm::mat4_cast(glm::quat(rotation))
                    * glm::scale(m, scale);
         };
+
+        /*operator glm::mat3() const {
+            return glm::transpose(glm::inverse(glm::mat3(push.model)))
+        }*/
     };
 
     class Mesh;

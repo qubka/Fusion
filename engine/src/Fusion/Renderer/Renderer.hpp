@@ -9,8 +9,9 @@ namespace Fusion {
     class DescriptorLayout;
 
     struct FUSION_API UniformBufferObject {
-        alignas(16) glm::mat4 perspective;
-        alignas(16) glm::mat4 orthogonal;
+        alignas(16) glm::mat4 projection;
+        alignas(16) glm::mat4 view;
+        alignas(16) glm::vec3 lightDirection;
     };
 
     class FUSION_API Renderer {

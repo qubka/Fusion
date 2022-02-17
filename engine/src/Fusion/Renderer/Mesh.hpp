@@ -10,17 +10,6 @@ namespace Fusion {
             glm::vec3 normal{};
             glm::vec2 ui{};
 
-            /// \brief Empty ctor.
-            /*Vertex() = default;
-            /// \brief Initializer list constructor.
-            Vertex(std::initializer_list<float> components) {
-            }
-
-            /// \brief Specific constructor to allow initialization list with vectors.
-            Vertex(const glm::vec3& position, const glm::vec3& color, const glm::vec3& normal, const glm::vec2& ui)
-                : position{position}, normal{normal}, ui{ui} {
-            }*/
-
             static std::vector<vk::VertexInputBindingDescription> getBindingDescriptions();
             static std::vector<vk::VertexInputAttributeDescription> getAttributeDescriptions();
 

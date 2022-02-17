@@ -13,42 +13,42 @@ using namespace Fusion;
 
 SceneHierarchyPanel::SceneHierarchyPanel() {
     glm::vec3 m_half_extents{1};
-    float orientation = 1.0;
+    float orientation = -1.0;
 
     Mesh::Builder meshBuilder{};
     meshBuilder.vertices =
             {
                     //front
                     //                                 position														 normal					      tex coord
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f,  1.0f * orientation},		{ 0.f, 0.f } },
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f,  1.0f * orientation},		{ 1.f, 0.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f,  1.0f * orientation},		{ 1.f, 1.f } },
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f,  1.0f * orientation},		{ 0.f, 1.f } },
+                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, 0.0f,  1.0f * orientation},		{ 0.f, 0.f } },
+                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, 0.0f,  1.0f * orientation},		{ 1.f, 0.f } },
+                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, 0.0f,  1.0f * orientation},		{ 1.f, 1.f } },
+                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, 0.0f,  1.0f * orientation},		{ 0.f, 1.f } },
                     //right
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 0.f } },
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 0.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 1.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 1.f } },
+                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 0.f } },
+                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 0.f } },
+                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 1.f } },
+                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 1.f } },
                     //back
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f, -1.0f * orientation},		{ 0.f, 0.f } },
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f, -1.0f * orientation},		{ 1.f, 0.f } },
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f, -1.0f * orientation},		{ 1.f, 1.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f, -1.0f * orientation},		{ 0.f, 1.f } },
+                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, 0.0f, -1.0f * orientation},		{ 0.f, 0.f } },
+                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, 0.0f, -1.0f * orientation},		{ 1.f, 0.f } },
+                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, 0.0f, -1.0f * orientation},		{ 1.f, 1.f } },
+                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, 0.0f, -1.0f * orientation},		{ 0.f, 1.f } },
                     //left
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, {-1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 0.f } },
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, {-1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 0.f } },
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, {-1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 1.f } },
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, {-1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 1.f } },
+                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, {-1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 0.f } },
+                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, {-1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 0.f } },
+                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, {-1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 1.f } },
+                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, {-1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 1.f } },
                     //top
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f,  1.0f * orientation, 0.0f},		{ 0.f, 0.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f,  1.0f * orientation, 0.0f},		{ 1.f, 0.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f,  1.0f * orientation, 0.0f},		{ 1.f, 1.f } },
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f,  1.0f * orientation, 0.0f},		{ 0.f, 1.f } },
+                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f,  1.0f * orientation, 0.0f},		{ 0.f, 0.f } },
+                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f,  1.0f * orientation, 0.0f},		{ 1.f, 0.f } },
+                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f,  1.0f * orientation, 0.0f},		{ 1.f, 1.f } },
+                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f,  1.0f * orientation, 0.0f},		{ 0.f, 1.f } },
                     //bottom
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, -1.0f * orientation, 0.0f},		{ 0.f, 0.f } },
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, -1.0f * orientation, 0.0f},		{ 1.f, 0.f } },
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, -1.0f * orientation, 0.0f},		{ 1.f, 1.f } },
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z },	{1.0f, 1.0f, 1.0f}, { 0.0f, -1.0f * orientation, 0.0f},		{ 0.f, 1.f } },
+                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, -1.0f * orientation, 0.0f},		{ 0.f, 0.f } },
+                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, -1.0f * orientation, 0.0f},		{ 1.f, 0.f } },
+                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, -1.0f * orientation, 0.0f},		{ 1.f, 1.f } },
+                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, -1.0f * orientation, 0.0f},		{ 0.f, 1.f } },
             };
 
     meshBuilder.indices =

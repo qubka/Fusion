@@ -12,7 +12,7 @@ namespace Fusion {
                         vk::MemoryPropertyFlags memoryPropertyFlags,
                         vk::DeviceSize minOffsetAlignment = 1);
         ~AllocatedBuffer();
-        FE_NONCOPYABLE(AllocatedBuffer);
+        //FE_NONCOPYABLE(AllocatedBuffer);
 
         void map(vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize offset = 0);
         void unmap();
