@@ -4,8 +4,6 @@ project(engine)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-msse -msse2 -msse3")
 
-add_subdirectory(external)
-
 file(GLOB_RECURSE COMMON_SRC src/Fusion/*.cpp)
 set(HEADER_FILES src/fspch.hpp)
 
@@ -28,7 +26,7 @@ target_link_libraries(${PROJECT_NAME}
         plog
         yaml-cpp
         portable_file_dialogs
-        lz4
+        nlohmann_json::nlohmann_json
 )
 
 # defines

@@ -1,3 +1,10 @@
+
+[submodule "external/json"]
+	path = external/json
+	url = https://github.com/nlohmann/json.git
+[submodule "external/lz4"]
+	path = external/lz4
+	url = https://github.com/lz4/lz4.git
 [submodule "external/glm"]
 	path = external/glm
 	url = https://github.com/g-truc/glm.git
@@ -6,26 +13,26 @@
 	url = https://github.com/glfw/glfw.git
 [submodule "external/imgui"]
 	path = external/imgui
-	url = https://github.com/ocornut/imgui
+	url = https://github.com/ocornut/imgui.git
 	branch = docking
 [submodule "external/entt"]
 	path = external/entt
-	url = https://github.com/skypjack/entt
+	url = https://github.com/skypjack/entt.git
 [submodule "external/stb"]
 	path = external/stb
 	url = https://github.com/nothings/stb.git
-[submodule "external/magic_enum"]
-	path = external/magic_enum
-	url = https://github.com/Neargye/magic_enum
 [submodule "external/yaml-cpp"]
 	path = external/yaml-cpp
-	url = https://github.com/jbeder/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
 [submodule "external/plog"]
 	path = external/plog
 	url = https://github.com/SergiusTheBest/plog.git
 [submodule "external/imguizmo"]
 	path = external/imguizmo
-	url = https://github.com/CedricGuillemet/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git
 [submodule "external/portable-file-dialogs"]
 	path = external/portable-file-dialogs
-	url = https://github.com/samhocevar/portable-file-dialogs
+	url = https://github.com/samhocevar/portable-file-dialogs.git
+[submodule "external/magic_enum"]
+	path = external/magic_enum
+	url = https://github.com/Neargye/magic_enum.git

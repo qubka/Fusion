@@ -1,11 +1,11 @@
 #include "TextureAsset.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <lz4.h>
 
 using namespace Fusion;
 
 TextureInfo TextureAsset::readTextureInfo(const AssetFile& file) {
-    TextureInfo info;
+    /*TextureInfo info;
 
     nlohmann::json texture_metadata = nlohmann::json::parse(file.serialized);
 
@@ -30,7 +30,8 @@ TextureInfo TextureAsset::readTextureInfo(const AssetFile& file) {
     }
 
 
-    return info;
+    return info;*/
+    return {};
 }
 
 void TextureAsset::unpackTexture(const TextureInfo& info, const std::string& source, size_t sourceSize, char* destination) {
