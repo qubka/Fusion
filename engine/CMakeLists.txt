@@ -28,6 +28,7 @@ target_link_libraries(${PROJECT_NAME}
         plog
         yaml-cpp
         portable_file_dialogs
+        lz4
 )
 
 # defines

@@ -207,4 +207,3 @@ set(PFD_LIB_NAME "portable-file-dialogs")
 
 add_subdirectory(${PFD_LIB_NAME})
 
-

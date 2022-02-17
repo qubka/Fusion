@@ -10,3 +10,4 @@ cpp.hint
 cmake-build-debug/
 mason_packages/
 bin/
+fusion.log
