@@ -88,7 +88,7 @@ void EditorLayer::onRender() {
     GlobalUbo ubo{};
     ubo.projection = editorCamera.getProjection();
     ubo.view = editorCamera.getView();
-    ubo.lightDirection = glm::normalize(glm::vec3{1, -3, -1});
+    ubo.lightDirection = glm::normalize(renderer.getLightDirection());
     auto& buffer = renderer.getCurrentUniformBuffer();
     buffer.writeToBuffer(&ubo);
     buffer.flush();
@@ -250,7 +250,8 @@ void EditorLayer::onImGui() {
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist();
 
-        ImGuizmo::SetRect(0, 0, vulkan.getWindow().getWidth(), vulkan.getWindow().getHeight());
+        auto& window = vulkan.getWindow();
+        ImGuizmo::SetRect(0, 0, static_cast<float>(window.getWidth()), static_cast<float>(window.getHeight()));
 
         // Camera
 
@@ -274,8 +275,8 @@ void EditorLayer::onImGui() {
         float snapValues[3] = { snapValue, snapValue, snapValue };
 
         /* Imguimo fix for Vulkan projection */
-        auto cameraView = glm::lookAtLH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
-        auto cameraProjection = glm::perspectiveLH(
+        auto cameraView = glm::lookAtRH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
+        auto cameraProjection = glm::perspectiveRH(
                 glm::radians(editorCamera.getFov()),
                 editorCamera.getAspect(),
                 editorCamera.getNearClip(),

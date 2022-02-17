@@ -1,6 +1,6 @@
 #include "TextureAsset.hpp"
 #include <nlohmann/json.hpp>
-#include <lz4.h>
+//#include <lz4.h>
 
 using namespace Fusion;
 

@@ -29,6 +29,7 @@ add_custom_target(
 
 
 add_subdirectory(external)
+add_subdirectory(assetlib)
 add_subdirectory(engine)
 #add_subdirectory(game)
 add_subdirectory(editor)

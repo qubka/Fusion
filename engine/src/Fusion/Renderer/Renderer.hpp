@@ -19,6 +19,7 @@ namespace Fusion {
         ~Renderer();
 
         glm::vec3& getColor() { return color; }
+        glm::vec3& getLightDirection() { return lightDirection; }
 
         DescriptorLayoutCache& getDescriptorLayoutCache() { return descriptorLayoutCache; };
         DescriptorAllocator& getGlobalAllocator() { return globalAllocator; }
@@ -64,6 +65,7 @@ namespace Fusion {
         DescriptorLayoutCache descriptorLayoutCache;
 
         glm::vec3 color{0.7f, 0.85f, 1.0f};
+        glm::vec3 lightDirection{1, -3, -1};
 
         uint32_t currentImage{0};
         uint32_t currentFrame{0};

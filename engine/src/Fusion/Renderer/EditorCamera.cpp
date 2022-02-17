@@ -39,7 +39,7 @@ void EditorCamera::mousePan(const glm::vec2& delta) {
 
 void EditorCamera::mouseRotate(const glm::vec2& delta) {
     float yawSign = up.y > 0 ? -1.0f : 1.0f;
-    yaw += yawSign * delta.x;
+    yaw -= yawSign * delta.x;
     pitch += delta.y;
 }
 
