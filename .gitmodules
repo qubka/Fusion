@@ -1,31 +1,31 @@
-[submodule "engine/external/glm"]
-	path = engine/external/glm
+[submodule "external/glm"]
+	path = external/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "engine/external/glfw"]
-	path = engine/external/glfw
+[submodule "external/glfw"]
+	path = external/glfw
 	url = https://github.com/glfw/glfw.git
-[submodule "engine/external/imgui"]
-	path = engine/external/imgui
+[submodule "external/imgui"]
+	path = external/imgui
 	url = https://github.com/ocornut/imgui
 	branch = docking
-[submodule "engine/external/entt"]
-	path = engine/external/entt
+[submodule "external/entt"]
+	path = external/entt
 	url = https://github.com/skypjack/entt
-[submodule "engine/external/stb"]
-	path = engine/external/stb
+[submodule "external/stb"]
+	path = external/stb
 	url = https://github.com/nothings/stb.git
-[submodule "engine/external/magic_enum"]
-	path = engine/external/magic_enum
+[submodule "external/magic_enum"]
+	path = external/magic_enum
 	url = https://github.com/Neargye/magic_enum
-[submodule "engine/external/yaml-cpp"]
-	path = engine/external/yaml-cpp
+[submodule "external/yaml-cpp"]
+	path = external/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
-[submodule "engine/external/plog"]
-	path = engine/external/plog
+[submodule "external/plog"]
+	path = external/plog
 	url = https://github.com/SergiusTheBest/plog.git
-[submodule "engine/external/imguizmo"]
-	path = engine/external/imguizmo
+[submodule "external/imguizmo"]
+	path = external/imguizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo
-[submodule "engine/external/portable-file-dialogs"]
-	path = engine/external/portable-file-dialogs
+[submodule "external/portable-file-dialogs"]
+	path = external/portable-file-dialogs
 	url = https://github.com/samhocevar/portable-file-dialogs
