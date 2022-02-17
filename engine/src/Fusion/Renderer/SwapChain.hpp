@@ -35,11 +35,12 @@ namespace Fusion {
         Vulkan& vulkan;
         vk::Extent2D windowExtent;
         vk::Extent2D swapChainExtent;
-        vk::Format swapChainImageFormat;
+
         vk::SwapchainKHR swapChain;
         vk::RenderPass renderPass;
 
         std::vector<vk::Image> swapChainImages;
+        vk::Format swapChainImageFormat;
         std::vector<vk::ImageView> swapChainImageViews;
         std::vector<vk::Framebuffer> swapChainFramebuffers;
         std::vector<vk::Semaphore> imageAvailableSemaphores;
