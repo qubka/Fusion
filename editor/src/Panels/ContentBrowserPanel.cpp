@@ -9,7 +9,6 @@ ContentBrowserPanel::ContentBrowserPanel() : currentDirectory{AssetPath} {
 }
 
 void ContentBrowserPanel::onImGui() {
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.1f, 0.105f, 0.11f, 1.0f });
     ImGui::Begin("Content Browser");
 
     if (currentDirectory != AssetPath) {
@@ -35,7 +34,7 @@ void ContentBrowserPanel::onImGui() {
         std::string filename = relativePath.filename().string();
 
         ImGui::PushID(filename.c_str());
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
         ImGui::Button(directoryEntry.is_directory() ? "\uF07C" : "\uF15C", { thumbnailSize, thumbnailSize });
 
         if (ImGui::BeginDragDropSource()) {
@@ -62,6 +61,5 @@ void ContentBrowserPanel::onImGui() {
     ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
     ImGui::SliderFloat("Padding", &padding, 0, 32);
 
-    ImGui::PopStyleColor();
     ImGui::End();
 }

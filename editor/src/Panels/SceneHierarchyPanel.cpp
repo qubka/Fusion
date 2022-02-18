@@ -70,7 +70,6 @@ void SceneHierarchyPanel::setContext(const std::shared_ptr<Scene>& scene) {
 }
 
 void SceneHierarchyPanel::onImGui() {
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.1f, 0.105f, 0.11f, 1.0f });
     ImGui::Begin("Scene Hierarchy");
 
     context->registry.each([&](auto entity) {
@@ -91,16 +90,13 @@ void SceneHierarchyPanel::onImGui() {
         ImGui::EndPopup();
     }
 
-    ImGui::PopStyleColor();
     ImGui::End();
 
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.1f, 0.105f, 0.11f, 1.0f });
     ImGui::Begin("Properties");
     if (selectionContext != entt::null) {
         drawComponents(selectionContext);
     }
 
-    ImGui::PopStyleColor();
     ImGui::End();
 }
 
@@ -146,14 +142,14 @@ void SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::NextColumn();
 
     ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 0 });
 
     float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
     ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.15f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.9f, 0.2f, 0.2f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.8f, 0.1f, 0.15f, 1.0f });
     ImGui::PushFont(boldFont);
     if (ImGui::Button("X", buttonSize))
         values.x = resetValue;
@@ -165,9 +161,9 @@ void SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PopItemWidth();
     ImGui::SameLine();
 
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f, 0.8f, 0.3f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.7f, 0.2f, 1.0f });
     ImGui::PushFont(boldFont);
     if (ImGui::Button("Y", buttonSize))
         values.y = resetValue;
@@ -179,9 +175,9 @@ void SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PopItemWidth();
     ImGui::SameLine();
 
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.25f, 0.8f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f, 0.35f, 0.9f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.1f, 0.25f, 0.8f, 1.0f });
     ImGui::PushFont(boldFont);
     if (ImGui::Button("Z", buttonSize))
         values.z = resetValue;
@@ -205,14 +201,14 @@ void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity en
     if (auto* component = context->registry.try_get<T>(entity)) {
         ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4, 4 });
         float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
         ImGui::Separator();
 
         bool opened = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
         ImGui::PopStyleVar();
         ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-        if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight })) {
+        if (ImGui::Button("+", { lineHeight, lineHeight })) {
             ImGui::OpenPopup("ComponentSettings");
         }
 

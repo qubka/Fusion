@@ -6,6 +6,7 @@
 
 namespace Fusion {
     class SwapChain;
+    class Offscreen;
 
     struct FUSION_API GlobalUbo {
         alignas(16) glm::mat4 projection;
@@ -24,21 +25,28 @@ namespace Fusion {
         DescriptorLayoutCache& getDescriptorLayoutCache() { return descriptorLayoutCache; };
         DescriptorAllocator& getGlobalAllocator() { return globalAllocator; }
         DescriptorAllocator& getCurrentDynamicAllocator() { return dynamicAllocators[currentFrame]; }
-        vk::CommandBuffer& getCurrentCommandBuffer() { return commandBuffers[currentFrame]; }
+
+        vk::CommandBuffer& getCurrentCommandBuffer() { return offscreenBuffer[currentFrame]; }
         AllocatedBuffer& getCurrentUniformBuffer() { return uniformBuffers[currentFrame]; }
 
         const vk::DescriptorSet getCurrentGlobalDescriptorSets() const { return globalDescriptorSets[currentFrame]; }
         const vk::DescriptorSetLayout& getGlobalDescriptorLayoutSet() const { return globalDescriptorSetLayout; }
 
         const std::unique_ptr<SwapChain>& getSwapChain() const { return swapChain; }
+        const std::unique_ptr<Offscreen>& getOffscreen() const { return offscreen; }
 
         uint32_t getFrameIndex() const { return currentFrame; }
         bool isFrameInProgress() const { return isFrameStarted; }
 
-        vk::CommandBuffer beginFrame();
-        void beginSwapChainRenderPass(vk::CommandBuffer& commandBuffer);
+        bool beginFrame();
+
+        vk::CommandBuffer beginOffscreenRenderPass();
+        void endOffscreenRenderPass(vk::CommandBuffer& commandBuffer);
+
+        vk::CommandBuffer beginSwapChainRenderPass();
         void endSwapChainRenderPass(vk::CommandBuffer& commandBuffer);
-        void endFrame(vk::CommandBuffer& commandBuffer);
+
+        void endFrame();
 
     private:
         void createCommandBuffers();
@@ -49,7 +57,10 @@ namespace Fusion {
         Vulkan& vulkan;
 
         std::unique_ptr<SwapChain> swapChain;
+        std::unique_ptr<Offscreen> offscreen;
         std::vector<vk::CommandBuffer> commandBuffers;
+        std::vector<vk::CommandBuffer> offscreenBuffer;
+
         std::vector<AllocatedBuffer> uniformBuffers;
         vk::DescriptorSetLayout globalDescriptorSetLayout;
         std::vector<vk::DescriptorSet> globalDescriptorSets;

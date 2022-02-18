@@ -5,10 +5,12 @@
 #include "Fusion/ImGui/ImGuiLayer.hpp"
 #include "Fusion/Renderer/Texture.hpp"
 #include "Fusion/Renderer/Renderer.hpp"
+#include "Fusion/Renderer/Offscreen.hpp"
 #include "Fusion/Renderer/AllocatedBuffer.hpp"
 #include "Fusion/Utils/Math.hpp"
 #include "Fusion/Events/WindowEvents.hpp"
 #include "Fusion/Scene/Components.hpp"
+
 
 #if _WIN32
 #define DEFAULT_PATH "C:\\"
@@ -22,6 +24,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imguizmo/ImGuizmo.h>
+#include <backends/imgui_impl_vulkan.h>
 
 using namespace Fusion;
 
@@ -34,7 +37,7 @@ EditorLayer::~EditorLayer() {
 
 void EditorLayer::onAttach() {
     activeScene = std::make_shared<Scene>();
-    editorCamera = EditorCamera(30, 1.778f, 0.1f, 1000);
+    editorCamera = EditorCamera{30, 1.778f, 0.1f, 1000};
 
     auto commandLineArgs = Application::Instance().getCommandLineArgs();
     if (commandLineArgs.count > 1) {
@@ -44,6 +47,9 @@ void EditorLayer::onAttach() {
     }
 
     sceneHierarchyPanel.setContext(activeScene);
+
+    auto& offscreen = renderer.getOffscreen();
+    textureID = ImGui_ImplVulkan_AddTexture(offscreen->getSampler(), offscreen->getView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void EditorLayer::onDetach() {
@@ -110,11 +116,13 @@ void EditorLayer::onImGui() {
     // TODO: Find solution for viewport. Currently we use global transparent background and set the color for each window to make it non transparent.
     /// Better to force vulkan generate image before imgui render and render it as an image in non-transparent viewport but it will require a lot of additional work to implement back buffer.
 
+    auto& window = vulkan.getWindow();
+
     // Note: Switch this to true to enable dockspace
     static bool dockspaceOpen = true;
     static bool opt_fullscreen_persistant = true;
     bool opt_fullscreen = opt_fullscreen_persistant;
-    static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+    static ImGuiDockNodeFlags dockspace_flags = 0;//ImGuiDockNodeFlags_PassthruCentralNode;
 
     // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
     // because it would be confusing to have two docking targets within each others.
@@ -140,7 +148,7 @@ void EditorLayer::onImGui() {
     // all active windows docked into it will lose their parent and become undocked.
     // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
     // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
 
     ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
     ImGui::PopStyleVar();
@@ -155,7 +163,7 @@ void EditorLayer::onImGui() {
     style.WindowMinSize.x = 370;
     if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
         ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-        ImGui::DockSpace(dockspace_id, ImVec2(0, 0), dockspace_flags);
+        ImGui::DockSpace(dockspace_id, {0, 0}, dockspace_flags);
     }
 
     style.WindowMinSize.x = minWinSizeX;
@@ -178,7 +186,7 @@ void EditorLayer::onImGui() {
                 renderer.getSwapChain()->saveScreenshot("assets/screenshot.png");
 
             if (ImGui::MenuItem("Exit"))
-                Application::Instance().getWindow().shouldClose(true);
+                window.shouldClose(true);
 
             ImGui::EndMenu();
         }
@@ -189,7 +197,6 @@ void EditorLayer::onImGui() {
     sceneHierarchyPanel.onImGui();
     contentBrowserPanel.onImGui();
 
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.1f, 0.105f, 0.11f, 1.0f });
     ImGui::Begin("Stats");
 
     std::string name = "None";
@@ -200,7 +207,7 @@ void EditorLayer::onImGui() {
     ImGui::Text("Mem: %fMB", info.getProcessMemoryUsed());
     ImGui::Text("Threads: %lu", info.getProcessThreadCount());
     //ImGui::Text("Video Mem: %d%% %d/%d", static_cast<int>((totalMemory - availMemory) / static_cast<float>(totalMemory) * 100), (totalMemory - availMemory) / 1024, totalMemory / 1024);
-    //ImGui::Text("Display: %dx%d (%s)", window.getWidth(), window.getHeight(), vendor);
+    ImGui::Text("Display: %dx%d", window.getWidth(), window.getHeight());
     //ImGui::Text(renderer);
     //ImGui::Text(version);
     ImGui::Text("FPS: %d", Time::FramesPerSecond());
@@ -215,26 +222,18 @@ void EditorLayer::onImGui() {
     //ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
     ImGui::ColorEdit3("Background", glm::value_ptr(Application::Instance().getRenderer().getColor()));
 
-    ImGui::PopStyleColor();
     ImGui::End();
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-    ImGui::Begin("Viewport");
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
+    ImGui::Begin("Scene");
 
-    /*auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+    auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
     auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
     auto viewportOffset = ImGui::GetWindowPos();
-    viewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
-    viewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+    ImVec2 minBounds = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+    ImVec2 maxBounds = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-    viewportFocused = ImGui::IsWindowFocused();
-    viewportHovered = ImGui::IsWindowHovered();
-    Application::Instance().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
-
-    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-    viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-
-    ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });*/
+    ImGui::Image(static_cast<ImTextureID*>(textureID), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -250,8 +249,7 @@ void EditorLayer::onImGui() {
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist();
 
-        auto& window = vulkan.getWindow();
-        ImGuizmo::SetRect(0, 0, static_cast<float>(window.getWidth()), static_cast<float>(window.getHeight()));
+        ImGuizmo::SetRect(minBounds.x, minBounds.y, maxBounds.x - minBounds.x, maxBounds.y - minBounds.y);
 
         // Camera
 
@@ -275,12 +273,15 @@ void EditorLayer::onImGui() {
         float snapValues[3] = { snapValue, snapValue, snapValue };
 
         /* Imguimo fix for Vulkan projection */
-        auto cameraView = glm::lookAtRH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
+        /*auto cameraView = glm::lookAtRH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
         auto cameraProjection = glm::perspectiveRH(
                 glm::radians(editorCamera.getFov()),
                 editorCamera.getAspect(),
                 editorCamera.getNearClip(),
-                editorCamera.getFarClip());
+                editorCamera.getFarClip());*/
+
+        const glm::mat4& cameraProjection = editorCamera.getProjection();
+        glm::mat4 cameraView = editorCamera.getView();
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                              (ImGuizmo::OPERATION)gizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
@@ -334,6 +335,8 @@ void EditorLayer::openScene(const std::filesystem::path& path) {
         //activeScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         sceneHierarchyPanel.setContext(activeScene);
     }
+
+    FE_LOG_INFO << "Scene " << path.filename().string() << " was loaded !";
 }
 
 void EditorLayer::saveSceneAs() {
@@ -345,20 +348,20 @@ void EditorLayer::saveSceneAs() {
 }
 
 void EditorLayer::UI_Toolbar() {
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 2});
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, {0, 0});
+    ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
     auto& colors = ImGui::GetStyle().Colors;
     const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f});
     const auto& buttonActive = colors[ImGuiCol_ButtonActive];
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, {buttonActive.x, buttonActive.y, buttonActive.z, 0.5f});
 
     ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     float size = ImGui::GetWindowHeight() - 4.0f;
     ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-    if (ImGui::Button(sceneState == SceneState::Edit ? "\uF07C" : "\uF15C", ImVec2(size, size))) {
+    if (ImGui::Button(sceneState == SceneState::Edit ? "\uF07C" : "\uF15C", {size, size})) {
         /*if (sceneState == SceneState::Edit)
             onScenePlay();
         else if (sceneState == SceneState::Play)

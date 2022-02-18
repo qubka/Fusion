@@ -5,6 +5,7 @@
 #include "Fusion/Renderer/Texture.hpp"
 #include "Fusion/Renderer/Descriptors.hpp"
 #include "Fusion/Renderer/SwapChain.hpp"
+#include "Fusion/Renderer/Offscreen.hpp"
 
 using namespace Fusion;
 
@@ -53,7 +54,7 @@ void MeshRenderer::createPipeline() {
     PipelineConfigInfo configInfo{};
     Pipeline::defaultPipelineConfigInfo(configInfo);
     configInfo.pipelineLayout = pipelineLayout;
-    configInfo.renderPass = renderer.getSwapChain()->getRenderPass();
+    configInfo.renderPass = renderer.getOffscreen()->getRenderPass();
     configInfo.subpass = 0;
     pipeline = std::make_unique<Pipeline>(vulkan, "assets/shaders/mesh.vert.spv", "assets/shaders/mesh.frag.spv", configInfo);
 }

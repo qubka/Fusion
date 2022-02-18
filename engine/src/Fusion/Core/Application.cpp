@@ -37,12 +37,16 @@ void Application::run() {
         }
 
         if (!window.isMinimize()) {
-            if (auto commandBuffer = renderer.beginFrame()) {
-                renderer.beginSwapChainRenderPass(commandBuffer);
+            if (renderer.beginFrame()) {
+                auto cmd = renderer.beginOffscreenRenderPass();
 
                 for (auto* layer: layers) {
                     layer->onRender();
                 }
+
+                renderer.endOffscreenRenderPass(cmd);
+
+                auto commandBuffer = renderer.beginSwapChainRenderPass();
 
                 imGuiLayer->begin();
                 for (auto* layer: layers) {
@@ -51,7 +55,7 @@ void Application::run() {
                 imGuiLayer->end(commandBuffer);
 
                 renderer.endSwapChainRenderPass(commandBuffer);
-                renderer.endFrame(commandBuffer);
+                renderer.endFrame();
             }
         }
 

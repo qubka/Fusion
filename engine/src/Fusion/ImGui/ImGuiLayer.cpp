@@ -25,17 +25,17 @@ ImGuiLayer::~ImGuiLayer() {
 void ImGuiLayer::onAttach() {
     // the size of the pool is very oversize, but it's copied from imgui demo itself.
     std::array<vk::DescriptorPoolSize, 11> poolSizes = {{
-        { vk::DescriptorType::eSampler, 1000 },
-        { vk::DescriptorType::eCombinedImageSampler, 1000 },
-        { vk::DescriptorType::eSampledImage, 1000 },
-        { vk::DescriptorType::eStorageImage, 1000 },
-        { vk::DescriptorType::eUniformTexelBuffer, 1000 },
-        { vk::DescriptorType::eStorageTexelBuffer, 1000 },
-        { vk::DescriptorType::eUniformBuffer, 1000 },
-        { vk::DescriptorType::eStorageBuffer, 1000 },
-        { vk::DescriptorType::eUniformTexelBuffer, 1000 },
-        { vk::DescriptorType::eStorageBufferDynamic, 1000 },
-        { vk::DescriptorType::eInputAttachment, 1000 }
+        { vk::DescriptorType::eSampler, 100 },
+        { vk::DescriptorType::eCombinedImageSampler, 100 },
+        { vk::DescriptorType::eSampledImage, 100 },
+        { vk::DescriptorType::eStorageImage, 100 },
+        { vk::DescriptorType::eUniformTexelBuffer, 100 },
+        { vk::DescriptorType::eStorageTexelBuffer, 100 },
+        { vk::DescriptorType::eUniformBuffer, 100 },
+        { vk::DescriptorType::eStorageBuffer, 100 },
+        { vk::DescriptorType::eUniformTexelBuffer, 100 },
+        { vk::DescriptorType::eStorageBufferDynamic, 100 },
+        { vk::DescriptorType::eInputAttachment, 100 }
     }};
 
     vk::DescriptorPoolCreateInfo poolInfo = {};
@@ -144,7 +144,7 @@ void ImGuiLayer::end(vk::CommandBuffer& commandBuffer) {
 
 void ImGuiLayer::setDarkThemeColors() {
     auto& colors = ImGui::GetStyle().Colors;
-    colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 0.0f };
+    //colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 0.0f };
 
     // Headers
     colors[ImGuiCol_Header] = { 0.2f, 0.205f, 0.21f, 1.0f };
