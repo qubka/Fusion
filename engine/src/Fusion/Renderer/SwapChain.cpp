@@ -104,7 +104,7 @@ void SwapChain::createSwapChain() {
 
     swapChainImageFormat = surfaceFormat.format;
     swapChainExtent = extent;
-    swapChainDepthFormat = findDepthFormat();
+    swapChainDepthFormat = vulkan.findDepthFormat();
 }
 
 vk::SurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats) const {
@@ -263,16 +263,6 @@ void SwapChain::createSyncObjects() {
         result = vulkan.getDevice().createFence(&fenceInfo, nullptr, &inFlightFences[i]);
         FE_ASSERT(result == vk::Result::eSuccess && "failed to create fence objects for a frame!");
     }
-}
-
-vk::Format SwapChain::findDepthFormat() const {
-    return vulkan.findSupportedFormat({
-        vk::Format::eD32Sfloat,
-        vk::Format::eD32SfloatS8Uint,
-        vk::Format::eD24UnormS8Uint
-    },
-    vk::ImageTiling::eOptimal,
-    vk::FormatFeatureFlagBits::eDepthStencilAttachment);
 }
 
 vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex) const {

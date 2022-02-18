@@ -62,5 +62,5 @@ void Texture::createImage(void* pixels, vk::Filter magFilter, vk::Filter minFilt
     vulkan.copyBufferToImage(*stagingBuffer, image, width, height, 1);
     vulkan.transitionImageLayout(image, format, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
     vulkan.createImageView(image, format, vk::ImageAspectFlagBits::eColor, view);
-    vulkan.createSampler(magFilter, minFilter, addressMode, minmapMode, sampler);
+    vulkan.createSampler(magFilter, minFilter, addressMode, minmapMode, vk::BorderColor::eFloatOpaqueWhite, sampler);
 }

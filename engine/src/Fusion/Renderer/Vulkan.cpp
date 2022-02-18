@@ -346,6 +346,18 @@ vk::Format Vulkan::findSupportedFormat(const std::vector<vk::Format>& candidates
     return vk::Format::eUndefined;
 }
 
+vk::Format Vulkan::findDepthFormat() const {
+    return findSupportedFormat({
+           vk::Format::eD32Sfloat,
+           vk::Format::eD32SfloatS8Uint,
+           vk::Format::eD24UnormS8Uint,
+           vk::Format::eD16UnormS8Uint,
+           vk::Format::eD16Unorm
+   },
+    vk::ImageTiling::eOptimal,
+    vk::FormatFeatureFlagBits::eDepthStencilAttachment);
+}
+
 uint32_t Vulkan::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
     vk::PhysicalDeviceMemoryProperties memProperties;
     physicalDevice.getMemoryProperties(&memProperties);
@@ -568,7 +580,7 @@ void Vulkan::createImageView(const vk::Image& image, vk::Format format, vk::Imag
     FE_ASSERT(result == vk::Result::eSuccess && "failed to create image views!");
 }
 
-void Vulkan::createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode, vk::Sampler& sampler) const {
+void Vulkan::createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::SamplerAddressMode addressMode, vk::SamplerMipmapMode minmapMode, vk::BorderColor borderColor, vk::Sampler& sampler) const {
     vk::SamplerCreateInfo samplerInfo{};
     samplerInfo.magFilter = magFilter;
     samplerInfo.minFilter = minFilter;
@@ -577,13 +589,15 @@ void Vulkan::createSampler(vk::Filter magFilter, vk::Filter minFilter, vk::Sampl
     samplerInfo.addressModeW = addressMode;
     samplerInfo.anisotropyEnable = VK_FALSE;
     samplerInfo.maxAnisotropy = deviceProperties.limits.maxSamplerAnisotropy;
-    samplerInfo.borderColor = vk::BorderColor::eIntOpaqueBlack;
+    samplerInfo.borderColor = borderColor;
     samplerInfo.unnormalizedCoordinates = VK_FALSE;
     samplerInfo.compareEnable = VK_FALSE;
     samplerInfo.compareOp = vk::CompareOp::eAlways;
     samplerInfo.mipmapMode = minmapMode;
-    samplerInfo.minLod = -1000;
-    samplerInfo.maxLod = 1000;
+    samplerInfo.mipLodBias = 0.0f;
+    samplerInfo.maxAnisotropy = 1.0f;
+    samplerInfo.minLod = 0.0f;
+    samplerInfo.maxLod = 1.0f;
 
     auto result = device.createSampler(&samplerInfo, nullptr, &sampler);
     FE_ASSERT(result == vk::Result::eSuccess && "failed to create texture sampler!");

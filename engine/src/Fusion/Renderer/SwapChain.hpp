@@ -56,7 +56,6 @@ namespace Fusion {
 
         std::shared_ptr<SwapChain> oldSwapChain;
 
-        vk::Format findDepthFormat() const;
         vk::SurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats) const;
         vk::PresentModeKHR chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes) const;
         vk::Extent2D chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities) const;
