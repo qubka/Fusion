@@ -272,7 +272,7 @@ vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex) const {
     return result;
 }
 
-vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, const uint32_t& imageIndex) {
+vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffer, const uint32_t& imageIndex) {
     vk::Fence& fence = inFlightFences[currentFrame];
     vk::Fence* image = imagesInFlight[imageIndex];
     if (image != nullptr) {
@@ -290,7 +290,7 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
     submitInfo.pWaitDstStageMask = waitStages;
 
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &buffers;
+    submitInfo.pCommandBuffers = &buffer;
 
     vk::Semaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
     submitInfo.signalSemaphoreCount = 1;
@@ -314,6 +314,8 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
 
     result = vulkan.getPresentQueue().presentKHR(&presentInfo);
     //FE_ASSERT((result == vk::Result::eSuccess || result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) && "failed to present swap chain image!");
+
+
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 

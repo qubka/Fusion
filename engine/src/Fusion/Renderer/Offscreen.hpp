@@ -2,20 +2,19 @@
 
 #include "Vulkan.hpp"
 
-/*namespace Fusion {
+namespace Fusion {
     class Offscreen {
     public:
         Offscreen(Vulkan& vulkan, vk::Extent2D extent);
-        Offscreen(Vulkan& vulkan, vk::Extent2D extent, std::shared_ptr<Offscreen> oldOffscreen);
+        //Offscreen(Vulkan& vulkan, vk::Extent2D extent, std::shared_ptr<Offscreen> oldOffscreen);
         ~Offscreen();
         FE_NONCOPYABLE(Offscreen);
 
         const vk::Framebuffer& getFrameBuffer() const { return frameBuffer; }
         const vk::RenderPass& getRenderPass() const { return renderPass; }
-        const vk::ImageView& getImageView(size_t index) const { return swapChainImageViews[index]; }
-        const vk::Format& getSwapChainImageFormat() const { return swapChainImageFormat; }
-        const vk::Extent2D& getSwapChainExtent() const { return swapChainExtent; }
-        size_t imageCount() const { return swapChainImages.size(); }
+        const vk::Extent2D& getExtent() const { return extent; }
+
+        vk::Result submitCommandBuffer(const vk::CommandBuffer& buffers);
 
     private:
         void init();
@@ -38,4 +37,4 @@
         vk::RenderPass renderPass;
         vk::Sampler sampler;
     };
-}*/
+}

@@ -18,7 +18,7 @@ namespace Fusion {
         size_t imageCount() const { return swapChainImages.size(); }
 
         vk::Result acquireNextImage(uint32_t& imageIndex) const;
-        vk::Result submitCommandBuffers(const vk::CommandBuffer& buffers, const uint32_t& imageIndex);
+        vk::Result submitCommandBuffers(const vk::CommandBuffer& buffer, const uint32_t& imageIndex);
 
         bool compareSwapFormats(const SwapChain& other) const;
         void saveScreenshot(const std::string& path) const;

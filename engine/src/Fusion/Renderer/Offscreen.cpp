@@ -1,6 +1,6 @@
 #include "Offscreen.hpp"
 
-/*using namespace Fusion;
+using namespace Fusion;
 
 Offscreen::Offscreen(Vulkan& vulkan, vk::Extent2D windowExtent) : vulkan{vulkan}, extent{extent} {
 
@@ -141,4 +141,27 @@ void Offscreen::createFramebuffers() {
 
     auto result = vulkan.getDevice().createFramebuffer(&framebufferInfo, nullptr, &frameBuffer);
     FE_ASSERT(result == vk::Result::eSuccess && "failed to create framebuffer!");
-}*/
+}
+
+vk::Result Offscreen::submitCommandBuffer(const vk::CommandBuffer& buffer) {
+    vk::Fence fence;
+    vk::FenceCreateInfo fenceInfo{};
+    vk::SubmitInfo submitInfo{};
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &buffer;
+
+    // Create a fence
+    auto result = vulkan.getDevice().createFence(&fenceInfo, nullptr, &fence);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to create the fence");
+
+    // Submit to the queue
+    result = vulkan.getPresentQueue().submit(1, &submitInfo, fence);
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to submit the buffer");
+
+    // Wait for the fence to signal that command buffer has finished executing
+    result = vulkan.getDevice().waitForFences(1, &fence, VK_TRUE, std::numeric_limits<uint64_t>::max());
+    FE_ASSERT(result == vk::Result::eSuccess && "failed to wait for fences");
+    vulkan.getDevice().destroyFence(fence, nullptr);
+
+    return result;
+}
