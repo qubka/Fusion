@@ -119,6 +119,7 @@ void EditorLayer::onImGui() {
     auto& window = vulkan.getWindow();
 
     // Note: Switch this to true to enable dockspace
+    static bool viewportOpen = true;
     static bool dockspaceOpen = true;
     static bool opt_fullscreen_persistant = true;
     bool opt_fullscreen = opt_fullscreen_persistant;
@@ -232,6 +233,21 @@ void EditorLayer::onImGui() {
     auto viewportOffset = ImGui::GetWindowPos();
     ImVec2 minBounds = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
     ImVec2 maxBounds = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+
+    auto& offscreen = renderer.getOffscreen();
+    /*if (currentExtent != offscreen->getExtent()) {
+        VkDescriptorImageInfo desc_image[1] = {};
+        desc_image[0].sampler = offscreen->getSampler();
+        desc_image[0].imageView = offscreen->getView();
+        desc_image[0].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        VkWriteDescriptorSet write_desc[1] = {};
+        write_desc[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write_desc[0].dstSet = static_cast<VkDescriptorSet>(textureID);
+        write_desc[0].descriptorCount = 1;
+        write_desc[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        write_desc[0].pImageInfo = desc_image;
+        vkUpdateDescriptorSets(vulkan.getDevice(), 1, write_desc, 0, NULL);
+    }*/
 
     ImGui::Image(static_cast<ImTextureID*>(textureID), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
 

@@ -105,14 +105,22 @@ void Offscreen::createRenderPass() {
     subpassDescription.pDepthStencilAttachment = &depthReference;
 
     // Use subpass dependencies for layout transitions
-    vk::SubpassDependency dependency;
-    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-    dependency.dstSubpass = 0;
-    dependency.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
-    dependency.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
-    dependency.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
-    dependency.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-    dependency.dependencyFlags = vk::DependencyFlagBits::eByRegion;
+    std::array<vk::SubpassDependency, 2> dependencies;
+    dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependencies[0].dstSubpass = 0;
+    dependencies[0].srcStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+    dependencies[0].dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+    dependencies[0].srcAccessMask =  vk::AccessFlagBits::eShaderRead;
+    dependencies[0].dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+    dependencies[0].dependencyFlags = vk::DependencyFlagBits::eByRegion;
+
+    dependencies[1].srcSubpass = 0;
+    dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+    dependencies[1].srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+    dependencies[1].dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+    dependencies[1].srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+    dependencies[1].dstAccessMask =  vk::AccessFlagBits::eShaderRead;
+    dependencies[1].dependencyFlags = vk::DependencyFlagBits::eByRegion;
 
     // Create the actual renderpass
     std::array<vk::AttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
@@ -121,8 +129,8 @@ void Offscreen::createRenderPass() {
     renderPassInfo.pAttachments = attachments.data();
     renderPassInfo.subpassCount = 1;
     renderPassInfo.pSubpasses = &subpassDescription;
-    renderPassInfo.dependencyCount = 1;
-    renderPassInfo.pDependencies = &dependency;
+    renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
+    renderPassInfo.pDependencies = dependencies.data();
 
     auto result = vulkan.getDevice().createRenderPass(&renderPassInfo, nullptr, &renderPass);
     FE_ASSERT(result == vk::Result::eSuccess && "failed to create render pass!");
@@ -143,7 +151,7 @@ void Offscreen::createFramebuffers() {
     FE_ASSERT(result == vk::Result::eSuccess && "failed to create framebuffer!");
 }
 
-vk::Result Offscreen::submitCommandBuffer(const vk::CommandBuffer& buffer) {
+/*vk::Result Offscreen::submitCommandBuffer(const vk::CommandBuffer& buffer) {
     vk::Fence fence;
     vk::FenceCreateInfo fenceInfo{};
     vk::SubmitInfo submitInfo{};
@@ -164,4 +172,4 @@ vk::Result Offscreen::submitCommandBuffer(const vk::CommandBuffer& buffer) {
     vulkan.getDevice().destroyFence(fence, nullptr);
 
     return result;
-}
+}*/

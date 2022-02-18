@@ -16,7 +16,7 @@ namespace Fusion {
         const vk::ImageView& getView() const { return color.view; }
         const vk::Sampler& getSampler() const { return sampler; }
 
-        vk::Result submitCommandBuffer(const vk::CommandBuffer& buffers);
+        //vk::Result submitCommandBuffer(const vk::CommandBuffer& buffers);
 
     private:
         void init();
@@ -38,5 +38,7 @@ namespace Fusion {
         FrameBufferAttachment depth;
         vk::RenderPass renderPass;
         vk::Sampler sampler;
+
+        void* textureID;
     };
 }

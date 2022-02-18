@@ -125,7 +125,6 @@ bool Renderer::beginFrame() {
 
 vk::CommandBuffer Renderer::beginSwapChainRenderPass() {
     FE_ASSERT(isFrameStarted && "cannot call beginSwapChainRenderPass if frame is not in progress");
-    //FE_ASSERT(commandBuffer == commandBuffers[currentFrame] && "cannot begin render pass on command buffer from a different frame");
 
     const auto& extent = swapChain->getSwapChainExtent();
     auto offset = vk::Offset2D{0, 0};
@@ -171,7 +170,7 @@ vk::CommandBuffer Renderer::beginSwapChainRenderPass() {
 
 void Renderer::endSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
     FE_ASSERT(isFrameStarted && "cannot call endSwapChainRenderPass if frame is not in progress");
-    //FE_ASSERT(commandBuffer == commandBuffers[currentFrame] && "cannot end render pass on command buffer from a different frame");
+    FE_ASSERT(commandBuffer == commandBuffers[currentFrame] && "cannot end render pass on command buffer from a different frame");
 
     commandBuffer.endRenderPass();
 
@@ -181,7 +180,6 @@ void Renderer::endSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
 
 vk::CommandBuffer Renderer::beginOffscreenRenderPass() {
     FE_ASSERT(isFrameStarted && "cannot call beginOffscreenRenderPass if frame is not in progress");
-    //FE_ASSERT(commandBuffer == commandBuffers[currentFrame] && "cannot begin render pass on command buffer from a different frame");
 
     const auto& extent = offscreen->getExtent();
     auto offset = vk::Offset2D{0, 0};
@@ -227,19 +225,21 @@ vk::CommandBuffer Renderer::beginOffscreenRenderPass() {
 
 void Renderer::endOffscreenRenderPass(vk::CommandBuffer& commandBuffer) {
     FE_ASSERT(isFrameStarted && "cannot call endOffscreenRenderPass if frame is not in progress");
-    //FE_ASSERT(commandBuffer == commandBuffers[currentFrame] && "cannot end render pass on command buffer from a different frame");
+    FE_ASSERT(commandBuffer == offscreenBuffer[currentFrame] && "cannot end render pass on command buffer from a different frame");
 
     commandBuffer.endRenderPass();
 
     auto result = commandBuffer.end();
     FE_ASSERT(result == vk::Result::eSuccess && "failed to record command buffer!");
+
+    //offscreen->submitCommandBuffer(commandBuffer);
 }
 
 void Renderer::endFrame() {
     FE_ASSERT(isFrameStarted && "cannot call endFrame if frame is not in progress");
     //FE_ASSERT(commandBuffer == commandBuffers[currentFrame] && "cannot end command buffer from a different frame");
 
-    auto result = swapChain->submitCommandBuffers({commandBuffers[currentFrame], offscreenBuffer[currentFrame]}, currentImage);
+    auto result = swapChain->submitCommandBuffers({offscreenBuffer[currentFrame], commandBuffers[currentFrame]}, currentImage);
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
         FE_LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
         recreateSwapChain();
