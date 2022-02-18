@@ -10,12 +10,12 @@ namespace Fusion {
         ~SwapChain();
         FE_NONCOPYABLE(SwapChain);
 
-        const vk::Framebuffer& getFrameBuffer(size_t index) const { return swapChainFramebuffers[index]; }
+        const vk::Framebuffer& getFrameBuffer(size_t index) const { return framebuffers[index]; }
         const vk::RenderPass& getRenderPass() const { return renderPass; }
-        const vk::ImageView& getImageView(size_t index) const { return swapChainImageViews[index]; }
-        const vk::Format& getSwapChainImageFormat() const { return swapChainImageFormat; }
+        const vk::ImageView& getImageView(size_t index) const { return imageViews[index]; }
+        const vk::Format& getSwapChainImageFormat() const { return imageFormat; }
         const vk::Extent2D& getSwapChainExtent() const { return swapChainExtent; }
-        size_t imageCount() const { return swapChainImages.size(); }
+        size_t imageCount() const { return images.size(); }
 
         vk::Result acquireNextImage(uint32_t& imageIndex) const;
         vk::Result submitCommandBuffers(const vk::CommandBuffer& buffer, const uint32_t& imageIndex);
@@ -39,10 +39,10 @@ namespace Fusion {
         vk::SwapchainKHR swapChain;
         vk::RenderPass renderPass;
 
-        std::vector<vk::Image> swapChainImages;
-        vk::Format swapChainImageFormat;
-        std::vector<vk::ImageView> swapChainImageViews;
-        std::vector<vk::Framebuffer> swapChainFramebuffers;
+        std::vector<vk::Image> images;
+        vk::Format imageFormat;
+        std::vector<vk::ImageView> imageViews;
+        std::vector<vk::Framebuffer> framebuffers;
         std::vector<vk::Semaphore> imageAvailableSemaphores;
         std::vector<vk::Semaphore> renderFinishedSemaphores;
         std::vector<vk::Fence> inFlightFences;
@@ -52,7 +52,7 @@ namespace Fusion {
         vk::Image depthImage;
         vk::DeviceMemory depthImageMemory;
         vk::ImageView depthImageView;
-        vk::Format swapChainDepthFormat;
+        vk::Format depthFormat;
 
         std::shared_ptr<SwapChain> oldSwapChain;
 

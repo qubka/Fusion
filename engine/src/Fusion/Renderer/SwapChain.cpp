@@ -13,7 +13,7 @@ SwapChain::SwapChain(Vulkan& vulkan, vk::Extent2D windowExtent, std::shared_ptr<
 }
 
 SwapChain::~SwapChain() {
-    for (const auto& imageView : swapChainImageViews) {
+    for (const auto& imageView : imageViews) {
         vulkan.getDevice().destroyImageView(imageView, nullptr);
     }
 
@@ -26,7 +26,7 @@ SwapChain::~SwapChain() {
         swapChain = nullptr;
     }
 
-    for (const auto& framebuffer : swapChainFramebuffers) {
+    for (const auto& framebuffer : framebuffers) {
         vulkan.getDevice().destroyFramebuffer(framebuffer, nullptr);
     }
 
@@ -98,13 +98,13 @@ void SwapChain::createSwapChain() {
     // retrieve the handles.
     result = vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, nullptr);
     FE_ASSERT(result == vk::Result::eSuccess && "failed to get swap chain images count!");
-    swapChainImages.resize(imageCount);
-    result = vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, swapChainImages.data());
+    images.resize(imageCount);
+    result = vulkan.getDevice().getSwapchainImagesKHR(swapChain, &imageCount, images.data());
     FE_ASSERT(result == vk::Result::eSuccess && "failed to get swap chain images!");
 
-    swapChainImageFormat = surfaceFormat.format;
+    imageFormat = surfaceFormat.format;
     swapChainExtent = extent;
-    swapChainDepthFormat = vulkan.findDepthFormat();
+    depthFormat = vulkan.findDepthFormat();
 }
 
 vk::SurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats) const {
@@ -150,16 +150,16 @@ vk::Extent2D SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capab
 }
 
 void SwapChain::createImageViews() {
-    swapChainImageViews.resize(swapChainImages.size());
+    imageViews.resize(images.size());
 
-    for (int i = 0; i < swapChainImages.size(); i++) {
-        vulkan.createImageView(swapChainImages[i], swapChainImageFormat, vk::ImageAspectFlagBits::eColor, swapChainImageViews[i]);
+    for (int i = 0; i < images.size(); i++) {
+        vulkan.createImageView(images[i], imageFormat, vk::ImageAspectFlagBits::eColor, imageViews[i]);
     }
 }
 
 void SwapChain::createRenderPass() {
     vk::AttachmentDescription colorAttachment{};
-    colorAttachment.format = swapChainImageFormat;
+    colorAttachment.format = imageFormat;
     colorAttachment.samples = vk::SampleCountFlagBits::e1;
     colorAttachment.loadOp = vk::AttachmentLoadOp::eClear;
     colorAttachment.storeOp = vk::AttachmentStoreOp::eStore;
@@ -169,7 +169,7 @@ void SwapChain::createRenderPass() {
     colorAttachment.finalLayout = vk::ImageLayout::ePresentSrcKHR;
 
     vk::AttachmentDescription depthAttachment{};
-    depthAttachment.format = swapChainDepthFormat;
+    depthAttachment.format = depthFormat;
     depthAttachment.samples = vk::SampleCountFlagBits::e1;
     depthAttachment.loadOp = vk::AttachmentLoadOp::eClear;
     depthAttachment.storeOp = vk::AttachmentStoreOp::eDontCare;
@@ -212,23 +212,23 @@ void SwapChain::createDepthResources() {
     vulkan.createImage(
             swapChainExtent.width,
             swapChainExtent.height,
-            swapChainDepthFormat,
+            depthFormat,
             vk::ImageTiling::eOptimal,
             vk::ImageUsageFlagBits::eDepthStencilAttachment,
             vk::MemoryPropertyFlagBits::eDeviceLocal,
             depthImage,
             depthImageMemory);
 
-    vulkan.createImageView(depthImage, swapChainDepthFormat, vk::ImageAspectFlagBits::eDepth, depthImageView);
+    vulkan.createImageView(depthImage, depthFormat, vk::ImageAspectFlagBits::eDepth, depthImageView);
 }
 
 void SwapChain::createFramebuffers() {
-    swapChainFramebuffers.resize(swapChainImageViews.size());
+    framebuffers.resize(imageViews.size());
 
-    for (size_t i = 0; i < swapChainImageViews.size(); i++) {
+    for (size_t i = 0; i < imageViews.size(); i++) {
         std::array<vk::ImageView, 2> attachments = {
-            swapChainImageViews[i],
-            depthImageView
+                imageViews[i],
+                depthImageView
         };
 
         vk::FramebufferCreateInfo framebufferInfo{};
@@ -239,7 +239,7 @@ void SwapChain::createFramebuffers() {
         framebufferInfo.height = swapChainExtent.height;
         framebufferInfo.layers = 1;
 
-        auto result = vulkan.getDevice().createFramebuffer(&framebufferInfo, nullptr, &swapChainFramebuffers[i]);
+        auto result = vulkan.getDevice().createFramebuffer(&framebufferInfo, nullptr, &framebuffers[i]);
         FE_ASSERT(result == vk::Result::eSuccess && "failed to create framebuffer!");
     }
 }
@@ -248,7 +248,7 @@ void SwapChain::createSyncObjects() {
     imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
-    imagesInFlight.resize(swapChainImages.size(), nullptr);
+    imagesInFlight.resize(images.size(), nullptr);
 
     vk::SemaphoreCreateInfo semaphoreInfo{};
     vk::FenceCreateInfo fenceInfo{};
@@ -323,8 +323,8 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffer, cons
 }
 
 bool SwapChain::compareSwapFormats(const SwapChain& other) const {
-    return other.swapChainDepthFormat == swapChainDepthFormat &&
-           other.swapChainImageFormat == swapChainImageFormat;
+    return other.depthFormat == depthFormat &&
+           other.imageFormat == imageFormat;
 }
 
 void InsertImageMemoryBarrier(
@@ -367,14 +367,14 @@ void SwapChain::saveScreenshot(const std::string& path) const{
 
     // Check if the device supports blitting from optimal images (the swapchain images are in optimal format)
     // Check if the device supports blitting to linear images
-    if (vulkan.findSupportedFormat({swapChainImageFormat}, vk::ImageTiling::eOptimal, vk::FormatFeatureFlagBits::eBlitSrc) == vk::Format::eUndefined ||
+    if (vulkan.findSupportedFormat({imageFormat}, vk::ImageTiling::eOptimal, vk::FormatFeatureFlagBits::eBlitSrc) == vk::Format::eUndefined ||
         vulkan.findSupportedFormat({vk::Format::eR8G8B8A8Unorm}, vk::ImageTiling::eLinear, vk::FormatFeatureFlagBits::eBlitDst) == vk::Format::eUndefined) {
         FE_LOG_ERROR << "Device does not support blitting to optimal or linear tiled images, using copy instead of blit!";
         supportsBlit = false;
     }
 
     // Source for the copy is the last rendered swapchain image
-    vk::Image srcImage = swapChainImages[currentFrame];
+    vk::Image srcImage = images[currentFrame];
 
     // Create the image
     vk::Image dstImage;
@@ -507,7 +507,7 @@ void SwapChain::saveScreenshot(const std::string& path) const{
     // Note: Not complete, only contains most common and basic BGR surface formats for demonstration purposes
     if (!supportsBlit) {
         std::vector<vk::Format> formatsBGR = { vk::Format::eB8G8R8A8Srgb, vk::Format::eB8G8R8A8Unorm, vk::Format::eB8G8R8A8Snorm };
-        colorSwizzle = (std::find(formatsBGR.begin(), formatsBGR.end(), swapChainImageFormat) != formatsBGR.end());
+        colorSwizzle = (std::find(formatsBGR.begin(), formatsBGR.end(), imageFormat) != formatsBGR.end());
     }
 
     // ppm binary pixel data
