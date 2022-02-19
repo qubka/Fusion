@@ -50,10 +50,10 @@ namespace Fusion {
         std::vector<vk::Fence*> imagesInFlight;
         uint32_t currentFrame{0};
 
-        vk::Image depthImage;
+        /*vk::Image depthImage;
         vk::DeviceMemory depthImageMemory;
         vk::ImageView depthImageView;
-        vk::Format depthFormat;
+        vk::Format depthFormat;*/
 
         std::shared_ptr<SwapChain> oldSwapChain;
 

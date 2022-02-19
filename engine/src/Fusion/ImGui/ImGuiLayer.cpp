@@ -112,6 +112,9 @@ void ImGuiLayer::onAttach() {
 
     //clear font textures from cpu data
     ImGui_ImplVulkan_DestroyFontUploadObjects();
+
+    // create ImTextureId's for offscreen
+    renderer.getOffscreen().createDescriptorSets();
 }
 
 void ImGuiLayer::onDetach() {

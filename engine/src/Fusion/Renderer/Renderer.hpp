@@ -33,7 +33,7 @@ namespace Fusion {
         const vk::DescriptorSetLayout& getGlobalDescriptorLayoutSet() const { return globalDescriptorSetLayout; }
 
         const std::unique_ptr<SwapChain>& getSwapChain() const { return swapChain; }
-        const Offscreen& getOffscreen() const { return offscreen; }
+        Offscreen& getOffscreen() { return offscreen; }
 
         uint32_t getFrameIndex() const { return currentFrame; }
         bool isFrameInProgress() const { return isFrameStarted; }

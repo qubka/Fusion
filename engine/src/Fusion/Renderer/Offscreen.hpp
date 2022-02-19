@@ -18,12 +18,13 @@ namespace Fusion {
 
         //vk::Result submitCommandBuffer(const vk::CommandBuffer& buffers);
 
+        void createDescriptorSets(); // Call from ImGUI
+
     private:
         void init();
         void createOffscreen();
         void createRenderPass();
         void createFramebuffers();
-        void createDescriptorSets();
 
         Vulkan& vulkan;
         vk::Extent2D extent;
