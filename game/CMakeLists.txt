@@ -3,7 +3,7 @@ project(game)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(${PROJECT_NAME} SandboxApp.cpp)
+add_executable(${PROJECT_NAME} sandbox_app.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE engine)
 

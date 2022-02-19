@@ -1,13 +1,13 @@
 #include "scene_hierarchy_panel.hpp"
-#include "Fusion/Scene/Components.hpp"
+#include "fusion/scene/components.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <magic_enum/include/magic_enum.hpp>
 
 // TEMP
-#include "Fusion/Core/Application.hpp"
-//#include "Fusion/Renderer/Mesh.hpp"
+#include "fusion/core/application.hpp"
+//#include "fusion/renderer/mesh.hpp"
 
 using namespace Fusion;
 

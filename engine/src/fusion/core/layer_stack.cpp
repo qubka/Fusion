@@ -1,5 +1,5 @@
-#include "LayerStack.hpp"
-#include "Layer.hpp"
+#include "layer_stack.hpp"
+#include "layer.hpp"
 
 using namespace Fusion;
 

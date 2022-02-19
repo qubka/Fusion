@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PerspectiveCamera.hpp"
+#include "perspective_camera.hpp"
 
 namespace Fusion {
     class KeyInput;
@@ -12,7 +12,7 @@ namespace Fusion {
         EditorCamera(float fov, float aspect, float near, float far);
         ~EditorCamera() override = default;
 
-        void onUpdate() override;
+        void update() override;
 
         float getPitch() const { return pitch; }
         float getYaw() const { return yaw; }

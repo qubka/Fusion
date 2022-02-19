@@ -10,19 +10,19 @@
 
 #include "common.hpp"
 
-#include "vks/helpers.hpp"
-#include "vks/filesystem.hpp"
-#include "vks/model.hpp"
-#include "vks/shaders.hpp"
-#include "vks/pipelines.hpp"
-#include "vks/texture.hpp"
-#include "vks/swapchain.hpp"
+#include "vkx/helpers.hpp"
+#include "vkx/filesystem.hpp"
+#include "vkx/model.hpp"
+#include "vkx/shaders.hpp"
+#include "vkx/pipelines.hpp"
+#include "vkx/texture.hpp"
+#include "vkx/swapchain.hpp"
 
 #include "GLFW/glfw3.h"
 
 #include "ui.hpp"
 #include "utils.hpp"
-#include "camera.hpp"
+#include "perspective_camera.hpp"
 #include "compute.hpp"
 
 #if defined(__ANDROID__)
@@ -93,8 +93,8 @@ namespace vkx {
         std::vector<vk::CommandBuffer> commandBuffers;
         std::vector<vk::ClearValue> clearValues;
         vk::RenderPassBeginInfo renderPassBeginInfo;
-        vk::Viewport viewport() { return vks::util::viewport(size); }
-        vk::Rect2D scissor() { return vks::util::rect2D(size); }
+        vk::Viewport viewport() { return vkx::util::viewport(size); }
+        vk::Rect2D scissor() { return vkx::util::rect2D(size); }
 
         virtual void clearCommandBuffers() final;
         virtual void allocateCommandBuffers() final;
@@ -130,7 +130,7 @@ namespace vkx {
         std::vector<vk::PipelineStageFlags> renderWaitStages;
         std::vector<vk::Semaphore> renderSignalSemaphores;
 
-        vks::Context context;
+        vkx::Context context;
         const vk::PhysicalDevice& physicalDevice{ context.physicalDevice };
         const vk::Device& device{ context.device };
         const vk::Queue& queue{ context.queue };
@@ -140,7 +140,7 @@ namespace vkx {
 
         vk::SurfaceKHR surface;
         // Wraps the swap chain to present images (framebuffers) to the windowing system
-        vks::SwapChain swapChain;
+        vkx::SwapChain swapChain;
 
         // Synchronization semaphores
         struct {
@@ -190,7 +190,7 @@ namespace vkx {
         uint32_t& width{ size.width };
         uint32_t& height{ size.height };
 
-        vk::ClearColorValue defaultClearColor = vks::util::clearColor(glm::vec4({ 0.025f, 0.025f, 0.025f, 1.0f }));
+        vk::ClearColorValue defaultClearColor = vkx::util::clearColor(glm::vec4({ 0.025f, 0.025f, 0.025f, 1.0f }));
         vk::ClearDepthStencilValue defaultClearDepth{ 1.0f, 0 };
 
         // Defines a frame rate independent timer value clamped from -1.0...1.0
@@ -206,13 +206,13 @@ namespace vkx {
         // Use to adjust mouse zoom speed
         float zoomSpeed = 1.0f;
 
-        Camera camera;
+        Fusion::PerspectiveCamera camera{static_cast<float>(size.width)  / size.height, 60.0f,  0.1f, 256.0f};
         glm::vec2 mousePos;
         bool viewUpdated{ false };
 
         std::string title = "Vulkan Example";
         std::string name = "vulkanExample";
-        vks::Image depthStencil;
+        vkx::Image depthStencil;
 
         // Gamepad state (only one pad supported)
         struct {
@@ -286,9 +286,9 @@ namespace vkx {
         // -
         void submitFrame();
 
-        virtual const glm::mat4& getProjection() const { return camera.matrices.perspective; }
+        virtual glm::mat4& getProjection() { return camera.getProjection(); }
 
-        virtual const glm::mat4& getView() const { return camera.matrices.view; }
+        virtual glm::mat4& getView() { return camera.getView(); }
 
         // Called if a key is pressed
         // Can be overriden in derived class to do custom key handling
@@ -302,12 +302,12 @@ namespace vkx {
         // OS specific
 #if defined(__ANDROID__)
         // true if application has focused, false if moved to background
-    ANativeWindow* window{ nullptr};
-    bool focused = false;
-    static int32_t handle_input_event(android_app* app, AInputEvent* event);
-    int32_t onInput(AInputEvent* event);
-    static void handle_app_cmd(android_app* app, int32_t cmd);
-    void onAppCmd(int32_t cmd);
+        ANativeWindow* window{ nullptr};
+        bool focused = false;
+        static int32_t handle_input_event(android_app* app, AInputEvent* event);
+        int32_t onInput(AInputEvent* event);
+        static void handle_app_cmd(android_app* app, int32_t cmd);
+        void onAppCmd(int32_t cmd);
 #else
         GLFWwindow* window{ nullptr };
         // Keyboard movement handler

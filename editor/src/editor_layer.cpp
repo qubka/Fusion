@@ -1,15 +1,15 @@
-#include "editorlayer.hpp"
-#include "Fusion/Core/Application.hpp"
-#include "Fusion/Core/Time.hpp"
-#include "Fusion/Input/Input.hpp"
-#include "Fusion/ImGui/ImGuiLayer.hpp"
-/*#include "Fusion/Renderer/Texture.hpp"
-#include "Fusion/Renderer/Renderer.hpp"
-#include "Fusion/Renderer/Offscreen.hpp"
-#include "Fusion/Renderer/AllocatedBuffer.hpp"*/
-#include "Fusion/Utils/Math.hpp"
-#include "Fusion/Events/WindowEvents.hpp"
-#include "Fusion/Scene/Components.hpp"
+#include "editor_layer.hpp"
+#include "fusion/core/application.hpp"
+#include "fusion/core/time.hpp"
+#include "fusion/input/input.hpp"
+#include "fusion/gui/imgui_layer.hpp"
+/*#include "fusion/renderer/texture.hpp"
+#include "fusion/renderer/renderer.hpp"
+#include "fusion/renderer/offscreen.hpp"
+#include "fusion/renderer/allocatedbuffer.hpp"*/
+#include "fusion/utils/math.hpp"
+#include "fusion/events/window_events.hpp"
+#include "fusion/scene/components.hpp"
 
 
 #if _WIN32

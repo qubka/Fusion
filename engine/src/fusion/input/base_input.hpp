@@ -2,8 +2,8 @@
 
 #include <GLFW/glfw3.h>
 
-#include "MouseCodes.hpp"
-#include "KeyCodes.hpp"
+#include "mouse_codes.hpp"
+#include "key_codes.hpp"
 
 namespace Fusion {
     class Window;

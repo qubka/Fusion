@@ -39,6 +39,6 @@
 
 #include <magic_enum.hpp>
 
-#include "Fusion/Core/Base.hpp"
-#include "Fusion/Core/Log.hpp"
-#include "Fusion/Utils/Extentions.hpp"
+#include "fusion/core/base.hpp"
+#include "fusion/core/log.hpp"
+#include "fusion/utils/extentions.hpp"

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "MouseCodes.hpp"
-#include "KeyCodes.hpp"
+#include "mouse_codes.hpp"
+#include "key_codes.hpp"
 
-#include "Fusion/Core/Window.hpp"
+#include "fusion/core/window.hpp"
 
 namespace Fusion {
     /* Global class (Testing purpose_ */

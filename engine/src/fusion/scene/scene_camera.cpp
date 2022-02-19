@@ -1,4 +1,4 @@
-#include "SceneCamera.hpp"
+#include "scene_camera.hpp"
 
 using namespace Fusion;
 

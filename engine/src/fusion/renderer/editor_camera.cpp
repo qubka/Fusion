@@ -1,6 +1,6 @@
-#include "EditorCamera.hpp"
-#include "Fusion/Input/Input.hpp"
-#include "Fusion/Core/Time.hpp"
+#include "editor_camera.hpp"
+#include "fusion/input/input.hpp"
+#include "fusion/core/time.hpp"
 
 using namespace Fusion;
 
@@ -10,7 +10,7 @@ EditorCamera::EditorCamera() : PerspectiveCamera{45.0f, 1.778f, 0.1f, 1000.0f} {
 EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : PerspectiveCamera{fov,aspect,near,far} {
 }
 
-void EditorCamera::onUpdate() {
+void EditorCamera::update() {
     if (Input::GetKey(Key::LeftAlt)) {
         if (Input::GetMouseButton(Mouse::ButtonMiddle))
             mousePan( Input::MouseDelta() * Time::ElapsedTime());
@@ -28,7 +28,7 @@ void EditorCamera::onUpdate() {
         setPositionAndRotation(calculatePosition(), glm::quat{glm::vec3(pitch, yaw, 0)});
     }
 
-    PerspectiveCamera::onUpdate();
+    PerspectiveCamera::update();
 }
 
 void EditorCamera::mousePan(const glm::vec2& delta) {

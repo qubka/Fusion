@@ -11,3 +11,17 @@ cmake-build-debug/
 mason_packages/
 bin/
 fusion.log
+
+external/entt/
+external/glfw/
+external/gli/
+external/glm/
+external/imgui/
+external/imguizmo/
+external/json/
+external/lz4/
+external/magic_enum/
+external/plog/
+external/portable-file-dialogs/
+external/stb/
+external/yaml-cpp/

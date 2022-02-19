@@ -1,5 +1,5 @@
-#include "Plane.hpp"
-#include "Ray.hpp"
+#include "plane.hpp"
+#include "ray.hpp"
 
 using namespace Fusion;
 

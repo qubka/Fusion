@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Window.hpp"
-#include "LayerStack.hpp"
-#include "Window.hpp"
+#include "window.hpp"
+#include "layer_stack.hpp"
+#include "window.hpp"
 
-//#include "Fusion/Renderer/Vulkan.hpp"
-//#include "Fusion/Renderer/Renderer.hpp"
+//#include "fusion/renderer/vulkan.hpp"
+//#include "fusion/renderer/renderer.hpp"
 
 int main(int argc, char** argv);
 

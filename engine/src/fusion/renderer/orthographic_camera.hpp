@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Camera.hpp"
+#include "camera.hpp"
 
 namespace Fusion {
     class OrthographicCamera : public Camera {
@@ -8,9 +8,9 @@ namespace Fusion {
         OrthographicCamera(float left, float right, float bottom, float top);
          ~OrthographicCamera() override = default;
 
-        virtual void onUpdate() { updateView(); }
+        virtual void update() { updateView(); }
 
-        void setProjection(float left, float right, float bottom, float top);
+        void setOrthographic(float left, float right, float bottom, float top);
 
         const glm::vec3& getPosition() const { return position; }
         void setPosition(const glm::vec3& pos);

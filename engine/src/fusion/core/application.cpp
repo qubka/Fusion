@@ -1,9 +1,9 @@
-#include "Application.hpp"
-#include "Layer.hpp"
-#include "Time.hpp"
+#include "application.hpp"
+#include "layer.hpp"
+#include "time.hpp"
 
-#include "Fusion/ImGui/ImGuiLayer.hpp"
-#include "Fusion/Input/Input.hpp"
+#include "fusion/gui/imgui_layer.hpp"
+#include "fusion/input/input.hpp"
 
 using namespace Fusion;
 

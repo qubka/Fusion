@@ -1,3 +1,3 @@
-#include "EditorApp.hpp"
+#include "editorapp.hpp"
 
 using namespace Fusion;

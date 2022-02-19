@@ -1,7 +1,7 @@
-#include "SceneSerializer.hpp"
+#include "scene_serializer.hpp"
 
-#include "Components.hpp"
-#include "Scene.hpp"
+#include "components.hpp"
+#include "scene.hpp"
 
 #include <yaml-cpp/yaml.h>
 

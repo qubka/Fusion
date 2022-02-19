@@ -1,7 +1,7 @@
-#include "Scene.hpp"
-#include "Components.hpp"
+#include "scene.hpp"
+#include "components.hpp"
 
-//#include "Fusion/Systems/MeshRenderer.hpp"
+//#include "fusion/systems/meshrenderer.hpp"
 
 using namespace Fusion;
 

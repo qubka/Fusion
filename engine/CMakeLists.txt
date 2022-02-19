@@ -11,8 +11,8 @@ endif()
 find_package(Vulkan REQUIRED)
 find_package(assimp REQUIRED) # https://ittone.ma/ittone/c-how-do-i-add-assimp-as-a-dependency-using-cmake-and-clion/
 
-file(GLOB_RECURSE SRC_SOURCES src/Fusion/*.cpp)
-#file(GLOB_RECURSE SRC_HEADERS src/Fusion/*.hpp)
+file(GLOB_RECURSE SRC_SOURCES src/fusion/*.cpp)
+file(GLOB_RECURSE SRC_HEADERS src/Fusion/*.hpp)
 set(HEADER_FILES src/fspch.hpp)
 
 add_library(${PROJECT_NAME} STATIC ${SRC_SOURCES} ${SRC_HEADERS})

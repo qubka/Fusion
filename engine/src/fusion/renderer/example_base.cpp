@@ -5,16 +5,16 @@
 *
 * This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 */
-#include "ExampleBase.hpp"
+#include "example_base.hpp"
 #include "fusion/core/window.hpp"
 
 #include <imgui.h>
 
 #include "ui.hpp"
-#include "android.hpp"
+#include "fusion/renderer/vkx/android.hpp"
 #include "keycodes.hpp"
-#include "vks/storage.hpp"
-#include "vks/filesystem.hpp"
+#include "vkx/storage.hpp"
+#include "vkx/filesystem.hpp"
 
 using namespace vkx;
 
@@ -22,12 +22,12 @@ using namespace vkx;
 // Instead, use the `prepare` and `run` methods
 ExampleBase::ExampleBase() {
 #if defined(__ANDROID__)
-    vks::storage::setAssetManager(vkx::android::androidApp->activity->assetManager);
+    vkx::storage::setAssetManager(vkx::android::androidApp->activity->assetManager);
     vkx::android::androidApp->userData = this;
     vkx::android::androidApp->onInputEvent = ExampleBase::handle_input_event;
     vkx::android::androidApp->onAppCmd = ExampleBase::handle_app_cmd;
 #endif
-    camera.setPerspective(60.0f, size, 0.1f, 256.0f);
+    //camera.setPerspective(60.0f, size.width / size.height, 0.1f, 256.0f);
 }
 
 ExampleBase::~ExampleBase() {
@@ -290,7 +290,7 @@ void ExampleBase::prepare() {
 
 void ExampleBase::setupRenderPassBeginInfo() {
     clearValues.clear();
-    clearValues.push_back(vks::util::clearColor(glm::vec4(0.1, 0.1, 0.1, 1.0)));
+    clearValues.push_back(vkx::util::clearColor(glm::vec4(0.1, 0.1, 0.1, 1.0)));
     clearValues.push_back(vk::ClearDepthStencilValue{ 1.0f, 0 });
 
     renderPassBeginInfo = vk::RenderPassBeginInfo();
@@ -558,10 +558,10 @@ void ExampleBase::update(float deltaTime) {
     frameTimer = deltaTime;
     ++frameCounter;
 
-    camera.update(deltaTime);
-    if (camera.moving()) {
+    camera.update(); //deltaTime
+    /*if (camera.moving()) {
         viewUpdated = true;
-    }
+    }*/
 
     // Convert to clamped timer value
     if (!paused) {
@@ -587,7 +587,7 @@ void ExampleBase::update(float deltaTime) {
     const float deadZone = 0.0015f;
     // todo : check if gamepad is present
     // todo : time based and relative axis positions
-    if (camera.type != Camera::CameraType::firstperson) {
+    /*if (camera.type != Camera::CameraType::firstperson) {
         // Rotate
         if (std::abs(gamePadState.axisLeft.x) > deadZone) {
             camera.rotate(glm::vec3(0.0f, gamePadState.axisLeft.x * 0.5f, 0.0f));
@@ -609,7 +609,7 @@ void ExampleBase::update(float deltaTime) {
     if (viewUpdated) {
         viewUpdated = false;
         viewChanged();
-    }
+    }*/
 }
 
 void ExampleBase::windowResize(const glm::uvec2& newSize) {
@@ -715,7 +715,7 @@ void ExampleBase::mouseMoved(const glm::vec2& newPos) {
         handled = io.WantCaptureMouse;
     }
 
-    if (mouseButtons.left) {
+    /*if (mouseButtons.left) {
         camera.rotate(glm::vec3(dy * camera.rotationSpeed, -dx * camera.rotationSpeed, 0.0f));
         viewUpdated = true;
     }
@@ -727,16 +727,16 @@ void ExampleBase::mouseMoved(const glm::vec2& newPos) {
         camera.translate(glm::vec3(-dx * 0.01f, -dy * 0.01f, 0.0f));
         viewUpdated = true;
     }
-    mousePos = newPos;
+    mousePos = newPos;*/
 }
 
 void ExampleBase::mouseScrolled(float delta) {
-    camera.translate(glm::vec3(0.0f, 0.0f, (float)delta * 0.005f * zoomSpeed));
+    //camera.translate(glm::vec3(0.0f, 0.0f, (float)delta * 0.005f * zoomSpeed));
     viewUpdated = true;
 }
 
 void ExampleBase::keyPressed(uint32_t key) {
-    if (camera.firstperson) {
+    /*if (camera.firstperson) {
         switch (key) {
             case KEY_W:
                 camera.keys.up = true;
@@ -751,7 +751,7 @@ void ExampleBase::keyPressed(uint32_t key) {
                 camera.keys.right = true;
                 break;
         }
-    }
+    }*/
 
     switch (key) {
         case KEY_P:
@@ -775,7 +775,7 @@ void ExampleBase::keyPressed(uint32_t key) {
 }
 
 void ExampleBase::keyReleased(uint32_t key) {
-    if (camera.firstperson) {
+    /*if (camera.firstperson) {
         switch (key) {
             case KEY_W:
                 camera.keys.up = false;
@@ -790,7 +790,7 @@ void ExampleBase::keyReleased(uint32_t key) {
                 camera.keys.right = false;
                 break;
         }
-    }
+    }*/
 }
 
 #if defined(__ANDROID__)

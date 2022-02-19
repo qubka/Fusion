@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Camera.hpp"
+#include "camera.hpp"
 
 namespace Fusion {
     class PerspectiveCamera : public Camera {
@@ -8,10 +8,10 @@ namespace Fusion {
         PerspectiveCamera(float aspect, float fov, float near, float far);
         ~PerspectiveCamera() override = default;
 
-        virtual void onUpdate() { updateView(); }
+        virtual void update() { updateView(); }
 
         void setViewport(int width, int height);
-        void setProjection(float aspect, float fov, float near, float far);
+        void setPerspective(float aspect, float fov, float near, float far);
 
         // Camera oriented directions
         const glm::vec3& getForward() const { return forward; }

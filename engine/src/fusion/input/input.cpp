@@ -1,7 +1,7 @@
-#include "Input.hpp"
+#include "input.hpp"
 
-#include "Fusion/Events/KeyEvents.hpp"
-#include "Fusion/Events/MouseEvents.hpp"
+#include "fusion/events/key_events.hpp"
+#include "fusion/events/mouse_events.hpp"
 
 #define MOUSE_BUTTONS 1024
 

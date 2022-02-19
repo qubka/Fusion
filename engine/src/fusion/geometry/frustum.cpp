@@ -1,4 +1,4 @@
-#include "Frustum.hpp"
+#include "frustum.hpp"
 #include "aabb.hpp"
 #include "sphere.hpp"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fusion/Renderer/Camera.hpp"
+#include "fusion/renderer/camera.hpp"
 
 namespace Fusion {
 

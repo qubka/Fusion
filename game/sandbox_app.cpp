@@ -1,5 +1,4 @@
-#include <Fusion.hpp>
-#include "Fusion/Core/EntryPoint.hpp"
+#include "fusion/core/entry_point.hpp"
 
 class ExampleLayer : public Fusion::Layer {
 public:

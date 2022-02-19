@@ -1,7 +1,7 @@
 #pragma once
 
-#include "BaseInput.hpp"
-#include "MouseCodes.hpp"
+#include "base_input.hpp"
+#include "mouse_codes.hpp"
 
 namespace Fusion {
     class Window;

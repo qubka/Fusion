@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fusion/Scene/Scene.hpp"
+#include "fusion/scene/scene.hpp"
 
 namespace Fusion {
     //class Mesh;

@@ -1,5 +1,5 @@
-#include <Fusion.hpp>
-//#include "Fusion/Core/EntryPoint.hpp"
+//#include <Fusion.hpp>
+//#include "fusion/core/entrypoint.hpp"
 //#include "EditorLayer.hpp"
 
 /*class EditorApp : public Fusion::Application {
@@ -26,13 +26,13 @@ Fusion::Application* Fusion::CreateApplication(Fusion::CommandLineArgs args) {
 * This code is licensed under the Mozilla Public License Version 2.0 (http://opensource.org/licenses/MPL-2.0)
 */
 
-#include "Fusion/Renderer/ExampleBase.hpp"
+#include "fusion/renderer/example_base.hpp"
 
 static std::vector<std::string> names{ "logos", "background", "models", "skybox" };
 
 class VulkanExample : public vkx::ExampleBase {
 public:
-    using DemoMesh = std::pair<vks::model::Model, vk::Pipeline>;
+    using DemoMesh = std::pair<vkx::model::Model, vk::Pipeline>;
 
     struct DemoMeshes {
         DemoMesh logos;
@@ -42,7 +42,7 @@ public:
     } demoMeshes;
 
     struct {
-        vks::Buffer meshVS;
+        vkx::Buffer meshVS;
     } uniformData;
 
     struct {
@@ -54,7 +54,7 @@ public:
     } uboVS;
 
     struct {
-        vks::texture::TextureCubeMap skybox;
+        vkx::texture::TextureCubeMap skybox;
     } textures;
 
     struct {
@@ -73,7 +73,7 @@ public:
         size.width = 1280;
         size.height = 720;
         rotationSpeed = 0.5f;
-        camera.setRotation({ 15.0f, 0.f, 0.0f });
+        //camera.setRotation({ 15.0f, 0.f, 0.0f });
         title = "Vulkan Demo Scene - � 2016 by Sascha Willems";
     }
 
@@ -100,8 +100,8 @@ public:
     void loadTextures() { textures.skybox.loadFromFile(context, getAssetPath() + "textures/cubemap_vulkan.ktx", vk::Format::eR8G8B8A8Unorm); }
 
     void updateDrawCommandBuffer(const vk::CommandBuffer& cmdBuffer) override {
-        cmdBuffer.setViewport(0, vks::util::viewport(size));
-        cmdBuffer.setScissor(0, vks::util::rect2D(size));
+        cmdBuffer.setViewport(0, vkx::util::viewport(size));
+        cmdBuffer.setScissor(0, vkx::util::rect2D(size));
         cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, descriptorSet, nullptr);
         std::array<DemoMesh*, 4> meshes{ {
                                                  &demoMeshes.skybox,
@@ -119,11 +119,11 @@ public:
         }
     }
 
-    vks::model::VertexLayout vertexLayout{ {
-                                                   vks::model::VERTEX_COMPONENT_POSITION,
-                                                   vks::model::VERTEX_COMPONENT_NORMAL,
-                                                   vks::model::VERTEX_COMPONENT_UV,
-                                                   vks::model::VERTEX_COMPONENT_COLOR,
+    vkx::model::VertexLayout vertexLayout{ {
+                                                   vkx::model::VERTEX_COMPONENT_POSITION,
+                                                   vkx::model::VERTEX_COMPONENT_NORMAL,
+                                                   vkx::model::VERTEX_COMPONENT_UV,
+                                                   vkx::model::VERTEX_COMPONENT_COLOR,
                                            } };
 
     void prepareVertices() {
@@ -178,7 +178,7 @@ public:
     }
 
     void preparePipelines() {
-        vks::pipelines::GraphicsPipelineBuilder pipelineBuilder{ device, pipelineLayout, renderPass };
+        vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ device, pipelineLayout, renderPass };
         pipelineBuilder.rasterizationState.frontFace = vk::FrontFace::eClockwise;
 
         // Binding description

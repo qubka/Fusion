@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.hpp>
 
-#include "Fusion/Events/EventQueue.hpp"
+#include "fusion/events/event_queue.hpp"
 
 namespace Fusion {
     class Window {
@@ -60,7 +60,7 @@ namespace Fusion {
         vk::SurfaceKHR createSurface(const vk::Instance& instance, const vk::AllocationCallbacks* pAllocator = nullptr) {
             return createWindowSurface(window, instance, pAllocator);
         }
-        vk::Extent2D getExtent() const { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)} }
+        vk::Extent2D getExtent() const { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)}; }
 #endif
 
     private:

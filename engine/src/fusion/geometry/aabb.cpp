@@ -1,6 +1,6 @@
-#include "AABB.hpp"
-#include "Ray.hpp"
-#include "Sphere.hpp"
+#include "aabb.hpp"
+#include "ray.hpp"
+#include "sphere.hpp"
 
 using namespace Fusion;
 

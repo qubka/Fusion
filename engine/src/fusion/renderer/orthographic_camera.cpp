@@ -3,11 +3,11 @@
 using namespace Fusion;
 
 OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top) : Camera{} {
-    setProjection(left, right, bottom, top);
+    setOrthographic(left, right, bottom, top);
     updateView();
 }
 
-void OrthographicCamera::setProjection(float left, float right, float bottom, float top) {
+void OrthographicCamera::setOrthographic(float left, float right, float bottom, float top) {
     projectionMatrix = glm::ortho(left, right, bottom, top);
     isDirty = true;
 }

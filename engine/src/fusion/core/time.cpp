@@ -1,4 +1,4 @@
-#include "Time.hpp"
+#include "time.hpp"
 
 #include <GLFW/glfw3.h>
 

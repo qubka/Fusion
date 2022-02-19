@@ -1,6 +1,6 @@
-#include "ImGuiLayer.hpp"
+#include "imgui_layer.hpp"
 
-/*#include "Fusion/Core/Window.hpp"
+/*#include "fusion/core/window.hpp"
 
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>

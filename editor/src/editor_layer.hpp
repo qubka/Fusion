@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Panels/scene_hierarchy_panel.hpp"
-#include "Panels/content_browser_panel.hpp"
+#include "panels/scene_hierarchy_panel.hpp"
+#include "panels/content_browser_panel.hpp"
 
-#include "Fusion/Core/Layer.hpp"
-#include "Fusion/Input/BaseInput.hpp"
-#include "Fusion/Scene/Scene.hpp"
-#include "Fusion/Scene/SceneSerializer.hpp"
-#include "Fusion/Renderer/EditorCamera.hpp"
-//#include "Fusion/Systems/MeshRenderer.hpp"
-#include "Fusion/Utils/ProcessInfo.hpp"
+#include "fusion/core/layer.hpp"
+#include "fusion/input/base_input.hpp"
+#include "fusion/scene/scene.hpp"
+#include "fusion/scene/scene_serializer.hpp"
+#include "fusion/renderer/editor_camera.hpp"
+//#include "fusion/systems/meshrenderer.hpp"
+#include "fusion/utils/process_info.hpp"
 
 namespace Fusion {
     class EditorLayer : public Layer {

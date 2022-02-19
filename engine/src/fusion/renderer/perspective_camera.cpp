@@ -1,4 +1,4 @@
-#include "PerspectiveCamera.hpp"
+#include "perspective_camera.hpp"
 
 using namespace Fusion;
 
@@ -19,7 +19,7 @@ void PerspectiveCamera::setViewport(int width, int height) {
     setAspect(viewportWidth / viewportHeight);
 }
 
-void PerspectiveCamera::setProjection(float aspectRatio, float fov, float nearClip, float farClip) {
+void PerspectiveCamera::setPerspective(float aspectRatio, float fov, float nearClip, float farClip) {
     aspect = aspectRatio;
     fovy = fov;
     near = nearClip;

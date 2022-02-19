@@ -1,4 +1,4 @@
-#include "Extentions.hpp"
+#include "extentions.hpp"
 
 #if 0
 #include <GL/glext.h>

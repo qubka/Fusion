@@ -1,5 +1,5 @@
-#include "Geometry.hpp"
-#include "Plane.hpp"
+#include "geometry.hpp"
+#include "plane.hpp"
 
 using namespace Fusion;
 

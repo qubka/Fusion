@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Fusion/Core/Layer.hpp"
-/*#include "Fusion/Renderer/Renderer.hpp"
-#include "Fusion/Renderer/SwapChain.hpp"
+#include "fusion/core/layer.hpp"
+/*#include "fusion/renderer/renderer.hpp"
+#include "fusion/renderer/swap_chain.hpp"
 
 namespace Fusion {
     class ImGuiLayer : public Layer {
