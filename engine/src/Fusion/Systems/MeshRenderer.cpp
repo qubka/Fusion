@@ -54,7 +54,7 @@ void MeshRenderer::createPipeline() {
     PipelineConfigInfo configInfo{};
     Pipeline::defaultPipelineConfigInfo(configInfo);
     configInfo.pipelineLayout = pipelineLayout;
-    configInfo.renderPass = renderer.getOffscreen()->getRenderPass();
+    configInfo.renderPass = renderer.getOffscreen().getRenderPass();
     configInfo.subpass = 0;
     pipeline = std::make_unique<Pipeline>(vulkan, "assets/shaders/mesh.vert.spv", "assets/shaders/mesh.frag.spv", configInfo);
 }

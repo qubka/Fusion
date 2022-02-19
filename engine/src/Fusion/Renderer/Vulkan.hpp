@@ -40,7 +40,9 @@ namespace Fusion {
         const vk::Queue& getGraphicsQueue() const { return graphicsQueue; }
         const vk::Queue& getPresentQueue() const { return presentQueue; }
         const vk::CommandPool& getCommandPool() const { return commandPool; }
+
         const vk::PhysicalDeviceProperties& getPhysicalProperties() const { return deviceProperties; }
+        //const vk::DisplayPropertiesKHR& getDisplayProperties() const { return displayProperties; }
 
         SwapChainSupportDetails getSwapChainSupport() const { return querySwapChainSupport(physicalDevice); }
         QueueFamilyIndices findPhysicalQueueFamilies() const { return findQueueFamilies(physicalDevice); }
@@ -94,8 +96,9 @@ namespace Fusion {
         vk::DispatchLoaderDynamic dldi;
 
         vk::PhysicalDeviceProperties deviceProperties;
+        //vk::DisplayPropertiesKHR displayProperties;
 
         const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
-        const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_MAINTENANCE1_EXTENSION_NAME};
     };
 }

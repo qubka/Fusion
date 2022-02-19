@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glfw/include/GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 
 #include "Fusion/Events/EventQueue.hpp"
 
@@ -18,6 +18,7 @@ namespace Fusion {
         int getHeight() const { return height; }
         float getAspect() const { return aspect; }
         const std::string& getTitle() const { return title; }
+        glm::vec2 getSize() const { return {width, height}; }
         glm::vec4 getViewport() const;
 
         bool shouldClose() const;

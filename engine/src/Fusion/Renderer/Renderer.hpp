@@ -3,10 +3,10 @@
 #include "Vulkan.hpp"
 #include "AllocatedBuffer.hpp"
 #include "Descriptors.hpp"
+#include "Offscreen.hpp"
 
 namespace Fusion {
     class SwapChain;
-    class Offscreen;
 
     struct FUSION_API GlobalUbo {
         alignas(16) glm::mat4 projection;
@@ -33,7 +33,7 @@ namespace Fusion {
         const vk::DescriptorSetLayout& getGlobalDescriptorLayoutSet() const { return globalDescriptorSetLayout; }
 
         const std::unique_ptr<SwapChain>& getSwapChain() const { return swapChain; }
-        const std::unique_ptr<Offscreen>& getOffscreen() const { return offscreen; }
+        const Offscreen& getOffscreen() const { return offscreen; }
 
         uint32_t getFrameIndex() const { return currentFrame; }
         bool isFrameInProgress() const { return isFrameStarted; }
@@ -57,8 +57,8 @@ namespace Fusion {
         Vulkan& vulkan;
 
         std::unique_ptr<SwapChain> swapChain;
-        std::unique_ptr<Offscreen> offscreen;
         std::vector<vk::CommandBuffer> commandBuffers;
+        Offscreen offscreen;
         std::vector<vk::CommandBuffer> offscreenBuffer;
 
         std::vector<AllocatedBuffer> uniformBuffers;

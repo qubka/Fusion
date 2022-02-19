@@ -46,14 +46,14 @@ void Vulkan::createInstance() {
                  << ", Minor: " << VK_API_VERSION_MINOR(version)
                  << ", Patch: " << VK_API_VERSION_PATCH(version) << '\n';
 
-    version = VK_MAKE_VERSION(1, 0, 0);
+    version = VK_API_VERSION_1_2;
 
     auto appInfo = vk::ApplicationInfo{
             window.getTitle().c_str(),
             version,
             "Fusion",
             version,
-            VK_API_VERSION_1_0
+            version
     };
 
     hasGflwRequiredInstanceExtensions();

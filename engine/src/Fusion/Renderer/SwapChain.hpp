@@ -43,6 +43,7 @@ namespace Fusion {
         vk::Format imageFormat;
         std::vector<vk::ImageView> imageViews;
         std::vector<vk::Framebuffer> framebuffers;
+
         std::vector<vk::Semaphore> imageAvailableSemaphores;
         std::vector<vk::Semaphore> renderFinishedSemaphores;
         std::vector<vk::Fence> inFlightFences;

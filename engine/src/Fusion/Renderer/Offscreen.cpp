@@ -1,50 +1,69 @@
 #include "Offscreen.hpp"
+#include "SwapChain.hpp"
+
+#include <GLFW/glfw3.h>
+#include <backends/imgui_impl_vulkan.h>
 
 using namespace Fusion;
 
-Offscreen::Offscreen(Vulkan& vulkan, vk::Extent2D extent) : vulkan{vulkan}, extent{extent} {
+Offscreen::Offscreen(Vulkan& vulkan) : vulkan{vulkan} {
     init();
 }
 
 Offscreen::~Offscreen() {
     // Color attachment
-    vulkan.getDevice().destroyImageView(color.view, nullptr);
-    vulkan.getDevice().destroyImage(color.image, nullptr);
-    vulkan.getDevice().freeMemory(color.memory, nullptr);
+    for (const auto& color : colors) {
+        vulkan.getDevice().destroyImageView(color.view, nullptr);
+        vulkan.getDevice().destroyImage(color.image, nullptr);
+        vulkan.getDevice().freeMemory(color.memory, nullptr);
+    }
 
     // Depth attachment
     vulkan.getDevice().destroyImageView(depth.view, nullptr);
     vulkan.getDevice().destroyImage(depth.image, nullptr);
     vulkan.getDevice().freeMemory(depth.memory, nullptr);
 
-    vulkan.getDevice().destroySampler(sampler, nullptr);
+    for (const auto& framebuffer : frameBuffers) {
+        vulkan.getDevice().destroyFramebuffer(framebuffer, nullptr);
+    }
+
     vulkan.getDevice().destroyRenderPass(renderPass, nullptr);
-    vulkan.getDevice().destroyFramebuffer( frameBuffer, nullptr);
+    vulkan.getDevice().destroySampler(sampler, nullptr);
 }
 
 void Offscreen::init() {
     createOffscreen();
     createRenderPass();
     createFramebuffers();
+    //createDescriptorSets();
 }
 
 void Offscreen::createOffscreen() {
     // Find a suitable color and depth format
-    color.format = vk::Format::eR8G8B8A8Unorm;
-    depth.format = vulkan.findDepthFormat();
+    colorFormat = vk::Format::eR8G8B8A8Unorm;
+    depthFormat = vulkan.findDepthFormat();
 
-    // Color attachment
-    vulkan.createImage(
-            extent.width,
-            extent.height,
-            color.format,
-            vk::ImageTiling::eOptimal,
-            vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled,
-            vk::MemoryPropertyFlagBits::eDeviceLocal,
-            color.image,
-            color.memory);
+    GLFWmonitor* primary = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(primary);
+    SwapChainSupportDetails swapChainSupport = vulkan.getSwapChainSupport();
+    extent = vk::Extent2D{static_cast<uint32_t>(mode->width), static_cast<uint32_t>(mode->height)};
 
-    vulkan.createImageView(color.image, color.format, vk::ImageAspectFlagBits::eColor, color.view);
+    colors.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+
+    for (auto& color : colors) {
+        // Color attachment
+        vulkan.createImage(
+                extent.width,
+                extent.height,
+                colorFormat,
+                vk::ImageTiling::eOptimal,
+                vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled,
+                vk::MemoryPropertyFlagBits::eDeviceLocal,
+                color.image,
+                color.memory);
+
+        vulkan.createImageView(color.image, colorFormat, vk::ImageAspectFlagBits::eColor, color.view);
+    }
 
     // Create sampler to sample from the attachment in the fragment shader
     vulkan.createSampler(
@@ -59,14 +78,14 @@ void Offscreen::createOffscreen() {
     vulkan.createImage(
             extent.width,
             extent.height,
-            depth.format,
+            depthFormat,
             vk::ImageTiling::eOptimal,
             vk::ImageUsageFlagBits::eDepthStencilAttachment,
             vk::MemoryPropertyFlagBits::eDeviceLocal,
             depth.image,
             depth.memory);
 
-    vulkan.createImageView(depth.image, depth.format, vk::ImageAspectFlagBits::eDepth, depth.view);
+    vulkan.createImageView(depth.image, depthFormat, vk::ImageAspectFlagBits::eDepth, depth.view);
 }
 
 // The color attachment of this framebuffer will then be used to sample from in the fragment shader of the final pass
@@ -75,7 +94,7 @@ void Offscreen::createRenderPass() {
 
     // Color attachment
     vk::AttachmentDescription colorAttachment{};
-    colorAttachment.format = color.format;
+    colorAttachment.format = colorFormat;
     colorAttachment.samples = vk::SampleCountFlagBits::e1;
     colorAttachment.loadOp = vk::AttachmentLoadOp::eClear;
     colorAttachment.storeOp = vk::AttachmentStoreOp::eStore;
@@ -86,7 +105,7 @@ void Offscreen::createRenderPass() {
 
     // Depth attachment
     vk::AttachmentDescription depthAttachment{};
-    depthAttachment.format = depth.format;
+    depthAttachment.format = depthFormat;
     depthAttachment.samples = vk::SampleCountFlagBits::e1;
     depthAttachment.loadOp = vk::AttachmentLoadOp::eClear;
     depthAttachment.storeOp = vk::AttachmentStoreOp::eDontCare;
@@ -137,18 +156,30 @@ void Offscreen::createRenderPass() {
 }
 
 void Offscreen::createFramebuffers() {
-    std::array<vk::ImageView, 2> attachments = {color.view, depth.view};
+    frameBuffers.resize(colors.size());
 
-    vk::FramebufferCreateInfo framebufferInfo{};
-    framebufferInfo.renderPass = renderPass;
-    framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-    framebufferInfo.pAttachments = attachments.data();
-    framebufferInfo.width = extent.width;
-    framebufferInfo.height = extent.height;
-    framebufferInfo.layers = 1;
+    for (size_t i = 0; i < colors.size(); i++) {
+        std::array<vk::ImageView, 2> attachments = {colors[i].view, depth.view};
 
-    auto result = vulkan.getDevice().createFramebuffer(&framebufferInfo, nullptr, &frameBuffer);
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to create framebuffer!");
+        vk::FramebufferCreateInfo framebufferInfo{};
+        framebufferInfo.renderPass = renderPass;
+        framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        framebufferInfo.pAttachments = attachments.data();
+        framebufferInfo.width = extent.width;
+        framebufferInfo.height = extent.height;
+        framebufferInfo.layers = 1;
+
+        auto result = vulkan.getDevice().createFramebuffer(&framebufferInfo, nullptr, &frameBuffers[i]);
+        FE_ASSERT(result == vk::Result::eSuccess && "failed to create framebuffer!");
+    }
+}
+
+void Offscreen::createDescriptorSets() {
+    textures.reserve(colors.size());
+
+    for (auto& color : colors) {
+        textures.emplace_back(ImGui_ImplVulkan_AddTexture(sampler, color.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+    }
 }
 
 /*vk::Result Offscreen::submitCommandBuffer(const vk::CommandBuffer& buffer) {

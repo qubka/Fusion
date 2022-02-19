@@ -46,8 +46,6 @@ namespace Fusion {
         };
         SceneState sceneState = SceneState::Edit;
 
-        void* textureID;
-
         Vulkan& vulkan;
         Renderer& renderer;
         MeshRenderer meshRenderer;

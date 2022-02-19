@@ -2,6 +2,10 @@
 
 namespace Fusion {
     void Log::Init() {
-        plog::init(plog::debug, "fusion.log");
+        const char* file = "fusion.log";
+        std::ofstream ofs;
+        ofs.open(file, std::ofstream::out | std::ofstream::trunc);
+        ofs.close();
+        plog::init(plog::debug, file);
     }
 }

@@ -1,6 +1,5 @@
 #include "Renderer.hpp"
 #include "SwapChain.hpp"
-#include "Offscreen.hpp"
 #include "AllocatedBuffer.hpp"
 #include "Descriptors.hpp"
 
@@ -8,9 +7,7 @@
 
 using namespace Fusion;
 
-Renderer::Renderer(Vulkan& vulkan) : vulkan{vulkan}, globalAllocator{vulkan}, descriptorLayoutCache{vulkan} {
-    offscreen = std::make_unique<Offscreen>(vulkan, vk::Extent2D{1280, 720});
-
+Renderer::Renderer(Vulkan& vulkan) : vulkan{vulkan}, globalAllocator{vulkan}, descriptorLayoutCache{vulkan}, offscreen{vulkan} {
     recreateSwapChain();
     createUniformBuffers();
     createDescriptorSets();
@@ -181,12 +178,12 @@ void Renderer::endSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
 vk::CommandBuffer Renderer::beginOffscreenRenderPass() {
     FE_ASSERT(isFrameStarted && "cannot call beginOffscreenRenderPass if frame is not in progress");
 
-    const auto& extent = offscreen->getExtent();
+    const auto& extent = offscreen.getExtent();
     auto offset = vk::Offset2D{0, 0};
 
     vk::RenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.renderPass = offscreen->getRenderPass();
-    renderPassInfo.framebuffer = offscreen->getFrameBuffer();
+    renderPassInfo.renderPass = offscreen.getRenderPass();
+    renderPassInfo.framebuffer = offscreen.getFrameBuffer(currentFrame);
     renderPassInfo.renderArea.offset = offset;
     renderPassInfo.renderArea.extent = extent;
 
@@ -209,9 +206,9 @@ vk::CommandBuffer Renderer::beginOffscreenRenderPass() {
 
     vk::Viewport viewport{};
     viewport.x = 0;
-    viewport.y = 0;
+    viewport.y = static_cast<float>(extent.height);
     viewport.width = static_cast<float>(extent.width);
-    viewport.height = static_cast<float>(extent.height);
+    viewport.height = -static_cast<float>(extent.height);
     viewport.minDepth = 0;
     viewport.maxDepth = 1;
 

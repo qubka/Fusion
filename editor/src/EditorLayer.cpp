@@ -24,7 +24,6 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imguizmo/ImGuizmo.h>
-#include <backends/imgui_impl_vulkan.h>
 
 using namespace Fusion;
 
@@ -47,9 +46,6 @@ void EditorLayer::onAttach() {
     }
 
     sceneHierarchyPanel.setContext(activeScene);
-
-    auto& offscreen = renderer.getOffscreen();
-    textureID = ImGui_ImplVulkan_AddTexture(offscreen->getSampler(), offscreen->getView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void EditorLayer::onDetach() {
@@ -234,22 +230,7 @@ void EditorLayer::onImGui() {
     ImVec2 minBounds = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
     ImVec2 maxBounds = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-    auto& offscreen = renderer.getOffscreen();
-    /*if (currentExtent != offscreen->getExtent()) {
-        VkDescriptorImageInfo desc_image[1] = {};
-        desc_image[0].sampler = offscreen->getSampler();
-        desc_image[0].imageView = offscreen->getView();
-        desc_image[0].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        VkWriteDescriptorSet write_desc[1] = {};
-        write_desc[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        write_desc[0].dstSet = static_cast<VkDescriptorSet>(textureID);
-        write_desc[0].descriptorCount = 1;
-        write_desc[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        write_desc[0].pImageInfo = desc_image;
-        vkUpdateDescriptorSets(vulkan.getDevice(), 1, write_desc, 0, NULL);
-    }*/
-
-    ImGui::Image(static_cast<ImTextureID*>(textureID), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
+    ImGui::Image(renderer.getOffscreen().getTextureId(renderer.getFrameIndex()), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -289,15 +270,15 @@ void EditorLayer::onImGui() {
         float snapValues[3] = { snapValue, snapValue, snapValue };
 
         /* Imguimo fix for Vulkan projection */
-        /*auto cameraView = glm::lookAtRH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
-        auto cameraProjection = glm::perspectiveRH(
+        auto cameraView = glm::lookAtLH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
+        auto cameraProjection = glm::perspectiveLH(
                 glm::radians(editorCamera.getFov()),
                 editorCamera.getAspect(),
                 editorCamera.getNearClip(),
-                editorCamera.getFarClip());*/
+                editorCamera.getFarClip());
 
-        const glm::mat4& cameraProjection = editorCamera.getProjection();
-        glm::mat4 cameraView = editorCamera.getView();
+        //const glm::mat4& cameraProjection = editorCamera.getProjection();
+        //glm::mat4 cameraView = editorCamera.getView();
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                              (ImGuizmo::OPERATION)gizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),

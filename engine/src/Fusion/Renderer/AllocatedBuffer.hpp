@@ -39,7 +39,7 @@ namespace Fusion {
 
     private:
         Vulkan& vulkan;
-        void* mapped = nullptr;
+        void* mapped{nullptr};
         vk::Buffer buffer;
         vk::DeviceMemory memory;
 
