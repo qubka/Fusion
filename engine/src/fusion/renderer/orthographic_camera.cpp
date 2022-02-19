@@ -1,4 +1,4 @@
-#include "OrthographicCamera.hpp"
+#include "orthographic_camera.hpp"
 
 using namespace Fusion;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Plane.hpp"
+#include "plane.hpp"
 
 namespace Fusion {
     class Sphere;

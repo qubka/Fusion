@@ -1,4 +1,4 @@
-#include "EditorLayer.hpp"
+#include "editorlayer.hpp"
 #include "Fusion/Core/Application.hpp"
 #include "Fusion/Core/Time.hpp"
 #include "Fusion/Input/Input.hpp"

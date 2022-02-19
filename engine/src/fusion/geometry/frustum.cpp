@@ -1,6 +1,6 @@
 #include "Frustum.hpp"
-#include "AABB.hpp"
-#include "Sphere.hpp"
+#include "aabb.hpp"
+#include "sphere.hpp"
 
 using namespace Fusion;
 

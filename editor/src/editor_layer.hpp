@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Panels/SceneHierarchyPanel.hpp"
-#include "Panels/ContentBrowserPanel.hpp"
+#include "Panels/scene_hierarchy_panel.hpp"
+#include "Panels/content_browser_panel.hpp"
 
 #include "Fusion/Core/Layer.hpp"
 #include "Fusion/Input/BaseInput.hpp"

@@ -6,7 +6,7 @@
 * This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 */
 #include "ExampleBase.hpp"
-#include "Fusion/Core/Window.hpp"
+#include "fusion/core/window.hpp"
 
 #include <imgui.h>
 

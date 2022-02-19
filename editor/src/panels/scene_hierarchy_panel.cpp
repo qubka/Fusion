@@ -1,4 +1,4 @@
-#include "SceneHierarchyPanel.hpp"
+#include "scene_hierarchy_panel.hpp"
 #include "Fusion/Scene/Components.hpp"
 
 #include <imgui/imgui.h>

@@ -21,7 +21,7 @@ Window::Window(std::string title, const glm::uvec2& size, const glm::ivec2& posi
 
     if (GLFWwindowCount == 0) {
         int success = glfwInit();
-        FE_ASSERT(success && "could not initialize GLFW!");
+        if (!success) throw std::runtime_error("could not initialize GLFW!");
         glfwSetErrorCallback(ErrorCallback);
         glfwSetMonitorCallback(MonitorCallback);
 #if GLFW_VERSION_MINOR >= 2
@@ -65,7 +65,7 @@ void Window::initWindow(const glm::ivec2& position) {
     }*/
 
     window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
-    FE_ASSERT(window && "failed to create window!");
+    if (!window) throw std::runtime_error("failed to create window!");
     GLFWwindowCount++;
 
     if (position != glm::ivec2{ 0, 0 }) {

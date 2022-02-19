@@ -1,4 +1,4 @@
-#include "ContentBrowserPanel.hpp"
+#include "content_browser_panel.hpp"
 
 #include <imgui/imgui.h>
 
