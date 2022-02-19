@@ -3,10 +3,10 @@
 #include "Fusion/Core/Time.hpp"
 #include "Fusion/Input/Input.hpp"
 #include "Fusion/ImGui/ImGuiLayer.hpp"
-#include "Fusion/Renderer/Texture.hpp"
+/*#include "Fusion/Renderer/Texture.hpp"
 #include "Fusion/Renderer/Renderer.hpp"
 #include "Fusion/Renderer/Offscreen.hpp"
-#include "Fusion/Renderer/AllocatedBuffer.hpp"
+#include "Fusion/Renderer/AllocatedBuffer.hpp"*/
 #include "Fusion/Utils/Math.hpp"
 #include "Fusion/Events/WindowEvents.hpp"
 #include "Fusion/Scene/Components.hpp"
@@ -27,7 +27,7 @@
 
 using namespace Fusion;
 
-EditorLayer::EditorLayer(Vulkan& vulkan, Renderer& renderer) : Layer{"EditorLayer"}, vulkan{vulkan}, renderer{renderer}, meshRenderer{vulkan, renderer} {
+EditorLayer::EditorLayer() : Layer{"EditorLayer"} {
 }
 
 EditorLayer::~EditorLayer() {
@@ -53,7 +53,7 @@ void EditorLayer::onDetach() {
 }
 
 void EditorLayer::onUpdate() {
-    auto& window = vulkan.getWindow();
+    /*auto& window = vulkan.getWindow();
     if (auto* event = window.getEventQueue().next<WindowFramebufferSizeEvent>()) {
         editorCamera.setViewport(event->width, event->height);
     }
@@ -81,13 +81,13 @@ void EditorLayer::onUpdate() {
         } else if (Input::GetKeyDown(Key::R)) {
             gizmoType = ImGuizmo::OPERATION::SCALE;
         }
-    }
+    }*/
 
 }
 
 void EditorLayer::onRender() {
     // update
-    GlobalUbo ubo{};
+    /*GlobalUbo ubo{};
     ubo.projection = editorCamera.getProjection();
     ubo.view = editorCamera.getView();
     ubo.lightDirection = glm::normalize(renderer.getLightDirection());
@@ -105,14 +105,14 @@ void EditorLayer::onRender() {
             activeScene->onRenderRuntime(meshRenderer);
             break;
         }
-    }
+    }*/
 }
 
 void EditorLayer::onImGui() {
     // TODO: Find solution for viewport. Currently we use global transparent background and set the color for each window to make it non transparent.
     /// Better to force vulkan generate image before imgui render and render it as an image in non-transparent viewport but it will require a lot of additional work to implement back buffer.
 
-    auto& window = vulkan.getWindow();
+    /*auto& window = vulkan.getWindow();
 
     // Note: Switch this to true to enable dockspace
     static bool viewportOpen = true;
@@ -269,7 +269,7 @@ void EditorLayer::onImGui() {
 
         float snapValues[3] = { snapValue, snapValue, snapValue };
 
-        /* Imguimo fix for Vulkan projection */
+        Imguimo fix for Vulkan projection
         auto cameraView = glm::lookAtLH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
         auto cameraProjection = glm::perspectiveLH(
                 glm::radians(editorCamera.getFov()),
@@ -303,8 +303,7 @@ void EditorLayer::onImGui() {
 
     //UI_Toolbar();
 
-    ImGui::End();
-
+    ImGui::End();*/
 }
 
 void EditorLayer::newScene() {

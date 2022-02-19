@@ -9,7 +9,7 @@ namespace Fusion {
     /* Global class (Testing purpose_ */
 
     // if you want use individual inputs, not called init here, use BaseInput's classes
-    class FUSION_API Input {
+    class Input {
     public:
         //! Returns true while the user holds down the key identified by GLFW code.
         static bool GetKey(KeyCode keycode);

@@ -13,7 +13,7 @@ namespace Fusion {
     /// Regards to Jonathan Heard
     /// @link https://stackoverflow.com/questions/55573238/how-do-i-do-a-proper-input-class-in-glfw-for-a-game-engine
     template<class T>
-    class FUSION_API BaseInput {
+    class BaseInput {
     public:
         //! Takes a list of which keys to keep state for
         BaseInput(const std::vector<T>& keysToMonitor);
@@ -37,7 +37,7 @@ namespace Fusion {
 
         struct Key {
             bool pressed{false};
-            uint32_t lastFrame{std::numeric_limits<uint32_t>::max()};
+            uint32_t lastFrame{UINT32_MAX};
         };
 
         std::map<T, Key> keys;

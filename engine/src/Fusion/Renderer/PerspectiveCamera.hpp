@@ -3,7 +3,7 @@
 #include "Camera.hpp"
 
 namespace Fusion {
-    class FUSION_API PerspectiveCamera : public Camera {
+    class PerspectiveCamera : public Camera {
     public:
         PerspectiveCamera(float aspect, float fov, float near, float far);
         ~PerspectiveCamera() override = default;

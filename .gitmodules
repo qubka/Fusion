@@ -36,3 +36,6 @@
 [submodule "external/magic_enum"]
 	path = external/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
+[submodule "external/gli"]
+	path = external/gli
+	url = https://github.com/g-truc/gli.git

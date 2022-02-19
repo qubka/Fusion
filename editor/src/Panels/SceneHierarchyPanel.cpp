@@ -7,7 +7,7 @@
 
 // TEMP
 #include "Fusion/Core/Application.hpp"
-#include "Fusion/Renderer/Mesh.hpp"
+//#include "Fusion/Renderer/Mesh.hpp"
 
 using namespace Fusion;
 
@@ -15,7 +15,7 @@ SceneHierarchyPanel::SceneHierarchyPanel() {
     glm::vec3 m_half_extents{1};
     float orientation = -1.0;
 
-    Mesh::Builder meshBuilder{};
+    /*Mesh::Builder meshBuilder{};
     meshBuilder.vertices =
             {
                     //front
@@ -61,7 +61,7 @@ SceneHierarchyPanel::SceneHierarchyPanel() {
                     20, 21, 22,		20, 22, 23   //bottom
             };
 
-    mesh = std::make_shared<Mesh>(Application::Instance().getVulkan(), meshBuilder);
+    mesh = std::make_shared<Mesh>(Application::Instance().getVulkan(), meshBuilder);*/
 }
 
 void SceneHierarchyPanel::setContext(const std::shared_ptr<Scene>& scene) {
@@ -84,7 +84,7 @@ void SceneHierarchyPanel::onImGui() {
         if (ImGui::MenuItem("Create Empty Entity")) {
             auto entity = context->registry.create();
             context->registry.emplace<TagComponent>(entity, "Empty Entity");
-            context->registry.emplace<MeshRendererComponent>(entity, mesh);
+            //context->registry.emplace<MeshRendererComponent>(entity, mesh);
             context->registry.emplace<TransformComponent>(entity);
         }
         ImGui::EndPopup();

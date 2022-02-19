@@ -23,8 +23,8 @@ namespace glm {
         }
 
         // Next take care of translation (easy).
-        translation = vec3(LocalMatrix[3]);
-        LocalMatrix[3] = vec4(0, 0, 0, LocalMatrix[3].w);
+        translation = vec3{LocalMatrix[3]};
+        LocalMatrix[3] = vec4{0, 0, 0, LocalMatrix[3].w};
 
         vec3 Row[3], Pdum3;
 

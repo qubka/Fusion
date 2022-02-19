@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Vulkan.hpp"
+/*#include "Vulkan.hpp"
 
 namespace Fusion {
-    class FUSION_API DescriptorAllocator {
+    class DescriptorAllocator {
     public:
         struct PoolSizes {
             std::vector<std::pair<vk::DescriptorType, float>> sizes =
@@ -44,7 +44,7 @@ namespace Fusion {
         static constexpr int INITIAL_POOL_SIZE = 1000;
     };
 
-    class FUSION_API DescriptorLayoutCache {
+    class DescriptorLayoutCache {
     public:
         DescriptorLayoutCache(Vulkan& vulkan);
         ~DescriptorLayoutCache();
@@ -68,7 +68,7 @@ namespace Fusion {
         Vulkan& vulkan;
     };
 
-    class FUSION_API DescriptorBuilder {
+    class DescriptorBuilder {
     public:
         DescriptorBuilder(DescriptorLayoutCache& cache, DescriptorAllocator& allocator);
         ~DescriptorBuilder();
@@ -87,4 +87,4 @@ namespace Fusion {
         DescriptorLayoutCache& cache;
         DescriptorAllocator& allocator;
     };
-};
+};*/

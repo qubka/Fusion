@@ -6,7 +6,7 @@
 namespace Fusion {
     class Window;
 
-    class FUSION_API KeyInput : public BaseInput<KeyCode> {
+    class KeyInput : public BaseInput<KeyCode> {
     public:
         KeyInput(const std::vector<KeyCode>& keysToMonitor);
         ~KeyInput();

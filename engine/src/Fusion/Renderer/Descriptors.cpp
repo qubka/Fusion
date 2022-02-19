@@ -1,5 +1,5 @@
 #include "Descriptors.hpp"
-
+/*
 using namespace Fusion;
 
 DescriptorAllocator::DescriptorAllocator(Vulkan& vulkan) : vulkan{vulkan} {
@@ -288,4 +288,4 @@ bool DescriptorBuilder::build(vk::DescriptorSet& set) {
 
     allocator.updateDescriptor(writes);
     return true;
-}
+}*/

@@ -14,15 +14,15 @@ else()
 endif()
 
 file(GLOB_RECURSE GLSL_SOURCE_FILES
-        "${PROJECT_SOURCE_DIR}/assets/shaders/*.frag"
-        "${PROJECT_SOURCE_DIR}/assets/shaders/*.vert"
-        "${PROJECT_SOURCE_DIR}/assets/shaders/*.comp"
+        "${PROJECT_SOURCE_DIR}/data/shaders/vulkanscene/*.frag"
+        "${PROJECT_SOURCE_DIR}/data/shaders/vulkanscene/*.vert"
+        "${PROJECT_SOURCE_DIR}/data/shaders/vulkanscene/*.comp"
         )
 
 foreach(GLSL ${GLSL_SOURCE_FILES})
     message(STATUS "BUILDING SHADER")
     get_filename_component(FILE_NAME ${GLSL} NAME)
-    set(SPIRV "${PROJECT_SOURCE_DIR}/assets/shaders/${FILE_NAME}.spv")
+    set(SPIRV "${PROJECT_SOURCE_DIR}/data/shaders/vulkanscene/${FILE_NAME}.spv")
     message(STATUS ${GLSL})
     add_custom_command(
             OUTPUT ${SPIRV}

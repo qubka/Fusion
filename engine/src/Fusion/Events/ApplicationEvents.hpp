@@ -2,19 +2,19 @@
 
 namespace Fusion {
 
-    struct FUSION_API MonitorConnectedEvent : public Event {
+    struct  MonitorConnectedEvent : public Event {
         const GLFWmonitor* monitor{nullptr};
     };
 
-    struct FUSION_API MonitorDisconnectedEvent : public Event {
+    struct  MonitorDisconnectedEvent : public Event {
         const GLFWmonitor* monitor{nullptr};
     };
 
-    struct FUSION_API JoystickConnectedEvent : public Event {
+    struct  JoystickConnectedEvent : public Event {
         int joystickId;
     };
 
-    struct FUSION_API JoystickDisconnectedEvent : public Event {
+    struct  JoystickDisconnectedEvent : public Event {
         int joystickId;
     };
 }

@@ -5,17 +5,17 @@
 
 namespace Fusion {
 
-    struct FUSION_API KeyEvent : public Event {
+    struct  KeyEvent : public Event {
         KeyCode keycode;
     };
 
-    struct FUSION_API KeyPressedEvent : public KeyEvent {
+    struct  KeyPressedEvent : public KeyEvent {
         bool repeat;
     };
 
-    struct FUSION_API KeyReleasedEvent : public KeyEvent {
+    struct  KeyReleasedEvent : public KeyEvent {
     };
 
-    struct FUSION_API KeyTypedEvent : public KeyEvent {
+    struct  KeyTypedEvent : public KeyEvent {
     };
 }

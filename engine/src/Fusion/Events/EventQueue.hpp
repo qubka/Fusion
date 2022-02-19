@@ -3,10 +3,10 @@
 class GLFWwindow;
 
 namespace Fusion {
-    class FUSION_API Event {
+    class Event {
     };
 
-    class FUSION_API EventQueue {
+    class EventQueue {
         typedef std::queue<Event*> Queue;
     public:
         EventQueue() = default;

@@ -1,4 +1,5 @@
 #include "Window.hpp"
+#if !defined(ANDROID)
 
 #include "Fusion/Events/WindowEvents.hpp"
 #include "Fusion/Events/ApplicationEvents.hpp"
@@ -8,12 +9,13 @@ using namespace Fusion;
 uint8_t Window::GLFWwindowCount{0};
 std::vector<GLFWwindow*> Window::instances;
 
-Window::Window(std::string title, int width, int height) :
+Window::Window(std::string title, const glm::uvec2& size, const glm::ivec2& position, bool fullscreen) :
     title{std::move(title)},
-    width{width},
-    height{height},
-    aspect{static_cast<float>(width) / static_cast<float>(height)},
-    minimize{width == 0 || height == 0}
+    width{static_cast<int>(size.x)},
+    height{static_cast<int>(size.y)},
+    aspect{static_cast<float>(size.x) / static_cast<float>(size.y)},
+    minimize{width == 0 || height == 0},
+    fullscreen{fullscreen}
 {
     FE_ASSERT(width >= 0 && height >= 0 && "width or height cannot be negative");
 
@@ -27,7 +29,7 @@ Window::Window(std::string title, int width, int height) :
 #endif
     }
 
-    init();
+    initWindow(position);
 
     instances.push_back(window);
 }
@@ -36,6 +38,7 @@ Window::~Window() {
     instances.erase(std::remove(instances.begin(), instances.end(), window), instances.end());
 
     glfwDestroyWindow(window);
+    window = nullptr;
 
     GLFWwindowCount--;
     if (GLFWwindowCount == 0) {
@@ -43,15 +46,31 @@ Window::~Window() {
     }
 }
 
-void Window::init() {
+void Window::initWindow(const glm::ivec2& position) {
     FE_LOG_INFO << "Creating window: " << title << " [" << width << " " << height << "]";
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-    window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
+    /*if (fullscreen) {
+        auto monitor = glfwGetPrimaryMonitor();
+        auto mode = glfwGetVideoMode(monitor);
+        width = mode->width;
+        height = mode->height;
+        aspect = static_cast<float>(width) / static_cast<float>(height);
+
+        window = glfwCreateWindow(width, height, title.c_str(), monitor, nullptr);
+    } else {
+        window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    }*/
+
+    window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     FE_ASSERT(window && "failed to create window!");
     GLFWwindowCount++;
+
+    if (position != glm::ivec2{ 0, 0 }) {
+        glfwSetWindowPos(window, position.x, position.y);
+    }
 
     glfwSetWindowUserPointer(window, this);
     glfwSetWindowPosCallback(window, PosCallback);
@@ -77,21 +96,28 @@ void Window::init() {
 #endif
 }
 
-void Window::onUpdate() {
-    eventQueue.free();
-    glfwPollEvents();
+#if defined(VULKAN_HPP)
+std::vector<std::string> Window::getRequiredInstanceExtensions() {
+    std::vector<std::string> result;
+    uint32_t count = 0;
+    const char** names = glfwGetRequiredInstanceExtensions(&count);
+    if (names && count) {
+        for (uint32_t i = 0; i < count; ++i) {
+            result.emplace_back(names[i]);
+        }
+    }
+    return result;
 }
 
-bool Window::shouldClose() const {
-    return glfwWindowShouldClose(window);
+vk::SurfaceKHR Window::createWindowSurface(GLFWwindow* window, const vk::Instance& instance, const vk::AllocationCallbacks* pAllocator) {
+    VkSurfaceKHR rawSurface;
+    auto result = static_cast<vk::Result>(glfwCreateWindowSurface((VkInstance)instance, window, reinterpret_cast<const VkAllocationCallbacks*>(pAllocator), &rawSurface));
+    return vk::createResultValue(result, rawSurface, "vk::CommandBuffer::begin");
 }
-
-void Window::shouldClose(bool flag) const {
-    glfwSetWindowShouldClose(window, flag);
-}
+#endif
 
 glm::vec4 Window::getViewport() const {
-#ifdef GLFW_INCLUDE_VULKAN
+#ifdef FE_VULKAN
     return {0, 0, width, height};
 #else // OPENGL
     return {0, height, width, -height}; // vertical flip is required
@@ -214,3 +240,4 @@ void Window::MonitorCallback(GLFWmonitor* monitor, int action) {
 void Window::ErrorCallback(int error, const char* description) {
     FE_LOG_ERROR << "[GLFW] Error (" << error << "): " << description;
 }
+#endif

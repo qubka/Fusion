@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Fusion {
-    struct FUSION_API AssetFile {
+    struct AssetFile {
         char type[4];
         int version;
         std::string serialized;
@@ -13,7 +13,7 @@ namespace Fusion {
         LZ4
     };
 
-    class FUSION_API Asset {
+    class Asset {
     public:
         static bool SaveBinaryFile(const std::string& path, const AssetFile& file);
         static bool LoadBinaryFile(const std::string& path, AssetFile& file);

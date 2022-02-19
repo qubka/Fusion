@@ -4,7 +4,7 @@ namespace Fusion {
     class Layer;
 
     //! A linear collection of Layers that supports element insertion and removal at both ends and also execute events
-    class FUSION_API LayerStack {
+    class LayerStack {
     public:
         LayerStack() = default;
         ~LayerStack();

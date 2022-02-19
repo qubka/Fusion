@@ -4,7 +4,7 @@
 
 namespace Fusion {
 
-    struct FUSION_API TagComponent {
+    struct  TagComponent {
         std::string tag;
 
         std::string& operator*() { return tag; }
@@ -12,7 +12,7 @@ namespace Fusion {
         operator std::string() const { return tag; }
     };
 
-    struct FUSION_API TransformComponent {
+    struct  TransformComponent {
         glm::vec3 translation{0};
         glm::vec3 rotation{0};
         glm::vec3 scale{1};
@@ -30,11 +30,11 @@ namespace Fusion {
     };
 
     class Mesh;
-    struct FUSION_API MeshRendererComponent {
+    struct  MeshRendererComponent {
         std::shared_ptr<Mesh> mesh;
     };
 
-    /*struct FUSION_API TranslateComponent {
+    /*struct  TranslateComponent {
         glm::mat4 transform{1};
 
         glm::mat4& operator*() { return transform; }
@@ -42,7 +42,7 @@ namespace Fusion {
         operator glm::mat4() const { return transform; }
     };
 
-    struct FUSION_API PositionComponent {
+    struct  PositionComponent {
         glm::vec3 position{0};
 
         glm::vec3& operator*() { return position; }
@@ -50,7 +50,7 @@ namespace Fusion {
         operator glm::vec3() const { return position; }
     };
 
-    struct FUSION_API RotationComponent {
+    struct  RotationComponent {
         glm::quat rotation{1, 0, 0, 0};
 
         glm::quat& operator*() { return rotation; }
@@ -58,7 +58,7 @@ namespace Fusion {
         operator glm::quat() const { return rotation; }
     };
 
-    struct FUSION_API ScaleComponent {
+    struct  ScaleComponent {
         glm::vec3 scale{1};
 
         glm::vec3& operator*() { return scale; }
@@ -66,7 +66,7 @@ namespace Fusion {
         operator glm::vec3() const { return scale; }
     };*/
 
-    struct FUSION_API CameraComponent {
+    struct  CameraComponent {
         SceneCamera camera;
         bool primary{true};
         bool fixedAspectRatio{false};

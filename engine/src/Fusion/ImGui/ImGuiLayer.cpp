@@ -1,6 +1,6 @@
 #include "ImGuiLayer.hpp"
 
-#include "Fusion/Core/Window.hpp"
+/*#include "Fusion/Core/Window.hpp"
 
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
@@ -175,4 +175,4 @@ void ImGuiLayer::setDarkThemeColors() {
     colors[ImGuiCol_TitleBg] = { 0.15f, 0.1505f, 0.151f, 1.0f };
     colors[ImGuiCol_TitleBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
     colors[ImGuiCol_TitleBgCollapsed] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-}
+}*/

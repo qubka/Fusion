@@ -4,40 +4,40 @@
 
 namespace Fusion {
 
-    struct FUSION_API WindowMovedEvent : public Event {
+    struct  WindowMovedEvent : public Event {
         glm::ivec2 pos;
     };
 
-    struct FUSION_API WindowSizeEvent : public Event {
+    struct  WindowSizeEvent : public Event {
         int width;
         int height;
     };
 
-    struct FUSION_API WindowCloseEvent : public Event {
+    struct  WindowCloseEvent : public Event {
     };
 
-    struct FUSION_API WindowRefreshEvent : public Event {
+    struct  WindowRefreshEvent : public Event {
     };
 
-    struct FUSION_API WindowFocusedEvent : public Event {
+    struct  WindowFocusedEvent : public Event {
     };
 
-    struct FUSION_API WindowUnfocusedEvent : public Event {
+    struct  WindowUnfocusedEvent : public Event {
     };
 
-    struct FUSION_API WindowIconifiedEvent : public Event {
+    struct  WindowIconifiedEvent : public Event {
     };
 
-    struct FUSION_API WindowDeiconifiedEvent : public Event {
+    struct  WindowDeiconifiedEvent : public Event {
     };
 
-    struct FUSION_API WindowFramebufferSizeEvent : public Event {
+    struct  WindowFramebufferSizeEvent : public Event {
         int width;
         int height;
     };
 
 #if GLFW_VERSION_MINOR >= 1
-    struct FUSION_API WindowFileDropCallback : public Event {
+    struct  WindowFileDropCallback : public Event {
         int count;
         const char** paths;
 
@@ -48,11 +48,11 @@ namespace Fusion {
     };
 #endif
 #if GLFW_VERSION_MINOR >= 3
-    struct FUSION_API WindowMaximizedEvent : public Event {
+    struct  WindowMaximizedEvent : public Event {
     };
-    struct FUSION_API WindowUnmaximizedEvent : public Event {
+    struct  WindowUnmaximizedEvent : public Event {
     };
-    struct FUSION_API WindowContentScaleEvent : public Event {
+    struct  WindowContentScaleEvent : public Event {
         glm::vec2 scale;
     };
 #endif

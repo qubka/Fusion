@@ -44,7 +44,7 @@ add_subdirectory(${PLOG_LIB_NAME})
 
 # glm
 set(GLM_LIB_NAME "glm")
-set(GLM_INC_PATH ${GLM_LIB_NAME}/glm)
+set(GLM_INC_PATH ${GLM_LIB_NAME})
 
 add_library(${GLM_LIB_NAME} INTERFACE)
 
@@ -65,6 +65,18 @@ target_include_directories(${GLM_LIB_NAME}
 #    PUBLIC
 #        ${GLM_INC_PATH}
 #)
+
+
+# gli
+set(GLI_LIB_NAME "gli")
+set(GLI_INC_PATH ${GLI_LIB_NAME})
+
+add_library(${GLI_LIB_NAME} INTERFACE)
+
+target_include_directories(${GLI_LIB_NAME}
+        INTERFACE
+        ${GLI_INC_PATH}
+        )
 
 
 # glad

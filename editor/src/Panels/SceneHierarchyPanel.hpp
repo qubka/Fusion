@@ -3,8 +3,8 @@
 #include "Fusion/Scene/Scene.hpp"
 
 namespace Fusion {
-    class Mesh;
-    class FUSION_API SceneHierarchyPanel {
+    //class Mesh;
+    class SceneHierarchyPanel {
     public:
         SceneHierarchyPanel();
         ~SceneHierarchyPanel() = default;
@@ -24,7 +24,7 @@ namespace Fusion {
 
     private:
         std::shared_ptr<Scene> context;
-        std::shared_ptr<Mesh> mesh;
+        //std::shared_ptr<Mesh> mesh;
         entt::entity selectionContext;
     };
 

@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Fusion {
-    struct FUSION_API Image {
+    struct  Image {
         uint8_t* pixels;
         int width;
         int height;

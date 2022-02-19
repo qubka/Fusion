@@ -8,13 +8,13 @@
 #include "Fusion/Scene/Scene.hpp"
 #include "Fusion/Scene/SceneSerializer.hpp"
 #include "Fusion/Renderer/EditorCamera.hpp"
-#include "Fusion/Systems/MeshRenderer.hpp"
+//#include "Fusion/Systems/MeshRenderer.hpp"
 #include "Fusion/Utils/ProcessInfo.hpp"
 
 namespace Fusion {
-    class FUSION_API EditorLayer : public Layer {
+    class EditorLayer : public Layer {
     public:
-        EditorLayer(Vulkan& vulkan, Renderer& renderer);
+        EditorLayer();
         ~EditorLayer() override;
 
         void onAttach() override;
@@ -46,8 +46,8 @@ namespace Fusion {
         };
         SceneState sceneState = SceneState::Edit;
 
-        Vulkan& vulkan;
+        /*Vulkan& vulkan;
         Renderer& renderer;
-        MeshRenderer meshRenderer;
+        MeshRenderer meshRenderer;*/
     };
 }

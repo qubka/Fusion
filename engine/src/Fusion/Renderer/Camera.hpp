@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Fusion {
-    class FUSION_API Camera {
+    class Camera {
     public:
         Camera() = default;
         virtual ~Camera() = default;

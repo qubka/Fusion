@@ -2,7 +2,7 @@
 
 namespace Fusion {
     //! Global time holder
-    class FUSION_API Time {
+    class Time {
     public:
         //! The time at the beginning of this frame (Read Only).
         static inline float TimeAsFloat() { return static_cast<float>(time); }

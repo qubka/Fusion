@@ -34,7 +34,7 @@ void OrthographicCamera::updateView() {
 
     glm::mat4 m{1};
     glm::mat4 transform {glm::translate(m, position) *
-#ifdef GLFW_INCLUDE_VULKAN
+#ifdef FE_VULKAN
             glm::rotate(m, glm::radians(rotation), vec3::down)};
 #else
             glm::rotate(m, glm::radians(rotation), vec3::up)};

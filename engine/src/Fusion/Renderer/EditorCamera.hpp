@@ -6,7 +6,7 @@ namespace Fusion {
     class KeyInput;
     class MouseInput;
 
-    class FUSION_API EditorCamera : public PerspectiveCamera {
+    class EditorCamera : public PerspectiveCamera {
     public:
         EditorCamera();
         EditorCamera(float fov, float aspect, float near, float far);

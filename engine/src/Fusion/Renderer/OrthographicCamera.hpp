@@ -3,7 +3,7 @@
 #include "Camera.hpp"
 
 namespace Fusion {
-    class FUSION_API OrthographicCamera : public Camera {
+    class OrthographicCamera : public Camera {
     public:
         OrthographicCamera(float left, float right, float bottom, float top);
          ~OrthographicCamera() override = default;

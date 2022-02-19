@@ -42,12 +42,4 @@ namespace vec2 {
     GLM_INLINE GLM_CONSTEXPR glm::vec2 zero = glm::vec2{0,0};
 }
 
-/*#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
-#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
-
-#include <glad/glad.h>
-
-GLint glxGpuTotalMemory();
-GLint glxGpuAvailMemory();*/
-
 #endif //VOX_EXTENTIONS_H

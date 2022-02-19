@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Fusion/Core/Layer.hpp"
-#include "Fusion/Renderer/Renderer.hpp"
+/*#include "Fusion/Renderer/Renderer.hpp"
 #include "Fusion/Renderer/SwapChain.hpp"
 
 namespace Fusion {
-    class FUSION_API ImGuiLayer : public Layer {
+    class ImGuiLayer : public Layer {
     public:
         ImGuiLayer(Vulkan& vulkan, Renderer& renderer);
         ~ImGuiLayer() override;
@@ -26,3 +26,4 @@ namespace Fusion {
         static void setDarkThemeColors();
     };
 }
+*/

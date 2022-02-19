@@ -4,7 +4,7 @@ namespace Fusion {
     class AABB;
     class Ray;
 
-    class FUSION_API Sphere {
+    class Sphere {
         glm::vec3 center;
         float radius;
     public:

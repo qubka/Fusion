@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Fusion {
-    class FUSION_API Ray {
+    class Ray {
         glm::vec3 origin;
         glm::vec3 direction;
     public:

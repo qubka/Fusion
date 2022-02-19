@@ -17,7 +17,13 @@
     #error "Unknown dynamic link import/export semantics."
 #endif
 #else
-    #define FUSION_API
+#define FUSION_API
+#endif
+
+#ifdef FE_DEBUG
+#define FE_ASSERT(...) assert(__VA_ARGS__)
+#else
+#define FE_ASSERT(...)
 #endif
 
 #ifdef FE_DEBUG

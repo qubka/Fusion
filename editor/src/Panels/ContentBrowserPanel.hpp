@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Fusion {
-    class FUSION_API ContentBrowserPanel {
+    class ContentBrowserPanel {
     public:
         ContentBrowserPanel();
         ~ContentBrowserPanel() = default;

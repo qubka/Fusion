@@ -8,14 +8,14 @@ namespace Fusion {
         RGBA8
     };
 
-    struct FUSION_API PageInfo {
+    struct PageInfo {
         uint32_t width;
         uint32_t height;
         uint32_t compressedSize;
         uint32_t originalSize;
     };
 
-    struct FUSION_API TextureInfo {
+    struct TextureInfo {
         uint64_t textureSize;
         TextureFormat textureFormat;
         CompressionMode compressionMode;
@@ -24,7 +24,7 @@ namespace Fusion {
         std::vector<PageInfo> pages;
     };
 
-    class FUSION_API TextureAsset {
+    class TextureAsset {
     public:
         TextureInfo readTextureInfo(const AssetFile& file);
         void unpackTexture(const TextureInfo& info, const std::string& source, size_t sourceSize, char* destination);

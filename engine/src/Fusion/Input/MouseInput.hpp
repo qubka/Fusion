@@ -6,7 +6,7 @@
 namespace Fusion {
     class Window;
 
-    class FUSION_API MouseInput : public BaseInput<MouseCode> {
+    class MouseInput : public BaseInput<MouseCode> {
     public:
         MouseInput(const std::vector<MouseCode>& buttonsToMonitor);
         ~MouseInput();

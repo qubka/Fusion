@@ -1,5 +1,6 @@
 #include "Extentions.hpp"
-/*
+
+#if 0
 #include <GL/glext.h>
 
 GLint glxGpuTotalMemory() {
@@ -29,4 +30,5 @@ GLint glxGpuAvailMemory() {
     }
 
     return curAvailMemKb;
-}*/
+}
+#endif

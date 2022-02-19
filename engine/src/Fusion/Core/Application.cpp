@@ -11,9 +11,9 @@ Application* Application::instance{nullptr};
 
 Application::Application(std::string name, CommandLineArgs args)
     : commandLineArgs{args},
-      window{std::move(name), 1280, 720},
-      vulkan{window},
-      renderer{vulkan}
+      window{std::move(name), {1280, 720}}//,
+      //vulkan{window},
+      //renderer{vulkan}
 {
     FE_ASSERT(!instance && "application already exists!");
     instance = this;
@@ -22,13 +22,13 @@ Application::Application(std::string name, CommandLineArgs args)
     //MouseInput::Setup(window);
     Input::Init(window);
 
-    imGuiLayer = new ImGuiLayer{vulkan, renderer};
-    pushOverlay(imGuiLayer);
+    //imGuiLayer = new ImGuiLayer{vulkan, renderer};
+   // pushOverlay(imGuiLayer);
 }
 
 void Application::run() {
     while (!window.shouldClose()) {
-        Time::Update();
+        /*Time::Update();
 
         window.onUpdate();
 
@@ -59,11 +59,11 @@ void Application::run() {
             }
         }
 
-        Input::Update();
+        Input::Update();*/
     }
 
-    auto result = vulkan.getDevice().waitIdle();
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to wait on the device!");
+    //auto result = vulkan.getDevice().waitIdle();
+    //FE_ASSERT(result == vk::Result::eSuccess && "failed to wait on the device!");
 }
 
 void Application::pushLayer(Layer* layer) {

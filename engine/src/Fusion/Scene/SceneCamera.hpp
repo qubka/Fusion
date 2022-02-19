@@ -4,7 +4,7 @@
 
 namespace Fusion {
 
-    class FUSION_API SceneCamera {
+    class SceneCamera {
     public:
         enum class ProjectionType { Perspective = 0, Orthographic = 1 };
     public:

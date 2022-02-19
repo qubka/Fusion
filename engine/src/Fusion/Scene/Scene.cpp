@@ -1,7 +1,7 @@
 #include "Scene.hpp"
 #include "Components.hpp"
 
-#include "Fusion/Systems/MeshRenderer.hpp"
+//#include "Fusion/Systems/MeshRenderer.hpp"
 
 using namespace Fusion;
 
@@ -21,12 +21,12 @@ void Scene::onUpdateEditor() {
 
 }
 
-void Scene::onRenderRuntime(MeshRenderer& meshRenderer) {
+void Scene::onRenderRuntime() {
 
 }
 
-void Scene::onRenderEditor(MeshRenderer& meshRenderer) {
-    meshRenderer.beginScene();
+void Scene::onRenderEditor() {
+    /*meshRenderer.beginScene();
 
     auto group = registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
     for (auto entity : group) {
@@ -34,5 +34,5 @@ void Scene::onRenderEditor(MeshRenderer& meshRenderer) {
         meshRenderer.drawMesh(transform, mesh.mesh);
     }
 
-    meshRenderer.endScene();
+    meshRenderer.endScene();*/
 }

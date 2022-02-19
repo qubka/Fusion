@@ -2,9 +2,10 @@
 
 #include "Window.hpp"
 #include "LayerStack.hpp"
+#include "Window.hpp"
 
-#include "Fusion/Renderer/Vulkan.hpp"
-#include "Fusion/Renderer/Renderer.hpp"
+//#include "Fusion/Renderer/Vulkan.hpp"
+//#include "Fusion/Renderer/Renderer.hpp"
 
 int main(int argc, char** argv);
 
@@ -12,7 +13,7 @@ namespace Fusion {
     class Layer;
     class ImGuiLayer;
 
-    struct FUSION_API CommandLineArgs {
+    struct  CommandLineArgs {
         int count{0};
         char** args{nullptr};
 
@@ -22,7 +23,7 @@ namespace Fusion {
         }
     };
 
-    class FUSION_API Application {
+    class Application {
     public:
         Application(std::string name = "Fusion", CommandLineArgs args = CommandLineArgs{});
         virtual ~Application() = default;
@@ -34,8 +35,8 @@ namespace Fusion {
         void pushOverlay(Layer* overlay);
 
         Window& getWindow() { return window; }
-        Vulkan& getVulkan() { return vulkan; }
-        Renderer& getRenderer() { return renderer; }
+        //Vulkan& getVulkan() { return vulkan; }
+        //Renderer& getRenderer() { return renderer; }
 
         CommandLineArgs& getCommandLineArgs() { return commandLineArgs; }
         ImGuiLayer& getImGuiLayer() { return *imGuiLayer; }
@@ -44,8 +45,8 @@ namespace Fusion {
     protected:
         Window window;
         CommandLineArgs commandLineArgs;
-        Vulkan vulkan;
-        Renderer renderer;
+        //Vulkan vulkan;
+        //Renderer renderer;
 
     private:
         LayerStack layers;

@@ -10,7 +10,7 @@ namespace Fusion {
     /// if extracted from projection matrix only, planes will be in eye-space
     /// if extracted from view*projection, planes will be in world space
     /// if extracted from model*view*projection planes will be in model space
-    class FUSION_API Frustum {
+    class Frustum {
         Plane planes[6];
     public:
         enum FrustumSection { TOP, BOTTOM, LEFT, RIGHT, NEAR, FAR };

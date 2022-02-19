@@ -3,9 +3,10 @@
 namespace Fusion {
     class Ray;
 
-    class FUSION_API Plane {
+    class Plane {
         glm::vec3 normal;
         float distance;
+
     public:
         Plane();
         Plane(const glm::vec3& normal, const glm::vec3& point);

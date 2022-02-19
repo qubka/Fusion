@@ -30,7 +30,7 @@ void PerspectiveCamera::setProjection(float aspectRatio, float fov, float nearCl
 /// @link https://matthewwellings.com/blog/the-new-vulkan-coordinate-system/
 
 glm::vec3 PerspectiveCamera::calcForward() const {
-#ifdef GLFW_INCLUDE_VULKAN
+#ifdef FE_VULKAN
     return rotation * vec3::forward;
 #else
     return rotation * vec3::back;
@@ -38,7 +38,7 @@ glm::vec3 PerspectiveCamera::calcForward() const {
 }
 
 glm::vec3 PerspectiveCamera::calcUp() const {
-#ifdef GLFW_INCLUDE_VULKAN
+#ifdef FE_VULKAN
     return rotation * vec3::down;
 #else
     return rotation * vec3::up;

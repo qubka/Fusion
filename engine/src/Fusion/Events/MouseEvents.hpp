@@ -5,27 +5,27 @@
 
 namespace Fusion {
 
-    struct FUSION_API MouseMovedEvent : public Event {
+    struct  MouseMovedEvent : public Event {
         glm::vec2 mouse;
     };
 
-    struct FUSION_API MouseScrollEvent : public Event {
+    struct  MouseScrollEvent : public Event {
         glm::vec2 offset;
     };
 
-    struct FUSION_API MouseCursorEnterEvent : public Event {
+    struct  MouseCursorEnterEvent : public Event {
     };
 
-    struct FUSION_API MouseCursorLeftEvent : public Event {
+    struct  MouseCursorLeftEvent : public Event {
     };
 
-    struct FUSION_API MouseButtonEvent : public Event {
+    struct  MouseButtonEvent : public Event {
         MouseCode button;
     };
 
-    struct FUSION_API MouseButtonPressedEvent : public MouseButtonEvent {
+    struct  MouseButtonPressedEvent : public MouseButtonEvent {
     };
 
-    struct FUSION_API MouseButtonReleasedEvent : public MouseButtonEvent {
+    struct  MouseButtonReleasedEvent : public MouseButtonEvent {
     };
 }

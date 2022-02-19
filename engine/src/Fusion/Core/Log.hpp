@@ -9,7 +9,7 @@ namespace Fusion {
         GameLog = 1
     };*/
 
-    class FUSION_API Log {
+    class Log {
     public:
         static void Init();
     };
