@@ -30,13 +30,20 @@ void MouseInput::setScrollOffset(const glm::vec2& offset) {
     scroll = offset;
 }
 
-void MouseInput::Setup(Window& window) {
+/*void MouseInput::Setup(Window& window) {
     glfwSetMouseButtonCallback(window, MouseButtonCallback);
     glfwSetCursorPosCallback(window, CursorPositionCallback);
     glfwSetCursorEnterCallback(window, CursorEnterCallback);
     glfwSetScrollCallback(window, ScrollCallback);
+}*/
+
+void MouseInput::Update() {
+    for (auto* input : instances) {
+        input->onUpdate();
+    }
 }
 
+#if !defined(__ANDROID__)
 void MouseInput::CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
     window.getEventQueue().submit(new MouseMovedEvent{{},{mouseX, mouseY}});
@@ -83,3 +90,6 @@ void MouseInput::MouseButtonCallback(GLFWwindow* handle, int button, int action,
         input->setKey(button, action);
     }
 }
+#else
+
+#endif

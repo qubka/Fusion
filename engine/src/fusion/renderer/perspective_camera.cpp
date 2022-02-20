@@ -8,7 +8,7 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float 
     near{near},
     far{far}
 {
-    FE_ASSERT(far > near && "far cannot be less then near");
+    assert(far > near && "Far cannot be less then near");
     updateProjection();
     updateView();
 }

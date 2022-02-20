@@ -42,7 +42,7 @@ namespace Fusion {
         const char** paths;
 
         const char* operator[](int index) const {
-            FE_ASSERT(index < count && "invalid argument index");
+            assert(index < count && "Invalid argument index");
             return paths[index];
         }
     };

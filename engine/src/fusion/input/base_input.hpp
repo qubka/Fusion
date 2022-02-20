@@ -1,13 +1,10 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-
 #include "mouse_codes.hpp"
 #include "key_codes.hpp"
+#include "action_codes.hpp"
 
 namespace Fusion {
-    class Window;
-
     /* Template class */
 
     /// Regards to Jonathan Heard
@@ -20,8 +17,8 @@ namespace Fusion {
         ~BaseInput() = default;
 
         virtual void onAttach() {}
-        virtual void onDetach() {}
         virtual void onUpdate() { currentFrame++; }
+        virtual void onDetach() {}
 
         //! If disabled, Input.isKey_ always returns false
         bool isEnabled() const { return enabled; }
@@ -32,7 +29,7 @@ namespace Fusion {
         bool isKeyDown(T keycode) const;
 
         //! Used internally to update key states. Should be called by the GLFW callbacks
-        void setKey(T keycode, uint8_t action);
+        void setKey(T keycode, ActionCode action);
 
         struct Key {
             bool pressed{ false };

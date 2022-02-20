@@ -3,6 +3,16 @@ project(fusion)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(SHADER_DIR "${PROJECT_SOURCE_DIR}/data/shaders")
+file(GLOB_RECURSE GLSL_SOURCE_FILES
+        ${SHADER_DIR}/*.vert
+        ${SHADER_DIR}/*.frag
+        ${SHADER_DIR}/*.comp
+        ${SHADER_DIR}/*.tesc
+        ${SHADER_DIR}/*.tese
+        ${SHADER_DIR}/*.geom
+        )
+
 if (WIN32)
     if (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "AMD64")
         set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin/glslangValidator.exe")
@@ -13,17 +23,10 @@ else()
     set(GLSL_VALIDATOR "/usr/bin/glslc")
 endif()
 
-file(GLOB_RECURSE GLSL_SOURCE_FILES
-        "${PROJECT_SOURCE_DIR}/data/shaders/vulkanscene/*.frag"
-        "${PROJECT_SOURCE_DIR}/data/shaders/vulkanscene/*.vert"
-        "${PROJECT_SOURCE_DIR}/data/shaders/vulkanscene/*.comp"
-        )
-
 foreach(GLSL ${GLSL_SOURCE_FILES})
     message(STATUS "BUILDING SHADER")
-    get_filename_component(FILE_NAME ${GLSL} NAME)
-    set(SPIRV "${PROJECT_SOURCE_DIR}/data/shaders/vulkanscene/${FILE_NAME}.spv")
-    message(STATUS ${GLSL})
+    set(SPIRV "${GLSL}.spv")
+    message(STATUS ${GLSL} -> ${SPIRV})
     add_custom_command(
             OUTPUT ${SPIRV}
             COMMAND ${GLSL_VALIDATOR} ${GLSL} -o ${SPIRV}
@@ -42,3 +45,4 @@ add_subdirectory(assetlib)
 add_subdirectory(engine)
 #add_subdirectory(game)
 add_subdirectory(editor)
+

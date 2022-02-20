@@ -20,18 +20,6 @@
 #define FUSION_API
 #endif
 
-#ifdef FE_DEBUG
-#define FE_ASSERT(...) assert(__VA_ARGS__)
-#else
-#define FE_ASSERT(...)
-#endif
-
-#ifdef FE_DEBUG
-#define FE_ASSERT(...) assert(__VA_ARGS__)
-#else
-#define FE_ASSERT(...)
-#endif
-
 #define FE_NONCOPYABLE(x) x(const x&) = delete; \
                           x(x&&) = delete; \
                           x& operator=(const x&) = delete; \

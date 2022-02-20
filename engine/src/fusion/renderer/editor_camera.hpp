@@ -12,7 +12,7 @@ namespace Fusion {
         EditorCamera(float fov, float aspect, float near, float far);
         ~EditorCamera() override = default;
 
-        void update() override;
+        void update(float ts) override;
 
         float getPitch() const { return pitch; }
         float getYaw() const { return yaw; }

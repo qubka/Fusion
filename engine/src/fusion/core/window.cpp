@@ -17,7 +17,7 @@ Window::Window(std::string title, const glm::uvec2& size, const glm::ivec2& posi
     minimize{width == 0 || height == 0},
     fullscreen{fullscreen}
 {
-    FE_ASSERT(width >= 0 && height >= 0 && "width or height cannot be negative");
+    assert(width >= 0 && height >= 0 && "Width or height cannot be negative");
 
     if (GLFWwindowCount == 0) {
         int success = glfwInit();
@@ -52,7 +52,7 @@ void Window::initWindow(const glm::ivec2& position) {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-    /*if (fullscreen) {
+    if (fullscreen) {
         auto monitor = glfwGetPrimaryMonitor();
         auto mode = glfwGetVideoMode(monitor);
         width = mode->width;
@@ -62,9 +62,8 @@ void Window::initWindow(const glm::ivec2& position) {
         window = glfwCreateWindow(width, height, title.c_str(), monitor, nullptr);
     } else {
         window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
-    }*/
+    }
 
-    window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     if (!window) throw std::runtime_error("Failed to create window!");
     GLFWwindowCount++;
 
@@ -81,12 +80,12 @@ void Window::initWindow(const glm::ivec2& position) {
     glfwSetWindowIconifyCallback(window, IconifyCallback);
     glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
     /* Setup inputs classes */
-    //glfwSetMouseButtonCallback(window, MouseButtonCallback);
-    //glfwSetCursorPosCallback(window, CursorPosCallback);
-    //glfwSetCursorEnterCallback(window, CursorEnterCallback);
-    //glfwSetScrollCallback(window, ScrollCallback);
-    //glfwSetKeyCallback(window, KeyCallback);
-    //glfwSetCharCallback(window, CharCallback);
+    glfwSetMouseButtonCallback(window, Input::MouseButtonCallback);
+    glfwSetCursorPosCallback(window, Input::CursorPosCallback);
+    glfwSetCursorEnterCallback(window, Input::CursorEnterCallback);
+    glfwSetScrollCallback(window, Input::ScrollCallback);
+    glfwSetKeyCallback(window, Input::KeyCallback);
+    glfwSetCharCallback(window, Input::CharCallback);
 #if GLFW_VERSION_MINOR >= 1
     glfwSetDropCallback(window, FileDropCallback);
 #endif
@@ -111,8 +110,8 @@ std::vector<std::string> Window::getRequiredInstanceExtensions() {
 
 vk::SurfaceKHR Window::createWindowSurface(GLFWwindow* window, const vk::Instance& instance, const vk::AllocationCallbacks* pAllocator) {
     VkSurfaceKHR rawSurface;
-    auto result = static_cast<vk::Result>(glfwCreateWindowSurface((VkInstance)instance, window, reinterpret_cast<const VkAllocationCallbacks*>(pAllocator), &rawSurface));
-    return vk::createResultValue(result, rawSurface, "vk::CommandBuffer::begin");
+    auto result = static_cast<vk::Result>(glfwCreateWindowSurface(instance, window, reinterpret_cast<const VkAllocationCallbacks*>(pAllocator), &rawSurface));
+    return vk::createResultValue(result, rawSurface, "glfwCreateWindowSurface");
 }
 #endif
 
@@ -137,7 +136,7 @@ void Window::SizeCallback(GLFWwindow* handle, int width, int height) {
     window.aspect = static_cast<float>(width) / static_cast<float>(height);
     window.minimize = width == 0 || height == 0;*/
 
-    window.getEventQueue().submit(new WindowSizeEvent{{}, width, height});
+    window.eventQueue.submit(new WindowSizeEvent{{}, width, height});
 }
 
 void Window::CloseCallback(GLFWwindow* handle) {

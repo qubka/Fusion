@@ -1,6 +1,5 @@
 #include "editor_camera.hpp"
 #include "fusion/input/input.hpp"
-#include "fusion/core/time.hpp"
 
 using namespace Fusion;
 
@@ -10,14 +9,14 @@ EditorCamera::EditorCamera() : PerspectiveCamera{45.0f, 1.778f, 0.1f, 1000.0f} {
 EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : PerspectiveCamera{fov,aspect,near,far} {
 }
 
-void EditorCamera::update() {
+void EditorCamera::update(float ts) {
     if (Input::GetKey(Key::LeftAlt)) {
         if (Input::GetMouseButton(Mouse::ButtonMiddle))
-            mousePan( Input::MouseDelta() * Time::ElapsedTime());
+            mousePan( Input::MouseDelta() * ts);
         else if (Input::GetMouseButton(Mouse::ButtonLeft))
-            mouseRotate( Input::MouseDelta() * Time::ElapsedTime());
+            mouseRotate( Input::MouseDelta() * ts);
         else if (Input::GetMouseButton(Mouse::ButtonRight))
-            mouseZoom(Input::MouseDelta().y * Time::ElapsedTime());
+            mouseZoom(Input::MouseDelta().y * ts);
         else {
             auto scroll = Input::MouseScroll().y;
             if (scroll != 0.0f) {
@@ -28,7 +27,7 @@ void EditorCamera::update() {
         setPositionAndRotation(calculatePosition(), glm::quat{glm::vec3{pitch, yaw, 0}});
     }
 
-    PerspectiveCamera::update();
+    PerspectiveCamera::update(ts);
 }
 
 void EditorCamera::mousePan(const glm::vec2& delta) {

@@ -140,14 +140,11 @@ vk::DescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(vk::Descri
     }
 
     //try to grab from cache
-    if (auto it { layoutCache.find(layoutInfo)}; it != layoutCache.end()) {
+    if (auto it { layoutCache.find(layoutInfo) }; it != layoutCache.end()) {
         return (*it).second;
     } else {
         //create a new one (not found)
-        vk::DescriptorSetLayout layout;
-
-        auto result = device.createDescriptorSetLayout(&info, nullptr, &layout);
-        FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor set layout!");
+        vk::DescriptorSetLayout layout = device.createDescriptorSetLayout(info);
 
         //add to cache
         layoutCache[layoutInfo] = layout;

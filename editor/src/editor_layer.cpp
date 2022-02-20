@@ -1,8 +1,6 @@
 #include "editor_layer.hpp"
 #include "fusion/core/application.hpp"
-#include "fusion/core/time.hpp"
 #include "fusion/input/input.hpp"
-#include "fusion/gui/imgui_layer.hpp"
 /*#include "fusion/renderer/texture.hpp"
 #include "fusion/renderer/renderer.hpp"
 #include "fusion/renderer/offscreen.hpp"
@@ -38,12 +36,12 @@ void EditorLayer::onAttach() {
     activeScene = std::make_shared<Scene>();
     editorCamera = EditorCamera{30, 1.778f, 0.1f, 1000};
 
-    auto commandLineArgs = Application::Instance().getCommandLineArgs();
+    /*auto commandLineArgs = Application::Instance().getCommandLineArgs();
     if (commandLineArgs.count > 1) {
         auto sceneFilePath = commandLineArgs[1];
         SceneSerializer serializer{activeScene};
         serializer.deserialize(sceneFilePath);
-    }
+    }*/
 
     sceneHierarchyPanel.setContext(activeScene);
 }

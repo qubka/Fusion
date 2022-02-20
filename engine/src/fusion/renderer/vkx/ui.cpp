@@ -215,7 +215,7 @@ void UIOverlay::preparePipeline() {
 
 /** Prepare a separate render pass for rendering the UI as an overlay */
 void UIOverlay::prepareRenderPass() {
-    vk::AttachmentDescription attachments[2] = {};
+    std::array<vk::AttachmentDescription, 2> attachments;
 
     // Color attachment
     attachments[0].format = createInfo.colorformat;
@@ -234,7 +234,7 @@ void UIOverlay::prepareRenderPass() {
 
     vk::AttachmentReference colorReference{ 0, vk::ImageLayout::eColorAttachmentOptimal };
     vk::AttachmentReference depthReference{ 1, vk::ImageLayout::eDepthStencilAttachmentOptimal };
-    vk::SubpassDependency subpassDependencies[2];
+    std::array<vk::SubpassDependency, 2> subpassDependencies;
 
     // Transition from final to initial (VK_SUBPASS_EXTERNAL refers to all commmands executed outside of the actual renderpass)
     subpassDependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -260,12 +260,12 @@ void UIOverlay::prepareRenderPass() {
     subpassDescription.pDepthStencilAttachment = &depthReference;
 
     vk::RenderPassCreateInfo renderPassInfo;
-    renderPassInfo.attachmentCount = 2;
-    renderPassInfo.pAttachments = attachments;
+    renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+    renderPassInfo.pAttachments = attachments.data();
     renderPassInfo.subpassCount = 1;
     renderPassInfo.pSubpasses = &subpassDescription;
-    renderPassInfo.dependencyCount = 2;
-    renderPassInfo.pDependencies = subpassDependencies;
+    renderPassInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());
+    renderPassInfo.pDependencies = subpassDependencies.data();
 
     renderPass = context.device.createRenderPass(renderPassInfo);
 }

@@ -1,9 +1,10 @@
 #include "input.hpp"
 
+#include "fusion/core/window.hpp"
 #include "fusion/events/key_events.hpp"
 #include "fusion/events/mouse_events.hpp"
 
-#define MOUSE_BUTTONS 1024
+#define MOUSE_BUTTONS 500
 
 using namespace Fusion;
 
@@ -13,15 +14,6 @@ uint32_t Input::current{};
 glm::vec2 Input::delta{};
 glm::vec2 Input::position{};
 glm::vec2 Input::scroll{};
-
-void Input::Init(Window& window) {
-    glfwSetKeyCallback(window, KeyCallback);
-    glfwSetMouseButtonCallback(window, MouseButtonCallback);
-    glfwSetCursorPosCallback(window, CursorPositionCallback);
-    glfwSetCursorEnterCallback(window, CursorEnterCallback);
-    glfwSetCharCallback(window, CharCallback);
-    glfwSetScrollCallback(window, ScrollCallback);
-}
 
 bool Input::GetKey(KeyCode keycode) {
     return keys[keycode];
@@ -56,7 +48,8 @@ void Input::Update() {
     current++;
 }
 
-void Input::CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY) {
+#if !defined(__ANDROID__)
+void Input::CursorPosCallback(GLFWwindow* handle, double mouseX, double mouseY) {
     glm::vec2 mouse {mouseX, mouseY};
 
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
@@ -148,3 +141,6 @@ void Input::CharCallback(GLFWwindow* handle, unsigned int keycode) {
 
     window.getEventQueue().submit(new KeyTypedEvent{{{}, static_cast<KeyCode>(keycode)}});
 }
+#else
+
+#endif

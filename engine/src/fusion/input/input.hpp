@@ -3,7 +3,7 @@
 #include "mouse_codes.hpp"
 #include "key_codes.hpp"
 
-#include "fusion/core/window.hpp"
+class GLFWwindow;
 
 namespace Fusion {
     /* Global class (Testing purpose_ */
@@ -32,25 +32,28 @@ namespace Fusion {
         //! The current mouse scroll delta.
         static glm::vec2& MouseScroll() { return scroll; }
 
+        static void Update();
+
     private:
-        static bool keys[1032];
-        static uint32_t frames[1032];
+        static bool keys[512];
+        static uint32_t frames[512];
         static uint32_t current;
         static glm::vec2 delta;
         static glm::vec2 position;
         static glm::vec2 scroll;
 
-        static void Init(Window& window);
-        static void Update();
-
-        friend class Application;
-
-    protected:
-        static void CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY);
+    public:
+#if !defined(__ANDROID__)
+        /// Workaround for C++ class using a c-style-callback
+        static void CursorPosCallback(GLFWwindow* handle, double mouseX, double mouseY);
         static void CursorEnterCallback(GLFWwindow* handle, int entered);
         static void ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY);
         static void MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode);
         static void KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mode);
         static void CharCallback(GLFWwindow* handle, unsigned int keycode);
+#else
+        static int32_t handle_input_event(android_app* app, AInputEvent* event);
+        static void handle_app_cmd(android_app* app, int32_t cmd);
+#endif
     };
 }

@@ -12,7 +12,7 @@ BaseInput<T>::BaseInput(const std::vector<T>& keysToMonitor) {
 template<class T>
 bool BaseInput<T>::isKey(T keycode) const {
     if (enabled) {
-        if (auto it {keys.find(keycode)}; it != keys.end()) {
+        if (auto it { keys.find(keycode) }; it != keys.end()) {
             const auto& key{ it->second };
             return key.pressed;
         }
@@ -23,7 +23,7 @@ bool BaseInput<T>::isKey(T keycode) const {
 template<class T>
 bool BaseInput<T>::isKeyUp(T keycode) const {
     if (enabled) {
-        if (auto it {keys.find(keycode)}; it != keys.end()) {
+        if (auto it { keys.find(keycode) }; it != keys.end()) {
             const auto& key{ it->second };
             return !key.pressed && key.lastFrame == currentFrame;
         }
@@ -34,7 +34,7 @@ bool BaseInput<T>::isKeyUp(T keycode) const {
 template<class T>
 bool BaseInput<T>::isKeyDown(T keycode) const {
     if (enabled) {
-        if (auto it {keys.find(keycode)}; it != keys.end()) {
+        if (auto it { keys.find(keycode) }; it != keys.end()) {
             const auto& key{ it->second };
             return key.pressed && key.lastFrame == currentFrame;
         }
@@ -43,22 +43,22 @@ bool BaseInput<T>::isKeyDown(T keycode) const {
 }
 
 template<class T>
-void BaseInput<T>::setKey(T keycode, uint8_t action) {
-    if (action == GLFW_REPEAT)
+void BaseInput<T>::setKey(T keycode, ActionCode action) {
+    if (action == Action::Repeat)
         return;
 
-    if (auto it {keys.find(keycode)}; it != keys.end()) {
+    if (auto it { keys.find(keycode) }; it != keys.end()) {
         auto& key{ it->second };
         switch (action) {
-            case GLFW_PRESS:
+            case Action::Press:
                 key.pressed = true;
                 key.lastFrame = currentFrame;
                 break;
-            case GLFW_RELEASE:
+            case Action::Release:
                 key.pressed = false;
                 key.lastFrame = currentFrame;
                 break;
-            default: // GLFW_REPEAT
+            default: // Repeat
                 break;
         }
     }

@@ -5,6 +5,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "fusion/events/event_queue.hpp"
+#include "fusion/input/input.hpp"
 
 namespace Fusion {
     class Window {
@@ -46,6 +47,7 @@ namespace Fusion {
             while (!shouldClose()) {
                 eventQueue.free();
                 glfwPollEvents();
+                Input::Update();
                 frameHandler();
             }
         }
@@ -79,6 +81,7 @@ namespace Fusion {
         static uint8_t GLFWwindowCount;
         static std::vector<GLFWwindow*> instances;
 
+        /// Workaround for C++ class using a c-style-callback
         static void PosCallback(GLFWwindow* handle, int x, int y);
         static void SizeCallback(GLFWwindow* handle, int width, int height);
         static void CloseCallback(GLFWwindow* handle);

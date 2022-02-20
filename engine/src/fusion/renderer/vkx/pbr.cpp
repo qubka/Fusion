@@ -90,7 +90,7 @@ void vkx::pbr::generateBRDFLUT(const vkx::Context& context, vkx::texture::Textur
         renderPassCI.pAttachments = &attDesc;
         renderPassCI.subpassCount = 1;
         renderPassCI.pSubpasses = &subpassDescription;
-        renderPassCI.dependencyCount = 2;
+        renderPassCI.dependencyCount = static_cast<uint32_t>(dependencies.size());
         renderPassCI.pDependencies = dependencies.data();
         renderpass = device.createRenderPass(renderPassCI);
     }
@@ -252,7 +252,7 @@ void vkx::pbr::generateIrradianceCube(const vkx::Context& context,
         renderPassCI.pAttachments = &attDesc;
         renderPassCI.subpassCount = 1;
         renderPassCI.pSubpasses = &subpassDescription;
-        renderPassCI.dependencyCount = 2;
+        renderPassCI.dependencyCount = static_cast<uint32_t>(dependencies.size());
         renderPassCI.pDependencies = dependencies.data();
 
         renderpass = device.createRenderPass(renderPassCI);

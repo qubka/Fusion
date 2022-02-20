@@ -8,7 +8,7 @@ namespace Fusion {
         OrthographicCamera(float left, float right, float bottom, float top);
          ~OrthographicCamera() override = default;
 
-        virtual void update() { updateView(); }
+        virtual void update(float ts) { updateView(); }
 
         void setOrthographic(float left, float right, float bottom, float top);
 

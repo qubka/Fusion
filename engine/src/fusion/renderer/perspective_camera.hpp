@@ -8,7 +8,7 @@ namespace Fusion {
         PerspectiveCamera(float aspect, float fov, float near, float far);
         ~PerspectiveCamera() override = default;
 
-        virtual void update() { updateView(); }
+        virtual void update(float ts) { updateView(); }
 
         void setViewport(int width, int height);
         void setPerspective(float aspect, float fov, float near, float far);

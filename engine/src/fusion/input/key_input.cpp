@@ -15,11 +15,18 @@ KeyInput::~KeyInput() {
     instances.erase(std::remove(instances.begin(), instances.end(), this), instances.end());
 }
 
-void KeyInput::Setup(Window& window) {
+/*void KeyInput::Setup(Window& window) {
     glfwSetKeyCallback(window, KeyCallback);
     glfwSetCharCallback(window, CharCallback);
+}*/
+
+void KeyInput::Update() {
+    for (auto* input : instances) {
+        input->onUpdate();
+    }
 }
 
+#if !defined(__ANDROID__)
 void KeyInput::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mods) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
@@ -47,3 +54,6 @@ void KeyInput::CharCallback(GLFWwindow* handle, unsigned int keycode) {
 
     window.getEventQueue().submit(new KeyTypedEvent{{{}, static_cast<KeyCode>(keycode)}});
 }
+#else
+
+#endif
