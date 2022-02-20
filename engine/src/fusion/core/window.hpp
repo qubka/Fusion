@@ -82,22 +82,28 @@ namespace Fusion {
         static std::vector<GLFWwindow*> instances;
 
         /// Workaround for C++ class using a c-style-callback
-        static void PosCallback(GLFWwindow* handle, int x, int y);
-        static void SizeCallback(GLFWwindow* handle, int width, int height);
-        static void CloseCallback(GLFWwindow* handle);
-        static void RefreshCallback(GLFWwindow* handle);
-        static void FocusCallback(GLFWwindow* handle, int focused);
-        static void IconifyCallback(GLFWwindow* handle, int iconified);
-        static void FramebufferSizeCallback(GLFWwindow* handle, int width, int height);
+        static void PosCallback(GLFWwindow* window, int x, int y);
+        static void SizeCallback(GLFWwindow* window, int width, int height);
+        static void CloseCallback(GLFWwindow* window);
+        static void RefreshCallback(GLFWwindow* window);
+        static void FocusCallback(GLFWwindow* window, int focused);
+        static void IconifyCallback(GLFWwindow* window, int iconified);
+        static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+        static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mode);
+        static void CursorPosCallback(GLFWwindow* window, double posX, double posY);
+        static void CursorEnterCallback(GLFWwindow* window, int entered);
+        static void ScrollCallback(GLFWwindow* window, double offsetX, double offsetY);
+        static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        static void CharCallback(GLFWwindow* window, unsigned int keycode);
 #if GLFW_VERSION_MINOR >= 1
-        static void FileDropCallback(GLFWwindow* handle, int count, const char** paths);
+        static void FileDropCallback(GLFWwindow* window, int count, const char** paths);
 #endif
 #if GLFW_VERSION_MINOR >= 2
         static void JoystickCallback(int jid, int action);
 #endif
 #if GLFW_VERSION_MINOR >= 3
-        static void MaximizeCallback(GLFWwindow* handle, int maximized);
-        static void ContentScaleCallback(GLFWwindow* handle, float scaleX, float scaleY);
+        static void MaximizeCallback(GLFWwindow* window, int maximized);
+        static void ContentScaleCallback(GLFWwindow* window, float scaleX, float scaleY);
 #endif
         static void ErrorCallback(int error, const char* description);
         static void MonitorCallback(GLFWmonitor* monitor, int action);

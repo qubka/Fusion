@@ -30,8 +30,12 @@ namespace Fusion {
         const glm::vec2& mouseScroll() const { return scroll; }
 
         //! Must be called before any MouseInput instances will work
-        //static void Setup(Window& window);
         static void Update();
+
+        /// Workaround for C++ class using a c-style-callback
+        static void OnMouseMoved(const glm::vec2& pos);
+        static void OnMouseScroll(const glm::vec2& offset);
+        static void OnMouseButton(MouseCode button, ActionCode action);
 
     private:
         glm::vec2 delta{};
@@ -42,16 +46,6 @@ namespace Fusion {
         void setCursorPosition(const glm::vec2& pos);
         void setScrollOffset(const glm::vec2& offset);
 
-#if !defined(__ANDROID__)
-        /// Workaround for C++ class using a c-style-callback
-        static void CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY);
-        static void CursorEnterCallback(GLFWwindow* handle, int entered);
-        static void ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY);
-        static void MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode);
-#else
-        static int32_t handle_input_event(android_app* app, AInputEvent* event);
-        static void handle_app_cmd(android_app* app, int32_t cmd);
-#endif
         static std::vector<MouseInput*> instances;
     };
 }

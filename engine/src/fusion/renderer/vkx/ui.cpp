@@ -444,8 +444,10 @@ void UIOverlay::submit(const vk::Queue& queue, uint32_t bufferindex, vk::SubmitI
     submitInfo.commandBufferCount = 1;
 
     queue.submit(submitInfo, fence);
-    context.device.waitForFences(fence, VK_TRUE, UINT64_MAX);
-    context.device.resetFences(fence);
+    auto result = context.device.waitForFences(fence, VK_TRUE, UINT64_MAX);
+    if (result == vk::Result::eSuccess) {
+        context.device.resetFences(fence);
+    }
 }
 
 bool UIOverlay::header(const char* caption) const {

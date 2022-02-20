@@ -1,8 +1,13 @@
 #include "window.hpp"
 #if !defined(ANDROID)
 
-#include "fusion/events/window_events.hpp"
 #include "fusion/events/application_events.hpp"
+#include "fusion/events/window_events.hpp"
+#include "fusion/events/key_events.hpp"
+#include "fusion/events/mouse_events.hpp"
+#include "fusion/input/input.hpp"
+#include "fusion/input/key_input.hpp"
+#include "fusion/input/mouse_input.hpp"
 
 using namespace Fusion;
 
@@ -80,12 +85,12 @@ void Window::initWindow(const glm::ivec2& position) {
     glfwSetWindowIconifyCallback(window, IconifyCallback);
     glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
     /* Setup inputs classes */
-    glfwSetMouseButtonCallback(window, Input::MouseButtonCallback);
-    glfwSetCursorPosCallback(window, Input::CursorPosCallback);
-    glfwSetCursorEnterCallback(window, Input::CursorEnterCallback);
-    glfwSetScrollCallback(window, Input::ScrollCallback);
-    glfwSetKeyCallback(window, Input::KeyCallback);
-    glfwSetCharCallback(window, Input::CharCallback);
+    glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    glfwSetCursorPosCallback(window, CursorPosCallback);
+    glfwSetCursorEnterCallback(window, CursorEnterCallback);
+    glfwSetScrollCallback(window, ScrollCallback);
+    glfwSetKeyCallback(window, KeyCallback);
+    glfwSetCharCallback(window, CharCallback);
 #if GLFW_VERSION_MINOR >= 1
     glfwSetDropCallback(window, FileDropCallback);
 #endif
@@ -116,7 +121,7 @@ vk::SurfaceKHR Window::createWindowSurface(GLFWwindow* window, const vk::Instanc
 #endif
 
 glm::vec4 Window::getViewport() const {
-#ifdef FE_VULKAN
+#ifdef GLFW_INCLUDE_VULKAN
     return { 0, 0, width, height };
 #else // OPENGL
     return { 0, height, width, -height }; // vertical flip is required
@@ -177,6 +182,77 @@ void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) 
     window.minimize = width == 0 || height == 0;
 
     window.getEventQueue().submit(new WindowFramebufferSizeEvent{{}, width, height});
+}
+
+void Window::CursorPosCallback(GLFWwindow* handle, double posX, double posY) {
+    glm::vec2 pos {posX, posY};
+
+    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    window.getEventQueue().submit(new MouseMovedEvent{{}, pos});
+
+    Input::OnMouseMoved(pos);
+    MouseInput::OnMouseMoved(pos);
+}
+
+void Window::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
+    glm::vec2 offset {offsetX, offsetY};
+
+    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    window.getEventQueue().submit(new MouseScrollEvent{{}, offset});
+
+    Input::OnMouseScroll(offset);
+    MouseInput::OnMouseScroll(offset);
+}
+
+void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode) {
+    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+
+    // Event system
+    switch (action) {
+        case GLFW_PRESS:
+            window.getEventQueue().submit(new MouseButtonPressedEvent{{{}, static_cast<MouseCode>(button)}});
+            break;
+        case GLFW_RELEASE:
+            window.getEventQueue().submit(new MouseButtonReleasedEvent{{{}, static_cast<MouseCode>(button)}});
+            break;
+    }
+
+    Input::OnMouseButton(button, action);
+    MouseInput::OnMouseButton(button, action);
+}
+
+void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mode) {
+    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+
+    // Event system
+    switch (action) {
+        case GLFW_PRESS:
+            window.getEventQueue().submit(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, false});
+            break;
+        case GLFW_RELEASE:
+            window.getEventQueue().submit(new KeyReleasedEvent{{{}, static_cast<KeyCode>(key)}});
+            break;
+        case GLFW_REPEAT:
+            window.getEventQueue().submit(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, true});
+            break;
+    }
+
+    Input::OnKeyPressed(key, action);
+    KeyInput::OnKeyPressed(key, action);
+}
+
+void Window::CursorEnterCallback(GLFWwindow* handle, int entered) {
+    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    if (entered)
+        window.getEventQueue().submit(new MouseCursorLeftEvent{});
+    else
+        window.getEventQueue().submit(new MouseCursorLeftEvent{});
+}
+
+void Window::CharCallback(GLFWwindow* handle, unsigned int keycode) {
+    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+
+    window.getEventQueue().submit(new KeyTypedEvent{{{}, static_cast<KeyCode>(keycode)}});
 }
 
 #if GLFW_VERSION_MINOR >= 1

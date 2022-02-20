@@ -48,99 +48,44 @@ void Input::Update() {
     current++;
 }
 
-#if !defined(__ANDROID__)
-void Input::CursorPosCallback(GLFWwindow* handle, double mouseX, double mouseY) {
-    glm::vec2 mouse {mouseX, mouseY};
-
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.getEventQueue().submit(new MouseMovedEvent{{}, mouse});
-
-    delta += mouse - position;
-    position = mouse;
+void Input::OnMouseMoved(const glm::vec2& pos) {
+    delta += pos - position;
+    position = pos;
 }
 
-void Input::CursorEnterCallback(GLFWwindow* handle, int entered) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    if (entered)
-        window.getEventQueue().submit(new MouseCursorLeftEvent{});
-    else
-        window.getEventQueue().submit(new MouseCursorLeftEvent{});
-}
-
-void Input::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
-    glm::vec2 offset {offsetX, offsetY};
-
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.getEventQueue().submit(new MouseScrollEvent{{}, offset});
-
+void Input::OnMouseScroll(const glm::vec2& offset) {
     scroll = offset;
 }
 
-void Input::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-
-    // Event system
-    switch (action) {
-        case GLFW_PRESS:
-            window.getEventQueue().submit(new MouseButtonPressedEvent{{{}, static_cast<MouseCode>(button)}});
-            break;
-        case GLFW_RELEASE:
-            window.getEventQueue().submit(new MouseButtonReleasedEvent{{{}, static_cast<MouseCode>(button)}});
-            break;
-    }
-
+void Input::OnMouseButton(MouseCode button, ActionCode action) {
     // Polling system
     int key = MOUSE_BUTTONS + button;
     switch (action) {
-        case GLFW_PRESS:
+        case Action::Press:
             keys[key] = true;
             frames[key] = current;
             break;
-        case GLFW_RELEASE:
+        case Action::Release:
             keys[key] = false;
             frames[key] = current;
             break;
-        default: // GLFW_REPEAT
+        default: // Action::Repeat
             break;
     }
 }
 
-void Input::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mode) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-
-    // Event system
-    switch (action) {
-        case GLFW_PRESS:
-            window.getEventQueue().submit(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, false});
-            break;
-        case GLFW_RELEASE:
-            window.getEventQueue().submit(new KeyReleasedEvent{{{}, static_cast<KeyCode>(key)}});
-            break;
-        case GLFW_REPEAT:
-            window.getEventQueue().submit(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, true});
-            break;
-    }
-
+void Input::OnKeyPressed(KeyCode key, ActionCode action) {
     // Polling system
     switch (action) {
-        case GLFW_PRESS:
+        case Action::Press:
             keys[key] = true;
             frames[key] = current;
             break;
-        case GLFW_RELEASE:
+        case Action::Release:
             keys[key] = false;
             frames[key] = current;
             break;
-        default: // GLFW_REPEAT
+        default: // Action::Repeat
             break;
     }
 }
-
-void Input::CharCallback(GLFWwindow* handle, unsigned int keycode) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-
-    window.getEventQueue().submit(new KeyTypedEvent{{{}, static_cast<KeyCode>(keycode)}});
-}
-#else
-
-#endif

@@ -188,7 +188,11 @@ public:
 
     vk::Pipeline create(const vk::PipelineCache& cache) {
         update();
-        return device.createGraphicsPipeline(cache, pipelineCreateInfo);
+        auto resultValue = device.createGraphicsPipeline(cache, pipelineCreateInfo);
+        if (resultValue.result != vk::Result::eSuccess) {
+            throw std::runtime_error("Failed to create graphics pipeline");
+        }
+        return resultValue.value;
     }
 
     vk::Pipeline create() { return create(pipelineCache); }

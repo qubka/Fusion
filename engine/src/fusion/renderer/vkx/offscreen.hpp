@@ -5,6 +5,37 @@
 
 namespace vkx {
 
+class Offscreen {
+public:
+    Offscreen(const vkx::Context& context)
+            : context{context} {}
+
+    const vkx::Context& context;
+    vk::RenderPass renderPass;
+    vk::CommandBuffer cmdBuffer;
+    vk::Semaphore renderComplete;
+    glm::uvec2 size { 0 };
+    std::vector<vk::Format> colorFormats{ vk::Format::eB8G8R8A8Unorm };
+    // This value is chosen as an invalid default that signals that the code should pick a specific depth buffer
+    // Alternative, you can set this to undefined to explicitly declare you want no depth buffer.
+    vk::Format depthFormat = vk::Format::eR8Uscaled;
+    std::vector<vkx::Framebuffer> framebuffers{ 1 };
+    vk::ImageUsageFlags attachmentUsage{ vk::ImageUsageFlagBits::eSampled };
+    vk::ImageUsageFlags depthAttachmentUsage;
+    vk::ImageLayout colorFinalLayout{ vk::ImageLayout::eShaderReadOnlyOptimal };
+    vk::ImageLayout depthFinalLayout{ vk::ImageLayout::eDepthStencilAttachmentOptimal };
+
+    void destroy() {
+        for (auto& framebuffer : framebuffers) {
+            framebuffer.destroy();
+        }
+        framebuffers.clear();
+        context.device.freeCommandBuffers(context.getCommandPool(), cmdBuffer);
+        context.device.destroyRenderPass(renderPass);
+        context.device.destroySemaphore(renderComplete);
+    }
+};
+
 struct OffscreenRenderer {
     const vkx::Context& context;
     const vk::Device& device;

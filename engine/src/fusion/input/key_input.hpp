@@ -24,15 +24,10 @@ namespace Fusion {
         //static void Setup(Window& window);
         static void Update();
 
-    private:
-#if !defined(__ANDROID__)
         /// Workaround for C++ class using a c-style-callback
-        static void KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mods);
-        static void CharCallback(GLFWwindow* handle, unsigned int keycode);
-#else
-        static int32_t handle_input_event(android_app* app, AInputEvent* event);
-        static void handle_app_cmd(android_app* app, int32_t cmd);
-#endif
+        static void OnKeyPressed(KeyCode key, ActionCode action);
+
+    private:
         static std::vector<KeyInput*> instances;
     };
 }

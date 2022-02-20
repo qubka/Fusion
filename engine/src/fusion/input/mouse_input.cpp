@@ -30,66 +30,26 @@ void MouseInput::setScrollOffset(const glm::vec2& offset) {
     scroll = offset;
 }
 
-/*void MouseInput::Setup(Window& window) {
-    glfwSetMouseButtonCallback(window, MouseButtonCallback);
-    glfwSetCursorPosCallback(window, CursorPositionCallback);
-    glfwSetCursorEnterCallback(window, CursorEnterCallback);
-    glfwSetScrollCallback(window, ScrollCallback);
-}*/
-
 void MouseInput::Update() {
     for (auto* input : instances) {
         input->onUpdate();
     }
 }
 
-#if !defined(__ANDROID__)
-void MouseInput::CursorPositionCallback(GLFWwindow* handle, double mouseX, double mouseY) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.getEventQueue().submit(new MouseMovedEvent{{},{mouseX, mouseY}});
-
-    // Polling system
+void MouseInput::OnMouseMoved(const glm::vec2& pos) {
     for (auto* input : instances) {
-        input->setCursorPosition({mouseX, mouseY});
+        input->setCursorPosition(pos);
     }
 }
 
-void MouseInput::CursorEnterCallback(GLFWwindow* handle, int entered) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    if (entered)
-        window.getEventQueue().submit(new MouseCursorEnterEvent{});
-    else
-        window.getEventQueue().submit(new MouseCursorLeftEvent{});
-}
-
-void MouseInput::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.getEventQueue().submit(new MouseScrollEvent{{},{offsetX, offsetY}});
-
-    // Polling system
+void MouseInput::OnMouseScroll(const glm::vec2& offset) {
     for (auto* input : instances) {
-        input->setScrollOffset({offsetX, offsetY});
+        input->setScrollOffset(offset);
     }
 }
 
-void MouseInput::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-
-    // Event system
-    switch (action) {
-        case GLFW_PRESS:
-            window.getEventQueue().submit(new MouseButtonPressedEvent{{{}, static_cast<MouseCode>(button)}});
-            break;
-        case GLFW_RELEASE:
-            window.getEventQueue().submit(new MouseButtonReleasedEvent{{{}, static_cast<MouseCode>(button)}});
-            break;
-    }
-
-    // Polling system
+void MouseInput::OnMouseButton(MouseCode button, ActionCode action) {
     for (auto* input : instances) {
         input->setKey(button, action);
     }
 }
-#else
-
-#endif

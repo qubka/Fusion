@@ -442,16 +442,21 @@ std::string Application::getWindowTitle() {
 
 void Application::prepareFrame() {
     // Acquire the next image from the swap chaing
-    auto resultValue = swapChain.acquireNextImage(semaphores.acquireComplete);
-    if (resultValue.result == vk::Result::eSuboptimalKHR) {
+    auto result = swapChain.acquireNextImage(semaphores.acquireComplete);
+
 #if !defined(__ANDROID__)
-        glm::ivec2 newSize;
-        glfwGetWindowSize(*window, &newSize.x, &newSize.y);
-        recreateSwapchain(newSize);
-        resultValue = swapChain.acquireNextImage(semaphores.acquireComplete);
-#endif
+    // Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE) or no longer optimal for presentation (SUBOPTIMAL)
+    if (result == vk::Result::eSuboptimalKHR || result == vk::Result::eErrorOutOfDateKHR) {
+        recreateSwapchain(window->getSize());
+        result = swapChain.acquireNextImage(semaphores.acquireComplete);
     }
-    currentBuffer = resultValue.value;
+#endif
+
+    if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR) {
+        throw std::runtime_error("Failed to acquire next image");
+    }
+
+    currentBuffer = swapChain.currentImage;
 }
 
 void Application::submitFrame() {
@@ -639,7 +644,7 @@ void Application::setupWindow() {
     }
 #endif
 
-    window = new Window(title, {width, height});
+    window = new Window(title, {size.width, size.height});
 }
 #endif
 

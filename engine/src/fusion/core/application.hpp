@@ -57,7 +57,7 @@ namespace Fusion {
         // Set to true when the debug marker extension is detected
         bool enableDebugMarkers{ false };
         // fps timer (one second interval)
-        float fpsTimer = 0.0f;
+        float fpsTimer { 0.0f };
         // Get window title with example name, device, et.
         std::string getWindowTitle();
         // Used to store app singleton
@@ -137,13 +137,13 @@ namespace Fusion {
         /** @brief Example settings that can be changed e.g. by command line arguments */
         struct Settings {
             /** @brief Activates validation layers (and message output) when set to true */
-            bool validation = false;
+            bool validation { false };
             /** @brief Set to true if fullscreen mode has been requested via command line */
-            bool fullscreen = false;
+            bool fullscreen { false };
             /** @brief Set to true if v-sync will be forced for the swapchain */
-            bool vsync = false;
+            bool vsync { false };
             /** @brief Enable UI overlay */
-            bool overlay = true;
+            bool overlay { true };
         } settings;
 
         // Command buffer pool
@@ -152,8 +152,6 @@ namespace Fusion {
         bool prepared = false;
         uint32_t version = VK_MAKE_VERSION(1, 1, 0);
         vk::Extent2D size{ 1280, 720 };
-        uint32_t& width{ size.width };
-        uint32_t& height{ size.height };
 
         std::string title;
         vkx::Image depthStencil;
@@ -228,12 +226,11 @@ namespace Fusion {
     private:
         // OS specific
 #if defined(__ANDROID__)
+        // TODO: Move to Android window class
         // true if application has focused, false if moved to background
         ANativeWindow* window{ nullptr };
-        bool focused = false;
-        static int32_t handle_input_event(android_app* app, AInputEvent* event);
+        bool focused { false };
         int32_t onInput(AInputEvent* event);
-        static void handle_app_cmd(android_app* app, int32_t cmd);
         void onAppCmd(int32_t cmd);
 #else
         Window* window{ nullptr };

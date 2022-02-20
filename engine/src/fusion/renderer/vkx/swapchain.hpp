@@ -197,14 +197,8 @@ struct SwapChain {
     }
 
     // Acquires the next image in the swap chain
-    vk::ResultValue<uint32_t> acquireNextImage(const vk::Semaphore& presentCompleteSemaphore, const vk::Fence& fence = vk::Fence()) {
-        auto resultValue = device.acquireNextImageKHR(swapChain, UINT64_MAX, presentCompleteSemaphore, fence);
-        vk::Result result = resultValue.result;
-        if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR) {
-            throw std::runtime_error("Failed to acquire next image");
-        }
-        currentImage = resultValue.value;
-        return resultValue;
+    vk::Result acquireNextImage(const vk::Semaphore& presentCompleteSemaphore, const vk::Fence& fence = vk::Fence()) {
+        return device.acquireNextImageKHR(swapChain, UINT64_MAX, presentCompleteSemaphore, fence, &currentImage); /// use noexcept to handle OUT_OF_DATE
     }
 
     void clearSubmitFence(uint32_t index) { images[index].fence = vk::Fence(); }
@@ -212,8 +206,8 @@ struct SwapChain {
     vk::Fence getSubmitFence(bool destroy = false) {
         auto& image = images[currentImage];
         while (image.fence) {
-            vk::Result fenceRes = device.waitForFences(image.fence, VK_TRUE, UINT64_MAX);
-            if (fenceRes == vk::Result::eSuccess) {
+            auto result = device.waitForFences(image.fence, VK_TRUE, UINT64_MAX);
+            if (result == vk::Result::eSuccess) {
                 if (destroy) {
                     device.destroyFence(image.fence);
                 }

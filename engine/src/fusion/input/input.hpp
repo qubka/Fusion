@@ -2,6 +2,7 @@
 
 #include "mouse_codes.hpp"
 #include "key_codes.hpp"
+#include "action_codes.hpp"
 
 class GLFWwindow;
 
@@ -43,17 +44,10 @@ namespace Fusion {
         static glm::vec2 scroll;
 
     public:
-#if !defined(__ANDROID__)
         /// Workaround for C++ class using a c-style-callback
-        static void CursorPosCallback(GLFWwindow* handle, double mouseX, double mouseY);
-        static void CursorEnterCallback(GLFWwindow* handle, int entered);
-        static void ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY);
-        static void MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode);
-        static void KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mode);
-        static void CharCallback(GLFWwindow* handle, unsigned int keycode);
-#else
-        static int32_t handle_input_event(android_app* app, AInputEvent* event);
-        static void handle_app_cmd(android_app* app, int32_t cmd);
-#endif
+        static void OnMouseMoved(const glm::vec2& pos);
+        static void OnMouseScroll(const glm::vec2& offset);
+        static void OnMouseButton(MouseCode button, ActionCode action);
+        static void OnKeyPressed(KeyCode key, ActionCode action);
     };
 }

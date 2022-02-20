@@ -1,236 +1,310 @@
-#include "fusion/core/application.hpp"
+#include "fusion/core/offscreen_application.hpp"
 #include "fusion/core/entry_point.hpp"
 #include "fusion/renderer/camera2.hpp"
 #include "editor_layer.hpp"
 
 using namespace Fusion;
 
-class EditorApp : public Application {
+
+// Vertex layout for this example
+vkx::model::VertexLayout vertexLayout{ {
+    vkx::model::Component::VERTEX_COMPONENT_POSITION,
+    vkx::model::Component::VERTEX_COMPONENT_UV,
+    vkx::model::Component::VERTEX_COMPONENT_COLOR,
+    vkx::model::Component::VERTEX_COMPONENT_NORMAL,
+} };
+
+class EditorApp : public OffscreenApplication {
 public:
-    using DemoMesh = std::pair<vkx::model::Model, vk::Pipeline>;
-
-    struct DemoMeshes {
-        DemoMesh logos;
-        DemoMesh background;
-        DemoMesh models;
-        DemoMesh skybox;
-    } demoMeshes;
-
     struct {
-        vkx::Buffer meshVS;
-    } uniformData;
-
-    struct {
-        glm::mat4 projection;
-        glm::mat4 model;
-        glm::mat4 normal;
-        glm::mat4 view;
-        glm::vec4 lightPos;
-    } uboVS;
-
-    struct {
-        vkx::texture::TextureCubeMap skybox;
+        vkx::texture::Texture2D colorMap;
     } textures;
 
     struct {
-        vk::Pipeline logos;
-        vk::Pipeline models;
-        vk::Pipeline skybox;
+        vkx::model::Model example;
+        vkx::model::Model plane;
+    } meshes;
+
+    struct {
+        vkx::Buffer vsShared;
+        vkx::Buffer vsMirror;
+        vkx::Buffer vsOffScreen;
+    } uniformData;
+
+    struct UBO {
+        glm::mat4 projection;
+        glm::mat4 model;
+        glm::vec4 lightPos = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    };
+
+    struct {
+        UBO vsShared;
+    } ubos;
+
+    struct {
+        vk::Pipeline shaded;
+        vk::Pipeline mirror;
     } pipelines;
 
-    vk::PipelineLayout pipelineLayout;
-    vk::DescriptorSet descriptorSet;
+    struct {
+        vk::PipelineLayout quad;
+        vk::PipelineLayout offscreen;
+    } pipelineLayouts;
+
+    struct {
+        vk::DescriptorSet mirror;
+        vk::DescriptorSet model;
+        vk::DescriptorSet offscreen;
+    } descriptorSets;
+
     vk::DescriptorSetLayout descriptorSetLayout;
 
-    glm::vec4 lightPos = glm::vec4(1.0f, 2.0f, 0.0f, 0.0f);
+    glm::vec3 meshPos = glm::vec3(0.0f, -1.5f, 0.0f);
 
     vkx::Camera camera;
 
-    EditorApp(CommandLineArgs args) : Application{"Editor", args} {
-        size.width = 1280;
-        size.height = 720;
-        //rotationSpeed = 0.5f;
+    EditorApp(const CommandLineArgs& args) : OffscreenApplication{"Vulkan Example - Offscreen rendering", args} {
         camera.setPerspective(60.0f, size, 0.1f, 256.0f);
-        camera.setRotation({ 15.0f, 0.f, 0.0f });
+        camera.setRotation({ -2.5f, 0.0f, 0.0f });
+        camera.setPosition({ 0.0f, 1.0f, 0.0f });
+        camera.dolly(-6.5f);
     }
 
     ~EditorApp() {
         // Clean up used Vulkan resources
         // Note : Inherited destructor cleans up resources stored in base class
-        device.destroyPipeline(pipelines.logos);
-        device.destroyPipeline(pipelines.models);
-        device.destroyPipeline(pipelines.skybox);
 
-        device.destroyPipelineLayout(pipelineLayout);
+        // Textures
+        //textureTarget.destroy();
+        textures.colorMap.destroy();
+
+        device.destroyPipeline(pipelines.shaded);
+        device.destroyPipeline(pipelines.mirror);
+        device.destroyPipelineLayout(pipelineLayouts.offscreen);
+        device.destroyPipelineLayout(pipelineLayouts.quad);
+
         device.destroyDescriptorSetLayout(descriptorSetLayout);
 
-        uniformData.meshVS.destroy();
+        // Meshes
+        meshes.example.destroy();
+        meshes.plane.destroy();
 
-        demoMeshes.logos.first.destroy();
-        demoMeshes.background.first.destroy();
-        demoMeshes.models.first.destroy();
-        demoMeshes.skybox.first.destroy();
-
-        textures.skybox.destroy();
+        // Uniform buffers
+        uniformData.vsShared.destroy();
+        uniformData.vsMirror.destroy();
+        uniformData.vsOffScreen.destroy();
     }
 
-    void loadTextures() { textures.skybox.loadFromFile(context, getAssetPath() + "textures/cubemap_vulkan.ktx", vk::Format::eR8G8B8A8Unorm); }
+    // The command buffer to copy for rendering
+    // the offscreen scene and blitting it into
+    // the texture target is only build once
+    // and gets resubmitted
+    void buildOffscreenCommandBuffer() override {
+        vk::ClearValue clearValues[2];
+        clearValues[0].color = vkx::util::clearColor({ 0.0f, 0.0f, 0.0f, 0.0f });
+        clearValues[1].depthStencil = vk::ClearDepthStencilValue{ 1.0f, 0 };
+
+        vk::RenderPassBeginInfo renderPassBeginInfo;
+        renderPassBeginInfo.renderPass = offscreen.renderPass;
+        renderPassBeginInfo.framebuffer = offscreen.framebuffers[0].framebuffer;
+        renderPassBeginInfo.renderArea.extent.width = offscreen.size.x;
+        renderPassBeginInfo.renderArea.extent.height = offscreen.size.y;
+        renderPassBeginInfo.clearValueCount = 2;
+        renderPassBeginInfo.pClearValues = clearValues;
+
+        vk::CommandBufferBeginInfo cmdBufInfo;
+        cmdBufInfo.flags = vk::CommandBufferUsageFlagBits::eSimultaneousUse;
+        offscreen.cmdBuffer.begin(cmdBufInfo);
+        offscreen.cmdBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+        offscreen.cmdBuffer.setViewport(0, vkx::util::viewport(offscreen.size));
+        offscreen.cmdBuffer.setScissor(0, vkx::util::rect2D(offscreen.size));
+        offscreen.cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayouts.offscreen, 0, descriptorSets.offscreen, nullptr);
+        offscreen.cmdBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipelines.shaded);
+        offscreen.cmdBuffer.bindVertexBuffers(0, meshes.example.vertices.buffer, { 0 });
+        offscreen.cmdBuffer.bindIndexBuffer(meshes.example.indices.buffer, 0, vk::IndexType::eUint32);
+        offscreen.cmdBuffer.drawIndexed(meshes.example.indexCount, 1, 0, 0, 0);
+        offscreen.cmdBuffer.endRenderPass();
+        offscreen.cmdBuffer.end();
+    }
 
     void onUpdateDrawCommandBuffer(const vk::CommandBuffer& cmdBuffer) override {
+        vk::DeviceSize offsets = 0;
         cmdBuffer.setViewport(0, vkx::util::viewport(size));
         cmdBuffer.setScissor(0, vkx::util::rect2D(size));
-        cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, descriptorSet, nullptr);
-        std::array<DemoMesh*, 4> meshes{ {
-                                                 &demoMeshes.skybox,
-                                                 &demoMeshes.background,
-                                                 &demoMeshes.logos,
-                                                 &demoMeshes.models,
-                                         } };
-        for (auto& meshPtr : meshes) {
-            const auto& pipeline = meshPtr->second;
-            const auto& mesh = meshPtr->first;
-            cmdBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
-            cmdBuffer.bindVertexBuffers(0, mesh.vertices.buffer, { 0 });
-            cmdBuffer.bindIndexBuffer(mesh.indices.buffer, 0, vk::IndexType::eUint32);
-            cmdBuffer.drawIndexed(mesh.indexCount, 1, 0, 0, 0);
-        }
+
+        // Reflection plane
+        cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayouts.quad, 0, descriptorSets.mirror, nullptr);
+        cmdBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipelines.mirror);
+        cmdBuffer.bindVertexBuffers(0, meshes.plane.vertices.buffer, offsets);
+        cmdBuffer.bindIndexBuffer(meshes.plane.indices.buffer, 0, vk::IndexType::eUint32);
+        cmdBuffer.drawIndexed(meshes.plane.indexCount, 1, 0, 0, 0);
+
+        // Model
+        cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayouts.quad, 0, descriptorSets.model, nullptr);
+        cmdBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipelines.shaded);
+        cmdBuffer.bindVertexBuffers(0, meshes.example.vertices.buffer, offsets);
+        cmdBuffer.bindIndexBuffer(meshes.example.indices.buffer, 0, vk::IndexType::eUint32);
+        cmdBuffer.drawIndexed(meshes.example.indexCount, 1, 0, 0, 0);
     }
 
-    vkx::model::VertexLayout vertexLayout{ {
-                                                   vkx::model::VERTEX_COMPONENT_POSITION,
-                                                   vkx::model::VERTEX_COMPONENT_NORMAL,
-                                                   vkx::model::VERTEX_COMPONENT_UV,
-                                                   vkx::model::VERTEX_COMPONENT_COLOR,
-                                           } };
-
-    void prepareVertices() {
-        struct Vertex {
-            float pos[3];
-            float normal[3];
-            float uv[2];
-            float color[3];
-        };
-
-        // Load meshes for demos scene
-
-        demoMeshes.logos.first.loadFromFile(context, getAssetPath() + "models/vulkanscenelogos.dae", vertexLayout);
-        demoMeshes.background.first.loadFromFile(context, getAssetPath() + "models/vulkanscenebackground.dae", vertexLayout);
-        demoMeshes.models.first.loadFromFile(context, getAssetPath() + "models/vulkanscenemodels.dae", vertexLayout);
-        demoMeshes.skybox.first.loadFromFile(context, getAssetPath() + "models/cube.obj", vertexLayout);
+    void onLoadAssets() override {
+        meshes.plane.loadFromFile(context, getAssetPath() + "models/plane.obj", vertexLayout, 0.4f);
+        meshes.example.loadFromFile(context, getAssetPath() + "models/chinesedragon.dae", vertexLayout, 0.3f);
+        std::string filename;
+        vk::Format format;
+        if (context.deviceFeatures.textureCompressionBC) {
+            filename = "textures/darkmetal_bc3_unorm.ktx";
+            format = vk::Format::eBc3UnormBlock;
+        } else if (context.deviceFeatures.textureCompressionASTC_LDR) {
+            filename = "textures/darkmetal_astc_8x8_unorm.ktx";
+            format = vk::Format::eAstc8x8UnormBlock;
+        } else if (context.deviceFeatures.textureCompressionETC2) {
+            filename = "textures/darkmetal_etc2_unorm.ktx";
+            format = vk::Format::eEtc2R8G8B8UnormBlock;
+        } else {
+            throw std::runtime_error("Device does not support any compressed texture format!");
+        }
+        textures.colorMap.loadFromFile(context, getAssetPath() + filename, format);
     }
 
     void setupDescriptorPool() {
-        // Example uses one ubo and one image sampler
         std::vector<vk::DescriptorPoolSize> poolSizes{
-                { vk::DescriptorType::eUniformBuffer, 2 },
-                { vk::DescriptorType::eCombinedImageSampler, 1 },
+                { vk::DescriptorType::eUniformBuffer, 6 },
+                { vk::DescriptorType::eCombinedImageSampler, 8 },
         };
-
-        descriptorPool = device.createDescriptorPool({ {}, 2, (uint32_t)poolSizes.size(), poolSizes.data() });
+        descriptorPool = device.createDescriptorPool({ {}, 5, (uint32_t)poolSizes.size(), poolSizes.data() });
     }
 
     void setupDescriptorSetLayout() {
-        std::vector<vk::DescriptorSetLayoutBinding> setLayoutBindings{ { 0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex },
-                                                                       { 1, vk::DescriptorType::eCombinedImageSampler, 1,
-                                                                                                                   vk::ShaderStageFlagBits::eFragment } };
+        // Textured quad pipeline layout
+        std::vector<vk::DescriptorSetLayoutBinding> setLayoutBindings{
+                // Binding 0 : Vertex shader uniform buffer
+                { 0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex },
+                // Binding 1 : Fragment shader image sampler
+                { 1, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment },
+                // Binding 2 : Fragment shader image sampler
+                { 2, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment },
+        };
 
         descriptorSetLayout = device.createDescriptorSetLayout({ {}, (uint32_t)setLayoutBindings.size(), setLayoutBindings.data() });
-        pipelineLayout = device.createPipelineLayout({ {}, 1, &descriptorSetLayout });
+        pipelineLayouts.quad = device.createPipelineLayout({ {}, 1, &descriptorSetLayout });
+        // Offscreen pipeline layout
+        pipelineLayouts.offscreen = device.createPipelineLayout({ {}, 1, &descriptorSetLayout });
     }
 
     void setupDescriptorSet() {
-        descriptorSet = device.allocateDescriptorSets({ descriptorPool, 1, &descriptorSetLayout })[0];
+        // Mirror plane descriptor set
+        vk::DescriptorSetAllocateInfo allocInfo{ descriptorPool, 1, &descriptorSetLayout };
+        descriptorSets.mirror = device.allocateDescriptorSets(allocInfo)[0];
 
-        // Cube map image descriptor
-        vk::DescriptorImageInfo texDescriptorCubeMap{ textures.skybox.sampler, textures.skybox.view, vk::ImageLayout::eGeneral };
+        // vk::Image descriptor for the offscreen mirror texture
+        vk::DescriptorImageInfo texDescriptorMirror{ offscreen.framebuffers[0].colors[0].sampler, offscreen.framebuffers[0].colors[0].view,
+                                                     vk::ImageLayout::eShaderReadOnlyOptimal };
+        // vk::Image descriptor for the color map
+        vk::DescriptorImageInfo texDescriptorColorMap{ textures.colorMap.sampler, textures.colorMap.view, vk::ImageLayout::eGeneral };
 
         std::vector<vk::WriteDescriptorSet> writeDescriptorSets{
                 // Binding 0 : Vertex shader uniform buffer
-                { descriptorSet, 0, 0, 1, vk::DescriptorType::eUniformBuffer, nullptr, &uniformData.meshVS.descriptor },
-                // Binding 1 : Fragment shader image sampler
-                { descriptorSet, 1, 0, 1, vk::DescriptorType::eCombinedImageSampler, &texDescriptorCubeMap },
+                { descriptorSets.mirror, 0, 0, 1, vk::DescriptorType::eUniformBuffer, nullptr, &uniformData.vsMirror.descriptor },
+                // Binding 1 : Fragment shader texture sampler
+                { descriptorSets.mirror, 1, 0, 1, vk::DescriptorType::eCombinedImageSampler, &texDescriptorMirror },
+                // Binding 2 : Fragment shader texture sampler
+                { descriptorSets.mirror, 2, 0, 1, vk::DescriptorType::eCombinedImageSampler, &texDescriptorColorMap },
         };
+        device.updateDescriptorSets(writeDescriptorSets, {});
 
-        device.updateDescriptorSets(writeDescriptorSets, nullptr);
+        // Model
+        // No texture
+        descriptorSets.model = device.allocateDescriptorSets(allocInfo)[0];
+        std::vector<vk::WriteDescriptorSet> modelWriteDescriptorSets{
+                // Binding 0 : Vertex shader uniform buffer
+                { descriptorSets.model, 0, 0, 1, vk::DescriptorType::eUniformBuffer, nullptr, &uniformData.vsShared.descriptor },
+        };
+        device.updateDescriptorSets(modelWriteDescriptorSets, {});
+
+        // Offscreen
+        descriptorSets.offscreen = device.allocateDescriptorSets(allocInfo)[0];
+        std::vector<vk::WriteDescriptorSet> offscreenWriteDescriptorSets{
+                // Binding 0 : Vertex shader uniform buffer
+                { descriptorSets.offscreen, 0, 0, 1, vk::DescriptorType::eUniformBuffer, nullptr, &uniformData.vsOffScreen.descriptor },
+        };
+        device.updateDescriptorSets(offscreenWriteDescriptorSets, {});
     }
 
     void preparePipelines() {
-        vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ device, pipelineLayout, renderPass };
+        // Solid rendering pipeline
+        vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ device, pipelineLayouts.quad, renderPass };
         pipelineBuilder.rasterizationState.frontFace = vk::FrontFace::eClockwise;
-
-        // Binding description
-        pipelineBuilder.vertexInputState.bindingDescriptions = { { 0, vertexLayout.stride(), vk::VertexInputRate::eVertex } };
-        pipelineBuilder.vertexInputState.attributeDescriptions = {
-                // Location 0 : Position
-                { 0, 0, vk::Format::eR32G32B32Sfloat, 0 },
-                // Location 1 : Normal
-                { 1, 0, vk::Format::eR32G32B32Sfloat, sizeof(float) * 3 },
-                // Location 2 : Texture coordinates
-                { 2, 0, vk::Format::eR32G32Sfloat, sizeof(float) * 6 },
-                // Location 3 : Color
-                { 3, 0, vk::Format::eR32G32B32Sfloat, sizeof(float) * 8 },
-        };
-
-        // Attribute descriptions
-
-        // vk::Pipeline for the meshes (armadillo, bunny, etc.)
-        // Load shaders
-        pipelineBuilder.loadShader(getAssetPath() + "shaders/vulkanscene/mesh.vert.spv", vk::ShaderStageFlagBits::eVertex);
-        pipelineBuilder.loadShader(getAssetPath() + "shaders/vulkanscene/mesh.frag.spv", vk::ShaderStageFlagBits::eFragment);
-        pipelines.models = pipelineBuilder.create(context.pipelineCache);
+        pipelineBuilder.vertexInputState.appendVertexLayout(vertexLayout);
+        pipelineBuilder.loadShader(getAssetPath() + "shaders/offscreen/mirror.vert.spv", vk::ShaderStageFlagBits::eVertex);
+        pipelineBuilder.loadShader(getAssetPath() + "shaders/offscreen/mirror.frag.spv", vk::ShaderStageFlagBits::eFragment);
+        pipelines.mirror = pipelineBuilder.create(context.pipelineCache);
         pipelineBuilder.destroyShaderModules();
 
-        // vk::Pipeline for the logos
-        pipelineBuilder.loadShader(getAssetPath() + "shaders/vulkanscene/logo.vert.spv", vk::ShaderStageFlagBits::eVertex);
-        pipelineBuilder.loadShader(getAssetPath() + "shaders/vulkanscene/logo.frag.spv", vk::ShaderStageFlagBits::eFragment);
-        pipelines.logos = pipelineBuilder.create(context.pipelineCache);
-        pipelineBuilder.destroyShaderModules();
-
-        // vk::Pipeline for the sky sphere (todo)
-        pipelineBuilder.rasterizationState.cullMode = vk::CullModeFlagBits::eFront;  // Inverted culling
-        pipelineBuilder.depthStencilState.depthWriteEnable = VK_FALSE;               // No depth writes
-        pipelineBuilder.loadShader(getAssetPath() + "shaders/vulkanscene/skybox.vert.spv", vk::ShaderStageFlagBits::eVertex);
-        pipelineBuilder.loadShader(getAssetPath() + "shaders/vulkanscene/skybox.frag.spv", vk::ShaderStageFlagBits::eFragment);
-        pipelines.skybox = pipelineBuilder.create(context.pipelineCache);
-
-        // Assign pipelines
-        demoMeshes.logos.second = pipelines.logos;
-        demoMeshes.models.second = pipelines.models;
-        demoMeshes.background.second = pipelines.models;
-        demoMeshes.skybox.second = pipelines.skybox;
+        // Solid shading pipeline
+        pipelineBuilder.loadShader(getAssetPath() + "shaders/offscreen/offscreen.vert.spv", vk::ShaderStageFlagBits::eVertex);
+        pipelineBuilder.loadShader(getAssetPath() + "shaders/offscreen/offscreen.frag.spv", vk::ShaderStageFlagBits::eFragment);
+        pipelineBuilder.layout = pipelineLayouts.offscreen;
+        pipelines.shaded = pipelineBuilder.create(context.pipelineCache);
     }
 
     // Prepare and initialize uniform buffer containing shader uniforms
     void prepareUniformBuffers() {
-        // Vertex shader uniform buffer block
-        uniformData.meshVS = context.createUniformBuffer(uboVS);
+        // Mesh vertex shader uniform buffer block
+        uniformData.vsShared = context.createUniformBuffer(ubos.vsShared);
+        // Mirror plane vertex shader uniform buffer block
+        uniformData.vsMirror = context.createUniformBuffer(ubos.vsShared);
+        // Offscreen vertex shader uniform buffer block
+        uniformData.vsOffScreen = context.createUniformBuffer(ubos.vsShared);
+
         updateUniformBuffers();
+        updateUniformBufferOffscreen();
     }
 
     void updateUniformBuffers() {
-        uboVS.projection = camera.matrices.perspective;
-        uboVS.view = glm::translate(glm::mat4(), glm::vec3(0, 0, camera.position.z));
-        uboVS.model = camera.matrices.view;
-        uboVS.model[3] = glm::vec4{ 0, 0, 0, 1 };
-        uboVS.normal = glm::inverseTranspose(uboVS.view * uboVS.model);
-        uboVS.lightPos = lightPos;
-        uniformData.meshVS.copy(uboVS);
+        // Mesh
+        ubos.vsShared.projection = camera.matrices.perspective;
+        ubos.vsShared.model = glm::translate(camera.matrices.view, meshPos);
+        uniformData.vsShared.copy(ubos.vsShared);
+
+        // Mirror
+        ubos.vsShared.model = camera.matrices.view;
+        uniformData.vsMirror.copy(ubos.vsShared);
+    }
+
+    void updateUniformBufferOffscreen() {
+        ubos.vsShared.projection = camera.matrices.perspective;
+        ubos.vsShared.model = camera.matrices.view;
+        ubos.vsShared.model = glm::scale(ubos.vsShared.model, glm::vec3(1.0f, -1.0f, 1.0f));
+        ubos.vsShared.model = glm::translate(ubos.vsShared.model, meshPos);
+        uniformData.vsOffScreen.copy(ubos.vsShared);
     }
 
     void prepare() override {
-        Application::prepare();
-        loadTextures();
-        prepareVertices();
+        offscreen.size = glm::uvec2(512);
+        OffscreenApplication::prepare();
         prepareUniformBuffers();
         setupDescriptorSetLayout();
         preparePipelines();
         setupDescriptorPool();
         setupDescriptorSet();
+        buildOffscreenCommandBuffer();
         buildCommandBuffers();
         prepared = true;
     }
 
-    void onViewChanged() override { updateUniformBuffers(); }
+    void render() override {
+        if (!prepared)
+            return;
+        draw();
+        updateUniformBuffers();
+        updateUniformBufferOffscreen();
+    }
+
+    void onViewChanged() override {
+        updateUniformBuffers();
+        updateUniformBufferOffscreen();
+    }
 };
 
 Fusion::Application* Fusion::CreateApplication(CommandLineArgs args) {

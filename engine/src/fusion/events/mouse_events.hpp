@@ -6,7 +6,7 @@
 namespace Fusion {
 
     struct  MouseMovedEvent : public Event {
-        glm::vec2 mouse;
+        glm::vec2 pos;
     };
 
     struct  MouseScrollEvent : public Event {
