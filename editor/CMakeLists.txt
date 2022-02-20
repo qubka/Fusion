@@ -4,7 +4,7 @@ project(editor)
 set(CMAKE_CXX_STANDARD 17)
 
 file(GLOB_RECURSE SRC_SOURCES src/*.cpp)
-add_executable(${PROJECT_NAME} editorapp.cpp ${SRC_SOURCES})
+add_executable(${PROJECT_NAME} editor_app.cpp ${SRC_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE engine)
 

@@ -14,8 +14,8 @@ namespace Fusion {
     class ImGuiLayer;
 
     struct  CommandLineArgs {
-        int count{0};
-        char** args{nullptr};
+        int count{ 0 };
+        char** args{ nullptr };
 
         const char* operator[](int index) const {
             FE_ASSERT(index < count && "invalid argument index");

@@ -11,7 +11,6 @@ namespace Fusion {
     public:
         Window(std::string title, const glm::uvec2& size, const glm::ivec2& position = {}, bool fullscreen = false);
         ~Window();
-        FE_NONCOPYABLE(Window);
 
         operator GLFWwindow*() const { return window; }
         int getWidth() const { return width; }
@@ -52,6 +51,7 @@ namespace Fusion {
         }
 
         bool isMinimize() const { return minimize; }
+        bool isFullscreen() const { return fullscreen; }
         EventQueue& getEventQueue() { return eventQueue; }
 
 #if defined(VULKAN_HPP)

@@ -164,7 +164,7 @@ struct SwapChain {
 
         // Get the swap chain images
         auto swapChainImages = device.getSwapchainImagesKHR(swapChain);
-        imageCount = (uint32_t)swapChainImages.size();
+        imageCount = static_cast<uint32_t>(swapChainImages.size());
 
         // Get the swap chain buffers containing the image and imageview
         images.resize(imageCount);

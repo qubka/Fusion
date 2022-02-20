@@ -1,7 +1,5 @@
 #pragma once
 
-//Fusion::Application* Fusion::CreateApplication();
-
 int main(int args, char** argv) {
     Fusion::Log::Init();
     FE_LOG_INFO << "Fusion Engine";

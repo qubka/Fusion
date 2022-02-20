@@ -3,6 +3,7 @@
 #include "components.hpp"
 #include "scene.hpp"
 
+#include <magic_enum.hpp>
 #include <yaml-cpp/yaml.h>
 
 namespace YAML {

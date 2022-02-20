@@ -64,7 +64,7 @@ inline void executeImmediately(vk::Device device, vk::CommandPool commandPool, v
     cbs[0].end();
 
     vk::SubmitInfo submit;
-    submit.commandBufferCount = (uint32_t)cbs.size();
+    submit.commandBufferCount = static_cast<uint32_t>(cbs.size());
     submit.pCommandBuffers = cbs.data();
     queue.submit(submit, vk::Fence{});
     device.waitIdle();
@@ -549,11 +549,11 @@ public:
 
     vk::UniqueRenderPass createUnique(const vk::Device& device) const {
         vk::RenderPassCreateInfo renderPassInfo{};
-        renderPassInfo.attachmentCount = (uint32_t)s.attachmentDescriptions.size();
+        renderPassInfo.attachmentCount = static_cast<uint32_t>(s.attachmentDescriptions.size());
         renderPassInfo.pAttachments = s.attachmentDescriptions.data();
-        renderPassInfo.subpassCount = (uint32_t)s.subpassDescriptions.size();
+        renderPassInfo.subpassCount = static_cast<uint32_t>(s.subpassDescriptions.size());
         renderPassInfo.pSubpasses = s.subpassDescriptions.data();
-        renderPassInfo.dependencyCount = (uint32_t)s.subpassDependencies.size();
+        renderPassInfo.dependencyCount = static_cast<uint32_t>(s.subpassDependencies.size());
         renderPassInfo.pDependencies = s.subpassDependencies.data();
         return device.createRenderPassUnique(renderPassInfo);
     }
@@ -603,7 +603,7 @@ public:
         }
 
         file.seekg(0, std::ios::end);
-        int length = (int)file.tellg();
+        int length = static_cast<int>(file.tellg());
 
         s.opcodes_.resize((size_t)(length / 4));
         file.seekg(0, std::ios::beg);
@@ -749,9 +749,9 @@ public:
     /// Create a self-deleting pipeline layout object.
     vk::UniquePipelineLayout createUnique(const vk::Device& device) const {
         vk::PipelineLayoutCreateInfo pipelineLayoutInfo{ {},
-                                                         (uint32_t)setLayouts_.size(),
+                                                         static_cast<uint32_t>(setLayouts_.size()),
                                                          setLayouts_.data(),
-                                                         (uint32_t)pushConstantRanges_.size(),
+                                                         static_cast<uint32_t>(pushConstantRanges_.size()),
                                                          pushConstantRanges_.data() };
         return std::move(device.createPipelineLayoutUnique(pipelineLayoutInfo));
     }
@@ -780,7 +780,7 @@ class PipelineMaker {
 public:
     PipelineMaker(uint32_t width, uint32_t height) {
         inputAssemblyState_.topology = vk::PrimitiveTopology::eTriangleList;
-        viewport_ = vk::Viewport{ 0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f };
+        viewport_ = vk::Viewport{ 0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 1.0f };
         scissor_ = vk::Rect2D{ { 0, 0 }, { width, height } };
         rasterizationState_.lineWidth = 1.0f;
 
@@ -816,23 +816,23 @@ public:
             colorBlendAttachments_.push_back(blend);
         }
 
-        auto count = (uint32_t)colorBlendAttachments_.size();
+        auto count = static_cast<uint32_t>(colorBlendAttachments_.size());
         colorBlendState_.attachmentCount = count;
         colorBlendState_.pAttachments = count ? colorBlendAttachments_.data() : nullptr;
 
         vk::PipelineViewportStateCreateInfo viewportState{ {}, 1, &viewport_, 1, &scissor_ };
 
         vk::PipelineVertexInputStateCreateInfo vertexInputState;
-        vertexInputState.vertexAttributeDescriptionCount = (uint32_t)vertexAttributeDescriptions_.size();
+        vertexInputState.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttributeDescriptions_.size());
         vertexInputState.pVertexAttributeDescriptions = vertexAttributeDescriptions_.data();
-        vertexInputState.vertexBindingDescriptionCount = (uint32_t)vertexBindingDescriptions_.size();
+        vertexInputState.vertexBindingDescriptionCount = static_cast<uint32_t>(vertexBindingDescriptions_.size());
         vertexInputState.pVertexBindingDescriptions = vertexBindingDescriptions_.data();
 
-        vk::PipelineDynamicStateCreateInfo dynState{ {}, (uint32_t)dynamicState_.size(), dynamicState_.data() };
+        vk::PipelineDynamicStateCreateInfo dynState{ {}, static_cast<uint32_t>(dynamicState_.size()), dynamicState_.data() };
 
         vk::GraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.pVertexInputState = &vertexInputState;
-        pipelineInfo.stageCount = (uint32_t)modules_.size();
+        pipelineInfo.stageCount = static_cast<uint32_t>(modules_.size());
         pipelineInfo.pStages = modules_.data();
         pipelineInfo.pInputAssemblyState = &inputAssemblyState_;
         pipelineInfo.pViewportState = &viewportState;
@@ -1452,7 +1452,7 @@ public:
     void samplers(uint32_t binding, vk::DescriptorType descriptorType, vk::ShaderStageFlags stageFlags, const std::vector<vk::Sampler> immutableSamplers) {
         s.samplers.push_back(immutableSamplers);
         auto pImmutableSamplers = s.samplers.back().data();
-        s.bindings.emplace_back(binding, descriptorType, (uint32_t)immutableSamplers.size(), stageFlags, pImmutableSamplers);
+        s.bindings.emplace_back(binding, descriptorType, static_cast<uint32_t>(immutableSamplers.size()), stageFlags, pImmutableSamplers);
     }
 
     void bufferView(uint32_t binding, vk::DescriptorType descriptorType, vk::ShaderStageFlags stageFlags, uint32_t descriptorCount) {
@@ -1462,7 +1462,7 @@ public:
     /// Create a self-deleting descriptor set object.
     vk::UniqueDescriptorSetLayout createUnique(vk::Device device) const {
         vk::DescriptorSetLayoutCreateInfo dsci{};
-        dsci.bindingCount = (uint32_t)s.bindings.size();
+        dsci.bindingCount = static_cast<uint32_t>(s.bindings.size());
         dsci.pBindings = s.bindings.data();
         return device.createDescriptorSetLayoutUnique(dsci);
     }
@@ -1491,7 +1491,7 @@ public:
     std::vector<vk::DescriptorSet> create(vk::Device device, vk::DescriptorPool descriptorPool) const {
         vk::DescriptorSetAllocateInfo dsai{};
         dsai.descriptorPool = descriptorPool;
-        dsai.descriptorSetCount = (uint32_t)s.layouts.size();
+        dsai.descriptorSetCount = static_cast<uint32_t>(s.layouts.size());
         dsai.pSetLayouts = s.layouts.data();
         return device.allocateDescriptorSets(dsai);
     }
@@ -1500,7 +1500,7 @@ public:
     std::vector<vk::UniqueDescriptorSet> createUnique(vk::Device device, vk::DescriptorPool descriptorPool) const {
         vk::DescriptorSetAllocateInfo dsai{};
         dsai.descriptorPool = descriptorPool;
-        dsai.descriptorSetCount = (uint32_t)s.layouts.size();
+        dsai.descriptorSetCount = static_cast<uint32_t>(s.layouts.size());
         dsai.pSetLayouts = s.layouts.data();
         return device.allocateDescriptorSetsUnique(dsai);
     }

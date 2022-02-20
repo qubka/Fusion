@@ -1,5 +1,4 @@
-#ifndef VOX_EXTENTIONS_H
-#define VOX_EXTENTIONS_H
+#pragma once
 
 /*#include <assimp/types.h>
 
@@ -26,20 +25,22 @@ void hashCombine(std::size_t& seed, const T& v, const Rest&... rest) {
 };
 
 namespace vec3 {
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 right = glm::vec3{1,0,0};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 left = glm::vec3{-1,0,0};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 up = glm::vec3{0,1,0};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 down = glm::vec3{0,-1,0};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 forward = glm::vec3{0,0,1};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 back = glm::vec3{0,0,-1};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 zero = glm::vec3{0,0,0};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 right{1.0f,0.0f,0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 left{-1.0f,0.0f,0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 up{0.0f,1.0f,0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 down{0.0f,-1.0f,0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 forward {0.0f,0.0f,1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 back{0.0f,0.0f,-1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 zero{0.0f,0.0f,0.0f};
 }
 namespace vec2 {
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 right = glm::vec2{1,0};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 left = glm::vec2{-1,0};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 up = glm::vec2{0,1};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 down = glm::vec2{0,-1};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 zero = glm::vec2{0,0};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 right{1.0f,0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 left{-1.0f,0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 up{0.0f,1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 down{0.0f,-1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 zero{0.0f,0.0f};
 }
-
-#endif //VOX_EXTENTIONS_H
+namespace quat {
+    GLM_INLINE GLM_CONSTEXPR glm::quat identity{ 1.0f, 0.0f, 0.0f, 0.0f };
+    GLM_INLINE GLM_CONSTEXPR glm::quat y_1800{ 0.0f, 0.0f, 1.0f, 0.0f };
+}

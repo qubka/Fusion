@@ -8,13 +8,11 @@
 
 #include "ui.hpp"
 
-#include <imgui.h>
+#include "imgui.h"
 
-#include "vkx/helpers.hpp"
-#include "vkx/pipelines.hpp"
-
-#include "utils.hpp"
-#include "fusion/renderer/vkx/android.hpp"
+#include "helpers.hpp"
+#include "pipelines.hpp"
+#include "android.hpp"
 
 using namespace vkx;
 using namespace vkx::ui;
@@ -48,7 +46,7 @@ void UIOverlay::create(const UIOverlayCreateInfo& createInfo) {
     style.Colors[ImGuiCol_CheckMark] = ImVec4(1.0f, 0.0f, 0.0f, 0.8f);
     // Dimensions
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2((float)createInfo.size.width, (float)createInfo.size.height);
+    io.DisplaySize = ImVec2(static_cast<float>(createInfo.size.width), static_cast<float>(createInfo.size.height));
     io.FontGlobalScale = scale;
 
     prepareResources();
@@ -201,8 +199,8 @@ void UIOverlay::preparePipeline() {
     if (!createInfo.shaders.empty()) {
         pipelineBuilder.shaderStages = createInfo.shaders;
     } else {
-        pipelineBuilder.loadShader(vkx::getAssetPath() + "shaders/base/uioverlay.vert.spv", vk::ShaderStageFlagBits::eVertex);
-        pipelineBuilder.loadShader(getAssetPath() + "shaders/base/uioverlay.frag.spv", vk::ShaderStageFlagBits::eFragment);
+        pipelineBuilder.loadShader(Fusion::getAssetPath() + "shaders/base/uioverlay.vert.spv", vk::ShaderStageFlagBits::eVertex);
+        pipelineBuilder.loadShader(Fusion::getAssetPath() + "shaders/base/uioverlay.frag.spv", vk::ShaderStageFlagBits::eFragment);
     }
 
     // Vertex bindings an attributes based on ImGui vertex definition
@@ -285,10 +283,10 @@ void UIOverlay::updateCommandBuffers() {
     ImGuiIO& io = ImGui::GetIO();
 
     const vk::Viewport viewport{ 0.0f, 0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, 1.0f };
-    const vk::Rect2D scissor{ {}, vk::Extent2D{ (uint32_t)io.DisplaySize.x, (uint32_t)io.DisplaySize.y } };
+    const vk::Rect2D scissor{ {}, vk::Extent2D{ static_cast<uint32_t>(io.DisplaySize.x), static_cast<uint32_t>(io.DisplaySize.y) } };
     // UI scale and translate via push constants
-    pushConstBlock.scale = glm::vec2(2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y);
-    pushConstBlock.translate = glm::vec2(-1.0f);
+    pushConstBlock.scale = glm::vec2{2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y};
+    pushConstBlock.translate = glm::vec2{-1.0f};
 
     if (cmdBuffers.size()) {
         context.trashAll<vk::CommandBuffer>(cmdBuffers,
@@ -296,7 +294,7 @@ void UIOverlay::updateCommandBuffers() {
         cmdBuffers.clear();
     }
 
-    cmdBuffers = context.device.allocateCommandBuffers({ commandPool, vk::CommandBufferLevel::ePrimary, (uint32_t)createInfo.framebuffers.size() });
+    cmdBuffers = context.device.allocateCommandBuffers({ commandPool, vk::CommandBufferLevel::ePrimary, static_cast<uint32_t>(createInfo.framebuffers.size()) });
 
     for (size_t i = 0; i < cmdBuffers.size(); ++i) {
         renderPassBeginInfo.framebuffer = createInfo.framebuffers[i];
@@ -306,7 +304,7 @@ void UIOverlay::updateCommandBuffers() {
 
 #if 0
         if (vkx::debug::marker::active) {
-            vkx::debug::marker::beginRegion(cmdBuffer, "UI overlay", glm::vec4(1.0f, 0.94f, 0.3f, 1.0f));
+            vkx::debug::marker::beginRegion(cmdBuffer, "UI overlay", glm::vec4{1.0f, 0.94f, 0.3f, 1.0f});
         }
 #endif
 
@@ -329,10 +327,10 @@ void UIOverlay::updateCommandBuffers() {
             for (int32_t k = 0; k < cmd_list->CmdBuffer.Size; k++) {
                 const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[k];
                 vk::Rect2D scissorRect;
-                scissorRect.offset.x = std::max((int32_t)(pcmd->ClipRect.x), 0);
-                scissorRect.offset.y = std::max((int32_t)(pcmd->ClipRect.y), 0);
-                scissorRect.extent.width = (uint32_t)(pcmd->ClipRect.z - pcmd->ClipRect.x);
-                scissorRect.extent.height = (uint32_t)(pcmd->ClipRect.w - pcmd->ClipRect.y);
+                scissorRect.offset.x = std::max(static_cast<int32_t>((pcmd->ClipRect.x)), 0);
+                scissorRect.offset.y = std::max(static_cast<int32_t>((pcmd->ClipRect.y)), 0);
+                scissorRect.extent.width = static_cast<uint32_t>(pcmd->ClipRect.z - pcmd->ClipRect.x);
+                scissorRect.extent.height = static_cast<uint32_t>((pcmd->ClipRect.w - pcmd->ClipRect.y));
                 cmdBuffer.setScissor(0, scissorRect);
                 cmdBuffer.drawIndexed(pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
                 indexOffset += pcmd->ElemCount;
@@ -430,7 +428,7 @@ void UIOverlay::update() {
 
 void UIOverlay::resize(const vk::Extent2D& size, const std::vector<vk::Framebuffer>& framebuffers) {
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2((float)(size.width), (float)(size.height));
+    io.DisplaySize = ImVec2(static_cast<float>(size.width), static_cast<float>(size.height));
     createInfo.size = size;
     createInfo.framebuffers = framebuffers;
     updateCommandBuffers();

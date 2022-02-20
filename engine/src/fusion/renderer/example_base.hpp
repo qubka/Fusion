@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "common.hpp"
-
 #include "vkx/helpers.hpp"
 #include "vkx/filesystem.hpp"
 #include "vkx/model.hpp"
@@ -20,10 +18,8 @@
 
 #include "GLFW/glfw3.h"
 
-#include "ui.hpp"
-#include "utils.hpp"
+#include "fusion/renderer/vkx/ui.hpp"
 #include "perspective_camera.hpp"
-#include "compute.hpp"
 
 #if defined(__ANDROID__)
 #include "AndroidNativeApp.hpp"
@@ -155,9 +151,6 @@ namespace vkx {
 #endif
         } semaphores;
 
-        // Returns the base asset path (for shaders, models, textures) depending on the os
-        const std::string& getAssetPath() { return ::vkx::getAssetPath(); }
-
     protected:
         /** @brief Example settings that can be changed e.g. by command line arguments */
         struct Settings {
@@ -190,7 +183,7 @@ namespace vkx {
         uint32_t& width{ size.width };
         uint32_t& height{ size.height };
 
-        vk::ClearColorValue defaultClearColor = vkx::util::clearColor(glm::vec4({ 0.025f, 0.025f, 0.025f, 1.0f }));
+        vk::ClearColorValue defaultClearColor = vkx::util::clearColor(glm::vec4{ 0.025f, 0.025f, 0.025f, 1.0f });
         vk::ClearDepthStencilValue defaultClearDepth{ 1.0f, 0 };
 
         // Defines a frame rate independent timer value clamped from -1.0...1.0
@@ -206,7 +199,7 @@ namespace vkx {
         // Use to adjust mouse zoom speed
         float zoomSpeed = 1.0f;
 
-        Fusion::PerspectiveCamera camera{static_cast<float>(size.width)  / size.height, 60.0f,  0.1f, 256.0f};
+        Fusion::PerspectiveCamera camera{static_cast<float>(size.width) / size.height, 60.0f,  0.1f, 256.0f};
         glm::vec2 mousePos;
         bool viewUpdated{ false };
 
@@ -216,8 +209,8 @@ namespace vkx {
 
         // Gamepad state (only one pad supported)
         struct {
-            glm::vec2 axisLeft = glm::vec2(0.0f);
-            glm::vec2 axisRight = glm::vec2(0.0f);
+            glm::vec2 axisLeft{0.0f};
+            glm::vec2 axisRight{0.0f};
             float rz{ 0.0f };
         } gamePadState;
 

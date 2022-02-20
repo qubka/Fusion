@@ -45,7 +45,7 @@ struct PipelineColorBlendStateCreateInfo : public vk::PipelineColorBlendStateCre
     std::vector<PipelineColorBlendAttachmentState> blendAttachmentStates{ PipelineColorBlendAttachmentState() };
 
     void update() {
-        this->attachmentCount = (uint32_t)blendAttachmentStates.size();
+        this->attachmentCount = static_cast<uint32_t>(blendAttachmentStates.size());
         this->pAttachments = blendAttachmentStates.data();
     }
 };
@@ -56,7 +56,7 @@ struct PipelineDynamicStateCreateInfo : public vk::PipelineDynamicStateCreateInf
     PipelineDynamicStateCreateInfo() { dynamicStateEnables = { vk::DynamicState::eViewport, vk::DynamicState::eScissor }; }
 
     void update() {
-        this->dynamicStateCount = (uint32_t)dynamicStateEnables.size();
+        this->dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
         this->pDynamicStates = dynamicStateEnables.data();
     }
 };
@@ -69,7 +69,7 @@ struct PipelineVertexInputStateCreateInfo : public vk::PipelineVertexInputStateC
         bindingDescriptions.emplace_back(binding, vertexLayout.stride(), rate);
         auto componentsSize = vertexLayout.components.size();
         attributeDescriptions.reserve(attributeDescriptions.size() + componentsSize);
-        auto attributeIndexOffset = (uint32_t)attributeDescriptions.size();
+        auto attributeIndexOffset = static_cast<uint32_t>(attributeDescriptions.size());
         for (uint32_t i = 0; i < componentsSize; ++i) {
             const auto& component = vertexLayout.components[i];
             const auto format = vertexLayout.componentFormat(component);
@@ -95,7 +95,7 @@ struct PipelineViewportStateCreateInfo : public vk::PipelineViewportStateCreateI
             viewportCount = 1;
             pViewports = nullptr;
         } else {
-            viewportCount = (uint32_t)viewports.size();
+            viewportCount = static_cast<uint32_t>(viewports.size());
             pViewports = viewports.data();
         }
 
@@ -103,7 +103,7 @@ struct PipelineViewportStateCreateInfo : public vk::PipelineViewportStateCreateI
             scissorCount = 1;
             pScissors = nullptr;
         } else {
-            scissorCount = (uint32_t)scissors.size();
+            scissorCount = static_cast<uint32_t>(scissors.size());
             pScissors = scissors.data();
         }
     }

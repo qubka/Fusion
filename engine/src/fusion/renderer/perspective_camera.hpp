@@ -46,8 +46,8 @@ namespace Fusion {
         void updateProjection();
 
     protected:
-        glm::vec3 position{0};
-        glm::quat rotation{1, 0, 0, 0};
+        glm::vec3 position{ 0.0f};
+        glm::quat rotation{ 1.0f, 0.0f, 0.0f, 0.0f };
 
         glm::vec3 forward;
         glm::vec3 right;

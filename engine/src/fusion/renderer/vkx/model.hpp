@@ -50,7 +50,7 @@ public:
     uint32_t componentIndex(Component component) const {
         for (size_t i = 0; i < components.size(); ++i) {
             if (components[i] == component) {
-                return (uint32_t)i;
+                return static_cast<uint32_t>(i);;
             }
         }
         return static_cast<uint32_t>(-1);

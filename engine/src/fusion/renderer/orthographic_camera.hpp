@@ -22,7 +22,7 @@ namespace Fusion {
         void updateView();
 
     private:
-        glm::vec3 position{0};
-        float rotation{0};
+        glm::vec3 position{ 0 };
+        float rotation{ 0 };
     };
 }

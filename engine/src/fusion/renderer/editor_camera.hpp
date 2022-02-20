@@ -32,11 +32,11 @@ namespace Fusion {
         float zoomSpeed() const;
 
     private:
-        glm::vec3 focalPoint{0};
+        glm::vec3 focalPoint{ 0 };
 
-        float distance{10};
-        float speed{1};
-        float pitch{0};
-        float yaw{0};
+        float distance{ 10 };
+        float speed{ 1 };
+        float pitch{ 0 };
+        float yaw{ 0 };
     };
 }

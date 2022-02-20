@@ -1,8 +1,8 @@
 #pragma once
 
-/*#include "Vulkan.hpp"
+#include "context.hpp"
 
-namespace Fusion {
+namespace vkx {
     class DescriptorAllocator {
     public:
         struct PoolSizes {
@@ -22,9 +22,8 @@ namespace Fusion {
                 };
         };
 
-        DescriptorAllocator(Vulkan& vulkan);
+        DescriptorAllocator(const vk::Device& device);
         ~DescriptorAllocator();
-        //FE_NONCOPYABLE(DescriptorAllocator)
 
         vk::DescriptorPool grabPool();
         void resetPools();
@@ -34,21 +33,20 @@ namespace Fusion {
     private:
         vk::DescriptorPool createPool(uint32_t count, vk::DescriptorPoolCreateFlags flags) const;
 
-        vk::DescriptorPool currentPool{nullptr};
+        vk::DescriptorPool currentPool{ nullptr };
         PoolSizes descriptorSizes;
         std::vector<vk::DescriptorPool> usedPools;
         std::vector<vk::DescriptorPool> freePools;
 
-        Vulkan& vulkan;
+        const vk::Device& device;
 
         static constexpr int INITIAL_POOL_SIZE = 1000;
     };
 
     class DescriptorLayoutCache {
     public:
-        DescriptorLayoutCache(Vulkan& vulkan);
+        DescriptorLayoutCache(const vk::Device& device);
         ~DescriptorLayoutCache();
-        FE_NONCOPYABLE(DescriptorLayoutCache)
 
         vk::DescriptorSetLayout createDescriptorLayout(vk::DescriptorSetLayoutCreateInfo& info);
 
@@ -65,14 +63,13 @@ namespace Fusion {
         };
 
         std::unordered_map<DescriptorLayoutInfo, vk::DescriptorSetLayout, DescriptorLayoutHash> layoutCache;
-        Vulkan& vulkan;
+        const vk::Device& device;
     };
 
     class DescriptorBuilder {
     public:
         DescriptorBuilder(DescriptorLayoutCache& cache, DescriptorAllocator& allocator);
         ~DescriptorBuilder();
-        FE_NONCOPYABLE(DescriptorBuilder)
 
         DescriptorBuilder& bindBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
         DescriptorBuilder& bindImage(uint32_t binding, vk::DescriptorImageInfo* imageInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
@@ -87,4 +84,4 @@ namespace Fusion {
         DescriptorLayoutCache& cache;
         DescriptorAllocator& allocator;
     };
-};*/
+};

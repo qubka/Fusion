@@ -118,9 +118,9 @@ vk::SurfaceKHR Window::createWindowSurface(GLFWwindow* window, const vk::Instanc
 
 glm::vec4 Window::getViewport() const {
 #ifdef FE_VULKAN
-    return {0, 0, width, height};
+    return { 0, 0, width, height };
 #else // OPENGL
-    return {0, height, width, -height}; // vertical flip is required
+    return { 0, height, width, -height }; // vertical flip is required
 #endif
 }
 

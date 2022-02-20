@@ -13,7 +13,6 @@ namespace Fusion {
         ~EventQueue() {
             free();
         }
-        //FE_NONCOPYABLE(EventQueue);
 
         template<typename EventType>
         void submit(EventType* event) {

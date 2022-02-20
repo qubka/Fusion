@@ -9,7 +9,6 @@ namespace Fusion {
     public:
         Scene();
         ~Scene();
-        FE_NONCOPYABLE(Scene);
 
         void onUpdateRuntime();
         void onUpdateEditor();

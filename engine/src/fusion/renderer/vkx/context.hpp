@@ -8,7 +8,7 @@
 #include <vector>
 #include <queue>
 
-#include "glm/glm/glm.hpp"
+#include <glm/glm/glm.hpp>
 #include <gli/gli/gli.hpp>
 
 #include <vulkan/vulkan.hpp>
@@ -209,14 +209,14 @@ public:
         vk::InstanceCreateInfo instanceCreateInfo;
         instanceCreateInfo.pApplicationInfo = &appInfo;
         if (!enabledExtensions.empty()) {
-            instanceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
+            instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(enabledExtensions.size());
             instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
         }
 
         CStringVector layers;
         if (enableValidation) {
             layers = filterLayers(debug::validationLayerNames);
-            instanceCreateInfo.enabledLayerCount = (uint32_t)layers.size();
+            instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
             instanceCreateInfo.ppEnabledLayerNames = layers.data();
         }
 
@@ -484,7 +484,7 @@ protected:
         }
 
         if (!enabledExtensions.empty()) {
-            deviceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
+            deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(enabledExtensions.size());
             deviceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
         }
         device = physicalDevice.createDevice(deviceCreateInfo);
@@ -656,7 +656,7 @@ public:
         for (size_t i = 0; i < imageCreateInfo.mipLevels; ++i) {
             const auto& mip = tex2D[i];
             const auto dims = mip.extent();
-            mips.push_back({ vk::Extent3D{ (uint32_t)dims.x, (uint32_t)dims.y, 1 }, (uint32_t)mip.size() });
+            mips.push_back({ vk::Extent3D{ static_cast<uint32_t>(dims.x), static_cast<uint32_t>(dims.y), 1 }, static_cast<uint32_t>(mip.size()) });
         }
         return stageToDeviceImage(imageCreateInfo, memoryPropertyFlags, (vk::DeviceSize)tex2D.size(), tex2D.data(), mips, layout);
     }

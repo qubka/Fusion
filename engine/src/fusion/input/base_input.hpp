@@ -18,7 +18,6 @@ namespace Fusion {
         //! Takes a list of which keys to keep state for
         BaseInput(const std::vector<T>& keysToMonitor);
         ~BaseInput() = default;
-        FE_NONCOPYABLE(BaseInput);
 
         virtual void onAttach() {}
         virtual void onDetach() {}
@@ -36,13 +35,13 @@ namespace Fusion {
         void setKey(T keycode, uint8_t action);
 
         struct Key {
-            bool pressed{false};
-            uint32_t lastFrame{UINT32_MAX};
+            bool pressed{ false };
+            uint32_t lastFrame{ UINT32_MAX };
         };
 
         std::map<T, Key> keys;
-        uint32_t currentFrame{0}; // can be used instead of global if needed
-        bool enabled{true};
+        uint32_t currentFrame{ 0 }; // can be used instead of global if needed
+        bool enabled{ true };
     };
 
     template class BaseInput<MouseCode>;

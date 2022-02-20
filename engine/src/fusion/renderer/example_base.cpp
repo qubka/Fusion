@@ -10,11 +10,11 @@
 
 #include <imgui.h>
 
-#include "ui.hpp"
-#include "fusion/renderer/vkx/android.hpp"
-#include "keycodes.hpp"
+#include "fusion/renderer/vkx/ui.hpp"
+
 #include "vkx/storage.hpp"
 #include "vkx/filesystem.hpp"
+#include "vkx/android.hpp"
 
 using namespace vkx;
 
@@ -290,13 +290,13 @@ void ExampleBase::prepare() {
 
 void ExampleBase::setupRenderPassBeginInfo() {
     clearValues.clear();
-    clearValues.push_back(vkx::util::clearColor(glm::vec4(0.1, 0.1, 0.1, 1.0)));
+    clearValues.push_back(vkx::util::clearColor(glm::vec4{0.1, 0.1, 0.1, 1.0}));
     clearValues.push_back(vk::ClearDepthStencilValue{ 1.0f, 0 });
 
     renderPassBeginInfo = vk::RenderPassBeginInfo();
     renderPassBeginInfo.renderPass = renderPass;
     renderPassBeginInfo.renderArea.extent = size;
-    renderPassBeginInfo.clearValueCount = (uint32_t)clearValues.size();
+    renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassBeginInfo.pClearValues = clearValues.data();
 }
 
@@ -489,7 +489,7 @@ void ExampleBase::setupRenderPass() {
                     // Input attachment references
                     0, nullptr,
                     // Color / resolve attachment references
-                    (uint32_t)colorAttachmentReferences.size(), colorAttachmentReferences.data(), nullptr,
+                    static_cast<uint32_t>(colorAttachmentReferences.size()), colorAttachmentReferences.data(), nullptr,
                     // Depth stecil attachment reference,
                     &depthReference,
                     // Preserve attachments
@@ -498,11 +498,11 @@ void ExampleBase::setupRenderPass() {
     };
 
     vk::RenderPassCreateInfo renderPassInfo;
-    renderPassInfo.attachmentCount = (uint32_t)attachments.size();
+    renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
     renderPassInfo.pAttachments = attachments.data();
-    renderPassInfo.subpassCount = (uint32_t)subpasses.size();
+    renderPassInfo.subpassCount = static_cast<uint32_t>(subpasses.size());
     renderPassInfo.pSubpasses = subpasses.data();
-    renderPassInfo.dependencyCount = (uint32_t)subpassDependencies.size();
+    renderPassInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());
     renderPassInfo.pDependencies = subpassDependencies.data();
     renderPass = device.createRenderPass(renderPassInfo);
 }
@@ -655,7 +655,7 @@ void ExampleBase::updateOverlay() {
 
     ImGuiIO& io = ImGui::GetIO();
 
-    io.DisplaySize = ImVec2((float)size.width, (float)size.height);
+    io.DisplaySize = ImVec2(static_cast<float>(size.width), static_cast<float>(size.height));
     io.DeltaTime = frameTimer;
 
     io.MousePos = ImVec2(mousePos.x, mousePos.y);
@@ -731,7 +731,7 @@ void ExampleBase::mouseMoved(const glm::vec2& newPos) {
 }
 
 void ExampleBase::mouseScrolled(float delta) {
-    //camera.translate(glm::vec3(0.0f, 0.0f, (float)delta * 0.005f * zoomSpeed));
+    //camera.translate(glm::vec3(0.0f, 0.0f, delta * 0.005f * zoomSpeed));
     viewUpdated = true;
 }
 
@@ -753,7 +753,7 @@ void ExampleBase::keyPressed(uint32_t key) {
         }
     }*/
 
-    switch (key) {
+    /*switch (key) {
         case KEY_P:
             paused = !paused;
             break;
@@ -771,7 +771,7 @@ void ExampleBase::keyPressed(uint32_t key) {
 
         default:
             break;
-    }
+    }*/
 }
 
 void ExampleBase::keyReleased(uint32_t key) {
@@ -985,7 +985,7 @@ void ExampleBase::MouseMoveHandler(GLFWwindow* window, double posx, double posy)
 
 void ExampleBase::MouseScrollHandler(GLFWwindow* window, double xoffset, double yoffset) {
     auto example = (ExampleBase*)glfwGetWindowUserPointer(window);
-    example->mouseScrolled((float)yoffset);
+    example->mouseScrolled(static_cast<float>(yoffset));
 }
 
 void ExampleBase::CloseHandler(GLFWwindow* window) {

@@ -106,7 +106,7 @@ struct Framebuffer {
 
         vk::FramebufferCreateInfo fbufCreateInfo;
         fbufCreateInfo.renderPass = renderPass;
-        fbufCreateInfo.attachmentCount = (uint32_t)attachments.size();
+        fbufCreateInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         fbufCreateInfo.pAttachments = attachments.data();
         fbufCreateInfo.width = size.x;
         fbufCreateInfo.height = size.y;

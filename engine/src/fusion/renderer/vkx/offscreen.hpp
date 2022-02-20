@@ -92,7 +92,7 @@ struct OffscreenRenderer {
             attachments[i].initialLayout = vk::ImageLayout::eColorAttachmentOptimal;
             attachments[i].finalLayout = colorFinalLayout;
             vk::AttachmentReference& attachmentReference = colorAttachmentReferences[i];
-            attachmentReference.attachment = (uint32_t)i;
+            attachmentReference.attachment = static_cast<uint32_t>(i);
             attachmentReference.layout = vk::ImageLayout::eColorAttachmentOptimal;
         }
 
@@ -106,7 +106,7 @@ struct OffscreenRenderer {
             depthAttachment.initialLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
             depthAttachment.finalLayout = depthFinalLayout;
             attachments.push_back(depthAttachment);
-            depthAttachmentReference.attachment = (uint32_t)attachments.size() - 1;
+            depthAttachmentReference.attachment = static_cast<uint32_t>(attachments.size()) - 1;
             depthAttachmentReference.layout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
         }
 
@@ -115,7 +115,7 @@ struct OffscreenRenderer {
             vk::SubpassDescription subpass;
             subpass.pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
             subpass.pDepthStencilAttachment = &depthAttachmentReference;
-            subpass.colorAttachmentCount = (uint32_t)colorAttachmentReferences.size();
+            subpass.colorAttachmentCount = static_cast<uint32_t>(colorAttachmentReferences.size());
             subpass.pColorAttachments = colorAttachmentReferences.data();
             subpasses.push_back(subpass);
         }
@@ -147,9 +147,9 @@ struct OffscreenRenderer {
         }
 
         vk::RenderPassCreateInfo renderPassInfo;
-        renderPassInfo.attachmentCount = (uint32_t)attachments.size();
+        renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         renderPassInfo.pAttachments = attachments.data();
-        renderPassInfo.subpassCount = (uint32_t)subpasses.size();
+        renderPassInfo.subpassCount = static_cast<uint32_t>(subpasses.size());
         renderPassInfo.pSubpasses = subpasses.data();
         //        renderPassInfo.dependencyCount = subpassDependencies.size();
         //        renderPassInfo.pDependencies = subpassDependencies.data();

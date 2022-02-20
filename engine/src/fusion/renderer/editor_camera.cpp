@@ -25,7 +25,7 @@ void EditorCamera::update() {
             }
         }
 
-        setPositionAndRotation(calculatePosition(), glm::quat{glm::vec3(pitch, yaw, 0)});
+        setPositionAndRotation(calculatePosition(), glm::quat{glm::vec3{pitch, yaw, 0}});
     }
 
     PerspectiveCamera::update();

@@ -15,17 +15,17 @@ namespace Fusion {
     struct  TransformComponent {
         glm::vec3 translation{0};
         glm::vec3 rotation{0};
-        glm::vec3 scale{1};
+        glm::vec3 scale{1.0f};
 
         operator glm::mat4() const {
-            glm::mat4 m{1};
+            glm::mat4 m{1.0f};
             return glm::translate(m, translation)
                    * glm::mat4_cast(glm::quat(rotation))
                    * glm::scale(m, scale);
         };
 
         /*operator glm::mat3() const {
-            return glm::transpose(glm::inverse(glm::mat3(push.model)))
+            return glm::transpose(glm::inverse(glm::mat3{push.model}))
         }*/
     };
 
@@ -35,7 +35,7 @@ namespace Fusion {
     };
 
     /*struct  TranslateComponent {
-        glm::mat4 transform{1};
+        glm::mat4 transform{1.0f};
 
         glm::mat4& operator*() { return transform; }
         const glm::mat4& operator*() const { return transform; }
@@ -59,7 +59,7 @@ namespace Fusion {
     };
 
     struct  ScaleComponent {
-        glm::vec3 scale{1};
+        glm::vec3 scale{1.0f};
 
         glm::vec3& operator*() { return scale; }
         const glm::vec3& operator*() const { return scale; }

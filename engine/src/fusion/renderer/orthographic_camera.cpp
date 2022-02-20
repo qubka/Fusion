@@ -32,7 +32,7 @@ void OrthographicCamera::updateView() {
     if (!isDirty)
         return;
 
-    glm::mat4 m{1};
+    glm::mat4 m{1.0f};
     glm::mat4 transform {glm::translate(m, position) *
 #ifdef FE_VULKAN
             glm::rotate(m, glm::radians(rotation), vec3::down)};

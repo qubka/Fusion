@@ -8,7 +8,7 @@
 using namespace Fusion;
 
 bool Input::keys[]{};
-uint32_t Input::frames[]{UINT32_MAX};
+uint32_t Input::frames[]{ UINT32_MAX };
 uint32_t Input::current{};
 glm::vec2 Input::delta{};
 glm::vec2 Input::position{};

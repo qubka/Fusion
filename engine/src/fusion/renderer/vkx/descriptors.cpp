@@ -1,17 +1,17 @@
-#include "Descriptors.hpp"
-/*
-using namespace Fusion;
+#include "descriptors.hpp"
 
-DescriptorAllocator::DescriptorAllocator(Vulkan& vulkan) : vulkan{vulkan} {
+using namespace vkx;
+
+DescriptorAllocator::DescriptorAllocator(const vk::Device& device) : device{device} {
 }
 
 DescriptorAllocator::~DescriptorAllocator() {
     //delete every pool held
     for (const auto& p : freePools) {
-        vulkan.getDevice().destroyDescriptorPool(p, nullptr);
+        device.destroyDescriptorPool(p);
     }
     for (const auto& p : usedPools) {
-        vulkan.getDevice().destroyDescriptorPool(p, nullptr);
+        device.destroyDescriptorPool(p);
     }
 }
 
@@ -41,12 +41,7 @@ vk::DescriptorPool DescriptorAllocator::createPool(uint32_t count, vk::Descripto
     poolInfo.poolSizeCount = static_cast<uint32_t>(sizes.size());
     poolInfo.pPoolSizes = sizes.data();
 
-    vk::DescriptorPool descriptorPool;
-
-    auto result = vulkan.getDevice().createDescriptorPool(&poolInfo, nullptr, &descriptorPool);
-    FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor pool!");
-
-    return descriptorPool;
+    return device.createDescriptorPool(poolInfo);
 }
 
 bool DescriptorAllocator::allocateDescriptor(const vk::DescriptorSetLayout& layout, vk::DescriptorSet& set) {
@@ -63,7 +58,7 @@ bool DescriptorAllocator::allocateDescriptor(const vk::DescriptorSetLayout& layo
     allocInfo.descriptorSetCount = 1;
 
     //try to allocate the descriptor set
-    auto result = vulkan.getDevice().allocateDescriptorSets(&allocInfo, &set);
+    auto result = device.allocateDescriptorSets(&allocInfo, &set);
 
     switch (result) {
         case vk::Result::eSuccess:
@@ -75,7 +70,7 @@ bool DescriptorAllocator::allocateDescriptor(const vk::DescriptorSetLayout& layo
             currentPool = grabPool();
             usedPools.push_back(currentPool);
 
-            result = vulkan.getDevice().allocateDescriptorSets(&allocInfo, &set);
+            result = device.allocateDescriptorSets(&allocInfo, &set);
 
             //if it still fails then we have big issues
             if (result == vk::Result::eSuccess) {
@@ -93,7 +88,7 @@ bool DescriptorAllocator::allocateDescriptor(const vk::DescriptorSetLayout& layo
 void DescriptorAllocator::resetPools() {
     //reset all used pools and add them to the free pools
     for (const auto& p : usedPools) {
-        vulkan.getDevice().resetDescriptorPool(p, {});
+        device.resetDescriptorPool(p, {});
         freePools.push_back(p);
     }
 
@@ -105,16 +100,16 @@ void DescriptorAllocator::resetPools() {
 }
 
 void DescriptorAllocator::updateDescriptor(std::vector<vk::WriteDescriptorSet>& writes) const {
-    vulkan.getDevice().updateDescriptorSets(static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
+    device.updateDescriptorSets(static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
 }
 
-DescriptorLayoutCache::DescriptorLayoutCache(Vulkan& vulkan) : vulkan{vulkan} {
+DescriptorLayoutCache::DescriptorLayoutCache(const vk::Device& device) : device{device} {
 }
 
 DescriptorLayoutCache::~DescriptorLayoutCache() {
     //delete every descriptor layout held
     for (const auto& [info, layout] : layoutCache) {
-        vulkan.getDevice().destroyDescriptorSetLayout(layout, nullptr);
+        device.destroyDescriptorSetLayout(layout, nullptr);
     }
 }
 
@@ -151,7 +146,7 @@ vk::DescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(vk::Descri
         //create a new one (not found)
         vk::DescriptorSetLayout layout;
 
-        auto result = vulkan.getDevice().createDescriptorSetLayout(&info, nullptr, &layout);
+        auto result = device.createDescriptorSetLayout(&info, nullptr, &layout);
         FE_ASSERT(result == vk::Result::eSuccess && "failed to create descriptor set layout!");
 
         //add to cache
@@ -201,7 +196,7 @@ DescriptorBuilder::~DescriptorBuilder() {
 }
 
 DescriptorBuilder& DescriptorBuilder::bindBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags) {
-    //create the descriptor binding for the layout
+    /// create the descriptor binding for the layout
     vk::DescriptorSetLayoutBinding newBinding{};
     newBinding.descriptorCount = 1;
     newBinding.descriptorType = type;
@@ -211,7 +206,7 @@ DescriptorBuilder& DescriptorBuilder::bindBuffer(uint32_t binding, vk::Descripto
 
     bindings.push_back(newBinding);
 
-    //create the descriptor write
+    /// create the descriptor write
     vk::WriteDescriptorSet newWrite{};
     newWrite.pNext = nullptr;
     newWrite.descriptorCount = 1;
@@ -224,7 +219,7 @@ DescriptorBuilder& DescriptorBuilder::bindBuffer(uint32_t binding, vk::Descripto
 }
 
 DescriptorBuilder& DescriptorBuilder::bindImage(uint32_t binding, vk::DescriptorImageInfo* imageInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags) {
-    //create the descriptor binding for the layout
+    /// create the descriptor binding for the layout
     vk::DescriptorSetLayoutBinding newBinding{};
     newBinding.descriptorCount = 1;
     newBinding.descriptorType = type;
@@ -234,7 +229,7 @@ DescriptorBuilder& DescriptorBuilder::bindImage(uint32_t binding, vk::Descriptor
 
     bindings.push_back(newBinding);
 
-    //create the descriptor write
+    /// create the descriptor write
     vk::WriteDescriptorSet newWrite{};
     newWrite.pNext = nullptr;
     newWrite.descriptorCount = 1;
@@ -255,11 +250,12 @@ bool DescriptorBuilder::build(vk::DescriptorSet& set, vk::DescriptorSetLayout& l
 
     layout = cache.createDescriptorLayout(layoutInfo);
 
-    //allocate descriptor
+    /// allocate descriptor
     bool success = allocator.allocateDescriptor(layout, set);
-    if (!success) return false;
+    if (!success)
+        return false;
 
-    //write descriptor
+    /// write descriptor
     for (auto& w : writes) {
         w.dstSet = set;
     }
@@ -277,15 +273,16 @@ bool DescriptorBuilder::build(vk::DescriptorSet& set) {
 
     auto layout = cache.createDescriptorLayout(layoutInfo);
 
-    //allocate descriptor
+    /// allocate descriptor
     bool success = allocator.allocateDescriptor(layout, set);
-    if (!success) return false;
+    if (!success)
+        return false;
 
-    //write descriptor
+    /// write descriptor
     for (auto& w : writes) {
         w.dstSet = set;
     }
 
     allocator.updateDescriptor(writes);
     return true;
-}*/
+}

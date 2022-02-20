@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "vkx/context.hpp"
+#include "context.hpp"
 #ifdef __ANDROID__
 #include <android/native_activity.h>
 #endif
@@ -35,8 +35,8 @@ private:
     const vkx::Context& context;
     vkx::Buffer vertexBuffer;
     vkx::Buffer indexBuffer;
-    int32_t vertexCount = 0;
-    int32_t indexCount = 0;
+    int32_t vertexCount{ 0 };
+    int32_t indexCount{ 0 };
 
     vk::DescriptorPool descriptorPool;
     vk::DescriptorSetLayout descriptorSetLayout;
@@ -61,8 +61,8 @@ private:
     void updateCommandBuffers();
 
 public:
-    bool visible = true;
-    float scale = 1.0f;
+    bool visible{ true };
+    float scale{ 1.0f };
 
     std::vector<vk::CommandBuffer> cmdBuffers;
 

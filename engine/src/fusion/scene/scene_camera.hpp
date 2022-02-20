@@ -41,7 +41,7 @@ namespace Fusion {
     private:
         ProjectionType projectionType = ProjectionType::Orthographic;
 
-        glm::mat4 projectionMatrix{1};
+        glm::mat4 projectionMatrix{1.0f};
 
         float perspectiveFOV = glm::radians(45.0f);
         float perspectiveNear{0.01f};
