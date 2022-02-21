@@ -3,10 +3,10 @@
 #if defined(__ANDROID__)
 #include <android/configuration.h>
 
-int32_t vkx::android::screenDensity{ 0 };
-android_app* vkx::android::androidApp{ nullptr };
+int32_t android::screenDensity{ 0 };
+android_app* android::androidApp{ nullptr };
 
-void vkx::android::getDeviceConfig(AAssetManager* assetManager) {
+void android::getDeviceConfig(AAssetManager* assetManager) {
     // Screen density
     AConfiguration* config = AConfiguration_new();
     AConfiguration_fromAssetManager(config, assetManager);
