@@ -5,13 +5,13 @@
 namespace Fusion {
     class PerspectiveCamera : public Camera {
     public:
-        PerspectiveCamera(float aspect, float fov, float near, float far);
+        PerspectiveCamera(float fov, float aspect, float near, float far);
         ~PerspectiveCamera() override = default;
 
         virtual void update(float ts) { updateView(); }
 
-        void setViewport(int width, int height);
-        void setPerspective(float aspect, float fov, float near, float far);
+        void setViewport(uint32_t width, uint32_t height);
+        void setPerspective(float fov, float aspect, float near, float far);
 
         // Camera oriented directions
         const glm::vec3& getForward() const { return forward; }
@@ -28,22 +28,14 @@ namespace Fusion {
         void setFarClip(float zFar) { far = zFar; updateProjection(); }
 
         const glm::vec3& getPosition() const { return position; }
-        void setPosition(const glm::vec3& pos) { position = pos; isDirty = true; }
+        void setPosition(const glm::vec3& pos) { position = pos; isDirty = true; };
         const glm::quat& getRotation() const { return rotation; }
-        void setRotation(const glm::quat& rot) { rotation = rot; isDirty = true; }
-        void setPositionAndRotation(const glm::vec3& pos, const glm::quat& rot) {
-            position = pos;
-            rotation = rot;
-            isDirty = true;
-        }
+        void setRotation(const glm::quat& rot) { rotation = rot; updateDirs(); isDirty = true; };
 
     private:
-        glm::vec3 calcForward() const;
-        glm::vec3 calcRight() const;
-        glm::vec3 calcUp() const;
-
         void updateView();
         void updateProjection();
+        void updateDirs();
 
     protected:
         glm::vec3 position{ 0.0f};

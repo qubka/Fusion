@@ -16,8 +16,8 @@ MouseInput::~MouseInput() {
 }
 
 void MouseInput::onUpdate() {
-    delta = {};
-    scroll = {};
+    delta = vec2::zero;
+    scroll = vec2::zero;
     BaseInput::onUpdate();
 }
 

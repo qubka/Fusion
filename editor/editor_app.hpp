@@ -1,10 +1,8 @@
 #include "fusion/core/offscreen_application.hpp"
 #include "fusion/core/entry_point.hpp"
-#include "fusion/renderer/camera2.hpp"
 #include "editor_layer.hpp"
 
 using namespace Fusion;
-
 
 // Vertex layout for this example
 vkx::model::VertexLayout vertexLayout{ {
@@ -61,13 +59,12 @@ public:
 
     glm::vec3 meshPos = glm::vec3(0.0f, -1.5f, 0.0f);
 
-    vkx::Camera camera;
+    EditorCamera camera{60, 0.1f, 1.0f, 2.0f};
 
     EditorApp(const CommandLineArgs& args) : OffscreenApplication{"Vulkan Example - Offscreen rendering", args} {
-        camera.setPerspective(60.0f, size, 0.1f, 256.0f);
-        camera.setRotation({ -2.5f, 0.0f, 0.0f });
+        camera.setPerspective(60.0f, static_cast<float>(size.width) / size.height, 0.1f, 1000.0f);
+        camera.setRotation(glm::quat{glm::vec3{ -2.5f, 0.0f, 0.0f }});
         camera.setPosition({ 0.0f, 1.0f, 0.0f });
-        camera.dolly(-6.5f);
     }
 
     ~EditorApp() {
@@ -263,18 +260,18 @@ public:
 
     void updateUniformBuffers() {
         // Mesh
-        ubos.vsShared.projection = camera.matrices.perspective;
-        ubos.vsShared.model = glm::translate(camera.matrices.view, meshPos);
+        ubos.vsShared.projection = camera.getViewProjection();
+        ubos.vsShared.model = glm::translate(glm::mat4{1}, meshPos);
         uniformData.vsShared.copy(ubos.vsShared);
 
         // Mirror
-        ubos.vsShared.model = camera.matrices.view;
+        ubos.vsShared.model = glm::mat4{1};
         uniformData.vsMirror.copy(ubos.vsShared);
     }
 
     void updateUniformBufferOffscreen() {
-        ubos.vsShared.projection = camera.matrices.perspective;
-        ubos.vsShared.model = camera.matrices.view;
+        ubos.vsShared.projection = camera.getViewProjection();
+        ubos.vsShared.model = glm::mat4{1};
         ubos.vsShared.model = glm::scale(ubos.vsShared.model, glm::vec3(1.0f, -1.0f, 1.0f));
         ubos.vsShared.model = glm::translate(ubos.vsShared.model, meshPos);
         uniformData.vsOffScreen.copy(ubos.vsShared);
@@ -297,6 +294,28 @@ public:
         if (!prepared)
             return;
         draw();
+
+        /*
+
+        static float yaw = 0.0f;
+        static float pitch = 0.0f;
+
+        glm::vec2 delta = Input::MouseDelta() * 0.0001f;
+        yaw -= delta.x;
+        pitch -= delta.y;
+
+        static constexpr float limit = glm::radians(89.0f);
+        if (pitch > limit) {
+            pitch = limit;
+        }
+        if (pitch < -limit) {
+            pitch = -limit;
+        }
+
+        camera.rotation = glm::degrees(glm::eulerAngles(glm::quat{ glm::vec3(pitch, yaw, 0) }));*/
+
+        camera.update(frameTimer);
+        Input::Update(); // TODO: refactor
         updateUniformBuffers();
         updateUniformBufferOffscreen();
     }

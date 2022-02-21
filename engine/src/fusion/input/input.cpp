@@ -43,8 +43,8 @@ bool Input::GetMouseButtonUp(MouseCode button) {
 }
 
 void Input::Update() {
-    delta = {};
-    scroll = {};
+    delta = vec2::zero;
+    scroll = vec2::zero;
     current++;
 }
 

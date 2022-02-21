@@ -13,10 +13,9 @@ namespace Fusion {
         void setOrthographic(float left, float right, float bottom, float top);
 
         const glm::vec3& getPosition() const { return position; }
-        void setPosition(const glm::vec3& pos);
+        void setPosition(const glm::vec3& pos) { position = pos; isDirty = true; };
         float getRotation() const { return rotation; }
-        void setRotation(float rot);
-        void setPositionAndRotation(const glm::vec3& pos, float rot);
+        void setRotation(float rot) { rotation = rot; isDirty = true;};
 
     private:
         void updateView();
