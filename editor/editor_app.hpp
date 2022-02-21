@@ -287,12 +287,9 @@ public:
         setupDescriptorSet();
         buildOffscreenCommandBuffer();
         buildCommandBuffers();
-        prepared = true;
     }
 
     void render() override {
-        if (!prepared)
-            return;
         draw();
 
         /*
@@ -315,7 +312,6 @@ public:
         camera.rotation = glm::degrees(glm::eulerAngles(glm::quat{ glm::vec3(pitch, yaw, 0) }));*/
 
         camera.update(frameTimer);
-        Input::Update(); // TODO: refactor
         updateUniformBuffers();
         updateUniformBufferOffscreen();
     }

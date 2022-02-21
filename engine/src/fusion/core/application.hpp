@@ -1,6 +1,6 @@
 #pragma once
 
-#include "window.hpp"
+#include "fusion/renderer/glfw/window.hpp"
 #include "layer_stack.hpp"
 
 #include "fusion/renderer/vkx/helpers.hpp"
@@ -47,6 +47,7 @@ namespace Fusion {
     protected:
         Application(std::string title = "Fusion", CommandLineArgs args = {});
         virtual ~Application();
+        FE_NONCOPYABLE(Application);
 
     public:
         void run();
@@ -149,7 +150,6 @@ namespace Fusion {
         // Command buffer pool
         vk::CommandPool cmdPool;
 
-        bool prepared = false;
         uint32_t version = VK_MAKE_VERSION(1, 1, 0);
         vk::Extent2D size{ 1280, 720 };
 
@@ -207,10 +207,8 @@ namespace Fusion {
 
         virtual void onLoadAssets() {}
 
-        bool platformLoopCondition();
-
         // Start the main render loop
-        void renderLoop();
+        void mainLoop();
 
         // Prepare the frame for workload submission
         // - Acquires the next image from the swap chain
@@ -226,14 +224,13 @@ namespace Fusion {
     private:
         // OS specific
 #if defined(__ANDROID__)
-        // TODO: Move to Android window class
         // true if application has focused, false if moved to background
-        ANativeWindow* window{ nullptr };
-        bool focused { false };
-        int32_t onInput(AInputEvent* event);
+        android::Window* window{ nullptr};
+        static int32_t handle_input_event(android_app* app, AInputEvent* event);
+        static void handle_app_cmd(android_app* app, int32_t cmd);
         void onAppCmd(int32_t cmd);
 #else
-        Window* window{ nullptr };
+        glfw::Window* window{ nullptr };
 #endif
     };
 

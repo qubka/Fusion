@@ -17,8 +17,8 @@ Application::Application(std::string title, CommandLineArgs args) : title{std::m
 #if defined(__ANDROID__)
     vkx::storage::setAssetManager(vkx::android::androidApp->activity->assetManager);
     vkx::android::androidApp->userData = this;
-    vkx::android::androidApp->onInputEvent = Application::handle_input_event;
-    vkx::android::androidApp->onAppCmd = Application::handle_app_cmd;
+    vkx::android::androidApp->onInputEvent = ExampleBase::handle_input_event;
+    vkx::android::androidApp->onAppCmd = ExampleBase::handle_app_cmd;
 #endif
     //camera.setPerspective(60.0f, size.width / size.height, 0.1f, 256.0f);
 }
@@ -70,7 +70,7 @@ void Application::run() {
         setupSwapchain();
         prepare();
 #endif
-        renderLoop();
+        mainLoop();
 
         // Once we exit the render loop, wait for everything to become idle before proceeding to the descructor.
         context.queue.waitIdle();
@@ -99,13 +99,13 @@ void Application::initVulkan() {
 #if defined(__ANDROID__)
     context.requireExtensions({ VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_ANDROID_SURFACE_EXTENSION_NAME });
 #else
-    context.requireExtensions(Window::getRequiredInstanceExtensions());
+    context.requireExtensions(glfw::Window::getRequiredInstanceExtensions());
 #endif
     context.requireDeviceExtensions({ VK_KHR_SWAPCHAIN_EXTENSION_NAME });
     context.createInstance(version);
 
 #if defined(__ANDROID__)
-    surface = context.instance.createAndroidSurfaceKHR({ {}, window });
+    surface = context.instance.createAndroidSurfaceKHR({ {}, android::androidApp->window });
 #else
     surface = window->createSurface(context.instance);
 #endif
@@ -392,48 +392,19 @@ void Application::addRenderWaitSemaphore(const vk::Semaphore& semaphore, const v
     renderWaitStages.push_back(waitStages);
 }
 
-bool Application::platformLoopCondition() {
-#if defined(__ANDROID__)
-    bool destroy = false;
-    focused = true;
-    int ident, events;
-    struct android_poll_source* source;
-    while (!destroy && (ident = ALooper_pollAll(focused ? 0 : -1, NULL, &events, (void**)&source)) >= 0) {
-        if (source != NULL) {
-            source->process(vkx::android::androidApp, source);
-        }
-        destroy = vkx::android::androidApp->destroyRequested != 0;
-    }
-
-    // App destruction requested
-    // Exit loop, example will be destroyed in application main
-    return !destroy;
-#else
-    if (window->shouldClose()) {
-        return false;
-    }
-
-    glfwPollEvents();
-
-    return true;
-#endif
-}
-
-void Application::renderLoop() {
+void Application::mainLoop() {
     auto tStart = std::chrono::high_resolution_clock::now();
 
-    while (platformLoopCondition()) {
+    window->runLoop([&]{
         auto tEnd = std::chrono::high_resolution_clock::now();
         auto tDiff = std::chrono::duration<float, std::milli>(tEnd - tStart).count();
         auto tDiffSeconds = tDiff / 1000.0f;
         tStart = tEnd;
 
         // Render frame
-        if (prepared) {
-            render();
-            update(tDiffSeconds);
-        }
-    }
+        render();
+        update(tDiffSeconds);
+    });
 }
 
 std::string Application::getWindowTitle() {
@@ -491,9 +462,6 @@ void Application::draw() {
 }
 
 void Application::render() {
-    if (!prepared) {
-        return;
-    }
     draw();
 }
 
@@ -516,11 +484,6 @@ void Application::update(float deltaTime) {
 }
 
 void Application::recreateSwapchain(const glm::uvec2& newSize) {
-    if (!prepared) {
-        return;
-    }
-    prepared = false;
-
     queue.waitIdle();
     device.waitIdle();
 
@@ -547,8 +510,6 @@ void Application::recreateSwapchain(const glm::uvec2& newSize) {
     buildCommandBuffers();
 
     onViewChanged();
-
-    prepared = true;
 }
 
 void Application::updateOverlay() {
@@ -603,6 +564,16 @@ void Application::updateOverlay() {
 }
 
 #if defined(__ANDROID__)
+int32_t Application::handle_input_event(android_app* app, AInputEvent* event) {
+    auto& app = *static_cast<Application*>(app->userData);
+    return app.window.onInput(event);
+}
+
+void Application::handle_app_cmd(android_app* app, int32_t cmd) {
+    auto& app = *static_cast<Application*>(app->userData);
+    app.onAppCmd(cmd);
+}
+
 void Application::onAppCmd(int32_t cmd) {
     switch (cmd) {
         case APP_CMD_INIT_WINDOW:
@@ -614,10 +585,10 @@ void Application::onAppCmd(int32_t cmd) {
             }
             break;
         case APP_CMD_LOST_FOCUS:
-            focused = false;
+            window.setFocuses(false);
             break;
         case APP_CMD_GAINED_FOCUS:
-            focused = true;
+            window.setFocuses(true)
             break;
         default:
             break;
@@ -625,9 +596,9 @@ void Application::onAppCmd(int32_t cmd) {
 }
 
 void Application::setupWindow() {
-    window = vkx::android::androidApp->window;
-    size.width = ANativeWindow_getWidth(window);
-    size.height = ANativeWindow_getHeight(window);
+    window = new Window{};
+    size.width = window.getWidth();
+    size.height = window.getHeight();
     camera.updateAspectRatio(size);
 }
 #else
@@ -644,7 +615,7 @@ void Application::setupWindow() {
     }
 #endif
 
-    window = new Window(title, {size.width, size.height});
+    window = new glfw::Window{title, {size.width, size.height}};
 }
 #endif
 

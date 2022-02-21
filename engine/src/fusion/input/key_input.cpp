@@ -1,6 +1,6 @@
 #include "key_input.hpp"
 
-#include "fusion/core/window.hpp"
+#include "fusion/renderer/glfw/window.hpp"
 #include "fusion/events/key_events.hpp"
 
 using namespace Fusion;

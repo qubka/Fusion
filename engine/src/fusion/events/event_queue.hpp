@@ -24,11 +24,11 @@ namespace Fusion {
                 events[typeid(EventType)] = list;
             }
 
-            list->push(std::move(event));
+            list->push(event);
         }
 
         template<typename EventType>
-        EventType* next(bool handle = false) {
+        const EventType* next(bool handle = false) {
             if (auto it { events.find(typeid(EventType)) }; it != events.end()) {
                 auto& queue{ *it->second };
                 if (!queue.empty()) {
@@ -42,8 +42,11 @@ namespace Fusion {
 
         void free() {
             for (auto [index, queue] : events) {
-                while(!queue->empty())
+                while(!queue->empty()) {
+                    auto* event = queue->front();
                     queue->pop();
+                    delete event;
+                }
             }
         }
 

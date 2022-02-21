@@ -1,6 +1,6 @@
 #include "input.hpp"
 
-#include "fusion/core/window.hpp"
+#include "fusion/renderer/glfw/window.hpp"
 #include "fusion/events/key_events.hpp"
 #include "fusion/events/mouse_events.hpp"
 

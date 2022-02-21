@@ -9,16 +9,17 @@
 #include "fusion/input/key_input.hpp"
 #include "fusion/input/mouse_input.hpp"
 
-using namespace Fusion;
+using namespace glfw;
 
 uint8_t Window::GLFWwindowCount{0};
 std::vector<GLFWwindow*> Window::instances;
 
-Window::Window(std::string title, const glm::uvec2& size, const glm::ivec2& position, bool fullscreen) :
+Window::Window(std::string title, const glm::uvec2& size, const glm::ivec2& position, bool fullscreen) : Fusion::Window{},
     title{std::move(title)},
     width{static_cast<int>(size.x)},
     height{static_cast<int>(size.y)},
     aspect{static_cast<float>(size.x) / static_cast<float>(size.y)},
+    position{position},
     minimize{width == 0 || height == 0},
     fullscreen{fullscreen}
 {
@@ -34,7 +35,7 @@ Window::Window(std::string title, const glm::uvec2& size, const glm::ivec2& posi
 #endif
     }
 
-    initWindow(position);
+    initWindow();
 
     instances.push_back(window);
 }
@@ -51,7 +52,7 @@ Window::~Window() {
     }
 }
 
-void Window::initWindow(const glm::ivec2& position) {
+void Window::initWindow() {
     FE_LOG_INFO << "Creating window: " << title << " [" << width << " " << height << "]";
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -100,6 +101,13 @@ void Window::initWindow(const glm::ivec2& position) {
 #endif
 }
 
+void Window::resetInputs() {
+    /* reset data and update frame */
+    Fusion::Input::Update();
+    Fusion::MouseInput::Update();
+    Fusion::KeyInput::Update();
+}
+
 #if defined(VULKAN_HPP)
 std::vector<std::string> Window::getRequiredInstanceExtensions() {
     std::vector<std::string> result;
@@ -120,8 +128,8 @@ vk::SurfaceKHR Window::createWindowSurface(GLFWwindow* window, const vk::Instanc
 }
 #endif
 
-glm::vec4 Window::getViewport() const {
-#ifdef GLFW_INCLUDE_VULKAN
+glm::vec4 Window::getViewport() {
+#ifdef VULKAN_HPP
     return { 0, 0, width, height };
 #else // OPENGL
     return { 0, height, width, -height }; // vertical flip is required
@@ -131,7 +139,7 @@ glm::vec4 Window::getViewport() const {
 void Window::PosCallback(GLFWwindow* handle, int x, int y) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.getEventQueue().submit(new WindowMovedEvent{{}, {x, y}});
+    window.getEventQueue().submit(new Fusion::WindowMovedEvent{{}, {x, y}});
 }
 
 void Window::SizeCallback(GLFWwindow* handle, int width, int height) {
@@ -141,37 +149,37 @@ void Window::SizeCallback(GLFWwindow* handle, int width, int height) {
     window.aspect = static_cast<float>(width) / static_cast<float>(height);
     window.minimize = width == 0 || height == 0;*/
 
-    window.eventQueue.submit(new WindowSizeEvent{{}, width, height});
+    window.eventQueue.submit(new Fusion::WindowSizeEvent{{}, width, height});
 }
 
 void Window::CloseCallback(GLFWwindow* handle) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.getEventQueue().submit(new WindowCloseEvent{});
+    window.getEventQueue().submit(new Fusion::WindowCloseEvent{});
 }
 
 void Window::RefreshCallback(GLFWwindow* handle) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.getEventQueue().submit(new WindowRefreshEvent{});
+    window.getEventQueue().submit(new Fusion::WindowRefreshEvent{});
 }
 
 void Window::FocusCallback(GLFWwindow* handle, int focused) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     if (focused)
-        window.getEventQueue().submit(new WindowFocusedEvent{});
+        window.getEventQueue().submit(new Fusion::WindowFocusedEvent{});
     else
-        window.getEventQueue().submit(new WindowUnfocusedEvent{});
+        window.getEventQueue().submit(new Fusion::WindowUnfocusedEvent{});
 }
 
 void Window::IconifyCallback(GLFWwindow* handle, int iconified) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     if (iconified)
-        window.getEventQueue().submit(new WindowDeiconifiedEvent{});
+        window.getEventQueue().submit(new Fusion::WindowDeiconifiedEvent{});
     else
-        window.getEventQueue().submit(new WindowDeiconifiedEvent{});
+        window.getEventQueue().submit(new Fusion::WindowDeiconifiedEvent{});
 }
 
 void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) {
@@ -181,27 +189,27 @@ void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) 
     window.aspect = static_cast<float>(width) / static_cast<float>(height);
     window.minimize = width == 0 || height == 0;
 
-    window.getEventQueue().submit(new WindowFramebufferSizeEvent{{}, width, height});
+    window.getEventQueue().submit(new Fusion::WindowFramebufferSizeEvent{{}, width, height});
 }
 
 void Window::CursorPosCallback(GLFWwindow* handle, double posX, double posY) {
     glm::vec2 pos {posX, posY};
 
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.getEventQueue().submit(new MouseMovedEvent{{}, pos});
+    window.getEventQueue().submit(new Fusion::MouseMovedEvent{{}, pos});
 
-    Input::OnMouseMoved(pos);
-    MouseInput::OnMouseMoved(pos);
+    Fusion::Input::OnMouseMoved(pos);
+    Fusion::MouseInput::OnMouseMoved(pos);
 }
 
 void Window::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
     glm::vec2 offset {offsetX, offsetY};
 
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.getEventQueue().submit(new MouseScrollEvent{{}, offset});
+    window.getEventQueue().submit(new Fusion::MouseScrollEvent{{}, offset});
 
-    Input::OnMouseScroll(offset);
-    MouseInput::OnMouseScroll(offset);
+    Fusion::Input::OnMouseScroll(offset);
+    Fusion::MouseInput::OnMouseScroll(offset);
 }
 
 void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode) {
@@ -210,15 +218,15 @@ void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int
     // Event system
     switch (action) {
         case GLFW_PRESS:
-            window.getEventQueue().submit(new MouseButtonPressedEvent{{{}, static_cast<MouseCode>(button)}});
+            window.getEventQueue().submit(new Fusion::MouseButtonPressedEvent{{{}, static_cast<Fusion::MouseCode>(button)}});
             break;
         case GLFW_RELEASE:
-            window.getEventQueue().submit(new MouseButtonReleasedEvent{{{}, static_cast<MouseCode>(button)}});
+            window.getEventQueue().submit(new Fusion::MouseButtonReleasedEvent{{{}, static_cast<Fusion::MouseCode>(button)}});
             break;
     }
 
-    Input::OnMouseButton(button, action);
-    MouseInput::OnMouseButton(button, action);
+    Fusion::Input::OnMouseButton(button, action);
+    Fusion::MouseInput::OnMouseButton(button, action);
 }
 
 void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mode) {
@@ -227,39 +235,39 @@ void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, 
     // Event system
     switch (action) {
         case GLFW_PRESS:
-            window.getEventQueue().submit(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, false});
+            window.getEventQueue().submit(new Fusion::KeyPressedEvent{{{}, static_cast<Fusion::KeyCode>(key)}, false});
             break;
         case GLFW_RELEASE:
-            window.getEventQueue().submit(new KeyReleasedEvent{{{}, static_cast<KeyCode>(key)}});
+            window.getEventQueue().submit(new Fusion::KeyReleasedEvent{{{}, static_cast<Fusion::KeyCode>(key)}});
             break;
         case GLFW_REPEAT:
-            window.getEventQueue().submit(new KeyPressedEvent{{{}, static_cast<KeyCode>(key)}, true});
+            window.getEventQueue().submit(new Fusion::KeyPressedEvent{{{}, static_cast<Fusion::KeyCode>(key)}, true});
             break;
     }
 
-    Input::OnKeyPressed(key, action);
-    KeyInput::OnKeyPressed(key, action);
+    Fusion::Input::OnKeyPressed(key, action);
+    Fusion::KeyInput::OnKeyPressed(key, action);
 }
 
 void Window::CursorEnterCallback(GLFWwindow* handle, int entered) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
     if (entered)
-        window.getEventQueue().submit(new MouseCursorLeftEvent{});
+        window.getEventQueue().submit(new Fusion::MouseCursorLeftEvent{});
     else
-        window.getEventQueue().submit(new MouseCursorLeftEvent{});
+        window.getEventQueue().submit(new Fusion::MouseCursorLeftEvent{});
 }
 
 void Window::CharCallback(GLFWwindow* handle, unsigned int keycode) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.getEventQueue().submit(new KeyTypedEvent{{{}, static_cast<KeyCode>(keycode)}});
+    window.getEventQueue().submit(new Fusion::KeyTypedEvent{{{}, static_cast<Fusion::KeyCode>(keycode)}});
 }
 
 #if GLFW_VERSION_MINOR >= 1
 void Window::FileDropCallback(GLFWwindow* handle, int count, const char** paths) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.getEventQueue().submit(new WindowFileDropCallback{{}, count, paths});
+    window.getEventQueue().submit(new Fusion::WindowFileDropCallback{{}, count, paths});
 }
 #endif
 
@@ -270,10 +278,10 @@ void Window::JoystickCallback(int jid, int action) {
 
         switch (action) {
             case GLFW_CONNECTED:
-                window.getEventQueue().submit(new JoystickConnectedEvent{{}, jid});
+                window.getEventQueue().submit(new Fusion::JoystickConnectedEvent{{}, jid});
                 break;
             case GLFW_DISCONNECTED:
-                window.getEventQueue().submit(new JoystickDisconnectedEvent{{}, jid});
+                window.getEventQueue().submit(new Fusion::JoystickDisconnectedEvent{{}, jid});
                 break;
         }
     }
@@ -285,15 +293,15 @@ void Window::MaximizeCallback(GLFWwindow* handle, int maximized) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     if (maximized)
-        window.getEventQueue().submit(new WindowMaximizedEvent{});
+        window.getEventQueue().submit(new Fusion::WindowMaximizedEvent{});
     else
-        window.getEventQueue().submit(new WindowUnmaximizedEvent{});
+        window.getEventQueue().submit(new Fusion::WindowUnmaximizedEvent{});
 }
 
 void Window::ContentScaleCallback(GLFWwindow* handle, float scaleX, float scaleY) {
     auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.getEventQueue().submit(new WindowContentScaleEvent{{},{scaleX, scaleY}});
+    window.getEventQueue().submit(new Fusion::WindowContentScaleEvent{{},{scaleX, scaleY}});
 }
 #endif
 
@@ -303,10 +311,10 @@ void Window::MonitorCallback(GLFWmonitor* monitor, int action) {
 
         switch (action) {
             case GLFW_CONNECTED:
-                window.getEventQueue().submit(new MonitorConnectedEvent{{}, monitor});
+                window.getEventQueue().submit(new Fusion::MonitorConnectedEvent{{}, monitor});
                 break;
             case GLFW_DISCONNECTED:
-                window.getEventQueue().submit(new MonitorDisconnectedEvent{{}, monitor});
+                window.getEventQueue().submit(new Fusion::MonitorDisconnectedEvent{{}, monitor});
                 break;
         }
     }

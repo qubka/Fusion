@@ -12,7 +12,6 @@
 
 #include "helpers.hpp"
 #include "pipelines.hpp"
-#include "android.hpp"
 
 using namespace vkx;
 using namespace vkx::ui;

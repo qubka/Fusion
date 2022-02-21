@@ -1,6 +1,6 @@
 #include "mouse_input.hpp"
 
-#include "fusion/core/window.hpp"
+#include "fusion/renderer/glfw/window.hpp"
 #include "fusion/events/mouse_events.hpp"
 
 using namespace Fusion;

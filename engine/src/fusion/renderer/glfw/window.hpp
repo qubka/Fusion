@@ -1,25 +1,26 @@
 #pragma once
 #if !defined(ANDROID)
 
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 #include <vulkan/vulkan.hpp>
 
+#include "fusion/core/window.hpp"
 #include "fusion/events/event_queue.hpp"
-#include "fusion/input/input.hpp"
 
-namespace Fusion {
-    class Window {
+namespace glfw {
+    class Window : public Fusion::Window {
     public:
         Window(std::string title, const glm::uvec2& size, const glm::ivec2& position = {}, bool fullscreen = false);
-        ~Window();
+        ~Window() override;
 
-        operator GLFWwindow*() const { return window; }
-        int getWidth() const { return width; }
-        int getHeight() const { return height; }
-        glm::uvec2 getSize() const { return {width, height}; }
-        float getAspect() const { return aspect; }
-        const std::string& getTitle() const { return title; }
-        glm::vec4 getViewport() const;
+        void* getNativeWindow() override { return window; }
+        int getWidth() override { return width; }
+        int getHeight() override { return height; }
+        glm::uvec2 getSize() override { return {width, height}; }
+        float getAspect() override { return aspect; }
+        const std::string& getTitle() override { return title; }
+        glm::vec4 getViewport() override;
+        Fusion::EventQueue& getEventQueue() { return eventQueue; }
 
         bool shouldClose() const { return glfwWindowShouldClose(window); };
         void shouldClose(bool flag) const { glfwSetWindowShouldClose(window, flag); };
@@ -43,18 +44,18 @@ namespace Fusion {
             glfwSetWindowSizeLimits(window, minSize.x, minSize.y, (maxSize.x != 0) ? maxSize.x : minSize.x, (maxSize.y != 0) ? maxSize.y : minSize.y);
         }
 
-        void runWindowLoop(const std::function<void()>& frameHandler) {
+        // FIXME implement joystick handling
+        void runLoop(const std::function<void()>& frameHandler) override {
             while (!shouldClose()) {
                 eventQueue.free();
+                resetInputs();
                 glfwPollEvents();
-                Input::Update();
                 frameHandler();
             }
         }
 
         bool isMinimize() const { return minimize; }
         bool isFullscreen() const { return fullscreen; }
-        EventQueue& getEventQueue() { return eventQueue; }
 
 #if defined(VULKAN_HPP)
         static std::vector<std::string> getRequiredInstanceExtensions();
@@ -71,12 +72,13 @@ namespace Fusion {
         int width;
         int height;
         float aspect;
+        glm::ivec2 position;
         bool minimize;
         bool fullscreen;
+        Fusion::EventQueue eventQueue;
 
-        EventQueue eventQueue;
-
-        void initWindow(const glm::ivec2& position);
+        void initWindow();
+        static void resetInputs() ;
 
         static uint8_t GLFWwindowCount;
         static std::vector<GLFWwindow*> instances;
