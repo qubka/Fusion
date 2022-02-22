@@ -1,6 +1,5 @@
 #include "editor_layer.hpp"
 #include "fusion/core/application.hpp"
-#include "fusion/input/input.hpp"
 /*#include "fusion/renderer/texture.hpp"
 #include "fusion/renderer/renderer.hpp"
 #include "fusion/renderer/offscreen.hpp"
@@ -107,14 +106,7 @@ void EditorLayer::onRender() {
 }
 
 void EditorLayer::onImGui() {
-    // TODO: Find solution for viewport. Currently we use global transparent background and set the color for each window to make it non transparent.
-    /// Better to force vulkan generate image before imgui render and render it as an image in non-transparent viewport but it will require a lot of additional work to implement back buffer.
-
-    /*auto& window = vulkan.getWindow();
-
     // Note: Switch this to true to enable dockspace
-    static bool viewportOpen = true;
-    static bool dockspaceOpen = true;
     static bool opt_fullscreen_persistant = true;
     bool opt_fullscreen = opt_fullscreen_persistant;
     static ImGuiDockNodeFlags dockspace_flags = 0;//ImGuiDockNodeFlags_PassthruCentralNode;
@@ -145,7 +137,7 @@ void EditorLayer::onImGui() {
     // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
 
-    ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+    ImGui::Begin("DockSpace Demo", nullptr, window_flags);
     ImGui::PopStyleVar();
 
     if (opt_fullscreen)
@@ -157,8 +149,8 @@ void EditorLayer::onImGui() {
     float minWinSizeX = style.WindowMinSize.x;
     style.WindowMinSize.x = 370;
     if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-        ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-        ImGui::DockSpace(dockspace_id, {0, 0}, dockspace_flags);
+        ImGuiID dockspace = ImGui::GetID("HUB_DockSpace");
+        ImGui::DockSpace(dockspace, {0, 0}, dockspace_flags);
     }
 
     style.WindowMinSize.x = minWinSizeX;
@@ -177,11 +169,11 @@ void EditorLayer::onImGui() {
             if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
                 saveSceneAs();
 
-            if (ImGui::MenuItem("Screenshot", "F12"))
-                renderer.getSwapChain()->saveScreenshot("assets/screenshot.png");
+            //if (ImGui::MenuItem("Screenshot", "F12"))
+            //    renderer.getSwapChain()->saveScreenshot("assets/screenshot.png");
 
-            if (ImGui::MenuItem("Exit"))
-                window.shouldClose(true);
+            //if (ImGui::MenuItem("Exit"))
+            //    window.shouldClose(true);
 
             ImGui::EndMenu();
         }
@@ -194,7 +186,7 @@ void EditorLayer::onImGui() {
 
     ImGui::Begin("Stats");
 
-    std::string name = "None";
+    /*std::string name = "None";
     //if (hoveredEntity)
     //    name = hoveredEntity.GetComponent<TagComponent>();
     //ImGui::Text("Hovered Entity: %s", name.c_str());
@@ -215,7 +207,7 @@ void EditorLayer::onImGui() {
     //ImGui::Text("Quads: %d", stats.QuadCount);
     //ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
     //ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-    ImGui::ColorEdit3("Background", glm::value_ptr(Application::Instance().getRenderer().getColor()));
+    ImGui::ColorEdit3("Background", glm::value_ptr(Application::Instance().getRenderer().getColor()));*/
 
     ImGui::End();
 
@@ -228,18 +220,18 @@ void EditorLayer::onImGui() {
     ImVec2 minBounds = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
     ImVec2 maxBounds = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-    ImGui::Image(renderer.getOffscreen().getTextureId(renderer.getFrameIndex()), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
+    //ImGui::Image(renderer.getOffscreen().getTextureId(renderer.getFrameIndex()), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
 
-    if (ImGui::BeginDragDropTarget()) {
+    /*if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
             const auto* path = static_cast<const wchar_t*>(payload->Data);
             openScene(std::filesystem::path(AssetPath) / path);
         }
         ImGui::EndDragDropTarget();
-    }
+    }*/
 
     // Gizmos
-    auto selectedEntity = sceneHierarchyPanel.getSelectedEntity();
+    /*auto selectedEntity = sceneHierarchyPanel.getSelectedEntity();
     if (selectedEntity != entt::null && gizmoType != -1) {
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist();
@@ -294,14 +286,14 @@ void EditorLayer::onImGui() {
             component.rotation += deltaRotation;
             component.scale = scale;
         }
-    }
+    }*/
 
     ImGui::PopStyleVar();
     ImGui::End();
 
     //UI_Toolbar();
 
-    ImGui::End();*/
+    ImGui::End();
 }
 
 void EditorLayer::newScene() {

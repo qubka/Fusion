@@ -27,6 +27,7 @@
 #include <typeindex>
 #include <list>
 #include <mutex>
+#include <numeric>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>

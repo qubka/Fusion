@@ -242,7 +242,7 @@ void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, 
             break;
     }
 
-    window.keyInput.onKeyPressed(action, action);
+    window.keyInput.onKeyPressed(key, action);
 }
 
 void Window::CursorEnterCallback(GLFWwindow* handle, int entered) {
@@ -281,6 +281,7 @@ void Window::JoystickCallback(int jid, int action) {
                 break;
         }
     }
+
 }
 #endif
 

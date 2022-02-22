@@ -1,7 +1,6 @@
 #include "window.hpp"
 // TODO: Refactor
 #if defined(ANDROID)
-
 #include "fusion/events/application_events.hpp"
 #include "fusion/events/window_events.hpp"
 #include "fusion/events/key_events.hpp"

@@ -1,7 +1,6 @@
 #pragma once
 // TODO: Refactor
 #if defined(ANDROID)
-
 #include "fusion/core/android.hpp"
 #include "fusion/core/window.hpp"
 #include "fusion/events/event_queue.hpp"

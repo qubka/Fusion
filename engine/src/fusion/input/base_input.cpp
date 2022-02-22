@@ -3,9 +3,18 @@
 using namespace fe;
 
 template<class T>
+BaseInput<T>::BaseInput(const std::pair<T, T>& range) {
+    std::vector<T> keysToMonitor(range.second - range.first + 1);
+    std::iota(keysToMonitor.begin(), keysToMonitor.end(), range.first);
+    for (T keycode : keysToMonitor) {
+        keys.emplace(keycode, KeyState{});
+    }
+}
+
+template<class T>
 BaseInput<T>::BaseInput(const std::initializer_list<T>& keysToMonitor) {
     for (T keycode : keysToMonitor) {
-        keys.emplace(keycode, Key{});
+        keys.emplace(keycode, KeyState{});
     }
 }
 

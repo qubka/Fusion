@@ -1,9 +1,8 @@
 #include "application.hpp"
 #include "layer.hpp"
 
-#include "fusion/input/input.hpp"
-
 #include <imgui.h>
+#include <ImGuizmo.h>
 
 using namespace fe;
 
@@ -522,39 +521,32 @@ void Application::updateOverlay() {
     }
 
     ImGuiIO& io = ImGui::GetIO();
-
     io.DisplaySize = ImVec2(static_cast<float>(size.width), static_cast<float>(size.height));
     io.DeltaTime = frameTimer;
 
-    auto& mousePos = Input::MousePosition();
+    auto& mouseInput = window->getMouseInput();
+    auto& mousePos = mouseInput.mousePosition();
     io.AddMousePosEvent(mousePos.x, mousePos.y);
-    io.AddMouseButtonEvent(Mouse::ButtonLeft, Input::GetMouseButton(Mouse::ButtonLeft));
-    io.AddMouseButtonEvent(Mouse::ButtonRight, Input::GetMouseButton(Mouse::ButtonRight));
+    io.AddMouseButtonEvent(Mouse::ButtonLeft, mouseInput.getMouseButton(Mouse::ButtonLeft));
+    io.AddMouseButtonEvent(Mouse::ButtonRight,mouseInput.getMouseButton(Mouse::ButtonRight));
 
     ImGui::NewFrame();
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::BeginFrame();
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+    /*ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
     ImGui::SetNextWindowPos(ImVec2(10, 10));
     //ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
     ImGui::Begin(title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
     ImGui::TextUnformatted(title.c_str());
     ImGui::TextUnformatted(context.deviceProperties.deviceName);
-    ImGui::Text("%.2f ms/frame (%.1d fps)", (1000.0f / lastFPS), lastFPS);
+    ImGui::Text("%.2f ms/frame (%.1d fps)", (1000.0f / lastFPS), lastFPS);*/
 
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 5.0f * ui.scale));
-#endif
-    ImGui::PushItemWidth(110.0f * ui.scale);
-    for (auto* layer: layers) {
+    /*for (auto* layer: layers) {
         layer->onImGui();
-    }
-    ImGui::PopItemWidth();
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
-    ImGui::PopStyleVar();
-#endif
+    }*/
 
-    ImGui::End();
-    ImGui::PopStyleVar();
+    ImGui::ShowDemoWindow();
 
     ImGui::Render();
 

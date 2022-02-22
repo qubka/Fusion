@@ -8,7 +8,6 @@
 #include "fusion/events/event_queue.hpp"
 #include "fusion/input/key_input.hpp"
 #include "fusion/input/mouse_input.hpp"
-#include "fusion/input/joystick_input.hpp"
 
 namespace glfw {
     class Window : public fe::Window {
@@ -84,9 +83,8 @@ namespace glfw {
         bool minimize;
 
         fe::EventQueue eventQueue;
-        fe::KeyInput keyInput;
-        fe::MouseInput mouseInput;
-        std::vector<fe::JoystickInput> joysticksInput;
+        fe::KeyInput keyInput {};  //! use all possible keymaps
+        fe::MouseInput mouseInput {}; //! use all possible keymaps
 
         void initGLFW();
         void initWindow(bool fullscreen);

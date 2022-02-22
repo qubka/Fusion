@@ -34,7 +34,7 @@ namespace fe {
         std::shared_ptr<Scene> activeScene;
         EditorCamera editorCamera;
 
-        ProcessInfo info{static_cast<unsigned int>(getpid())};
+        //ProcessInfo info{static_cast<unsigned int>(getpid())};
 
         // Panels
         SceneHierarchyPanel sceneHierarchyPanel;

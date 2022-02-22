@@ -6,6 +6,7 @@
 namespace fe {
     class MouseInput : public BaseInput<MouseCode> {
     public:
+        MouseInput() : BaseInput<MouseCode>{std::make_pair(Mouse::Button0, Mouse::ButtonLast)} {} //! use all possible buttonmaps
         MouseInput(const std::initializer_list<MouseCode>& buttonsToMonitor)
             : BaseInput<MouseCode>{buttonsToMonitor} {};
         ~MouseInput() = default;

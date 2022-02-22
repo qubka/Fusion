@@ -31,22 +31,26 @@ void UIOverlay::create(const UIOverlayCreateInfo& createInfo) {
     };
     vkx::logMessage(vkx::LogLevel::LOG_DEBUG, "Android UI scale %f", scale);
 #endif
-
-    // Init ImGui
-    // Color scheme
-    ImGuiStyle& style = ImGui::GetStyle();
-    style.Colors[ImGuiCol_TitleBg] = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-    style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.0f, 0.0f, 0.0f, 0.1f);
-    style.Colors[ImGuiCol_MenuBarBg] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
-    style.Colors[ImGuiCol_Header] = ImVec4(0.8f, 0.0f, 0.0f, 0.4f);
-    style.Colors[ImGuiCol_HeaderActive] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
-    style.Colors[ImGuiCol_HeaderHovered] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
-    style.Colors[ImGuiCol_CheckMark] = ImVec4(1.0f, 0.0f, 0.0f, 0.8f);
-    // Dimensions
+    // Flags
     ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
+    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    setStyleColors();
+
+    // Dimensions
     io.DisplaySize = ImVec2(static_cast<float>(createInfo.size.width), static_cast<float>(createInfo.size.height));
     io.FontGlobalScale = scale;
+    io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+
+    // Load a first font
+    //io.Fonts->AddFontDefault();
 
     prepareResources();
     if (createInfo.renderPass) {
@@ -77,6 +81,10 @@ void UIOverlay::destroy() {
         context.device.destroyCommandPool(commandPool);
         context.device.destroyFence(fence);
     }
+
+    if (ImGui::GetCurrentContext()) {
+        ImGui::DestroyContext();
+    }
 }
 
 /** Prepare all vulkan resources required to render the UI overlay */
@@ -86,6 +94,24 @@ void UIOverlay::prepareResources() {
     // Create font texture
     std::vector<uint8_t> fontData;
     int texWidth, texHeight;
+
+#if defined(__ANDROID__)
+    float scale = android::screenDensity / (float)ACONFIGURATION_DENSITY_MEDIUM;
+		AAsset* asset = AAssetManager_open(androidApp->activity->assetManager, "Roboto-Medium.ttf", AASSET_MODE_STREAMING);
+		if (asset) {
+			size_t size = AAsset_getLength(asset);
+			assert(size > 0);
+			char *fontAsset = new char[size];
+			AAsset_read(asset, fontAsset, size);
+			AAsset_close(asset);
+			io.Fonts->AddFontFromMemoryTTF(fontAsset, size, 14.0f * scale);
+			delete[] fontAsset;
+		}
+#else
+    //const std::string filename = fe::getAssetPath() + "Roboto-Black.ttf";
+    //io.Fonts->AddFontFromFileTTF(filename.c_str(), 16.0f);
+#endif
+
     {
         unsigned char* fontBuffer;
         io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
@@ -186,10 +212,14 @@ void UIOverlay::preparePipeline() {
     for (uint32_t i = 0; i < createInfo.attachmentCount; i++) {
         auto& blendAttachmentState = pipelineBuilder.colorBlendState.blendAttachmentStates[i];
         blendAttachmentState.blendEnable = VK_TRUE;
+        blendAttachmentState.colorWriteMask = vkx::util::fullColorWriteMask();
         blendAttachmentState.srcColorBlendFactor = vk::BlendFactor::eSrcAlpha;
         blendAttachmentState.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
+        blendAttachmentState.colorBlendOp = vk::BlendOp::eAdd;
         blendAttachmentState.srcAlphaBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
         blendAttachmentState.dstAlphaBlendFactor = vk::BlendFactor::eZero;
+        blendAttachmentState.alphaBlendOp = vk::BlendOp::eAdd;
+
     }
 
     pipelineBuilder.multisampleState.rasterizationSamples = createInfo.rasterizationSamples;
@@ -287,7 +317,7 @@ void UIOverlay::updateCommandBuffers() {
     pushConstBlock.scale = glm::vec2{2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y};
     pushConstBlock.translate = glm::vec2{-1.0f};
 
-    if (cmdBuffers.size()) {
+    if (!cmdBuffers.empty()) {
         context.trashAll<vk::CommandBuffer>(cmdBuffers,
                                             [&](const std::vector<vk::CommandBuffer>& buffers) { context.device.freeCommandBuffers(commandPool, buffers); });
         cmdBuffers.clear();
@@ -311,7 +341,7 @@ void UIOverlay::updateCommandBuffers() {
         cmdBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
         cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, descriptorSet, {});
         cmdBuffer.bindVertexBuffers(0, vertexBuffer.buffer, { 0 });
-        cmdBuffer.bindIndexBuffer(indexBuffer.buffer, 0, vk::IndexType::eUint16);
+        cmdBuffer.bindIndexBuffer(indexBuffer.buffer, 0, sizeof(ImDrawIdx) == 2 ? vk::IndexType::eUint16 : vk::IndexType::eUint32);
         cmdBuffer.setViewport(0, viewport);
         cmdBuffer.setScissor(0, scissor);
 
@@ -498,4 +528,37 @@ void UIOverlay::text(const char* formatstr, ...) const {
     va_start(args, formatstr);
     ImGui::TextV(formatstr, args);
     va_end(args);
+}
+
+void UIOverlay::setStyleColors() {
+    // Color scheme
+    auto& colors = ImGui::GetStyle().Colors;
+    colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 1.0f };
+
+    // Headers
+    colors[ImGuiCol_Header] = { 0.2f, 0.205f, 0.21f, 1.0f };
+    colors[ImGuiCol_HeaderHovered] = { 0.3f, 0.305f, 0.31f, 1.0f };
+    colors[ImGuiCol_HeaderActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+
+    // Buttons
+    colors[ImGuiCol_Button] = { 0.2f, 0.205f, 0.21f, 1.0f };
+    colors[ImGuiCol_ButtonHovered] = { 0.3f, 0.305f, 0.31f, 1.0f };
+    colors[ImGuiCol_ButtonActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+
+    // Frame BG
+    colors[ImGuiCol_FrameBg] = { 0.2f, 0.205f, 0.21f, 1.0f };
+    colors[ImGuiCol_FrameBgHovered] = { 0.3f, 0.305f, 0.31f, 1.0f };
+    colors[ImGuiCol_FrameBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+
+    // Tabs
+    colors[ImGuiCol_Tab] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_TabHovered] = { 0.38f, 0.3805f, 0.381f, 1.0f };
+    colors[ImGuiCol_TabActive] = { 0.28f, 0.2805f, 0.281f, 1.0f };
+    colors[ImGuiCol_TabUnfocused] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_TabUnfocusedActive] = { 0.2f, 0.205f, 0.21f, 1.0f };
+
+    // Title
+    colors[ImGuiCol_TitleBg] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_TitleBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_TitleBgCollapsed] = { 0.15f, 0.1505f, 0.151f, 1.0 };
 }

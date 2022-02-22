@@ -13,8 +13,10 @@ namespace fe {
     class BaseInput {
     public:
         //! Takes a list of which keys to keep state for
+        BaseInput(const std::pair<T, T>& range);
         BaseInput(const std::initializer_list<T>& keysToMonitor);
         ~BaseInput() = default;
+        FE_NONCOPYABLE(BaseInput);
 
         virtual void onAttach() {}
         virtual void onUpdate() { currentFrame++; }
@@ -32,12 +34,12 @@ namespace fe {
         //! Used internally to update key states. Should be called by the GLFW callbacks
         void setKey(T keycode, ActionCode action);
 
-        struct Key {
+        struct KeyState {
             bool pressed{ false };
             uint32_t lastFrame{ UINT32_MAX };
         };
 
-        std::map<T, Key> keys;
+        std::map<T, KeyState> keys;
         uint32_t currentFrame{ 0 };
         bool enabled{ true };
     };

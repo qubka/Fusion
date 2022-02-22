@@ -59,6 +59,7 @@ private:
     void preparePipeline();
     void prepareRenderPass();
     void updateCommandBuffers();
+    static void setStyleColors();
 
 public:
     bool visible{ true };
