@@ -529,27 +529,18 @@ void Application::updateOverlay() {
     io.AddMousePosEvent(mousePos.x, mousePos.y);
     io.AddMouseButtonEvent(Mouse::ButtonLeft, mouseInput.getMouseButton(Mouse::ButtonLeft));
     io.AddMouseButtonEvent(Mouse::ButtonRight,mouseInput.getMouseButton(Mouse::ButtonRight));
+    auto& mouseWheel = mouseInput.mouseScroll();
+    io.AddMouseWheelEvent(mouseWheel.x, mouseWheel.y);
 
     ImGui::NewFrame();
     ImGuizmo::SetOrthographic(false);
     ImGuizmo::BeginFrame();
 
-    /*ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-    ImGui::SetNextWindowPos(ImVec2(10, 10));
-    //ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
-    ImGui::Begin(title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-    ImGui::TextUnformatted(title.c_str());
-    ImGui::TextUnformatted(context.deviceProperties.deviceName);
-    ImGui::Text("%.2f ms/frame (%.1d fps)", (1000.0f / lastFPS), lastFPS);*/
-
-    /*for (auto* layer: layers) {
+    for (auto* layer: layers) {
         layer->onImGui();
-    }*/
-
-    ImGui::ShowDemoWindow();
+    }
 
     ImGui::Render();
-
     ui.update();
 
 #if defined(VK_USE_PLATFORM_ANDROID_KHR)

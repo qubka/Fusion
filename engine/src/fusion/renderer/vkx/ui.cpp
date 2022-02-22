@@ -50,7 +50,7 @@ void UIOverlay::create(const UIOverlayCreateInfo& createInfo) {
     io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 
     // Load a first font
-    //io.Fonts->AddFontDefault();
+    io.Fonts->AddFontDefault();
 
     prepareResources();
     if (createInfo.renderPass) {
@@ -512,8 +512,8 @@ bool UIOverlay::comboBox(const char* caption, int32_t* itemindex, const std::vec
     }
     std::vector<const char*> charitems;
     charitems.reserve(items.size());
-    for (size_t i = 0; i < items.size(); i++) {
-        charitems.push_back(items[i].c_str());
+    for (const auto& item : items) {
+        charitems.push_back(item.c_str());
     }
     uint32_t itemCount = static_cast<uint32_t>(charitems.size());
     return ImGui::Combo(caption, itemindex, &charitems[0], itemCount, itemCount);
