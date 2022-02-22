@@ -521,7 +521,7 @@ void Application::updateOverlay() {
     }
 
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(static_cast<float>(size.width), static_cast<float>(size.height));
+    io.DisplaySize = ImVec2{static_cast<float>(size.width), static_cast<float>(size.height)};
     io.DeltaTime = frameTimer;
 
     auto& mouseInput = window->getMouseInput();

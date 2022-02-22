@@ -45,12 +45,8 @@ void UIOverlay::create(const UIOverlayCreateInfo& createInfo) {
     setStyleColors();
 
     // Dimensions
-    io.DisplaySize = ImVec2(static_cast<float>(createInfo.size.width), static_cast<float>(createInfo.size.height));
+    io.DisplaySize = ImVec2{static_cast<float>(createInfo.size.width), static_cast<float>(createInfo.size.height)};
     io.FontGlobalScale = scale;
-    io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-
-    // Load a first font
-    io.Fonts->AddFontDefault();
 
     prepareResources();
     if (createInfo.renderPass) {
@@ -95,9 +91,16 @@ void UIOverlay::prepareResources() {
     std::vector<uint8_t> fontData;
     int texWidth, texHeight;
 
+    // Add character ranges and merge into the previous font
+    // The ranges array is not copied by the AddFont* functions and is used lazily
+    // so ensure it is available at the time of building or calling GetTexDataAsRGBA32().
+    static const ImWchar icons_ranges[] = { 0xf000, 0xf3ff, 0 }; // Will not be copied by AddFont* so keep in scope.
+    ImFontConfig config;
+    config.MergeMode = true;
+
 #if defined(__ANDROID__)
     float scale = android::screenDensity / (float)ACONFIGURATION_DENSITY_MEDIUM;
-		AAsset* asset = AAssetManager_open(androidApp->activity->assetManager, "Roboto-Medium.ttf", AASSET_MODE_STREAMING);
+		AAsset* asset = AAssetManager_open(androidApp->activity->assetManager, "fonts/Roboto-Black.ttf", AASSET_MODE_STREAMING);
 		if (asset) {
 			size_t size = AAsset_getLength(asset);
 			assert(size > 0);
@@ -107,9 +110,23 @@ void UIOverlay::prepareResources() {
 			io.Fonts->AddFontFromMemoryTTF(fontAsset, size, 14.0f * scale);
 			delete[] fontAsset;
 		}
+        AAsset* asset = AAssetManager_open(androidApp->activity->assetManager, "fonts/fontawesome-webfont.ttf", AASSET_MODE_STREAMING);
+		if (asset) {
+			size_t size = AAsset_getLength(asset);
+			assert(size > 0);
+			char *fontAsset = new char[size];
+			AAsset_read(asset, fontAsset, size);
+			AAsset_close(asset);
+			io.Fonts->AddFontFromMemoryTTF(fontAsset, size, 20.0f * scale, &config, icons_ranges);
+			delete[] fontAsset;
+		}
+        io.Fonts->Build();
 #else
-    //const std::string filename = fe::getAssetPath() + "Roboto-Black.ttf";
-    //io.Fonts->AddFontFromFileTTF(filename.c_str(), 16.0f);
+    std::string filename = fe::getAssetPath() + "fonts/Roboto-Black.ttf";
+    io.Fonts->AddFontFromFileTTF(filename.c_str(), 14.0f);
+    filename = fe::getAssetPath() + "fonts/fontawesome-webfont.ttf"; //TODO: Replace
+    io.Fonts->AddFontFromFileTTF(filename.c_str(), 20.0f, &config, icons_ranges); // Merge into first font
+    io.Fonts->Build();
 #endif
 
     {
@@ -457,7 +474,7 @@ void UIOverlay::update() {
 
 void UIOverlay::resize(const vk::Extent2D& size, const std::vector<vk::Framebuffer>& framebuffers) {
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(static_cast<float>(size.width), static_cast<float>(size.height));
+    io.DisplaySize = ImVec2{static_cast<float>(size.width), static_cast<float>(size.height)};
     createInfo.size = size;
     createInfo.framebuffers = framebuffers;
     updateCommandBuffers();
@@ -533,32 +550,32 @@ void UIOverlay::text(const char* formatstr, ...) const {
 void UIOverlay::setStyleColors() {
     // Color scheme
     auto& colors = ImGui::GetStyle().Colors;
-    colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 1.0f };
+    colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
 
     // Headers
-    colors[ImGuiCol_Header] = { 0.2f, 0.205f, 0.21f, 1.0f };
-    colors[ImGuiCol_HeaderHovered] = { 0.3f, 0.305f, 0.31f, 1.0f };
-    colors[ImGuiCol_HeaderActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_Header] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+    colors[ImGuiCol_HeaderHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
+    colors[ImGuiCol_HeaderActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 
     // Buttons
-    colors[ImGuiCol_Button] = { 0.2f, 0.205f, 0.21f, 1.0f };
-    colors[ImGuiCol_ButtonHovered] = { 0.3f, 0.305f, 0.31f, 1.0f };
-    colors[ImGuiCol_ButtonActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_Button] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+    colors[ImGuiCol_ButtonHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
+    colors[ImGuiCol_ButtonActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 
     // Frame BG
-    colors[ImGuiCol_FrameBg] = { 0.2f, 0.205f, 0.21f, 1.0f };
-    colors[ImGuiCol_FrameBgHovered] = { 0.3f, 0.305f, 0.31f, 1.0f };
-    colors[ImGuiCol_FrameBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_FrameBg] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+    colors[ImGuiCol_FrameBgHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
+    colors[ImGuiCol_FrameBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 
     // Tabs
-    colors[ImGuiCol_Tab] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-    colors[ImGuiCol_TabHovered] = { 0.38f, 0.3805f, 0.381f, 1.0f };
-    colors[ImGuiCol_TabActive] = { 0.28f, 0.2805f, 0.281f, 1.0f };
-    colors[ImGuiCol_TabUnfocused] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-    colors[ImGuiCol_TabUnfocusedActive] = { 0.2f, 0.205f, 0.21f, 1.0f };
+    colors[ImGuiCol_Tab] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_TabHovered] = ImVec4{ 0.38f, 0.3805f, 0.381f, 1.0f };
+    colors[ImGuiCol_TabActive] = ImVec4{ 0.28f, 0.2805f, 0.281f, 1.0f };
+    colors[ImGuiCol_TabUnfocused] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
 
     // Title
-    colors[ImGuiCol_TitleBg] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-    colors[ImGuiCol_TitleBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-    colors[ImGuiCol_TitleBgCollapsed] = { 0.15f, 0.1505f, 0.151f, 1.0 };
+    colors[ImGuiCol_TitleBg] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0 };
 }
