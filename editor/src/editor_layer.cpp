@@ -8,6 +8,7 @@
 #include "fusion/events/window_events.hpp"
 #include "fusion/scene/components.hpp"
 
+#include "../editor_app.hpp"
 
 #if _WIN32
 #define DEFAULT_PATH "C:\\"
@@ -24,7 +25,7 @@
 
 using namespace fe;
 
-EditorLayer::EditorLayer() : Layer{"EditorLayer"} {
+EditorLayer::EditorLayer(const EditorApp& app) : Layer{"EditorLayer"}, app{app} {
 }
 
 EditorLayer::~EditorLayer() {
@@ -220,7 +221,7 @@ void EditorLayer::onImGui() {
     ImVec2 minBounds = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
     ImVec2 maxBounds = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-    /*ImGui::Image(renderer.getOffscreen().getTextureId(renderer.getFrameIndex()), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
+    //ImGui::Image(offscreen, ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -228,7 +229,7 @@ void EditorLayer::onImGui() {
             openScene(std::filesystem::path(fe::getAssetPath()) / path);
         }
         ImGui::EndDragDropTarget();
-    }*/
+    }
 
     // Gizmos
     /*auto selectedEntity = sceneHierarchyPanel.getSelectedEntity();

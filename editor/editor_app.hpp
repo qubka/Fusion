@@ -1,16 +1,14 @@
 #include "fusion/core/offscreen_application.hpp"
-#include "fusion/core/entry_point.hpp"
 #include "editor_layer.hpp"
 
-using namespace fe;
-
-// Vertex layout for this example
-vkx::model::VertexLayout vertexLayout{ {
-    vkx::model::Component::VERTEX_COMPONENT_POSITION,
-    vkx::model::Component::VERTEX_COMPONENT_UV,
-    vkx::model::Component::VERTEX_COMPONENT_COLOR,
-    vkx::model::Component::VERTEX_COMPONENT_NORMAL,
-} };
+namespace fe {
+    // Vertex layout for this example
+    static vkx::model::VertexLayout vertexLayout{ {
+           vkx::model::Component::VERTEX_COMPONENT_POSITION,
+           vkx::model::Component::VERTEX_COMPONENT_UV,
+           vkx::model::Component::VERTEX_COMPONENT_COLOR,
+           vkx::model::Component::VERTEX_COMPONENT_NORMAL,
+    } };
 
 class EditorApp : public OffscreenApplication {
 public:
@@ -65,7 +63,7 @@ public:
         camera.setPerspective(60.0f, static_cast<float>(size.width) / size.height, 0.1f, 1000.0f);
         camera.setRotation(glm::quat{glm::vec3{ -2.5f, 0.0f, 0.0f }});
         camera.setPosition({ 0.0f, 1.0f, 0.0f });
-        pushLayer(new EditorLayer());
+        pushLayer(new EditorLayer{*this});
     }
 
     ~EditorApp() {
@@ -288,29 +286,15 @@ public:
         setupDescriptorSet();
         buildOffscreenCommandBuffer();
         buildCommandBuffers();
+
+        //auto* layer = layers.getFront();
+        //dynamic_cast<EditorLayer*>(layer)->offscreen = ui.addTexture(offscreen.framebuffers[0].colors[0].sampler, offscreen.framebuffers[0].colors[0].view, vk::ImageLayout::eShaderReadOnlyOptimal);
     }
 
     void render() override {
         draw();
 
-        static float yaw = 0.0f;
-        static float pitch = 0.0f;
-
-        /*glm::vec2 delta = Input::MouseDelta() * 0.0001f;
-        yaw -= delta.x;
-        pitch -= delta.y;
-
-        static constexpr float limit = glm::radians(89.0f);
-        if (pitch > limit) {
-            pitch = limit;
-        }
-        if (pitch < -limit) {
-            pitch = -limit;
-        }
-
-        camera.rotation = glm::degrees(glm::eulerAngles(glm::quat{ glm::vec3{pitch, yaw, 0} }));
-
-        camera.update(frameTimer);*/
+        camera.update(frameTimer);
         updateUniformBuffers();
         updateUniformBufferOffscreen();
     }
@@ -320,7 +304,4 @@ public:
         updateUniformBufferOffscreen();
     }
 };
-
-fe::Application* fe::CreateApplication(CommandLineArgs args) {
-    return new EditorApp{args};
 }

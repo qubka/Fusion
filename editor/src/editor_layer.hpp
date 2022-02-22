@@ -11,10 +11,13 @@
 //#include "fusion/systems/meshrenderer.hpp"
 #include "fusion/utils/process_info.hpp"
 
+#include <imgui.h>
+
 namespace fe {
+    class EditorApp;
     class EditorLayer : public Layer {
     public:
-        EditorLayer();
+        EditorLayer(const EditorApp& app);
         ~EditorLayer() override;
 
         void onAttach() override;
@@ -46,8 +49,6 @@ namespace fe {
         };
         SceneState sceneState = SceneState::Edit;
 
-        /*Vulkan& vulkan;
-        Renderer& renderer;
-        MeshRenderer meshRenderer;*/
+        const EditorApp& app;
     };
 }

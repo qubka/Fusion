@@ -188,7 +188,8 @@ namespace fe {
         void setupUi();
 
         void updateOverlay();
-        virtual void onSetupUIOverlay(vkx::ui::UIOverlayCreateInfo& uiCreateInfo) {}
+        virtual void onPreSetupUIOverlay(vkx::ui::UIOverlayCreateInfo& uiCreateInfo) {}
+        virtual void onPostSetupUIOverlay() {}
 
         virtual void onUpdateCommandBufferPreDraw(const vk::CommandBuffer& commandBuffer) {}
         virtual void onUpdateDrawCommandBuffer(const vk::CommandBuffer& commandBuffer) {}

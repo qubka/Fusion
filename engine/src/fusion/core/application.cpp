@@ -305,7 +305,7 @@ void Application::setupUi() {
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
     // Virtual function call for example to customize overlay creation
-    onSetupUIOverlay(overlayCreateInfo);
+    onPreSetupUIOverlay(overlayCreateInfo);
     ui.create(overlayCreateInfo);
 
     for (auto& shader : overlayCreateInfo.shaders) {
@@ -314,6 +314,7 @@ void Application::setupUi() {
     }
 
     updateOverlay();
+    onPostSetupUIOverlay();
 }
 
 void Application::drawCurrentCommandBuffer() {
