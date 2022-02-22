@@ -9,6 +9,9 @@
 #pragma once
 
 #include "context.hpp"
+
+#include <imgui.h>
+
 #ifdef __ANDROID__
 #include <android/native_activity.h>
 #endif
@@ -25,8 +28,8 @@ struct UIOverlayCreateInfo {
     std::vector<vk::PipelineShaderStageCreateInfo> shaders;
     vk::SampleCountFlagBits rasterizationSamples{ vk::SampleCountFlagBits::e1 };
     uint32_t subpassCount{ 1 };
-    std::vector<vk::ClearValue> clearValues = {};
-    uint32_t attachmentCount = 1;
+    std::vector<vk::ClearValue> clearValues{};
+    uint32_t attachmentCount{ 1 };
 };
 
 class UIOverlay {
@@ -40,7 +43,7 @@ private:
 
     vk::DescriptorPool descriptorPool;
     vk::DescriptorSetLayout descriptorSetLayout;
-    vk::DescriptorSet descriptorSet;
+    //vk::DescriptorSet descriptorSet;
     vk::PipelineLayout pipelineLayout;
     const vk::PipelineCache& pipelineCache{ context.pipelineCache };
     vk::Pipeline pipeline;
@@ -87,5 +90,7 @@ public:
     bool comboBox(const char* caption, int32_t* itemindex, const std::vector<std::string>& items) const;
     bool button(const char* caption) const;
     void text(const char* formatstr, ...) const;
+
+    ImTextureID addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const;
 };
 }}  // namespace vkx::ui

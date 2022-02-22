@@ -117,7 +117,7 @@ void UIOverlay::prepareResources() {
 			char *fontAsset = new char[size];
 			AAsset_read(asset, fontAsset, size);
 			AAsset_close(asset);
-			io.Fonts->AddFontFromMemoryTTF(fontAsset, size, 20.0f * scale, &config, icons_ranges);
+			io.Fonts->AddFontFromMemoryTTF(fontAsset, size, 14.0f * scale, &config, icons_ranges);
 			delete[] fontAsset;
 		}
         io.Fonts->Build();
@@ -125,7 +125,7 @@ void UIOverlay::prepareResources() {
     std::string filename = fe::getAssetPath() + "fonts/Roboto-Black.ttf";
     io.Fonts->AddFontFromFileTTF(filename.c_str(), 14.0f);
     filename = fe::getAssetPath() + "fonts/fontawesome-webfont.ttf"; //TODO: Replace
-    io.Fonts->AddFontFromFileTTF(filename.c_str(), 20.0f, &config, icons_ranges); // Merge into first font
+    io.Fonts->AddFontFromFileTTF(filename.c_str(), 14.0f, &config, icons_ranges); // Merge into first font
     io.Fonts->Build();
 #endif
 
@@ -182,7 +182,7 @@ void UIOverlay::prepareResources() {
     vk::DescriptorPoolSize poolSize;
     poolSize.type = vk::DescriptorType::eCombinedImageSampler;
     poolSize.descriptorCount = 1;
-    descriptorPool = context.device.createDescriptorPool({ {}, 2, 1, &poolSize });
+    descriptorPool = context.device.createDescriptorPool({ {}, 3, 1, &poolSize });
 
     // Descriptor set layout
     vk::DescriptorSetLayoutBinding setLayoutBinding{ 0, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment };
@@ -190,22 +190,8 @@ void UIOverlay::prepareResources() {
     descriptorSetLayout = context.device.createDescriptorSetLayout({ {}, 1, &setLayoutBinding });
 
     // Descriptor set
-    vk::DescriptorSetAllocateInfo allocInfo;
-    allocInfo.descriptorPool = descriptorPool;
-    allocInfo.pSetLayouts = &descriptorSetLayout;
-    allocInfo.descriptorSetCount = 1;
-    descriptorSet = context.device.allocateDescriptorSets(allocInfo)[0];
-
-    vk::DescriptorImageInfo fontDescriptor;
-    fontDescriptor.imageView = font.view;
-    fontDescriptor.sampler = font.sampler;
-    fontDescriptor.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-    vk::WriteDescriptorSet writeDescriptorSet;
-    writeDescriptorSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
-    writeDescriptorSet.pImageInfo = &fontDescriptor;
-    writeDescriptorSet.descriptorCount = 1;
-    writeDescriptorSet.dstSet = descriptorSet;
-    context.device.updateDescriptorSets(writeDescriptorSet, {});
+    ImTextureID fontDescriptorSet = addTexture(font.sampler, font.view, vk::ImageLayout::eShaderReadOnlyOptimal);
+    io.Fonts->SetTexID(fontDescriptorSet);
 
     // Pipeline layout
     // Push constants for UI rendering parameters
@@ -356,7 +342,7 @@ void UIOverlay::updateCommandBuffers() {
 
         cmdBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
         cmdBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
-        cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, descriptorSet, {});
+        //cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, descriptorSet, {});
         cmdBuffer.bindVertexBuffers(0, vertexBuffer.buffer, { 0 });
         cmdBuffer.bindIndexBuffer(indexBuffer.buffer, 0, sizeof(ImDrawIdx) == 2 ? vk::IndexType::eUint16 : vk::IndexType::eUint32);
         cmdBuffer.setViewport(0, viewport);
@@ -378,6 +364,11 @@ void UIOverlay::updateCommandBuffers() {
                 scissorRect.extent.width = static_cast<uint32_t>(pcmd->ClipRect.z - pcmd->ClipRect.x);
                 scissorRect.extent.height = static_cast<uint32_t>((pcmd->ClipRect.w - pcmd->ClipRect.y));
                 cmdBuffer.setScissor(0, scissorRect);
+
+                // Bind DescriptorSet with font or user texture
+                vk::DescriptorSet descriptor[1] = { vk::DescriptorSet((VkDescriptorSet)pcmd->TextureId) };
+                cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, 1, descriptor, 0, nullptr);
+
                 cmdBuffer.drawIndexed(pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
                 indexOffset += pcmd->ElemCount;
             }
@@ -468,7 +459,7 @@ void UIOverlay::update() {
 	}
 
     if (updateCmdBuffers) {
-        updateCommandBuffers();
+        updateCommandBuffers(); // TODO: Update when dock move
     }
 }
 
@@ -578,4 +569,14 @@ void UIOverlay::setStyleColors() {
     colors[ImGuiCol_TitleBg] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
     colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
     colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0 };
+}
+
+// Register a texture
+// FIXME: This is experimental in the sense that we are unsure how to best design/tackle this problem, please post to https://github.com/ocornut/imgui/pull/914 if you have suggestions.
+ImTextureID UIOverlay::addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const {
+    vk::DescriptorSet descriptorSet = context.device.allocateDescriptorSets({ descriptorPool, 1, &descriptorSetLayout })[0];
+    vk::DescriptorImageInfo imageInfo { sampler, view, layout };
+    vk::WriteDescriptorSet writeDescriptorSet{ descriptorSet, 0, 0, 1, vk::DescriptorType::eCombinedImageSampler, &imageInfo };
+    context.device.updateDescriptorSets(writeDescriptorSet, {});
+    return static_cast<VkDescriptorSet>(descriptorSet);
 }

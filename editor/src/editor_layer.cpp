@@ -220,12 +220,12 @@ void EditorLayer::onImGui() {
     ImVec2 minBounds = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
     ImVec2 maxBounds = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-    //ImGui::Image(renderer.getOffscreen().getTextureId(renderer.getFrameIndex()), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
+    /*ImGui::Image(renderer.getOffscreen().getTextureId(renderer.getFrameIndex()), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
 
-    /*if (ImGui::BeginDragDropTarget()) {
+    if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
             const auto* path = static_cast<const wchar_t*>(payload->Data);
-            openScene(std::filesystem::path(AssetPath) / path);
+            openScene(std::filesystem::path(fe::getAssetPath()) / path);
         }
         ImGui::EndDragDropTarget();
     }*/

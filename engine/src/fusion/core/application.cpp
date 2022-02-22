@@ -527,8 +527,9 @@ void Application::updateOverlay() {
     auto& mouseInput = window->getMouseInput();
     auto& mousePos = mouseInput.mousePosition();
     io.AddMousePosEvent(mousePos.x, mousePos.y);
-    io.AddMouseButtonEvent(Mouse::ButtonLeft, mouseInput.getMouseButton(Mouse::ButtonLeft));
-    io.AddMouseButtonEvent(Mouse::ButtonRight,mouseInput.getMouseButton(Mouse::ButtonRight));
+    io.AddMouseButtonEvent(0, mouseInput.getMouseButton(Mouse::ButtonLeft));
+    io.AddMouseButtonEvent(1,mouseInput.getMouseButton(Mouse::ButtonRight));
+    io.AddMouseButtonEvent(3, mouseInput.getMouseButton(Mouse::ButtonMiddle));
     auto& mouseWheel = mouseInput.mouseScroll();
     io.AddMouseWheelEvent(mouseWheel.x, mouseWheel.y);
 
@@ -542,12 +543,6 @@ void Application::updateOverlay() {
 
     ImGui::Render();
     ui.update();
-
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
-    if (mouseButtons.left) {
-        mouseButtons.left = false;
-    }
-#endif
 }
 
 #if defined(__ANDROID__)

@@ -208,7 +208,8 @@ void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity en
         bool opened = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
         ImGui::PopStyleVar();
         ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-        if (ImGui::Button("+", { lineHeight, lineHeight })) {
+
+        if (ImGui::Button("\uF067")) {
             ImGui::OpenPopup("ComponentSettings");
         }
 

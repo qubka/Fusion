@@ -57,7 +57,7 @@ public:
 
     vk::DescriptorSetLayout descriptorSetLayout;
 
-    glm::vec3 meshPos = glm::vec3(0.0f, -1.5f, 0.0f);
+    glm::vec3 meshPos = glm::vec3{0.0f, -1.5f, 0.0f};
 
     EditorCamera camera{60, 0.1f, 1.0f, 2.0f};
 
@@ -273,7 +273,7 @@ public:
     void updateUniformBufferOffscreen() {
         ubos.vsShared.projection = camera.getViewProjection();
         ubos.vsShared.model = glm::mat4{1};
-        ubos.vsShared.model = glm::scale(ubos.vsShared.model, glm::vec3(1.0f, -1.0f, 1.0f));
+        ubos.vsShared.model = glm::scale(ubos.vsShared.model, glm::vec3{1.0f, -1.0f, 1.0f});
         ubos.vsShared.model = glm::translate(ubos.vsShared.model, meshPos);
         uniformData.vsOffScreen.copy(ubos.vsShared);
     }
@@ -308,7 +308,7 @@ public:
             pitch = -limit;
         }
 
-        camera.rotation = glm::degrees(glm::eulerAngles(glm::quat{ glm::vec3(pitch, yaw, 0) }));
+        camera.rotation = glm::degrees(glm::eulerAngles(glm::quat{ glm::vec3{pitch, yaw, 0} }));
 
         camera.update(frameTimer);*/
         updateUniformBuffers();
