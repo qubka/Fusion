@@ -107,7 +107,7 @@ void Application::initVulkan() {
 #if defined(__ANDROID__)
     surface = context.instance.createAndroidSurfaceKHR({ {}, android::androidApp->window });
 #else
-    surface = window->createSurface(context.instance);
+    surface = glfw::Window::createWindowSurface(reinterpret_cast<GLFWwindow*>(window->getNativeWindow()), context.instance);;
 #endif
 
     context.createDevice(surface);
@@ -314,9 +314,7 @@ void Application::setupUi() {
         shader.module = vk::ShaderModule{};
     }
 
-    for (auto* layer: layers) {
-        layer->onImGui();
-    }
+    updateOverlay();
 }
 
 void Application::drawCurrentCommandBuffer() {
@@ -330,11 +328,11 @@ void Application::drawCurrentCommandBuffer() {
     context.emptyDumpster(fence);
     {
         vk::SubmitInfo submitInfo;
-        submitInfo.waitSemaphoreCount = (uint32_t)renderWaitSemaphores.size();
+        submitInfo.waitSemaphoreCount = static_cast<uint32_t>(renderWaitSemaphores.size());
         submitInfo.pWaitSemaphores = renderWaitSemaphores.data();
         submitInfo.pWaitDstStageMask = renderWaitStages.data();
 
-        submitInfo.signalSemaphoreCount = (uint32_t)renderSignalSemaphores.size();
+        submitInfo.signalSemaphoreCount = static_cast<uint32_t>(renderSignalSemaphores.size());
         submitInfo.pSignalSemaphores = renderSignalSemaphores.data();
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = commandBuffers.data() + currentBuffer;
@@ -401,9 +399,11 @@ void Application::mainLoop() {
         auto tDiffSeconds = tDiff / 1000.0f;
         tStart = tEnd;
 
-        // Render frame
-        render();
         update(tDiffSeconds);
+
+        if (!window->isMinimized()) {
+            render();
+        }
     });
 }
 
@@ -473,11 +473,15 @@ void Application::update(float deltaTime) {
     fpsTimer += frameTimer;
     if (fpsTimer > 1.0f) {
 #if !defined(__ANDROID__)
-        window->setTitle(getWindowTitle());
+        reinterpret_cast<glfw::Window*>(window)->setTitle(getWindowTitle());
 #endif
         lastFPS = frameCounter;
         fpsTimer = 0.0f;
         frameCounter = 0;
+    }
+
+    for (auto* layer: layers) {
+        layer->onUpdate();
     }
 
     updateOverlay();
@@ -524,8 +528,8 @@ void Application::updateOverlay() {
 
     auto& mousePos = Input::MousePosition();
     io.AddMousePosEvent(mousePos.x, mousePos.y);
-    io.AddMouseButtonEvent(Mouse::ButtonLeft, Input::GetMouseButtonDown(Mouse::ButtonLeft));
-    io.AddMouseButtonEvent(Mouse::ButtonRight, Input::GetMouseButtonDown(Mouse::ButtonRight));
+    io.AddMouseButtonEvent(Mouse::ButtonLeft, Input::GetMouseButton(Mouse::ButtonLeft));
+    io.AddMouseButtonEvent(Mouse::ButtonRight, Input::GetMouseButton(Mouse::ButtonRight));
 
     ImGui::NewFrame();
 
@@ -565,12 +569,12 @@ void Application::updateOverlay() {
 
 #if defined(__ANDROID__)
 int32_t Application::handle_input_event(android_app* app, AInputEvent* event) {
-    auto& app = *static_cast<Application*>(app->userData);
+    auto& app = *reinterpret_cast<Application*>(app->userData);
     return app.window.onInput(event);
 }
 
 void Application::handle_app_cmd(android_app* app, int32_t cmd) {
-    auto& app = *static_cast<Application*>(app->userData);
+    auto& app = *reinterpret_cast<Application*>(app->userData);
     app.onAppCmd(cmd);
 }
 
@@ -585,10 +589,10 @@ void Application::onAppCmd(int32_t cmd) {
             }
             break;
         case APP_CMD_LOST_FOCUS:
-            window.setFocuses(false);
+            window.setMinimized(false);
             break;
         case APP_CMD_GAINED_FOCUS:
-            window.setFocuses(true)
+            window.setMinimized(true)
             break;
         default:
             break;

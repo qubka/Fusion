@@ -11,31 +11,31 @@
 
 using namespace glfw;
 
-uint8_t Window::GLFWwindowCount{0};
 std::vector<GLFWwindow*> Window::instances;
 
-Window::Window(std::string title, const glm::uvec2& size, const glm::ivec2& position, bool fullscreen) : Fusion::Window{},
+Window::Window(std::string title, const glm::uvec2& size, const glm::ivec2& position) :
+    Fusion::Window{},
     title{std::move(title)},
     width{static_cast<int>(size.x)},
     height{static_cast<int>(size.y)},
     aspect{static_cast<float>(size.x) / static_cast<float>(size.y)},
     position{position},
-    minimize{width == 0 || height == 0},
-    fullscreen{fullscreen}
+    minimize{false}
 {
-    assert(width >= 0 && height >= 0 && "Width or height cannot be negative");
+    initGLFW();
+    initWindow(false);
 
-    if (GLFWwindowCount == 0) {
-        int success = glfwInit();
-        if (!success) throw std::runtime_error("Could not initialize GLFW!");
-        glfwSetErrorCallback(ErrorCallback);
-        glfwSetMonitorCallback(MonitorCallback);
-#if GLFW_VERSION_MINOR >= 2
-        glfwSetJoystickCallback(JoystickCallback);
-#endif
-    }
+    instances.push_back(window);
+}
 
-    initWindow();
+Window::Window(std::string title) :
+    Fusion::Window{},
+    title{std::move(title)},
+    position{0, 0},
+    minimize{false}
+{
+    initGLFW();
+    initWindow(true);
 
     instances.push_back(window);
 }
@@ -46,13 +46,24 @@ Window::~Window() {
     glfwDestroyWindow(window);
     window = nullptr;
 
-    GLFWwindowCount--;
-    if (GLFWwindowCount == 0) {
+    if (instances.empty()) {
         glfwTerminate();
     }
 }
 
-void Window::initWindow() {
+void Window::initGLFW() {
+    if (instances.empty()) {
+        int success = glfwInit();
+        if (!success) throw std::runtime_error("Could not initialize GLFW!");
+        glfwSetErrorCallback(ErrorCallback);
+        glfwSetMonitorCallback(MonitorCallback);
+#if GLFW_VERSION_MINOR >= 2
+        glfwSetJoystickCallback(JoystickCallback);
+#endif
+    }
+}
+
+void Window::initWindow(bool fullscreen) {
     FE_LOG_INFO << "Creating window: " << title << " [" << width << " " << height << "]";
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -69,9 +80,8 @@ void Window::initWindow() {
     } else {
         window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     }
-
+    assert(width > 0 && height > 0 && "Width or height cannot be negative");
     if (!window) throw std::runtime_error("Failed to create window!");
-    GLFWwindowCount++;
 
     if (position != glm::ivec2{ 0, 0 }) {
         glfwSetWindowPos(window, position.x, position.y);
@@ -137,13 +147,13 @@ glm::vec4 Window::getViewport() {
 }
 
 void Window::PosCallback(GLFWwindow* handle, int x, int y) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     window.getEventQueue().submit(new Fusion::WindowMovedEvent{{}, {x, y}});
 }
 
 void Window::SizeCallback(GLFWwindow* handle, int width, int height) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
     /*window.width = width;
     window.height = height;
     window.aspect = static_cast<float>(width) / static_cast<float>(height);
@@ -153,19 +163,19 @@ void Window::SizeCallback(GLFWwindow* handle, int width, int height) {
 }
 
 void Window::CloseCallback(GLFWwindow* handle) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     window.getEventQueue().submit(new Fusion::WindowCloseEvent{});
 }
 
 void Window::RefreshCallback(GLFWwindow* handle) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     window.getEventQueue().submit(new Fusion::WindowRefreshEvent{});
 }
 
 void Window::FocusCallback(GLFWwindow* handle, int focused) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     if (focused)
         window.getEventQueue().submit(new Fusion::WindowFocusedEvent{});
@@ -174,7 +184,7 @@ void Window::FocusCallback(GLFWwindow* handle, int focused) {
 }
 
 void Window::IconifyCallback(GLFWwindow* handle, int iconified) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     if (iconified)
         window.getEventQueue().submit(new Fusion::WindowDeiconifiedEvent{});
@@ -183,7 +193,7 @@ void Window::IconifyCallback(GLFWwindow* handle, int iconified) {
 }
 
 void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
     window.width = width;
     window.height = height;
     window.aspect = static_cast<float>(width) / static_cast<float>(height);
@@ -195,7 +205,7 @@ void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) 
 void Window::CursorPosCallback(GLFWwindow* handle, double posX, double posY) {
     glm::vec2 pos {posX, posY};
 
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
     window.getEventQueue().submit(new Fusion::MouseMovedEvent{{}, pos});
 
     Fusion::Input::OnMouseMoved(pos);
@@ -205,7 +215,7 @@ void Window::CursorPosCallback(GLFWwindow* handle, double posX, double posY) {
 void Window::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
     glm::vec2 offset {offsetX, offsetY};
 
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
     window.getEventQueue().submit(new Fusion::MouseScrollEvent{{}, offset});
 
     Fusion::Input::OnMouseScroll(offset);
@@ -213,7 +223,7 @@ void Window::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) 
 }
 
 void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     // Event system
     switch (action) {
@@ -230,7 +240,7 @@ void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int
 }
 
 void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mode) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     // Event system
     switch (action) {
@@ -250,7 +260,7 @@ void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, 
 }
 
 void Window::CursorEnterCallback(GLFWwindow* handle, int entered) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
     if (entered)
         window.getEventQueue().submit(new Fusion::MouseCursorLeftEvent{});
     else
@@ -258,14 +268,14 @@ void Window::CursorEnterCallback(GLFWwindow* handle, int entered) {
 }
 
 void Window::CharCallback(GLFWwindow* handle, unsigned int keycode) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     window.getEventQueue().submit(new Fusion::KeyTypedEvent{{{}, static_cast<Fusion::KeyCode>(keycode)}});
 }
 
 #if GLFW_VERSION_MINOR >= 1
 void Window::FileDropCallback(GLFWwindow* handle, int count, const char** paths) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     window.getEventQueue().submit(new Fusion::WindowFileDropCallback{{}, count, paths});
 }
@@ -274,7 +284,7 @@ void Window::FileDropCallback(GLFWwindow* handle, int count, const char** paths)
 #if GLFW_VERSION_MINOR >= 2
 void Window::JoystickCallback(int jid, int action) {
     for (auto* handle : instances) {
-        auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+        auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
         switch (action) {
             case GLFW_CONNECTED:
@@ -290,7 +300,7 @@ void Window::JoystickCallback(int jid, int action) {
 
 #if GLFW_VERSION_MINOR >= 3
 void Window::MaximizeCallback(GLFWwindow* handle, int maximized) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     if (maximized)
         window.getEventQueue().submit(new Fusion::WindowMaximizedEvent{});
@@ -299,7 +309,7 @@ void Window::MaximizeCallback(GLFWwindow* handle, int maximized) {
 }
 
 void Window::ContentScaleCallback(GLFWwindow* handle, float scaleX, float scaleY) {
-    auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     window.getEventQueue().submit(new Fusion::WindowContentScaleEvent{{},{scaleX, scaleY}});
 }
@@ -307,7 +317,7 @@ void Window::ContentScaleCallback(GLFWwindow* handle, float scaleX, float scaleY
 
 void Window::MonitorCallback(GLFWmonitor* monitor, int action) {
     for (auto* handle : instances) {
-        auto& window = *static_cast<Window *>(glfwGetWindowUserPointer(handle));
+        auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
         switch (action) {
             case GLFW_CONNECTED:

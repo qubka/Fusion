@@ -74,7 +74,7 @@ inline void executeImmediately(vk::Device device, vk::CommandPool commandPool, v
 
 /// Scale a value by mip level, but do not reduce to zero.
 inline uint32_t mipScale(uint32_t value, uint32_t mipLevel) {
-    return std::max(value >> mipLevel, (uint32_t)1);
+    return std::max(value >> mipLevel, static_cast<uint32_t>(1));
 }
 
 /// Load a binary file into a vector.
@@ -2108,7 +2108,7 @@ public:
                 swap(imageSize);
             //printf("%08x: is=%08x / %08x\n", p-begin, imageSize, end - begin);
             p += 4;
-            imageOffsets_.push_back((uint32_t)(p - begin));
+            imageOffsets_.push_back(static_cast<uint32_t>(p - begin));
             imageSizes_.push_back(imageSize);
             p += incr;
         }

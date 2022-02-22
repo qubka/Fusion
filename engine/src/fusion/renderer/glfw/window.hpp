@@ -1,7 +1,7 @@
 #pragma once
 #if !defined(ANDROID)
 
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 #include <vulkan/vulkan.hpp>
 
 #include "fusion/core/window.hpp"
@@ -10,7 +10,8 @@
 namespace glfw {
     class Window : public Fusion::Window {
     public:
-        Window(std::string title, const glm::uvec2& size, const glm::ivec2& position = {}, bool fullscreen = false);
+        Window(std::string title, const glm::uvec2& size, const glm::ivec2& position = {});
+        Window(std::string title);
         ~Window() override;
 
         void* getNativeWindow() override { return window; }
@@ -22,8 +23,9 @@ namespace glfw {
         glm::vec4 getViewport() override;
         Fusion::EventQueue& getEventQueue() { return eventQueue; }
 
-        bool shouldClose() const { return glfwWindowShouldClose(window); };
-        void shouldClose(bool flag) const { glfwSetWindowShouldClose(window, flag); };
+        bool shouldClose() override { return glfwWindowShouldClose(window); };
+        void shouldClose(bool flag) override { glfwSetWindowShouldClose(window, flag); };
+
         void makeCurrent() const { glfwMakeContextCurrent(window); }
         void swapBuffers() const { glfwSwapBuffers(window); }
 
@@ -54,8 +56,8 @@ namespace glfw {
             }
         }
 
-        bool isMinimize() const { return minimize; }
-        bool isFullscreen() const { return fullscreen; }
+        virtual bool isMinimized() override { return minimize; }
+        virtual void setMinimized(bool flag) override { minimize = flag; }
 
 #if defined(VULKAN_HPP)
         static std::vector<std::string> getRequiredInstanceExtensions();
@@ -74,13 +76,12 @@ namespace glfw {
         float aspect;
         glm::ivec2 position;
         bool minimize;
-        bool fullscreen;
         Fusion::EventQueue eventQueue;
 
-        void initWindow();
+        void initGLFW();
+        void initWindow(bool fullscreen);
         static void resetInputs() ;
 
-        static uint8_t GLFWwindowCount;
         static std::vector<GLFWwindow*> instances;
 
         /// Workaround for C++ class using a c-style-callback

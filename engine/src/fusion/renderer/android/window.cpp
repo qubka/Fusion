@@ -126,5 +126,4 @@ int32_t Window::onInput(AInputEvent* event) {
     }
     return 0;
 }
-
 #endif

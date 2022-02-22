@@ -169,7 +169,7 @@ public:
                 { vk::DescriptorType::eUniformBuffer, 6 },
                 { vk::DescriptorType::eCombinedImageSampler, 8 },
         };
-        descriptorPool = device.createDescriptorPool({ {}, 5, (uint32_t)poolSizes.size(), poolSizes.data() });
+        descriptorPool = device.createDescriptorPool({ {}, 5, static_cast<uint32_t>(poolSizes.size()), poolSizes.data() });
     }
 
     void setupDescriptorSetLayout() {
@@ -183,7 +183,7 @@ public:
                 { 2, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment },
         };
 
-        descriptorSetLayout = device.createDescriptorSetLayout({ {}, (uint32_t)setLayoutBindings.size(), setLayoutBindings.data() });
+        descriptorSetLayout = device.createDescriptorSetLayout({ {}, static_cast<uint32_t>(setLayoutBindings.size()), setLayoutBindings.data() });
         pipelineLayouts.quad = device.createPipelineLayout({ {}, 1, &descriptorSetLayout });
         // Offscreen pipeline layout
         pipelineLayouts.offscreen = device.createPipelineLayout({ {}, 1, &descriptorSetLayout });

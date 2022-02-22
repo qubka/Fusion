@@ -224,14 +224,11 @@ namespace Fusion {
     private:
         // OS specific
 #if defined(__ANDROID__)
-        // true if application has focused, false if moved to background
-        android::Window* window{ nullptr};
         static int32_t handle_input_event(android_app* app, AInputEvent* event);
         static void handle_app_cmd(android_app* app, int32_t cmd);
         void onAppCmd(int32_t cmd);
-#else
-        glfw::Window* window{ nullptr };
 #endif
+        Window* window{ nullptr };
     };
 
     Application* CreateApplication(CommandLineArgs args);
