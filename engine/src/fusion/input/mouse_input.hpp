@@ -3,17 +3,18 @@
 #include "base_input.hpp"
 #include "mouse_codes.hpp"
 
-class GLFWwindow;
-
 namespace Fusion {
-    class Window;
-
     class MouseInput : public BaseInput<MouseCode> {
     public:
-        MouseInput(const std::vector<MouseCode>& buttonsToMonitor);
-        ~MouseInput();
+        MouseInput(const std::initializer_list<MouseCode>& buttonsToMonitor)
+            : BaseInput<MouseCode>{buttonsToMonitor} {};
+        ~MouseInput() = default;
 
-        void onUpdate() override;
+        void onUpdate() override {
+            delta = vec2::zero;
+            scroll = vec2::zero;
+            BaseInput::onUpdate();
+        };
 
         //! Returns whether the given mouse button is held down.
         bool getMouseButton(MouseCode button) const { return isKey(button); }
@@ -29,23 +30,22 @@ namespace Fusion {
         //! The current mouse scroll delta.
         const glm::vec2& mouseScroll() const { return scroll; }
 
-        //! Must be called before any MouseInput instances will work
-        static void Update();
-
-        /// Workaround for C++ class using a c-style-callback
-        static void OnMouseMoved(const glm::vec2& pos);
-        static void OnMouseScroll(const glm::vec2& offset);
-        static void OnMouseButton(MouseCode button, ActionCode action);
+        //! Used internally to update mouse data. Should be called by the GLFW callbacks
+        void onMouseMoved(const glm::vec2& pos) { setCursorPosition(pos); };
+        void onMouseScroll(const glm::vec2& offset) { setScrollOffset(offset); };
+        void onMouseButton(MouseCode button, ActionCode action) { setKey(button, action); };
 
     private:
         glm::vec2 delta{};
         glm::vec2 position{};
         glm::vec2 scroll{};
 
-        //! Used internally to update mouse data. Should be called by the GLFW callbacks
-        void setCursorPosition(const glm::vec2& pos);
-        void setScrollOffset(const glm::vec2& offset);
-
-        static std::vector<MouseInput*> instances;
+        void setCursorPosition(const glm::vec2& pos) {
+            delta += pos - position;
+            position = pos;
+        };
+        void setScrollOffset(const glm::vec2& offset) {
+            scroll = offset;
+        };
     };
 }

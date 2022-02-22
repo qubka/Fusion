@@ -3,15 +3,12 @@
 #include "base_input.hpp"
 #include "key_codes.hpp"
 
-class GLFWwindow;
-
 namespace Fusion {
-    class Window;
-
     class KeyInput : public BaseInput<KeyCode> {
     public:
-        KeyInput(const std::vector<KeyCode>& keysToMonitor);
-        ~KeyInput();
+        KeyInput(const std::initializer_list<KeyCode>& keysToMonitor)
+            : BaseInput<KeyCode>{keysToMonitor} {};
+        ~KeyInput() = default;
 
         //! Returns true while the user holds down the key identified by GLFW code.
         bool getKey(KeyCode key) const { return isKey(key); }
@@ -20,14 +17,7 @@ namespace Fusion {
         //! Returns true during the frame the user starts pressing down the key identified by GLFW code.
         bool getKeyDown(KeyCode key) const { return isKeyDown(key); }
 
-        //! Must be called before any KeyInput instances will work
-        //static void Setup(Window& window);
-        static void Update();
-
-        /// Workaround for C++ class using a c-style-callback
-        static void OnKeyPressed(KeyCode key, ActionCode action);
-
-    private:
-        static std::vector<KeyInput*> instances;
+        //! Used internally to update mouse data. Should be called by the GLFW callbacks
+        void onKeyPressed(KeyCode key, ActionCode action) { setKey(key, action); };
     };
 }

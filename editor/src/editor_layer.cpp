@@ -52,7 +52,7 @@ void EditorLayer::onDetach() {
 
 void EditorLayer::onUpdate() {
     /*auto& window = vulkan.getWindow();
-    if (auto* event = window.getEventQueue().next<WindowFramebufferSizeEvent>()) {
+    if (auto* event = window.eventQueue.next<WindowFramebufferSizeEvent>()) {
         editorCamera.setViewport(event->width, event->height);
     }
 

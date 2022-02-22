@@ -3,7 +3,7 @@
 using namespace Fusion;
 
 template<class T>
-BaseInput<T>::BaseInput(const std::vector<T>& keysToMonitor) {
+BaseInput<T>::BaseInput(const std::initializer_list<T>& keysToMonitor) {
     for (T keycode : keysToMonitor) {
         keys.emplace(keycode, Key{});
     }

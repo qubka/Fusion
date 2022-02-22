@@ -2,6 +2,9 @@
 
 namespace Fusion {
     class EventQueue;
+    class KeyInput;
+    class MouseInput;
+
     class Window {
     public:
         Window() = default;
@@ -15,13 +18,16 @@ namespace Fusion {
         virtual float getAspect() = 0;
         virtual const std::string& getTitle() = 0;
         virtual glm::vec4 getViewport() = 0;
-        virtual EventQueue& getEventQueue() = 0;
 
         virtual bool isMinimized() = 0;
         virtual void setMinimized(bool flag) = 0;
 
         virtual bool shouldClose() = 0;
         virtual void shouldClose(bool flag) = 0;
+
+        virtual EventQueue& getEventQueue() = 0;
+        virtual KeyInput& getKeyInput() = 0;
+        virtual MouseInput& getMouseInput() = 0;
 
         virtual void runLoop(const std::function<void()>& frameHandler) = 0;
     };

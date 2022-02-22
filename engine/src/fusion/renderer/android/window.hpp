@@ -1,5 +1,5 @@
 #pragma once
-#if defined(ANDROID)
+//#if defined(ANDROID)
 
 #include "fusion/core/android.hpp"
 #include "fusion/core/window.hpp"
@@ -48,4 +48,4 @@ namespace android {
         static Window instance;
     };
 }
-#endif
+//#endif

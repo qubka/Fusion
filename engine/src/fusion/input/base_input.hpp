@@ -13,7 +13,7 @@ namespace Fusion {
     class BaseInput {
     public:
         //! Takes a list of which keys to keep state for
-        BaseInput(const std::vector<T>& keysToMonitor);
+        BaseInput(const std::initializer_list<T>& keysToMonitor);
         ~BaseInput() = default;
 
         virtual void onAttach() {}
@@ -23,6 +23,7 @@ namespace Fusion {
         //! If disabled, Input.isKey_ always returns false
         bool isEnabled() const { return enabled; }
         void isEnabled(bool flag) { enabled = flag; }
+
     protected:
         bool isKey(T keycode) const;
         bool isKeyUp(T keycode) const;
@@ -37,7 +38,7 @@ namespace Fusion {
         };
 
         std::map<T, Key> keys;
-        uint32_t currentFrame{ 0 }; // can be used instead of global if needed
+        uint32_t currentFrame{ 0 };
         bool enabled{ true };
     };
 

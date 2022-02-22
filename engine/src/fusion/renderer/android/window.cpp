@@ -1,5 +1,5 @@
 #include "window.hpp"
-#if defined(ANDROID)
+//#if defined(ANDROID)
 
 #include "fusion/events/application_events.hpp"
 #include "fusion/events/window_events.hpp"
@@ -126,4 +126,4 @@ int32_t Window::onInput(AInputEvent* event) {
     }
     return 0;
 }
-#endif
+//#endif

@@ -6,6 +6,8 @@
 
 #include "fusion/core/window.hpp"
 #include "fusion/events/event_queue.hpp"
+#include "fusion/input/key_input.hpp"
+#include "fusion/input/mouse_input.hpp"
 
 namespace glfw {
     class Window : public Fusion::Window {
@@ -21,11 +23,14 @@ namespace glfw {
         float getAspect() override { return aspect; }
         const std::string& getTitle() override { return title; }
         glm::vec4 getViewport() override;
-        Fusion::EventQueue& getEventQueue() { return eventQueue; }
 
         bool shouldClose() override { return glfwWindowShouldClose(window); };
         void shouldClose(bool flag) override { glfwSetWindowShouldClose(window, flag); };
 
+        Fusion::EventQueue& getEventQueue() { return eventQueue; }
+        Fusion::KeyInput& getKeyInput() { return keyInput; }
+        Fusion::MouseInput& getMouseInput() { return mouseInput; }
+        
         void makeCurrent() const { glfwMakeContextCurrent(window); }
         void swapBuffers() const { glfwSwapBuffers(window); }
 
@@ -50,14 +55,15 @@ namespace glfw {
         void runLoop(const std::function<void()>& frameHandler) override {
             while (!shouldClose()) {
                 eventQueue.free();
-                resetInputs();
+                keyInput.onUpdate();
+                mouseInput.onUpdate();
                 glfwPollEvents();
                 frameHandler();
             }
         }
 
-        virtual bool isMinimized() override { return minimize; }
-        virtual void setMinimized(bool flag) override { minimize = flag; }
+        bool isMinimized() override { return minimize; }
+        void setMinimized(bool flag) override { minimize = flag; }
 
 #if defined(VULKAN_HPP)
         static std::vector<std::string> getRequiredInstanceExtensions();
@@ -76,11 +82,13 @@ namespace glfw {
         float aspect;
         glm::ivec2 position;
         bool minimize;
+
         Fusion::EventQueue eventQueue;
+        Fusion::KeyInput keyInput;
+        Fusion::MouseInput mouseInput;
 
         void initGLFW();
         void initWindow(bool fullscreen);
-        static void resetInputs() ;
 
         static std::vector<GLFWwindow*> instances;
 
