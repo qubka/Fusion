@@ -1,12 +1,15 @@
 #pragma once
-//#if defined(ANDROID)
+// TODO: Refactor
+#if defined(ANDROID)
 
 #include "fusion/core/android.hpp"
 #include "fusion/core/window.hpp"
 #include "fusion/events/event_queue.hpp"
+#include "fusion/input/key_input.hpp"
+#include "fusion/input/mouse_input.hpp"
 
 namespace android {
-    class Window : public Fusion::Window {
+    class Window : public fe::Window {
     public:
         Window();
         ~Window() override = default;
@@ -18,13 +21,16 @@ namespace android {
         float getAspect() override { return aspect; }
         const std::string& getTitle() override { return title; }
         glm::vec4 getViewport() override;
-        Fusion::EventQueue& getEventQueue() override { return eventQueue; }
 
         bool isMinimized() override { return focused; }
         void setMinimized(bool flag) override { focused = flag; }
 
         bool shouldClose() override;
         void shouldClose(bool flag) override { if (flag) ANativeActivity_finish(androidApp->state->activity); }
+
+        fe::EventQueue& getEventQueue() { return eventQueue; }
+        fe::KeyInput& getKeyInput() { return keyInput; }
+        fe::MouseInput& getMouseInput() { return mouseInput; }
 
         void runLoop(const std::function<void()>& frameHandler) override {
             while (!shouldClose()) {
@@ -41,11 +47,14 @@ namespace android {
         float aspect;
         bool focused;
         std::string title;
-        Fusion::EventQueue eventQueue;
+
+        fe::EventQueue eventQueue;
+        fe::KeyInput keyInput;
+        fe::MouseInput mouseInput;
 
         static void resetInputs();
 
         static Window instance;
     };
 }
-//#endif
+#endif

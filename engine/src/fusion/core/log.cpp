@@ -1,6 +1,6 @@
 #include "plog/Initializers/RollingFileInitializer.h"
 
-namespace Fusion {
+namespace fe {
     void Log::Init() {
         const char* file = "fusion.log";
         std::ofstream ofs;

@@ -2,7 +2,7 @@
 
 #include "camera.hpp"
 
-namespace Fusion {
+namespace fe {
     class PerspectiveCamera : public Camera {
     public:
         PerspectiveCamera(float fov, float aspect, float near, float far);

@@ -1,6 +1,6 @@
 #include "scene_camera.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 SceneCamera::SceneCamera() {
     recalculateProjection();

@@ -2,7 +2,7 @@
 
 #include "scene_camera.hpp"
 
-namespace Fusion {
+namespace fe {
 
     struct  TagComponent {
         std::string tag;

@@ -1,7 +1,7 @@
 #include "layer_stack.hpp"
 #include "layer.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 LayerStack::~LayerStack() {
     for (auto* layer : layers) {

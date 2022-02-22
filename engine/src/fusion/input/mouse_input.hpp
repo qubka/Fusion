@@ -3,7 +3,7 @@
 #include "base_input.hpp"
 #include "mouse_codes.hpp"
 
-namespace Fusion {
+namespace fe {
     class MouseInput : public BaseInput<MouseCode> {
     public:
         MouseInput(const std::initializer_list<MouseCode>& buttonsToMonitor)

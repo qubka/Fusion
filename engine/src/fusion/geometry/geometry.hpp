@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     class Plane;
 
     class Geometry {

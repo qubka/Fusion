@@ -2,7 +2,7 @@
 
 #include "plane.hpp"
 
-namespace Fusion {
+namespace fe {
     class Sphere;
     class AABB;
 

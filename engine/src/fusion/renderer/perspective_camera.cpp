@@ -1,6 +1,6 @@
 #include "perspective_camera.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float far) : Camera{},
     fovy{fov},

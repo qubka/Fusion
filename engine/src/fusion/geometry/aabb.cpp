@@ -2,7 +2,7 @@
 #include "ray.hpp"
 #include "sphere.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 AABB::AABB() : center{0}, extents{0} {
 

@@ -1,7 +1,7 @@
 #include "editor_camera.hpp"
 #include "fusion/input/input.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 EditorCamera::EditorCamera() : PerspectiveCamera{45.0f, 1.778f, 0.1f, 1000.0f} {
 }

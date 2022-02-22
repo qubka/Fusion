@@ -2,7 +2,7 @@
 
 #include "fusion/scene/scene.hpp"
 
-namespace Fusion {
+namespace fe {
     //class Mesh;
     class SceneHierarchyPanel {
     public:

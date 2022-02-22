@@ -2,7 +2,7 @@
 
 #include <imgui/imgui.h>
 
-using namespace Fusion;
+using namespace fe;
 
 ContentBrowserPanel::ContentBrowserPanel() : currentDirectory{getAssetPath()} {
 

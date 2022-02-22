@@ -2,7 +2,7 @@
 
 #include <plog/Log.h>
 
-namespace Fusion {
+namespace fe {
     // Define log instances. Default is 0 and is omitted from this enum.
     /*enum {
         EngineLog = 0,

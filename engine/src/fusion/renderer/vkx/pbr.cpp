@@ -125,8 +125,8 @@ void vkx::pbr::generateBRDFLUT(const vkx::Context& context, vkx::texture::Textur
     pipelineBuilder.rasterizationState.cullMode = vk::CullModeFlagBits::eNone;
     pipelineBuilder.depthStencilState = { false };
     // Look-up-table (from BRDF) pipeline
-    pipelineBuilder.loadShader(Fusion::getAssetPath() + "shaders/pbr/genbrdflut.vert.spv", vk::ShaderStageFlagBits::eVertex);
-    pipelineBuilder.loadShader(Fusion::getAssetPath() + "shaders/pbr/genbrdflut.frag.spv", vk::ShaderStageFlagBits::eFragment);
+    pipelineBuilder.loadShader(fe::getAssetPath() + "shaders/pbr/genbrdflut.vert.spv", vk::ShaderStageFlagBits::eVertex);
+    pipelineBuilder.loadShader(fe::getAssetPath() + "shaders/pbr/genbrdflut.frag.spv", vk::ShaderStageFlagBits::eFragment);
     vk::Pipeline pipeline = pipelineBuilder.create(context.pipelineCache);
 
     // Render
@@ -332,8 +332,8 @@ void vkx::pbr::generateIrradianceCube(const vkx::Context& context,
         { 0, 0, vk::Format::eR32G32B32Sfloat, 0 },
     };
 
-    pipelineBuilder.loadShader(Fusion::getAssetPath() + "shaders/pbr/filtercube.vert.spv", vk::ShaderStageFlagBits::eVertex);
-    pipelineBuilder.loadShader(Fusion::getAssetPath() + "shaders/pbr/irradiancecube.frag.spv", vk::ShaderStageFlagBits::eFragment);
+    pipelineBuilder.loadShader(fe::getAssetPath() + "shaders/pbr/filtercube.vert.spv", vk::ShaderStageFlagBits::eVertex);
+    pipelineBuilder.loadShader(fe::getAssetPath() + "shaders/pbr/irradiancecube.frag.spv", vk::ShaderStageFlagBits::eFragment);
     vk::Pipeline pipeline = pipelineBuilder.create(context.pipelineCache);
 
     // Render
@@ -599,8 +599,8 @@ void vkx::pbr::generatePrefilteredCube(const vkx::Context& context,
         { 0, 0, vk::Format::eR32G32B32Sfloat, 0 },
     };
 
-    pipelineBuilder.loadShader(Fusion::getAssetPath() + "shaders/pbr/filtercube.vert.spv", vk::ShaderStageFlagBits::eVertex);
-    pipelineBuilder.loadShader(Fusion::getAssetPath() + "shaders/pbr/prefilterenvmap.frag.spv", vk::ShaderStageFlagBits::eFragment);
+    pipelineBuilder.loadShader(fe::getAssetPath() + "shaders/pbr/filtercube.vert.spv", vk::ShaderStageFlagBits::eVertex);
+    pipelineBuilder.loadShader(fe::getAssetPath() + "shaders/pbr/prefilterenvmap.frag.spv", vk::ShaderStageFlagBits::eFragment);
     vk::Pipeline pipeline = pipelineBuilder.create(context.pipelineCache);
 
     // Render

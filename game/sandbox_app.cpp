@@ -1,6 +1,6 @@
 #include "fusion/core/entry_point.hpp"
 
-class ExampleLayer : public Fusion::Layer {
+class ExampleLayer : public fe::Layer {
 public:
     ExampleLayer() : Layer{"ExampleLayer"} {
     }
@@ -17,15 +17,15 @@ public:
     }
 };
 
-class SandboxApp : public Fusion::Application {
+class SandboxApp : public fe::Application {
 public:
-    SandboxApp(Fusion::CommandLineArgs args) : Application{"Sandbox", args} {
+    SandboxApp(fe::CommandLineArgs args) : Application{"Sandbox", args} {
         pushLayer(new ExampleLayer{});
     }
     ~SandboxApp() override {
     }
 };
 
-Fusion::Application* Fusion::CreateApplication(CommandLineArgs args) {
+fe::Application* fe::CreateApplication(CommandLineArgs args) {
     return new SandboxApp{args};
 }

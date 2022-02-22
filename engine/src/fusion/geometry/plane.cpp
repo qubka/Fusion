@@ -1,7 +1,7 @@
 #include "plane.hpp"
 #include "ray.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 Plane::Plane() : normal{0}, distance{0} {
 }

@@ -3,7 +3,7 @@
 #include "event_queue.hpp"
 #include "fusion/input/key_codes.hpp"
 
-namespace Fusion {
+namespace fe {
 
     struct  KeyEvent : public Event {
         KeyCode keycode;

@@ -4,7 +4,7 @@
 #include "fusion/renderer/vkx/framebuffer.hpp"
 #include "fusion/renderer/vkx/offscreen.hpp"
 
-namespace Fusion {
+namespace fe {
     class OffscreenApplication : public Application {
     protected:
         OffscreenApplication(const std::string& title, const CommandLineArgs& args)

@@ -1,5 +1,6 @@
 #include "window.hpp"
-//#if defined(ANDROID)
+// TODO: Refactor
+#if defined(ANDROID)
 
 #include "fusion/events/application_events.hpp"
 #include "fusion/events/window_events.hpp"
@@ -15,7 +16,7 @@ using namespace android;
 
 Window* Window::instance{nullptr};
 
-Window::Window() : Fusion::Window{},
+Window::Window() : fe::Window{},
     width{ANativeWindow_getWidth(androidApp->window)},
     height{ANativeWindow_getHeight(androidApp->window)},
     aspect{static_cast<float>(width) / static_cast<float>(height)}
@@ -52,9 +53,9 @@ glm::vec4 Window::getViewport() {
 
 void Window::resetInputs() {
     /* reset data and update frame */
-    Fusion::Input::Update();
-    Fusion::MouseInput::Update();
-    Fusion::KeyInput::Update();
+    fe::Input::Update();
+    fe::MouseInput::Update();
+    fe::KeyInput::Update();
 }
 
 int32_t Window::onInput(AInputEvent* event) {
@@ -126,4 +127,4 @@ int32_t Window::onInput(AInputEvent* event) {
     }
     return 0;
 }
-//#endif
+#endif

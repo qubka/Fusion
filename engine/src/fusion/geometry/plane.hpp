@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     class Ray;
 
     class Plane {
@@ -55,4 +55,4 @@ namespace Fusion {
     };
 }
 
-std::ostream& operator<<(std::ostream& o, const Fusion::Plane& p);
+std::ostream& operator<<(std::ostream& o, const fe::Plane& p);

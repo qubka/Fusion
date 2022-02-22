@@ -14,7 +14,7 @@
 
 int main(int argc, char** argv);
 
-namespace Fusion {
+namespace fe {
 
     struct CommandLineArgs {
         int count{ 0 };

@@ -8,9 +8,10 @@
 #include "fusion/events/event_queue.hpp"
 #include "fusion/input/key_input.hpp"
 #include "fusion/input/mouse_input.hpp"
+#include "fusion/input/joystick_input.hpp"
 
 namespace glfw {
-    class Window : public Fusion::Window {
+    class Window : public fe::Window {
     public:
         Window(std::string title, const glm::uvec2& size, const glm::ivec2& position = {});
         Window(std::string title);
@@ -27,10 +28,10 @@ namespace glfw {
         bool shouldClose() override { return glfwWindowShouldClose(window); };
         void shouldClose(bool flag) override { glfwSetWindowShouldClose(window, flag); };
 
-        Fusion::EventQueue& getEventQueue() { return eventQueue; }
-        Fusion::KeyInput& getKeyInput() { return keyInput; }
-        Fusion::MouseInput& getMouseInput() { return mouseInput; }
-        
+        fe::EventQueue& getEventQueue() { return eventQueue; }
+        fe::KeyInput& getKeyInput() { return keyInput; }
+        fe::MouseInput& getMouseInput() { return mouseInput; }
+
         void makeCurrent() const { glfwMakeContextCurrent(window); }
         void swapBuffers() const { glfwSwapBuffers(window); }
 
@@ -51,7 +52,6 @@ namespace glfw {
             glfwSetWindowSizeLimits(window, minSize.x, minSize.y, (maxSize.x != 0) ? maxSize.x : minSize.x, (maxSize.y != 0) ? maxSize.y : minSize.y);
         }
 
-        // FIXME implement joystick handling
         void runLoop(const std::function<void()>& frameHandler) override {
             while (!shouldClose()) {
                 eventQueue.free();
@@ -83,9 +83,10 @@ namespace glfw {
         glm::ivec2 position;
         bool minimize;
 
-        Fusion::EventQueue eventQueue;
-        Fusion::KeyInput keyInput;
-        Fusion::MouseInput mouseInput;
+        fe::EventQueue eventQueue;
+        fe::KeyInput keyInput;
+        fe::MouseInput mouseInput;
+        std::vector<fe::JoystickInput> joysticksInput;
 
         void initGLFW();
         void initWindow(bool fullscreen);

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     using MouseCode = uint8_t;
 
     namespace Mouse {

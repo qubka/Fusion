@@ -2,7 +2,7 @@
 #include "fusion/core/entry_point.hpp"
 #include "editor_layer.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 // Vertex layout for this example
 vkx::model::VertexLayout vertexLayout{ {
@@ -322,6 +322,6 @@ public:
     }
 };
 
-Fusion::Application* Fusion::CreateApplication(CommandLineArgs args) {
+fe::Application* fe::CreateApplication(CommandLineArgs args) {
     return new EditorApp{args};
 }

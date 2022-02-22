@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     class Layer {
     public:
         Layer(std::string name = "Layer") : name{std::move(name)} {}

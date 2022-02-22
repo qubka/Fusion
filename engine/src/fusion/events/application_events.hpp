@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
 
     struct  MonitorConnectedEvent : public Event {
         const GLFWmonitor* monitor{nullptr};

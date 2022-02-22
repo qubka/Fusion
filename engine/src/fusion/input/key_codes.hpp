@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     using KeyCode = uint16_t;
 
     namespace Key {

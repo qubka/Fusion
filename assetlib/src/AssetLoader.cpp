@@ -1,6 +1,6 @@
 #include "AssetLoader.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 bool Asset::SaveBinaryFile(const std::string& path, const AssetFile& file) {
     std::ofstream outfile;

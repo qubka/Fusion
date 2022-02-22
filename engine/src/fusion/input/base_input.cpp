@@ -1,6 +1,6 @@
 #include "base_input.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 template<class T>
 BaseInput<T>::BaseInput(const std::initializer_list<T>& keysToMonitor) {

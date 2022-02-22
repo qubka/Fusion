@@ -2,7 +2,7 @@
 
 #include "AssetLoader.hpp"
 
-namespace Fusion {
+namespace fe {
     enum class TextureFormat : uint32_t {
         Unknown = 0,
         RGBA8

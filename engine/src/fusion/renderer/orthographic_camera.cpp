@@ -1,6 +1,6 @@
 #include "orthographic_camera.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top) : Camera{} {
     setOrthographic(left, right, bottom, top);

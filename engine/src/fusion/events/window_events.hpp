@@ -2,7 +2,7 @@
 
 #include "event_queue.hpp"
 
-namespace Fusion {
+namespace fe {
 
     struct  WindowMovedEvent : public Event {
         glm::ivec2 pos;

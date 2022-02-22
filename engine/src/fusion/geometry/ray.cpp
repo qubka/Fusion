@@ -1,6 +1,6 @@
 #include "ray.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 Ray::Ray() : origin{0}, direction{0} {
 }

@@ -3,7 +3,7 @@
 
 //#include "fusion/systems/meshrenderer.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 Scene::Scene() {
 

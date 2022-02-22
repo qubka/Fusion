@@ -1,5 +1,5 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     const std::string& getAssetPath();
 }

@@ -2,7 +2,7 @@
 
 #include <entt/entity/registry.hpp>
 
-namespace Fusion {
+namespace fe {
     class EditorCamera;
 
     class Scene {

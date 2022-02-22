@@ -3,7 +3,7 @@
 #include "base_input.hpp"
 #include "key_codes.hpp"
 
-namespace Fusion {
+namespace fe {
     class KeyInput : public BaseInput<KeyCode> {
     public:
         KeyInput(const std::initializer_list<KeyCode>& keysToMonitor)

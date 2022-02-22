@@ -1,3 +1,3 @@
 #include "editor_app.hpp"
 
-using namespace Fusion;
+using namespace fe;

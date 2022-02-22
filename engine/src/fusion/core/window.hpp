@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     class EventQueue;
     class KeyInput;
     class MouseInput;

@@ -2,7 +2,7 @@
 
 #include "fusion/renderer/camera.hpp"
 
-namespace Fusion {
+namespace fe {
 
     class SceneCamera {
     public:

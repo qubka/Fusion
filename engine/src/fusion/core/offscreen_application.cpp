@@ -1,3 +1,3 @@
 #include "offscreen_application.hpp"
 
-using namespace Fusion;
+using namespace fe;

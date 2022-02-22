@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     using ActionCode = uint8_t;
 
     namespace Action {

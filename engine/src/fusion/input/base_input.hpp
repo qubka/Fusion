@@ -4,7 +4,7 @@
 #include "key_codes.hpp"
 #include "action_codes.hpp"
 
-namespace Fusion {
+namespace fe {
     /* Template class */
 
     /// Regards to Jonathan Heard

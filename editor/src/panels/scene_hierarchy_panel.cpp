@@ -9,7 +9,7 @@
 #include "fusion/core/application.hpp"
 //#include "fusion/renderer/mesh.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 SceneHierarchyPanel::SceneHierarchyPanel() {
     glm::vec3 m_half_extents{1};

@@ -11,7 +11,7 @@
 //#include "fusion/systems/meshrenderer.hpp"
 #include "fusion/utils/process_info.hpp"
 
-namespace Fusion {
+namespace fe {
     class EditorLayer : public Layer {
     public:
         EditorLayer();

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     class Layer;
 
     //! A linear collection of Layers that supports element insertion and removal at both ends and also execute events

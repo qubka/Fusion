@@ -127,7 +127,7 @@ namespace YAML {
     }
 }
 
-using namespace Fusion;
+using namespace fe;
 
 SceneSerializer::SceneSerializer(const std::shared_ptr<Scene>& scene) : scene{scene} {
 

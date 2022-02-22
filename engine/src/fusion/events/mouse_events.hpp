@@ -3,7 +3,7 @@
 #include "event_queue.hpp"
 #include "fusion/input/mouse_codes.hpp"
 
-namespace Fusion {
+namespace fe {
 
     struct  MouseMovedEvent : public Event {
         glm::vec2 pos;

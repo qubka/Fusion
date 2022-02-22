@@ -1,7 +1,7 @@
 #include "geometry.hpp"
 #include "plane.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 glm::vec3 Geometry::intersectionPoint(const Plane& a, const Plane& b, const Plane& c) {
     float f = -glm::dot(a.getNormal(), glm::cross(b.getNormal(), c.getNormal()));

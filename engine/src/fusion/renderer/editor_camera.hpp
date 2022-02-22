@@ -2,7 +2,7 @@
 
 #include "perspective_camera.hpp"
 
-namespace Fusion {
+namespace fe {
     class KeyInput;
     class MouseInput;
 

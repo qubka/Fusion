@@ -198,8 +198,8 @@ void UIOverlay::preparePipeline() {
     if (!createInfo.shaders.empty()) {
         pipelineBuilder.shaderStages = createInfo.shaders;
     } else {
-        pipelineBuilder.loadShader(Fusion::getAssetPath() + "shaders/base/uioverlay.vert.spv", vk::ShaderStageFlagBits::eVertex);
-        pipelineBuilder.loadShader(Fusion::getAssetPath() + "shaders/base/uioverlay.frag.spv", vk::ShaderStageFlagBits::eFragment);
+        pipelineBuilder.loadShader(fe::getAssetPath() + "shaders/base/uioverlay.vert.spv", vk::ShaderStageFlagBits::eVertex);
+        pipelineBuilder.loadShader(fe::getAssetPath() + "shaders/base/uioverlay.frag.spv", vk::ShaderStageFlagBits::eFragment);
     }
 
     // Vertex bindings an attributes based on ImGui vertex definition

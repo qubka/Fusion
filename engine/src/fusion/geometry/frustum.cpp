@@ -2,7 +2,7 @@
 #include "aabb.hpp"
 #include "sphere.hpp"
 
-using namespace Fusion;
+using namespace fe;
 
 Frustum::Frustum(const glm::vec3& ntl, const glm::vec3& ntr, const glm::vec3& nbl, const glm::vec3& nbr, const glm::vec3& ftl, const glm::vec3& ftr, const glm::vec3& fbl, const glm::vec3& fbr) {
     set(ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr);

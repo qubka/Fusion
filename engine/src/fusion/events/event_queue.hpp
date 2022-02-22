@@ -2,7 +2,7 @@
 
 class GLFWwindow;
 
-namespace Fusion {
+namespace fe {
     class Event {
     };
 

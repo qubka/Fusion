@@ -2,7 +2,7 @@
 #include <nlohmann/json.hpp>
 //#include <lz4.h>
 
-using namespace Fusion;
+using namespace fe;
 
 TextureInfo TextureAsset::readTextureInfo(const AssetFile& file) {
     /*TextureInfo info;

@@ -23,7 +23,7 @@
 #include <imgui/imgui_internal.h>
 #include <imguizmo/ImGuizmo.h>
 
-using namespace Fusion;
+using namespace fe;
 
 EditorLayer::EditorLayer() : Layer{"EditorLayer"} {
 }

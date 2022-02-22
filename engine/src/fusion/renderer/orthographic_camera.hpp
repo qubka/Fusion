@@ -2,7 +2,7 @@
 
 #include "camera.hpp"
 
-namespace Fusion {
+namespace fe {
     class OrthographicCamera : public Camera {
     public:
         OrthographicCamera(float left, float right, float bottom, float top);

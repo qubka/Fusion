@@ -1,6 +1,6 @@
 #include "common.hpp"
 
-const std::string& Fusion::getAssetPath() {
+const std::string& fe::getAssetPath() {
 #if defined(__ANDROID__)
     static const std::string NOTHING;
     return NOTHING;

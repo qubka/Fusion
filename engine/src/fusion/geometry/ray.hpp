@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     class Ray {
         glm::vec3 origin;
         glm::vec3 direction;
@@ -27,4 +27,4 @@ namespace Fusion {
     };
 }
 
-std::ostream& operator<<(std::ostream& o, const Fusion::Ray& r);
+std::ostream& operator<<(std::ostream& o, const fe::Ray& r);

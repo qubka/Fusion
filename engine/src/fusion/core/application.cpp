@@ -5,7 +5,7 @@
 
 #include <imgui.h>
 
-using namespace Fusion;
+using namespace fe;
 
 Application* Application::instance{nullptr};
 

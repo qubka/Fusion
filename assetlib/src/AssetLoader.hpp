@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fusion {
+namespace fe {
     struct AssetFile {
         char type[4];
         int version;
