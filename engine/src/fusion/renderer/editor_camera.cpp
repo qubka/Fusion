@@ -1,4 +1,5 @@
 #include "editor_camera.hpp"
+#include "fusion/input/input.hpp"
 
 using namespace fe;
 
@@ -9,8 +10,8 @@ EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : Per
 }
 
 void EditorCamera::update(float ts) {
-    if (/*Input::GetKey(Key::LeftAlt)*/ true) {
-        /*if (Input::GetMouseButton(Mouse::ButtonMiddle))
+    if (Input::GetKey(Key::LeftAlt)) {
+        if (Input::GetMouseButton(Mouse::ButtonMiddle))
             mousePan( Input::MouseDelta() * ts);
         else if (Input::GetMouseButton(Mouse::ButtonLeft))
             mouseRotate( Input::MouseDelta() * ts);
@@ -21,7 +22,7 @@ void EditorCamera::update(float ts) {
             if (scroll != 0.0f) {
                 mouseZoom(scroll * 0.1f);
             }
-        }*/
+        }
 
         setRotation(glm::quat{glm::vec3{pitch, yaw, 0}});
         setPosition(calculatePosition());

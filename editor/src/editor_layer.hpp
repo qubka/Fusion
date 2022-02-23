@@ -49,6 +49,9 @@ namespace fe {
         };
         SceneState sceneState = SceneState::Edit;
 
+    public:
+        ImTextureID offscreen;
+
         const EditorApp& app;
     };
 }

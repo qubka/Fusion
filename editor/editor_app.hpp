@@ -57,12 +57,9 @@ public:
 
     glm::vec3 meshPos = glm::vec3{0.0f, -1.5f, 0.0f};
 
-    EditorCamera camera{60, 0.1f, 1.0f, 2.0f};
+    EditorCamera camera{60, static_cast<float>(size.width) / size.height, 0.1f, 1000.0f};
 
     EditorApp(const CommandLineArgs& args) : OffscreenApplication{"Vulkan Example - Offscreen rendering", args} {
-        camera.setPerspective(60.0f, static_cast<float>(size.width) / size.height, 0.1f, 1000.0f);
-        camera.setRotation(glm::quat{glm::vec3{ -2.5f, 0.0f, 0.0f }});
-        camera.setPosition({ 0.0f, 1.0f, 0.0f });
         pushLayer(new EditorLayer{*this});
     }
 
@@ -287,8 +284,8 @@ public:
         buildOffscreenCommandBuffer();
         buildCommandBuffers();
 
-        //auto* layer = layers.getFront();
-        //dynamic_cast<EditorLayer*>(layer)->offscreen = ui.addTexture(offscreen.framebuffers[0].colors[0].sampler, offscreen.framebuffers[0].colors[0].view, vk::ImageLayout::eShaderReadOnlyOptimal);
+        auto* layer = layers.getFront();
+        dynamic_cast<EditorLayer*>(layer)->offscreen = ui.addTexture(offscreen.framebuffers[0].colors[0].sampler, offscreen.framebuffers[0].colors[0].view, vk::ImageLayout::eShaderReadOnlyOptimal);
     }
 
     void render() override {

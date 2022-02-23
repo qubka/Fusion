@@ -149,10 +149,7 @@ void Application::prepare() {
     setupFrameBuffer();
     setupUi();
 
-    for (auto* layer: layers) {
-        layer->onPrepare();
-        layer->onLoadAssets();
-    }
+    onLoadAssets();
 }
 
 void Application::setupDepthStencil() {
@@ -381,25 +378,13 @@ void Application::buildCommandBuffers() {
         const auto& cmdBuffer = commandBuffers[i];
         cmdBuffer.reset(vk::CommandBufferResetFlagBits::eReleaseResources);
         cmdBuffer.begin(cmdBufInfo);
-
-        for (auto* layer: layers) {
-            layer->onUpdateCommandBufferPreDraw(cmdBuffer);
-        }
-
+        onUpdateCommandBufferPreDraw(cmdBuffer);
         // Let child classes execute operations outside the renderpass, like buffer barriers or query pool operations
         renderPassBeginInfo.framebuffer = framebuffers[i];
         cmdBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-
-        for (auto* layer: layers) {
-            layer->onUpdateDrawCommandBuffer(cmdBuffer);
-        }
-
+        onUpdateDrawCommandBuffer(cmdBuffer);
         cmdBuffer.endRenderPass();
-
-        for (auto* layer: layers) {
-            layer->onUpdateCommandBufferPostDraw(cmdBuffer);
-        }
-
+        onUpdateCommandBufferPostDraw(cmdBuffer);
         cmdBuffer.end();
     }
 }
@@ -527,10 +512,7 @@ void Application::recreateSwapchain(const glm::uvec2& newSize) {
         ui.resize(size, framebuffers);
     }
 
-    // Notify derived class
-    for (auto* layer: layers) {
-        layer->onWindowResized();
-    }
+    onWindowResized();
 
     // Command buffers need to be recreated as they may store
     // references to the recreated frame buffer
@@ -538,9 +520,7 @@ void Application::recreateSwapchain(const glm::uvec2& newSize) {
     allocateCommandBuffers();
     buildCommandBuffers();
 
-    for (auto* layer: layers) {
-        layer->onViewChanged();
-    }
+    onViewChanged();
 }
 
 void Application::updateOverlay() {

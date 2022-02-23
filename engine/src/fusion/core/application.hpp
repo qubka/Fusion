@@ -50,6 +50,11 @@ namespace fe {
 
         void run();
 
+    public:
+        static const Application& Instance() { return *instance; }
+        const fe::KeyInput& getKeyInput() const { return window->getKeyInput(); }
+        const fe::MouseInput& getMouseInput() const { return window->getMouseInput(); }
+
     private:
         // Set to true when the debug marker extension is detected
         bool enableDebugMarkers{ false };
@@ -194,6 +199,19 @@ namespace fe {
 
         void drawCurrentCommandBuffer();
 
+        virtual void onUpdateCommandBufferPreDraw(const vk::CommandBuffer& cmdBuffer) {}
+        virtual void onUpdateDrawCommandBuffer(const vk::CommandBuffer& cmdBuffer) {}
+        virtual void onUpdateCommandBufferPostDraw(const vk::CommandBuffer& cmdBuffer) {}
+
+        virtual void onLoadAssets() {}
+        // Called when the window has been resized
+        // Can be overriden in derived class to recreate or rebuild resources attached to the frame buffer / swapchain
+        virtual void onWindowResized() {}
+        // Called when view change occurs
+        // Can be overriden in derived class to e.g. update uniform buffers
+        // Containing view dependant matrices
+        virtual void onViewChanged() {}
+
         // Start the main render loop
         void mainLoop();
 
@@ -207,7 +225,6 @@ namespace fe {
         // - Submits the text overlay (if enabled)
         // -
         void submitFrame();
-
     private:
         // OS specific
 #if defined(__ANDROID__)
