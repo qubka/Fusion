@@ -2,10 +2,7 @@
 
 using namespace vkx;
 
-DescriptorAllocator::DescriptorAllocator(const vk::Device& device) : device{device} {
-}
-
-DescriptorAllocator::~DescriptorAllocator() {
+void DescriptorAllocator::destroy() {
     //delete every pool held
     for (const auto& p : freePools) {
         device.destroyDescriptorPool(p);
@@ -103,10 +100,7 @@ void DescriptorAllocator::updateDescriptor(std::vector<vk::WriteDescriptorSet>& 
     device.updateDescriptorSets(static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
 }
 
-DescriptorLayoutCache::DescriptorLayoutCache(const vk::Device& device) : device{device} {
-}
-
-DescriptorLayoutCache::~DescriptorLayoutCache() {
+void DescriptorLayoutCache::destroy() {
     //delete every descriptor layout held
     for (const auto& [info, layout] : layoutCache) {
         device.destroyDescriptorSetLayout(layout, nullptr);
@@ -184,12 +178,6 @@ size_t DescriptorLayoutCache::DescriptorLayoutInfo::hash() const{
     }
 
     return seed;
-}
-
-DescriptorBuilder::DescriptorBuilder(DescriptorLayoutCache& cache, DescriptorAllocator& allocator) : cache{cache}, allocator{allocator} {
-}
-
-DescriptorBuilder::~DescriptorBuilder() {
 }
 
 DescriptorBuilder& DescriptorBuilder::bindBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags) {

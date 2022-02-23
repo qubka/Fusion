@@ -73,7 +73,6 @@ void UIOverlay::destroy() {
         if (!createInfo.renderPass) {
             context.device.destroyRenderPass(renderPass);
         }
-        context.device.freeCommandBuffers(commandPool, cmdBuffers);
         context.device.destroyCommandPool(commandPool);
         context.device.destroyFence(fence);
     }
@@ -303,108 +302,67 @@ void UIOverlay::prepareRenderPass() {
 }
 
 /** Update the command buffers to reflect UI changes */
-void UIOverlay::updateCommandBuffers() {
-    vk::CommandBufferBeginInfo cmdBufInfo{ vk::CommandBufferUsageFlagBits::eSimultaneousUse };
+void UIOverlay::draw(const vk::CommandBuffer& cmdBuffer) {
+    ImDrawData* imDrawData = ImGui::GetDrawData();
+    int32_t vertexOffset = 0;
+    int32_t indexOffset = 0;
 
-    vk::RenderPassBeginInfo renderPassBeginInfo;
-    renderPassBeginInfo.renderPass = renderPass;
-    renderPassBeginInfo.renderArea.extent = createInfo.size;
-    renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(createInfo.clearValues.size());
-    renderPassBeginInfo.pClearValues = createInfo.clearValues.data();
+    if (!imDrawData || imDrawData->CmdListsCount == 0) {
+        return;
+    }
 
     ImGuiIO& io = ImGui::GetIO();
 
-    const vk::Viewport viewport{ 0.0f, 0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, 1.0f };
-    const vk::Rect2D scissor{ {}, vk::Extent2D{ static_cast<uint32_t>(io.DisplaySize.x), static_cast<uint32_t>(io.DisplaySize.y) } };
-    // UI scale and translate via push constants
+    cmdBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
+    //cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, descriptorSet, {});
+
     pushConstBlock.scale = glm::vec2{2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y};
     pushConstBlock.translate = glm::vec2{-1.0f};
+    cmdBuffer.pushConstants(pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, vk::ArrayProxy<const PushConstBlock>{ pushConstBlock });
 
-    if (!cmdBuffers.empty()) {
-        context.trashAll<vk::CommandBuffer>(cmdBuffers,
-                                            [&](const std::vector<vk::CommandBuffer>& buffers) { context.device.freeCommandBuffers(commandPool, buffers); });
-        cmdBuffers.clear();
-    }
+    cmdBuffer.bindVertexBuffers(0, vertexBuffer.buffer, { 0 });
+    cmdBuffer.bindIndexBuffer(indexBuffer.buffer, 0, sizeof(ImDrawIdx) == 2 ? vk::IndexType::eUint16 : vk::IndexType::eUint32);
 
-    cmdBuffers = context.device.allocateCommandBuffers({ commandPool, vk::CommandBufferLevel::ePrimary, static_cast<uint32_t>(createInfo.framebuffers.size()) });
+    for (int32_t i = 0; i < imDrawData->CmdListsCount; i++) {
+        const ImDrawList* cmd_list = imDrawData->CmdLists[i];
+        for (int32_t j = 0; j < cmd_list->CmdBuffer.Size; j++) {
+            const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[j];
+            vk::Rect2D scissorRect;
+            scissorRect.offset.x = std::max(static_cast<int32_t>((pcmd->ClipRect.x)), 0);
+            scissorRect.offset.y = std::max(static_cast<int32_t>((pcmd->ClipRect.y)), 0);
+            scissorRect.extent.width = static_cast<uint32_t>(pcmd->ClipRect.z - pcmd->ClipRect.x);
+            scissorRect.extent.height = static_cast<uint32_t>((pcmd->ClipRect.w - pcmd->ClipRect.y));
+            cmdBuffer.setScissor(0, scissorRect);
 
-    for (size_t i = 0; i < cmdBuffers.size(); ++i) {
-        renderPassBeginInfo.framebuffer = createInfo.framebuffers[i];
+            // Bind DescriptorSet with font or user texture
+            vk::DescriptorSet descriptor[1] = { vk::DescriptorSet((VkDescriptorSet)pcmd->TextureId) };
+            cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, 1, descriptor, 0, nullptr);
 
-        const auto& cmdBuffer = cmdBuffers[i];
-        cmdBuffer.begin(cmdBufInfo);
+            cmdBuffer.drawIndexed(pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
 
-#if 0
-        if (vkx::debug::marker::active) {
-            vkx::debug::marker::beginRegion(cmdBuffer, "UI overlay", glm::vec4{1.0f, 0.94f, 0.3f, 1.0f});
+            indexOffset += pcmd->ElemCount;
         }
-#endif
-
-        cmdBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-        cmdBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
-        //cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, descriptorSet, {});
-        cmdBuffer.bindVertexBuffers(0, vertexBuffer.buffer, { 0 });
-        cmdBuffer.bindIndexBuffer(indexBuffer.buffer, 0, sizeof(ImDrawIdx) == 2 ? vk::IndexType::eUint16 : vk::IndexType::eUint32);
-        cmdBuffer.setViewport(0, viewport);
-        cmdBuffer.setScissor(0, scissor);
-
-        cmdBuffer.pushConstants(pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, vk::ArrayProxy<const PushConstBlock>{ pushConstBlock });
-
-        // Render commands
-        ImDrawData* imDrawData = ImGui::GetDrawData();
-        int32_t vertexOffset = 0;
-        int32_t indexOffset = 0;
-        for (int32_t j = 0; j < imDrawData->CmdListsCount; j++) {
-            const ImDrawList* cmd_list = imDrawData->CmdLists[j];
-            for (int32_t k = 0; k < cmd_list->CmdBuffer.Size; k++) {
-                const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[k];
-                vk::Rect2D scissorRect;
-                scissorRect.offset.x = std::max(static_cast<int32_t>((pcmd->ClipRect.x)), 0);
-                scissorRect.offset.y = std::max(static_cast<int32_t>((pcmd->ClipRect.y)), 0);
-                scissorRect.extent.width = static_cast<uint32_t>(pcmd->ClipRect.z - pcmd->ClipRect.x);
-                scissorRect.extent.height = static_cast<uint32_t>((pcmd->ClipRect.w - pcmd->ClipRect.y));
-                cmdBuffer.setScissor(0, scissorRect);
-
-                // Bind DescriptorSet with font or user texture
-                vk::DescriptorSet descriptor[1] = { vk::DescriptorSet((VkDescriptorSet)pcmd->TextureId) };
-                cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, 1, descriptor, 0, nullptr);
-
-                cmdBuffer.drawIndexed(pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
-                indexOffset += pcmd->ElemCount;
-            }
-            vertexOffset += cmd_list->VtxBuffer.Size;
-        }
-
-        // Add empty subpasses if requested
-        if (createInfo.subpassCount > 1) {
-            for (uint32_t j = 1; j < createInfo.subpassCount; j++) {
-                cmdBuffer.nextSubpass(vk::SubpassContents::eInline);
-            }
-        }
-
-        cmdBuffer.endRenderPass();
-#if 0 
-        if (vkx::debug::marker::active) {
-            vkx::debug::marker::endRegion(cmdBuffers[i]);
-        }
-#endif
-
-        cmdBuffer.end();
+        vertexOffset += cmd_list->VtxBuffer.Size;
     }
 }
 
 /** Update vertex and index buffer containing the imGui elements when required */
-void UIOverlay::update() {
+bool UIOverlay::update() {
     ImDrawData* imDrawData = ImGui::GetDrawData();
     bool updateCmdBuffers = false;
 
     if (!imDrawData) {
-        return;
+        return false;
     };
 
     // Note: Alignment is done inside buffer creation
     vk::DeviceSize vertexBufferSize = imDrawData->TotalVtxCount * sizeof(ImDrawVert);
     vk::DeviceSize indexBufferSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
+
+    // Update buffers only if vertex or index count has been changed compared to current buffer size
+    if ((vertexBufferSize == 0) || (indexBufferSize == 0)) {
+        return false;
+    }
 
     // Update buffers only if vertex or index count has been changed compared to current buffer size
 
@@ -458,33 +416,13 @@ void UIOverlay::update() {
 		indexBuffer.flush();
 	}
 
-    if (updateCmdBuffers) {
-        updateCommandBuffers(); // TODO: Update when dock move
-    }
+    return updateCmdBuffers;
 }
 
-void UIOverlay::resize(const vk::Extent2D& size, const std::vector<vk::Framebuffer>& framebuffers) {
+void UIOverlay::resize(const vk::Extent2D& size) {
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2{static_cast<float>(size.width), static_cast<float>(size.height)};
     createInfo.size = size;
-    createInfo.framebuffers = framebuffers;
-    updateCommandBuffers();
-}
-
-/** Submit the overlay command buffers to a queue */
-void UIOverlay::submit(const vk::Queue& queue, uint32_t bufferindex, vk::SubmitInfo submitInfo) const {
-    if (!visible) {
-        return;
-    }
-
-    submitInfo.pCommandBuffers = &cmdBuffers[bufferindex];
-    submitInfo.commandBufferCount = 1;
-
-    queue.submit(submitInfo, fence);
-    auto result = context.device.waitForFences(fence, VK_TRUE, UINT64_MAX);
-    if (result == vk::Result::eSuccess) {
-        context.device.resetFences(fence);
-    }
 }
 
 bool UIOverlay::header(const char* caption) const {

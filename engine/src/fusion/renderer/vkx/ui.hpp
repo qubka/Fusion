@@ -21,7 +21,7 @@ namespace vkx { namespace ui {
 struct UIOverlayCreateInfo {
     vk::Queue copyQueue;
     vk::RenderPass renderPass;
-    std::vector<vk::Framebuffer> framebuffers;
+    //std::vector<vk::Framebuffer> framebuffers;
     vk::Format colorformat;
     vk::Format depthformat;
     vk::Extent2D size;
@@ -61,14 +61,13 @@ private:
     void prepareResources();
     void preparePipeline();
     void prepareRenderPass();
-    void updateCommandBuffers();
     static void setStyleColors();
 
 public:
     bool visible{ true };
     float scale{ 1.0f };
 
-    std::vector<vk::CommandBuffer> cmdBuffers;
+    //std::vector<vk::CommandBuffer> cmdBuffers;
 
     UIOverlay(const vkx::Context& context) : context(context) {}
     ~UIOverlay();
@@ -76,10 +75,9 @@ public:
     void create(const UIOverlayCreateInfo& createInfo);
     void destroy();
 
-    void update();
-    void resize(const vk::Extent2D& newSize, const std::vector<vk::Framebuffer>& framebuffers);
-
-    void submit(const vk::Queue& queue, uint32_t bufferindex, vk::SubmitInfo submitInfo) const;
+    bool update();
+    void draw(const vk::CommandBuffer& cmdBuffer);
+    void resize(const vk::Extent2D& newSize);
 
     bool header(const char* caption) const;
     bool checkBox(const char* caption, bool* value) const;

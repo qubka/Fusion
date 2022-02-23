@@ -61,10 +61,10 @@ struct OffscreenRenderer {
     vk::DescriptorPool descriptorPool;
 
     OffscreenRenderer(const vkx::Context& context)
-        : context(context)
-        , device(context.device)
-        , queue(context.queue)
-        , colorFormats({ vk::Format::eB8G8R8A8Unorm }) {}
+        : context{context}
+        , device{context.device}
+        , queue{context.queue}
+        , colorFormats{{ vk::Format::eB8G8R8A8Unorm }} {}
 
     void destroy() {
         queue.waitIdle();
@@ -77,8 +77,8 @@ struct OffscreenRenderer {
 
     void prepare() {
         cmdPool = context.getCommandPool();
-        semaphores.renderComplete = device.createSemaphore(vk::SemaphoreCreateInfo());
-        semaphores.renderStart = device.createSemaphore(vk::SemaphoreCreateInfo());
+        semaphores.renderComplete = device.createSemaphore({ });
+        semaphores.renderStart = device.createSemaphore({ });
         prepareRenderPass();
         prepareFramebuffer();
         prepareSampler();

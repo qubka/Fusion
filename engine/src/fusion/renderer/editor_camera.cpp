@@ -6,7 +6,7 @@ using namespace fe;
 EditorCamera::EditorCamera() : PerspectiveCamera{45.0f, 1.778f, 0.1f, 1000.0f} {
 }
 
-EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : PerspectiveCamera{fov,aspect,near,far} {
+EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : PerspectiveCamera{fov, aspect, near, far} {
 }
 
 void EditorCamera::update(float ts) {

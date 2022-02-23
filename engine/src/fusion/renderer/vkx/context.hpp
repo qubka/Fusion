@@ -229,8 +229,8 @@ public:
         dynamicDispatch.init(instance, &vkGetInstanceProcAddr);
     }
 
-    void createDevice(const vk::SurfaceKHR& surface = nullptr) {
-        pickDevice(surface);
+    void createDevice(const vk::SurfaceKHR& surf = nullptr) {
+        pickDevice(surf);
         buildDevice();
         dynamicDispatch.init(instance, &vkGetInstanceProcAddr, device, &vkGetDeviceProcAddr);
 
@@ -239,11 +239,16 @@ public:
             debug::marker::setup(instance, device);
         }
 
-        pipelineCache = device.createPipelineCache(vk::PipelineCacheCreateInfo());
+        pipelineCache = device.createPipelineCache({  });
         // Find a queue that supports graphics operations
 
         // Get the graphics queue
         queue = device.getQueue(queueIndices.graphics, 0);
+
+        // Save our surface
+        if (surf) {
+            surface = surf;
+        }
     }
 
     void destroy() {
@@ -265,6 +270,10 @@ public:
         if (enableValidation) {
             debug::freeDebugCallback(instance);
         }
+        if (surface) {
+            instance.destroySurfaceKHR(surface);
+        }
+
         instance.destroy();
     }
 
@@ -496,6 +505,8 @@ public:
     std::vector<vk::PhysicalDevice> physicalDevices;
     // Physical device (GPU) that Vulkan will ise
     vk::PhysicalDevice physicalDevice;
+    // Opaque handle to a surface object
+    vk::SurfaceKHR surface;
 
     // Queue family properties
     std::vector<vk::QueueFamilyProperties> queueFamilyProperties;
@@ -515,6 +526,12 @@ public:
     // Helper for accessing functionality not available in the statically linked Vulkan library
     vk::DispatchLoaderDynamic dynamicDispatch;
 
+    struct SwapChainSupportDetails {
+        vk::SurfaceCapabilitiesKHR capabilities;
+        std::vector<vk::SurfaceFormatKHR> formats;
+        std::vector<vk::PresentModeKHR> presentModes;
+    };
+
     struct QueueIndices {
         uint32_t graphics{ VK_QUEUE_FAMILY_IGNORED };
         uint32_t transfer{ VK_QUEUE_FAMILY_IGNORED };
@@ -532,6 +549,14 @@ public:
         }
         return s_cmdPool;
     }
+
+    SwapChainSupportDetails getSwapChainSupport()const {
+        SwapChainSupportDetails details;
+        details.capabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface);
+        details.formats = physicalDevice.getSurfaceFormatsKHR(surface);
+        details.presentModes = physicalDevice.getSurfacePresentModesKHR(surface);
+        return details;
+    };
 
     void destroyCommandPool() const {
         if (s_cmdPool) {

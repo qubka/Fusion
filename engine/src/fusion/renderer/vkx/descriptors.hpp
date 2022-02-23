@@ -22,13 +22,13 @@ namespace vkx {
                 };
         };
 
-        DescriptorAllocator(const vk::Device& device);
-        ~DescriptorAllocator();
+        DescriptorAllocator(const vk::Device& device) : device{device} {};
 
         vk::DescriptorPool grabPool();
         void resetPools();
         bool allocateDescriptor(const vk::DescriptorSetLayout& layout, vk::DescriptorSet& set);
         void updateDescriptor(std::vector<vk::WriteDescriptorSet>& writes) const;
+        void destroy();
 
     private:
         vk::DescriptorPool createPool(uint32_t count, vk::DescriptorPoolCreateFlags flags) const;
@@ -45,10 +45,10 @@ namespace vkx {
 
     class DescriptorLayoutCache {
     public:
-        DescriptorLayoutCache(const vk::Device& device);
-        ~DescriptorLayoutCache();
+        DescriptorLayoutCache(const vk::Device& device) : device{device} {};
 
         vk::DescriptorSetLayout createDescriptorLayout(vk::DescriptorSetLayoutCreateInfo& info);
+        void destroy();
 
         struct DescriptorLayoutInfo {
             //good idea to turn this into an inlined array
@@ -68,8 +68,8 @@ namespace vkx {
 
     class DescriptorBuilder {
     public:
-        DescriptorBuilder(DescriptorLayoutCache& cache, DescriptorAllocator& allocator);
-        ~DescriptorBuilder();
+        DescriptorBuilder(DescriptorLayoutCache& cache, DescriptorAllocator& allocator)
+            : cache{cache}, allocator{allocator} {};
 
         DescriptorBuilder& bindBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
         DescriptorBuilder& bindImage(uint32_t binding, vk::DescriptorImageInfo* imageInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
