@@ -5,17 +5,17 @@
 
 namespace fe {
 
-    struct  KeyEvent : public Event {
+    struct KeyEvent : public Event {
         KeyCode keycode;
     };
 
-    struct  KeyPressedEvent : public KeyEvent {
+    struct KeyPressedEvent : public KeyEvent {
         bool repeat;
     };
 
-    struct  KeyReleasedEvent : public KeyEvent {
+    struct KeyReleasedEvent : public KeyEvent {
     };
 
-    struct  KeyTypedEvent : public KeyEvent {
+    struct KeyTypedEvent : public KeyEvent {
     };
 }

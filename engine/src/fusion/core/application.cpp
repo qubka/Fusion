@@ -64,10 +64,7 @@ void Application::run() {
     try {
 // Android initialization is handled in APP_CMD_INIT_WINDOW event
 #if !defined(__ANDROID__)
-        setupWindow();
-        initVulkan();
-        setupSwapchain();
-        prepare();
+        mainInit();
 #endif
         mainLoop();
 
@@ -77,6 +74,13 @@ void Application::run() {
     } catch(const std::system_error& err) {
         std::cerr << err.what() << std::endl;
     }
+}
+
+void Application::mainInit() {
+    setupWindow();
+    initVulkan();
+    setupSwapchain();
+    prepare();
 }
 
 void Application::initVulkan() {
@@ -145,7 +149,10 @@ void Application::prepare() {
     setupFrameBuffer();
     setupUi();
 
-    onLoadAssets();
+    for (auto* layer: layers) {
+        layer->onPrepare();
+        layer->onLoadAssets();
+    }
 }
 
 void Application::setupDepthStencil() {
@@ -374,13 +381,25 @@ void Application::buildCommandBuffers() {
         const auto& cmdBuffer = commandBuffers[i];
         cmdBuffer.reset(vk::CommandBufferResetFlagBits::eReleaseResources);
         cmdBuffer.begin(cmdBufInfo);
-        onUpdateCommandBufferPreDraw(cmdBuffer);
+
+        for (auto* layer: layers) {
+            layer->onUpdateCommandBufferPreDraw(cmdBuffer);
+        }
+
         // Let child classes execute operations outside the renderpass, like buffer barriers or query pool operations
         renderPassBeginInfo.framebuffer = framebuffers[i];
         cmdBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-        onUpdateDrawCommandBuffer(cmdBuffer);
+
+        for (auto* layer: layers) {
+            layer->onUpdateDrawCommandBuffer(cmdBuffer);
+        }
+
         cmdBuffer.endRenderPass();
-        onUpdateCommandBufferPostDraw(cmdBuffer);
+
+        for (auto* layer: layers) {
+            layer->onUpdateCommandBufferPostDraw(cmdBuffer);
+        }
+
         cmdBuffer.end();
     }
 }
@@ -463,6 +482,10 @@ void Application::draw() {
 
 void Application::render() {
     draw();
+
+    for (auto* layer: layers) {
+        layer->onRender();
+    }
 }
 
 void Application::update(float deltaTime) {
@@ -505,7 +528,9 @@ void Application::recreateSwapchain(const glm::uvec2& newSize) {
     }
 
     // Notify derived class
-    onWindowResized();
+    for (auto* layer: layers) {
+        layer->onWindowResized();
+    }
 
     // Command buffers need to be recreated as they may store
     // references to the recreated frame buffer
@@ -513,7 +538,9 @@ void Application::recreateSwapchain(const glm::uvec2& newSize) {
     allocateCommandBuffers();
     buildCommandBuffers();
 
-    onViewChanged();
+    for (auto* layer: layers) {
+        layer->onViewChanged();
+    }
 }
 
 void Application::updateOverlay() {
@@ -561,10 +588,7 @@ void Application::onAppCmd(int32_t cmd) {
     switch (cmd) {
         case APP_CMD_INIT_WINDOW:
             if (vkx::android::androidApp->window != nullptr) {
-                setupWindow();
-                initVulkan();
-                setupSwapchain();
-                prepare();
+                init();
             }
             break;
         case APP_CMD_LOST_FOCUS:

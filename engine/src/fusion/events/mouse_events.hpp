@@ -5,27 +5,27 @@
 
 namespace fe {
 
-    struct  MouseMovedEvent : public Event {
+    struct MouseMovedEvent : public Event {
         glm::vec2 pos;
     };
 
-    struct  MouseScrollEvent : public Event {
+    struct MouseScrollEvent : public Event {
         glm::vec2 offset;
     };
 
-    struct  MouseCursorEnterEvent : public Event {
+    struct MouseCursorEnterEvent : public Event {
     };
 
-    struct  MouseCursorLeftEvent : public Event {
+    struct MouseCursorLeftEvent : public Event {
     };
 
-    struct  MouseButtonEvent : public Event {
+    struct MouseButtonEvent : public Event {
         MouseCode button;
     };
 
-    struct  MouseButtonPressedEvent : public MouseButtonEvent {
+    struct MouseButtonPressedEvent : public MouseButtonEvent {
     };
 
-    struct  MouseButtonReleasedEvent : public MouseButtonEvent {
+    struct MouseButtonReleasedEvent : public MouseButtonEvent {
     };
 }

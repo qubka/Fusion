@@ -1,0 +1,39 @@
+#include "mesh.hpp"
+
+using namespace vkx;
+
+Mesh::Mesh(const Context& context, const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer) {
+    vertexCount = static_cast<uint32_t>(vertexBuffer.size());
+    assert(vertexCount >= 3 && "Vertex count must be at least 3");
+
+    // Vertex buffer
+    vertices = context.stageToDeviceBuffer(vk::BufferUsageFlagBits::eVertexBuffer, vertexBuffer);
+
+    indexCount = static_cast<uint32_t>(indexBuffer.size());
+
+    // Index buffer
+    indices = indexCount > 0 ? context.stageToDeviceBuffer(vk::BufferUsageFlagBits::eIndexBuffer, indexBuffer) : Buffer{};
+}
+
+void Mesh::destroy() {
+    vertices.destroy();
+    indices.destroy();
+}
+
+void Mesh::draw(const vk::CommandBuffer& commandBuffer) const {
+    if (indices) {
+        commandBuffer.drawIndexed(indexCount, 1, 0, 0, 0);
+    } else {
+        commandBuffer.draw(vertexCount, 1, 0, 0);
+    }
+}
+
+void Mesh::bind(const vk::CommandBuffer& commandBuffer) const {
+    vk::Buffer buffers[] = {vertices.buffer };
+    vk::DeviceSize offsets[] = { 0 };
+    commandBuffer.bindVertexBuffers(0, 1, buffers, offsets);
+
+    if (indices) {
+        commandBuffer.bindIndexBuffer(indices.buffer, 0, vk::IndexType::eUint32);
+    }
+}

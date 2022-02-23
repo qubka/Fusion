@@ -15,7 +15,6 @@
 int main(int argc, char** argv);
 
 namespace fe {
-
     struct CommandLineArgs {
         int count{ 0 };
         char** args{ nullptr };
@@ -49,10 +48,7 @@ namespace fe {
         virtual ~Application();
         FE_NONCOPYABLE(Application);
 
-    public:
         void run();
-        // Called if the window is resized and some resources have to be recreatesd
-        void recreateSwapchain(const glm::uvec2& newSize);
 
     private:
         // Set to true when the debug marker extension is detected
@@ -99,10 +95,12 @@ namespace fe {
         // List of available frame buffers (same as number of swap chain images)
         std::vector<vk::Framebuffer> framebuffers;
         // Active frame buffer index
-        uint32_t currentBuffer = 0;
+        uint32_t currentBuffer{ 0 };
         // Descriptor set pool
         vk::DescriptorPool descriptorPool;
 
+        // Called if the window is resized and some resources have to be recreatesd
+        void recreateSwapchain(const glm::uvec2& newSize);
         void addRenderWaitSemaphore(const vk::Semaphore& semaphore, const vk::PipelineStageFlags& waitStages = vk::PipelineStageFlagBits::eBottomOfPipe);
 
         std::vector<vk::Semaphore> renderWaitSemaphores;
@@ -162,6 +160,9 @@ namespace fe {
         void pushLayer(Layer* layer) { layers.pushFront(layer); }
         void pushOverlay(Layer* layer) { layers.pushBack(layer); }
 
+        // Initialize application
+        void mainInit();
+
         // Setup the vulkan instance, enable required extensions and connect to the physical device (GPU)
         virtual void initVulkan();
         virtual void setupSwapchain();
@@ -191,22 +192,7 @@ namespace fe {
         virtual void onPreSetupUIOverlay(vkx::ui::UIOverlayCreateInfo& uiCreateInfo) {}
         virtual void onPostSetupUIOverlay() {}
 
-        virtual void onUpdateCommandBufferPreDraw(const vk::CommandBuffer& commandBuffer) {}
-        virtual void onUpdateDrawCommandBuffer(const vk::CommandBuffer& commandBuffer) {}
-        virtual void onUpdateCommandBufferPostDraw(const vk::CommandBuffer& commandBuffer) {}
-
-        // Called when view change occurs
-        // Can be overriden in derived class to e.g. update uniform buffers
-        // Containing view dependant matrices
-        virtual void onViewChanged() {}
-
-        // Called when the window has been resized
-        // Can be overriden in derived class to recreate or rebuild resources attached to the frame buffer / swapchain
-        virtual void onWindowResized() {}
-
         void drawCurrentCommandBuffer();
-
-        virtual void onLoadAssets() {}
 
         // Start the main render loop
         void mainLoop();

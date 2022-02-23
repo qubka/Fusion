@@ -139,7 +139,11 @@ glm::vec4 Window::getViewport() {
 void Window::PosCallback(GLFWwindow* handle, int x, int y) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.eventQueue.submit(new fe::WindowMovedEvent{{}, {x, y}});
+    glm::ivec2 pos {x, y};
+
+    window.position = pos;
+
+    window.eventQueue.submit(new fe::WindowMovedEvent{{}, pos});
 }
 
 void Window::SizeCallback(GLFWwindow* handle, int width, int height) {

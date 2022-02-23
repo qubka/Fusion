@@ -8,10 +8,11 @@ namespace fe {
 
     class EventQueue {
         typedef std::queue<Event*> Queue;
+        
     public:
         EventQueue() = default;
         ~EventQueue() {
-            free();
+            clean();
         }
 
         template<typename EventType>
@@ -40,7 +41,7 @@ namespace fe {
             return nullptr;
         }
 
-        void free() {
+        void clean() {
             for (auto [index, queue] : events) {
                 while(!queue->empty()) {
                     auto* event = queue->front();

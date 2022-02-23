@@ -47,13 +47,14 @@ namespace glfw {
             glfwSetWindowTitle(window, title.c_str());
         }
 
+        const glm::ivec2& getPosition() const { return position; }
         void setSizeLimits(const glm::uvec2& minSize, const glm::uvec2& maxSize = {}) {
             glfwSetWindowSizeLimits(window, minSize.x, minSize.y, (maxSize.x != 0) ? maxSize.x : minSize.x, (maxSize.y != 0) ? maxSize.y : minSize.y);
         }
 
         void runLoop(const std::function<void()>& frameHandler) override {
             while (!shouldClose()) {
-                eventQueue.free();
+                eventQueue.clean();
                 keyInput.onUpdate();
                 mouseInput.onUpdate();
                 glfwPollEvents();
@@ -83,8 +84,8 @@ namespace glfw {
         bool minimize;
 
         fe::EventQueue eventQueue;
-        fe::KeyInput keyInput {};  //! use all possible keymaps
-        fe::MouseInput mouseInput {}; //! use all possible keymaps
+        fe::KeyInput keyInput{};  //! use all possible keymaps
+        fe::MouseInput mouseInput{}; //! use all possible keymaps
 
         void initGLFW();
         void initWindow(bool fullscreen);

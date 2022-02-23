@@ -4,7 +4,7 @@
 
 namespace fe {
 
-    struct  TagComponent {
+    struct TagComponent {
         std::string tag;
 
         std::string& operator*() { return tag; }
@@ -12,7 +12,7 @@ namespace fe {
         operator std::string() const { return tag; }
     };
 
-    struct  TransformComponent {
+    struct TransformComponent {
         glm::vec3 translation{0};
         glm::vec3 rotation{0};
         glm::vec3 scale{1.0f};
@@ -30,11 +30,11 @@ namespace fe {
     };
 
     class Mesh;
-    struct  MeshRendererComponent {
+    struct MeshRendererComponent {
         std::shared_ptr<Mesh> mesh;
     };
 
-    /*struct  TranslateComponent {
+    /*struct TranslateComponent {
         glm::mat4 transform{1.0f};
 
         glm::mat4& operator*() { return transform; }
@@ -42,7 +42,7 @@ namespace fe {
         operator glm::mat4() const { return transform; }
     };
 
-    struct  PositionComponent {
+    struct PositionComponent {
         glm::vec3 position{0};
 
         glm::vec3& operator*() { return position; }
@@ -50,7 +50,7 @@ namespace fe {
         operator glm::vec3() const { return position; }
     };
 
-    struct  RotationComponent {
+    struct RotationComponent {
         glm::quat rotation{1, 0, 0, 0};
 
         glm::quat& operator*() { return rotation; }
@@ -58,7 +58,7 @@ namespace fe {
         operator glm::quat() const { return rotation; }
     };
 
-    struct  ScaleComponent {
+    struct ScaleComponent {
         glm::vec3 scale{1.0f};
 
         glm::vec3& operator*() { return scale; }
@@ -66,7 +66,7 @@ namespace fe {
         operator glm::vec3() const { return scale; }
     };*/
 
-    struct  CameraComponent {
+    struct CameraComponent {
         SceneCamera camera;
         bool primary{true};
         bool fixedAspectRatio{false};

@@ -12,8 +12,8 @@ namespace fe {
         ~MouseInput() = default;
 
         void onUpdate() override {
-            delta = vec2::zero;
-            scroll = vec2::zero;
+            delta = {};
+            scroll = {};
             BaseInput::onUpdate();
         };
 
