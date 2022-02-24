@@ -22,7 +22,8 @@ namespace vkx {
                 };
         };
 
-        DescriptorAllocator(const vk::Device& device) : device{device} {};
+        DescriptorAllocator(const vk::Device& device)
+            : device{device} {};
 
         vk::DescriptorPool grabPool();
         void resetPools();
@@ -45,7 +46,8 @@ namespace vkx {
 
     class DescriptorLayoutCache {
     public:
-        DescriptorLayoutCache(const vk::Device& device) : device{device} {};
+        DescriptorLayoutCache(const vk::Device& device)
+            : device{device} {};
 
         vk::DescriptorSetLayout createDescriptorLayout(vk::DescriptorSetLayoutCreateInfo& info);
         void destroy();

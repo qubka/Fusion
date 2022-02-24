@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fusion/renderer/glfw/window.hpp"
 #include "layer_stack.hpp"
+#include "command_line.hpp"
 
 #include "fusion/renderer/vkx/helpers.hpp"
 #include "fusion/renderer/vkx/filesystem.hpp"
@@ -11,38 +11,17 @@
 #include "fusion/renderer/vkx/texture.hpp"
 #include "fusion/renderer/vkx/swapchain.hpp"
 #include "fusion/renderer/vkx/ui.hpp"
+#include "fusion/renderer/vkx/benchmark.hpp"
 #include "fusion/renderer/renderer.hpp"
+#if defined(__ANDROID__)
+#include "fusion/renderer/android/window.hpp"
+#else
+#include "fusion/renderer/glfw/window.hpp"
+#endif
 
 int main(int argc, char** argv);
 
 namespace fe {
-    struct CommandLineArgs {
-        int count{ 0 };
-        char** args{ nullptr };
-
-        const char* operator[](int index) const {
-            assert(index < count && "Invalid argument index");
-            return args[index];
-        }
-    };
-
-    struct UpdateOperation {
-        const vk::Buffer buffer;
-        const vk::DeviceSize size;
-        const vk::DeviceSize offset;
-        const uint32_t* data;
-
-        template <typename T>
-        UpdateOperation(const vk::Buffer& buffer, const T& data, vk::DeviceSize offset = 0)
-                : buffer{buffer}
-                , size{sizeof(T)}
-                , offset{offset}
-                , data{reinterpret_cast<uint32_t*>(&data)} {
-            assert(0 == (sizeof(T) % 4));
-            assert(0 == (offset % 4));
-        }
-    };
-
     class Application {
     protected:
         Application(std::string title = "Fusion", CommandLineArgs args = {});
@@ -53,17 +32,17 @@ namespace fe {
 
     public:
         static const Application& Instance() { return *instance; }
-        const fe::KeyInput& getKeyInput() const { return window->getKeyInput(); }
-        const fe::MouseInput& getMouseInput() const { return window->getMouseInput(); }
         fe::Window& getWindow() const { return *window; }
 
     private:
-        // Set to true when the debug marker extension is detected
-        bool enableDebugMarkers{ false };
         // fps timer (one second interval)
-        float fpsTimer { 0.0f };
+        float fpsTimer{ 0.0f };
         // Get window title with example name, device, et.
         std::string getWindowTitle();
+        std::string title;
+        // Default window size
+        vk::Extent2D size{ 1280, 720 };
+
         // Used to store app singleton
         static Application* instance;
         friend int ::main(int argc, char** argv);
@@ -72,14 +51,16 @@ namespace fe {
         /** @brief Example settings that can be changed e.g. by command line arguments */
         struct Settings {
             /** @brief Activates validation layers (and message output) when set to true */
-            bool validation { false };
+            bool validation{ false };
             /** @brief Set to true if fullscreen mode has been requested via command line */
-            bool fullscreen { false };
+            bool fullscreen{ false };
             /** @brief Set to true if v-sync will be forced for the swapchain */
-            bool vsync { false };
+            bool vsync{ false };
             /** @brief Enable UI overlay */
-            bool overlay { true };
+            bool overlay{ true };
         } settings;
+
+        vkx::Benchmark benchmark;
 
         // Last frame time, measured using a high performance timer (if available)
         float frameTimer{ 0.0015f };
@@ -99,11 +80,7 @@ namespace fe {
 
     protected:
         uint32_t version = VK_MAKE_VERSION(1, 1, 0);
-        vk::Extent2D size{ 1280, 720 };
-
-        std::string title;
-
-        CommandLineArgs commandLineArgs;
+        CommandLineParser commandLineParser;
 
         LayerStack layers;
         void pushLayer(Layer* layer) { layers.pushFront(layer); }
@@ -130,6 +107,8 @@ namespace fe {
         static int32_t handle_input_event(android_app* app, AInputEvent* event);
         static void handle_app_cmd(android_app* app, int32_t cmd);
         void onAppCmd(int32_t cmd);
+#elif defined(_WIN32)
+        void setupConsole(std::string title);
 #endif
         Window* window{ nullptr };
     };

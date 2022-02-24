@@ -32,7 +32,7 @@ struct Framebuffer {
         }
         if (framebuffer) {
             device.destroyFramebuffer(framebuffer);
-            framebuffer = vk::Framebuffer();
+            framebuffer = vk::Framebuffer{};
         }
     }
 

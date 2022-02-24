@@ -11,6 +11,7 @@ ContentBrowserPanel::ContentBrowserPanel() : currentDirectory{getAssetPath()} {
 void ContentBrowserPanel::onImGui() {
     ImGui::Begin("Content Browser");
 
+    //TODO: FIXME
     if (currentDirectory != std::filesystem::path(getAssetPath())) {
         if (ImGui::Button("\uF112")) {
             currentDirectory = currentDirectory.parent_path();
@@ -22,7 +23,7 @@ void ContentBrowserPanel::onImGui() {
     float cellSize = thumbnailSize + padding;
 
     float panelWidth = ImGui::GetContentRegionAvail().x;
-    int columnCount = (int)(panelWidth / cellSize);
+    int columnCount = static_cast<int>(panelWidth / cellSize);
     if (columnCount < 1)
         columnCount = 1;
 

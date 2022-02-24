@@ -62,6 +62,7 @@ endif()
 # defines
 target_compile_definitions(${PROJECT_NAME} PUBLIC FE_DEBUG)
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLFW_INCLUDE_VULKAN)
+#target_compile_definitions(${PROJECT_NAME} PUBLIC VULKAN_HPP_DISABLE_ENHANCED_MODE)
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLM_FORCE_DEPTH_ZERO_TO_ONE)
 
 add_dependencies(${PROJECT_NAME} Shaders)

@@ -14,16 +14,6 @@ namespace android {
         ~Window() override = default;
 
         void* getNativeWindow() override { return androidApp->window; }
-        int getWidth() override { return width; }
-        int getHeight() override { return height; }
-        glm::uvec2 getSize() override { return { width, height }; }
-        float getAspect() override { return aspect; }
-        const std::string& getTitle() override { return title; }
-        glm::vec4 getViewport() override;
-
-        bool isMinimized() override { return focused; }
-        void setMinimized(bool flag) override { focused = flag; }
-
         bool shouldClose() override;
         void shouldClose(bool flag) override { if (flag) ANativeActivity_finish(androidApp->state->activity); }
 
@@ -40,12 +30,7 @@ namespace android {
         int32_t onInput(AInputEvent* event);
 
     private:
-        //ANativeWindow* window;
-        int width;
-        int height;
-        float aspect;
         bool focused;
-        std::string title;
 
         fe::EventQueue eventQueue;
         fe::KeyInput keyInput;

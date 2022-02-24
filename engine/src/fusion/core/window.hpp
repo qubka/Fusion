@@ -7,20 +7,29 @@ namespace fe {
 
     class Window {
     public:
-        Window() = default;
+        Window(int width, int height)
+            : width{width}
+            , height{height}
+            , minimize{false} {
+            assert(width >= 0 && height >= 0 && "Width or height cannot be negative");
+        }
         virtual ~Window() = default;
         FE_NONCOPYABLE(Window);
 
-        virtual void* getNativeWindow() = 0;
-        virtual int getWidth() = 0;
-        virtual int getHeight() = 0;
-        virtual glm::uvec2 getSize() = 0;
-        virtual float getAspect() = 0;
-        virtual const std::string& getTitle() = 0;
-        virtual glm::vec4 getViewport() = 0;
+        int getWidth() const { return width; };
+        int getHeight() const { return height; };
+        bool isMinimized() const { return minimize; };
+        void setMinimized(bool flag) { minimize = flag; };
 
-        virtual bool isMinimized() = 0;
-        virtual void setMinimized(bool flag) = 0;
+        float getAspect() const { return static_cast<float>(getWidth()) / static_cast<float>(getHeight()); }
+        glm::uvec2 getSize() const { return {getWidth(), getHeight()}; }
+#if defined(VULKAN_HPP)
+        glm::vec4 getViewport() const { return { 0, 0, getWidth(), getHeight() }; }
+        vk::Extent2D getExtent() const { return {static_cast<uint32_t>(getWidth()), static_cast<uint32_t>(getHeight())}; }
+#else
+        glm::vec4 Window::getViewport() const { return { 0, getHeight(), getWidth(), -getHeight() }; } // vertical flip is required
+#endif
+        virtual void* getNativeWindow() = 0;
 
         virtual bool shouldClose() = 0;
         virtual void shouldClose(bool flag) = 0;
@@ -30,5 +39,10 @@ namespace fe {
         virtual MouseInput& getMouseInput() = 0;
 
         virtual void runLoop(const std::function<void()>& frameHandler) = 0;
+
+    protected:
+        int width;
+        int height;
+        bool minimize;
     };
 }

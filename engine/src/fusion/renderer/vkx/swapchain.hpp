@@ -18,42 +18,13 @@ struct SwapChainImage {
 
 using FramebufferAttachment = Image;
 
-class SwapChain {
+struct SwapChain {
     using Attachment = FramebufferAttachment;
-    SwapChain(const vkx::Context& context)
-        : context{context} {};
-public:
-    ~SwapChain() { destroy(); }
-    SwapChain(const SwapChain& swapChain) = delete;
 
-public:
-    const vk::Framebuffer& getFrameBuffer(size_t index) const { return framebuffers[index]; };
-    const vk::SwapchainKHR& getSwapChain() const { return swapChain; };
-    const vk::ImageView& getImageView(size_t index) const { return images[index].view; };
-    const vk::Format& getColorFormat() const { return colorFormat; };
-    const vk::Format& getDepthFormat() const { return depthFormat; };
-    const vk::Extent2D& getSurfaceExtent() const { return surfaceExtent; };
-    //size_t imageCount() const { return swapChainImages.size(); };
-
-    vk::Result acquireNextImage(uint32_t& imageIndex) const;
-    vk::Result submitCommandBuffers(const vk::CommandBuffer& buffers, const uint32_t& imageIndex);
-
-    /**
-    * Create the swapchain and get its images with given width and height
-    *
-    * @param width Pointer to the width of the swapchain (may be adjusted to fit the requirements of the swapchain)
-    * @param height Pointer to the height of the swapchain (may be adjusted to fit the requirements of the swapchain)
-    * @param vsync (Optional) Can be used to force vsync-ed rendering (by using VK_PRESENT_MODE_FIFO_KHR as presentation mode)
-    */
-    static SwapChain* create(const vkx::Context& context, const vk::Extent2D& size, const vk::RenderPass& renderPass, bool vsync, const vk::SwapchainKHR& oldSwapChain = {nullptr});
-
-private:
     const vkx::Context& context;
     const vk::Device& device{ context.device };
     const vk::Queue& queue{ context.queue };
-
-    vk::Extent2D surfaceExtent;
-
+    vk::Extent2D extent;
     vk::SwapchainKHR swapChain;
     std::vector<SwapChainImage> images;
     vk::Format colorFormat { vk::Format::eB8G8R8A8Unorm };
@@ -62,14 +33,33 @@ private:
     std::vector<vk::Semaphore> renderFinishedSemaphores;
     std::vector<vk::Fence> inFlightFences;
     std::vector<vk::Fence*> imagesInFlight;
+    uint32_t imageCount{ 0 };
     uint32_t currentFrame{ 0 };
 
     Attachment depthStencil;
     vk::Format depthFormat { vk::Format::eUndefined };
 
-    void destroy();
+    SwapChain(const vkx::Context& context)
+            : context{context} {};
 
-    void createSwapChain(const vk::Extent2D& size, const vk::SwapchainKHR& oldSwapChain, bool vsync);
+    vk::Result acquireNextImage(uint32_t& imageIndex) const;
+    vk::Result submitCommandBuffers(const vk::CommandBuffer& buffers, const uint32_t& imageIndex);
+
+    // Creates an os specific surface
+    // Tries to find a graphics and a present queue
+    void create(const vk::Extent2D& size, const vk::RenderPass& renderPass, bool vsync) {
+        createSwapChain(size, vsync);
+        createImages();
+        createDepthStencil();
+        createFramebuffers(renderPass);
+        createSyncObjects();
+    }
+
+    // Free all Vulkan resources used by the swap chain
+    void destroy(const vk::SwapchainKHR& oldSwapChain = {nullptr});
+
+private:
+    void createSwapChain(const vk::Extent2D& size, bool vsync);
     void createImages();
     void createDepthStencil();
     void createFramebuffers(const vk::RenderPass& renderPass);
@@ -77,7 +67,7 @@ private:
 
     static vk::SurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
     static vk::PresentModeKHR chooseSwapPresentMode(bool vsync, const std::vector<vk::PresentModeKHR>& availablePresentModes);
-    static vk::Extent2D chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const vk::Extent2D& current);
+    static vk::Extent2D chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const vk::Extent2D& size);
 
 public:
     static constexpr int MAX_FRAMES_IN_FLIGHT = 2;

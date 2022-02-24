@@ -6,10 +6,8 @@
 #include "vkx/shaders.hpp"
 #include "vkx/pipelines.hpp"
 #include "vkx/texture.hpp"
-#include "fusion/renderer/vkx/swapchain.hpp"
-#include "vkx/ui.hpp"
+#include "vkx/swapchain.hpp"
 #include "vkx/descriptors.hpp"
-#include "fusion/renderer/vkx/framebuffer.hpp"
 
 namespace fe {
     struct {
@@ -38,24 +36,24 @@ namespace fe {
         const vk::DescriptorSet getCurrentGlobalDescriptorSets() const { return globalDescriptorSets[currentFrame]; }
         const vk::DescriptorSetLayout& getGlobalDescriptorLayoutSet() const { return globalDescriptorSetLayout; }
 
-        const vkx::SwapChain& getSwapChain() const { return *swapChain; }
+        const vkx::SwapChain& getSwapChain() const { return swapChain; }
+        const vk::RenderPass& getRenderPass() const { return renderPass; }
 
         uint32_t getFrameIndex() const { return currentFrame; }
         bool isFrameInProgress() const { return isFrameStarted; }
 
-        bool beginFrame();
+        vk::CommandBuffer beginFrame();
 
-        vk::CommandBuffer beginRender();
-        void endRender(vk::CommandBuffer& commandBuffer);
-
-        void endFrame();
+        void beginRenderPass(vk::CommandBuffer& commandBuffer);
+        void endRenderPass(vk::CommandBuffer& commandBuffer);
+        void endFrame(vk::CommandBuffer& commandBuffer);
 
     private:
         const vkx::Context& context;
         const vk::Device& device{ context.device };
 
+        vkx::SwapChain swapChain{ context };
         vk::CommandPool commandPool;
-        vkx::SwapChain* swapChain{ nullptr };
         vk::RenderPass renderPass;
 
         std::vector<vk::CommandBuffer> commandBuffers;
@@ -65,8 +63,8 @@ namespace fe {
         std::vector<vk::DescriptorSet> globalDescriptorSets;
 
         std::vector<vkx::DescriptorAllocator> dynamicAllocators;
-        vkx::DescriptorAllocator globalAllocator{ context.device };
-        vkx::DescriptorLayoutCache descriptorLayoutCache{ context.device };
+        vkx::DescriptorAllocator globalAllocator{ device };
+        vkx::DescriptorLayoutCache descriptorLayoutCache{ device };
 
         std::array<vk::ClearValue, 2> clearValues{};
         glm::vec3 color{0.7f, 0.85f, 1.0f};

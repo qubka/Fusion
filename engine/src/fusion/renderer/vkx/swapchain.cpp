@@ -2,42 +2,41 @@
 
 using namespace vkx;
 
-void SwapChain::destroy() {
+void SwapChain::destroy(const vk::SwapchainKHR& oldSwapChain) {
     for (const auto& image : images) {
         device.destroyImageView(image.view);
     }
 
     depthStencil.destroy();
 
-    device.destroySwapchainKHR(swapChain);
+    device.destroySwapchainKHR(oldSwapChain ? oldSwapChain : swapChain);
 
     for (const auto& framebuffer : framebuffers) {
         device.destroyFramebuffer(framebuffer);
     }
-
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        device.destroySemaphore(renderFinishedSemaphores[i]);
-        device.destroySemaphore(imageAvailableSemaphores[i]);
-        device.destroyFence(inFlightFences[i]);
+    for (const auto& semaphore : renderFinishedSemaphores) {
+        device.destroySemaphore(semaphore);
+    }
+    for (const auto& semaphore : imageAvailableSemaphores) {
+        device.destroySemaphore(semaphore);
+    }
+    for (const auto& fence : inFlightFences) {
+        device.destroyFence(fence);
+    }
+    for (auto* image : imagesInFlight) {
+        image = nullptr;
     }
 }
 
-vkx::SwapChain* SwapChain::create(const vkx::Context& context, const vk::Extent2D& size, const vk::RenderPass& renderPass, bool vsync, const vk::SwapchainKHR& oldSwapChain) {
-    auto* swapChain = new SwapChain(context);
-    swapChain->createSwapChain(size, oldSwapChain, vsync);
-    swapChain->createImages();
-    swapChain->createDepthStencil();
-    swapChain->createFramebuffers(renderPass);
-    swapChain->createSyncObjects();
-    return swapChain;
-}
+void SwapChain::createSwapChain(const vk::Extent2D& size, bool vsync) {
+    vk::SwapchainKHR oldSwapChain = swapChain;
+    currentFrame = 0;
 
-void SwapChain::createSwapChain(const vk::Extent2D& size, const vk::SwapchainKHR& oldSwapChain, bool vsync) {
     vkx::Context::SwapChainSupportDetails swapChainSupport = context.getSwapChainSupport();
 
     vk::SurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
     vk::PresentModeKHR presentMode = chooseSwapPresentMode(vsync, swapChainSupport.presentModes);
-    surfaceExtent = chooseSwapExtent(swapChainSupport.capabilities, size);
+    extent = chooseSwapExtent(swapChainSupport.capabilities, size);
 
     // Determine the number of images
     uint32_t desiredNumberOfSwapchainImages =  swapChainSupport.capabilities.minImageCount + 1;
@@ -57,7 +56,7 @@ void SwapChain::createSwapChain(const vk::Extent2D& size, const vk::SwapchainKHR
     swapchainCI.minImageCount = desiredNumberOfSwapchainImages;
     swapchainCI.imageFormat = surfaceFormat.format;
     swapchainCI.imageColorSpace = surfaceFormat.colorSpace;
-    swapchainCI.imageExtent = surfaceExtent;
+    swapchainCI.imageExtent = extent;
     swapchainCI.imageUsage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferDst;
     swapchainCI.preTransform = preTransform;
     swapchainCI.imageArrayLayers = 1;
@@ -71,7 +70,14 @@ void SwapChain::createSwapChain(const vk::Extent2D& size, const vk::SwapchainKHR
 
     swapChain = device.createSwapchainKHR(swapchainCI);
 
-    // Find a suitable depth format
+    // If an existing sawp chain is re-created, destroy the old swap chain
+    // This also cleans up all the presentable images
+    if (oldSwapChain) {
+        destroy(oldSwapChain);
+    }
+
+    // Find a suitable formats
+    colorFormat = surfaceFormat.format;
     depthFormat = context.getSupportedDepthFormat();
 }
 
@@ -85,7 +91,7 @@ void SwapChain::createImages() {
 
     // Get the swap chain images
     auto swapChainImages = device.getSwapchainImagesKHR(swapChain);
-    size_t imageCount = swapChainImages.size();
+    imageCount = swapChainImages.size();
 
     // Get the swap chain buffers containing the image and imageview
     images.resize(imageCount);
@@ -101,7 +107,7 @@ void SwapChain::createDepthStencil() {
 
     vk::ImageCreateInfo depthStencilCI;
     depthStencilCI.imageType = vk::ImageType::e2D;
-    depthStencilCI.extent = vk::Extent3D{ surfaceExtent.width, surfaceExtent.height, 1 };
+    depthStencilCI.extent = vk::Extent3D{ extent.width, extent.height, 1 };
     depthStencilCI.format = depthFormat;
     depthStencilCI.mipLevels = 1;
     depthStencilCI.arrayLayers = 1;
@@ -121,11 +127,11 @@ void SwapChain::createDepthStencil() {
 }
 
 void SwapChain::createFramebuffers(const vk::RenderPass& renderPass) {
-    framebuffers.reserve(images.size());
+    framebuffers.resize(imageCount);
 
-    for (const auto& image : images) {
+    for (size_t i = 0; i < imageCount; i++) {
         std::array<vk::ImageView, 2> attachments = {
-                image.view,
+                images[i].view,
                 depthStencil.view
         };
 
@@ -133,25 +139,25 @@ void SwapChain::createFramebuffers(const vk::RenderPass& renderPass) {
         framebufferCI.renderPass = renderPass;
         framebufferCI.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferCI.pAttachments = attachments.data();
-        framebufferCI.width = surfaceExtent.width;
-        framebufferCI.height = surfaceExtent.height;
+        framebufferCI.width = extent.width;
+        framebufferCI.height = extent.height;
         framebufferCI.layers = 1;
 
         // Create frame buffers for every swap chain image
-        framebuffers.push_back(device.createFramebuffer(framebufferCI));
+        framebuffers[i] = device.createFramebuffer(framebufferCI);
     }
 }
 
 void SwapChain::createSyncObjects() {
-    imageAvailableSemaphores.reserve(MAX_FRAMES_IN_FLIGHT);
-    renderFinishedSemaphores.reserve(MAX_FRAMES_IN_FLIGHT);
-    inFlightFences.reserve(MAX_FRAMES_IN_FLIGHT);
-    imagesInFlight.resize(images.size(), nullptr);
+    imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+    imagesInFlight.resize(imageCount, nullptr);
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        imageAvailableSemaphores.push_back(device.createSemaphore({}));
-        renderFinishedSemaphores.push_back(device.createSemaphore({}));
-        inFlightFences.push_back(device.createFence({vk::FenceCreateFlagBits::eSignaled}));
+        imageAvailableSemaphores[i] = device.createSemaphore({});
+        renderFinishedSemaphores[i] = device.createSemaphore({});
+        inFlightFences[i] = device.createFence({vk::FenceCreateFlagBits::eSignaled});
     }
 }
 
@@ -191,26 +197,26 @@ vk::PresentModeKHR SwapChain::chooseSwapPresentMode(bool vsync, const std::vecto
     return bestMode;
 }
 
-vk::Extent2D SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const vk::Extent2D& current) {
+vk::Extent2D SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const vk::Extent2D& size) {
     if (capabilities.currentExtent.width == UINT32_MAX || capabilities.currentExtent.height == UINT32_MAX) {
         return {
                 std::max(capabilities.minImageExtent.width,
-                         std::min(capabilities.maxImageExtent.width, current.width)),
+                         std::min(capabilities.maxImageExtent.width, size.width)),
                 std::max(capabilities.minImageExtent.height,
-                         std::min(capabilities.maxImageExtent.height, current.height))
+                         std::min(capabilities.maxImageExtent.height, size.height))
         };
     } else {
         return capabilities.currentExtent;
     }
 }
 
-vk::Result SwapChain::acquireNextImage(uint32_t& currentImage) const {
+vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex) const {
     auto result = device.waitForFences(1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
     if (result != vk::Result::eSuccess) {
         throw std::runtime_error("failed to wait for fences");
     }
 
-    return device.acquireNextImageKHR(swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], nullptr, &currentImage); /// use noexcept to handle OUT_OF_DATE
+    return device.acquireNextImageKHR(swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], nullptr, &imageIndex); /// use noexcept to handle OUT_OF_DATE
 }
 
 vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, const uint32_t& imageIndex) {

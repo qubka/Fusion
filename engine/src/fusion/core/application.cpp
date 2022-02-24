@@ -10,7 +10,7 @@ Application* Application::instance{nullptr};
 
 // Avoid doing work in the ctor as it can't make use of overridden virtual functions
 // Instead, use the `prepare` and `run` methods
-Application::Application(std::string title, CommandLineArgs args) : title{std::move(title)}, commandLineArgs{args} {
+Application::Application(std::string title, CommandLineArgs args) : title{std::move(title)} {
     assert(!instance && "Application already exists!");
     instance = this;
 #if defined(__ANDROID__)
@@ -19,7 +19,82 @@ Application::Application(std::string title, CommandLineArgs args) : title{std::m
     vkx::android::androidApp->onInputEvent = ExampleBase::handle_input_event;
     vkx::android::androidApp->onAppCmd = ExampleBase::handle_app_cmd;
 #endif
-    //camera.setPerspective(60.0f, size.width / size.height, 0.1f, 256.0f);
+
+#if !defined(VK_USE_PLATFORM_ANDROID_KHR)
+    // Check for a valid asset path
+    struct stat info;
+    if (stat(getAssetPath().c_str(), &info) != 0) {
+#if defined(_WIN32)
+        std::string msg = "Could not locate asset path in \"" + getAssetPath() + "\" !";
+		MessageBox(NULL, msg.c_str(), "Fatal error", MB_OK | MB_ICONERROR);
+#else
+        FE_LOG_ERROR << "Error: Could not find asset path in " << getAssetPath();
+#endif
+        exit(-1);
+    }
+#endif
+
+    //settings.validation = enableValidation;
+
+    // Command line arguments
+    commandLineParser.parse(args);
+    if (commandLineParser.isSet("help")) {
+#if defined(_WIN32)
+        setupConsole("Fusion Engine");
+#endif
+        commandLineParser.printHelp();
+        std::cin.get();
+        exit(0);
+    }
+    if (commandLineParser.isSet("validation")) {
+        settings.validation = true;
+    }
+    if (commandLineParser.isSet("vsync")) {
+        settings.vsync = true;
+    }
+    if (commandLineParser.isSet("height")) {
+        size.height = commandLineParser.getValueAsInt("height", size.height);
+    }
+    if (commandLineParser.isSet("width")) {
+        size.width = commandLineParser.getValueAsInt("width", size.width);
+    }
+    if (commandLineParser.isSet("fullscreen")) {
+        settings.fullscreen = true;
+    }
+    if (commandLineParser.isSet("shaders")) {
+        std::string value = commandLineParser.getValueAsString("shaders", "glsl");
+        if ((value != "glsl") && (value != "hlsl")) {
+            FE_LOG_ERROR << "Shader type must be one of 'glsl' or 'hlsl'";
+        }/* else {
+            shaderDir = value;
+        }*/
+    }
+    if (commandLineParser.isSet("benchmark")) {
+        benchmark.active = true;
+        //vkx::util::errorModeSilent = true;
+    }
+    if (commandLineParser.isSet("benchmarkwarmup")) {
+        benchmark.warmup = commandLineParser.getValueAsInt("benchmarkwarmup", benchmark.warmup);
+    }
+    if (commandLineParser.isSet("benchmarkruntime")) {
+        benchmark.duration = commandLineParser.getValueAsInt("benchmarkruntime", benchmark.duration);
+    }
+    if (commandLineParser.isSet("benchmarkresultfile")) {
+        benchmark.filename = commandLineParser.getValueAsString("benchmarkresultfile", benchmark.filename);
+    }
+    if (commandLineParser.isSet("benchmarkresultframes")) {
+        benchmark.outputFrameTimes = true;
+    }
+    if (commandLineParser.isSet("benchmarkframes")) {
+        benchmark.outputFrames = commandLineParser.getValueAsInt("benchmarkframes", benchmark.outputFrames);
+    }
+
+#if defined(_WIN32)
+    // Enable console if validation is active, debug message callback will output to it
+	if (settings.validation) {
+		setupConsole("Fusion Engine");
+	}
+#endif
 }
 
 Application::~Application() {
@@ -53,7 +128,7 @@ void Application::run() {
         context.queue.waitIdle();
         context.device.waitIdle();
     } catch(const std::system_error& err) {
-        std::cerr << err.what() << std::endl;
+        FE_LOG_ERROR << err.what();
     }
 }
 
@@ -65,19 +140,15 @@ void Application::mainInit() {
 }
 
 void Application::setupUi() {
+    settings.overlay = settings.overlay && (!benchmark.active);
     if (!settings.overlay) {
         return;
     }
 
-    auto& swapChain = renderer.getSwapChain();
-
     struct vkx::ui::UIOverlayCreateInfo overlayCreateInfo;
     // Setup default overlay creation info
-    overlayCreateInfo.copyQueue = queue;
-    //overlayCreateInfo.framebuffers = swapChain.framebuffers;
-    overlayCreateInfo.colorformat = swapChain.getColorFormat();
-    overlayCreateInfo.depthformat = swapChain.getDepthFormat();
-    overlayCreateInfo.size = size;
+    overlayCreateInfo.renderPass = renderer.getRenderPass();
+    //overlayCreateInfo.size = size;
 
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
@@ -131,6 +202,15 @@ void Application::setupRenderer() {
 }
 
 void Application::mainLoop() {
+    if (benchmark.active) {
+        benchmark.run([=] { render(); }, physicalDevice.getProperties());
+        device.waitIdle();
+        if (!benchmark.filename.empty()) {
+            benchmark.saveResults();
+        }
+        return;
+    }
+
     auto tStart = std::chrono::high_resolution_clock::now();
 
     window->runLoop([&]{
@@ -173,6 +253,20 @@ void Application::update(float deltaTime) {
     updateOverlay();
 }
 
+#if defined(_WIN32)
+// Win32 : Sets up a console window and redirects standard output to it
+void Application::setupConsole(std::string title)
+{
+	AllocConsole();
+	AttachConsole(GetCurrentProcessId());
+	FILE *stream;
+	freopen_s(&stream, "CONIN$", "r", stdin);
+	freopen_s(&stream, "CONOUT$", "w+", stdout);
+	freopen_s(&stream, "CONOUT$", "w+", stderr);
+	SetConsoleTitle(TEXT(title.c_str()));
+}
+#endif
+
 #if defined(__ANDROID__)
 int32_t Application::handle_input_event(android_app* app, AInputEvent* event) {
     auto& app = *reinterpret_cast<Application*>(app->userData);
@@ -192,10 +286,10 @@ void Application::onAppCmd(int32_t cmd) {
             }
             break;
         case APP_CMD_LOST_FOCUS:
-            window.setMinimized(false);
+            window.setFocus(false);
             break;
         case APP_CMD_GAINED_FOCUS:
-            window.setMinimized(true)
+            window.setFocus(true)
             break;
         default:
             break;
@@ -203,42 +297,34 @@ void Application::onAppCmd(int32_t cmd) {
 }
 
 void Application::setupWindow() {
-    window = new Window{};
-    size.width = window.getWidth();
-    size.height = window.getHeight();
-    camera.updateAspectRatio(size);
+    window = new android::Window{};
 }
 #else
 
 void Application::setupWindow() {
-    bool fullscreen = false;
-
-#ifdef _WIN32
-    // Check command line arguments
-    for (int32_t i = 0; i < __argc; i++) {
-        if (__argv[i] == std::string("-fullscreen")) {
-            fullscreen = true;
-        }
+    if (settings.fullscreen) {
+        window = new glfw::Window{title};
+    } else {
+        window = new glfw::Window{title, { size.width, size.height }};
     }
-#endif
-
-    window = new glfw::Window{title, {size.width, size.height}};
 }
 #endif
 
 void Application::render() {
-    if (renderer.beginFrame()) {
-        auto commandBuffer = renderer.beginRender();
+    if (auto cmdBuffer = renderer.beginFrame()) {
+        renderer.beginRenderPass(cmdBuffer);
 
         for (auto* layer: layers) {
             layer->onRender();
         }
 
-        drawUI(commandBuffer);
+        if (settings.overlay) {
+            ui.draw(cmdBuffer);
+        }
 
-        renderer.endRender(commandBuffer);
+        renderer.endRenderPass(cmdBuffer);
 
-        renderer.endFrame();
+        renderer.endFrame(cmdBuffer);
     }
 }
 
@@ -247,8 +333,10 @@ void Application::updateOverlay() {
         return;
     }
 
+    const auto& extent = window->getExtent();
+
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2{static_cast<float>(size.width), static_cast<float>(size.height)};
+    io.DisplaySize = ImVec2{static_cast<float>(extent.width), static_cast<float>(extent.height)};
     io.DeltaTime = frameTimer;
 
     auto& mouseInput = window->getMouseInput();
@@ -270,18 +358,5 @@ void Application::updateOverlay() {
 
     ImGui::Render();
     ui.update();
-}
-
-void Application::drawUI(const vk::CommandBuffer& commandBuffer) {
-    if (!settings.overlay) {
-        return;
-    }
-
-    const vk::Viewport viewport = vkx::util::viewport(static_cast<float>(size.width), static_cast<float>(size.height), 0.0f, 1.0f);
-    const vk::Rect2D scissor = vkx::util::rect2D(size.width, size.width, 0, 0);
-    commandBuffer.setViewport(0, 1, &viewport);
-    commandBuffer.setScissor(0, 1, &scissor);
-
-    ui.draw(commandBuffer);
 }
 

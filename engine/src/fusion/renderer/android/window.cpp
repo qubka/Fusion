@@ -15,10 +15,9 @@ using namespace android;
 
 Window* Window::instance{nullptr};
 
-Window::Window() : fe::Window{},
-    width{ANativeWindow_getWidth(androidApp->window)},
-    height{ANativeWindow_getHeight(androidApp->window)},
-    aspect{static_cast<float>(width) / static_cast<float>(height)}
+Window::Window()
+    : fe::Window{ANativeWindow_getWidth(androidApp->window),
+                 ANativeWindow_getHeight(androidApp->window)}
 {
     assert(!instance && "Application already exists!");
     instance = this;
@@ -26,7 +25,7 @@ Window::Window() : fe::Window{},
 
 bool Window::shouldClose() {
     bool destroy = false;
-    eventQueue.free();
+    eventQueue.clean();
     resetInputs();
     focused = true;
     int ident, events;
@@ -42,19 +41,11 @@ bool Window::shouldClose() {
     return destroy;
 }
 
-glm::vec4 Window::getViewport() {
-#ifdef VULKAN_HPP
-    return { 0, 0, width, height };
-#else // OPENGL
-    return { 0, height, width, -height }; // vertical flip is required
-#endif
-}
-
 void Window::resetInputs() {
-    /* reset data and update frame */
+    /*
     fe::Input::Update();
     fe::MouseInput::Update();
-    fe::KeyInput::Update();
+    fe::KeyInput::Update();*/
 }
 
 int32_t Window::onInput(AInputEvent* event) {

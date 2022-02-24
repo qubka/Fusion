@@ -45,7 +45,7 @@ void UIOverlay::create(const UIOverlayCreateInfo& createInfo) {
     setStyleColors();
 
     // Dimensions
-    io.DisplaySize = ImVec2{static_cast<float>(createInfo.size.width), static_cast<float>(createInfo.size.height)};
+    //io.DisplaySize = ImVec2{static_cast<float>(createInfo.size.width), static_cast<float>(createInfo.size.height)};
     io.FontGlobalScale = scale;
 
     prepareResources();
@@ -221,7 +221,6 @@ void UIOverlay::preparePipeline() {
         blendAttachmentState.srcAlphaBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
         blendAttachmentState.dstAlphaBlendFactor = vk::BlendFactor::eZero;
         blendAttachmentState.alphaBlendOp = vk::BlendOp::eAdd;
-
     }
 
     pipelineBuilder.multisampleState.rasterizationSamples = createInfo.rasterizationSamples;
@@ -293,7 +292,7 @@ void UIOverlay::prepareRenderPass() {
     vk::RenderPassCreateInfo renderPassInfo;
     renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
     renderPassInfo.pAttachments = attachments.data();
-    renderPassInfo.subpassCount = 1;
+    renderPassInfo.subpassCount = createInfo.subpassCount;
     renderPassInfo.pSubpasses = &subpassDescription;
     renderPassInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());
     renderPassInfo.pDependencies = subpassDependencies.data();
@@ -417,12 +416,6 @@ bool UIOverlay::update() {
 	}
 
     return updateCmdBuffers;
-}
-
-void UIOverlay::resize(const vk::Extent2D& size) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2{static_cast<float>(size.width), static_cast<float>(size.height)};
-    createInfo.size = size;
 }
 
 bool UIOverlay::header(const char* caption) const {

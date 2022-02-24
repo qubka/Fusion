@@ -12,18 +12,11 @@
 namespace glfw {
     class Window : public fe::Window {
     public:
-        Window(std::string title, const glm::uvec2& size, const glm::ivec2& position = {});
+        Window(std::string title, const glm::ivec2& size, const glm::ivec2& position = {});
         Window(std::string title);
         ~Window() override;
 
         void* getNativeWindow() override { return window; }
-        int getWidth() override { return width; }
-        int getHeight() override { return height; }
-        glm::uvec2 getSize() override { return {width, height}; }
-        float getAspect() override { return aspect; }
-        const std::string& getTitle() override { return title; }
-        glm::vec4 getViewport() override;
-
         bool shouldClose() override { return glfwWindowShouldClose(window); };
         void shouldClose(bool flag) override { glfwSetWindowShouldClose(window, flag); };
 
@@ -42,6 +35,7 @@ namespace glfw {
             }
         }
 
+        const std::string& getTitle() const { return title; }
         void setTitle(const std::string& str) {
             title = str;
             glfwSetWindowTitle(window, title.c_str());
@@ -62,26 +56,18 @@ namespace glfw {
             }
         }
 
-        bool isMinimized() override { return minimize; }
-        void setMinimized(bool flag) override { minimize = flag; }
-
 #if defined(VULKAN_HPP)
         static std::vector<std::string> getRequiredInstanceExtensions();
         static vk::SurfaceKHR createWindowSurface(GLFWwindow* window, const vk::Instance& instance, const vk::AllocationCallbacks* pAllocator = nullptr);
         vk::SurfaceKHR createSurface(const vk::Instance& instance, const vk::AllocationCallbacks* pAllocator = nullptr) {
             return createWindowSurface(window, instance, pAllocator);
         }
-        vk::Extent2D getExtent() const { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)}; }
 #endif
 
     private:
         GLFWwindow* window;
         std::string title;
-        int width;
-        int height;
-        float aspect;
         glm::ivec2 position;
-        bool minimize;
 
         fe::EventQueue eventQueue;
         fe::KeyInput keyInput{};  //! use all possible keymaps

@@ -61,8 +61,8 @@ struct AttachmentCreateInfo {
 };
 
 /**
-        * @brief Encapsulates a complete Vulkan framebuffer with an arbitrary number and combination of attachments
-        */
+* @brief Encapsulates a complete Vulkan framebuffer with an arbitrary number and combination of attachments
+*/
 struct Framebuffer {
 public:
     const vkx::Context& context;
@@ -194,10 +194,10 @@ public:
     }
 
     /**
-                * Creates a default render pass setup with one sub pass
-                *
-                * @return VK_SUCCESS if all resources have been created successfully
-                */
+     * Creates a default render pass setup with one sub pass
+     *
+     * @return VK_SUCCESS if all resources have been created successfully
+     */
     void createRenderPass() {
         std::vector<vk::AttachmentDescription> attachmentDescriptions;
         for (auto& attachment : attachments) {

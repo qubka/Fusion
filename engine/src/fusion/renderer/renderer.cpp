@@ -20,9 +20,7 @@ void Renderer::destroy() {
     }
     uniformBuffers.clear();
 
-    if (swapChain) {
-        delete swapChain;
-    }
+    swapChain.destroy();
 
     device.destroyRenderPass(renderPass);
 
@@ -141,9 +139,9 @@ void Renderer::createCommandBuffers() {
 void Renderer::recreateSwapChain() {
     auto& window = Application::Instance().getWindow();
 
-    auto extent = vk::Extent2D(window.getWidth(), window.getHeight());
+    auto extent = window.getExtent();
     while (extent.width == 0 || extent.height == 0) {
-        extent = vk::Extent2D(window.getWidth(), window.getHeight());
+        extent = window.getExtent();
         glfwWaitEvents();
     }
 
@@ -151,28 +149,21 @@ void Renderer::recreateSwapChain() {
 
     FE_LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
 
-    if (swapChain == nullptr) {
-        swapChain = vkx::SwapChain::create(context, extent, renderPass, false);
-    } else {
-        auto* newSwapChain = vkx::SwapChain::create(context, extent, renderPass, false, swapChain->getSwapChain());
-        delete swapChain;
-        swapChain = newSwapChain;
-    }
+    swapChain.create(extent, renderPass, false);
 
     //ui.resize(extent, swapChain->framebuffers);
 }
 
-bool Renderer::beginFrame() {
-    assert(swapChain && "renderer wasn't initialized yet");
+vk::CommandBuffer Renderer::beginFrame() {
     assert(!isFrameStarted && "cannot call beginFrame while already in progress");
 
-    auto result = swapChain->acquireNextImage(currentImage);
+    auto result = swapChain.acquireNextImage(currentImage);
 
 #if !defined(__ANDROID__)
     // Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE) or no longer optimal for presentation (SUBOPTIMAL)
     if (result == vk::Result::eSuboptimalKHR || result == vk::Result::eErrorOutOfDateKHR) {
         recreateSwapChain();
-        return false;
+        return nullptr;
     }
 #endif
 
@@ -180,16 +171,20 @@ bool Renderer::beginFrame() {
         throw std::runtime_error("Failed to acquire next image");
     }
 
+    const auto& commandBuffer = commandBuffers[currentFrame];
+    vk::CommandBufferBeginInfo beginInfo{ vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
+
+    commandBuffer.begin(beginInfo);
+
     isFrameStarted = true;
 
-    return true;
+    return commandBuffer;
 }
 
-vk::CommandBuffer Renderer::beginRender() {
-    assert(swapChain && "renderer wasn't initialized yet");
-    assert(isFrameStarted && "cannot call beginRender if frame is not in progress");
+void Renderer::beginRenderPass(vk::CommandBuffer& commandBuffer) {
+    assert(isFrameStarted && "cannot call beginRenderPass if frame is not in progress");
 
-    const auto& extent = swapChain->getSurfaceExtent();
+    const auto& extent = swapChain.extent;
     auto offset = vk::Offset2D{0, 0};
 
     clearValues[0].color = std::array<float, 4>{ color.x, color.y, color.z, 1 };
@@ -198,16 +193,12 @@ vk::CommandBuffer Renderer::beginRender() {
 
     vk::RenderPassBeginInfo renderPassInfo;
     renderPassInfo.renderPass = renderPass;
-    renderPassInfo.framebuffer = swapChain->getFrameBuffer(currentImage);
+    renderPassInfo.framebuffer = swapChain.framebuffers[currentImage];
     renderPassInfo.renderArea.offset = offset;
     renderPassInfo.renderArea.extent = extent;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    const auto& commandBuffer = commandBuffers[currentFrame];
-    vk::CommandBufferBeginInfo beginInfo{ vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
-
-    commandBuffer.begin(beginInfo);
     commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
     vk::Viewport viewport = vkx::util::viewport(extent);
@@ -215,25 +206,22 @@ vk::CommandBuffer Renderer::beginRender() {
 
     commandBuffer.setViewport(0, 1, &viewport);
     commandBuffer.setScissor(0, 1, &scissor);
-
-    return commandBuffer;
 }
 
-void Renderer::endRender(vk::CommandBuffer& commandBuffer) {
-    assert(swapChain && "renderer wasn't initialized yet");
-    assert(isFrameStarted && "cannot call endRender if frame is not in progress");
+void Renderer::endRenderPass(vk::CommandBuffer& commandBuffer) {
+    assert(isFrameStarted && "cannot call endRenderPass if frame is not in progress");
     assert(commandBuffer == commandBuffers[currentFrame] && "cannot end render pass on command buffer from a different frame");
 
     commandBuffer.endRenderPass();
-    commandBuffer.end();
 }
 
-void Renderer::endFrame() {
-    assert(swapChain && "renderer wasn't initialized yet");
+void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
     assert(isFrameStarted && "cannot call endFrame if frame is not in progress");
-    //assert(commandBuffer == commandBuffers[currentFrame] && "cannot end command buffer from a different frame");
+    assert(commandBuffer == commandBuffers[currentFrame] && "cannot end command buffer from a different frame");
 
-    auto result = swapChain->submitCommandBuffers(commandBuffers[currentFrame], currentImage);
+    commandBuffer.end();
+
+    auto result = swapChain.submitCommandBuffers(commandBuffer, currentImage);
 #if !defined(__ANDROID__)
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
         recreateSwapChain();

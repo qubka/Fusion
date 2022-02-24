@@ -19,16 +19,13 @@
 namespace vkx { namespace ui {
 
 struct UIOverlayCreateInfo {
-    vk::Queue copyQueue;
     vk::RenderPass renderPass;
-    //std::vector<vk::Framebuffer> framebuffers;
     vk::Format colorformat;
     vk::Format depthformat;
-    vk::Extent2D size;
+    //vk::Extent2D size;
     std::vector<vk::PipelineShaderStageCreateInfo> shaders;
     vk::SampleCountFlagBits rasterizationSamples{ vk::SampleCountFlagBits::e1 };
     uint32_t subpassCount{ 1 };
-    std::vector<vk::ClearValue> clearValues{};
     uint32_t attachmentCount{ 1 };
 };
 
@@ -45,7 +42,6 @@ private:
     vk::DescriptorSetLayout descriptorSetLayout;
     //vk::DescriptorSet descriptorSet;
     vk::PipelineLayout pipelineLayout;
-    const vk::PipelineCache& pipelineCache{ context.pipelineCache };
     vk::Pipeline pipeline;
     vk::RenderPass renderPass;
     vk::CommandPool commandPool;
@@ -77,7 +73,6 @@ public:
 
     bool update();
     void draw(const vk::CommandBuffer& cmdBuffer);
-    void resize(const vk::Extent2D& newSize);
 
     bool header(const char* caption) const;
     bool checkBox(const char* caption, bool* value) const;

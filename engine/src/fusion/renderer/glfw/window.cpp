@@ -10,14 +10,10 @@ using namespace glfw;
 
 std::vector<GLFWwindow*> Window::instances;
 
-Window::Window(std::string title, const glm::uvec2& size, const glm::ivec2& position) :
-    fe::Window{},
-    title{std::move(title)},
-    width{static_cast<int>(size.x)},
-    height{static_cast<int>(size.y)},
-    aspect{static_cast<float>(size.x) / static_cast<float>(size.y)},
-    position{position},
-    minimize{false}
+Window::Window(std::string title, const glm::ivec2& size, const glm::ivec2& position)
+    : fe::Window{size.x, size.y}
+    , title{std::move(title)}
+    , position{position}
 {
     initGLFW();
     initWindow(false);
@@ -25,11 +21,10 @@ Window::Window(std::string title, const glm::uvec2& size, const glm::ivec2& posi
     instances.push_back(window);
 }
 
-Window::Window(std::string title) :
-    fe::Window{},
-    title{std::move(title)},
-    position{0, 0},
-    minimize{false}
+Window::Window(std::string title)
+    : fe::Window{1, 1}  // will be fullscreen
+    , title{std::move(title)}
+    , position{0, 0}
 {
     initGLFW();
     initWindow(true);
@@ -71,13 +66,12 @@ void Window::initWindow(bool fullscreen) {
         auto mode = glfwGetVideoMode(monitor);
         width = mode->width;
         height = mode->height;
-        aspect = static_cast<float>(width) / static_cast<float>(height);
 
         window = glfwCreateWindow(width, height, title.c_str(), monitor, nullptr);
     } else {
         window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     }
-    assert(width > 0 && height > 0 && "Width or height cannot be negative");
+
     if (!window) throw std::runtime_error("Failed to create window!");
 
     if (position != glm::ivec2{ 0, 0 }) {
@@ -127,14 +121,6 @@ vk::SurfaceKHR Window::createWindowSurface(GLFWwindow* window, const vk::Instanc
     return vk::createResultValue(result, rawSurface, "glfwCreateWindowSurface");
 }
 #endif
-
-glm::vec4 Window::getViewport() {
-#ifdef VULKAN_HPP
-    return { 0, 0, width, height };
-#else // OPENGL
-    return { 0, height, width, -height }; // vertical flip is required
-#endif
-}
 
 void Window::PosCallback(GLFWwindow* handle, int x, int y) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
@@ -190,7 +176,6 @@ void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) 
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
     window.width = width;
     window.height = height;
-    window.aspect = static_cast<float>(width) / static_cast<float>(height);
     window.minimize = width == 0 || height == 0;
 
     window.eventQueue.submit(new fe::WindowFramebufferSizeEvent{{}, width, height});
@@ -292,6 +277,8 @@ void Window::JoystickCallback(int jid, int action) {
 #if GLFW_VERSION_MINOR >= 3
 void Window::MaximizeCallback(GLFWwindow* handle, int maximized) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
+
+    window.minimize = !maximized;
 
     if (maximized)
         window.eventQueue.submit(new fe::WindowMaximizedEvent{});
