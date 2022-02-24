@@ -5,8 +5,8 @@ using namespace fe;
 
 void Renderer::create() {
     commandPool = context.getCommandPool();
-    recreateSwapChain();
     createRenderPass();
+    recreateSwapChain();
     createUniformBuffers();
     createDescriptorSets();
     createCommandBuffers();
@@ -21,7 +21,6 @@ void Renderer::destroy() {
     uniformBuffers.clear();
 
     if (swapChain) {
-        swapChain->destroy();
         delete swapChain;
     }
 
@@ -153,12 +152,11 @@ void Renderer::recreateSwapChain() {
     FE_LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
 
     if (swapChain == nullptr) {
-        swapChain = new vkx::SwapChain(context, extent);
+        swapChain = vkx::SwapChain::create(context, extent, renderPass, false);
     } else {
-        auto* swapchain = new vkx::SwapChain(context, extent, swapChain->swapChain);
-        swapChain->destroy();
+        auto* newSwapChain = vkx::SwapChain::create(context, extent, renderPass, false, swapChain->getSwapChain());
         delete swapChain;
-        swapChain = swapchain;
+        swapChain = newSwapChain;
     }
 
     //ui.resize(extent, swapChain->framebuffers);
@@ -187,11 +185,11 @@ bool Renderer::beginFrame() {
     return true;
 }
 
-vk::CommandBuffer Renderer::beginSwapChainRenderPass() {
+vk::CommandBuffer Renderer::beginRender() {
     assert(swapChain && "renderer wasn't initialized yet");
-    assert(isFrameStarted && "cannot call beginSwapChainRenderPass if frame is not in progress");
+    assert(isFrameStarted && "cannot call beginRender if frame is not in progress");
 
-    const auto& extent = swapChain->surfaceExtent;
+    const auto& extent = swapChain->getSurfaceExtent();
     auto offset = vk::Offset2D{0, 0};
 
     clearValues[0].color = std::array<float, 4>{ color.x, color.y, color.z, 1 };
@@ -200,7 +198,7 @@ vk::CommandBuffer Renderer::beginSwapChainRenderPass() {
 
     vk::RenderPassBeginInfo renderPassInfo;
     renderPassInfo.renderPass = renderPass;
-    renderPassInfo.framebuffer = swapChain->framebuffers[currentImage];
+    renderPassInfo.framebuffer = swapChain->getFrameBuffer(currentImage);
     renderPassInfo.renderArea.offset = offset;
     renderPassInfo.renderArea.extent = extent;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -221,9 +219,9 @@ vk::CommandBuffer Renderer::beginSwapChainRenderPass() {
     return commandBuffer;
 }
 
-void Renderer::endSwapChainRenderPass(vk::CommandBuffer& commandBuffer) {
+void Renderer::endRender(vk::CommandBuffer& commandBuffer) {
     assert(swapChain && "renderer wasn't initialized yet");
-    assert(isFrameStarted && "cannot call endSwapChainRenderPass if frame is not in progress");
+    assert(isFrameStarted && "cannot call endRender if frame is not in progress");
     assert(commandBuffer == commandBuffers[currentFrame] && "cannot end render pass on command buffer from a different frame");
 
     commandBuffer.endRenderPass();

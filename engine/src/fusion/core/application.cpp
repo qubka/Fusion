@@ -75,8 +75,8 @@ void Application::setupUi() {
     // Setup default overlay creation info
     overlayCreateInfo.copyQueue = queue;
     //overlayCreateInfo.framebuffers = swapChain.framebuffers;
-    overlayCreateInfo.colorformat = swapChain.colorFormat;
-    overlayCreateInfo.depthformat = swapChain.depthFormat;
+    overlayCreateInfo.colorformat = swapChain.getColorFormat();
+    overlayCreateInfo.depthformat = swapChain.getDepthFormat();
     overlayCreateInfo.size = size;
 
     ImGui::SetCurrentContext(ImGui::CreateContext());
@@ -228,19 +228,15 @@ void Application::setupWindow() {
 
 void Application::render() {
     if (renderer.beginFrame()) {
-        /*auto cmd = renderer.beginOffscreenRenderPass();
+        auto commandBuffer = renderer.beginRender();
 
         for (auto* layer: layers) {
             layer->onRender();
         }
 
-        renderer.endOffscreenRenderPass(cmd);*/
-
-        auto commandBuffer = renderer.beginSwapChainRenderPass();
-
         drawUI(commandBuffer);
 
-        renderer.endSwapChainRenderPass(commandBuffer);
+        renderer.endRender(commandBuffer);
 
         renderer.endFrame();
     }

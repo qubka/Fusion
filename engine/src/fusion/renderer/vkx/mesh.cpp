@@ -2,7 +2,7 @@
 
 using namespace vkx;
 
-Mesh::Mesh(const Context& context, const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer) {
+void Mesh::loadFromArray(const Context& context, const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer) {
     vertexCount = static_cast<uint32_t>(vertexBuffer.size());
     assert(vertexCount >= 3 && "Vertex count must be at least 3");
 

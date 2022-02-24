@@ -6,7 +6,7 @@
 #include "vkx/shaders.hpp"
 #include "vkx/pipelines.hpp"
 #include "vkx/texture.hpp"
-#include "vkx/swapchain.hpp"
+#include "fusion/renderer/vkx/swapchain.hpp"
 #include "vkx/ui.hpp"
 #include "vkx/descriptors.hpp"
 #include "fusion/renderer/vkx/framebuffer.hpp"
@@ -45,20 +45,17 @@ namespace fe {
 
         bool beginFrame();
 
-        //vk::CommandBuffer beginOffscreenRenderPass();
-        //void endOffscreenRenderPass(vk::CommandBuffer& commandBuffer);
-
-        vk::CommandBuffer beginSwapChainRenderPass();
-        void endSwapChainRenderPass(vk::CommandBuffer& commandBuffer);
+        vk::CommandBuffer beginRender();
+        void endRender(vk::CommandBuffer& commandBuffer);
 
         void endFrame();
 
     private:
         const vkx::Context& context;
-        const vk::Device& device { context.device };
+        const vk::Device& device{ context.device };
 
         vk::CommandPool commandPool;
-        vkx::SwapChain* swapChain { nullptr};
+        vkx::SwapChain* swapChain{ nullptr };
         vk::RenderPass renderPass;
 
         std::vector<vk::CommandBuffer> commandBuffers;

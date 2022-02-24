@@ -4,8 +4,12 @@
 #include "context.hpp"
 
 namespace vkx {
-    class Mesh {
-    public:
+    struct Mesh {
+        Buffer vertices;
+        Buffer indices;
+        uint32_t indexCount { 0 };
+        uint32_t vertexCount { 0 };
+
         struct Vertex {
             glm::vec3 position{};
             glm::vec3 color{};
@@ -13,18 +17,13 @@ namespace vkx {
             glm::vec2 ui{};
         };
 
-        Mesh(const Context& context, const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer = {});
+        /** @brief Generate mesh from list of vertices and indices */
+        void loadFromArray(const Context& context, const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer = {});
 
         /** @brief Release all Vulkan resources of this mesh */
         void destroy();
 
         void bind(const vk::CommandBuffer& cmdBuffer) const;
         void draw(const vk::CommandBuffer& cmdBuffer) const;
-
-    private:
-        Buffer vertices;
-        Buffer indices;
-        uint32_t indexCount;
-        uint32_t vertexCount;
     };
 }
