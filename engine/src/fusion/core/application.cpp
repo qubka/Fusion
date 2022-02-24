@@ -342,9 +342,18 @@ void Application::updateOverlay() {
     auto& mouseInput = window->getMouseInput();
     auto& mousePos = mouseInput.mousePosition();
     io.AddMousePosEvent(mousePos.x, mousePos.y);
-    io.AddMouseButtonEvent(0, mouseInput.getMouseButton(Mouse::ButtonLeft));
-    io.AddMouseButtonEvent(1,mouseInput.getMouseButton(Mouse::ButtonRight));
-    io.AddMouseButtonEvent(3, mouseInput.getMouseButton(Mouse::ButtonMiddle));
+    io.AddMouseButtonEvent(0, mouseInput.getMouseButton(Mouse::Button0));
+    io.AddMouseButtonEvent(1,mouseInput.getMouseButton(Mouse::Button1));
+    io.AddMouseButtonEvent(2, mouseInput.getMouseButton(Mouse::Button2));
+    io.AddMouseButtonEvent(3, mouseInput.getMouseButton(Mouse::Button3));
+    io.AddMouseButtonEvent(4, mouseInput.getMouseButton(Mouse::Button4));
+
+    /*window->getEventQueue().next<>()
+
+    io.AddFocusEvent();
+    io.AddInputCharacter();
+    io.AddKeyEvent();*/
+
     auto& mouseWheel = mouseInput.mouseScroll();
     io.AddMouseWheelEvent(mouseWheel.x, mouseWheel.y);
 
