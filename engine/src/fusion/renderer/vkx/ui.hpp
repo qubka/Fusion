@@ -22,7 +22,7 @@ struct UIOverlayCreateInfo {
     vk::RenderPass renderPass;
     vk::Format colorformat;
     vk::Format depthformat;
-    //vk::Extent2D size;
+    vk::Extent2D size;
     std::vector<vk::PipelineShaderStageCreateInfo> shaders;
     vk::SampleCountFlagBits rasterizationSamples{ vk::SampleCountFlagBits::e1 };
     uint32_t subpassCount{ 1 };

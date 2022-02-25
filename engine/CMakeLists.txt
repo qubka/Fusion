@@ -26,6 +26,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     gli
     entt
     magic_enum
+    signals
     stb
     plog
     yaml-cpp

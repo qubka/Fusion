@@ -148,7 +148,7 @@ void Application::setupUi() {
     struct vkx::ui::UIOverlayCreateInfo overlayCreateInfo;
     // Setup default overlay creation info
     overlayCreateInfo.renderPass = renderer.getRenderPass();
-    //overlayCreateInfo.size = size;
+    overlayCreateInfo.size = size;
 
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
@@ -213,7 +213,9 @@ void Application::mainLoop() {
 
     auto tStart = std::chrono::high_resolution_clock::now();
 
-    window->runLoop([&]{
+    while (!window->shouldClose()) {
+        window->pollEvents();
+
         auto tEnd = std::chrono::high_resolution_clock::now();
         auto tDiff = std::chrono::duration<float, std::milli>(tEnd - tStart).count();
         auto tDiffSeconds = tDiff / 1000.0f;
@@ -224,7 +226,7 @@ void Application::mainLoop() {
         if (!window->isMinimized()) {
             render();
         }
-    });
+    }
 }
 
 std::string Application::getWindowTitle() {
@@ -307,6 +309,69 @@ void Application::setupWindow() {
     } else {
         window = new glfw::Window{title, { size.width, size.height }};
     }
+
+    window->KeyEvent.connect<&KeyInput::onKeyPressed>(&keyInput);
+    window->MouseButtonEvent.connect<&MouseInput::onMouseButton>(&mouseInput);
+    window->MouseMotionEvent.connect<&MouseInput::onMouseMotion>(&mouseInput);
+    window->MouseMotionNormEvent.connect<&MouseInput::onMouseMotionNorm>(&mouseInput);
+    window->MouseScrollEvent.connect<&MouseInput::onMouseScroll>(&mouseInput);
+
+    window->FramebufferEvent.connect([](const glm::ivec2& pos) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.DisplaySize = ImVec2{static_cast<float>(pos.x), static_cast<float>(pos.y)};
+    });
+
+    window->MouseButtonEvent.connect([](MouseCode button, ActionCode action) {
+        if (button >= 0 && button < ImGuiMouseButton_COUNT) {
+            ImGuiIO& io = ImGui::GetIO();
+            io.AddMouseButtonEvent(button, action == Action::Press);
+        }
+    });
+
+    window->MouseMotionEvent.connect([](const glm::vec2& pos) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMousePosEvent(pos.x, pos.y);
+    });
+
+    window->MouseScrollEvent.connect([](const glm::vec2& offset) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseWheelEvent(offset.x, offset.y);
+    });
+
+    window->KeyEvent.connect([](KeyCode keycode, ActionCode action) {
+        if (keycode < ImGuiKey_COUNT) {
+            keycode = ImGui_ImplGlfw_TranslateUntranslatedKey(keycode, scancode);
+
+            ImGuiIO& io = ImGui::GetIO();
+            ImGuiKey imgui_key = ImGui_ImplGlfw_KeyToImGuiKey(keycode);
+            io.AddKeyEvent(imgui_key, action == Action::Press);
+            io.SetKeyEventNativeData(imgui_key, keycode, 0); // To support legacy indexing (<1.87 user code)
+        }
+    });
+
+    window->CharInputEvent.connect([](uint32_t c) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddInputCharacter(c);
+    });
+
+    window->FocusEvent.connect([](bool focuses) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddFocusEvent(focuses);
+    });
+
+    // Workaround: X11 seems to send spurious Leave/Enter events which would make us lose our position,
+    // so we back it up and restore on Leave/Enter (see https://github.com/ocornut/imgui/issues/4984)
+    window->MouseEnterEvent.connect([](bool entered) {
+        ImGuiIO& io = ImGui::GetIO();
+        if (entered) {
+            bd->MouseWindow = window;
+            io.AddMousePosEvent(bd->LastValidMousePos.x, bd->LastValidMousePos.y);
+        } else if (!entered && bd->MouseWindow == window) {
+            bd->LastValidMousePos = io.MousePos;
+            bd->MouseWindow = NULL;
+            io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+        }
+    });
 }
 #endif
 
@@ -333,29 +398,8 @@ void Application::updateOverlay() {
         return;
     }
 
-    const auto& extent = window->getExtent();
-
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2{static_cast<float>(extent.width), static_cast<float>(extent.height)};
     io.DeltaTime = frameTimer;
-
-    auto& mouseInput = window->getMouseInput();
-    auto& mousePos = mouseInput.mousePosition();
-    io.AddMousePosEvent(mousePos.x, mousePos.y);
-    io.AddMouseButtonEvent(0, mouseInput.getMouseButton(Mouse::Button0));
-    io.AddMouseButtonEvent(1,mouseInput.getMouseButton(Mouse::Button1));
-    io.AddMouseButtonEvent(2, mouseInput.getMouseButton(Mouse::Button2));
-    io.AddMouseButtonEvent(3, mouseInput.getMouseButton(Mouse::Button3));
-    io.AddMouseButtonEvent(4, mouseInput.getMouseButton(Mouse::Button4));
-
-    /*window->getEventQueue().next<>()
-
-    io.AddFocusEvent();
-    io.AddInputCharacter();
-    io.AddKeyEvent();*/
-
-    auto& mouseWheel = mouseInput.mouseScroll();
-    io.AddMouseWheelEvent(mouseWheel.x, mouseWheel.y);
 
     ImGui::NewFrame();
     ImGuizmo::SetOrthographic(false);

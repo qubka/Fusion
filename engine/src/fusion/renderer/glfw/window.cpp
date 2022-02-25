@@ -1,11 +1,6 @@
 #include "window.hpp"
 #if !defined(ANDROID)
 
-#include "fusion/events/application_events.hpp"
-#include "fusion/events/window_events.hpp"
-#include "fusion/events/key_events.hpp"
-#include "fusion/events/mouse_events.hpp"
-
 using namespace glfw;
 
 std::vector<GLFWwindow*> Window::instances;
@@ -100,6 +95,8 @@ void Window::initWindow(bool fullscreen) {
     glfwSetWindowMaximizeCallback(window, MaximizeCallback);
     glfwSetWindowContentScaleCallback(window, ContentScaleCallback);
 #endif
+
+    StartEvent();
 }
 
 #if defined(VULKAN_HPP)
@@ -129,47 +126,39 @@ void Window::PosCallback(GLFWwindow* handle, int x, int y) {
 
     window.position = pos;
 
-    window.eventQueue.submit(new fe::WindowMovedEvent{{}, pos});
+    window.PositionChangeEvent(pos);
 }
 
 void Window::SizeCallback(GLFWwindow* handle, int width, int height) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
-    /*window.width = width;
-    window.height = height;
-    window.aspect = static_cast<float>(width) / static_cast<float>(height);
-    window.minimize = width == 0 || height == 0;*/
 
-    window.eventQueue.submit(new fe::WindowSizeEvent{{}, width, height});
+    glm::ivec2 size {width, height};
+
+    window.SizeChangeEvent(size);
 }
 
 void Window::CloseCallback(GLFWwindow* handle) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.eventQueue.submit(new fe::WindowCloseEvent{});
+    window.CloseEvent();
 }
 
 void Window::RefreshCallback(GLFWwindow* handle) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.eventQueue.submit(new fe::WindowRefreshEvent{});
+    window.RefreshEvent();
 }
 
 void Window::FocusCallback(GLFWwindow* handle, int focused) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    if (focused)
-        window.eventQueue.submit(new fe::WindowFocusedEvent{});
-    else
-        window.eventQueue.submit(new fe::WindowUnfocusedEvent{});
+    window.FocusEvent(focused);
 }
 
 void Window::IconifyCallback(GLFWwindow* handle, int iconified) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    if (iconified)
-        window.eventQueue.submit(new fe::WindowDeiconifiedEvent{});
-    else
-        window.eventQueue.submit(new fe::WindowDeiconifiedEvent{});
+    window.IconifyEvent(iconified);
 }
 
 void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) {
@@ -178,81 +167,91 @@ void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) 
     window.height = height;
     window.minimize = width == 0 || height == 0;
 
-    window.eventQueue.submit(new fe::WindowFramebufferSizeEvent{{}, width, height});
+    glm::ivec2 size {width, height};
+
+    window.FramebufferEvent(size);
 }
 
 void Window::CursorPosCallback(GLFWwindow* handle, double posX, double posY) {
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
+
     glm::vec2 pos {posX, posY};
 
-    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.eventQueue.submit(new fe::MouseMovedEvent{{}, pos});
+    window.MouseMotionEvent(pos);
 
-    window.mouseInput.onMouseMoved(pos);
+    glm::vec2 norm {
+        2.0f * pos.x / static_cast<float>(window.width - 1),
+        2.0f * pos.y / static_cast<float>(window.height - 1)
+    };
+
+    window.MouseMotionNormEvent(norm);
 }
 
 void Window::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
+    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
+
     glm::vec2 offset {offsetX, offsetY};
 
-    auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
-    window.eventQueue.submit(new fe::MouseScrollEvent{{}, offset});
-
-    window.mouseInput.onMouseScroll(offset);
+    window.MouseScrollEvent(offset);
 }
 
 void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    // Event system
+    window.MouseButtonEvent(button, action, mode);
+
     switch (action) {
         case GLFW_PRESS:
-            window.eventQueue.submit(new fe::MouseButtonPressedEvent{{{}, static_cast<fe::MouseCode>(button)}});
+            window.MousePressEvent(button);
             break;
         case GLFW_RELEASE:
-            window.eventQueue.submit(new fe::MouseButtonReleasedEvent{{{}, static_cast<fe::MouseCode>(button)}});
+            window.MouseReleaseEvent(button);
             break;
     }
-
-    window.mouseInput.onMouseButton(button, action);
 }
 
 void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mode) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    // Event system
+    window.KeyEvent(key, scancode, action, mode);
+
     switch (action) {
         case GLFW_PRESS:
-            window.eventQueue.submit(new fe::KeyPressedEvent{{{}, static_cast<fe::KeyCode>(key)}, false});
+            window.KeyPressEvent(key);
             break;
         case GLFW_RELEASE:
-            window.eventQueue.submit(new fe::KeyReleasedEvent{{{}, static_cast<fe::KeyCode>(key)}});
+            window.KeyReleaseEvent(key);
             break;
         case GLFW_REPEAT:
-            window.eventQueue.submit(new fe::KeyPressedEvent{{{}, static_cast<fe::KeyCode>(key)}, true});
+            window.KeyHoldEvent(key);
             break;
     }
-
-    window.keyInput.onKeyPressed(key, action);
 }
 
 void Window::CursorEnterCallback(GLFWwindow* handle, int entered) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
-    if (entered)
-        window.eventQueue.submit(new fe::MouseCursorLeftEvent{});
-    else
-        window.eventQueue.submit(new fe::MouseCursorLeftEvent{});
+
+    window.MouseEnterEvent(entered);
 }
 
 void Window::CharCallback(GLFWwindow* handle, unsigned int keycode) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.eventQueue.submit(new fe::KeyTypedEvent{{{}, static_cast<fe::KeyCode>(keycode)}});
+    window.CharInputEvent(keycode);
 }
 
 #if GLFW_VERSION_MINOR >= 1
 void Window::FileDropCallback(GLFWwindow* handle, int count, const char** paths) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.eventQueue.submit(new fe::WindowFileDropCallback{{}, count, paths});
+    std::vector<std::string> result;
+    result.reserve(count);
+
+    for (int i = 0; i < count; ++i) {
+        result.emplace_back(paths[i]);
+    }
+
+    window.FileDropEvent(result);
 }
 #endif
 
@@ -263,10 +262,10 @@ void Window::JoystickCallback(int jid, int action) {
 
         switch (action) {
             case GLFW_CONNECTED:
-                window.eventQueue.submit(new fe::JoystickConnectedEvent{{}, jid});
+                window.JoystickEvent(jid, true);
                 break;
             case GLFW_DISCONNECTED:
-                window.eventQueue.submit(new fe::JoystickDisconnectedEvent{{}, jid});
+                window.JoystickEvent(jid, false);
                 break;
         }
     }
@@ -280,16 +279,15 @@ void Window::MaximizeCallback(GLFWwindow* handle, int maximized) {
 
     window.minimize = !maximized;
 
-    if (maximized)
-        window.eventQueue.submit(new fe::WindowMaximizedEvent{});
-    else
-        window.eventQueue.submit(new fe::WindowUnmaximizedEvent{});
+    window.MaximizeEvent(maximized);
 }
 
 void Window::ContentScaleCallback(GLFWwindow* handle, float scaleX, float scaleY) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.eventQueue.submit(new fe::WindowContentScaleEvent{{},{scaleX, scaleY}});
+    glm::vec2 scale {scaleX, scaleY};
+
+    window.ContentScaleEvent(scale);
 }
 #endif
 
@@ -299,10 +297,10 @@ void Window::MonitorCallback(GLFWmonitor* monitor, int action) {
 
         switch (action) {
             case GLFW_CONNECTED:
-                window.eventQueue.submit(new fe::MonitorConnectedEvent{{}, monitor});
+                window.MonitorEvent(true);
                 break;
             case GLFW_DISCONNECTED:
-                window.eventQueue.submit(new fe::MonitorDisconnectedEvent{{}, monitor});
+                window.MonitorEvent(false);
                 break;
         }
     }

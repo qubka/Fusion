@@ -234,3 +234,15 @@ set(JSON_LIB_NAME "json")
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 
 add_subdirectory(${JSON_LIB_NAME})
+
+
+# magic_enum
+set(SIGNALS_LIB_NAME "signals")
+set(SIGNALS_INC_PATH ${SIGNALS_LIB_NAME})
+
+add_library(${SIGNALS_LIB_NAME} INTERFACE)
+
+target_include_directories(${SIGNALS_LIB_NAME}
+        INTERFACE
+        ${SIGNALS_INC_PATH}
+        )

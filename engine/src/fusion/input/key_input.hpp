@@ -6,7 +6,8 @@
 namespace fe {
     class KeyInput : public BaseInput<KeyCode> {
     public:
-        KeyInput() : BaseInput<KeyCode>{std::make_pair(Key::Space, Key::KeyLast)} {}; //! use all possible keymaps
+        KeyInput()
+            : BaseInput<KeyCode>{std::make_pair(Key::Space, Key::KeyLast)} {}; //! use all possible keymaps
         KeyInput(const std::initializer_list<KeyCode>& keysToMonitor)
             : BaseInput<KeyCode>{keysToMonitor} {};
         ~KeyInput() = default;
@@ -19,6 +20,6 @@ namespace fe {
         bool getKeyDown(KeyCode key) const { return isKeyDown(key); }
 
         //! Used internally to update mouse data. Should be called by the GLFW callbacks
-        void onKeyPressed(KeyCode key, ActionCode action) { setKey(key, action); };
+        void onKeyPressed(KeyCode key, ActionCode action) { setKey(key, action); }
     };
 }

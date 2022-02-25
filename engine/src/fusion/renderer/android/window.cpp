@@ -1,10 +1,6 @@
 #include "window.hpp"
 // TODO: Refactor
 #if defined(ANDROID)
-#include "fusion/events/application_events.hpp"
-#include "fusion/events/window_events.hpp"
-#include "fusion/events/key_events.hpp"
-#include "fusion/events/mouse_events.hpp"
 #include "fusion/input/input.hpp"
 #include "fusion/input/key_input.hpp"
 #include "fusion/input/mouse_input.hpp"
@@ -23,10 +19,7 @@ Window::Window()
     instance = this;
 }
 
-bool Window::shouldClose() {
-    bool destroy = false;
-    eventQueue.clean();
-    resetInputs();
+void Window::pollEvents() {
     focused = true;
     int ident, events;
     struct android_poll_source* source;
@@ -36,16 +29,6 @@ bool Window::shouldClose() {
         }
         destroy = androidApp->destroyRequested != 0;
     }
-
-    // App destruction requested
-    return destroy;
-}
-
-void Window::resetInputs() {
-    /*
-    fe::Input::Update();
-    fe::MouseInput::Update();
-    fe::KeyInput::Update();*/
 }
 
 int32_t Window::onInput(AInputEvent* event) {

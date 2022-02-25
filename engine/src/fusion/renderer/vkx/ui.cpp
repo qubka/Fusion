@@ -45,7 +45,7 @@ void UIOverlay::create(const UIOverlayCreateInfo& createInfo) {
     setStyleColors();
 
     // Dimensions
-    //io.DisplaySize = ImVec2{static_cast<float>(createInfo.size.width), static_cast<float>(createInfo.size.height)};
+    io.DisplaySize = ImVec2{static_cast<float>(createInfo.size.width), static_cast<float>(createInfo.size.height)};
     io.FontGlobalScale = scale;
 
     prepareResources();

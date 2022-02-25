@@ -5,7 +5,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include "fusion/core/window.hpp"
-#include "fusion/events/event_queue.hpp"
 #include "fusion/input/key_input.hpp"
 #include "fusion/input/mouse_input.hpp"
 
@@ -19,10 +18,6 @@ namespace glfw {
         void* getNativeWindow() override { return window; }
         bool shouldClose() override { return glfwWindowShouldClose(window); };
         void shouldClose(bool flag) override { glfwSetWindowShouldClose(window, flag); };
-
-        fe::EventQueue& getEventQueue() { return eventQueue; }
-        fe::KeyInput& getKeyInput() { return keyInput; }
-        fe::MouseInput& getMouseInput() { return mouseInput; }
 
         void makeCurrent() const { glfwMakeContextCurrent(window); }
         void swapBuffers() const { glfwSwapBuffers(window); }
@@ -46,14 +41,8 @@ namespace glfw {
             glfwSetWindowSizeLimits(window, minSize.x, minSize.y, (maxSize.x != 0) ? maxSize.x : minSize.x, (maxSize.y != 0) ? maxSize.y : minSize.y);
         }
 
-        void runLoop(const std::function<void()>& frameHandler) override {
-            while (!shouldClose()) {
-                eventQueue.clean();
-                keyInput.onUpdate();
-                mouseInput.onUpdate();
-                glfwPollEvents();
-                frameHandler();
-            }
+        void pollEvents() override {
+            glfwPollEvents();
         }
 
 #if defined(VULKAN_HPP)
@@ -68,10 +57,6 @@ namespace glfw {
         GLFWwindow* window;
         std::string title;
         glm::ivec2 position;
-
-        fe::EventQueue eventQueue;
-        fe::KeyInput keyInput{};  //! use all possible keymaps
-        fe::MouseInput mouseInput{}; //! use all possible keymaps
 
         void initGLFW();
         void initWindow(bool fullscreen);

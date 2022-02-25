@@ -52,3 +52,6 @@
 	path = external/gli
 	url = https://github.com/g-truc/gli.git
 	ignore = all
+[submodule "external/signals"]
+	path = external/signals
+	url = https://github.com/qubka/signals.git

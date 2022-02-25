@@ -31,8 +31,10 @@ namespace fe {
         void run();
 
     public:
-        static const Application& Instance() { return *instance; }
-        fe::Window& getWindow() const { return *window; }
+        static Application& Instance() { return *instance; }
+        Window& getWindow() { return *window; }
+        KeyInput& getKeyInput() { return keyInput; }
+        MouseInput& getMouseInput() { return mouseInput; }
 
     private:
         // fps timer (one second interval)
@@ -111,6 +113,8 @@ namespace fe {
         void setupConsole(std::string title);
 #endif
         Window* window{ nullptr };
+        KeyInput keyInput{};
+        MouseInput mouseInput{};
     };
 
     Application* CreateApplication(CommandLineArgs args);

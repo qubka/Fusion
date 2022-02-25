@@ -5,7 +5,6 @@
 #include "fusion/renderer/offscreen.hpp"
 #include "fusion/renderer/allocatedbuffer.hpp"*/
 #include "fusion/utils/math.hpp"
-#include "fusion/events/window_events.hpp"
 #include "fusion/scene/components.hpp"
 
 #include "../editor_app.hpp"
