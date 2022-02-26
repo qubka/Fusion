@@ -142,7 +142,7 @@ void Renderer::recreateSwapChain() {
     auto extent = window.getExtent();
     while (extent.width == 0 || extent.height == 0) {
         extent = window.getExtent();
-        glfwWaitEvents();
+        window.waitEvents();
     }
 
     device.waitIdle();
@@ -150,8 +150,6 @@ void Renderer::recreateSwapChain() {
     FE_LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
 
     swapChain.create(extent, renderPass, false);
-
-    //ui.resize(extent, swapChain->framebuffers);
 }
 
 vk::CommandBuffer Renderer::beginFrame() {
@@ -161,13 +159,13 @@ vk::CommandBuffer Renderer::beginFrame() {
 
 #if !defined(__ANDROID__)
     // Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE) or no longer optimal for presentation (SUBOPTIMAL)
-    if (result == vk::Result::eSuboptimalKHR || result == vk::Result::eErrorOutOfDateKHR) {
+    if (result == vk::Result::eErrorOutOfDateKHR) {
         recreateSwapChain();
         return nullptr;
     }
 #endif
 
-    if (result != vk::Result::eSuccess) {
+    if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR) {
         throw std::runtime_error("Failed to acquire next image");
     }
 

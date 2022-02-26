@@ -1,6 +1,12 @@
 #pragma once
 
 namespace fe {
+    struct MouseData {
+        uint8_t button;
+        uint8_t action;
+        uint8_t mods;
+    };
+
     using MouseCode = uint8_t;
 
     namespace Mouse {

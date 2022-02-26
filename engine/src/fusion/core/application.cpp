@@ -149,6 +149,7 @@ void Application::setupUi() {
     // Setup default overlay creation info
     overlayCreateInfo.renderPass = renderer.getRenderPass();
     overlayCreateInfo.size = size;
+    overlayCreateInfo.window = window;
 
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
@@ -315,63 +316,6 @@ void Application::setupWindow() {
     window->MouseMotionEvent.connect<&MouseInput::onMouseMotion>(&mouseInput);
     window->MouseMotionNormEvent.connect<&MouseInput::onMouseMotionNorm>(&mouseInput);
     window->MouseScrollEvent.connect<&MouseInput::onMouseScroll>(&mouseInput);
-
-    window->FramebufferEvent.connect([](const glm::ivec2& pos) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.DisplaySize = ImVec2{static_cast<float>(pos.x), static_cast<float>(pos.y)};
-    });
-
-    window->MouseButtonEvent.connect([](MouseCode button, ActionCode action) {
-        if (button >= 0 && button < ImGuiMouseButton_COUNT) {
-            ImGuiIO& io = ImGui::GetIO();
-            io.AddMouseButtonEvent(button, action == Action::Press);
-        }
-    });
-
-    window->MouseMotionEvent.connect([](const glm::vec2& pos) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddMousePosEvent(pos.x, pos.y);
-    });
-
-    window->MouseScrollEvent.connect([](const glm::vec2& offset) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddMouseWheelEvent(offset.x, offset.y);
-    });
-
-    window->KeyEvent.connect([](KeyCode keycode, ActionCode action) {
-        if (keycode < ImGuiKey_COUNT) {
-            keycode = ImGui_ImplGlfw_TranslateUntranslatedKey(keycode, scancode);
-
-            ImGuiIO& io = ImGui::GetIO();
-            ImGuiKey imgui_key = ImGui_ImplGlfw_KeyToImGuiKey(keycode);
-            io.AddKeyEvent(imgui_key, action == Action::Press);
-            io.SetKeyEventNativeData(imgui_key, keycode, 0); // To support legacy indexing (<1.87 user code)
-        }
-    });
-
-    window->CharInputEvent.connect([](uint32_t c) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddInputCharacter(c);
-    });
-
-    window->FocusEvent.connect([](bool focuses) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddFocusEvent(focuses);
-    });
-
-    // Workaround: X11 seems to send spurious Leave/Enter events which would make us lose our position,
-    // so we back it up and restore on Leave/Enter (see https://github.com/ocornut/imgui/issues/4984)
-    window->MouseEnterEvent.connect([](bool entered) {
-        ImGuiIO& io = ImGui::GetIO();
-        if (entered) {
-            bd->MouseWindow = window;
-            io.AddMousePosEvent(bd->LastValidMousePos.x, bd->LastValidMousePos.y);
-        } else if (!entered && bd->MouseWindow == window) {
-            bd->LastValidMousePos = io.MousePos;
-            bd->MouseWindow = NULL;
-            io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
-        }
-    });
 }
 #endif
 

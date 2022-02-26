@@ -4,6 +4,21 @@
 
 namespace fe {
 
+    static std::random_device RandomDevice;
+    static std::mt19937_64 Engine(RandomDevice());
+    static std::uniform_int_distribution<uint64_t> UniformDistribution;
+
+    struct IdComponent {
+        uint64_t id;
+
+        IdComponent() : id{UniformDistribution(Engine)} {}
+        explicit IdComponent(uint64_t id) : id{id} {}
+
+        uint64_t& operator*() { return id; }
+        const uint64_t& operator*() const { return id; }
+        operator uint64_t() const { return id; }
+    };
+
     struct TagComponent {
         std::string tag;
 

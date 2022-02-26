@@ -37,6 +37,7 @@ namespace fe {
         virtual void shouldClose(bool flag) = 0;
 
         virtual void pollEvents() = 0;
+        virtual void waitEvents() = 0;
 
     protected:
         int width;
@@ -52,14 +53,14 @@ namespace fe {
         fteng::signal<void()> RefreshEvent;
         fteng::signal<void(bool)> FocusEvent;
         fteng::signal<void(bool)> IconifyEvent;
-        fteng::signal<void(MouseCode, ActionCode)> MouseButtonEvent;
+        fteng::signal<void(MouseData)> MouseButtonEvent;
         fteng::signal<void(MouseCode)> MousePressEvent;
         fteng::signal<void(MouseCode)> MouseReleaseEvent;
         fteng::signal<void(const glm::vec2 &)> MouseMotionEvent;
         fteng::signal<void(const glm::vec2 &)> MouseMotionNormEvent;
         fteng::signal<void(bool)> MouseEnterEvent;
         fteng::signal<void(const glm::vec2 &)> MouseScrollEvent;
-        fteng::signal<void(KeyCode, ActionCode)> KeyEvent;
+        fteng::signal<void(KeyData)> KeyEvent;
         fteng::signal<void(KeyCode)> KeyPressEvent;
         fteng::signal<void(KeyCode)> KeyReleaseEvent;
         fteng::signal<void(KeyCode)> KeyHoldEvent;

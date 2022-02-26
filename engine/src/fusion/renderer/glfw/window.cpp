@@ -195,10 +195,10 @@ void Window::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) 
     window.MouseScrollEvent(offset);
 }
 
-void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mode) {
+void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mods) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.MouseButtonEvent(button, action, mode);
+    window.MouseButtonEvent(fe::MouseData{ static_cast<uint8_t>(button), static_cast<uint8_t>(action), static_cast<uint8_t>(mods) });
 
     switch (action) {
         case GLFW_PRESS:
@@ -210,10 +210,10 @@ void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int
     }
 }
 
-void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mode) {
+void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mods) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.KeyEvent(key, scancode, action, mode);
+    window.KeyEvent(fe::KeyData{static_cast<uint16_t>(key), static_cast<uint8_t>(scancode), static_cast<uint8_t>(action), static_cast<uint8_t>(mods)});
 
     switch (action) {
         case GLFW_PRESS:

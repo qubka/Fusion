@@ -20,6 +20,6 @@ namespace fe {
         bool getKeyDown(KeyCode key) const { return isKeyDown(key); }
 
         //! Used internally to update mouse data. Should be called by the GLFW callbacks
-        void onKeyPressed(KeyCode key, ActionCode action) { setKey(key, action); }
+        void onKeyPressed(KeyData data) { setKey(data.key, data.action); }
     };
 }

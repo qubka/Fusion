@@ -5,64 +5,7 @@
 #include <imgui/imgui_internal.h>
 #include <magic_enum/include/magic_enum.hpp>
 
-// TEMP
-#include "fusion/core/application.hpp"
-//#include "fusion/renderer/mesh.hpp"
-
 using namespace fe;
-
-SceneHierarchyPanel::SceneHierarchyPanel() {
-    glm::vec3 m_half_extents{1};
-    float orientation = -1.0;
-
-    /*Mesh::Builder meshBuilder{};
-    meshBuilder.vertices =
-            {
-                    //front
-                    //                                 position														 normal					      tex coord
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, 0.0f,  1.0f * orientation},		{ 0.f, 0.f } },
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, 0.0f,  1.0f * orientation},		{ 1.f, 0.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, 0.0f,  1.0f * orientation},		{ 1.f, 1.f } },
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, 0.0f,  1.0f * orientation},		{ 0.f, 1.f } },
-                    //right
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 0.f } },
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 0.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 1.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 1.f } },
-                    //back
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, 0.0f, -1.0f * orientation},		{ 0.f, 0.f } },
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, 0.0f, -1.0f * orientation},		{ 1.f, 0.f } },
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, 0.0f, -1.0f * orientation},		{ 1.f, 1.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, 0.0f, -1.0f * orientation},		{ 0.f, 1.f } },
-                    //left
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, {-1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 0.f } },
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, {-1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 0.f } },
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, {-1.0f * orientation, 0.0f, 0.0f},		{ 1.f, 1.f } },
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, {-1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 1.f } },
-                    //top
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f,  1.0f * orientation, 0.0f},		{ 0.f, 0.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f,  1.0f * orientation, 0.0f},		{ 1.f, 0.f } },
-                    { { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f,  1.0f * orientation, 0.0f},		{ 1.f, 1.f } },
-                    { {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f,  1.0f * orientation, 0.0f},		{ 0.f, 1.f } },
-                    //bottom
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, -1.0f * orientation, 0.0f},		{ 0.f, 0.f } },
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z }, { 0.0f, -1.0f * orientation, 0.0f},		{ 1.f, 0.f } },
-                    { { 1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, -1.0f * orientation, 0.0f},		{ 1.f, 1.f } },
-                    { {-1.f * m_half_extents.x, -1.f * m_half_extents.y,  1.f * m_half_extents.z }, { 0.0f, -1.0f * orientation, 0.0f},		{ 0.f, 1.f } },
-            };
-
-    meshBuilder.indices =
-            {
-                    0,  1,  2,		 0,  2,  3,  //front
-                    4,  5,  6,		 4,  6,  7,  //right
-                    8,  9, 10,		 8, 10, 11,  //back
-                    12, 13, 14,		12, 14, 15,  //left
-                    16, 17, 18,		16, 18, 19,  //upper
-                    20, 21, 22,		20, 22, 23   //bottom
-            };
-
-    mesh = std::make_shared<Mesh>(Application::Instance().getVulkan(), meshBuilder);*/
-}
 
 void SceneHierarchyPanel::setContext(const std::shared_ptr<Scene>& scene) {
     context = scene;
@@ -83,8 +26,8 @@ void SceneHierarchyPanel::onImGui() {
     if (ImGui::BeginPopupContextWindow(0, 1, false)) {
         if (ImGui::MenuItem("Create Empty Entity")) {
             auto entity = context->registry.create();
+            context->registry.emplace<IdComponent>(entity);
             context->registry.emplace<TagComponent>(entity, "Empty Entity");
-            //context->registry.emplace<MeshRendererComponent>(entity, mesh);
             context->registry.emplace<TransformComponent>(entity);
         }
         ImGui::EndPopup();
@@ -255,13 +198,12 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
             }
         }
 
-
         ImGui::EndPopup();
     }
 
     ImGui::PopItemWidth();
 
-    drawComponent<TransformComponent>("Transform", entity, [&](auto& component)
+    drawComponent<TransformComponent>("Transform", entity, [](TransformComponent& component)
     {
         drawVec3Control("Translation", component.translation);
         glm::vec3 rotation = glm::degrees(component.rotation);
@@ -270,7 +212,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
         drawVec3Control("Scale", component.scale, 1.0f);
     });
 
-    drawComponent<CameraComponent>("Camera", entity, [&](CameraComponent& component)
+    drawComponent<CameraComponent>("Camera", entity, [](CameraComponent& component)
     {
         auto& camera = component.camera;
 

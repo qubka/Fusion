@@ -9,6 +9,7 @@
 #pragma once
 
 #include "context.hpp"
+#include "fusion/core/window.hpp"
 
 #include <imgui.h>
 
@@ -23,6 +24,7 @@ struct UIOverlayCreateInfo {
     vk::Format colorformat;
     vk::Format depthformat;
     vk::Extent2D size;
+    fe::Window* window;
     std::vector<vk::PipelineShaderStageCreateInfo> shaders;
     vk::SampleCountFlagBits rasterizationSamples{ vk::SampleCountFlagBits::e1 };
     uint32_t subpassCount{ 1 };
@@ -49,6 +51,9 @@ private:
 
     vkx::Image font;
 
+    fe::Window* currentWindow{ nullptr };
+    ImVec2 lastValidMousePos{ -FLT_MAX, -FLT_MAX };
+
     struct PushConstBlock {
         glm::vec2 scale;
         glm::vec2 translate;
@@ -57,23 +62,22 @@ private:
     void prepareResources();
     void preparePipeline();
     void prepareRenderPass();
+    void setupEvents();
+
     static void setStyleColors();
 
 public:
     bool visible{ true };
     float scale{ 1.0f };
 
-    //std::vector<vk::CommandBuffer> cmdBuffers;
-
-    UIOverlay(const vkx::Context& context) : context(context) {}
+    UIOverlay(const vkx::Context& context) : context{context} {}
     ~UIOverlay();
 
     void create(const UIOverlayCreateInfo& createInfo);
     void destroy();
-
     bool update();
-    void draw(const vk::CommandBuffer& cmdBuffer);
 
+    void draw(const vk::CommandBuffer& cmdBuffer);
     bool header(const char* caption) const;
     bool checkBox(const char* caption, bool* value) const;
     bool checkBox(const char* caption, int32_t* value) const;
@@ -82,8 +86,16 @@ public:
     bool sliderInt(const char* caption, int32_t* value, int32_t min, int32_t max) const;
     bool comboBox(const char* caption, int32_t* itemindex, const std::vector<std::string>& items) const;
     bool button(const char* caption) const;
+
     void text(const char* formatstr, ...) const;
 
     ImTextureID addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const;
+
+#if defined GLFW_INCLUDE_VULKAN
+private:
+    static void UpdateKeyModifiers(int mods);
+    static int TranslateUntranslatedKey(int key, int scancode);
+    static ImGuiKey KeyToImGuiKey(int key);
+#endif
 };
 }}  // namespace vkx::ui

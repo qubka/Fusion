@@ -45,6 +45,10 @@ namespace glfw {
             glfwPollEvents();
         }
 
+        void waitEvents() override {
+            glfwWaitEvents();
+        }
+
 #if defined(VULKAN_HPP)
         static std::vector<std::string> getRequiredInstanceExtensions();
         static vk::SurfaceKHR createWindowSurface(GLFWwindow* window, const vk::Instance& instance, const vk::AllocationCallbacks* pAllocator = nullptr);
@@ -71,7 +75,7 @@ namespace glfw {
         static void FocusCallback(GLFWwindow* window, int focused);
         static void IconifyCallback(GLFWwindow* window, int iconified);
         static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
-        static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mode);
+        static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
         static void CursorPosCallback(GLFWwindow* window, double posX, double posY);
         static void CursorEnterCallback(GLFWwindow* window, int entered);
         static void ScrollCallback(GLFWwindow* window, double offsetX, double offsetY);

@@ -135,7 +135,9 @@ SceneSerializer::SceneSerializer(const std::shared_ptr<Scene>& scene) : scene{sc
 
 void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity entity) {
     out << YAML::BeginMap; // Entity
-    out << YAML::Key << "Entity" << YAML::Value << "12837192831273"; // TODO: Entity ID goes here
+    if (auto* component = registry.try_get<IdComponent>(entity)) {
+        out << YAML::Key << "Entity" << YAML::Value << component->id;
+    }
 
     if (auto* component = registry.try_get<TagComponent>(entity)) {
         out << YAML::Key << "TagComponent";
@@ -212,8 +214,9 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
 
     if (const auto& entities = data["Entities"]) {
         for (const auto& entity : entities) {
-            auto uuid = entity["Entity"].as<uint64_t>(); // TODO
-            auto deserializedEntity = scene->registry.create(/*uuid*/);
+            auto uuid = entity["Entity"].as<uint64_t>();
+            auto deserializedEntity = scene->registry.create();
+            scene->registry.emplace<IdComponent>(deserializedEntity, uuid);
 
             std::string name;
             if (const auto& tagComponent = entity["TagComponent"]) {
@@ -248,6 +251,8 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
                         cameraComponent["FixedAspectRatio"].as<bool>()
                 );
             }
+
+
         }
     }
 

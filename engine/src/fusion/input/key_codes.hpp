@@ -1,6 +1,13 @@
 #pragma once
 
 namespace fe {
+    struct KeyData {
+        uint16_t key;
+        uint8_t scancode;
+        uint8_t action;
+        uint8_t mods;
+    };
+
     using KeyCode = uint16_t;
 
     namespace Key {

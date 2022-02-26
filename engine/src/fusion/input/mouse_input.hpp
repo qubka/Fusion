@@ -34,11 +34,12 @@ namespace fe {
         //! The current mouse scroll delta.
         const glm::vec2& mouseScroll() const { return scroll; }
 
+    public:
         //! Used internally to update mouse data. Should be called by the GLFW callbacks
         void onMouseMotion(const glm::vec2& pos) { setMousePosition(pos); }
         void onMouseMotionNorm(const glm::vec2& pos) { setMousePositionNorm(pos); }
         void onMouseScroll(const glm::vec2& offset) { setScrollOffset(offset); }
-        void onMouseButton(MouseCode button, ActionCode action) { setKey(button, action); };
+        void onMouseButton(MouseData data) { setKey(data.button, data.action); };
 
     private:
         glm::vec2 position{};

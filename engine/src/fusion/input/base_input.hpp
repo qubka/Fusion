@@ -6,7 +6,6 @@
 
 namespace fe {
     /* Template class */
-
     /// Regards to Jonathan Heard
     /// @link https://stackoverflow.com/questions/55573238/how-do-i-do-a-proper-input-class-in-glfw-for-a-game-engine
     template<class T>

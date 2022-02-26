@@ -64,7 +64,7 @@ struct OffscreenRenderer {
         : context{context}
         , device{context.device}
         , queue{context.queue}
-        , colorFormats{{ vk::Format::eB8G8R8A8Unorm }} {}
+        , colorFormats{ vk::Format::eB8G8R8A8Unorm } {}
 
     void destroy() {
         queue.waitIdle();
