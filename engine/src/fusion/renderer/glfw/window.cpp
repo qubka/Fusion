@@ -51,7 +51,7 @@ void Window::initGLFW() {
 }
 
 void Window::initWindow(bool fullscreen) {
-    FE_LOG_INFO << "Creating window: " << title << " [" << width << " " << height << "]";
+    LOG_INFO << "Creating window: " << title << " [" << width << " " << height << "]";
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -307,6 +307,6 @@ void Window::MonitorCallback(GLFWmonitor* monitor, int action) {
 }
 
 void Window::ErrorCallback(int error, const char* description) {
-    FE_LOG_ERROR << "[GLFW] Error (" << error << "): " << description;
+    LOG_ERROR << "[GLFW] Error (" << error << "): " << description;
 }
 #endif

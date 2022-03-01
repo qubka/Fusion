@@ -14,9 +14,3 @@ namespace fe {
         static void Init();
     };
 }
-
-#define FE_LOG_DEBUG PLOG_DEBUG
-#define FE_LOG_INFO  PLOG_INFO
-#define FE_LOG_WARNING PLOG_WARNING
-#define FE_LOG_ERROR PLOG_ERROR
-#define FE_LOG_FATAL PLOG_FATAL

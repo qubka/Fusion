@@ -3,7 +3,6 @@
 #include "components.hpp"
 #include "scene.hpp"
 
-#include <magic_enum.hpp>
 #include <yaml-cpp/yaml.h>
 
 namespace YAML {
@@ -210,7 +209,7 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
         return false;
 
     auto sceneName = data["Scene"].as<std::string>();
-    FE_LOG_DEBUG << "Deserializing scene:" << sceneName;
+    LOG_DEBUG << "Deserializing scene:" << sceneName;
 
     if (const auto& entities = data["Entities"]) {
         for (const auto& entity : entities) {
@@ -224,7 +223,7 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
                 scene->registry.emplace<TagComponent>(deserializedEntity, name);
             }
 
-            FE_LOG_DEBUG << "Deserialized entity with ID = " << uuid << ", name = " << name;
+            LOG_DEBUG << "Deserialized entity with ID = " << uuid << ", name = " << name;
 
             if (const auto& transformComponent = entity["TransformComponent"]) {
                 scene->registry.emplace<TransformComponent>(deserializedEntity,

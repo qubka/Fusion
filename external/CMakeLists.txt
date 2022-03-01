@@ -132,7 +132,7 @@ target_include_directories(${MAGIC_ENUM_LIB_NAME}
 #)
 
 
-# entt
+# stb
 set(STB_LIB_NAME "stb")
 set(STB_INC_PATH ${STB_LIB_NAME}/)
 

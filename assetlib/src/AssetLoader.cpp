@@ -36,7 +36,7 @@ bool Asset::LoadBinaryFile(const std::string& path, AssetFile& file) {
     infile.open(path, std::ios::binary);
 
     if (!infile.is_open()) {
-        FE_LOG_ERROR << "Error when trying to write file: " << path << std::endl;
+        LOG_ERROR << "Error when trying to write file: " << path << std::endl;
         return false;
     }
 

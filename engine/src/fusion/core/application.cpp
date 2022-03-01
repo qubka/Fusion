@@ -1,8 +1,8 @@
 #include "application.hpp"
 #include "layer.hpp"
 
-#include <imgui.h>
-#include <ImGuizmo.h>
+#include <imgui/imgui.h>
+#include <imguizmo/ImGuizmo.h>
 
 using namespace fe;
 
@@ -28,7 +28,7 @@ Application::Application(std::string title, CommandLineArgs args) : title{std::m
         std::string msg = "Could not locate asset path in \"" + getAssetPath() + "\" !";
 		MessageBox(NULL, msg.c_str(), "Fatal error", MB_OK | MB_ICONERROR);
 #else
-        FE_LOG_ERROR << "Error: Could not find asset path in " << getAssetPath();
+        LOG_ERROR << "Error: Could not find asset path in " << getAssetPath();
 #endif
         exit(-1);
     }
@@ -64,7 +64,7 @@ Application::Application(std::string title, CommandLineArgs args) : title{std::m
     if (commandLineParser.isSet("shaders")) {
         std::string value = commandLineParser.getValueAsString("shaders", "glsl");
         if ((value != "glsl") && (value != "hlsl")) {
-            FE_LOG_ERROR << "Shader type must be one of 'glsl' or 'hlsl'";
+            LOG_ERROR << "Shader type must be one of 'glsl' or 'hlsl'";
         }/* else {
             shaderDir = value;
         }*/
@@ -128,7 +128,7 @@ void Application::run() {
         context.queue.waitIdle();
         context.device.waitIdle();
     } catch(const std::system_error& err) {
-        FE_LOG_ERROR << err.what();
+        LOG_ERROR << err.what();
     }
 }
 

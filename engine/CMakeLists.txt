@@ -27,11 +27,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     entt
     magic_enum
     signals
-    stb
     plog
     yaml-cpp
-    portable_file_dialogs
-    #assetlib
     Vulkan::Vulkan
     assimp::assimp
 )

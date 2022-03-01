@@ -2,6 +2,7 @@
 
 #include "panels/scene_hierarchy_panel.hpp"
 #include "panels/content_browser_panel.hpp"
+#include "panels/inspector_panel.hpp"
 
 #include "fusion/core/layer.hpp"
 #include "fusion/input/base_input.hpp"
@@ -11,7 +12,7 @@
 //#include "fusion/systems/meshrenderer.hpp"
 #include "fusion/utils/process_info.hpp"
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 namespace fe {
     class EditorApp;
@@ -42,6 +43,7 @@ namespace fe {
         // Panels
         SceneHierarchyPanel sceneHierarchyPanel;
         ContentBrowserPanel contentBrowserPanel;
+        InspectorPanel inspectorPanel;
 
         int gizmoType = -1;
         enum class SceneState {

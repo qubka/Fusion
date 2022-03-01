@@ -16,10 +16,6 @@ namespace fe {
         void onRenderRuntime();
         void onRenderEditor();
 
-        //entt::entity getPrimaryCameraEntity() const { return entt::null; }
-
         entt::registry registry;
-
-
     };
 }

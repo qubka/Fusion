@@ -147,7 +147,7 @@ void Renderer::recreateSwapChain() {
 
     device.waitIdle();
 
-    FE_LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
+    LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
 
     swapChain.create(extent, renderPass, false);
 }

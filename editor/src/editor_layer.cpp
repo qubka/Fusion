@@ -181,6 +181,7 @@ void EditorLayer::onImGui() {
         ImGui::EndMenuBar();
     }
 
+    inspectorPanel.onImGui();
     sceneHierarchyPanel.onImGui();
     contentBrowserPanel.onImGui();
 
@@ -310,7 +311,7 @@ void EditorLayer::openScene() {
 
 void EditorLayer::openScene(const std::filesystem::path& path) {
     if (path.extension().string() != ".scene") {
-        FE_LOG_WARNING << "Could not load " << path.filename().string() << " - not a scene file";
+        LOG_WARNING << "Could not load " << path.filename().string() << " - not a scene file";
         return;
     }
 
@@ -322,7 +323,7 @@ void EditorLayer::openScene(const std::filesystem::path& path) {
         sceneHierarchyPanel.setContext(activeScene);
     }
 
-    FE_LOG_INFO << "Scene " << path.filename().string() << " was loaded !";
+    LOG_INFO << "Scene " << path.filename().string() << " was loaded !";
 }
 
 void EditorLayer::saveSceneAs() {

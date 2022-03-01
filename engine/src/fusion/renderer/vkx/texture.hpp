@@ -56,17 +56,17 @@ class Texture2D : public Texture {
 
 public:
     /**
-        * Load a 2D texture including all mip levels
-        *
-        * @param filename File to load (supports .ktx and .dds)
-        * @param format Vulkan format of the image data stored in the file
-        * @param device Vulkan device to create the texture on
-        * @param copyQueue Queue used for the texture staging copy commands (must support transfer)
-        * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
-        * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-        * @param (Optional) forceLinear Force linear tiling (not advised, defaults to false)
-        *
-        */
+     * Load a 2D texture including all mip levels
+     *
+     * @param filename File to load (supports .ktx and .dds)
+     * @param format Vulkan format of the image data stored in the file
+     * @param device Vulkan device to create the texture on
+     * @param copyQueue Queue used for the texture staging copy commands (must support transfer)
+     * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
+     * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+     * @param (Optional) forceLinear Force linear tiling (not advised, defaults to false)
+     *
+     */
     void loadFromFile(const vkx::Context& context,
                       const std::string& filename,
                       vk::Format format = vk::Format::eR8G8B8A8Unorm,
@@ -223,16 +223,16 @@ public:
 class Texture2DArray : public Texture {
 public:
     /**
-        * Load a 2D texture array including all mip levels
-        *
-        * @param filename File to load (supports .ktx and .dds)
-        * @param format Vulkan format of the image data stored in the file
-        * @param device Vulkan device to create the texture on
-        * @param copyQueue Queue used for the texture staging copy commands (must support transfer)
-        * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
-        * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-        *
-        */
+     * Load a 2D texture array including all mip levels
+     *
+     * @param filename File to load (supports .ktx and .dds)
+     * @param format Vulkan format of the image data stored in the file
+     * @param device Vulkan device to create the texture on
+     * @param copyQueue Queue used for the texture staging copy commands (must support transfer)
+     * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
+     * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+     *
+     */
     void loadFromFile(const vkx::Context& context,
                       std::string filename,
                       vk::Format format,
@@ -338,16 +338,16 @@ public:
 class TextureCubeMap : public Texture {
 public:
     /**
-        * Load a cubemap texture including all mip levels from a single file
-        *
-        * @param filename File to load (supports .ktx and .dds)
-        * @param format Vulkan format of the image data stored in the file
-        * @param device Vulkan device to create the texture on
-        * @param copyQueue Queue used for the texture staging copy commands (must support transfer)
-        * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
-        * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-        *
-        */
+     * Load a cubemap texture including all mip levels from a single file
+     *
+     * @param filename File to load (supports .ktx and .dds)
+     * @param format Vulkan format of the image data stored in the file
+     * @param device Vulkan device to create the texture on
+     * @param copyQueue Queue used for the texture staging copy commands (must support transfer)
+     * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
+     * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+     *
+     */
     void loadFromFile(const vkx::Context& context,
                       const std::string& filename,
                       vk::Format format,

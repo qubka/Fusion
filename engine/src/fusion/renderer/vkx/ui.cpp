@@ -123,10 +123,10 @@ void UIOverlay::prepareResources() {
 		}
         io.Fonts->Build();
 #else
-    std::string filename = getAssetPath() + "fonts/Roboto-Black.ttf";
-    io.Fonts->AddFontFromFileTTF(filename.c_str(), 14.0f);
-    filename = getAssetPath() + "fonts/fontawesome-webfont.ttf"; //TODO: Replace
-    io.Fonts->AddFontFromFileTTF(filename.c_str(), 14.0f, &config, icons_ranges); // Merge into first font
+    std::string filename = getAssetPath() + "/fonts/Roboto-Black.ttf";
+    io.Fonts->AddFontFromFileTTF(filename.c_str(), 16.0f);
+    filename = getAssetPath() + "/fonts/fontawesome-webfont.ttf"; //TODO: Replace
+    io.Fonts->AddFontFromFileTTF(filename.c_str(), 16.0f, &config, icons_ranges); // Merge into first font
     io.Fonts->Build();
 #endif
 
@@ -231,8 +231,8 @@ void UIOverlay::preparePipeline() {
     if (!createInfo.shaders.empty()) {
         pipelineBuilder.shaderStages = createInfo.shaders;
     } else {
-        pipelineBuilder.loadShader(fe::getAssetPath() + "shaders/base/uioverlay.vert.spv", vk::ShaderStageFlagBits::eVertex);
-        pipelineBuilder.loadShader(fe::getAssetPath() + "shaders/base/uioverlay.frag.spv", vk::ShaderStageFlagBits::eFragment);
+        pipelineBuilder.loadShader(fe::getAssetPath() + "/shaders/base/uioverlay.vert.spv", vk::ShaderStageFlagBits::eVertex);
+        pipelineBuilder.loadShader(fe::getAssetPath() + "/shaders/base/uioverlay.frag.spv", vk::ShaderStageFlagBits::eFragment);
     }
 
     // Vertex bindings an attributes based on ImGui vertex definition

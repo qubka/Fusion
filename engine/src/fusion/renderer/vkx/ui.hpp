@@ -11,7 +11,7 @@
 #include "context.hpp"
 #include "fusion/core/window.hpp"
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 #ifdef __ANDROID__
 #include <android/native_activity.h>

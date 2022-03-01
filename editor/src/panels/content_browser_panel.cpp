@@ -11,8 +11,7 @@ ContentBrowserPanel::ContentBrowserPanel() : currentDirectory{getAssetPath()} {
 void ContentBrowserPanel::onImGui() {
     ImGui::Begin("Content Browser");
 
-    //TODO: FIXME
-    if (currentDirectory != std::filesystem::path(getAssetPath())) {
+    if (currentDirectory.string() != getAssetPath()) {
         if (ImGui::Button("\uF112")) {
             currentDirectory = currentDirectory.parent_path();
         }
@@ -32,11 +31,17 @@ void ContentBrowserPanel::onImGui() {
     for (auto& directoryEntry : std::filesystem::directory_iterator(currentDirectory)) {
         const auto& path = directoryEntry.path();
         auto relativePath = std::filesystem::relative(path, getAssetPath());
-        std::string filename = relativePath.filename().string();
+        auto filename = relativePath.filename();
 
         ImGui::PushID(filename.c_str());
         ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
-        ImGui::Button(directoryEntry.is_directory() ? "\uF07C" : "\uF15C", { thumbnailSize, thumbnailSize });
+
+        if (directoryEntry.is_directory()) {
+            ImGui::Button("\uF07C", { thumbnailSize, thumbnailSize });
+        } else {
+            auto key { extentions.find(filename.extension()) };
+            ImGui::Button(key != extentions.end() ? key->second.c_str() : "\uF016", { thumbnailSize, thumbnailSize });
+        }
 
         if (ImGui::BeginDragDropSource()) {
             auto itemStr = relativePath.wstring();
@@ -46,10 +51,16 @@ void ContentBrowserPanel::onImGui() {
         }
 
         ImGui::PopStyleColor();
-        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)){
-            if (directoryEntry.is_directory())
-                currentDirectory /= path.filename();
+        if (ImGui::IsItemHovered()) {
+            if (directoryEntry.is_directory()) {
+                if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+                    currentDirectory /= path.filename();
+            } else {
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+                    currentFile = directoryEntry;
+            }
         }
+
         ImGui::TextWrapped("%s", filename.c_str());
 
         ImGui::NextColumn();

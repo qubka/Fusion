@@ -152,7 +152,7 @@ void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity en
         ImGui::PopStyleVar();
         ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 
-        if (ImGui::Button("\uF067")) {
+        if (ImGui::Button("+")) {
             ImGui::OpenPopup("ComponentSettings");
         }
 

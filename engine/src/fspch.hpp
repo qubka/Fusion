@@ -43,6 +43,8 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include <magic_enum.hpp>
+
 #if defined(__ANDROID__)
 #include <android/native_activity.h>
 #include <android/asset_manager.h>

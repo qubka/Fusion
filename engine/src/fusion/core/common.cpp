@@ -8,7 +8,7 @@ const std::string& fe::getAssetPath() {
     static std::string path;
     static std::once_flag once;
     std::call_once(once, [] {
-        path = "data/";
+        path = "data";
     });
     return path;
 #endif

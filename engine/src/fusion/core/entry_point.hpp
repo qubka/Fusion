@@ -2,8 +2,8 @@
 
 int main(int args, char** argv) {
     fe::Log::Init();
-    FE_LOG_INFO << "Fusion Engine";
-    FE_LOG_INFO << "Game Started";
+    LOG_INFO << "Fusion Engine";
+    LOG_INFO << "Game Started";
 
     auto app = fe::CreateApplication({args, argv});
     app->run();
