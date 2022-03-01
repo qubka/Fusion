@@ -6,6 +6,7 @@
 #include "fusion/renderer/allocatedbuffer.hpp"*/
 #include "fusion/utils/math.hpp"
 #include "fusion/scene/components.hpp"
+#include "fusion/input/input.hpp"
 
 #include "../editor_app.hpp"
 
@@ -15,7 +16,6 @@
 #define DEFAULT_PATH "/tmp"
 #endif
 
-//#include <backends/imgui_impl_vulkan.h>
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
 #include <imgui/imgui.h>
@@ -24,7 +24,7 @@
 
 using namespace fe;
 
-EditorLayer::EditorLayer(const EditorApp& app) : Layer{"EditorLayer"}, app{app} {
+EditorLayer::EditorLayer() : Layer{"EditorLayer"} {
 }
 
 EditorLayer::~EditorLayer() {
@@ -49,21 +49,21 @@ void EditorLayer::onDetach() {
 
 }
 
-void EditorLayer::onUpdate() {
+void EditorLayer::onUpdate(float ts) {
     /*auto& window = vulkan.getWindow();
     if (auto* event = window.eventQueue.next<WindowFramebufferSizeEvent>()) {
         editorCamera.setViewport(event->width, event->height);
-    }
+    }*/
 
     switch (sceneState) {
         case SceneState::Edit: {
-            editorCamera.onUpdate();
-            activeScene->onUpdateEditor();
+            editorCamera.update(ts);
+            activeScene->onUpdateEditor(ts);
             break;
         }
 
         case SceneState::Play: {
-            activeScene->onUpdateRuntime();
+            activeScene->onUpdateRuntime(ts);
             break;
         }
     }
@@ -78,31 +78,28 @@ void EditorLayer::onUpdate() {
         } else if (Input::GetKeyDown(Key::R)) {
             gizmoType = ImGuizmo::OPERATION::SCALE;
         }
-    }*/
-
+    }
 }
 
-void EditorLayer::onRender() {
+void EditorLayer::onRender(Renderer& renderer) {
     // update
-    /*GlobalUbo ubo{};
+    GlobalUbo ubo{};
     ubo.projection = editorCamera.getProjection();
     ubo.view = editorCamera.getView();
-    ubo.lightDirection = glm::normalize(renderer.getLightDirection());
     auto& buffer = renderer.getCurrentUniformBuffer();
-    buffer.writeToBuffer(&ubo);
+    buffer.copy(ubo);
     buffer.flush();
 
     switch (sceneState) {
-        case SceneState::Edit: {
-            activeScene->onRenderEditor(meshRenderer);
+        case SceneState::Edit:
+            activeScene->onRenderEditor(renderer);
             break;
-        }
 
         case SceneState::Play: {
-            activeScene->onRenderRuntime(meshRenderer);
+            activeScene->onRenderRuntime(renderer);
             break;
         }
-    }*/
+    }
 }
 
 void EditorLayer::onImGui() {
@@ -181,7 +178,6 @@ void EditorLayer::onImGui() {
         ImGui::EndMenuBar();
     }
 
-    inspectorPanel.onImGui();
     sceneHierarchyPanel.onImGui();
     contentBrowserPanel.onImGui();
 

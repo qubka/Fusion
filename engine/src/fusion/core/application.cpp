@@ -250,7 +250,7 @@ void Application::update(float deltaTime) {
     }
 
     for (auto* layer: layers) {
-        layer->onUpdate();
+        layer->onUpdate(deltaTime);
     }
 
     updateOverlay();
@@ -324,7 +324,7 @@ void Application::render() {
         renderer.beginRenderPass(cmdBuffer);
 
         for (auto* layer: layers) {
-            layer->onRender();
+            layer->onRender(renderer);
         }
 
         if (settings.overlay) {

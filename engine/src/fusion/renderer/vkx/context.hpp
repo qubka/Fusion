@@ -184,7 +184,7 @@ public:
 
     void createInstance(uint32_t version = VK_MAKE_VERSION(1, 1, 0)) {
         if (enableValidation) {
-            requireExtensions({ (const char*)VK_EXT_DEBUG_REPORT_EXTENSION_NAME });
+            requireExtensions({ VK_EXT_DEBUG_REPORT_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME });
         }
 
         // Vulkan instance
@@ -224,6 +224,8 @@ public:
 
         if (enableValidation) {
             debug::setupDebugging(instance, vk::DebugReportFlagBitsEXT::eError | vk::DebugReportFlagBitsEXT::eWarning);
+            debug::setupMessenger(instance, vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning | vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+                                            vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance);
         }
 
         dynamicDispatch.init(instance, &vkGetInstanceProcAddr);
@@ -269,6 +271,7 @@ public:
         device.destroy();
         if (enableValidation) {
             debug::freeDebugCallback(instance);
+            debug::freeMessengerCallback(instance);
         }
         if (surface) {
             instance.destroySurfaceKHR(surface);

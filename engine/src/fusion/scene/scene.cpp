@@ -13,19 +13,19 @@ Scene::~Scene() {
 
 }
 
-void Scene::onUpdateRuntime() {
+void Scene::onUpdateRuntime(float ts) {
 
 }
 
-void Scene::onUpdateEditor() {
+void Scene::onUpdateEditor(float ts) {
 
 }
 
-void Scene::onRenderRuntime() {
+void Scene::onRenderRuntime(Renderer& renderer) {
 
 }
 
-void Scene::onRenderEditor() {
+void Scene::onRenderEditor(Renderer& renderer) {
     /*meshRenderer.beginScene();
 
     auto group = registry.group<TransformComponent>(entt::get<MeshRendererComponent>);

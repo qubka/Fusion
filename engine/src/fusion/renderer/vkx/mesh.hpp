@@ -23,7 +23,7 @@ namespace vkx {
         /** @brief Release all Vulkan resources of this mesh */
         void destroy();
 
-        void bind(const vk::CommandBuffer& cmdBuffer) const;
-        void draw(const vk::CommandBuffer& cmdBuffer) const;
+        void bind(const vk::CommandBuffer& commandBuffer) const;
+        void draw(const vk::CommandBuffer& commandBuffer) const;
     };
 }

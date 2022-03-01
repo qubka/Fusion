@@ -368,7 +368,7 @@ void UIOverlay::setupEvents() {
 }
 
 /** Update the command buffers to reflect UI changes */
-void UIOverlay::draw(const vk::CommandBuffer& cmdBuffer) {
+void UIOverlay::draw(const vk::CommandBuffer& commandBuffer) {
     ImDrawData* imDrawData = ImGui::GetDrawData();
     int32_t vertexOffset = 0;
     int32_t indexOffset = 0;
@@ -379,15 +379,15 @@ void UIOverlay::draw(const vk::CommandBuffer& cmdBuffer) {
 
     ImGuiIO& io = ImGui::GetIO();
 
-    cmdBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
+    commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
     //cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, descriptorSet, {});
 
     pushConstBlock.scale = glm::vec2{2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y};
     pushConstBlock.translate = glm::vec2{-1.0f};
-    cmdBuffer.pushConstants(pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, vk::ArrayProxy<const PushConstBlock>{ pushConstBlock });
+    commandBuffer.pushConstants(pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, vk::ArrayProxy<const PushConstBlock>{ pushConstBlock });
 
-    cmdBuffer.bindVertexBuffers(0, vertexBuffer.buffer, { 0 });
-    cmdBuffer.bindIndexBuffer(indexBuffer.buffer, 0, sizeof(ImDrawIdx) == 2 ? vk::IndexType::eUint16 : vk::IndexType::eUint32);
+    commandBuffer.bindVertexBuffers(0, vertexBuffer.buffer, { 0 });
+    commandBuffer.bindIndexBuffer(indexBuffer.buffer, 0, sizeof(ImDrawIdx) == 2 ? vk::IndexType::eUint16 : vk::IndexType::eUint32);
 
     for (int32_t i = 0; i < imDrawData->CmdListsCount; i++) {
         const ImDrawList* cmd_list = imDrawData->CmdLists[i];
@@ -398,13 +398,13 @@ void UIOverlay::draw(const vk::CommandBuffer& cmdBuffer) {
             scissorRect.offset.y = std::max(static_cast<int32_t>((pcmd->ClipRect.y)), 0);
             scissorRect.extent.width = static_cast<uint32_t>(pcmd->ClipRect.z - pcmd->ClipRect.x);
             scissorRect.extent.height = static_cast<uint32_t>((pcmd->ClipRect.w - pcmd->ClipRect.y));
-            cmdBuffer.setScissor(0, scissorRect);
+            commandBuffer.setScissor(0, scissorRect);
 
             // Bind DescriptorSet with font or user texture
             vk::DescriptorSet descriptor[1] = { vk::DescriptorSet((VkDescriptorSet)pcmd->TextureId) };
-            cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, 1, descriptor, 0, nullptr);
+            commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, 1, descriptor, 0, nullptr);
 
-            cmdBuffer.drawIndexed(pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
+            commandBuffer.drawIndexed(pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
 
             indexOffset += pcmd->ElemCount;
         }

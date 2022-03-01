@@ -1,6 +1,7 @@
 #pragma once
 
 namespace fe {
+    class Renderer;
     class Layer {
     public:
         Layer(std::string name = "Layer") : name{std::move(name)} {}
@@ -8,8 +9,8 @@ namespace fe {
 
         virtual void onAttach() {}
         virtual void onDetach() {}
-        virtual void onUpdate() {}
-        virtual void onRender() {}
+        virtual void onUpdate(float ts) {}
+        virtual void onRender(Renderer& renderer) {}
         virtual void onImGui() {}
 
         const std::string& getName() const { return name; }

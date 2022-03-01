@@ -219,7 +219,7 @@ vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex) const {
     return device.acquireNextImageKHR(swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], nullptr, &imageIndex); /// use noexcept to handle OUT_OF_DATE
 }
 
-vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, const uint32_t& imageIndex) {
+vk::Result SwapChain::submitCommandBuffers(const std::vector<vk::CommandBuffer>& buffers, const uint32_t& imageIndex) {
     vk::Fence& fence = inFlightFences[currentFrame];
     vk::Fence* image = imagesInFlight[imageIndex];
     if (image != nullptr) {
@@ -237,8 +237,8 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer& buffers, con
     submitInfo.pWaitSemaphores = &imageAvailableSemaphores[currentFrame];
     submitInfo.pWaitDstStageMask = waitStages;
 
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &buffers;
+    submitInfo.commandBufferCount = static_cast<uint32_t>(buffers.size());
+    submitInfo.pCommandBuffers = buffers.data();
 
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = &renderFinishedSemaphores[currentFrame];

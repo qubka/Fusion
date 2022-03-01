@@ -8,13 +8,14 @@
 #include "vkx/texture.hpp"
 #include "vkx/swapchain.hpp"
 #include "vkx/descriptors.hpp"
+#include "vkx/offscreen.hpp"
 
 namespace fe {
-    struct {
+    struct GlobalUbo {
         alignas(16) glm::mat4 projection;
         alignas(16) glm::mat4 view;
         alignas(16) glm::vec3 lightDirection;
-    } globalUbo;
+    };
 
     class Renderer {
     public:
@@ -52,6 +53,7 @@ namespace fe {
         const vkx::Context& context;
         const vk::Device& device{ context.device };
 
+        vkx::Offscreen offscreen{ context };
         vkx::SwapChain swapChain{ context };
         vk::CommandPool commandPool;
         vk::RenderPass renderPass;

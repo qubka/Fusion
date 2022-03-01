@@ -5,6 +5,9 @@ using namespace fe;
 
 void Renderer::create() {
     commandPool = context.getCommandPool();
+    offscreen.size = { 512, 512 };
+    offscreen.create();
+
     createRenderPass();
     recreateSwapChain();
     createUniformBuffers();
@@ -14,6 +17,8 @@ void Renderer::create() {
 
 void Renderer::destroy() {
     device.freeCommandBuffers(commandPool, commandBuffers);
+
+    offscreen.destroy();
 
     for (auto& buffer : uniformBuffers) {
         buffer.destroy();
@@ -111,7 +116,7 @@ void Renderer::createUniformBuffers() {
 
     /* Global Ubo */
     for (int i = 0; i < vkx::SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
-        uniformBuffers.push_back(context.createUniformBuffer(globalUbo));
+        uniformBuffers.push_back(context.createUniformBuffer(GlobalUbo{}));
     }
 }
 
@@ -133,7 +138,7 @@ void Renderer::createDescriptorSets() {
 }
 
 void Renderer::createCommandBuffers() {
-    commandBuffers = device.allocateCommandBuffers({ commandPool, vk::CommandBufferLevel::ePrimary, vkx::SwapChain::MAX_FRAMES_IN_FLIGHT });
+    commandBuffers = context.allocateCommandBuffers(vkx::SwapChain::MAX_FRAMES_IN_FLIGHT);
 }
 
 void Renderer::recreateSwapChain() {
@@ -173,6 +178,7 @@ vk::CommandBuffer Renderer::beginFrame() {
     vk::CommandBufferBeginInfo beginInfo{ vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
 
     commandBuffer.begin(beginInfo);
+    offscreen.commandBuffer.begin(beginInfo);
 
     isFrameStarted = true;
 
@@ -204,12 +210,23 @@ void Renderer::beginRenderPass(vk::CommandBuffer& commandBuffer) {
 
     commandBuffer.setViewport(0, 1, &viewport);
     commandBuffer.setScissor(0, 1, &scissor);
+
+    renderPassInfo.renderPass = offscreen.renderPass;
+    renderPassInfo.framebuffer = offscreen.framebuffers[0].framebuffer;
+    renderPassInfo.renderArea.extent.width = offscreen.size.x;
+    renderPassInfo.renderArea.extent.width = offscreen.size.y;
+
+    offscreen.commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+
+    offscreen.commandBuffer.setViewport(0, 1, &viewport);
+    offscreen.commandBuffer.setScissor(0, 1, &scissor);
 }
 
 void Renderer::endRenderPass(vk::CommandBuffer& commandBuffer) {
     assert(isFrameStarted && "cannot call endRenderPass if frame is not in progress");
     assert(commandBuffer == commandBuffers[currentFrame] && "cannot end render pass on command buffer from a different frame");
 
+    offscreen.commandBuffer.endRenderPass();
     commandBuffer.endRenderPass();
 }
 
@@ -217,9 +234,11 @@ void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
     assert(isFrameStarted && "cannot call endFrame if frame is not in progress");
     assert(commandBuffer == commandBuffers[currentFrame] && "cannot end command buffer from a different frame");
 
+    offscreen.commandBuffer.end();
+
     commandBuffer.end();
 
-    auto result = swapChain.submitCommandBuffers(commandBuffer, currentImage);
+    auto result = swapChain.submitCommandBuffers({ offscreen.commandBuffer, commandBuffer }, currentImage);
 #if !defined(__ANDROID__)
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
         recreateSwapChain();

@@ -34,6 +34,15 @@ void setupDebugging(const vk::Instance& instance, const vk::DebugReportFlagsEXT&
 // Clear debug callback
 void freeDebugCallback(const vk::Instance& instance);
 
+// Load dubug function pointers and set message callback
+// if callBack is NULL, default message callback will be used
+void setupMessenger(const vk::Instance& instance, const vk::DebugUtilsMessageSeverityFlagsEXT& severity, const vk::DebugUtilsMessageTypeFlagsEXT& type, const MessageHandler& handler = [](const Message& m) {
+    return VK_TRUE;
+});
+
+// Clear messanger callback
+void freeMessengerCallback(const vk::Instance& instance);
+
 // Setup and functions for the VK_EXT_debug_marker_extension
 // Extension spec can be found at https://github.com/KhronosGroup/Vulkan-Docs/blob/1.0-VK_EXT_debug_marker/doc/specs/vulkan/appendices/VK_EXT_debug_marker.txt
 // Note that the extension will only be present if run from an offline debugging application
@@ -62,10 +71,10 @@ void beginRegion(const vk::CommandBuffer& cmdbuffer, const std::string& pMarkerN
 void insert(const vk::CommandBuffer& cmdbuffer, const std::string& markerName, const glm::vec4& color);
 
 // End the current debug marker region
-void endRegion(const vk::CommandBuffer& cmdBuffer);
+void endRegion(const vk::CommandBuffer& commandBuffer);
 
 // Object specific naming functions
-void setCommandBufferName(const vk::Device& device, const VkCommandBuffer& cmdBuffer, const char* name);
+void setCommandBufferName(const vk::Device& device, const VkCommandBuffer& commandBuffer, const char* name);
 void setQueueName(const vk::Device& device, const VkQueue& queue, const char* name);
 void setImageName(const vk::Device& device, const VkImage& image, const char* name);
 void setSamplerName(const vk::Device& device, const VkSampler& sampler, const char* name);
@@ -84,20 +93,20 @@ void setEventName(const vk::Device& device, const VkEvent& _event, const char* n
 
 class Marker {
 public:
-    Marker(const vk::CommandBuffer& cmdBuffer, const std::string& name, const glm::vec4& color = glm::vec4{0.8f})
-        : cmdBuffer(cmdBuffer) {
+    Marker(const vk::CommandBuffer& commandBuffer, const std::string& name, const glm::vec4& color = glm::vec4{0.8f})
+        : commandBuffer(commandBuffer) {
         if (active) {
-            beginRegion(cmdBuffer, name, color);
+            beginRegion(commandBuffer, name, color);
         }
     }
     ~Marker() {
         if (active) {
-            endRegion(cmdBuffer);
+            endRegion(commandBuffer);
         }
     }
 
 private:
-    const vk::CommandBuffer& cmdBuffer;
+    const vk::CommandBuffer& commandBuffer;
 };
 }  // namespace marker
 }}  // namespace vkx::debug

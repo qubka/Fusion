@@ -3,14 +3,14 @@ project(editor)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(SQLite3 REQUIRED)
+#find_package(SQLite3 REQUIRED)
 
 file(GLOB_RECURSE SRC_SOURCES src/*.cpp)
 add_executable(${PROJECT_NAME} editor_app.cpp ${SRC_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         engine
-        sqlite3
+        #sqlite3
         portable_file_dialogs
         )
 

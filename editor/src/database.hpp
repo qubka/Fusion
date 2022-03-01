@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sqlite3.h>
+/*#include <sqlite3.h>
 
 namespace fe {
     class Database {
@@ -11,8 +11,8 @@ namespace fe {
         void connect(const std::string& path);
         void close();
 
-
+        void exec(const std::string& request);
     private:
         sqlite3* db;
     };
-}
+}*/

@@ -5,15 +5,8 @@
 namespace fe {
     class EditorApp : public Application {
     public:
-        EditorApp(const CommandLineArgs& args) : Application{ "Vulkan Example - Offscreen rendering", args } {
-            pushLayer(new EditorLayer{ *this });
-            registry.start();
+        EditorApp(const CommandLineArgs& args) : Application{"Fusion Editor", args} {
+            pushLayer(new EditorLayer{});
         }
-
-        ~EditorApp() {
-            registry.destroy();
-        }
-
-        FileRegistry registry;
     };
 }

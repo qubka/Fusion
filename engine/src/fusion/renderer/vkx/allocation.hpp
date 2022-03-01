@@ -19,17 +19,39 @@ struct Allocation {
     /** @brief Memory propertys flags to be filled by external source at buffer creation (to query at some later point) */
     vk::MemoryPropertyFlags memoryPropertyFlags;
 
+    /**
+     * Map a memory range of this buffer. If successful, mapped points to the specified buffer range.
+     *
+     * @param size (Optional) Size of the memory range to map. Pass VK_WHOLE_SIZE to map the complete
+     * buffer range.
+     * @param offset (Optional) Byte offset from beginning
+     *
+     * @return VkResult of the buffer mapping call
+     */
     template <typename T = void>
     inline T* map(size_t offset = 0, VkDeviceSize size = VK_WHOLE_SIZE) {
         mapped = device.mapMemory(memory, offset, size, vk::MemoryMapFlags());
         return (T*)mapped;
     }
 
+    /**
+     * Unmap a mapped memory range
+     *
+     * @note Does not return a result as vkUnmapMemory can't fail
+     */
     inline void unmap() {
         device.unmapMemory(memory);
         mapped = nullptr;
     }
 
+    /**
+     * Copies the specified data to the mapped buffer. Default value writes whole buffer range
+     *
+     * @param size (Optional) Size of the data to copy. Pass VK_WHOLE_SIZE to flush the complete buffer
+     * @param data Pointer to the data to copy range.
+     * @param offset (Optional) Byte offset from beginning of mapped region
+     *
+     */
     inline void copy(size_t size, const void* data, VkDeviceSize offset = 0) const { memcpy(static_cast<uint8_t*>(mapped) + offset, data, size); }
 
     template <typename T>
@@ -43,29 +65,29 @@ struct Allocation {
     }
 
     /**
-    * Flush a memory range of the buffer to make it visible to the device
-    *
-    * @note Only required for non-coherent memory
-    *
-    * @param size (Optional) Size of the memory range to flush. Pass VK_WHOLE_SIZE to flush the complete buffer range.
-    * @param offset (Optional) Byte offset from beginning
-    *
-    * @return VkResult of the flush call
-    */
+     * Flush a memory range of the buffer to make it visible to the device
+     *
+     * @note Only required for non-coherent memory
+     *
+     * @param size (Optional) Size of the memory range to flush. Pass VK_WHOLE_SIZE to flush the complete buffer range.
+     * @param offset (Optional) Byte offset from beginning
+     *
+     * @return VkResult of the flush call
+     */
     void flush(vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize offset = 0) {
         return device.flushMappedMemoryRanges(vk::MappedMemoryRange{ memory, offset, size });
     }
 
     /**
-    * Invalidate a memory range of the buffer to make it visible to the host
-    *
-    * @note Only required for non-coherent memory
-    *
-    * @param size (Optional) Size of the memory range to invalidate. Pass VK_WHOLE_SIZE to invalidate the complete buffer range.
-    * @param offset (Optional) Byte offset from beginning
-    *
-    * @return VkResult of the invalidate call
-    */
+     * Invalidate a memory range of the buffer to make it visible to the host
+     *
+     * @note Only required for non-coherent memory
+     *
+     * @param size (Optional) Size of the memory range to invalidate. Pass VK_WHOLE_SIZE to invalidate the complete buffer range.
+     * @param offset (Optional) Byte offset from beginning
+     *
+     * @return VkResult of the invalidate call
+     */
     void invalidate(vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize offset = 0) {
         return device.invalidateMappedMemoryRanges(vk::MappedMemoryRange{ memory, offset, size });
     }

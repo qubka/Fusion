@@ -9,18 +9,14 @@
 namespace fe {
     class FileRegistry {
     public:
-        FileRegistry() {
-        }
+        FileRegistry() = default;
         ~FileRegistry() = default;
 
         //using Model = std::shared_ptr<vkx::model::Model>;
         //using Texture = std::shared_ptr<vkx::texture::Texture>;
 
         void start() {
-            database.connect("editor.db");
-
             cache();
-
             std::thread t1 ([&] {
                 watcher.start([&](const std::string& path, FileStatus status) {
                     // Process only regular files, all other file types are ignored
@@ -47,7 +43,6 @@ namespace fe {
         }
 
         void destroy() {
-            database.close();
         }
 
         void onFileCreated(const std::string& path) {
@@ -72,7 +67,8 @@ namespace fe {
 
     private:
         FileWatcher watcher{getAssetPath(), std::chrono::milliseconds(1000)};
-        Database database;
+        //Database database{};
+
         //std::unordered_map<std::string, Model> models;
         //std::unordered_map<std::string, Texture> textures;
     };

@@ -35,33 +35,49 @@ std::list<std::string> validationLayerNames = {
 
 static std::once_flag dispatcherInitFlag;
 vk::DispatchLoaderDynamic dispatcher;
-vk::DebugReportCallbackEXT msgCallback;
+vk::DebugReportCallbackEXT dbgCallback;
+vk::DebugUtilsMessengerEXT msgCallback;
 
-VkBool32 messageCallback(VkDebugReportFlagsEXT flags,
-                         VkDebugReportObjectTypeEXT objType,
-                         uint64_t srcObject,
-                         size_t location,
-                         int32_t msgCode,
-                         const char* pLayerPrefix,
-                         const char* pMsg,
-                         void* pUserData) {
-    std::string message;
-    {
-        std::stringstream buf;
-        if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
-            buf << "ERROR: ";
-        } else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT) {
-            buf << "WARNING: ";
-        } else if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) {
-            buf << "PERF: ";
-        } else {
-            return false;
-        }
-        buf << "[" << pLayerPrefix << "] Code " << msgCode << " : " << pMsg;
-        message = buf.str();
+static VKAPI_ATTR VkBool32 VKAPI_CALL messageCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                                      VkDebugUtilsMessageTypeFlagsEXT messageType,
+                                                      const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                                                      void* pUserData) {
+    auto message = static_cast<vk::DebugUtilsMessageTypeFlagBitsEXT>(messageType);
+
+    if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
+        LOG_VERBOSE << "[" << to_string(message) << "] = " << pCallbackData->pMessage;
+    } else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+        LOG_INFO << "[" << to_string(message) << "] = " << pCallbackData->pMessage;
+    } else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+        LOG_WARNING << "[" << to_string(message) << "] = " << pCallbackData->pMessage;
+    } else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+        LOG_ERROR << "[" << to_string(message) << "] = " << pCallbackData->pMessage;
     }
+    return false;
+}
 
-    std::cout << message << std::endl;
+static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugReportFlagsEXT flags,
+                                                   VkDebugReportObjectTypeEXT objType,
+                                                   uint64_t srcObject,
+                                                   size_t location,
+                                                   int32_t msgCode,
+                                                   const char* pLayerPrefix,
+                                                   const char* pMsg,
+                                                   void* pUserData) {
+
+    auto obj = static_cast<vk::DebugUtilsMessageTypeFlagBitsEXT>(objType);
+
+    if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT) {
+        LOG_INFO << "[" << pLayerPrefix << "] (" << to_string(obj) << ")" << " Code " << msgCode << " : " << pMsg;
+    } else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT) {
+        LOG_WARNING << "[" << pLayerPrefix << "] (" << to_string(obj) << ")" << " Code " << msgCode << " : " << pMsg;
+    } else if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) {
+        LOG_VERBOSE << "[" << pLayerPrefix << "] (" << to_string(obj) << ")" << " Code " << msgCode << " : " << pMsg;
+    } else if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
+        LOG_ERROR << "[" << pLayerPrefix << "] (" << to_string(obj) << ")" << " Code " << msgCode << " : " << pMsg;
+    } else if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT) {
+        LOG_DEBUG << "[" << pLayerPrefix << "] (" << to_string(obj) << ")" << " Code " << msgCode << " : " << pMsg;
+    }
 
 #ifdef __ANDROID__
     __android_log_write(ANDROID_LOG_DEBUG, LOG_TAG, message.c_str());
@@ -75,15 +91,30 @@ VkBool32 messageCallback(VkDebugReportFlagsEXT flags,
 
 void setupDebugging(const vk::Instance& instance, const vk::DebugReportFlagsEXT& flags, const MessageHandler& handler) {
     std::call_once(dispatcherInitFlag, [&] { dispatcher.init(instance, &vkGetInstanceProcAddr); });
-    vk::DebugReportCallbackCreateInfoEXT dbgCreateInfo = {};
-    dbgCreateInfo.pfnCallback = (PFN_vkDebugReportCallbackEXT)messageCallback;
+    vk::DebugReportCallbackCreateInfoEXT dbgCreateInfo{};
     dbgCreateInfo.flags = flags;
-    msgCallback = instance.createDebugReportCallbackEXT(dbgCreateInfo, nullptr, dispatcher);
+    dbgCreateInfo.pfnCallback = (PFN_vkDebugReportCallbackEXT)debugCallback;
+    dbgCallback = instance.createDebugReportCallbackEXT(dbgCreateInfo, nullptr, dispatcher);
 }
 
 void freeDebugCallback(const vk::Instance& instance) {
     std::call_once(dispatcherInitFlag, [&] { dispatcher.init(instance, &vkGetInstanceProcAddr); });
-    instance.destroyDebugReportCallbackEXT(msgCallback, nullptr, dispatcher);
+    instance.destroyDebugReportCallbackEXT(dbgCallback, nullptr, dispatcher);
+}
+
+void setupMessenger(const vk::Instance& instance, const vk::DebugUtilsMessageSeverityFlagsEXT& severity, const vk::DebugUtilsMessageTypeFlagsEXT& type, const MessageHandler& handler) {
+    std::call_once(dispatcherInitFlag, [&] { dispatcher.init(instance, &vkGetInstanceProcAddr); });
+    vk::DebugUtilsMessengerCreateInfoEXT msgCreateInfo{};
+    msgCreateInfo.flags = {};
+    msgCreateInfo.messageType = type;
+    msgCreateInfo.messageSeverity = severity;
+    msgCreateInfo.pfnUserCallback = messageCallback;
+    msgCallback = instance.createDebugUtilsMessengerEXT(msgCreateInfo, nullptr, dispatcher);
+}
+
+void freeMessengerCallback(const vk::Instance& instance) {
+    std::call_once(dispatcherInitFlag, [&] { dispatcher.init(instance, &vkGetInstanceProcAddr); });
+    instance.destroyDebugUtilsMessengerEXT(msgCallback, nullptr, dispatcher);
 }
 
 namespace marker {
@@ -136,8 +167,8 @@ void endRegion(const vk::CommandBuffer& cmdbuffer) {
     }
 }
 
-void setCommandBufferName(const vk::Device& device, const VkCommandBuffer& cmdBuffer, const char* name) {
-    setObjectName(device, reinterpret_cast<uint64_t>(cmdBuffer), vk::DebugReportObjectTypeEXT::eCommandBuffer, name);
+void setCommandBufferName(const vk::Device& device, const VkCommandBuffer& commandBuffer, const char* name) {
+    setObjectName(device, reinterpret_cast<uint64_t>(commandBuffer), vk::DebugReportObjectTypeEXT::eCommandBuffer, name);
 }
 
 void setQueueName(const vk::Device& device, const VkQueue& queue, const char* name) {

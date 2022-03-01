@@ -27,7 +27,7 @@ struct SwapChain {
     vk::Extent2D extent;
     vk::SwapchainKHR swapChain;
     std::vector<SwapChainImage> images;
-    vk::Format colorFormat { vk::Format::eB8G8R8A8Unorm };
+    vk::Format colorFormat{ vk::Format::eB8G8R8A8Unorm };
     std::vector<vk::Framebuffer> framebuffers;
     std::vector<vk::Semaphore> imageAvailableSemaphores;
     std::vector<vk::Semaphore> renderFinishedSemaphores;
@@ -43,7 +43,7 @@ struct SwapChain {
             : context{context} {};
 
     vk::Result acquireNextImage(uint32_t& imageIndex) const;
-    vk::Result submitCommandBuffers(const vk::CommandBuffer& buffers, const uint32_t& imageIndex);
+    vk::Result submitCommandBuffers(const std::vector<vk::CommandBuffer>& buffers, const uint32_t& imageIndex);
 
     // Creates an os specific surface
     // Tries to find a graphics and a present queue

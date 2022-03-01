@@ -77,7 +77,7 @@ public:
     void destroy();
     bool update();
 
-    void draw(const vk::CommandBuffer& cmdBuffer);
+    void draw(const vk::CommandBuffer& commandBuffer);
     bool header(const char* caption) const;
     bool checkBox(const char* caption, bool* value) const;
     bool checkBox(const char* caption, int32_t* value) const;

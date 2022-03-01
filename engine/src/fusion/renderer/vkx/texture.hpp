@@ -21,7 +21,6 @@
 #include "filesystem.hpp"
 
 namespace vkx { namespace texture {
-
 /** @brief Vulkan texture base class */
 class Texture : public vkx::Image {
     using Parent = vkx::Image;
