@@ -40,7 +40,7 @@ struct Framebuffer {
     // The contents of this framebuffer are then
     // blitted to our render target
     void create(const vkx::Context& context,
-                const glm::uvec2& size,
+                const vk::Extent2D& extent,
                 const std::vector<vk::Format>& colorFormats,
                 vk::Format depthFormat,
                 const vk::RenderPass& renderPass,
@@ -54,9 +54,7 @@ struct Framebuffer {
         // Color attachment
         vk::ImageCreateInfo image;
         image.imageType = vk::ImageType::e2D;
-        image.extent.width = size.x;
-        image.extent.height = size.y;
-        image.extent.depth = 1;
+        image.extent = vk::Extent3D{ extent.width, extent.height, 1U };
         image.mipLevels = 1;
         image.arrayLayers = 1;
         image.samples = vk::SampleCountFlagBits::e1;
@@ -108,8 +106,8 @@ struct Framebuffer {
         fbufCreateInfo.renderPass = renderPass;
         fbufCreateInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         fbufCreateInfo.pAttachments = attachments.data();
-        fbufCreateInfo.width = size.x;
-        fbufCreateInfo.height = size.y;
+        fbufCreateInfo.width = extent.width;
+        fbufCreateInfo.height = extent.height;
         fbufCreateInfo.layers = 1;
         framebuffer = context.device.createFramebuffer(fbufCreateInfo);
     }

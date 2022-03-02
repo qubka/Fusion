@@ -10,6 +10,7 @@
 
 #include "context.hpp"
 #include "framebuffer.hpp"
+#include "texture.hpp"
 
 #include "fusion/core/window.hpp"
 
@@ -45,12 +46,9 @@ private:
 
     vk::DescriptorPool descriptorPool;
     vk::DescriptorSetLayout descriptorSetLayout;
-    //vk::DescriptorSet descriptorSet;
     vk::PipelineLayout pipelineLayout;
     vk::Pipeline pipeline;
     vk::RenderPass renderPass;
-    vk::CommandPool commandPool;
-    vk::Fence fence;
 
     vkx::Image font;
 

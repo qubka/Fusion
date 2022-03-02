@@ -6,7 +6,7 @@ using namespace fe;
 void Renderer::create() {
     commandPool = context.getCommandPool();
 
-    offscreen.size = { 512, 512 };
+    offscreen.extent = vk::Extent2D{ 512, 512 };
     offscreen.create();
 
     recreateSwapChain();
@@ -16,7 +16,7 @@ void Renderer::create() {
 }
 
 void Renderer::destroy() {
-    device.freeCommandBuffers(commandPool, commandBuffers);
+    context.device.freeCommandBuffers(commandPool, commandBuffers);
 
     offscreen.destroy();
 
@@ -75,7 +75,8 @@ void Renderer::recreateSwapChain() {
         window.waitEvents();
     }
 
-    device.waitIdle();
+    context.device.waitIdle();
+    context.queue.waitIdle();
 
     LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
 
@@ -115,40 +116,46 @@ void Renderer::beginRenderPass(uint32_t frameIndex) {
     assert(isFrameStarted && "cannot call beginRenderPass if frame is not in progress");
     assert(frameIndex == currentFrame && "cannot start render pass on command buffer from a different frame");
 
-    const auto& extent = swapChain.extent;
+    const auto& surfaceExtent = swapChain.extent;
     auto offset = vk::Offset2D{0, 0};
 
     clearValues[0].color = std::array<float, 4>{ color.x, color.y, color.z, 1 };
     clearValues[1].depthStencil.depth = 1.0f;
     clearValues[1].depthStencil.stencil = 0;
 
-    vk::Viewport viewport = vkx::util::viewport(extent);
-    vk::Rect2D scissor = vkx::util::rect2D(extent, offset);
-
     vk::RenderPassBeginInfo renderPassInfo;
     renderPassInfo.renderPass = swapChain.renderPass;
     renderPassInfo.framebuffer = swapChain.framebuffers[currentImage];
     renderPassInfo.renderArea.offset = offset;
-    renderPassInfo.renderArea.extent = extent;
+    renderPassInfo.renderArea.extent = surfaceExtent;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
     auto& mainCmdBuffer = commandBuffers[currentFrame];
     mainCmdBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-    mainCmdBuffer.setViewport(0, 1, &viewport);
-    mainCmdBuffer.setScissor(0, 1, &scissor);
+
+    {
+        vk::Viewport viewport = vkx::util::viewport(surfaceExtent);
+        vk::Rect2D scissor = vkx::util::rect2D(surfaceExtent, offset);
+        mainCmdBuffer.setViewport(0, 1, &viewport);
+        mainCmdBuffer.setScissor(0, 1, &scissor);
+    }
 
     if (offscreen.active) {
+        const auto& screenExtent = offscreen.extent;
         vk::RenderPassBeginInfo offPassInfo;
         offPassInfo.renderPass = offscreen.renderPass;
         offPassInfo.framebuffer = offscreen.framebuffers[currentFrame].framebuffer;
-        offPassInfo.renderArea.extent.width = offscreen.size.x;
-        offPassInfo.renderArea.extent.width = offscreen.size.y;
+        offPassInfo.renderArea.offset = offset;
+        offPassInfo.renderArea.extent = screenExtent;
         offPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
         offPassInfo.pClearValues = clearValues.data();
 
         auto& offCmdBuffer = offscreen.commandBuffers[currentFrame];
         offCmdBuffer.beginRenderPass(offPassInfo, vk::SubpassContents::eInline);
+
+        vk::Viewport viewport = vkx::util::viewport(screenExtent);
+        vk::Rect2D scissor = vkx::util::rect2D(screenExtent, offset);
         offCmdBuffer.setViewport(0, 1, &viewport);
         offCmdBuffer.setScissor(0, 1, &scissor);
     }

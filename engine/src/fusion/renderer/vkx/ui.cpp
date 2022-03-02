@@ -64,19 +64,15 @@ UIOverlay::~UIOverlay() {
 }
 
 void UIOverlay::destroy() {
-    if (commandPool) {
-        vertexBuffer.destroy();
-        indexBuffer.destroy();
-        font.destroy();
-        context.device.destroyDescriptorSetLayout(descriptorSetLayout);
-        context.device.destroyDescriptorPool(descriptorPool);
-        context.device.destroyPipelineLayout(pipelineLayout);
-        context.device.destroyPipeline(pipeline);
-        if (!createInfo.renderPass) {
-            context.device.destroyRenderPass(renderPass);
-        }
-        context.device.destroyCommandPool(commandPool);
-        context.device.destroyFence(fence);
+    vertexBuffer.destroy();
+    indexBuffer.destroy();
+    font.destroy();
+    context.device.destroyDescriptorSetLayout(descriptorSetLayout);
+    context.device.destroyDescriptorPool(descriptorPool);
+    context.device.destroyPipelineLayout(pipelineLayout);
+    context.device.destroyPipeline(pipeline);
+    if (!createInfo.renderPass) {
+        context.device.destroyRenderPass(renderPass);
     }
 
     if (ImGui::GetCurrentContext()) {
@@ -174,11 +170,6 @@ void UIOverlay::prepareResources() {
 
     // Command buffer
 
-    vk::CommandPoolCreateInfo cmdPoolInfo;
-    cmdPoolInfo.queueFamilyIndex = context.queueIndices.graphics;
-    cmdPoolInfo.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
-    commandPool = context.device.createCommandPool(cmdPoolInfo);
-
     // Descriptor pool
     vk::DescriptorPoolSize poolSize;
     poolSize.type = vk::DescriptorType::eCombinedImageSampler;
@@ -199,9 +190,6 @@ void UIOverlay::prepareResources() {
     vk::PushConstantRange pushConstantRange{ vk::ShaderStageFlagBits::eVertex, 0, sizeof(PushConstBlock) };
     vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ {}, 1, &descriptorSetLayout, 1, &pushConstantRange };
     pipelineLayout = context.device.createPipelineLayout(pipelineLayoutCreateInfo);
-
-    // Command buffer execution fence
-    fence = context.device.createFence(vk::FenceCreateInfo{});
 
     // Store offscreen frame images
     for (auto& framebuffer : createInfo.framebuffers) {

@@ -8,7 +8,7 @@ struct Offscreen {
     const vkx::Context& context;
     vk::RenderPass renderPass;
     vk::Semaphore renderComplete;
-    glm::uvec2 size{ 0 };
+    vk::Extent2D extent{ 0, 0 };
     std::vector<vk::Format> colorFormats{ vk::Format::eB8G8R8A8Unorm };
     // This value is chosen as an invalid default that signals that the code should pick a specific depth buffer
     // Alternative, you can set this to undefined to explicitly declare you want no depth buffer.
@@ -16,7 +16,7 @@ struct Offscreen {
     std::vector<vkx::Framebuffer> framebuffers{ vkx::SwapChain::MAX_FRAMES_IN_FLIGHT };
     std::vector<vk::CommandBuffer> commandBuffers;
     vk::ImageUsageFlags attachmentUsage{ vk::ImageUsageFlagBits::eSampled };
-    vk::ImageUsageFlags depthAttachmentUsage;
+    vk::ImageUsageFlags depthAttachmentUsage{ vk::ImageUsageFlagBits::eDepthStencilAttachment };
     vk::ImageLayout colorFinalLayout{ vk::ImageLayout::eShaderReadOnlyOptimal };
     vk::ImageLayout depthFinalLayout{ vk::ImageLayout::eDepthStencilAttachmentOptimal };
 
@@ -27,7 +27,7 @@ struct Offscreen {
 
     void create() {
         assert(!colorFormats.empty());
-        assert(size != glm::uvec2());
+        assert(extent != vk::Extent2D(0, 0));
 
         if (depthFormat == vk::Format::eR8Uscaled) {
             depthFormat = context.getSupportedDepthFormat();
@@ -41,7 +41,7 @@ struct Offscreen {
         }
 
         for (auto& framebuffer: framebuffers) {
-            framebuffer.create(context, size, colorFormats, depthFormat, renderPass, attachmentUsage,depthAttachmentUsage);
+            framebuffer.create(context, extent, colorFormats, depthFormat, renderPass, attachmentUsage,depthAttachmentUsage);
         }
         createSampler();
     }
@@ -135,13 +135,13 @@ protected:
                 (colorFinalLayout != vk::ImageLayout::eUndefined)) {
                 // Implicit transition
                 vk::SubpassDependency dependency;
-                dependency.srcSubpass = 0;
-                dependency.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
-                dependency.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
-
-                dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
+                dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+                dependency.dstSubpass = 0;
+                dependency.srcStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+                dependency.dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+                dependency.srcAccessMask =  vk::AccessFlagBits::eShaderRead;
                 dependency.dstAccessMask = vkx::util::accessFlagsForLayout(colorFinalLayout);
-                dependency.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+                dependency.dependencyFlags = vk::DependencyFlagBits::eByRegion;
 
                 subpassDependencies.push_back(dependency);
             }
@@ -151,12 +151,13 @@ protected:
                 // Implicit transition
                 vk::SubpassDependency dependency;
                 dependency.srcSubpass = 0;
-                dependency.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-                dependency.srcStageMask = vk::PipelineStageFlagBits::eLateFragmentTests;
-
                 dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
-                dependency.dstAccessMask = vkx::util::accessFlagsForLayout(depthFinalLayout);
+                dependency.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
                 dependency.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+                dependency.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+                dependency.dstAccessMask =  vkx::util::accessFlagsForLayout(depthFinalLayout);
+                dependency.dependencyFlags = vk::DependencyFlagBits::eByRegion;
+
                 subpassDependencies.push_back(dependency);
             }
         }

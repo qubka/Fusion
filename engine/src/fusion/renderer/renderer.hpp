@@ -51,8 +51,6 @@ namespace fe {
 
     private:
         const vkx::Context& context;
-        const vk::Device& device{ context.device };
-
         vkx::Offscreen offscreen{ context };
         vkx::SwapChain swapChain{ context };
         vk::CommandPool commandPool;
@@ -64,8 +62,8 @@ namespace fe {
         std::vector<vk::DescriptorSet> globalDescriptorSets;
 
         std::vector<vkx::DescriptorAllocator> dynamicAllocators;
-        vkx::DescriptorAllocator globalAllocator{ device };
-        vkx::DescriptorLayoutCache descriptorLayoutCache{ device };
+        vkx::DescriptorAllocator globalAllocator{ context.device };
+        vkx::DescriptorLayoutCache descriptorLayoutCache{ context.device };
 
         std::array<vk::ClearValue, 2> clearValues{};
         glm::vec3 color{0.7f, 0.85f, 1.0f};
