@@ -9,7 +9,6 @@
 #include "fusion/renderer/vkx/shaders.hpp"
 #include "fusion/renderer/vkx/pipelines.hpp"
 #include "fusion/renderer/vkx/texture.hpp"
-#include "fusion/renderer/vkx/swapchain.hpp"
 #include "fusion/renderer/vkx/ui.hpp"
 #include "fusion/renderer/vkx/benchmark.hpp"
 #include "fusion/renderer/renderer.hpp"

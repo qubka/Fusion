@@ -5,10 +5,10 @@ using namespace fe;
 
 void Renderer::create() {
     commandPool = context.getCommandPool();
+
     offscreen.size = { 512, 512 };
     offscreen.create();
 
-    createRenderPass();
     recreateSwapChain();
     createUniformBuffers();
     createDescriptorSets();
@@ -27,8 +27,6 @@ void Renderer::destroy() {
 
     swapChain.destroy();
 
-    device.destroyRenderPass(renderPass);
-
     descriptorLayoutCache.destroy();
 
     for (auto& allocator : dynamicAllocators) {
@@ -36,79 +34,6 @@ void Renderer::destroy() {
     }
     dynamicAllocators.clear();
     globalAllocator.destroy();
-}
-
-void Renderer::createRenderPass() {
-    std::vector<vk::AttachmentDescription> attachments;
-    attachments.resize(2);
-
-    // Color attachment
-    attachments[0].format = colorformat;
-    attachments[0].loadOp = vk::AttachmentLoadOp::eClear;
-    attachments[0].storeOp = vk::AttachmentStoreOp::eStore;
-    attachments[0].initialLayout = vk::ImageLayout::eUndefined;
-    attachments[0].finalLayout = vk::ImageLayout::ePresentSrcKHR;
-
-    // Depth attachment
-    attachments[1].format = depthFormat;
-    attachments[1].loadOp = vk::AttachmentLoadOp::eClear;
-    attachments[1].storeOp = vk::AttachmentStoreOp::eDontCare;
-    attachments[1].stencilLoadOp = vk::AttachmentLoadOp::eClear;
-    attachments[1].stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
-    attachments[1].initialLayout = vk::ImageLayout::eUndefined;
-    attachments[1].finalLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
-
-    // Only one depth attachment, so put it first in the references
-    vk::AttachmentReference depthReference;
-    depthReference.attachment = 1;
-    depthReference.layout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
-
-    std::vector<vk::AttachmentReference> colorAttachmentReferences;
-    {
-        vk::AttachmentReference colorReference;
-        colorReference.attachment = 0;
-        colorReference.layout = vk::ImageLayout::eColorAttachmentOptimal;
-        colorAttachmentReferences.push_back(colorReference);
-    }
-
-    using vPSFB = vk::PipelineStageFlagBits;
-    using vAFB = vk::AccessFlagBits;
-    std::vector<vk::SubpassDependency> subpassDependencies{
-            {
-                    0, VK_SUBPASS_EXTERNAL,
-                    vPSFB::eColorAttachmentOutput, vPSFB::eBottomOfPipe,
-                    vAFB::eColorAttachmentRead | vAFB::eColorAttachmentWrite, vAFB::eMemoryRead,
-                    vk::DependencyFlagBits::eByRegion
-            },
-            {
-                    VK_SUBPASS_EXTERNAL, 0,
-                    vPSFB::eBottomOfPipe, vPSFB::eColorAttachmentOutput,
-                    vAFB::eMemoryRead, vAFB::eColorAttachmentRead | vAFB::eColorAttachmentWrite,
-                    vk::DependencyFlagBits::eByRegion
-            },
-    };
-    std::vector<vk::SubpassDescription> subpasses{
-            {
-                    {}, vk::PipelineBindPoint::eGraphics,
-                    // Input attachment references
-                    0, nullptr,
-                    // Color / resolve attachment references
-                    static_cast<uint32_t>(colorAttachmentReferences.size()), colorAttachmentReferences.data(), nullptr,
-                    // Depth stecil attachment reference,
-                    &depthReference,
-                    // Preserve attachments
-                    0, nullptr
-            },
-    };
-
-    vk::RenderPassCreateInfo renderPassInfo;
-    renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-    renderPassInfo.pAttachments = attachments.data();
-    renderPassInfo.subpassCount = static_cast<uint32_t>(subpasses.size());
-    renderPassInfo.pSubpasses = subpasses.data();
-    renderPassInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());
-    renderPassInfo.pDependencies = subpassDependencies.data();
-    renderPass = device.createRenderPass(renderPassInfo);
 }
 
 void Renderer::createUniformBuffers() {
@@ -154,10 +79,10 @@ void Renderer::recreateSwapChain() {
 
     LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
 
-    swapChain.create(extent, renderPass, false);
+    swapChain.create(extent, false);
 }
 
-vk::CommandBuffer Renderer::beginFrame() {
+uint32_t Renderer::beginFrame() {
     assert(!isFrameStarted && "cannot call beginFrame while already in progress");
 
     auto result = swapChain.acquireNextImage(currentImage);
@@ -166,7 +91,7 @@ vk::CommandBuffer Renderer::beginFrame() {
     // Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE) or no longer optimal for presentation (SUBOPTIMAL)
     if (result == vk::Result::eErrorOutOfDateKHR) {
         recreateSwapChain();
-        return nullptr;
+        return UINT32_MAX;
     }
 #endif
 
@@ -174,19 +99,21 @@ vk::CommandBuffer Renderer::beginFrame() {
         throw std::runtime_error("Failed to acquire next image");
     }
 
-    const auto& commandBuffer = commandBuffers[currentFrame];
     vk::CommandBufferBeginInfo beginInfo{ vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
 
-    commandBuffer.begin(beginInfo);
-    offscreen.commandBuffer.begin(beginInfo);
+    commandBuffers[currentFrame].begin(beginInfo);
+    if (offscreen.active) {
+        offscreen.commandBuffers[currentFrame].begin(beginInfo);
+    }
 
     isFrameStarted = true;
 
-    return commandBuffer;
+    return currentFrame;
 }
 
-void Renderer::beginRenderPass(vk::CommandBuffer& commandBuffer) {
+void Renderer::beginRenderPass(uint32_t frameIndex) {
     assert(isFrameStarted && "cannot call beginRenderPass if frame is not in progress");
+    assert(frameIndex == currentFrame && "cannot start render pass on command buffer from a different frame");
 
     const auto& extent = swapChain.extent;
     auto offset = vk::Offset2D{0, 0};
@@ -195,50 +122,66 @@ void Renderer::beginRenderPass(vk::CommandBuffer& commandBuffer) {
     clearValues[1].depthStencil.depth = 1.0f;
     clearValues[1].depthStencil.stencil = 0;
 
+    vk::Viewport viewport = vkx::util::viewport(extent);
+    vk::Rect2D scissor = vkx::util::rect2D(extent, offset);
+
     vk::RenderPassBeginInfo renderPassInfo;
-    renderPassInfo.renderPass = renderPass;
+    renderPassInfo.renderPass = swapChain.renderPass;
     renderPassInfo.framebuffer = swapChain.framebuffers[currentImage];
     renderPassInfo.renderArea.offset = offset;
     renderPassInfo.renderArea.extent = extent;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+    auto& mainCmdBuffer = commandBuffers[currentFrame];
+    mainCmdBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+    mainCmdBuffer.setViewport(0, 1, &viewport);
+    mainCmdBuffer.setScissor(0, 1, &scissor);
 
-    vk::Viewport viewport = vkx::util::viewport(extent);
-    vk::Rect2D scissor = vkx::util::rect2D(extent, offset);
+    if (offscreen.active) {
+        vk::RenderPassBeginInfo offPassInfo;
+        offPassInfo.renderPass = offscreen.renderPass;
+        offPassInfo.framebuffer = offscreen.framebuffers[currentFrame].framebuffer;
+        offPassInfo.renderArea.extent.width = offscreen.size.x;
+        offPassInfo.renderArea.extent.width = offscreen.size.y;
+        offPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        offPassInfo.pClearValues = clearValues.data();
 
-    commandBuffer.setViewport(0, 1, &viewport);
-    commandBuffer.setScissor(0, 1, &scissor);
-
-    renderPassInfo.renderPass = offscreen.renderPass;
-    renderPassInfo.framebuffer = offscreen.framebuffers[0].framebuffer;
-    renderPassInfo.renderArea.extent.width = offscreen.size.x;
-    renderPassInfo.renderArea.extent.width = offscreen.size.y;
-
-    offscreen.commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-
-    offscreen.commandBuffer.setViewport(0, 1, &viewport);
-    offscreen.commandBuffer.setScissor(0, 1, &scissor);
+        auto& offCmdBuffer = offscreen.commandBuffers[currentFrame];
+        offCmdBuffer.beginRenderPass(offPassInfo, vk::SubpassContents::eInline);
+        offCmdBuffer.setViewport(0, 1, &viewport);
+        offCmdBuffer.setScissor(0, 1, &scissor);
+    }
 }
 
-void Renderer::endRenderPass(vk::CommandBuffer& commandBuffer) {
+void Renderer::endRenderPass(uint32_t frameIndex) {
     assert(isFrameStarted && "cannot call endRenderPass if frame is not in progress");
-    assert(commandBuffer == commandBuffers[currentFrame] && "cannot end render pass on command buffer from a different frame");
+    assert(frameIndex == currentFrame && "cannot end render pass on command buffer from a different frame");
 
-    offscreen.commandBuffer.endRenderPass();
-    commandBuffer.endRenderPass();
+    commandBuffers[currentFrame].endRenderPass();
+    if (offscreen.active) {
+        offscreen.commandBuffers[currentFrame].endRenderPass();
+    }
 }
 
-void Renderer::endFrame(vk::CommandBuffer& commandBuffer) {
+void Renderer::endFrame(uint32_t frameIndex) {
     assert(isFrameStarted && "cannot call endFrame if frame is not in progress");
-    assert(commandBuffer == commandBuffers[currentFrame] && "cannot end command buffer from a different frame");
+    assert(frameIndex == currentFrame && "cannot end command buffer from a different frame");
 
-    offscreen.commandBuffer.end();
+    std::vector<vk::CommandBuffer> buffers;
+    buffers.reserve(offscreen.active ? 2 : 1);
 
-    commandBuffer.end();
+    if (offscreen.active) {
+        buffers.push_back(offscreen.commandBuffers[currentFrame]);
+    }
+    buffers.push_back(commandBuffers[currentFrame]);
 
-    auto result = swapChain.submitCommandBuffers({ offscreen.commandBuffer, commandBuffer }, currentImage);
+    for (auto& buffer : buffers) {
+        buffer.end();
+    }
+
+    auto result = swapChain.submitCommandBuffers(buffers, currentImage);
+
 #if !defined(__ANDROID__)
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
         recreateSwapChain();

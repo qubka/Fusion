@@ -31,23 +31,23 @@ namespace fe {
         vkx::DescriptorAllocator& getGlobalAllocator() { return globalAllocator; }
         vkx::DescriptorAllocator& getCurrentDynamicAllocator() { return dynamicAllocators[currentFrame]; }
 
-        //vk::CommandBuffer& getCurrentCommandBuffer() { return offscreenBuffer[currentFrame]; }
+        vk::CommandBuffer& getCurrentCommandBuffer() { return commandBuffers[currentFrame]; }
         vkx::Buffer& getCurrentUniformBuffer() { return uniformBuffers[currentFrame]; }
 
         const vk::DescriptorSet getCurrentGlobalDescriptorSets() const { return globalDescriptorSets[currentFrame]; }
         const vk::DescriptorSetLayout& getGlobalDescriptorLayoutSet() const { return globalDescriptorSetLayout; }
 
+        const vkx::Offscreen& getOffscreen() const { return offscreen; }
         const vkx::SwapChain& getSwapChain() const { return swapChain; }
-        const vk::RenderPass& getRenderPass() const { return renderPass; }
 
         uint32_t getFrameIndex() const { return currentFrame; }
         bool isFrameInProgress() const { return isFrameStarted; }
 
-        vk::CommandBuffer beginFrame();
+        uint32_t beginFrame();
 
-        void beginRenderPass(vk::CommandBuffer& commandBuffer);
-        void endRenderPass(vk::CommandBuffer& commandBuffer);
-        void endFrame(vk::CommandBuffer& commandBuffer);
+        void beginRenderPass(uint32_t frameIndex);
+        void endRenderPass(uint32_t frameIndex);
+        void endFrame(uint32_t frameIndex);
 
     private:
         const vkx::Context& context;
@@ -56,7 +56,6 @@ namespace fe {
         vkx::Offscreen offscreen{ context };
         vkx::SwapChain swapChain{ context };
         vk::CommandPool commandPool;
-        vk::RenderPass renderPass;
 
         std::vector<vk::CommandBuffer> commandBuffers;
 
@@ -76,15 +75,9 @@ namespace fe {
         uint32_t currentFrame{ 0 };
         bool isFrameStarted{ false };
 
-        void createRenderPass();
+        void recreateSwapChain();
         void createCommandBuffers();
         void createUniformBuffers();
         void createDescriptorSets();
-        void recreateSwapChain();
-
-        // Color buffer format
-        vk::Format colorformat{ vk::Format::eB8G8R8A8Unorm };
-        // Depth buffer format...  selected during Vulkan initialization
-        vk::Format depthFormat{ vk::Format::eUndefined };
     };
 }

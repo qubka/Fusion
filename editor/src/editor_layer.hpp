@@ -18,7 +18,7 @@ namespace fe {
     class EditorApp;
     class EditorLayer : public Layer {
     public:
-        EditorLayer();
+        EditorLayer(EditorApp& context);
         ~EditorLayer() override;
 
         void onAttach() override;
@@ -45,5 +45,7 @@ namespace fe {
         int gizmoType = -1;
         enum class SceneState { Edit = 0, Play = 1 };
         SceneState sceneState = SceneState::Edit;
+
+        EditorApp& context;
     };
 }

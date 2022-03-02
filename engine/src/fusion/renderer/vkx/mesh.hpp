@@ -18,7 +18,7 @@ namespace vkx {
         };
 
         /** @brief Generate mesh from list of vertices and indices */
-        void loadFromArray(const Context& context, const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer = {});
+        void loadFromBuffer(const Context& context, const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer = {});
 
         /** @brief Release all Vulkan resources of this mesh */
         void destroy();

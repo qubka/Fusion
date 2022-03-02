@@ -202,6 +202,12 @@ void UIOverlay::prepareResources() {
 
     // Command buffer execution fence
     fence = context.device.createFence(vk::FenceCreateInfo{});
+
+    // Store offscreen frame images
+    for (auto& framebuffer : createInfo.framebuffers) {
+        auto& color = framebuffer.colors[0];
+        frameImages.push_back(addTexture(color.sampler, color.view, vk::ImageLayout::eShaderReadOnlyOptimal));
+    }
 }
 
 /** Prepare a separate pipeline for the UI overlay rendering decoupled from the main application */

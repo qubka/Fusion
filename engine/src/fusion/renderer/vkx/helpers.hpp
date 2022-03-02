@@ -76,22 +76,16 @@ inline vk::PipelineStageFlags pipelineStageForLayout(vk::ImageLayout layout) {
         case vk::ImageLayout::eTransferDstOptimal:
         case vk::ImageLayout::eTransferSrcOptimal:
             return vk::PipelineStageFlagBits::eTransfer;
-
         case vk::ImageLayout::eColorAttachmentOptimal:
             return vk::PipelineStageFlagBits::eColorAttachmentOutput;
-
         case vk::ImageLayout::eDepthStencilAttachmentOptimal:
             return vk::PipelineStageFlagBits::eEarlyFragmentTests;
-
         case vk::ImageLayout::eShaderReadOnlyOptimal:
             return vk::PipelineStageFlagBits::eFragmentShader;
-
         case vk::ImageLayout::ePreinitialized:
             return vk::PipelineStageFlagBits::eHost;
-
         case vk::ImageLayout::eUndefined:
             return vk::PipelineStageFlagBits::eTopOfPipe;
-
         default:
             return vk::PipelineStageFlagBits::eBottomOfPipe;
     }

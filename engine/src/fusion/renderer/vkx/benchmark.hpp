@@ -1,11 +1,3 @@
-/*
-* Benchmark class
-*
-* Copyright (C) 2016-2017 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*/
-
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -34,9 +26,9 @@ namespace vkx
         double runtime = 0.0;
         uint32_t frameCount = 0;
 
-        void run(std::function<void()> renderFunc, const vk::PhysicalDeviceProperties& deviceProps) {
+        void run(std::function<void()> renderFunc, const vk::PhysicalDeviceProperties& props) {
             active = true;
-            this->deviceProps = deviceProps;
+            deviceProps = props;
 #if defined(_WIN32)
             AttachConsole(ATTACH_PARENT_PROCESS);
 			freopen_s(&stream, "CONOUT$", "w+", stdout);

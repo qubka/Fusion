@@ -127,8 +127,8 @@ void Application::run() {
         // Once we exit the render loop, wait for everything to become idle before proceeding to the descructor.
         context.queue.waitIdle();
         context.device.waitIdle();
-    } catch(const std::system_error& err) {
-        LOG_ERROR << err.what();
+    } catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
     }
 }
 
@@ -147,7 +147,8 @@ void Application::setupUi() {
 
     struct vkx::ui::UIOverlayCreateInfo overlayCreateInfo;
     // Setup default overlay creation info
-    overlayCreateInfo.renderPass = renderer.getRenderPass();
+    overlayCreateInfo.renderPass = renderer.getSwapChain().renderPass;
+    overlayCreateInfo.framebuffers = renderer.getOffscreen().framebuffers;
     overlayCreateInfo.size = size;
     overlayCreateInfo.window = window;
 
@@ -320,20 +321,20 @@ void Application::setupWindow() {
 #endif
 
 void Application::render() {
-    if (auto cmdBuffer = renderer.beginFrame()) {
-        renderer.beginRenderPass(cmdBuffer);
+    if (uint32_t frameIndex = renderer.beginFrame(); frameIndex != UINT32_MAX) {
+        renderer.beginRenderPass(frameIndex);
 
         for (auto* layer: layers) {
             layer->onRender(renderer);
         }
 
         if (settings.overlay) {
-            ui.draw(cmdBuffer);
+            ui.draw(renderer.getCurrentCommandBuffer());
         }
 
-        renderer.endRenderPass(cmdBuffer);
+        renderer.endRenderPass(frameIndex);
 
-        renderer.endFrame(cmdBuffer);
+        renderer.endFrame(frameIndex);
     }
 }
 

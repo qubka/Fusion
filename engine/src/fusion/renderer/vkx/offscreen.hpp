@@ -4,27 +4,26 @@
 #include "framebuffer.hpp"
 
 namespace vkx {
-class Offscreen {
-public:
-    Offscreen(const vkx::Context& context)
-            : context{ context } {}
-
+struct Offscreen {
     const vkx::Context& context;
     vk::RenderPass renderPass;
-    vk::CommandBuffer commandBuffer;
     vk::Semaphore renderComplete;
     glm::uvec2 size{ 0 };
     std::vector<vk::Format> colorFormats{ vk::Format::eB8G8R8A8Unorm };
     // This value is chosen as an invalid default that signals that the code should pick a specific depth buffer
     // Alternative, you can set this to undefined to explicitly declare you want no depth buffer.
     vk::Format depthFormat{ vk::Format::eR8Uscaled };
-    std::vector<vkx::Framebuffer> framebuffers{ 1 };
+    std::vector<vkx::Framebuffer> framebuffers{ vkx::SwapChain::MAX_FRAMES_IN_FLIGHT };
+    std::vector<vk::CommandBuffer> commandBuffers;
     vk::ImageUsageFlags attachmentUsage{ vk::ImageUsageFlagBits::eSampled };
     vk::ImageUsageFlags depthAttachmentUsage;
     vk::ImageLayout colorFinalLayout{ vk::ImageLayout::eShaderReadOnlyOptimal };
     vk::ImageLayout depthFinalLayout{ vk::ImageLayout::eDepthStencilAttachmentOptimal };
 
     bool active{ true };
+
+    Offscreen(const vkx::Context& context)
+            : context{ context } {}
 
     void create() {
         assert(!colorFormats.empty());
@@ -34,7 +33,7 @@ public:
             depthFormat = context.getSupportedDepthFormat();
         }
 
-        commandBuffer = context.allocateCommandBuffers(1)[0];
+        commandBuffers = context.allocateCommandBuffers(vkx::SwapChain::MAX_FRAMES_IN_FLIGHT);
         renderComplete = context.device.createSemaphore({});
 
         if (!renderPass) {
@@ -42,8 +41,7 @@ public:
         }
 
         for (auto& framebuffer: framebuffers) {
-            framebuffer.create(context, size, colorFormats, depthFormat, renderPass, attachmentUsage,
-                               depthAttachmentUsage);
+            framebuffer.create(context, size, colorFormats, depthFormat, renderPass, attachmentUsage,depthAttachmentUsage);
         }
         createSampler();
     }
@@ -53,7 +51,7 @@ public:
             framebuffer.destroy();
         }
         framebuffers.clear();
-        context.device.freeCommandBuffers(context.getCommandPool(), commandBuffer);
+        context.device.freeCommandBuffers(context.getCommandPool(), commandBuffers);
         context.device.destroyRenderPass(renderPass);
         context.device.destroySemaphore(renderComplete);
     }
@@ -66,8 +64,8 @@ protected:
         sampler.minFilter = vk::Filter::eLinear;
         sampler.mipmapMode = vk::SamplerMipmapMode::eLinear;
         sampler.addressModeU = vk::SamplerAddressMode::eClampToEdge;
-        sampler.addressModeV = sampler.addressModeU;
-        sampler.addressModeW = sampler.addressModeU;
+        sampler.addressModeV = vk::SamplerAddressMode::eClampToEdge;
+        sampler.addressModeW = vk::SamplerAddressMode::eClampToEdge;
         sampler.mipLodBias = 0.0f;
         sampler.maxAnisotropy = 0;
         sampler.compareOp = vk::CompareOp::eNever;
@@ -108,7 +106,7 @@ protected:
             attachmentReference.attachment = i;
             attachmentReference.layout = vk::ImageLayout::eColorAttachmentOptimal;
 
-            subpass.colorAttachmentCount = (uint32_t) colorAttachmentReferences.size();
+            subpass.colorAttachmentCount = static_cast<uint32_t>(colorAttachmentReferences.size());
             subpass.pColorAttachments = colorAttachmentReferences.data();
         }
 
@@ -126,7 +124,7 @@ protected:
             depthAttachment.initialLayout = vk::ImageLayout::eUndefined;
             depthAttachment.finalLayout = depthFinalLayout;
             attachments.push_back(depthAttachment);
-            depthAttachmentReference.attachment = (uint32_t) attachments.size() - 1;
+            depthAttachmentReference.attachment = static_cast<uint32_t>(attachments.size() - 1);
             depthAttachmentReference.layout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
             subpass.pDepthStencilAttachment = &depthAttachmentReference;
         }
@@ -144,6 +142,7 @@ protected:
                 dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
                 dependency.dstAccessMask = vkx::util::accessFlagsForLayout(colorFinalLayout);
                 dependency.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+
                 subpassDependencies.push_back(dependency);
             }
 
@@ -167,11 +166,11 @@ protected:
         }
 
         vk::RenderPassCreateInfo renderPassInfo;
-        renderPassInfo.attachmentCount = (uint32_t) attachments.size();
+        renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         renderPassInfo.pAttachments = attachments.data();
         renderPassInfo.subpassCount = 1;
         renderPassInfo.pSubpasses = &subpass;
-        renderPassInfo.dependencyCount = (uint32_t) subpassDependencies.size();
+        renderPassInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());
         renderPassInfo.pDependencies = subpassDependencies.data();
         renderPass = context.device.createRenderPass(renderPassInfo);
     }

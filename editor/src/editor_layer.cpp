@@ -24,7 +24,7 @@
 
 using namespace fe;
 
-EditorLayer::EditorLayer() : Layer{"EditorLayer"} {
+EditorLayer::EditorLayer(EditorApp& context) : Layer{"EditorLayer"}, context{context} {
 }
 
 EditorLayer::~EditorLayer() {
@@ -217,7 +217,7 @@ void EditorLayer::onImGui() {
     ImVec2 minBounds = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
     ImVec2 maxBounds = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-    //ImGui::Image(offscreen, ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
+    ImGui::Image(context.getCurrentFrameImage(), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {

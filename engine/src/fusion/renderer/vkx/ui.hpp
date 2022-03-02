@@ -9,6 +9,8 @@
 #pragma once
 
 #include "context.hpp"
+#include "framebuffer.hpp"
+
 #include "fusion/core/window.hpp"
 
 #include <imgui/imgui.h>
@@ -21,6 +23,7 @@ namespace vkx { namespace ui {
 
 struct UIOverlayCreateInfo {
     vk::RenderPass renderPass;
+    std::vector<vkx::Framebuffer> framebuffers;
     vk::Format colorformat;
     vk::Format depthformat;
     vk::Extent2D size;
@@ -69,6 +72,7 @@ private:
 public:
     bool visible{ true };
     float scale{ 1.0f };
+    std::vector<ImTextureID> frameImages;
 
     UIOverlay(const vkx::Context& context) : context{context} {}
     ~UIOverlay();

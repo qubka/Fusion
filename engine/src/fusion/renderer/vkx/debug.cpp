@@ -1,14 +1,5 @@
-/*
-* Vulkan examples debug wrapper
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*/
-
 #include "debug.hpp"
-#include <iostream>
-#include <sstream>
+
 #include <mutex>
 
 #ifdef __ANDROID__

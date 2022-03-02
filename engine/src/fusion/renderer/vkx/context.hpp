@@ -13,7 +13,6 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "forward.hpp"
 #include "debug.hpp"
 #include "image.hpp"
 #include "buffer.hpp"
@@ -815,7 +814,7 @@ public:
                 const vk::ArrayProxy<const vk::Semaphore>& wait = {},
                 const vk::ArrayProxy<const vk::PipelineStageFlags>& waitStages = {},
                 const vk::ArrayProxy<const vk::Semaphore>& signals = {},
-                const vk::Fence& fence = vk::Fence()) const {
+                const vk::Fence& fence = vk::Fence{}) const {
         vk::SubmitInfo info;
         info.commandBufferCount = commandBuffers.size();
         info.pCommandBuffers = commandBuffers.data();
@@ -843,7 +842,7 @@ public:
     void submit(const vk::ArrayProxy<const vk::CommandBuffer>& commandBuffers,
                 const vk::ArrayProxy<const SemaphoreStagePair>& wait = {},
                 const vk::ArrayProxy<const vk::Semaphore>& signals = {},
-                const vk::Fence& fence = vk::Fence()) const {
+                const vk::Fence& fence = vk::Fence{}) const {
         std::vector<vk::Semaphore> waitSemaphores;
         std::vector<vk::PipelineStageFlags> waitStages;
         for (size_t i = 0; i < wait.size(); ++i) {
@@ -858,7 +857,7 @@ public:
     void submit(const vk::ArrayProxy<const vk::CommandBuffer>& commandBuffers,
                 const SemaphoreStagePair& wait,
                 const vk::ArrayProxy<const vk::Semaphore>& signals = {},
-                const vk::Fence& fence = vk::Fence()) const {
+                const vk::Fence& fence = vk::Fence{}) const {
         submit(commandBuffers, wait.first, wait.second, signals, fence);
     }
 
