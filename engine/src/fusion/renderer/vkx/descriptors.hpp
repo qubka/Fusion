@@ -40,8 +40,6 @@ namespace vkx {
         std::vector<vk::DescriptorPool> freePools;
 
         const vk::Device& device;
-
-        static constexpr int INITIAL_POOL_SIZE = 1000;
     };
 
     class DescriptorLayoutCache {

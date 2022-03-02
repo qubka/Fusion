@@ -13,6 +13,10 @@ Scene::~Scene() {
 
 }
 
+void Scene::onViewportResize(const glm::vec2& size) {
+
+}
+
 void Scene::onUpdateRuntime(float ts) {
 
 }

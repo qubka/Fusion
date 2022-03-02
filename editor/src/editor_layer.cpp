@@ -50,14 +50,10 @@ void EditorLayer::onDetach() {
 }
 
 void EditorLayer::onUpdate(float ts) {
-    /*auto& window = vulkan.getWindow();
-    if (auto* event = window.eventQueue.next<WindowFramebufferSizeEvent>()) {
-        editorCamera.setViewport(event->width, event->height);
-    }*/
-
     switch (sceneState) {
         case SceneState::Edit: {
-            editorCamera.update(ts);
+            if (viewportFocused)
+                editorCamera.update(ts);
             activeScene->onUpdateEditor(ts);
             break;
         }
@@ -183,28 +179,33 @@ void EditorLayer::onImGui() {
 
     ImGui::Begin("Stats");
 
-    /*std::string name = "None";
+    //std::string name = "None";
     //if (hoveredEntity)
     //    name = hoveredEntity.GetComponent<TagComponent>();
     //ImGui::Text("Hovered Entity: %s", name.c_str());
-    ImGui::Text("CPU: %f%%", info.getProcessCpuUsage());
-    ImGui::Text("Mem: %fMB", info.getProcessMemoryUsed());
-    ImGui::Text("Threads: %lu", info.getProcessThreadCount());
+    //ImGui::Text("CPU: %f%%", info.getProcessCpuUsage());
+    //ImGui::Text("Mem: %fMB", info.getProcessMemoryUsed());
+    //ImGui::Text("Threads: %lu", info.getProcessThreadCount());
     //ImGui::Text("Video Mem: %d%% %d/%d", static_cast<int>((totalMemory - availMemory) / static_cast<float>(totalMemory) * 100), (totalMemory - availMemory) / 1024, totalMemory / 1024);
-    ImGui::Text("Display: %dx%d", window.getWidth(), window.getHeight());
+    //ImGui::Text("Display: %dx%d", window.getWidth(), window.getHeight());
     //ImGui::Text(renderer);
     //ImGui::Text(version);
-    ImGui::Text("FPS: %d", Time::FramesPerSecond());
+    //ImGui::Text("FPS: %d", Time::FramesPerSecond());
     //ImGui::Text("XYZ: " + glm::to_string(camera.position());
     ImGui::Text("Mouse Position: %s", glm::to_string(Input::MousePosition()).c_str());
+    ImGui::Text("Mouse Normalized Position: %s", glm::to_string(Input::MouseNormalizedPosition()).c_str());
     ImGui::Text("Mouse Delta: %s", glm::to_string(Input::MouseDelta()).c_str());
     ImGui::Text("Mouse Scroll: %s", glm::to_string(Input::MouseScroll()).c_str());
+    ImGui::Text("Viewport Focused: %s", viewportFocused ? "TRUE" : "FALSE");
+    ImGui::Text("Viewport Hovered: %s", viewportHovered ? "TRUE" : "FALSE");
+
     //ImGui::Text("Renderer Stats:");
     //ImGui::Text("Draw Calls: %d", stats.DrawCalls);
     //ImGui::Text("Quads: %d", stats.QuadCount);
     //ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
     //ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-    ImGui::ColorEdit3("Background", glm::value_ptr(Application::Instance().getRenderer().getColor()));*/
+    //static glm::vec3 color;
+    //ImGui::ColorEdit3("Background", glm::value_ptr(color));
 
     ImGui::End();
 
@@ -214,10 +215,20 @@ void EditorLayer::onImGui() {
     auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
     auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
     auto viewportOffset = ImGui::GetWindowPos();
-    ImVec2 minBounds = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
-    ImVec2 maxBounds = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+    glm::vec2 minBounds { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+    glm::vec2 maxBounds { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-    ImGui::Image(context.getCurrentFrameImage(), ImGui::GetContentRegionAvail(), { 0, 1 }, { 1, 0 });
+    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+    viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+
+    //editorCamera.setViewport(viewportSize);
+    //activeScene->onViewportResize(viewportSize);
+
+    //viewportFocused = ImGui::IsWindowFocused();
+    //viewportHovered = ImGui::IsWindowHovered();
+    //context.getUI().blockEvents(!viewportFocused && !viewportHovered);
+
+    ImGui::Image(context.getCurrentFrameImage(), viewportPanelSize, { 0, 1 }, { 1, 0 });
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -228,7 +239,7 @@ void EditorLayer::onImGui() {
     }
 
     // Gizmos
-    /*auto selectedEntity = sceneHierarchyPanel.getSelectedEntity();
+    auto selectedEntity = sceneHierarchyPanel.getSelectedEntity();
     if (selectedEntity != entt::null && gizmoType != -1) {
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist();
@@ -244,7 +255,7 @@ void EditorLayer::onImGui() {
         // glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
 
         // Entity transform
-        auto& component = activeScene->getEntityRegistry().get<TransformComponent>(selectedEntity);
+        auto& component = activeScene->registry.get<TransformComponent>(selectedEntity);
         glm::mat4 transform = component;
 
         // Snapping
@@ -256,7 +267,7 @@ void EditorLayer::onImGui() {
 
         float snapValues[3] = { snapValue, snapValue, snapValue };
 
-        Imguimo fix for Vulkan projection
+        // Imguimo fix for Vulkan projection
         auto cameraView = glm::lookAtLH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
         auto cameraProjection = glm::perspectiveLH(
                 glm::radians(editorCamera.getFov()),
@@ -264,15 +275,12 @@ void EditorLayer::onImGui() {
                 editorCamera.getNearClip(),
                 editorCamera.getFarClip());
 
-        //const glm::mat4& cameraProjection = editorCamera.getProjection();
-        //glm::mat4 cameraView = editorCamera.getView();
+        /*const glm::mat4& cameraProjection = editorCamera.getProjection();
+        glm::mat4 cameraView = editorCamera.getView();*/
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                              (ImGuizmo::OPERATION)gizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
                              nullptr, snap ? snapValues : nullptr);
-
-        //glm::mat4 m{1};
-        //ImGuizmo::DrawGrid(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), glm::value_ptr(m), 100.0f);
 
         if (ImGuizmo::IsUsing()) {
             glm::vec3 translation, rotation, scale;
@@ -283,7 +291,7 @@ void EditorLayer::onImGui() {
             component.rotation += deltaRotation;
             component.scale = scale;
         }
-    }*/
+    }
 
     ImGui::PopStyleVar();
     ImGui::End();
@@ -295,7 +303,7 @@ void EditorLayer::onImGui() {
 
 void EditorLayer::newScene() {
     activeScene = std::make_shared<Scene>();
-    //activeScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+    activeScene->onViewportResize(viewportSize);
     sceneHierarchyPanel.setContext(activeScene);
 }
 
@@ -315,7 +323,7 @@ void EditorLayer::openScene(const std::filesystem::path& path) {
     SceneSerializer serializer{newScene};
     if (serializer.deserialize(path)) {
         activeScene = newScene;
-        //activeScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        activeScene->onViewportResize(viewportSize);
         sceneHierarchyPanel.setContext(activeScene);
     }
 

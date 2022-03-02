@@ -262,7 +262,7 @@ vk::Extent2D SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capab
 vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex) const {
     auto result = device.waitForFences(1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
     if (result != vk::Result::eSuccess) {
-        throw std::runtime_error("failed to wait for fences");
+        throw std::runtime_error("failed to wait for inFlightFences");
     }
 
     return device.acquireNextImageKHR(swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], nullptr, &imageIndex); /// use noexcept to handle OUT_OF_DATE
@@ -274,14 +274,14 @@ vk::Result SwapChain::submitCommandBuffers(const std::vector<vk::CommandBuffer>&
     if (image != nullptr) {
         auto result = device.waitForFences(1, image, VK_TRUE, UINT64_MAX);
         if (result != vk::Result::eSuccess) {
-            throw std::runtime_error("failed to wait for fences");
+            throw std::runtime_error("failed to wait for imagesInFlight");
         }
     }
     imagesInFlight[imageIndex] = &fence;
 
     vk::SubmitInfo submitInfo;
 
-    vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eBottomOfPipe };
+    vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = &imageAvailableSemaphores[currentFrame];
     submitInfo.pWaitDstStageMask = waitStages;

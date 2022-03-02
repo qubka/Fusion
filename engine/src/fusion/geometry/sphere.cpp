@@ -4,6 +4,8 @@
 
 using namespace fe;
 
+#define EPSILON_VALUE 4.37114e-05
+
 Sphere::Sphere() : center{0}, radius{0} {
 }
 

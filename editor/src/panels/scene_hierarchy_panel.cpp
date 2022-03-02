@@ -61,8 +61,8 @@ void SceneHierarchyPanel::drawEntity(entt::entity entity) {
     }
 
     if (opened) {
-        if (ImGui::TreeNodeEx((void*)9817239, ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth, "%s", tag.c_str()))
-            ImGui::TreePop();
+        //if (ImGui::TreeNodeEx((void*)9817239, ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth, "%s", tag.c_str()))
+        //    ImGui::TreePop();
         ImGui::TreePop();
     }
 

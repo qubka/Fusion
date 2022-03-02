@@ -32,6 +32,8 @@ namespace fe {
     public:
         static Application& Instance() { return *instance; }
         Window& getWindow() { return *window; }
+        vkx::ui::UIOverlay& getUI() { return ui; }
+        Renderer& getRenderer() { return renderer; }
         KeyInput& getKeyInput() { return keyInput; }
         MouseInput& getMouseInput() { return mouseInput; }
 
@@ -111,8 +113,8 @@ namespace fe {
         void setupConsole(std::string title);
 #endif
         Window* window{ nullptr };
-        KeyInput keyInput{};
-        MouseInput mouseInput{};
+        KeyInput keyInput{/*all keys*/};
+        MouseInput mouseInput{/*all buttons*/};
     };
 
     Application* CreateApplication(CommandLineArgs args);

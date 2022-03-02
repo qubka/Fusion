@@ -338,7 +338,7 @@ public:
     //
 
     void trashPipeline(vk::Pipeline& pipeline) const {
-        trash<vk::Pipeline>(pipeline, [this](vk::Pipeline pipeline) { device.destroyPipeline(pipeline); });
+        trash<vk::Pipeline>(pipeline, [&](vk::Pipeline pipeline) { device.destroyPipeline(pipeline); });
     }
 
     void trashCommandBuffers(const vk::CommandPool& commandPool, std::vector<vk::CommandBuffer>& cmdBuffers) const {
@@ -938,7 +938,7 @@ inline void Context::copyToMemory(const vk::DeviceMemory& memory, const gli::tex
 
 template <>
 inline void Context::trash<vk::CommandBuffer>(vk::CommandBuffer value) const {
-    std::function<void(vk::CommandBuffer t)> destructor = [this](vk::CommandBuffer commandBuffer) {
+    std::function<void(vk::CommandBuffer t)> destructor = [&](vk::CommandBuffer commandBuffer) {
         device.freeCommandBuffers(getCommandPool(), commandBuffer);
     };
     trash<vk::CommandBuffer>(value, destructor);

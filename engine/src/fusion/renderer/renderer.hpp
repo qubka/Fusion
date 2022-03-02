@@ -24,7 +24,7 @@ namespace fe {
         void create();
         void destroy();
 
-        //glm::vec3& getColor() { return color; }
+        glm::vec3& getColor() { return color; }
         //glm::vec3& getLightDirection() { return lightDirection; }
 
         vkx::DescriptorLayoutCache& getDescriptorLayoutCache() { return descriptorLayoutCache; };
@@ -53,8 +53,8 @@ namespace fe {
         const vkx::Context& context;
         vkx::Offscreen offscreen{ context };
         vkx::SwapChain swapChain{ context };
-        vk::CommandPool commandPool;
 
+        vk::CommandPool commandPool;
         std::vector<vk::CommandBuffer> commandBuffers;
 
         std::vector<vkx::Buffer> uniformBuffers;
@@ -77,5 +77,7 @@ namespace fe {
         void createCommandBuffers();
         void createUniformBuffers();
         void createDescriptorSets();
+
+        void setRenderPass(const vk::CommandBuffer& commandBuffer, const vk::RenderPass& renderPass, const vk::Framebuffer& framebuffer, const vk::Extent2D& extent);
     };
 }

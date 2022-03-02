@@ -300,9 +300,9 @@ void UIOverlay::prepareRenderPass() {
 void UIOverlay::setupEvents() {
     assert(createInfo.window);
 
-    createInfo.window->FramebufferEvent.connect([](const glm::ivec2& pos) {
+    createInfo.window->FramebufferEvent.connect([](const glm::ivec2& size) {
         ImGuiIO& io = ImGui::GetIO();
-        io.DisplaySize = ImVec2{static_cast<float>(pos.x), static_cast<float>(pos.y)};
+        io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
     });
 
     createInfo.window->MouseButtonEvent.connect([](MouseData data) {
@@ -374,7 +374,6 @@ void UIOverlay::draw(const vk::CommandBuffer& commandBuffer) {
     ImGuiIO& io = ImGui::GetIO();
 
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
-    //cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, descriptorSet, {});
 
     pushConstBlock.scale = glm::vec2{2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y};
     pushConstBlock.translate = glm::vec2{-1.0f};
@@ -577,11 +576,11 @@ ImTextureID UIOverlay::addTexture(const vk::Sampler& sampler, const vk::ImageVie
 #include <GLFW/glfw3.h>
 
 void UIOverlay::UpdateKeyModifiers(int mods) {
-    ImGuiIO& io = ImGui::GetIO();
+    /*ImGuiIO& io = ImGui::GetIO();
     io.AddKeyEvent(ImGuiKey_ModCtrl, (mods & GLFW_MOD_CONTROL) != 0);
     io.AddKeyEvent(ImGuiKey_ModShift, (mods & GLFW_MOD_SHIFT) != 0);
     io.AddKeyEvent(ImGuiKey_ModAlt, (mods & GLFW_MOD_ALT) != 0);
-    io.AddKeyEvent(ImGuiKey_ModSuper, (mods & GLFW_MOD_SUPER) != 0);
+    io.AddKeyEvent(ImGuiKey_ModSuper, (mods & GLFW_MOD_SUPER) != 0);*/
 }
 
 int UIOverlay::TranslateUntranslatedKey(int key, int scancode) {

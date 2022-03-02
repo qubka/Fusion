@@ -100,9 +100,6 @@ Application::Application(std::string title, CommandLineArgs args) : title{std::m
 Application::~Application() {
     instance = nullptr;
 
-    context.queue.waitIdle();
-    context.device.waitIdle();
-
     renderer.destroy();
 
     ui.destroy();
@@ -125,8 +122,8 @@ void Application::run() {
         mainLoop();
 
         // Once we exit the render loop, wait for everything to become idle before proceeding to the descructor.
-        context.queue.waitIdle();
-        context.device.waitIdle();
+        queue.waitIdle();
+        device.waitIdle();
     } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
     }
@@ -159,7 +156,7 @@ void Application::setupUi() {
     ui.create(overlayCreateInfo);
 
     for (auto& shader : overlayCreateInfo.shaders) {
-        context.device.destroyShaderModule(shader.module);
+        device.destroyShaderModule(shader.module);
         shader.module = vk::ShaderModule{};
     }
 
@@ -168,7 +165,7 @@ void Application::setupUi() {
 
 void Application::initVulkan() {
     // TODO make this less stupid
-    context.setDeviceFeaturesPicker([this](const vk::PhysicalDevice& device, vk::PhysicalDeviceFeatures2& features){
+    context.setDeviceFeaturesPicker([&](const vk::PhysicalDevice& device, vk::PhysicalDeviceFeatures2& features){
         if (deviceFeatures.textureCompressionBC) {
             enabledFeatures.textureCompressionBC = VK_TRUE;
         } else if (context.deviceFeatures.textureCompressionASTC_LDR) {
@@ -179,7 +176,6 @@ void Application::initVulkan() {
         if (deviceFeatures.samplerAnisotropy) {
             enabledFeatures.samplerAnisotropy = VK_TRUE;
         }
-        //getEnabledFeatures();
     });
 
 #if defined(__ANDROID__)
@@ -193,7 +189,7 @@ void Application::initVulkan() {
 #if defined(__ANDROID__)
     auto surface = context.instance.createAndroidSurfaceKHR({ {}, android::androidApp->window });
 #else
-    auto surface = glfw::Window::createWindowSurface(reinterpret_cast<GLFWwindow*>(window->getNativeWindow()), context.instance);;
+    auto surface = reinterpret_cast<glfw::Window*>(window)->createSurface(context.instance);
 #endif
 
     context.createDevice(surface);
@@ -255,6 +251,9 @@ void Application::update(float deltaTime) {
     }
 
     updateOverlay();
+
+    keyInput.onUpdate();
+    mouseInput.onUpdate();
 }
 
 #if defined(_WIN32)
@@ -347,7 +346,6 @@ void Application::updateOverlay() {
     io.DeltaTime = frameTimer;
 
     ImGui::NewFrame();
-    ImGuizmo::SetOrthographic(false);
     ImGuizmo::BeginFrame();
 
     for (auto* layer: layers) {

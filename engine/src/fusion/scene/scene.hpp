@@ -11,6 +11,7 @@ namespace fe {
         Scene();
         ~Scene();
 
+        void onViewportResize(const glm::vec2& size);
         void onUpdateRuntime(float ts);
         void onUpdateEditor(float ts);
 

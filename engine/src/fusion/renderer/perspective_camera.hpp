@@ -10,7 +10,7 @@ namespace fe {
 
         virtual void update(float ts) { updateView(); }
 
-        void setViewport(uint32_t width, uint32_t height);
+        void setViewport(const glm::vec2& size);
         void setPerspective(float fov, float aspect, float near, float far);
 
         // Camera oriented directions

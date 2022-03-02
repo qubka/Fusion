@@ -46,6 +46,10 @@ namespace fe {
         enum class SceneState { Edit = 0, Play = 1 };
         SceneState sceneState = SceneState::Edit;
 
+        glm::vec2 viewportSize;
+        bool viewportFocused;
+        bool viewportHovered;
+
         EditorApp& context;
     };
 }

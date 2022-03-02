@@ -14,9 +14,12 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float 
     updateView();
 }
 
-void PerspectiveCamera::setViewport(uint32_t width, uint32_t height) {
-    viewportWidth = static_cast<float>(width);
-    viewportHeight = static_cast<float>(height);
+void PerspectiveCamera::setViewport(const glm::vec2& size) {
+    if (viewportWidth == size.x && viewportHeight == size.y)
+        return;
+
+    viewportWidth = size.x;
+    viewportHeight = size.y;
     setAspect(viewportWidth / viewportHeight);
 }
 

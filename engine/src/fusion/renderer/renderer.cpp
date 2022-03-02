@@ -37,19 +37,19 @@ void Renderer::destroy() {
 }
 
 void Renderer::createUniformBuffers() {
-    uniformBuffers.reserve(vkx::SwapChain::MAX_FRAMES_IN_FLIGHT);
+    uniformBuffers.reserve(MAX_FRAMES_IN_FLIGHT);
 
     /* Global Ubo */
-    for (int i = 0; i < vkx::SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
+    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         uniformBuffers.push_back(context.createUniformBuffer(GlobalUbo{}));
     }
 }
 
 void Renderer::createDescriptorSets() {
-    dynamicAllocators.reserve(vkx::SwapChain::MAX_FRAMES_IN_FLIGHT);
-    globalDescriptorSets.resize(vkx::SwapChain::MAX_FRAMES_IN_FLIGHT);
+    dynamicAllocators.reserve(MAX_FRAMES_IN_FLIGHT);
+    globalDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
 
-    for (int i = 0; i < vkx::SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
+    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         auto& descriptorAllocator = dynamicAllocators.emplace_back(context.device);
         vkx::DescriptorBuilder{descriptorLayoutCache, descriptorAllocator}
                 .bindBuffer(0, &uniformBuffers[i].descriptor, vk::DescriptorType::eUniformBuffer,vk::ShaderStageFlagBits::eVertex)
@@ -63,7 +63,7 @@ void Renderer::createDescriptorSets() {
 }
 
 void Renderer::createCommandBuffers() {
-    commandBuffers = context.allocateCommandBuffers(vkx::SwapChain::MAX_FRAMES_IN_FLIGHT);
+    commandBuffers = context.allocateCommandBuffers(MAX_FRAMES_IN_FLIGHT);
 }
 
 void Renderer::recreateSwapChain() {
@@ -76,7 +76,7 @@ void Renderer::recreateSwapChain() {
     }
 
     context.device.waitIdle();
-    context.queue.waitIdle();
+    //context.queue.waitIdle();
 
     LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
 
@@ -116,48 +116,24 @@ void Renderer::beginRenderPass(uint32_t frameIndex) {
     assert(isFrameStarted && "cannot call beginRenderPass if frame is not in progress");
     assert(frameIndex == currentFrame && "cannot start render pass on command buffer from a different frame");
 
-    const auto& surfaceExtent = swapChain.extent;
-    auto offset = vk::Offset2D{0, 0};
-
     clearValues[0].color = std::array<float, 4>{ color.x, color.y, color.z, 1 };
     clearValues[1].depthStencil.depth = 1.0f;
     clearValues[1].depthStencil.stencil = 0;
 
-    vk::RenderPassBeginInfo renderPassInfo;
-    renderPassInfo.renderPass = swapChain.renderPass;
-    renderPassInfo.framebuffer = swapChain.framebuffers[currentImage];
-    renderPassInfo.renderArea.offset = offset;
-    renderPassInfo.renderArea.extent = surfaceExtent;
-    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-    renderPassInfo.pClearValues = clearValues.data();
-
-    auto& mainCmdBuffer = commandBuffers[currentFrame];
-    mainCmdBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-
-    {
-        vk::Viewport viewport = vkx::util::viewport(surfaceExtent);
-        vk::Rect2D scissor = vkx::util::rect2D(surfaceExtent, offset);
-        mainCmdBuffer.setViewport(0, 1, &viewport);
-        mainCmdBuffer.setScissor(0, 1, &scissor);
-    }
+    setRenderPass(
+    commandBuffers[currentFrame],
+    swapChain.renderPass,
+    swapChain.framebuffers[currentImage],
+    swapChain.extent
+    );
 
     if (offscreen.active) {
-        const auto& screenExtent = offscreen.extent;
-        vk::RenderPassBeginInfo offPassInfo;
-        offPassInfo.renderPass = offscreen.renderPass;
-        offPassInfo.framebuffer = offscreen.framebuffers[currentFrame].framebuffer;
-        offPassInfo.renderArea.offset = offset;
-        offPassInfo.renderArea.extent = screenExtent;
-        offPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        offPassInfo.pClearValues = clearValues.data();
-
-        auto& offCmdBuffer = offscreen.commandBuffers[currentFrame];
-        offCmdBuffer.beginRenderPass(offPassInfo, vk::SubpassContents::eInline);
-
-        vk::Viewport viewport = vkx::util::viewport(screenExtent);
-        vk::Rect2D scissor = vkx::util::rect2D(screenExtent, offset);
-        offCmdBuffer.setViewport(0, 1, &viewport);
-        offCmdBuffer.setScissor(0, 1, &scissor);
+        setRenderPass(
+        offscreen.commandBuffers[currentFrame],
+        offscreen.renderPass,
+        offscreen.framebuffers[currentFrame].framebuffer,
+        offscreen.extent
+        );
     }
 }
 
@@ -188,7 +164,6 @@ void Renderer::endFrame(uint32_t frameIndex) {
     }
 
     auto result = swapChain.submitCommandBuffers(buffers, currentImage);
-
 #if !defined(__ANDROID__)
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
         recreateSwapChain();
@@ -202,5 +177,23 @@ void Renderer::endFrame(uint32_t frameIndex) {
 #endif
 
     isFrameStarted = false;
-    currentFrame = (currentFrame + 1) % vkx::SwapChain::MAX_FRAMES_IN_FLIGHT;
+    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+void Renderer::setRenderPass(const vk::CommandBuffer& commandBuffer, const vk::RenderPass& renderPass, const vk::Framebuffer& framebuffer, const vk::Extent2D& extent) {
+    auto offset = vk::Offset2D{0, 0};
+
+    vk::RenderPassBeginInfo renderPassInfo;
+    renderPassInfo.renderPass = renderPass;
+    renderPassInfo.framebuffer = framebuffer;
+    renderPassInfo.renderArea.offset = offset;
+    renderPassInfo.renderArea.extent = extent;
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vk::Rect2D scissor = vkx::util::rect2D(extent, offset);
+    vk::Viewport viewport = vkx::util::viewport(extent);
+    commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+    commandBuffer.setViewport(0, 1, &viewport);
+    commandBuffer.setScissor(0, 1, &scissor);
 }

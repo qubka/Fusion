@@ -36,8 +36,6 @@ namespace fe {
         void transform(const glm::mat4& transform);
         //! Converts sphere to another coordinate system. Note that it will not return correct results if there are non-uniform scaling, shears, or other unusual transforms in \a transform.
         Sphere transformed(const glm::mat4& transform) const;
-
-        static constexpr double EPSILON_VALUE = 4.37114e-05;
     };
 }
 

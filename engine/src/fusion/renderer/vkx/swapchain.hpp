@@ -11,12 +11,14 @@
 #include "context.hpp"
 
 namespace vkx {
+
 struct SwapChainImage {
     vk::Image image;
     vk::ImageView view;
 };
 
 using FramebufferAttachment = Image;
+#define MAX_FRAMES_IN_FLIGHT 2
 
 struct SwapChain {
     using Attachment = FramebufferAttachment;
@@ -71,8 +73,5 @@ private:
     static vk::SurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
     static vk::PresentModeKHR chooseSwapPresentMode(bool vsync, const std::vector<vk::PresentModeKHR>& availablePresentModes);
     static vk::Extent2D chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const vk::Extent2D& size);
-
-public:
-    static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 };
 }  // namespace vkx

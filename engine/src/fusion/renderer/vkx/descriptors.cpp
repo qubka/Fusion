@@ -20,7 +20,7 @@ vk::DescriptorPool DescriptorAllocator::grabPool() {
         return pool;
     } else {
         //no pools availible, so create a new one
-        return createPool(INITIAL_POOL_SIZE, {});
+        return createPool(1000, {});
     }
 }
 
