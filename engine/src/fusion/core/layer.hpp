@@ -9,7 +9,7 @@ namespace fe {
 
         virtual void onAttach() {}
         virtual void onDetach() {}
-        virtual void onUpdate(float ts) {}
+        virtual void onUpdate(float dt) {}
         virtual void onRender(Renderer& renderer) {}
         virtual void onImGui() {}
 

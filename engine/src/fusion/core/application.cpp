@@ -142,8 +142,25 @@ void Application::setupUi() {
         return;
     }
 
-    ui.create(window->getNativeWindow(), renderer);
-    renderer.getOffscreen().setup();
+    struct vkx::ui::UIOverlayCreateInfo overlayCreateInfo;
+    // Setup default overlay creation info
+    overlayCreateInfo.renderPass = renderer.getSwapChain().renderPass;
+    overlayCreateInfo.framebuffers = renderer.getOffscreen().framebuffers;
+    overlayCreateInfo.size = size;
+    overlayCreateInfo.window = window;
+
+    ImGui::SetCurrentContext(ImGui::CreateContext());
+
+    // Virtual function call for example to customize overlay creation
+    //onPreSetupUIOverlay(overlayCreateInfo);
+    ui.create(overlayCreateInfo);
+
+    for (auto& shader : overlayCreateInfo.shaders) {
+        device.destroyShaderModule(shader.module);
+        shader.module = vk::ShaderModule{};
+    }
+
+    updateOverlay(0.0015f);
 }
 
 void Application::initVulkan() {
@@ -214,12 +231,11 @@ std::string Application::getWindowTitle() {
     return title + " - " + std::string(context.deviceProperties.deviceName) + " - " + std::to_string(frameCounter) + " fps";
 }
 
-void Application::update(float deltaTime) {
+void Application::update(float dt) {
     ++frameNumber;
-    frameTimer = deltaTime;
     ++frameCounter;
 
-    fpsTimer += frameTimer;
+    fpsTimer += dt;
     if (fpsTimer > 1.0f) {
 #if !defined(__ANDROID__)
         reinterpret_cast<glfw::Window*>(window)->setTitle(getWindowTitle());
@@ -230,8 +246,10 @@ void Application::update(float deltaTime) {
     }
 
     for (auto* layer: layers) {
-        layer->onUpdate(deltaTime);
+        layer->onUpdate(dt);
     }
+
+    updateOverlay(dt);
 
     keyInput.onUpdate();
     mouseInput.onUpdate();
@@ -309,13 +327,7 @@ void Application::render() {
         }
 
         if (settings.overlay) {
-            ui.begin();
-
-            for (auto* layer: layers) {
-                layer->onImGui();
-            }
-
-            ui.end(renderer.getCurrentCommandBuffer());
+            ui.draw(renderer.getCurrentCommandBuffer());
         }
 
         renderer.endRenderPass(frameIndex);
@@ -324,3 +336,21 @@ void Application::render() {
     }
 }
 
+void Application::updateOverlay(float dt) {
+    if (!settings.overlay) {
+        return;
+    }
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.DeltaTime = dt;
+
+    ImGui::NewFrame();
+    ImGuizmo::BeginFrame();
+
+    for (auto* layer: layers) {
+        layer->onImGui();
+    }
+
+    ImGui::Render();
+    ui.update();
+}

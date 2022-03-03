@@ -17,7 +17,6 @@ struct Offscreen {
     vk::Format depthFormat{ vk::Format::eR8Uscaled };
     std::vector<vkx::Framebuffer> framebuffers{ MAX_FRAMES_IN_FLIGHT };
     std::vector<vk::CommandBuffer> commandBuffers;
-    std::vector<VkDescriptorSet> frameImages;
     vk::ImageUsageFlags attachmentUsage{ vk::ImageUsageFlagBits::eSampled };
     vk::ImageUsageFlags depthAttachmentUsage{ vk::ImageUsageFlagBits::eDepthStencilAttachment };
     vk::ImageLayout colorFinalLayout{ vk::ImageLayout::eShaderReadOnlyOptimal };
@@ -48,13 +47,6 @@ struct Offscreen {
         }
 
         createSampler();
-    }
-
-    void setup() {
-        for (auto& framebuffer : framebuffers) {
-            auto& color = framebuffer.colors[0];
-            frameImages.push_back(ImGui_ImplVulkan_AddTexture(color.sampler, color.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
-        }
     }
 
     void destroy() {

@@ -49,6 +49,7 @@ private:
     vk::PipelineLayout pipelineLayout;
     vk::Pipeline pipeline;
     vk::RenderPass renderPass;
+    std::vector<ImTextureID> frameImages;
 
     vkx::Image font;
 
@@ -70,7 +71,6 @@ private:
 public:
     bool visible{ true };
     float scale{ 1.0f };
-    std::vector<ImTextureID> frameImages;
 
     UIOverlay(const vkx::Context& context) : context{context} {}
     ~UIOverlay();
@@ -92,6 +92,9 @@ public:
     void text(const char* formatstr, ...) const;
 
     ImTextureID addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const;
+    ImTextureID getFrameImage(uint32_t i) {
+        return frameImages[i];
+    }
 
 #if defined GLFW_INCLUDE_VULKAN
 private:

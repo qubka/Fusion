@@ -191,7 +191,7 @@ void UIOverlay::prepareResources() {
     vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ {}, 1, &descriptorSetLayout, 1, &pushConstantRange };
     pipelineLayout = context.device.createPipelineLayout(pipelineLayoutCreateInfo);
 
-    // Store offscreen frame images
+    // Offscreen frame images
     for (auto& framebuffer : createInfo.framebuffers) {
         auto& color = framebuffer.colors[0];
         frameImages.push_back(addTexture(color.sampler, color.view, vk::ImageLayout::eShaderReadOnlyOptimal));
@@ -394,7 +394,7 @@ void UIOverlay::draw(const vk::CommandBuffer& commandBuffer) {
             commandBuffer.setScissor(0, scissorRect);
 
             // Bind DescriptorSet with font or user texture
-            vk::DescriptorSet descriptor[1] = { vk::DescriptorSet((VkDescriptorSet)pcmd->TextureId) };
+            vk::DescriptorSet descriptor[1] = { vk::DescriptorSet(static_cast<VkDescriptorSet>(pcmd->TextureId)) };
             commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, 1, descriptor, 0, nullptr);
 
             commandBuffer.drawIndexed(pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
@@ -430,8 +430,7 @@ bool UIOverlay::update() {
         vertexCount = imDrawData->TotalVtxCount;
         if (vertexBuffer) {
             vertexBuffer.unmap();
-            context.trash<vkx::Buffer>(vertexBuffer);
-            vertexBuffer = vkx::Buffer();
+            vertexBuffer.destroy();
         }
 		if (vertexCount) {
 			vertexBuffer = context.createBuffer(vk::BufferUsageFlagBits::eVertexBuffer, vk::MemoryPropertyFlagBits::eHostVisible, vertexBufferSize);
@@ -441,8 +440,7 @@ bool UIOverlay::update() {
     }
 
     // Index buffer
-    vk::DeviceSize indexSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
-    if (!indexBuffer || (indexCount < imDrawData->TotalIdxCount)) {
+    if (!indexBuffer || (indexCount != imDrawData->TotalIdxCount)) {
         indexCount = imDrawData->TotalIdxCount;
         if (indexBuffer) {
             indexBuffer.unmap();
@@ -456,8 +454,8 @@ bool UIOverlay::update() {
     }
 
     // Upload data
-    auto* vtxDst = (ImDrawVert*)vertexBuffer.mapped;
-    auto* idxDst = (ImDrawIdx*)indexBuffer.mapped;
+    auto* vtxDst = reinterpret_cast<ImDrawVert*>(vertexBuffer.mapped);
+    auto* idxDst = reinterpret_cast<ImDrawIdx*>(indexBuffer.mapped);
 
     for (int n = 0; n < imDrawData->CmdListsCount; n++) {
         const ImDrawList* cmd_list = imDrawData->CmdLists[n];

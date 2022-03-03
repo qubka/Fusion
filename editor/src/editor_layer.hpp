@@ -23,7 +23,7 @@ namespace fe {
 
         void onAttach() override;
         void onDetach() override;
-        void onUpdate(float ts) override;
+        void onUpdate(float dt) override;
         void onRender(Renderer& renderer) override;
         void onImGui() override;
 

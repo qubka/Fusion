@@ -34,12 +34,11 @@ namespace fe {
         vk::CommandBuffer& getCurrentCommandBuffer() { return commandBuffers[currentFrame]; }
         vkx::Buffer& getCurrentUniformBuffer() { return uniformBuffers[currentFrame]; }
 
-        VkDescriptorSet getCurrentFrameImage() { return offscreen.frameImages[currentFrame]; }
         const vk::DescriptorSet getCurrentGlobalDescriptorSets() const { return globalDescriptorSets[currentFrame]; }
         const vk::DescriptorSetLayout& getGlobalDescriptorLayoutSet() const { return globalDescriptorSetLayout; }
 
-        vkx::Offscreen& getOffscreen() { return offscreen; }
-        vkx::SwapChain& getSwapChain() { return swapChain; }
+        const vkx::Offscreen& getOffscreen() const { return offscreen; }
+        const vkx::SwapChain& getSwapChain() const { return swapChain; }
 
         uint32_t getFrameIndex() const { return currentFrame; }
         bool isFrameInProgress() const { return isFrameStarted; }

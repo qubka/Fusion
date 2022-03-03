@@ -9,14 +9,14 @@ EditorCamera::EditorCamera() : PerspectiveCamera{45.0f, 1.778f, 0.1f, 1000.0f} {
 EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : PerspectiveCamera{fov, aspect, near, far} {
 }
 
-void EditorCamera::update(float ts) {
+void EditorCamera::update(float dt) {
     if (Input::GetKey(Key::LeftAlt)) {
         if (Input::GetMouseButton(Mouse::ButtonMiddle))
-            mousePan( Input::MouseDelta() * ts);
+            mousePan( Input::MouseDelta() * dt);
         else if (Input::GetMouseButton(Mouse::ButtonLeft))
-            mouseRotate( Input::MouseDelta() * ts);
+            mouseRotate( Input::MouseDelta() * dt);
         else if (Input::GetMouseButton(Mouse::ButtonRight))
-            mouseZoom(Input::MouseDelta().y * ts);
+            mouseZoom(Input::MouseDelta().y * dt);
         else {
             auto scroll = Input::MouseScroll().y;
             if (scroll != 0.0f) {
@@ -28,7 +28,7 @@ void EditorCamera::update(float ts) {
         setPosition(calculatePosition());
     }
 
-    PerspectiveCamera::update(ts);
+    PerspectiveCamera::update(dt);
 }
 
 void EditorCamera::mousePan(const glm::vec2& delta) {

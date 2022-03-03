@@ -10,8 +10,8 @@
 #include "fusion/renderer/vkx/pipelines.hpp"
 #include "fusion/renderer/vkx/texture.hpp"
 #include "fusion/renderer/vkx/benchmark.hpp"
+#include "fusion/renderer/vkx/ui.hpp"
 #include "fusion/renderer/renderer.hpp"
-#include "fusion/renderer/gui.hpp"
 
 #if defined(__ANDROID__)
 #include "fusion/renderer/android/window.hpp"
@@ -33,7 +33,7 @@ namespace fe {
     public:
         static Application& Instance() { return *instance; }
         Window& getWindow() { return *window; }
-        Gui& getGUI() { return ui; }
+        vkx::ui::UIOverlay& getGUI() { return ui; }
         Renderer& getRenderer() { return renderer; }
         KeyInput& getKeyInput() { return keyInput; }
         MouseInput& getMouseInput() { return mouseInput; }
@@ -66,8 +66,6 @@ namespace fe {
 
         vkx::Benchmark benchmark;
 
-        // Last frame time, measured using a high performance timer (if available)
-        float frameTimer{ 0.0015f };
         // Frame counter to display fps
         uint64_t frameNumber{ 0 };
         uint32_t frameCounter{ 0 };
@@ -80,7 +78,7 @@ namespace fe {
         const vk::PhysicalDeviceFeatures& deviceFeatures{ context.deviceFeatures };
         vk::PhysicalDeviceFeatures& enabledFeatures{ context.enabledFeatures };
         fe::Renderer renderer{ context };
-        fe::Gui ui{ context };
+        vkx::ui::UIOverlay ui{ context };
 
     protected:
         uint32_t version = VK_MAKE_VERSION(1, 1, 0);
@@ -100,7 +98,9 @@ namespace fe {
         void setupUi();
 
         virtual void render();
-        virtual void update(float deltaTime);
+        virtual void update(float dt);
+
+        void updateOverlay(float dt);
 
     private:
         // OS specific

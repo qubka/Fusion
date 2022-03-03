@@ -49,17 +49,17 @@ void EditorLayer::onDetach() {
 
 }
 
-void EditorLayer::onUpdate(float ts) {
+void EditorLayer::onUpdate(float dt) {
     switch (sceneState) {
         case SceneState::Edit: {
             if (viewportFocused)
-                editorCamera.update(ts);
-            activeScene->onUpdateEditor(ts);
+                editorCamera.update(dt);
+            activeScene->onUpdateEditor(dt);
             break;
         }
 
         case SceneState::Play: {
-            activeScene->onUpdateRuntime(ts);
+            activeScene->onUpdateRuntime(dt);
             break;
         }
     }
@@ -228,7 +228,7 @@ void EditorLayer::onImGui() {
     viewportHovered = ImGui::IsWindowHovered();
     //context.getUI().blockEvents(!viewportFocused && !viewportHovered);
 
-    ImGui::Image(context.getRenderer().getCurrentFrameImage(), viewportPanelSize, { 0, 1 }, { 1, 0 });
+    ImGui::Image(context.getCurrentFrameImage(), viewportPanelSize, { 0, 1 }, { 1, 0 });
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {

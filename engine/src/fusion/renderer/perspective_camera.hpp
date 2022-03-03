@@ -8,7 +8,7 @@ namespace fe {
         PerspectiveCamera(float fov, float aspect, float near, float far);
         ~PerspectiveCamera() override = default;
 
-        virtual void update(float ts) { updateView(); }
+        virtual void update(float dt) { updateView(); }
 
         void setViewport(const glm::vec2& size);
         void setPerspective(float fov, float aspect, float near, float far);

@@ -12,7 +12,7 @@ namespace fe {
         EditorCamera(float fov, float aspect, float near, float far);
         ~EditorCamera() override = default;
 
-        void update(float ts) override;
+        void update(float dt) override;
 
         float getPitch() const { return pitch; }
         float getYaw() const { return yaw; }

@@ -17,11 +17,11 @@ void Scene::onViewportResize(const glm::vec2& size) {
 
 }
 
-void Scene::onUpdateRuntime(float ts) {
+void Scene::onUpdateRuntime(float dt) {
 
 }
 
-void Scene::onUpdateEditor(float ts) {
+void Scene::onUpdateEditor(float dt) {
 
 }
 
