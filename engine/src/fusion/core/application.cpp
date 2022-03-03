@@ -142,25 +142,8 @@ void Application::setupUi() {
         return;
     }
 
-    struct vkx::ui::UIOverlayCreateInfo overlayCreateInfo;
-    // Setup default overlay creation info
-    overlayCreateInfo.renderPass = renderer.getSwapChain().renderPass;
-    overlayCreateInfo.framebuffers = renderer.getOffscreen().framebuffers;
-    overlayCreateInfo.size = size;
-    overlayCreateInfo.window = window;
-
-    ImGui::SetCurrentContext(ImGui::CreateContext());
-
-    // Virtual function call for example to customize overlay creation
-    //onPreSetupUIOverlay(overlayCreateInfo);
-    ui.create(overlayCreateInfo);
-
-    for (auto& shader : overlayCreateInfo.shaders) {
-        device.destroyShaderModule(shader.module);
-        shader.module = vk::ShaderModule{};
-    }
-
-    updateOverlay();
+    ui.create(window->getNativeWindow(), renderer);
+    renderer.getOffscreen().setup();
 }
 
 void Application::initVulkan() {
@@ -250,8 +233,6 @@ void Application::update(float deltaTime) {
         layer->onUpdate(deltaTime);
     }
 
-    updateOverlay();
-
     keyInput.onUpdate();
     mouseInput.onUpdate();
 }
@@ -328,31 +309,18 @@ void Application::render() {
         }
 
         if (settings.overlay) {
-            ui.draw(renderer.getCurrentCommandBuffer());
+            ui.begin();
+
+            for (auto* layer: layers) {
+                layer->onImGui();
+            }
+
+            ui.end(renderer.getCurrentCommandBuffer());
         }
 
         renderer.endRenderPass(frameIndex);
 
         renderer.endFrame(frameIndex);
     }
-}
-
-void Application::updateOverlay() {
-    if (!settings.overlay) {
-        return;
-    }
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.DeltaTime = frameTimer;
-
-    ImGui::NewFrame();
-    ImGuizmo::BeginFrame();
-
-    for (auto* layer: layers) {
-        layer->onImGui();
-    }
-
-    ImGui::Render();
-    ui.update();
 }
 

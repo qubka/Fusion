@@ -8,9 +8,5 @@ namespace fe {
         EditorApp(const CommandLineArgs& args) : Application{"Fusion Editor", args} {
             pushLayer(new EditorLayer{*this});
         }
-
-        ImTextureID getCurrentFrameImage() {
-            return ui.frameImages[renderer.getFrameIndex()];
-        }
     };
 }

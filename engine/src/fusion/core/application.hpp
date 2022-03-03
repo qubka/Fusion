@@ -9,9 +9,10 @@
 #include "fusion/renderer/vkx/shaders.hpp"
 #include "fusion/renderer/vkx/pipelines.hpp"
 #include "fusion/renderer/vkx/texture.hpp"
-#include "fusion/renderer/vkx/ui.hpp"
 #include "fusion/renderer/vkx/benchmark.hpp"
 #include "fusion/renderer/renderer.hpp"
+#include "fusion/renderer/gui.hpp"
+
 #if defined(__ANDROID__)
 #include "fusion/renderer/android/window.hpp"
 #else
@@ -32,7 +33,7 @@ namespace fe {
     public:
         static Application& Instance() { return *instance; }
         Window& getWindow() { return *window; }
-        vkx::ui::UIOverlay& getUI() { return ui; }
+        Gui& getGUI() { return ui; }
         Renderer& getRenderer() { return renderer; }
         KeyInput& getKeyInput() { return keyInput; }
         MouseInput& getMouseInput() { return mouseInput; }
@@ -78,8 +79,8 @@ namespace fe {
         const vk::Queue& queue{ context.queue };
         const vk::PhysicalDeviceFeatures& deviceFeatures{ context.deviceFeatures };
         vk::PhysicalDeviceFeatures& enabledFeatures{ context.enabledFeatures };
-        vkx::ui::UIOverlay ui{ context };
         fe::Renderer renderer{ context };
+        fe::Gui ui{ context };
 
     protected:
         uint32_t version = VK_MAKE_VERSION(1, 1, 0);
@@ -100,8 +101,6 @@ namespace fe {
 
         virtual void render();
         virtual void update(float deltaTime);
-
-        void updateOverlay();
 
     private:
         // OS specific

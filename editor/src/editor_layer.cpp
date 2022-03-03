@@ -221,14 +221,14 @@ void EditorLayer::onImGui() {
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
     viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-    //editorCamera.setViewport(viewportSize);
-    //activeScene->onViewportResize(viewportSize);
+    editorCamera.setViewport(viewportSize);
+    activeScene->onViewportResize(viewportSize);
 
-    //viewportFocused = ImGui::IsWindowFocused();
-    //viewportHovered = ImGui::IsWindowHovered();
+    viewportFocused = ImGui::IsWindowFocused();
+    viewportHovered = ImGui::IsWindowHovered();
     //context.getUI().blockEvents(!viewportFocused && !viewportHovered);
 
-    ImGui::Image(context.getCurrentFrameImage(), viewportPanelSize, { 0, 1 }, { 1, 0 });
+    ImGui::Image(context.getRenderer().getCurrentFrameImage(), viewportPanelSize, { 0, 1 }, { 1, 0 });
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
