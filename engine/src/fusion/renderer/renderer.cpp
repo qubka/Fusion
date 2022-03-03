@@ -52,14 +52,16 @@ void Renderer::createDescriptorSets() {
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         auto& descriptorAllocator = dynamicAllocators.emplace_back(context.device);
         vkx::DescriptorBuilder{descriptorLayoutCache, descriptorAllocator}
-                .bindBuffer(0, &uniformBuffers[i].descriptor, vk::DescriptorType::eUniformBuffer,vk::ShaderStageFlagBits::eVertex)
-                .build(globalDescriptorSets[i], globalDescriptorSetLayout);
+            // Binding 0 : Vertex shader uniform buffer
+            .bindBuffer(0, &uniformBuffers[i].descriptor, vk::DescriptorType::eUniformBuffer,vk::ShaderStageFlagBits::eVertex)
+            .build(globalDescriptorSets[i], globalDescriptorSetLayout);
     }
 
     /*vk::DescriptorSet textureSet;
     DescriptorBuilder(descriptorLayoutCache, globalAllocator)
-            .bindImage(0, nullptr, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
-            .build(textureSet, textureLayoutSet);*/
+        // Binding 1 : Fragment shader image sampler
+        .bindImage(0, nullptr, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
+        .build(textureSet, textureLayoutSet);*/
 }
 
 void Renderer::createCommandBuffers() {
@@ -75,8 +77,8 @@ void Renderer::recreateSwapChain() {
         window.waitEvents();
     }
 
+    context.queue.waitIdle();
     context.device.waitIdle();
-    //context.queue.waitIdle();
 
     LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
 
@@ -121,18 +123,18 @@ void Renderer::beginRenderPass(uint32_t frameIndex) {
     clearValues[1].depthStencil.stencil = 0;
 
     setRenderPass(
-    commandBuffers[currentFrame],
-    swapChain.renderPass,
-    swapChain.framebuffers[currentImage],
-    swapChain.extent
+        commandBuffers[currentFrame],
+        swapChain.renderPass,
+        swapChain.framebuffers[currentImage],
+        swapChain.extent
     );
 
     if (offscreen.active) {
         setRenderPass(
-        offscreen.commandBuffers[currentFrame],
-        offscreen.renderPass,
-        offscreen.framebuffers[currentFrame].framebuffer,
-        offscreen.extent
+            offscreen.commandBuffers[currentFrame],
+            offscreen.renderPass,
+            offscreen.framebuffers[currentFrame].framebuffer,
+            offscreen.extent
         );
     }
 }

@@ -3,9 +3,6 @@
 #include "database.hpp"
 #include "file_watcher.hpp"
 
-#include "fusion/renderer/vkx/model.hpp"
-#include "fusion/renderer/vkx/texture.hpp"
-
 namespace fe {
     class FileRegistry {
     public:

@@ -296,7 +296,7 @@ void EditorLayer::onImGui() {
     ImGui::PopStyleVar();
     ImGui::End();
 
-    //UI_Toolbar();
+    UI_Toolbar();
 
     ImGui::End();
 }
@@ -352,7 +352,7 @@ void EditorLayer::UI_Toolbar() {
 
     float size = ImGui::GetWindowHeight() - 4.0f;
     ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-    if (ImGui::Button(sceneState == SceneState::Edit ? "\uF07C" : "\uF15C", {size, size})) {
+    if (ImGui::Button(sceneState == SceneState::Edit ? "\uF04B" : "\uF04D", {size, size})) {
         /*if (sceneState == SceneState::Edit)
             onScenePlay();
         else if (sceneState == SceneState::Play)

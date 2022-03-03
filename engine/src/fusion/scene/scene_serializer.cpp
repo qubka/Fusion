@@ -164,7 +164,7 @@ void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity 
 
         out << YAML::Key << "Camera" << YAML::Value;
         out << YAML::BeginMap; // Camera
-        out << YAML::Key << "projectionType" << YAML::Value << magic_enum::enum_integer(camera.getProjectionType());;
+        out << YAML::Key << "projectionType" << YAML::Value << magic_enum::enum_integer(camera.getProjectionType());
         out << YAML::Key << "perspectiveFOV" << YAML::Value << camera.getPerspectiveVerticalFOV();
         out << YAML::Key << "perspectiveNear" << YAML::Value << camera.getPerspectiveNearClip();
         out << YAML::Key << "perspectiveFar" << YAML::Value << camera.getPerspectiveFarClip();
@@ -177,6 +177,19 @@ void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity 
         out << YAML::Key << "fixedAspectRatio" << YAML::Value << component->fixedAspectRatio;
 
         out << YAML::EndMap; // CameraComponent
+    }
+
+    if (auto* component = registry.try_get<ModelComponent>(entity)) {
+        out << YAML::Key << "ModelComponent";
+        out << YAML::BeginMap; // ModelComponent
+
+        out << YAML::Key << "path" << YAML::Value << component->path;
+        out << YAML::Key << "layout" << YAML::Value << component->layout;
+        out << YAML::Key << "scale" << YAML::Value << component->scale;
+        out << YAML::Key << "center" << YAML::Value << component->center;
+        out << YAML::Key << "uvscale" << YAML::Value << component->uvscale;
+
+        out << YAML::EndMap; // ModelComponent
     }
 
     out << YAML::EndMap; // Entity
@@ -236,21 +249,30 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
                 const auto& cameraProps = cameraComponent["Camera"];
 
                 SceneCamera camera;
-                camera.setProjectionType(magic_enum::enum_value<SceneCamera::ProjectionType>(cameraProps["ProjectionType"].as<int>()));
-                camera.setPerspectiveVerticalFOV(cameraProps["PerspectiveFOV"].as<float>());
-                camera.setPerspectiveNearClip(cameraProps["PerspectiveNear"].as<float>());
-                camera.setPerspectiveFarClip(cameraProps["PerspectiveFar"].as<float>());
-                camera.setOrthographicSize(cameraProps["OrthographicSize"].as<float>());
-                camera.setOrthographicNearClip(cameraProps["OrthographicNear"].as<float>());
-                camera.setOrthographicFarClip(cameraProps["OrthographicFar"].as<float>());
+                camera.setProjectionType(magic_enum::enum_value<SceneCamera::ProjectionType>(cameraProps["projectionType"].as<int>()));
+                camera.setPerspectiveVerticalFOV(cameraProps["perspectiveFOV"].as<float>());
+                camera.setPerspectiveNearClip(cameraProps["perspectiveNear"].as<float>());
+                camera.setPerspectiveFarClip(cameraProps["perspectiveFar"].as<float>());
+                camera.setOrthographicSize(cameraProps["orthographicSize"].as<float>());
+                camera.setOrthographicNearClip(cameraProps["orthographicNear"].as<float>());
+                camera.setOrthographicFarClip(cameraProps["orthographicFar"].as<float>());
 
                 scene->registry.emplace<CameraComponent>(deserializedEntity,
                         camera,
-                        cameraComponent["Primary"].as<bool>(),
-                        cameraComponent["FixedAspectRatio"].as<bool>()
+                        cameraComponent["primary"].as<bool>(),
+                        cameraComponent["fixedAspectRatio"].as<bool>()
                 );
             }
 
+            if (const auto& modelComponent = entity["ModelComponent"]) {
+                scene->registry.emplace<ModelComponent>(deserializedEntity,
+                    modelComponent["path"].as<std::string>(),
+                    modelComponent["layout"].as<std::vector<int>>(),
+                    modelComponent["scale"].as<glm::vec3>(),
+                    modelComponent["center"].as<glm::vec3>(),
+                    modelComponent["uvscale"].as<glm::vec2>()
+                );
+            }
 
         }
     }

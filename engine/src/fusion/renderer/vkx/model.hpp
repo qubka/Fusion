@@ -23,19 +23,18 @@ class Importer;
 namespace vkx { namespace model {
 
 /** @brief Vertex layout components */
-enum Component
-{
-    VERTEX_COMPONENT_POSITION = 0x0,
-    VERTEX_COMPONENT_NORMAL = 0x1,
-    VERTEX_COMPONENT_COLOR = 0x2,
-    VERTEX_COMPONENT_UV = 0x3,
-    VERTEX_COMPONENT_TANGENT = 0x4,
-    VERTEX_COMPONENT_BITANGENT = 0x5,
-    VERTEX_COMPONENT_DUMMY_FLOAT = 0x6,
-    VERTEX_COMPONENT_DUMMY_INT = 0x7,
-    VERTEX_COMPONENT_DUMMY_VEC4 = 0x8,
-    VERTEX_COMPONENT_DUMMY_INT4 = 0x9,
-    VERTEX_COMPONENT_DUMMY_UINT4 = 0xA,
+enum class Component : uint8_t {
+    Position = 0x0,
+    Normal = 0x1,
+    Color = 0x2,
+    UV = 0x3,
+    Tangent = 0x4,
+    Bitangent = 0x5,
+    DummyFloat = 0x6,
+    DummyInt = 0x7,
+    DummyVec4 = 0x8,
+    DummyInt4 = 0x9,
+    DummyUint4 = 0xa,
 };
 
 /** @brief Stores vertex layout components for model loading and Vulkan vertex input and atribute bindings  */
@@ -45,12 +44,18 @@ public:
     std::vector<Component> components;
     VertexLayout() = default;
     VertexLayout(std::vector<Component>&& components, uint32_t binding = 0)
-        : components(std::move(components)) {}
+        : components{std::move(components)} {}
+    explicit VertexLayout(std::vector<int>& ids, uint32_t binding = 0) {
+        components.reserve(ids.size());
+        for (auto i : ids) {
+            components.push_back(magic_enum::enum_value<Component>(i));
+        }
+    }
 
     uint32_t componentIndex(Component component) const {
         for (size_t i = 0; i < components.size(); ++i) {
             if (components[i] == component) {
-                return static_cast<uint32_t>(i);;
+                return static_cast<uint32_t>(i);
             }
         }
         return static_cast<uint32_t>(-1);
@@ -58,17 +63,17 @@ public:
 
     static vk::Format componentFormat(Component component) {
         switch (component) {
-            case VERTEX_COMPONENT_UV:
+            case Component::UV:
                 return vk::Format::eR32G32Sfloat;
-            case VERTEX_COMPONENT_DUMMY_FLOAT:
+            case Component::DummyFloat:
                 return vk::Format::eR32Sfloat;
-            case VERTEX_COMPONENT_DUMMY_INT:
+            case Component::DummyInt:
                 return vk::Format::eR32Sint;
-            case VERTEX_COMPONENT_DUMMY_VEC4:
+            case Component::DummyVec4:
                 return vk::Format::eR32G32B32A32Sfloat;
-            case VERTEX_COMPONENT_DUMMY_INT4:
+            case Component::DummyInt4:
                 return vk::Format::eR32G32B32A32Sint;
-            case VERTEX_COMPONENT_DUMMY_UINT4:
+            case Component::DummyUint4:
                 return vk::Format::eR32G32B32A32Uint;
             default:
                 return vk::Format::eR32G32B32Sfloat;
@@ -77,17 +82,17 @@ public:
 
     static uint32_t componentSize(Component component) {
         switch (component) {
-            case VERTEX_COMPONENT_UV:
+            case Component::UV:
                 return 2 * sizeof(float);
-            case VERTEX_COMPONENT_DUMMY_FLOAT:
+            case Component::DummyFloat:
                 return sizeof(float);
-            case VERTEX_COMPONENT_DUMMY_INT:
+            case Component::DummyInt:
                 return sizeof(int);
-            case VERTEX_COMPONENT_DUMMY_VEC4:
+            case Component::DummyVec4:
                 return 4 * sizeof(float);
-            case VERTEX_COMPONENT_DUMMY_INT4:
+            case Component::DummyInt4:
                 return 4 * sizeof(int32_t);
-            case VERTEX_COMPONENT_DUMMY_UINT4:
+            case Component::DummyUint4:
                 return 4 * sizeof(uint32_t);
             default:
                 // All components except the ones listed above are made up of 3 floats
@@ -122,9 +127,9 @@ struct ModelCreateInfo {
     ModelCreateInfo() = default;
 
     ModelCreateInfo(const glm::vec3& scale, const glm::vec2& uvscale, const glm::vec3& center)
-        : center(center)
-        , scale(scale)
-        , uvscale(uvscale) {}
+        : center{center}
+        , scale{scale}
+        , uvscale{uvscale} {}
 
     ModelCreateInfo(float scale, float uvscale, float center)
         : ModelCreateInfo(glm::vec3{scale}, glm::vec2{ uvscale }, glm::vec3{center}) {}

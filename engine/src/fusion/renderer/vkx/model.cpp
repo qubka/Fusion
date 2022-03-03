@@ -116,43 +116,43 @@ void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* pSce
     vertexBuffer.reserve(layout.components.size() * 4);
     for (auto& component : layout.components) {
         switch (component) {
-            case VERTEX_COMPONENT_POSITION:
+            case Component::Position:
                 vertexBuffer.push_back(scaledPos.x);
                 vertexBuffer.push_back(scaledPos.y);
                 vertexBuffer.push_back(scaledPos.z);
                 break;
-            case VERTEX_COMPONENT_NORMAL:
+            case Component::Normal:
                 vertexBuffer.push_back(pNormal->x);
                 vertexBuffer.push_back(-pNormal->y);
                 vertexBuffer.push_back(pNormal->z);
                 break;
-            case VERTEX_COMPONENT_UV:
+            case Component::UV:
                 vertexBuffer.push_back(pTexCoord->x * uvscale.s);
                 vertexBuffer.push_back(pTexCoord->y * uvscale.t);
                 break;
-            case VERTEX_COMPONENT_COLOR:
+            case Component::Color:
                 vertexBuffer.push_back(pColor.r);
                 vertexBuffer.push_back(pColor.g);
                 vertexBuffer.push_back(pColor.b);
                 break;
-            case VERTEX_COMPONENT_TANGENT:
+            case Component::Tangent:
                 vertexBuffer.push_back(pTangent->x);
                 vertexBuffer.push_back(pTangent->y);
                 vertexBuffer.push_back(pTangent->z);
                 break;
-            case VERTEX_COMPONENT_BITANGENT:
+            case Component::Bitangent:
                 vertexBuffer.push_back(pBiTangent->x);
                 vertexBuffer.push_back(pBiTangent->y);
                 vertexBuffer.push_back(pBiTangent->z);
                 break;
             // Dummy components for padding
-            case VERTEX_COMPONENT_DUMMY_INT:
-            case VERTEX_COMPONENT_DUMMY_FLOAT:
+            case Component::DummyInt:
+            case Component::DummyFloat:
                 vertexBuffer.push_back(0.0f);
                 break;
-            case VERTEX_COMPONENT_DUMMY_INT4:
-            case VERTEX_COMPONENT_DUMMY_UINT4:
-            case VERTEX_COMPONENT_DUMMY_VEC4:
+            case Component::DummyInt4:
+            case Component::DummyUint4:
+            case Component::DummyVec4:
                 vertexBuffer.push_back(0.0f);
                 vertexBuffer.push_back(0.0f);
                 vertexBuffer.push_back(0.0f);

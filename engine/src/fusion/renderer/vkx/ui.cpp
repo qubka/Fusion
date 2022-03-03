@@ -119,9 +119,8 @@ void UIOverlay::prepareResources() {
 		}
         io.Fonts->Build();
 #else
-    std::string filename = getAssetPath() + "/fonts/Roboto-Black.ttf";
-    io.Fonts->AddFontFromFileTTF(filename.c_str(), 16.0f);
-    filename = getAssetPath() + "/fonts/fontawesome-webfont.ttf"; //TODO: Replace
+    io.Fonts->AddFontDefault();
+    std::string filename = getAssetPath() + "/fonts/fontawesome-webfont.ttf"; //TODO: Replace
     io.Fonts->AddFontFromFileTTF(filename.c_str(), 16.0f, &config, icons_ranges); // Merge into first font
     io.Fonts->Build();
 #endif
@@ -323,10 +322,10 @@ void UIOverlay::setupEvents() {
     });
 
     createInfo.window->KeyEvent.connect([](KeyData data) {
-        if (data.action != Action::Press && data.action != Action::Release)
+        if (data.action >= Action::Repeat)
             return;
 
-        UpdateKeyModifiers(data.mods);
+        //UpdateKeyModifiers(data.mods);
 
         int keycode = TranslateUntranslatedKey(data.key, data.scancode);
 
@@ -371,13 +370,12 @@ void UIOverlay::draw(const vk::CommandBuffer& commandBuffer) {
         return;
     }
 
-    ImGuiIO& io = ImGui::GetIO();
-
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
 
+    ImGuiIO& io = ImGui::GetIO();
     pushConstBlock.scale = glm::vec2{2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y};
     pushConstBlock.translate = glm::vec2{-1.0f};
-    commandBuffer.pushConstants(pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, vk::ArrayProxy<const PushConstBlock>{ pushConstBlock });
+    commandBuffer.pushConstants<PushConstBlock>(pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, pushConstBlock);
 
     commandBuffer.bindVertexBuffers(0, vertexBuffer.buffer, { 0 });
     commandBuffer.bindIndexBuffer(indexBuffer.buffer, 0, sizeof(ImDrawIdx) == 2 ? vk::IndexType::eUint16 : vk::IndexType::eUint32);
@@ -385,21 +383,21 @@ void UIOverlay::draw(const vk::CommandBuffer& commandBuffer) {
     for (int32_t i = 0; i < imDrawData->CmdListsCount; i++) {
         const ImDrawList* cmd_list = imDrawData->CmdLists[i];
         for (int32_t j = 0; j < cmd_list->CmdBuffer.Size; j++) {
-            const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[j];
+            const ImDrawCmd& pcmd = cmd_list->CmdBuffer[j];
             vk::Rect2D scissorRect;
-            scissorRect.offset.x = std::max(static_cast<int32_t>((pcmd->ClipRect.x)), 0);
-            scissorRect.offset.y = std::max(static_cast<int32_t>((pcmd->ClipRect.y)), 0);
-            scissorRect.extent.width = static_cast<uint32_t>(pcmd->ClipRect.z - pcmd->ClipRect.x);
-            scissorRect.extent.height = static_cast<uint32_t>((pcmd->ClipRect.w - pcmd->ClipRect.y));
+            scissorRect.offset.x = std::max(static_cast<int32_t>((pcmd.ClipRect.x)), 0);
+            scissorRect.offset.y = std::max(static_cast<int32_t>((pcmd.ClipRect.y)), 0);
+            scissorRect.extent.width = static_cast<uint32_t>(pcmd.ClipRect.z - pcmd.ClipRect.x);
+            scissorRect.extent.height = static_cast<uint32_t>((pcmd.ClipRect.w - pcmd.ClipRect.y));
             commandBuffer.setScissor(0, scissorRect);
 
             // Bind DescriptorSet with font or user texture
-            vk::DescriptorSet descriptor[1] = { vk::DescriptorSet(static_cast<VkDescriptorSet>(pcmd->TextureId)) };
+            vk::DescriptorSet descriptor[1] = { vk::DescriptorSet(static_cast<VkDescriptorSet>(pcmd.TextureId)) };
             commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipelineLayout, 0, 1, descriptor, 0, nullptr);
 
-            commandBuffer.drawIndexed(pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
+            commandBuffer.drawIndexed(pcmd.ElemCount, 1, indexOffset, vertexOffset, 0);
 
-            indexOffset += pcmd->ElemCount;
+            indexOffset += pcmd.ElemCount;
         }
         vertexOffset += cmd_list->VtxBuffer.Size;
     }
@@ -574,11 +572,11 @@ ImTextureID UIOverlay::addTexture(const vk::Sampler& sampler, const vk::ImageVie
 #include <GLFW/glfw3.h>
 
 void UIOverlay::UpdateKeyModifiers(int mods) {
-    /*ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     io.AddKeyEvent(ImGuiKey_ModCtrl, (mods & GLFW_MOD_CONTROL) != 0);
     io.AddKeyEvent(ImGuiKey_ModShift, (mods & GLFW_MOD_SHIFT) != 0);
     io.AddKeyEvent(ImGuiKey_ModAlt, (mods & GLFW_MOD_ALT) != 0);
-    io.AddKeyEvent(ImGuiKey_ModSuper, (mods & GLFW_MOD_SUPER) != 0);*/
+    io.AddKeyEvent(ImGuiKey_ModSuper, (mods & GLFW_MOD_SUPER) != 0);
 }
 
 int UIOverlay::TranslateUntranslatedKey(int key, int scancode) {

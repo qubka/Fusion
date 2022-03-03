@@ -9,7 +9,6 @@
 #include "fusion/scene/scene_serializer.hpp"
 #include "fusion/renderer/editor_camera.hpp"
 #include "fusion/utils/process_info.hpp"
-#include "fusion/renderer/vkx/ui.hpp"
 #include "fusion/renderer/renderer.hpp"
 
 #include <imgui/imgui.h>
