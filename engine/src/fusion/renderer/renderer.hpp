@@ -21,7 +21,7 @@ namespace fe {
     public:
         Renderer(const vkx::Context& context) : context{context} { }
 
-        void create();
+        void create(const vk::Extent2D& size);
         void destroy();
 
         glm::vec3& getColor() { return color; }
@@ -41,16 +41,18 @@ namespace fe {
         const vkx::SwapChain& getSwapChain() const { return swapChain; }
 
         uint32_t getFrameIndex() const { return currentFrame; }
-        bool isFrameInProgress() const { return isFrameStarted; }
+        bool isFrameInProgress() const { return frameStarted; }
 
         uint32_t beginFrame();
 
         void beginRenderPass(uint32_t frameIndex);
         void endRenderPass(uint32_t frameIndex);
+
         void endFrame(uint32_t frameIndex);
 
     private:
         const vkx::Context& context;
+
         vkx::Offscreen offscreen{ context };
         vkx::SwapChain swapChain{ context };
 
@@ -71,12 +73,12 @@ namespace fe {
 
         uint32_t currentImage{ 0 };
         uint32_t currentFrame{ 0 };
-        bool isFrameStarted{ false };
+        bool frameStarted{ false };
 
-        void recreateSwapChain();
         void createCommandBuffers();
         void createUniformBuffers();
         void createDescriptorSets();
+        void recreateSwapChain();
 
         void setRenderPass(const vk::CommandBuffer& commandBuffer, const vk::RenderPass& renderPass, const vk::Framebuffer& framebuffer, const vk::Extent2D& extent);
     };

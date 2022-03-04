@@ -29,6 +29,7 @@ struct SwapChain {
     vk::Extent2D extent;
     vk::SwapchainKHR swapChain;
     vk::RenderPass renderPass;
+    vk::PresentInfoKHR presentInfo;
     std::vector<SwapChainImage> images;
     vk::Format colorFormat{ vk::Format::eB8G8R8A8Unorm };
     std::vector<vk::Framebuffer> framebuffers;
@@ -37,38 +38,45 @@ struct SwapChain {
     std::vector<vk::Fence> inFlightFences;
     std::vector<vk::Fence*> imagesInFlight;
     uint32_t imageCount{ 0 };
-    uint32_t currentFrame{ 0 };
+    uint32_t currentImage{ 0 };
 
     Attachment depthStencil;
     vk::Format depthFormat { vk::Format::eUndefined };
 
-    SwapChain(const vkx::Context& context)
-            : context{context} {};
+    SwapChain(const vkx::Context& context) : context{context} {
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = &swapChain;
+        presentInfo.pImageIndices = &currentImage;
+    }
 
     vk::Result acquireNextImage(uint32_t& imageIndex) const;
-    vk::Result submitCommandBuffers(const std::vector<vk::CommandBuffer>& buffers, const uint32_t& imageIndex);
+    vk::Result submitCommandBuffers(const vk::ArrayProxy<const vk::CommandBuffer>& buffers, uint32_t imageIndex);
+    const vk::Fence& getSubmitFence(uint32_t imageIndex);
 
     // Creates an os specific surface
     // Tries to find a graphics and a present queue
     void create(const vk::Extent2D& size, bool vsync) {
-        prepareSwapChain(size, vsync);
-        prepareImages();
-        prepareDepthStencil();
-        prepareRenderPass();
-        prepareFramebuffers();
-        prepareSyncObjects();
+        createSwapChain(size, vsync);
+        createImages();
+        createDepthStencil();
+        createRenderPass();
+        createFramebuffers();
+        createSyncObjects();
     }
 
     // Free all Vulkan resources used by the swap chain
     void destroy(const vk::SwapchainKHR& oldSwapChain = {});
 
 private:
-    void prepareSwapChain(const vk::Extent2D& size, bool vsync);
-    void prepareImages();
-    void prepareDepthStencil();
-    void prepareRenderPass();
-    void prepareFramebuffers();
-    void prepareSyncObjects();
+    void createSwapChain(const vk::Extent2D& size, bool vsync);
+    void createImages();
+    void createDepthStencil();
+    void createRenderPass();
+    void createFramebuffers();
+    void createSyncObjects();
+
+    // Present the current image to the queue
+    vk::Result queuePresent(const vk::Semaphore& waitSemaphore);
 
     static vk::SurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
     static vk::PresentModeKHR chooseSwapPresentMode(bool vsync, const std::vector<vk::PresentModeKHR>& availablePresentModes);
