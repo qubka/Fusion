@@ -32,7 +32,7 @@ vk::DescriptorPool DescriptorAllocator::createPool(uint32_t count, vk::Descripto
         sizes.emplace_back(sz.first, static_cast<uint32_t>(sz.second * count));
     }
 
-    vk::DescriptorPoolCreateInfo poolInfo{};
+    vk::DescriptorPoolCreateInfo poolInfo;
     poolInfo.flags = flags;
     poolInfo.maxSets = count;
     poolInfo.poolSizeCount = static_cast<uint32_t>(sizes.size());
@@ -48,7 +48,7 @@ bool DescriptorAllocator::allocateDescriptor(const vk::DescriptorSetLayout& layo
         usedPools.push_back(currentPool);
     }
 
-    vk::DescriptorSetAllocateInfo allocInfo{};
+    vk::DescriptorSetAllocateInfo allocInfo;
     allocInfo.pNext = nullptr;
     allocInfo.pSetLayouts = &layout;
     allocInfo.descriptorPool = currentPool;
@@ -127,10 +127,9 @@ vk::DescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(vk::Descri
     }
     //sort the bindings if they aren't in order
     if (!isSorted) {
-        std::sort(layoutInfo.bindings.begin(), layoutInfo.bindings.end(),
-                  [](const vk::DescriptorSetLayoutBinding& a, const vk::DescriptorSetLayoutBinding& b) {
-              return a.binding < b.binding;
-          });
+        std::sort(layoutInfo.bindings.begin(), layoutInfo.bindings.end(), [](const vk::DescriptorSetLayoutBinding& a, const vk::DescriptorSetLayoutBinding& b) {
+            return a.binding < b.binding;
+        });
     }
 
     //try to grab from cache
@@ -182,22 +181,22 @@ size_t DescriptorLayoutCache::DescriptorLayoutInfo::hash() const{
 
 DescriptorBuilder& DescriptorBuilder::bindBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags) {
     /// create the descriptor binding for the layout
-    vk::DescriptorSetLayoutBinding newBinding{};
+    vk::DescriptorSetLayoutBinding newBinding;
+    newBinding.binding = binding;
     newBinding.descriptorCount = 1;
     newBinding.descriptorType = type;
     newBinding.pImmutableSamplers = nullptr;
     newBinding.stageFlags = stageFlags;
-    newBinding.binding = binding;
 
     bindings.push_back(newBinding);
 
     /// create the descriptor write
-    vk::WriteDescriptorSet newWrite{};
-    newWrite.pNext = nullptr;
+    vk::WriteDescriptorSet newWrite;
+    newWrite.dstBinding = binding;
     newWrite.descriptorCount = 1;
     newWrite.descriptorType = type;
     newWrite.pBufferInfo = bufferInfo;
-    newWrite.dstBinding = binding;
+    newWrite.pNext = nullptr;
 
     writes.push_back(newWrite);
     return *this;
@@ -205,22 +204,22 @@ DescriptorBuilder& DescriptorBuilder::bindBuffer(uint32_t binding, vk::Descripto
 
 DescriptorBuilder& DescriptorBuilder::bindImage(uint32_t binding, vk::DescriptorImageInfo* imageInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags) {
     /// create the descriptor binding for the layout
-    vk::DescriptorSetLayoutBinding newBinding{};
+    vk::DescriptorSetLayoutBinding newBinding;
+    newBinding.binding = binding;
     newBinding.descriptorCount = 1;
     newBinding.descriptorType = type;
     newBinding.pImmutableSamplers = nullptr;
     newBinding.stageFlags = stageFlags;
-    newBinding.binding = binding;
 
     bindings.push_back(newBinding);
 
     /// create the descriptor write
-    vk::WriteDescriptorSet newWrite{};
-    newWrite.pNext = nullptr;
+    vk::WriteDescriptorSet newWrite;
+    newWrite.dstBinding = binding;
     newWrite.descriptorCount = 1;
     newWrite.descriptorType = type;
     newWrite.pImageInfo = imageInfo;
-    newWrite.dstBinding = binding;
+    newWrite.pNext = nullptr;
 
     writes.push_back(newWrite);
     return *this;
@@ -228,7 +227,7 @@ DescriptorBuilder& DescriptorBuilder::bindImage(uint32_t binding, vk::Descriptor
 
 bool DescriptorBuilder::build(vk::DescriptorSet& set, vk::DescriptorSetLayout& layout) {
     //build layout first
-    vk::DescriptorSetLayoutCreateInfo layoutInfo{};
+    vk::DescriptorSetLayoutCreateInfo layoutInfo;
     layoutInfo.pNext = nullptr;
     layoutInfo.pBindings = bindings.data();
     layoutInfo.bindingCount = bindings.size();
@@ -251,7 +250,7 @@ bool DescriptorBuilder::build(vk::DescriptorSet& set, vk::DescriptorSetLayout& l
 
 bool DescriptorBuilder::build(vk::DescriptorSet& set) {
     //build layout first
-    vk::DescriptorSetLayoutCreateInfo layoutInfo{};
+    vk::DescriptorSetLayoutCreateInfo layoutInfo;
     layoutInfo.pNext = nullptr;
     layoutInfo.pBindings = bindings.data();
     layoutInfo.bindingCount = bindings.size();

@@ -66,7 +66,7 @@ inline void executeImmediately(vk::Device device, vk::CommandPool commandPool, v
     vk::SubmitInfo submit;
     submit.commandBufferCount = static_cast<uint32_t>(cbs.size());
     submit.pCommandBuffers = cbs.data();
-    queue.submit(submit, vk::Fence{});
+    queue.submit(submit, {});
     device.waitIdle();
 
     device.freeCommandBuffers(commandPool, cbs);

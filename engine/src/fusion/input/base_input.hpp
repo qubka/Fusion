@@ -14,7 +14,6 @@ namespace fe {
         //! Takes a list of which keys to keep state for
         BaseInput(const std::pair<T, T>& range);
         BaseInput(const std::initializer_list<T>& keysToMonitor);
-        ~BaseInput() = default;
         FE_NONCOPYABLE(BaseInput);
 
         virtual void onAttach() {}

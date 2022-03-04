@@ -197,7 +197,7 @@ struct SwapChain {
     }
 
     // Acquires the next image in the swap chain
-    vk::Result acquireNextImage(const vk::Semaphore& presentCompleteSemaphore, const vk::Fence& fence = vk::Fence{}) {
+    vk::Result acquireNextImage(const vk::Semaphore& presentCompleteSemaphore, const vk::Fence& fence = {}) {
         return device.acquireNextImageKHR(swapChain, UINT64_MAX, presentCompleteSemaphore, fence, &currentImage); /// use noexcept to handle OUT_OF_DATE
     }
 

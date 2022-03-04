@@ -6,7 +6,6 @@ namespace fe {
     class SceneSerializer {
     public:
         SceneSerializer(const std::shared_ptr<Scene>& scene);
-        ~SceneSerializer() = default;
 
         void serialize(const std::string& filepath);
         void serializeRuntime(const std::string& filepath);

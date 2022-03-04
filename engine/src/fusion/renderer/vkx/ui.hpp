@@ -64,7 +64,7 @@ private:
     void prepareResources();
     void preparePipeline();
     void prepareRenderPass();
-    void setupEvents();
+    void prepareEvents();
 
     static void setStyleColors();
 

@@ -58,7 +58,7 @@ void Renderer::createDescriptorSets() {
     }
 
     /*vk::DescriptorSet textureSet;
-    DescriptorBuilder(descriptorLayoutCache, globalAllocator)
+    vkx::DescriptorBuilder{descriptorLayoutCache, globalAllocator}
         // Binding 1 : Fragment shader image sampler
         .bindImage(0, nullptr, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
         .build(textureSet, textureLayoutSet);*/
@@ -153,7 +153,7 @@ void Renderer::endFrame(uint32_t frameIndex) {
     assert(isFrameStarted && "cannot call endFrame if frame is not in progress");
     assert(frameIndex == currentFrame && "cannot end command buffer from a different frame");
 
-    std::vector<vk::CommandBuffer> buffers;
+    vk::ArrayProxy<vk::CommandBuffer> buffers;
     buffers.reserve(offscreen.active ? 2 : 1);
 
     if (offscreen.active) {

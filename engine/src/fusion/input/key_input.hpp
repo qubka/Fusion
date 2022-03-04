@@ -10,7 +10,6 @@ namespace fe {
             : BaseInput<KeyCode>{std::make_pair(Key::Space, Key::KeyLast)} {}; //! use all possible keymaps
         KeyInput(const std::initializer_list<KeyCode>& keysToMonitor)
             : BaseInput<KeyCode>{keysToMonitor} {};
-        ~KeyInput() = default;
 
         //! Returns true while the user holds down the key identified by GLFW code.
         bool getKey(KeyCode key) const { return isKey(key); }

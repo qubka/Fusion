@@ -11,7 +11,6 @@ namespace fe {
 
     public:
         Gui(const vkx::Context& context) : context{context} {}
-        ~Gui() = default;
 
         void create(void* window, Renderer& renderer);
         void destroy();

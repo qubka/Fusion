@@ -49,7 +49,7 @@ void UIOverlay::create(const UIOverlayCreateInfo& createInfo) {
     io.DisplaySize = ImVec2{static_cast<float>(createInfo.size.width), static_cast<float>(createInfo.size.height)};
     io.FontGlobalScale = scale;
 
-    setupEvents();
+    prepareEvents();
     prepareResources();
     if (createInfo.renderPass) {
         renderPass = createInfo.renderPass;
@@ -296,7 +296,7 @@ void UIOverlay::prepareRenderPass() {
 }
 
 /** Set the window events callbacks */
-void UIOverlay::setupEvents() {
+void UIOverlay::prepareEvents() {
     assert(createInfo.window);
 
     createInfo.window->FramebufferEvent.connect([](const glm::ivec2& size) {

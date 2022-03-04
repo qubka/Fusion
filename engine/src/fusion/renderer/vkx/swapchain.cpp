@@ -28,7 +28,7 @@ void SwapChain::destroy(const vk::SwapchainKHR& oldSwapChain) {
     imagesInFlight.clear();
 }
 
-void SwapChain::createSwapChain(const vk::Extent2D& size, bool vsync) {
+void SwapChain::prepareSwapChain(const vk::Extent2D& size, bool vsync) {
     vk::SwapchainKHR oldSwapChain = swapChain;
     currentFrame = 0;
 
@@ -81,7 +81,7 @@ void SwapChain::createSwapChain(const vk::Extent2D& size, bool vsync) {
     depthFormat = context.getSupportedDepthFormat();
 }
 
-void SwapChain::createImages() {
+void SwapChain::prepareImages() {
     vk::ImageViewCreateInfo colorAttachmentView;
     colorAttachmentView.format = colorFormat;
     colorAttachmentView.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
@@ -102,7 +102,7 @@ void SwapChain::createImages() {
     }
 }
 
-void SwapChain::createDepthStencil() {
+void SwapChain::prepareDepthStencil() {
     vk::ImageAspectFlags aspect = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
 
     vk::ImageCreateInfo depthStencilCI;
@@ -126,7 +126,7 @@ void SwapChain::createDepthStencil() {
     depthStencil.view = device.createImageView(depthStencilView);
 }
 
-void SwapChain::createRenderPass() {
+void SwapChain::prepareRenderPass() {
     std::array<vk::AttachmentDescription, 2> attachments;
 
     attachments[0].format = colorFormat;
@@ -175,7 +175,7 @@ void SwapChain::createRenderPass() {
     renderPass = device.createRenderPass(renderPassInfo);
 }
 
-void SwapChain::createFramebuffers() {
+void SwapChain::prepareFramebuffers() {
     framebuffers.resize(imageCount);
 
     for (size_t i = 0; i < imageCount; i++) {
@@ -197,7 +197,7 @@ void SwapChain::createFramebuffers() {
     }
 }
 
-void SwapChain::createSyncObjects() {
+void SwapChain::prepareSyncObjects() {
     imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);

@@ -51,24 +51,24 @@ struct SwapChain {
     // Creates an os specific surface
     // Tries to find a graphics and a present queue
     void create(const vk::Extent2D& size, bool vsync) {
-        createSwapChain(size, vsync);
-        createImages();
-        createDepthStencil();
-        createRenderPass();
-        createFramebuffers();
-        createSyncObjects();
+        prepareSwapChain(size, vsync);
+        prepareImages();
+        prepareDepthStencil();
+        prepareRenderPass();
+        prepareFramebuffers();
+        prepareSyncObjects();
     }
 
     // Free all Vulkan resources used by the swap chain
-    void destroy(const vk::SwapchainKHR& oldSwapChain = {nullptr});
+    void destroy(const vk::SwapchainKHR& oldSwapChain = {});
 
 private:
-    void createSwapChain(const vk::Extent2D& size, bool vsync);
-    void createImages();
-    void createDepthStencil();
-    void createRenderPass();
-    void createFramebuffers();
-    void createSyncObjects();
+    void prepareSwapChain(const vk::Extent2D& size, bool vsync);
+    void prepareImages();
+    void prepareDepthStencil();
+    void prepareRenderPass();
+    void prepareFramebuffers();
+    void prepareSyncObjects();
 
     static vk::SurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
     static vk::PresentModeKHR chooseSwapPresentMode(bool vsync, const std::vector<vk::PresentModeKHR>& availablePresentModes);

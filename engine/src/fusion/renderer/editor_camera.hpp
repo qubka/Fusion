@@ -10,7 +10,6 @@ namespace fe {
     public:
         EditorCamera();
         EditorCamera(float fov, float aspect, float near, float far);
-        ~EditorCamera() override = default;
 
         void update(float dt) override;
 

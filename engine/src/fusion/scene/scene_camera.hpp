@@ -9,7 +9,6 @@ namespace fe {
         enum class ProjectionType { Perspective = 0, Orthographic = 1 };
     public:
         SceneCamera();
-        ~SceneCamera() = default;
 
         void setPerspective(float fov, float nearClip, float farClip);
         void setOrthographic(float size, float nearClip, float farClip);

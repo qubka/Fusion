@@ -10,7 +10,6 @@ namespace fe {
             : BaseInput<MouseCode>{std::make_pair(Mouse::Button0, Mouse::ButtonLast)} {} //! use all possible buttonmaps
         MouseInput(const std::initializer_list<MouseCode>& buttonsToMonitor)
             : BaseInput<MouseCode>{buttonsToMonitor} {};
-        ~MouseInput() = default;
 
         void onUpdate() override {
             delta = {};

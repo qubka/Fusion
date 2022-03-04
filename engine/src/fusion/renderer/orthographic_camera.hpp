@@ -6,7 +6,6 @@ namespace fe {
     class OrthographicCamera : public Camera {
     public:
         OrthographicCamera(float left, float right, float bottom, float top);
-         ~OrthographicCamera() override = default;
 
         virtual void update(float dt) { updateView(); }
 

@@ -3,9 +3,6 @@
 namespace fe {
     class Camera {
     public:
-        Camera() = default;
-        virtual ~Camera() = default;
-
         glm::mat4& getProjection() { return projectionMatrix; }
         glm::mat4& getView() { return viewMatrix; }
         glm::mat4& getViewProjection() { return viewProjectionMatrix; }
