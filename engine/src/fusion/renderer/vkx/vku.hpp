@@ -530,7 +530,7 @@ public:
 
     void subpassColorAttachment(vk::ImageLayout layout, uint32_t attachment) {
         vk::SubpassDescription& subpass = s.subpassDescriptions.back();
-        auto* p = getAttachmentReference();
+        auto p = getAttachmentReference();
         p->layout = layout;
         p->attachment = attachment;
         if (subpass.colorAttachmentCount == 0) {
@@ -541,7 +541,7 @@ public:
 
     void subpassDepthStencilAttachment(vk::ImageLayout layout, uint32_t attachment) {
         vk::SubpassDescription& subpass = s.subpassDescriptions.back();
-        auto* p = getAttachmentReference();
+        auto p = getAttachmentReference();
         p->layout = layout;
         p->attachment = attachment;
         subpass.pDepthStencilAttachment = p;

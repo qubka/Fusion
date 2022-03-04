@@ -452,8 +452,8 @@ bool UIOverlay::update() {
     }
 
     // Upload data
-    auto* vtxDst = reinterpret_cast<ImDrawVert*>(vertexBuffer.mapped);
-    auto* idxDst = reinterpret_cast<ImDrawIdx*>(indexBuffer.mapped);
+    auto vtxDst = reinterpret_cast<ImDrawVert*>(vertexBuffer.mapped);
+    auto idxDst = reinterpret_cast<ImDrawIdx*>(indexBuffer.mapped);
 
     for (int n = 0; n < imDrawData->CmdListsCount; n++) {
         const ImDrawList* cmd_list = imDrawData->CmdLists[n];

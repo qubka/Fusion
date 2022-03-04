@@ -206,7 +206,7 @@ bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
 template<typename T>
 void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function) {
     const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
-    if (auto* component = context->registry.try_get<T>(entity)) {
+    if (auto component = context->registry.try_get<T>(entity)) {
         ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4, 4 });

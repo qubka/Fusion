@@ -134,18 +134,18 @@ SceneSerializer::SceneSerializer(const std::shared_ptr<Scene>& scene) : scene{sc
 
 void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity entity) {
     out << YAML::BeginMap; // Entity
-    if (auto* component = registry.try_get<IdComponent>(entity)) {
+    if (auto component = registry.try_get<IdComponent>(entity)) {
         out << YAML::Key << "Entity" << YAML::Value << component->id;
     }
 
-    if (auto* component = registry.try_get<TagComponent>(entity)) {
+    if (auto component = registry.try_get<TagComponent>(entity)) {
         out << YAML::Key << "TagComponent";
         out << YAML::BeginMap; // TagComponent
         out << YAML::Key << "tag" << YAML::Value << component->tag;
         out << YAML::EndMap; // TagComponent
     }
 
-    if (auto* component = registry.try_get<TransformComponent>(entity)) {
+    if (auto component = registry.try_get<TransformComponent>(entity)) {
         out << YAML::Key << "TransformComponent";
         out << YAML::BeginMap; // TransformComponent
 
@@ -156,7 +156,7 @@ void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity 
         out << YAML::EndMap; // TransformComponent
     }
 
-    if (auto* component = registry.try_get<CameraComponent>(entity)) {
+    if (auto component = registry.try_get<CameraComponent>(entity)) {
         out << YAML::Key << "CameraComponent";
         out << YAML::BeginMap; // CameraComponent
 
@@ -179,7 +179,7 @@ void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity 
         out << YAML::EndMap; // CameraComponent
     }
 
-    if (auto* component = registry.try_get<ModelComponent>(entity)) {
+    if (auto component = registry.try_get<ModelComponent>(entity)) {
         out << YAML::Key << "ModelComponent";
         out << YAML::BeginMap; // ModelComponent
 

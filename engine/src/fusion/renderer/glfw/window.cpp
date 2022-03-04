@@ -126,6 +126,8 @@ void Window::PosCallback(GLFWwindow* handle, int x, int y) {
 
     window.position = pos;
 
+    LOG_VERBOSE << "PositionChangeEvent: " << glm::to_string(pos);
+
     window.PositionChangeEvent(pos);
 }
 
@@ -134,11 +136,15 @@ void Window::SizeCallback(GLFWwindow* handle, int width, int height) {
 
     glm::ivec2 size {width, height};
 
+    LOG_VERBOSE << "SizeChangeEvent: " << glm::to_string(size);
+
     window.SizeChangeEvent(size);
 }
 
 void Window::CloseCallback(GLFWwindow* handle) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
+
+    LOG_VERBOSE << "CloseEvent";
 
     window.CloseEvent();
 }
@@ -146,17 +152,23 @@ void Window::CloseCallback(GLFWwindow* handle) {
 void Window::RefreshCallback(GLFWwindow* handle) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
+    LOG_VERBOSE << "RefreshEvent";
+
     window.RefreshEvent();
 }
 
 void Window::FocusCallback(GLFWwindow* handle, int focused) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
+    LOG_VERBOSE << "FocusEvent: " << (focused ? "TRUE" : "FALSE");
+
     window.FocusEvent(focused);
 }
 
 void Window::IconifyCallback(GLFWwindow* handle, int iconified) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
+
+    LOG_VERBOSE << "IconifyEvent: " << (iconified ? "TRUE" : "FALSE");
 
     window.IconifyEvent(iconified);
 }
@@ -169,6 +181,8 @@ void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) 
 
     glm::ivec2 size {width, height};
 
+    LOG_VERBOSE << "FramebufferEvent: " << glm::to_string(size);
+
     window.FramebufferEvent(size);
 }
 
@@ -176,6 +190,8 @@ void Window::CursorPosCallback(GLFWwindow* handle, double posX, double posY) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
     glm::vec2 pos {posX, posY};
+
+    LOG_VERBOSE << "MouseMotionEvent: " << glm::to_string(pos);
 
     window.MouseMotionEvent(pos);
 
@@ -192,11 +208,15 @@ void Window::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) 
 
     glm::vec2 offset {offsetX, offsetY};
 
+    LOG_VERBOSE << "MouseScrollEvent: " << glm::to_string(offset);
+
     window.MouseScrollEvent(offset);
 }
 
 void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mods) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
+
+    LOG_VERBOSE << "MouseButtonEvent: " << glm::to_string(glm::ivec3{button, action, mods});
 
     window.MouseButtonEvent(fe::MouseData{ static_cast<uint8_t>(button), static_cast<uint8_t>(action), static_cast<uint8_t>(mods) });
 
@@ -212,6 +232,8 @@ void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int
 
 void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mods) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
+
+    LOG_VERBOSE << "KeyEvent: " << glm::to_string(glm::ivec4{key, scancode, action, mods});
 
     window.KeyEvent(fe::KeyData{static_cast<uint16_t>(key), static_cast<uint8_t>(scancode), static_cast<uint8_t>(action), static_cast<uint8_t>(mods)});
 
@@ -231,11 +253,15 @@ void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, 
 void Window::CursorEnterCallback(GLFWwindow* handle, int entered) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
+    LOG_VERBOSE << "MouseEnterEvent: " << (entered ? "TRUE" : "FALSE");
+
     window.MouseEnterEvent(entered);
 }
 
 void Window::CharCallback(GLFWwindow* handle, unsigned int keycode) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
+
+    LOG_VERBOSE << "CharInputEvent: " << keycode;
 
     window.CharInputEvent(keycode);
 }
@@ -251,13 +277,17 @@ void Window::FileDropCallback(GLFWwindow* handle, int count, const char** paths)
         result.emplace_back(paths[i]);
     }
 
+    LOG_VERBOSE << "FileDropEvent: " << count;
+
     window.FileDropEvent(result);
 }
 #endif
 
 #if GLFW_VERSION_MINOR >= 2
 void Window::JoystickCallback(int jid, int action) {
-    for (auto* handle : instances) {
+    LOG_VERBOSE << "JoystickEvent: [id: " << jid << " | action: " << action << "]";
+
+    for (auto handle : instances) {
         auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
         switch (action) {
@@ -277,7 +307,18 @@ void Window::JoystickCallback(int jid, int action) {
 void Window::MaximizeCallback(GLFWwindow* handle, int maximized) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
-    window.minimize = !maximized;
+    LOG_VERBOSE << "MaximizeEvent: " << (maximized ? "TRUE" : "FALSE");
+    /*if (maximized) {
+        auto monitor = glfwGetPrimaryMonitor();
+        auto mode = glfwGetVideoMode(monitor);
+        window.width = mode->width;
+        window.height = mode->height;
+        window.minimize = false;
+    } else {
+        window.width = 0;
+        window.height = 0;
+        window.minimize = true;
+    }*/
 
     window.MaximizeEvent(maximized);
 }
@@ -287,12 +328,16 @@ void Window::ContentScaleCallback(GLFWwindow* handle, float scaleX, float scaleY
 
     glm::vec2 scale {scaleX, scaleY};
 
+    LOG_VERBOSE << "ContentScaleEvent: " << glm::to_string(scale);
+
     window.ContentScaleEvent(scale);
 }
 #endif
 
 void Window::MonitorCallback(GLFWmonitor* monitor, int action) {
-    for (auto* handle : instances) {
+    LOG_VERBOSE << "MonitorCallback: " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
+
+    for (auto handle : instances) {
         auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
         switch (action) {
