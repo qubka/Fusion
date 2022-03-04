@@ -12,6 +12,6 @@ namespace fe {
         glm::mat4 viewMatrix{1.0f};
         glm::mat4 viewProjectionMatrix{1.0f};
 
-        bool isDirty{true};
+        bool dirty{ true};
     };
 }

@@ -48,7 +48,7 @@ inline vk::Rect2D rect2D(const glm::uvec2& size, const glm::ivec2& offset = glm:
     return rect2D(size.x, size.y, offset.x, offset.y);
 }
 
-inline vk::Rect2D rect2D(const vk::Extent2D& size, const vk::Offset2D& offset = vk::Offset2D()) {
+inline vk::Rect2D rect2D(const vk::Extent2D& size, const vk::Offset2D& offset = vk::Offset2D{}) {
     return rect2D(size.width, size.height, offset.x, offset.y);
 }
 

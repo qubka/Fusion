@@ -232,7 +232,7 @@ void EditorLayer::onImGui() {
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            const auto* path = static_cast<const wchar_t*>(payload->Data);
+            const auto path = static_cast<const wchar_t*>(payload->Data);
             openScene(std::filesystem::path(fe::getAssetPath()) / path);
         }
         ImGui::EndDragDropTarget();

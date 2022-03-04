@@ -38,16 +38,16 @@ void PerspectiveCamera::updateDirs() {
 }
 
 void PerspectiveCamera::updateView() {
-    if (!isDirty)
+    if (!dirty)
         return;
 
     viewMatrix = glm::lookAt(position, position + forward, up);
     viewProjectionMatrix = projectionMatrix * viewMatrix;
 
-    isDirty = false;
+    dirty = false;
 }
 
 void PerspectiveCamera::updateProjection() {
     projectionMatrix = glm::perspective(glm::radians(fovy), aspect, near, far);
-    isDirty = true;
+    dirty = true;
 }

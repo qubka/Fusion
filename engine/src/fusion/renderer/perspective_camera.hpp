@@ -27,9 +27,9 @@ namespace fe {
         void setFarClip(float zFar) { far = zFar; updateProjection(); }
 
         const glm::vec3& getPosition() const { return position; }
-        void setPosition(const glm::vec3& pos) { position = pos; isDirty = true; };
+        void setPosition(const glm::vec3& pos) { position = pos; dirty = true; };
         const glm::quat& getRotation() const { return rotation; }
-        void setRotation(const glm::quat& rot) { rotation = rot; updateDirs(); isDirty = true; };
+        void setRotation(const glm::quat& rot) { rotation = rot; updateDirs(); dirty = true; };
 
     private:
         void updateView();

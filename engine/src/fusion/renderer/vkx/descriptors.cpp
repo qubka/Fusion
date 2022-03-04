@@ -110,7 +110,7 @@ void DescriptorLayoutCache::destroy() {
 vk::DescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(vk::DescriptorSetLayoutCreateInfo& info) {
     DescriptorLayoutInfo layoutInfo;
     layoutInfo.bindings.reserve(info.bindingCount);
-    bool isSorted = true;
+    bool sorted = true;
     int lastBinding = -1;
 
     //copy from the direct info struct into our own one
@@ -122,11 +122,11 @@ vk::DescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(vk::Descri
         if (binding > lastBinding) {
             lastBinding = binding;
         } else {
-            isSorted = false;
+            sorted = false;
         }
     }
     //sort the bindings if they aren't in order
-    if (!isSorted) {
+    if (!sorted) {
         std::sort(layoutInfo.bindings.begin(), layoutInfo.bindings.end(), [](const vk::DescriptorSetLayoutBinding& a, const vk::DescriptorSetLayoutBinding& b) {
             return a.binding < b.binding;
         });

@@ -9,7 +9,6 @@ namespace vkx {
 struct Offscreen {
     const vkx::Context& context;
     vk::RenderPass renderPass;
-    vk::Semaphore renderComplete;
     vk::Extent2D extent{ 0, 0 };
     std::vector<vk::Format> colorFormats{ vk::Format::eB8G8R8A8Unorm };
     // This value is chosen as an invalid default that signals that the code should pick a specific depth buffer
@@ -22,21 +21,20 @@ struct Offscreen {
     vk::ImageLayout colorFinalLayout{ vk::ImageLayout::eShaderReadOnlyOptimal };
     vk::ImageLayout depthFinalLayout{ vk::ImageLayout::eDepthStencilAttachmentOptimal };
 
-    bool active{ true };
+    bool active{ false };
 
     Offscreen(const vkx::Context& context)
             : context{ context } {}
 
     void create() {
         assert(!colorFormats.empty());
-        assert(extent != vk::Extent2D(0, 0));
+        assert(extent != vk::Extent2D{});
 
         if (depthFormat == vk::Format::eR8Uscaled) {
             depthFormat = context.getSupportedDepthFormat();
         }
 
         commandBuffers = context.allocateCommandBuffers(MAX_FRAMES_IN_FLIGHT);
-        renderComplete = context.device.createSemaphore({});
 
         if (!renderPass) {
             createRenderPass();
@@ -47,16 +45,16 @@ struct Offscreen {
         }
 
         createSampler();
+
+        active = true;
     }
 
     void destroy() {
         for (auto& framebuffer: framebuffers) {
             framebuffer.destroy();
         }
-        framebuffers.clear();
         context.device.freeCommandBuffers(context.getCommandPool(), commandBuffers);
         context.device.destroyRenderPass(renderPass);
-        context.device.destroySemaphore(renderComplete);
     }
 
 protected:

@@ -196,7 +196,7 @@ void Application::initVulkan() {
 }
 
 void Application::setupRenderer() {
-    renderer.create();
+    renderer.create(size);
 }
 
 void Application::mainLoop() {
@@ -245,7 +245,7 @@ void Application::update(float dt) {
         frameCounter = 0;
     }
 
-    for (auto* layer: layers) {
+    for (auto layer: layers) {
         layer->onUpdate(dt);
     }
 
@@ -322,7 +322,7 @@ void Application::render() {
     if (uint32_t frameIndex = renderer.beginFrame(); frameIndex != UINT32_MAX) {
         renderer.beginRenderPass(frameIndex);
 
-        for (auto* layer: layers) {
+        for (auto layer: layers) {
             layer->onRender(renderer);
         }
 
@@ -347,7 +347,7 @@ void Application::updateOverlay(float dt) {
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
 
-    for (auto* layer: layers) {
+    for (auto layer: layers) {
         layer->onImGui();
     }
 

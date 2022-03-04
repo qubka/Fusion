@@ -12,9 +12,9 @@ namespace fe {
         void setOrthographic(float left, float right, float bottom, float top);
 
         const glm::vec3& getPosition() const { return position; }
-        void setPosition(const glm::vec3& pos) { position = pos; isDirty = true; };
+        void setPosition(const glm::vec3& pos) { position = pos; dirty = true; };
         float getRotation() const { return rotation; }
-        void setRotation(float rot) { rotation = rot; isDirty = true;};
+        void setRotation(float rot) { rotation = rot; dirty = true;};
 
     private:
         void updateView();

@@ -9,11 +9,11 @@ OrthographicCamera::OrthographicCamera(float left, float right, float bottom, fl
 
 void OrthographicCamera::setOrthographic(float left, float right, float bottom, float top) {
     projectionMatrix = glm::ortho(left, right, bottom, top);
-    isDirty = true;
+    dirty = true;
 }
 
 void OrthographicCamera::updateView() {
-    if (!isDirty)
+    if (!dirty)
         return;
 
     glm::mat4 m{1.0f};
@@ -23,5 +23,5 @@ void OrthographicCamera::updateView() {
     viewMatrix = glm::inverse(transform);
     viewProjectionMatrix = projectionMatrix * viewMatrix;
 
-    isDirty = false;
+    dirty = false;
 }

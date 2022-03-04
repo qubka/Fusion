@@ -4,7 +4,7 @@
 using namespace fe;
 
 LayerStack::~LayerStack() {
-    for (auto* layer : layers) {
+    for (auto layer : layers) {
         layer->onDetach();
         delete layer;
     }
@@ -29,14 +29,14 @@ Layer* LayerStack::pollBack() {
 }
 
 Layer* LayerStack::removeFront() {
-    auto* layer = layers.front();
+    auto layer = layers.front();
     layer->onDetach();
     layers.pop_front();
     return layer;
 }
 
 Layer* LayerStack::removeBack() {
-    auto* layer = layers.back();
+    auto layer = layers.back();
     layer->onDetach();
     layers.pop_front();
     return layer;

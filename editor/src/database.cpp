@@ -20,7 +20,7 @@ void Database::close() {
 }
 
 static int callback(void* context, int columnCount, char** columnValues, char** columnNames) {
-    auto* obj = reinterpret_cast<Database*>(context);
+    auto obj = reinterpret_cast<Database*>(context);
 
     std::vector<std::string> values;
     values.reserve(columnCount);
