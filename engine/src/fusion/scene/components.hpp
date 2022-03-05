@@ -46,7 +46,6 @@ namespace fe {
     };
 
     struct ModelComponent {
-        //std::shared_ptr<vkx::model::Model> model;
         std::string path;
         std::vector<int> layout;
         glm::vec3 scale{ 1.0f };

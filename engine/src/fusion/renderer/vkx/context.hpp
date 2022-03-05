@@ -818,8 +818,8 @@ public:
         info.commandBufferCount = commandBuffers.size();
         info.pCommandBuffers = commandBuffers.data();
 
+        info.signalSemaphoreCount = signals.size();
         if (!signals.empty()) {
-            info.signalSemaphoreCount = signals.size();
             info.pSignalSemaphores = signals.data();
         }
 
@@ -828,11 +828,9 @@ public:
         if (!wait.empty()) {
             info.waitSemaphoreCount = wait.size();
             info.pWaitSemaphores = wait.data();
-            info.pWaitDstStageMask = waitStages.data();
         }
         info.pWaitDstStageMask = waitStages.data();
 
-        info.signalSemaphoreCount = signals.size();
         queue.submit(info, fence);
     }
 

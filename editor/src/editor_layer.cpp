@@ -82,17 +82,18 @@ void EditorLayer::onRender(Renderer& renderer) {
     GlobalUbo ubo{};
     ubo.projection = editorCamera.getProjection();
     ubo.view = editorCamera.getView();
+    ubo.lightDirection = renderer.getLightDirection();
     auto& buffer = renderer.getCurrentUniformBuffer();
     buffer.copy(ubo);
     buffer.flush();
 
     switch (sceneState) {
         case SceneState::Edit:
-            activeScene->onRenderEditor(renderer);
+            activeScene->onRenderEditor();
             break;
 
         case SceneState::Play: {
-            activeScene->onRenderRuntime(renderer);
+            activeScene->onRenderRuntime();
             break;
         }
     }

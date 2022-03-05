@@ -28,9 +28,9 @@ void SwapChain::destroy(const vk::SwapchainKHR& oldSwapChain) {
     imagesInFlight.clear();
 }
 
-void SwapChain::prepareSwapChain(const vk::Extent2D& size, bool vsync) {
+void SwapChain::createSwapChain(const vk::Extent2D& size, bool vsync) {
     vk::SwapchainKHR oldSwapChain = swapChain;
-    currentFrame = 0;
+    currentImage = 0;
 
     vkx::Context::SwapChainSupportDetails swapChainSupport = context.getSwapChainSupport();
 
@@ -81,7 +81,7 @@ void SwapChain::prepareSwapChain(const vk::Extent2D& size, bool vsync) {
     depthFormat = context.getSupportedDepthFormat();
 }
 
-void SwapChain::prepareImages() {
+void SwapChain::createImages() {
     vk::ImageViewCreateInfo colorAttachmentView;
     colorAttachmentView.format = colorFormat;
     colorAttachmentView.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
@@ -102,7 +102,7 @@ void SwapChain::prepareImages() {
     }
 }
 
-void SwapChain::prepareDepthStencil() {
+void SwapChain::createDepthStencil() {
     vk::ImageAspectFlags aspect = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
 
     vk::ImageCreateInfo depthStencilCI;
@@ -126,7 +126,7 @@ void SwapChain::prepareDepthStencil() {
     depthStencil.view = device.createImageView(depthStencilView);
 }
 
-void SwapChain::prepareRenderPass() {
+void SwapChain::createRenderPass() {
     std::array<vk::AttachmentDescription, 2> attachments;
 
     attachments[0].format = colorFormat;
@@ -175,13 +175,13 @@ void SwapChain::prepareRenderPass() {
     renderPass = device.createRenderPass(renderPassInfo);
 }
 
-void SwapChain::prepareFramebuffers() {
+void SwapChain::createFramebuffers() {
     framebuffers.resize(imageCount);
 
     for (size_t i = 0; i < imageCount; i++) {
         std::array<vk::ImageView, 2> attachments = {
-                images[i].view,
-                depthStencil.view
+            images[i].view,
+            depthStencil.view
         };
 
         vk::FramebufferCreateInfo framebufferCI;
@@ -197,7 +197,7 @@ void SwapChain::prepareFramebuffers() {
     }
 }
 
-void SwapChain::prepareSyncObjects() {
+void SwapChain::createSyncObjects() {
     imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
@@ -260,49 +260,46 @@ vk::Extent2D SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capab
 }
 
 vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex) const {
-    auto result = device.waitForFences(1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+    auto result = device.waitForFences(1, &inFlightFences[currentImage], VK_TRUE, UINT64_MAX);
     if (result != vk::Result::eSuccess) {
-        throw std::runtime_error("failed to wait for inFlightFences");
+        LOG_ERROR << "failed to wait for inFlightFences";
     }
 
-    return device.acquireNextImageKHR(swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], nullptr, &imageIndex); /// use noexcept to handle OUT_OF_DATE
+    return device.acquireNextImageKHR(swapChain, UINT64_MAX, imageAvailableSemaphores[currentImage], nullptr, &imageIndex); /// use noexcept to handle OUT_OF_DATE
 }
 
-vk::Result SwapChain::submitCommandBuffers(const std::vector<vk::CommandBuffer>& buffers, const uint32_t& imageIndex) {
-    vk::Fence& fence = inFlightFences[currentFrame];
-    vk::Fence* image = imagesInFlight[imageIndex];
-    if (image != nullptr) {
-        auto result = device.waitForFences(1, image, VK_TRUE, UINT64_MAX);
-        if (result != vk::Result::eSuccess) {
-            throw std::runtime_error("failed to wait for imagesInFlight");
-        }
-    }
-    imagesInFlight[imageIndex] = &fence;
+vk::Result SwapChain::submitCommandBuffers(const vk::ArrayProxy<const vk::CommandBuffer>& buffers, uint32_t imageIndex) {
+    context.submit(
+        buffers,
+        { imageAvailableSemaphores[currentImage] },
+        { vk::PipelineStageFlagBits::eColorAttachmentOutput },
+        { renderFinishedSemaphores[currentImage] },
+    getSubmitFence(imageIndex));
 
-    vk::SubmitInfo submitInfo;
-
-    vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
-    submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = &imageAvailableSemaphores[currentFrame];
-    submitInfo.pWaitDstStageMask = waitStages;
-
-    submitInfo.commandBufferCount = static_cast<uint32_t>(buffers.size());
-    submitInfo.pCommandBuffers = buffers.data();
-
-    submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = &renderFinishedSemaphores[currentFrame];
-
-    device.resetFences(fence);
-    queue.submit(submitInfo, fence);
-
-    vk::PresentInfoKHR presentInfo;
-    presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pWaitSemaphores = &renderFinishedSemaphores[currentFrame];
-    presentInfo.swapchainCount = 1;
-    presentInfo.pSwapchains = &swapChain;
     presentInfo.pImageIndices = &imageIndex;
 
-    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    auto result = queuePresent(renderFinishedSemaphores[currentImage]);
+    currentImage = (currentImage + 1) % MAX_FRAMES_IN_FLIGHT;
+    return result;
+}
 
+const vk::Fence& SwapChain::getSubmitFence(uint32_t imageIndex) {
+    vk::Fence& next = inFlightFences[currentImage];
+    vk::Fence* prev = imagesInFlight[imageIndex];
+    if (prev != nullptr) {
+        auto result = device.waitForFences(1, prev, VK_TRUE, UINT64_MAX);
+        if (result != vk::Result::eSuccess) {
+            LOG_ERROR << "failed to wait for imagesInFlight";
+        }
+    }
+    imagesInFlight[imageIndex] = &next;
+    device.resetFences(next);
+    return next;
+}
+
+
+vk::Result SwapChain::queuePresent(const vk::Semaphore& waitSemaphore) {
+    presentInfo.waitSemaphoreCount = waitSemaphore ? 1 : 0;
+    presentInfo.pWaitSemaphores = &waitSemaphore;
     return queue.presentKHR(&presentInfo);
 }

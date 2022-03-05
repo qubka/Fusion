@@ -9,6 +9,6 @@ namespace fe {
             pushLayer(new EditorLayer{*this});
         }
 
-        void* getCurrentFrameImage() { return ui.getFrameImage(renderer.getFrameIndex()); }
+        void* getCurrentFrameImage() { return renderer.getFrameImage(); }
     };
 }
