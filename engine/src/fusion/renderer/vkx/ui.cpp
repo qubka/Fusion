@@ -57,6 +57,8 @@ void UIOverlay::create(const UIOverlayCreateInfo& createInfo) {
         prepareRenderPass();
     }
     preparePipeline();
+
+    active = true;
 }
 
 /** Free up all Vulkan resources acquired by the UI overlay */
@@ -64,6 +66,9 @@ UIOverlay::~UIOverlay() {
 }
 
 void UIOverlay::destroy() {
+    if (!active)
+        return;
+
     vertexBuffer.destroy();
     indexBuffer.destroy();
     font.destroy();
@@ -243,14 +248,14 @@ void UIOverlay::prepareRenderPass() {
     std::array<vk::AttachmentDescription, 2> attachments;
 
     // Color attachment
-    attachments[0].format = createInfo.colorformat;
+    attachments[0].format = createInfo.colorFormat;
     attachments[0].stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
     attachments[0].stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
     attachments[0].initialLayout = vk::ImageLayout::ePresentSrcKHR;
     attachments[0].finalLayout = vk::ImageLayout::ePresentSrcKHR;
 
     // Depth attachment
-    attachments[1].format = createInfo.depthformat;
+    attachments[1].format = createInfo.depthFormat;
     attachments[1].loadOp = vk::AttachmentLoadOp::eDontCare;
     attachments[1].storeOp = vk::AttachmentStoreOp::eDontCare;
     attachments[1].stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
@@ -297,12 +302,7 @@ void UIOverlay::prepareRenderPass() {
 
 /** Set the window events callbacks */
 void UIOverlay::prepareEvents() {
-    assert(createInfo.window);
-
-    createInfo.window->FramebufferEvent.connect([](const glm::ivec2& size) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
-    });
+    assert(createInfo.window && "Window not initialized to set up events!");
 
     createInfo.window->MouseButtonEvent.connect([](MouseData data) {
         if (data.button >= 0 && data.button < ImGuiMouseButton_COUNT) {
@@ -472,6 +472,12 @@ bool UIOverlay::update() {
 	}
 
     return updateCmdBuffers;
+}
+
+void UIOverlay::resize(const vk::Extent2D& size) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2{static_cast<float>(size.width), static_cast<float>(size.height)};
+    createInfo.size = size;
 }
 
 bool UIOverlay::header(const char* caption) const {
