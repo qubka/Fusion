@@ -1,7 +1,7 @@
 #include "scene.hpp"
 #include "components.hpp"
 
-//#include "fusion/systems/meshrenderer.hpp"
+#include "fusion/renderer/systems/model_renderer.hpp"
 
 using namespace fe;
 
@@ -25,18 +25,20 @@ void Scene::onUpdateEditor(float dt) {
 
 }
 
-void Scene::onRenderRuntime(Renderer& renderer) {
+void Scene::onRenderRuntime() {
 
 }
 
-void Scene::onRenderEditor(Renderer& renderer) {
-    /*meshRenderer.beginScene();
+void Scene::onRenderEditor() {
+    auto& renderer = ModelRenderer::Instance();
 
-    auto group = registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
+    renderer.begin();
+
+    auto group = registry.group<TransformComponent>(entt::get<ModelComponent>);
     for (auto entity : group) {
-        auto [transform, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
-        meshRenderer.drawMesh(transform, mesh.mesh);
+        auto [transform, model] = group.get<TransformComponent, ModelComponent>(entity);
+        renderer.draw(transform);
     }
 
-    meshRenderer.endScene();*/
+    renderer.end();
 }

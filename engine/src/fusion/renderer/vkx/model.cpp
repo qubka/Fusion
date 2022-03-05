@@ -32,7 +32,6 @@ void Model::loadFromFile(const Context& context, const std::string& filename, co
     Assimp::Importer importer;
     const aiScene* pScene;
 
-
     // Load file
     vkx::file::withBinaryFileContents(filename, [&](const char* filename, size_t size, const void* data) {
         pScene = importer.ReadFileFromMemory(data, size, flags, filename);
@@ -47,7 +46,7 @@ void Model::loadFromFile(const Context& context, const std::string& filename, co
 
     parts.clear();
     parts.resize(pScene->mNumMeshes);
-    for (unsigned int i = 0; i < pScene->mNumMeshes; i++) {
+    for (uint32_t i = 0; i < pScene->mNumMeshes; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
         parts[i] = {};
         parts[i].name = paiMesh->mName.C_Str();
@@ -65,11 +64,11 @@ void Model::loadFromFile(const Context& context, const std::string& filename, co
     indexCount = 0;
 
     // Load meshes
-    for (unsigned int meshIndex = 0; meshIndex < pScene->mNumMeshes; meshIndex++) {
+    for (uint32_t meshIndex = 0; meshIndex < pScene->mNumMeshes; meshIndex++) {
         auto& part = parts[meshIndex];
         const aiMesh* paiMesh = pScene->mMeshes[meshIndex];
-        const auto& numVertices = pScene->mMeshes[meshIndex]->mNumVertices;
-        for (unsigned int vertexIndex = 0; vertexIndex < numVertices; vertexIndex++) {
+        const uint32_t numVertices = pScene->mMeshes[meshIndex]->mNumVertices;
+        for (uint32_t vertexIndex = 0; vertexIndex < numVertices; vertexIndex++) {
             appendVertex(vertexBuffer, pScene, meshIndex, vertexIndex);
         }
 
@@ -77,18 +76,17 @@ void Model::loadFromFile(const Context& context, const std::string& filename, co
 
         vertexCount += numVertices;
         part.indexBase = static_cast<uint32_t>(indexBuffer.size());
-        for (unsigned int j = 0; j < paiMesh->mNumFaces; j++) {
-            const aiFace& Face = paiMesh->mFaces[j];
-            if (Face.mNumIndices != 3)
+        for (uint32_t j = 0; j < paiMesh->mNumFaces; j++) {
+            const aiFace& face = paiMesh->mFaces[j];
+            if (face.mNumIndices != 3)
                 continue;
-            indexBuffer.push_back(part.indexBase + Face.mIndices[0]);
-            indexBuffer.push_back(part.indexBase + Face.mIndices[1]);
-            indexBuffer.push_back(part.indexBase + Face.mIndices[2]);
+            indexBuffer.push_back(part.indexBase + face.mIndices[0]);
+            indexBuffer.push_back(part.indexBase + face.mIndices[1]);
+            indexBuffer.push_back(part.indexBase + face.mIndices[2]);
             part.indexCount += 3;
         }
         indexCount += part.indexCount;
     }
-
 
     // Vertex buffer
     vertices = context.stageToDeviceBuffer(vk::BufferUsageFlagBits::eVertexBuffer, vertexBuffer);
@@ -97,18 +95,18 @@ void Model::loadFromFile(const Context& context, const std::string& filename, co
 };
 
 void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* pScene, uint32_t meshIndex, uint32_t vertexIndex) {
-    static const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+    static const aiVector3D Zero3D{0.0f, 0.0f, 0.0f};
     const aiMesh* paiMesh = pScene->mMeshes[meshIndex];
-    const auto& j = vertexIndex;
-    aiColor3D pColor(0.f, 0.f, 0.f);
+    const uint32_t i = vertexIndex;
+    aiColor3D pColor{0.f, 0.f, 0.f};
     pScene->mMaterials[paiMesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, pColor);
-    const aiVector3D* pPos = &(paiMesh->mVertices[j]);
-    const aiVector3D* pNormal = &(paiMesh->mNormals[j]);
-    const aiVector3D* pTexCoord = (paiMesh->HasTextureCoords(0)) ? &(paiMesh->mTextureCoords[0][j]) : &Zero3D;
-    const aiVector3D* pTangent = (paiMesh->HasTangentsAndBitangents()) ? &(paiMesh->mTangents[j]) : &Zero3D;
-    const aiVector3D* pBiTangent = (paiMesh->HasTangentsAndBitangents()) ? &(paiMesh->mBitangents[j]) : &Zero3D;
+    const aiVector3D& pos = paiMesh->mVertices[i];
+    const aiVector3D& normal = paiMesh->mNormals[i];
+    const aiVector3D& texCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
+    const aiVector3D& tangent = paiMesh->HasTangentsAndBitangents() ? paiMesh->mTangents[i] : Zero3D;
+    const aiVector3D& biTangent = paiMesh->HasTangentsAndBitangents() ? paiMesh->mBitangents[i] : Zero3D;
     std::vector<float> vertexBuffer;
-    glm::vec3 scaledPos{ pPos->x, -pPos->y, pPos->z };
+    glm::vec3 scaledPos{ pos.x, -pos.y, pos.z };
     scaledPos *= scale;
     scaledPos += center;
 
@@ -122,13 +120,13 @@ void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* pSce
                 vertexBuffer.push_back(scaledPos.z);
                 break;
             case Component::Normal:
-                vertexBuffer.push_back(pNormal->x);
-                vertexBuffer.push_back(-pNormal->y);
-                vertexBuffer.push_back(pNormal->z);
+                vertexBuffer.push_back(normal.x);
+                vertexBuffer.push_back(-normal.y);
+                vertexBuffer.push_back(normal.z);
                 break;
             case Component::UV:
-                vertexBuffer.push_back(pTexCoord->x * uvscale.s);
-                vertexBuffer.push_back(pTexCoord->y * uvscale.t);
+                vertexBuffer.push_back(texCoord.x * uvscale.s);
+                vertexBuffer.push_back(texCoord.y * uvscale.t);
                 break;
             case Component::Color:
                 vertexBuffer.push_back(pColor.r);
@@ -136,14 +134,14 @@ void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* pSce
                 vertexBuffer.push_back(pColor.b);
                 break;
             case Component::Tangent:
-                vertexBuffer.push_back(pTangent->x);
-                vertexBuffer.push_back(pTangent->y);
-                vertexBuffer.push_back(pTangent->z);
+                vertexBuffer.push_back(tangent.x);
+                vertexBuffer.push_back(tangent.y);
+                vertexBuffer.push_back(tangent.z);
                 break;
             case Component::Bitangent:
-                vertexBuffer.push_back(pBiTangent->x);
-                vertexBuffer.push_back(pBiTangent->y);
-                vertexBuffer.push_back(pBiTangent->z);
+                vertexBuffer.push_back(biTangent.x);
+                vertexBuffer.push_back(biTangent.y);
+                vertexBuffer.push_back(biTangent.z);
                 break;
             // Dummy components for padding
             case Component::DummyInt:

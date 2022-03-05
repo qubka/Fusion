@@ -15,8 +15,8 @@ namespace fe {
         void onUpdateRuntime(float dt);
         void onUpdateEditor(float dt);
 
-        void onRenderRuntime(Renderer& renderer);
-        void onRenderEditor(Renderer& renderer);
+        void onRenderRuntime();
+        void onRenderEditor();
 
         entt::registry registry;
     };

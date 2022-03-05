@@ -43,11 +43,11 @@ public:
     /** @brief Components used to generate vertices from */
     std::vector<Component> components;
     VertexLayout() = default;
-    VertexLayout(std::vector<Component>&& components, uint32_t binding = 0)
+    VertexLayout(std::vector<Component>&& components)
         : components{std::move(components)} {}
-    explicit VertexLayout(std::vector<int>& ids, uint32_t binding = 0) {
+    explicit VertexLayout(std::vector<int>& ids) {
         components.reserve(ids.size());
-        for (auto i : ids) {
+        for (int i : ids) {
             components.push_back(magic_enum::enum_value<Component>(i));
         }
     }
@@ -139,8 +139,8 @@ struct Model {
     vk::Device device;
     Buffer vertices;
     Buffer indices;
-    uint32_t indexCount = 0;
-    uint32_t vertexCount = 0;
+    uint32_t indexCount{ 0 };
+    uint32_t vertexCount{ 0 };
     VertexLayout layout;
     glm::vec3 scale{ 1.0f };
     glm::vec3 center{ 0.0f };
@@ -159,8 +159,8 @@ struct Model {
     static const int defaultFlags;
 
     struct Dimension {
-        glm::vec3 min = glm::vec3{FLT_MAX};
-        glm::vec3 max = glm::vec3{-FLT_MAX};
+        glm::vec3 min{ FLT_MAX };
+        glm::vec3 max{ -FLT_MAX };
         glm::vec3 size;
     } dim;
 

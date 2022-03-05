@@ -18,30 +18,28 @@ inline vk::ColorComponentFlags fullColorWriteMask() {
     return vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 }
 
-inline vk::Viewport viewport(float width, float height, float minDepth = 0, float maxDepth = 1) {
-    vk::Viewport viewport;
-    viewport.width = width;
-    viewport.height = height;
-    viewport.minDepth = minDepth;
-    viewport.maxDepth = maxDepth;
-    return viewport;
+inline vk::Viewport viewport(float x, float y, float width, float height, float minDepth = 0, float maxDepth = 1) {
+    return { x, y, width, height, minDepth, maxDepth };
 }
 
 inline vk::Viewport viewport(const glm::uvec2& size, float minDepth = 0, float maxDepth = 1) {
-    return viewport(static_cast<float>(size.x), static_cast<float>(size.y), minDepth, maxDepth);
+    return viewport(0, 0, static_cast<float>(size.x), static_cast<float>(size.y), minDepth, maxDepth);
 }
 
 inline vk::Viewport viewport(const vk::Extent2D& size, float minDepth = 0, float maxDepth = 1) {
-    return viewport(static_cast<float>(size.width), static_cast<float>(size.height), minDepth, maxDepth);
+    return viewport(0, 0, static_cast<float>(size.width), static_cast<float>(size.height), minDepth, maxDepth);
+}
+
+inline vk::Viewport flippedViewport(const glm::uvec2& size, float minDepth = 0, float maxDepth = 1) {
+    return viewport(0, static_cast<float>(size.y), static_cast<float>(size.x), -static_cast<float>(size.y), minDepth, maxDepth);
+}
+
+inline vk::Viewport flippedViewport(const vk::Extent2D& size, float minDepth = 0, float maxDepth = 1) {
+    return viewport(0, static_cast<float>(size.height), static_cast<float>(size.width), -static_cast<float>(size.height), minDepth, maxDepth);
 }
 
 inline vk::Rect2D rect2D(uint32_t width, uint32_t height, int32_t offsetX = 0, int32_t offsetY = 0) {
-    vk::Rect2D rect2D;
-    rect2D.extent.width = width;
-    rect2D.extent.height = height;
-    rect2D.offset.x = offsetX;
-    rect2D.offset.y = offsetY;
-    return rect2D;
+    return {{offsetX,offsetY},{width,height}};
 }
 
 inline vk::Rect2D rect2D(const glm::uvec2& size, const glm::ivec2& offset = glm::ivec2{0}) {

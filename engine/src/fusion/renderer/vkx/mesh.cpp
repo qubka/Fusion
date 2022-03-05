@@ -29,9 +29,7 @@ void Mesh::draw(const vk::CommandBuffer& commandBuffer) const {
 }
 
 void Mesh::bind(const vk::CommandBuffer& commandBuffer) const {
-    vk::Buffer buffers[] = {vertices.buffer };
-    vk::DeviceSize offsets[] = { 0 };
-    commandBuffer.bindVertexBuffers(0, 1, buffers, offsets);
+    commandBuffer.bindVertexBuffers(0, vertices.buffer, { 0 });
 
     if (indices) {
         commandBuffer.bindIndexBuffer(indices.buffer, 0, vk::IndexType::eUint32);

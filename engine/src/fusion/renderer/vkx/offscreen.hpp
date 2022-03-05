@@ -9,7 +9,7 @@ namespace vkx {
 struct Offscreen {
     const vkx::Context& context;
     vk::RenderPass renderPass;
-    vk::Extent2D extent{ 0, 0 };
+    vk::Extent2D extent;
     std::vector<vk::Format> colorFormats{ vk::Format::eB8G8R8A8Unorm };
     // This value is chosen as an invalid default that signals that the code should pick a specific depth buffer
     // Alternative, you can set this to undefined to explicitly declare you want no depth buffer.
@@ -50,6 +50,9 @@ struct Offscreen {
     }
 
     void destroy() {
+        if (!active)
+            return;
+
         for (auto& framebuffer: framebuffers) {
             framebuffer.destroy();
         }

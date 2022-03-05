@@ -151,7 +151,7 @@ public:
                     void* buffer,
                     vk::DeviceSize bufferSize,
                     vk::Format format,
-                    const vk::Extent2D& extent,
+                    const vk::Extent2D& size,
                     vk::Filter filter = vk::Filter::eLinear,
                     vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                     vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
@@ -160,9 +160,9 @@ public:
         device = context.device;
         this->format = format;
         this->imageLayout = imageLayout;
-        this->extent.width = extent.width;
-        this->extent.height = extent.height;
-        this->extent.depth = 1;
+        extent.width = size.width;
+        extent.height = size.height;
+        extent.depth = 1;
         mipLevels = 1;
 
         // Create optimal tiled target image
@@ -171,7 +171,7 @@ public:
         imageCreateInfo.format = format;
         imageCreateInfo.mipLevels = mipLevels;
         imageCreateInfo.arrayLayers = 1;
-        imageCreateInfo.extent = this->extent;
+        imageCreateInfo.extent = extent;
         // Ensure that the TRANSFER_DST bit is set for staging
         imageCreateInfo.usage = imageUsageFlags | vk::ImageUsageFlagBits::eTransferDst;
         static_cast<vkx::Image&>(*this) = context.createImage(imageCreateInfo);
@@ -187,8 +187,8 @@ public:
                 vk::BufferImageCopy bufferCopyRegion;
                 bufferCopyRegion.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
                 bufferCopyRegion.imageSubresource.layerCount = 1;
-                bufferCopyRegion.imageExtent.width = extent.width;
-                bufferCopyRegion.imageExtent.height = extent.height;
+                bufferCopyRegion.imageExtent.width = size.width;
+                bufferCopyRegion.imageExtent.height = size.height;
                 bufferCopyRegion.imageExtent.depth = 1;
 
                 commandBuffer.copyBufferToImage(stagingBuffer.buffer, image, vk::ImageLayout::eTransferDstOptimal, bufferCopyRegion);
@@ -237,7 +237,7 @@ public:
                       vk::Format format,
                       vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                       vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
-        this->device = device;
+        device = context.device;
         this->imageLayout = imageLayout;
         descriptor.imageLayout = imageLayout;
 
