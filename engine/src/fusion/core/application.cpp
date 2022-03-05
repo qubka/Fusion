@@ -1,9 +1,6 @@
 #include "application.hpp"
 #include "layer.hpp"
 
-#include <imgui/imgui.h>
-#include <imguizmo/ImGuizmo.h>
-
 using namespace fe;
 
 Application* Application::instance{nullptr};
@@ -102,8 +99,6 @@ Application::~Application() {
 
     renderer.destroy();
 
-    ui.destroy();
-
     context.destroy();
 
 #if defined(__ANDROID__)
@@ -131,39 +126,11 @@ void Application::run() {
 
 void Application::mainInit() {
     setupWindow();
-    initVulkan();
+    setupVulkan();
     setupRenderer();
-    setupUi();
 }
 
-void Application::setupUi() {
-    settings.overlay = settings.overlay && (!benchmark.active);
-    if (!settings.overlay) {
-        return;
-    }
-
-    struct vkx::ui::UIOverlayCreateInfo overlayCreateInfo;
-    // Setup default overlay creation info
-    overlayCreateInfo.renderPass = renderer.getSwapChain().renderPass;
-    overlayCreateInfo.framebuffers = renderer.getOffscreen().framebuffers;
-    overlayCreateInfo.size = size;
-    overlayCreateInfo.window = window;
-
-    ImGui::SetCurrentContext(ImGui::CreateContext());
-
-    // Virtual function call for example to customize overlay creation
-    //onPreSetupUIOverlay(overlayCreateInfo);
-    ui.create(overlayCreateInfo);
-
-    for (auto& shader : overlayCreateInfo.shaders) {
-        device.destroyShaderModule(shader.module);
-        shader.module = vk::ShaderModule{};
-    }
-
-    updateOverlay(0.0015f);
-}
-
-void Application::initVulkan() {
+void Application::setupVulkan() {
     // TODO make this less stupid
     context.setDeviceFeaturesPicker([&](const vk::PhysicalDevice& device, vk::PhysicalDeviceFeatures2& features){
         if (deviceFeatures.textureCompressionBC) {
@@ -183,7 +150,7 @@ void Application::initVulkan() {
 #else
     context.requireExtensions(glfw::Window::getRequiredInstanceExtensions());
 #endif
-    context.requireDeviceExtensions({ VK_KHR_SWAPCHAIN_EXTENSION_NAME });
+    context.requireDeviceExtensions({ VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_MAINTENANCE1_EXTENSION_NAME });
     context.createInstance(version);
 
 #if defined(__ANDROID__)
@@ -196,7 +163,7 @@ void Application::initVulkan() {
 }
 
 void Application::setupRenderer() {
-    renderer.create(size);
+    renderer.create(size, settings.overlay);
 }
 
 void Application::mainLoop() {
@@ -249,7 +216,13 @@ void Application::update(float dt) {
         layer->onUpdate(dt);
     }
 
-    updateOverlay(dt);
+    if (renderer.beginGui(dt)) {
+        for (auto layer: layers) {
+            layer->onImGui();
+        }
+
+        renderer.endGui();
+    }
 
     keyInput.onUpdate();
     mouseInput.onUpdate();
@@ -326,31 +299,8 @@ void Application::render() {
             layer->onRender(renderer);
         }
 
-        if (settings.overlay) {
-            ui.draw(renderer.getCurrentCommandBuffer());
-        }
-
         renderer.endRenderPass(frameIndex);
 
         renderer.endFrame(frameIndex);
     }
-}
-
-void Application::updateOverlay(float dt) {
-    if (!settings.overlay) {
-        return;
-    }
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.DeltaTime = dt;
-
-    ImGui::NewFrame();
-    ImGuizmo::BeginFrame();
-
-    for (auto layer: layers) {
-        layer->onImGui();
-    }
-
-    ImGui::Render();
-    ui.update();
 }

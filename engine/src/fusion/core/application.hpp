@@ -10,7 +10,6 @@
 #include "fusion/renderer/vkx/pipelines.hpp"
 #include "fusion/renderer/vkx/texture.hpp"
 #include "fusion/renderer/vkx/benchmark.hpp"
-#include "fusion/renderer/vkx/ui.hpp"
 #include "fusion/renderer/renderer.hpp"
 
 #if defined(__ANDROID__)
@@ -31,9 +30,8 @@ namespace fe {
         void run();
 
     public:
-        static Application& Instance() { return *instance; }
-        Window& getWindow() { return *window; }
-        vkx::ui::UIOverlay& getGUI() { return ui; }
+        static Application& Instance() { assert(instance && "Application was not initialized!"); return *instance; }
+        Window* getWindow() { return window; }
         Renderer& getRenderer() { return renderer; }
         KeyInput& getKeyInput() { return keyInput; }
         MouseInput& getMouseInput() { return mouseInput; }
@@ -78,7 +76,6 @@ namespace fe {
         const vk::PhysicalDeviceFeatures& deviceFeatures{ context.deviceFeatures };
         vk::PhysicalDeviceFeatures& enabledFeatures{ context.enabledFeatures };
         fe::Renderer renderer{ context };
-        vkx::ui::UIOverlay ui{ context };
 
     protected:
         uint32_t version = VK_MAKE_VERSION(1, 1, 0);
@@ -92,15 +89,12 @@ namespace fe {
         void mainLoop();
 
         // Setup the vulkan instance, enable required extensions and connect to the physical device (GPU)
-        void initVulkan();
+        void setupVulkan();
         void setupRenderer();
         void setupWindow();
-        void setupUi();
 
         virtual void render();
         virtual void update(float dt);
-
-        void updateOverlay(float dt);
 
     private:
         // OS specific
