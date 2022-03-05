@@ -9,6 +9,9 @@
 #include "vkx/swapchain.hpp"
 #include "vkx/descriptors.hpp"
 #include "vkx/offscreen.hpp"
+#include "vkx/ui.hpp"
+
+#include "systems/model_renderer.hpp"
 
 namespace fe {
     struct GlobalUbo {
@@ -21,25 +24,29 @@ namespace fe {
     public:
         Renderer(const vkx::Context& context) : context{context} { }
 
-        void create(const vk::Extent2D& size);
+        void create(const vk::Extent2D& size, bool overlay = false);
         void destroy();
 
         glm::vec3& getColor() { return color; }
-        //glm::vec3& getLightDirection() { return lightDirection; }
+        glm::vec3& getLightDirection() { return lightDirection; }
 
         vkx::DescriptorLayoutCache& getDescriptorLayoutCache() { return descriptorLayoutCache; };
         vkx::DescriptorAllocator& getGlobalAllocator() { return globalAllocator; }
         vkx::DescriptorAllocator& getCurrentDynamicAllocator() { return dynamicAllocators[currentFrame]; }
 
-        vk::CommandBuffer& getCurrentCommandBuffer() { return commandBuffers[currentFrame]; }
+        vk::RenderPass& getDrawRenderPass() { return offscreen.active ? offscreen.renderPass : swapChain.renderPass; }
+        vk::CommandBuffer& getMainCommandBuffer() { return commandBuffers[currentFrame]; }
+        vk::CommandBuffer& getCurrentCommandBuffer() { return offscreen.active ? offscreen.commandBuffers[currentFrame] : commandBuffers[currentFrame]; }
         vkx::Buffer& getCurrentUniformBuffer() { return uniformBuffers[currentFrame]; }
 
         const vk::DescriptorSet getCurrentGlobalDescriptorSets() const { return globalDescriptorSets[currentFrame]; }
         const vk::DescriptorSetLayout& getGlobalDescriptorLayoutSet() const { return globalDescriptorSetLayout; }
 
-        const vkx::Offscreen& getOffscreen() const { return offscreen; }
-        const vkx::SwapChain& getSwapChain() const { return swapChain; }
+        vkx::Offscreen& getOffscreen() { return offscreen; }
+        vkx::SwapChain& getSwapChain() { return swapChain; }
+        vkx::ui::UIOverlay& getGUI() { return gui; }
 
+        ImTextureID getFrameImage() { return gui.getFrameImage(currentFrame); }
         uint32_t getFrameIndex() const { return currentFrame; }
         bool isFrameInProgress() const { return frameStarted; }
 
@@ -50,11 +57,15 @@ namespace fe {
 
         void endFrame(uint32_t frameIndex);
 
+        bool beginGui(float dt) const;
+        void endGui();
+
     private:
         const vkx::Context& context;
 
         vkx::Offscreen offscreen{ context };
         vkx::SwapChain swapChain{ context };
+        vkx::ui::UIOverlay gui{ context };
 
         vk::CommandPool commandPool;
         std::vector<vk::CommandBuffer> commandBuffers;
@@ -69,7 +80,9 @@ namespace fe {
 
         std::array<vk::ClearValue, 2> clearValues{};
         glm::vec3 color{0.7f, 0.85f, 1.0f};
-        //glm::vec3 lightDirection{1, -3, -1};
+        glm::vec3 lightDirection{1, -3, -1};
+
+        ModelRenderer* modelRenderer;
 
         uint32_t currentImage{ 0 };
         uint32_t currentFrame{ 0 };
@@ -78,8 +91,7 @@ namespace fe {
         void createCommandBuffers();
         void createUniformBuffers();
         void createDescriptorSets();
+        void createGui();
         void recreateSwapChain();
-
-        void setRenderPass(const vk::CommandBuffer& commandBuffer, const vk::RenderPass& renderPass, const vk::Framebuffer& framebuffer, const vk::Extent2D& extent);
     };
 }

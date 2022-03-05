@@ -1,18 +1,28 @@
 #include "renderer.hpp"
 #include "fusion/core/application.hpp"
 
+#include <imgui/imgui.h>
+#include <imguizmo/ImGuizmo.h>
+
 using namespace fe;
 
-void Renderer::create() {
+void Renderer::create(const vk::Extent2D& size, bool overlay) {
     commandPool = context.getCommandPool();
 
-    offscreen.extent = vk::Extent2D{ 512, 512 };
-    offscreen.create();
+    clearValues[1].depthStencil.depth = 1.0f;
+    clearValues[1].depthStencil.stencil = 0;
 
-    recreateSwapChain();
+    swapChain.create(size, false);
+
     createUniformBuffers();
     createDescriptorSets();
     createCommandBuffers();
+    if (overlay) {
+        createGui();
+    }
+
+    modelRenderer = new ModelRenderer( context, *this );
+    modelRenderer->create();
 }
 
 void Renderer::destroy() {
@@ -20,10 +30,14 @@ void Renderer::destroy() {
 
     offscreen.destroy();
 
+    gui.destroy();
+
     for (auto& buffer : uniformBuffers) {
         buffer.destroy();
     }
-    uniformBuffers.clear();
+
+    modelRenderer->destroy();
+    delete modelRenderer;
 
     swapChain.destroy();
 
@@ -32,7 +46,6 @@ void Renderer::destroy() {
     for (auto& allocator : dynamicAllocators) {
         allocator.destroy();
     }
-    dynamicAllocators.clear();
     globalAllocator.destroy();
 }
 
@@ -68,25 +81,47 @@ void Renderer::createCommandBuffers() {
     commandBuffers = context.allocateCommandBuffers(MAX_FRAMES_IN_FLIGHT);
 }
 
-void Renderer::recreateSwapChain() {
-    auto& window = Application::Instance().getWindow();
+void Renderer::createGui() {
+    offscreen.extent = swapChain.extent;
+    offscreen.create();
 
-    auto extent = window.getExtent();
+    // Setup default overlay creation info
+    vkx::ui::UIOverlayCreateInfo overlayCreateInfo;
+    overlayCreateInfo.renderPass = swapChain.renderPass;
+    overlayCreateInfo.size = swapChain.extent;
+    overlayCreateInfo.framebuffers = offscreen.framebuffers;
+    overlayCreateInfo.window = Application::Instance().getWindow();
+
+    ImGui::SetCurrentContext(ImGui::CreateContext());
+
+    gui.create(overlayCreateInfo);
+
+    for (auto& shader : overlayCreateInfo.shaders) {
+        context.device.destroyShaderModule(shader.module);
+        shader.module = vk::ShaderModule{};
+    }
+}
+
+void Renderer::recreateSwapChain() {
+    auto window = Application::Instance().getWindow();
+
+    auto extent = window->getExtent();
     while (extent.width == 0 || extent.height == 0) {
-        extent = window.getExtent();
-        window.waitEvents();
+        extent = window->getExtent();
+        window->waitEvents();
     }
 
-    context.queue.waitIdle();
+    //context.queue.waitIdle();
     context.device.waitIdle();
 
-    LOG_DEBUG << "swap chain out of date/suboptimal/window resized - recreating";
+    LOG_DEBUG << "swap chain recreating: [" << extent.width << ", " << extent.height << "]";
 
     swapChain.create(extent, false);
+    gui.resize(swapChain.extent);
 }
 
 uint32_t Renderer::beginFrame() {
-    assert(!isFrameStarted && "cannot call beginFrame while already in progress");
+    assert(!frameStarted && "cannot call beginFrame while already in progress");
 
     auto result = swapChain.acquireNextImage(currentImage);
 
@@ -109,39 +144,64 @@ uint32_t Renderer::beginFrame() {
         offscreen.commandBuffers[currentFrame].begin(beginInfo);
     }
 
-    isFrameStarted = true;
+    clearValues[0].color = vkx::util::clearColor({ color, 1.0f });
+
+    frameStarted = true;
 
     return currentFrame;
 }
 
 void Renderer::beginRenderPass(uint32_t frameIndex) {
-    assert(isFrameStarted && "cannot call beginRenderPass if frame is not in progress");
+    assert(frameStarted && "cannot call beginRenderPass if frame is not in progress");
     assert(frameIndex == currentFrame && "cannot start render pass on command buffer from a different frame");
 
-    clearValues[0].color = std::array<float, 4>{ color.x, color.y, color.z, 1 };
-    clearValues[1].depthStencil.depth = 1.0f;
-    clearValues[1].depthStencil.stencil = 0;
+    auto offset = vk::Offset2D{};
+    {
+        auto& extent = swapChain.extent;
+        vk::RenderPassBeginInfo renderPassInfo;
+        renderPassInfo.renderPass = swapChain.renderPass;
+        renderPassInfo.framebuffer = swapChain.framebuffers[currentImage];
+        renderPassInfo.renderArea.offset = offset;
+        renderPassInfo.renderArea.extent = extent;
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
 
-    setRenderPass(
-        commandBuffers[currentFrame],
-        swapChain.renderPass,
-        swapChain.framebuffers[currentImage],
-        swapChain.extent
-    );
+        vk::Rect2D scissor = vkx::util::rect2D(extent, offset);
+        vk::Viewport viewport = vkx::util::viewport(extent);
+
+        auto& commandBuffer = commandBuffers[currentFrame];
+        commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+        commandBuffer.setViewport(0, 1, &viewport);
+        commandBuffer.setScissor(0, 1, &scissor);
+    }
 
     if (offscreen.active) {
-        setRenderPass(
-            offscreen.commandBuffers[currentFrame],
-            offscreen.renderPass,
-            offscreen.framebuffers[currentFrame].framebuffer,
-            offscreen.extent
-        );
+        auto& extent = offscreen.extent;
+        vk::RenderPassBeginInfo renderPassInfo;
+        renderPassInfo.renderPass = offscreen.renderPass;
+        renderPassInfo.framebuffer = offscreen.framebuffers[currentFrame].framebuffer;
+        renderPassInfo.renderArea.offset = offset;
+        renderPassInfo.renderArea.extent = extent;
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vk::Rect2D scissor = vkx::util::rect2D(extent, offset);
+        vk::Viewport viewport = vkx::util::flippedViewport(extent);
+
+        auto& commandBuffer = offscreen.commandBuffers[currentFrame];
+        commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+        commandBuffer.setViewport(0, 1, &viewport);
+        commandBuffer.setScissor(0, 1, &scissor);
     }
 }
 
 void Renderer::endRenderPass(uint32_t frameIndex) {
-    assert(isFrameStarted && "cannot call endRenderPass if frame is not in progress");
+    assert(frameStarted && "cannot call endRenderPass if frame is not in progress");
     assert(frameIndex == currentFrame && "cannot end render pass on command buffer from a different frame");
+
+    if (gui.active) {
+        gui.draw(commandBuffers[currentFrame]);
+    }
 
     commandBuffers[currentFrame].endRenderPass();
     if (offscreen.active) {
@@ -150,22 +210,21 @@ void Renderer::endRenderPass(uint32_t frameIndex) {
 }
 
 void Renderer::endFrame(uint32_t frameIndex) {
-    assert(isFrameStarted && "cannot call endFrame if frame is not in progress");
+    assert(frameStarted && "cannot call endFrame if frame is not in progress");
     assert(frameIndex == currentFrame && "cannot end command buffer from a different frame");
 
-    vk::ArrayProxy<vk::CommandBuffer> buffers;
-    buffers.reserve(offscreen.active ? 2 : 1);
-
+    commandBuffers[currentFrame].end();
     if (offscreen.active) {
-        buffers.push_back(offscreen.commandBuffers[currentFrame]);
-    }
-    buffers.push_back(commandBuffers[currentFrame]);
-
-    for (auto& buffer : buffers) {
-        buffer.end();
+        offscreen.commandBuffers[currentFrame].end();
     }
 
-    auto result = swapChain.submitCommandBuffers(buffers, currentImage);
+    vk::Result result;
+    if (offscreen.active) {
+        result = swapChain.submitCommandBuffers({ offscreen.commandBuffers[currentFrame], commandBuffers[currentFrame] }, currentImage);
+    } else {
+        result = swapChain.submitCommandBuffers({ commandBuffers[currentFrame] }, currentImage);
+    }
+
 #if !defined(__ANDROID__)
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
         recreateSwapChain();
@@ -178,24 +237,23 @@ void Renderer::endFrame(uint32_t frameIndex) {
     }
 #endif
 
-    isFrameStarted = false;
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    frameStarted = false;
 }
 
-void Renderer::setRenderPass(const vk::CommandBuffer& commandBuffer, const vk::RenderPass& renderPass, const vk::Framebuffer& framebuffer, const vk::Extent2D& extent) {
-    auto offset = vk::Offset2D{0, 0};
+bool Renderer::beginGui(float dt) const {
+    if (!gui.active)
+        return false;
 
-    vk::RenderPassBeginInfo renderPassInfo;
-    renderPassInfo.renderPass = renderPass;
-    renderPassInfo.framebuffer = framebuffer;
-    renderPassInfo.renderArea.offset = offset;
-    renderPassInfo.renderArea.extent = extent;
-    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-    renderPassInfo.pClearValues = clearValues.data();
+    ImGuiIO& io = ImGui::GetIO();
+    io.DeltaTime = dt;
 
-    vk::Rect2D scissor = vkx::util::rect2D(extent, offset);
-    vk::Viewport viewport = vkx::util::viewport(extent);
-    commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-    commandBuffer.setViewport(0, 1, &viewport);
-    commandBuffer.setScissor(0, 1, &scissor);
+    ImGui::NewFrame();
+    ImGuizmo::BeginFrame();
+    return true;
+}
+
+void Renderer::endGui() {
+    ImGui::Render();
+    gui.update();
 }
