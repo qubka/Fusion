@@ -262,7 +262,7 @@ vk::Extent2D SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capab
 vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex) const {
     auto result = device.waitForFences(1, &inFlightFences[currentImage], VK_TRUE, UINT64_MAX);
     if (result != vk::Result::eSuccess) {
-        LOG_ERROR << "failed to wait for inFlightFences";
+        LOG_ERROR << "failed to wait for inFlightFences: " << to_string(result);
     }
 
     return device.acquireNextImageKHR(swapChain, UINT64_MAX, imageAvailableSemaphores[currentImage], nullptr, &imageIndex); /// use noexcept to handle OUT_OF_DATE
@@ -289,7 +289,7 @@ const vk::Fence& SwapChain::getSubmitFence(uint32_t imageIndex) {
     if (prev != nullptr) {
         auto result = device.waitForFences(1, prev, VK_TRUE, UINT64_MAX);
         if (result != vk::Result::eSuccess) {
-            LOG_ERROR << "failed to wait for imagesInFlight";
+            LOG_ERROR << "failed to wait for imagesInFlight" << to_string(result);
         }
     }
     imagesInFlight[imageIndex] = &next;

@@ -190,7 +190,7 @@ public:
         update();
         auto resultValue = device.createGraphicsPipeline(cache, pipelineCreateInfo);
         if (resultValue.result != vk::Result::eSuccess) {
-            throw std::runtime_error("Failed to create graphics pipeline");
+            throw std::runtime_error("Failed to create graphics pipeline: " + to_string(resultValue.result));
         }
         return resultValue.value;
     }

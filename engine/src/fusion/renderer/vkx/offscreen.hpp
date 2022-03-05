@@ -9,7 +9,7 @@ namespace vkx {
 struct Offscreen {
     const vkx::Context& context;
     vk::RenderPass renderPass;
-    vk::Extent2D extent;
+    vk::Extent2D size;
     std::vector<vk::Format> colorFormats{ vk::Format::eB8G8R8A8Unorm };
     // This value is chosen as an invalid default that signals that the code should pick a specific depth buffer
     // Alternative, you can set this to undefined to explicitly declare you want no depth buffer.
@@ -28,7 +28,7 @@ struct Offscreen {
 
     void create() {
         assert(!colorFormats.empty());
-        assert(extent != vk::Extent2D{});
+        assert(size != vk::Extent2D{});
 
         if (depthFormat == vk::Format::eR8Uscaled) {
             depthFormat = context.getSupportedDepthFormat();
@@ -41,7 +41,7 @@ struct Offscreen {
         }
 
         for (auto& framebuffer: framebuffers) {
-            framebuffer.create(context, extent, colorFormats, depthFormat, renderPass, attachmentUsage,depthAttachmentUsage);
+            framebuffer.create(context, size, colorFormats, depthFormat, renderPass, attachmentUsage,depthAttachmentUsage);
         }
 
         createSampler();

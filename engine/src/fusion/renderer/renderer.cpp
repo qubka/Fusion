@@ -82,7 +82,7 @@ void Renderer::createCommandBuffers() {
 }
 
 void Renderer::createGui() {
-    offscreen.extent = swapChain.extent;
+    offscreen.size = swapChain.extent;
     offscreen.create();
 
     // Setup default overlay creation info
@@ -134,7 +134,7 @@ uint32_t Renderer::beginFrame() {
 #endif
 
     if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR) {
-        throw std::runtime_error("Failed to acquire next image");
+        throw std::runtime_error("Failed to acquire next image: " + to_string(result));
     }
 
     vk::CommandBufferBeginInfo beginInfo{ vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
@@ -156,18 +156,19 @@ void Renderer::beginRenderPass(uint32_t frameIndex) {
     assert(frameIndex == currentFrame && "cannot start render pass on command buffer from a different frame");
 
     auto offset = vk::Offset2D{};
+    vk::RenderPassBeginInfo renderPassInfo;
+    renderPassInfo.renderArea.offset = offset;
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
     {
-        auto& extent = swapChain.extent;
-        vk::RenderPassBeginInfo renderPassInfo;
         renderPassInfo.renderPass = swapChain.renderPass;
         renderPassInfo.framebuffer = swapChain.framebuffers[currentImage];
-        renderPassInfo.renderArea.offset = offset;
-        renderPassInfo.renderArea.extent = extent;
-        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassInfo.pClearValues = clearValues.data();
 
-        vk::Rect2D scissor = vkx::util::rect2D(extent, offset);
-        vk::Viewport viewport = vkx::util::viewport(extent);
+        auto& size = swapChain.extent;
+        renderPassInfo.renderArea.extent = size;
+        vk::Rect2D scissor = vkx::util::rect2D(size, offset);
+        vk::Viewport viewport = vkx::util::viewport(size);
 
         auto& commandBuffer = commandBuffers[currentFrame];
         commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
@@ -176,17 +177,13 @@ void Renderer::beginRenderPass(uint32_t frameIndex) {
     }
 
     if (offscreen.active) {
-        auto& extent = offscreen.extent;
-        vk::RenderPassBeginInfo renderPassInfo;
         renderPassInfo.renderPass = offscreen.renderPass;
         renderPassInfo.framebuffer = offscreen.framebuffers[currentFrame].framebuffer;
-        renderPassInfo.renderArea.offset = offset;
-        renderPassInfo.renderArea.extent = extent;
-        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassInfo.pClearValues = clearValues.data();
 
-        vk::Rect2D scissor = vkx::util::rect2D(extent, offset);
-        vk::Viewport viewport = vkx::util::flippedViewport(extent);
+        auto& size = offscreen.size;
+        renderPassInfo.renderArea.extent = size;
+        vk::Rect2D scissor = vkx::util::rect2D(size, offset);
+        vk::Viewport viewport = vkx::util::flippedViewport(size);
 
         auto& commandBuffer = offscreen.commandBuffers[currentFrame];
         commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
@@ -199,11 +196,14 @@ void Renderer::endRenderPass(uint32_t frameIndex) {
     assert(frameStarted && "cannot call endRenderPass if frame is not in progress");
     assert(frameIndex == currentFrame && "cannot end render pass on command buffer from a different frame");
 
+    auto& commandBuffer = commandBuffers[currentFrame];
+
     if (gui.active) {
-        gui.draw(commandBuffers[currentFrame]);
+        gui.draw(commandBuffer);
     }
 
-    commandBuffers[currentFrame].endRenderPass();
+    commandBuffer.endRenderPass();
+
     if (offscreen.active) {
         offscreen.commandBuffers[currentFrame].endRenderPass();
     }
@@ -213,27 +213,28 @@ void Renderer::endFrame(uint32_t frameIndex) {
     assert(frameStarted && "cannot call endFrame if frame is not in progress");
     assert(frameIndex == currentFrame && "cannot end command buffer from a different frame");
 
-    commandBuffers[currentFrame].end();
-    if (offscreen.active) {
-        offscreen.commandBuffers[currentFrame].end();
-    }
+    auto& commandBuffer = commandBuffers[currentFrame];
+    commandBuffer.end();
 
     vk::Result result;
     if (offscreen.active) {
-        result = swapChain.submitCommandBuffers({ offscreen.commandBuffers[currentFrame], commandBuffers[currentFrame] }, currentImage);
+        auto& offBuffer = offscreen.commandBuffers[currentFrame];
+        offBuffer.end();
+
+        result = swapChain.submitCommandBuffers({ offBuffer, commandBuffer }, currentImage);
     } else {
-        result = swapChain.submitCommandBuffers({ commandBuffers[currentFrame] }, currentImage);
+        result = swapChain.submitCommandBuffers(commandBuffer, currentImage);
     }
 
 #if !defined(__ANDROID__)
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
         recreateSwapChain();
     } else if (result != vk::Result::eSuccess) {
-        throw std::runtime_error("Failed to present swap chain image");
+        throw std::runtime_error("Failed to present swap chain image: " + to_string(result));
     }
 #else
     if (result != vk::Result::eSuccess) {
-        throw std::runtime_error("Failed to present swap chain image");
+        throw std::runtime_error("Failed to present swap chain image: " + to_string(result));
     }
 #endif
 
