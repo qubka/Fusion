@@ -52,8 +52,8 @@ struct FramebufferAttachment : public vkx::Image {
 };
 
 /**
-        * @brief Describes the attributes of an attachment to be created
-        */
+ * @brief Describes the attributes of an attachment to be created
+ */
 struct AttachmentCreateInfo {
     uint32_t layerCount{ 1 };
     vk::Format format{ vk::Format::eR8G8B8A8Unorm };
@@ -61,8 +61,8 @@ struct AttachmentCreateInfo {
 };
 
 /**
-* @brief Encapsulates a complete Vulkan framebuffer with an arbitrary number and combination of attachments
-*/
+ * @brief Encapsulates a complete Vulkan framebuffer with an arbitrary number and combination of attachments
+ */
 struct Framebuffer {
 public:
     const vkx::Context& context;
@@ -74,10 +74,10 @@ public:
     std::vector<vkx::FramebufferAttachment> attachments;
 
     /**
-                * Default constructor
-                *
-                * @param vulkanDevice Pointer to a valid VulkanDevice
-                */
+     * Default constructor
+     *
+     * @param vulkanDevice Pointer to a valid VulkanDevice
+     */
     Framebuffer(const vkx::Context& context)
         : context(context) {}
 

@@ -11,8 +11,6 @@
 #include "fusion/utils/process_info.hpp"
 #include "fusion/renderer/renderer.hpp"
 
-#include <imgui/imgui.h>
-
 namespace fe {
     class EditorApp;
     class EditorLayer : public Layer {
@@ -41,7 +39,7 @@ namespace fe {
         SceneHierarchyPanel sceneHierarchyPanel;
         ContentBrowserPanel contentBrowserPanel;
 
-        int gizmoType = -1;
+        int gizmoType{ -1 };
         enum class SceneState { Edit = 0, Play = 1 };
         SceneState sceneState = SceneState::Edit;
 

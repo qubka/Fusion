@@ -30,7 +30,7 @@ Also note that the scale of the models is not unified, so the general scale may 
 
 
 ## Vulkan scene
-<img src="./images/vulkanscene.png" alt="Vulkan Scene" width="192px">
+<img src="./descriptorSets/vulkanscene.png" alt="Vulkan Scene" width="192px">
 
 A test scene with a high triangle count made up by all the single models listed here, see the model descriptions for details.
 
@@ -40,7 +40,7 @@ If you plan on using this for anything public I'd love know, sp please let me kn
 
 
 ## Vulkan Logo
-<img src="./images/vulkanlogo.png" alt="Vulkan logo" width="192px">
+<img src="./descriptorSets/vulkanlogo.png" alt="Vulkan logo" width="192px">
 
 A 3D rendition of the official Vulkan(tm) Logo. I made this based on the 2D logo, please note that it's not 100% perfect, e.g. the arc is slightly different.
 
@@ -49,7 +49,7 @@ A 3D rendition of the official Vulkan(tm) Logo. I made this based on the 2D logo
 Triangle count : 4,348
 
 ## Angry teapot
-<img src="./images/angryteapot.png" alt="Angry teapot" width="192px">
+<img src="./descriptorSets/angryteapot.png" alt="Angry teapot" width="192px">
 
 Pretty much what it's name suggests. It's an angry teapot, based on the one from the (first) Vulkan T-Shirt Logo.
 
@@ -60,9 +60,9 @@ Made by me from scratch. Just some teapot with angry looking eyes.
 Triangle count : 5,564
 
 ## Hamardillo
-<img src="./images/hammardillo.png" alt="Angry teapot" width="192px">
+<img src="./descriptorSets/hammardillo.png" alt="Angry teapot" width="192px">
 
-Based on the Stanford Armadillo : http://graphics.stanford.edu/data/3Dscanrep/
+Based on the Stanford Armadillo : http://graphics.stanford.edu/arguments/3Dscanrep/
 
 Since the mode is not rigged, I had to manually change arm and hand rotations and positions, so the seams are not perfect.
 I also added some black eyes, a nose ring and a skull-crushing hammer to emphasize it's attitude over high driver overhead.
@@ -70,20 +70,20 @@ I also added some black eyes, a nose ring and a skull-crushing hammer to emphasi
 Triangle count : 91,956
 
 ## Chinese dragon
-<img src="./images/chinesedragon.png" alt="Chinese dragon" width="192px">
+<img src="./descriptorSets/chinesedragon.png" alt="Chinese dragon" width="192px">
 
-Based on the Stanford Dragon : http://graphics.stanford.edu/data/3Dscanrep/
+Based on the Stanford Dragon : http://graphics.stanford.edu/arguments/3Dscanrep/
 
-(Please read their note on [inappropriate uses for this model](http://graphics.stanford.edu/data/3Dscanrep/#uses))
+(Please read their note on [inappropriate uses for this model](http://graphics.stanford.edu/arguments/3Dscanrep/#uses))
 
 I did some optimizations on the model to lower the triangle count without loosing too mich detail and put some spheres in for the eyes and under the claw to make them pop out a bit more.
 
 Triangle count : 102,880
 
 ## Tactical bunny
-<img src="./images/tacticalbunny.png" alt="Chinese dragon" width="192px">
+<img src="./descriptorSets/tacticalbunny.png" alt="Chinese dragon" width="192px">
 
-Based on the Stanford Bunny : http://graphics.stanford.edu/data/3Dscanrep/
+Based on the Stanford Bunny : http://graphics.stanford.edu/arguments/3Dscanrep/
 
 Reduces vertex count, added some angry eyes (the one's from the angry teapot) and added a tactical helmet, so you get a bunny ready to take down some terrorists here.
 

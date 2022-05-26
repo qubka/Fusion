@@ -25,22 +25,22 @@ void hashCombine(std::size_t& seed, const T& v, const Rest&... rest) {
 };
 
 namespace vec3 {
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 right{1.0f,0.0f,0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 left{-1.0f,0.0f,0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 up{0.0f,1.0f,0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 down{0.0f,-1.0f,0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 forward {0.0f,0.0f,1.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 back{0.0f,0.0f,-1.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 zero{0.0f,0.0f,0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 right{1.0f, 0.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 left{-1.0f, 0.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 up{0.0f, 1.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 down{0.0f, -1.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 forward {0.0f, 0.0f, 1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 back{0.0f ,0.0f, -1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 zero{0.0f, 0.0f, 0.0f};
 }
 namespace vec2 {
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 right{1.0f,0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 left{-1.0f,0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 up{0.0f,1.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 down{0.0f,-1.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 zero{0.0f,0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 right{1.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 left{-1.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 up{0.0f, 1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 down{0.0f, -1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 zero{0.0f, 0.0f};
 }
 namespace quat {
-    GLM_INLINE GLM_CONSTEXPR glm::quat identity{ 1.0f, 0.0f, 0.0f, 0.0f };
-    GLM_INLINE GLM_CONSTEXPR glm::quat y_1800{ 0.0f, 0.0f, 1.0f, 0.0f };
+    GLM_INLINE GLM_CONSTEXPR glm::quat identity{1.0f, 0.0f, 0.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::quat y_1800{0.0f, 0.0f, 1.0f, 0.0f};
 }

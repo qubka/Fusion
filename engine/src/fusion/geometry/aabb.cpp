@@ -4,7 +4,7 @@
 
 using namespace fe;
 
-AABB::AABB() : center{0}, extents{0} {
+AABB::AABB() : center{0.0f}, extents{0.0f} {
 
 }
 

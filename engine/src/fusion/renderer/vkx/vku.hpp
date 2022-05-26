@@ -605,7 +605,7 @@ public:
         file.seekg(0, std::ios::end);
         int length = static_cast<int>(file.tellg());
 
-        s.opcodes_.resize((size_t)(length / 4));
+        s.opcodes_.resize(static_cast<size_t>(length / 4));
         file.seekg(0, std::ios::beg);
         file.read((char*)s.opcodes_.data(), s.opcodes_.size() * 4);
 
@@ -1184,7 +1184,7 @@ public:
     /// For a host buffer, copy memory to the buffer object.
     void updateLocal(const vk::Device& device, const void* value, vk::DeviceSize size) const {
         void* ptr = device.mapMemory(*mem_, 0, size_, vk::MemoryMapFlags{});
-        memcpy(ptr, value, (size_t)size);
+        memcpy(ptr, value, static_cast<size_t>(size));
         flush(device);
         device.unmapMemory(*mem_);
     }

@@ -37,7 +37,7 @@ void Scene::onRenderEditor() {
     auto group = registry.group<TransformComponent>(entt::get<ModelComponent>);
     for (auto entity : group) {
         auto [transform, model] = group.get<TransformComponent, ModelComponent>(entity);
-        renderer.draw(transform);
+        renderer.draw(transform.invTransform());
     }
 
     renderer.end();

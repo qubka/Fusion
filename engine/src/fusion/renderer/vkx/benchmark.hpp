@@ -12,19 +12,19 @@ namespace vkx
 {
     class Benchmark {
     private:
-        FILE *stream;
+        FILE* stream;
         vk::PhysicalDeviceProperties deviceProps;
     public:
-        bool active = false;
-        bool outputFrameTimes = false;
-        int outputFrames = -1; // -1 means no frames limit
-        uint32_t warmup = 1;
-        uint32_t duration = 10;
+        bool active{ false };
+        bool outputFrameTimes{ false };
+        int outputFrames{ -1 }; // -1 means no frames limit
+        uint32_t warmup{ 1 };
+        uint32_t duration{ 10 };
         std::vector<double> frameTimes;
-        std::string filename = "";
+        std::string filename;
 
-        double runtime = 0.0;
-        uint32_t frameCount = 0;
+        double runtime{ 0.0 };
+        uint32_t frameCount{ 0 };
 
         void run(std::function<void()> renderFunc, const vk::PhysicalDeviceProperties& props) {
             active = true;
@@ -80,6 +80,7 @@ namespace vkx
                     for (size_t i = 0; i < frameTimes.size(); i++) {
                         result << i << "," << frameTimes[i] << "\n";
                     }
+
                     double tMin = *std::min_element(frameTimes.begin(), frameTimes.end());
                     double tMax = *std::max_element(frameTimes.begin(), frameTimes.end());
                     double tAvg = std::accumulate(frameTimes.begin(), frameTimes.end(), 0.0) / (double)frameTimes.size();

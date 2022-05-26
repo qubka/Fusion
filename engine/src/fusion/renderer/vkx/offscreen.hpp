@@ -2,8 +2,7 @@
 
 #include "context.hpp"
 #include "framebuffer.hpp"
-
-#include <backends/imgui_impl_vulkan.h>
+#include "ui.hpp"
 
 namespace vkx {
 struct Offscreen {
@@ -15,6 +14,7 @@ struct Offscreen {
     // Alternative, you can set this to undefined to explicitly declare you want no depth buffer.
     vk::Format depthFormat{ vk::Format::eR8Uscaled };
     std::vector<vkx::Framebuffer> framebuffers{ MAX_FRAMES_IN_FLIGHT };
+    std::vector<vk::DescriptorSet> descriptorSets;
     std::vector<vk::CommandBuffer> commandBuffers;
     vk::ImageUsageFlags attachmentUsage{ vk::ImageUsageFlagBits::eSampled };
     vk::ImageUsageFlags depthAttachmentUsage{ vk::ImageUsageFlagBits::eDepthStencilAttachment };
@@ -26,7 +26,7 @@ struct Offscreen {
     Offscreen(const vkx::Context& context)
             : context{ context } {}
 
-    void create() {
+    void create(vkx::ui::UIOverlay& ui) {
         assert(!colorFormats.empty());
         assert(size != vk::Extent2D{});
 
@@ -34,17 +34,25 @@ struct Offscreen {
             depthFormat = context.getSupportedDepthFormat();
         }
 
-        commandBuffers = context.allocateCommandBuffers(MAX_FRAMES_IN_FLIGHT);
-
         if (!renderPass) {
             createRenderPass();
         }
 
+        commandBuffers = context.allocateCommandBuffers(MAX_FRAMES_IN_FLIGHT);
+
         for (auto& framebuffer: framebuffers) {
-            framebuffer.create(context, size, colorFormats, depthFormat, renderPass, attachmentUsage,depthAttachmentUsage);
+            framebuffer.create(context, size, colorFormats, depthFormat, renderPass, attachmentUsage, depthAttachmentUsage);
         }
 
         createSampler();
+
+        assert(framebuffers[0].colors.size() == 1);
+
+        descriptorSets.reserve(MAX_FRAMES_IN_FLIGHT);
+        for (auto& framebuffer : framebuffers) {
+            auto& image = framebuffer.colors[0];
+            descriptorSets.push_back(ui.addTexture(image.sampler, image.view, colorFinalLayout));
+        }
 
         active = true;
     }
@@ -61,6 +69,7 @@ struct Offscreen {
     }
 
 protected:
+
     void createSampler() {
         // Create sampler
         vk::SamplerCreateInfo sampler;

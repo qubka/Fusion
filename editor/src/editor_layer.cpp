@@ -1,9 +1,5 @@
 #include "editor_layer.hpp"
 #include "fusion/core/application.hpp"
-/*#include "fusion/renderer/texture.hpp"
-#include "fusion/renderer/renderer.hpp"
-#include "fusion/renderer/offscreen.hpp"
-#include "fusion/renderer/allocatedbuffer.hpp"*/
 #include "fusion/utils/math.hpp"
 #include "fusion/scene/components.hpp"
 #include "fusion/input/input.hpp"
@@ -68,11 +64,13 @@ void EditorLayer::onUpdate(float dt) {
         if (Input::GetKeyDown(Key::Q)) {
             gizmoType = -1;
         } else if (Input::GetKeyDown(Key::W)) {
-            gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+            gizmoType = ImGuizmo::TRANSLATE;
         } else if (Input::GetKeyDown(Key::E)) {
-            gizmoType = ImGuizmo::OPERATION::ROTATE;
+            gizmoType = ImGuizmo::ROTATE;
         } else if (Input::GetKeyDown(Key::R)) {
-            gizmoType = ImGuizmo::OPERATION::SCALE;
+            gizmoType = ImGuizmo::SCALE;
+        } else if (Input::GetKeyDown(Key::T)) {
+            gizmoType = ImGuizmo::UNIVERSAL;
         }
     }
 }
@@ -82,7 +80,7 @@ void EditorLayer::onRender(Renderer& renderer) {
     GlobalUbo ubo{};
     ubo.projection = editorCamera.getProjection();
     ubo.view = editorCamera.getView();
-    ubo.lightDirection = renderer.getLightDirection();
+    ubo.lightDirection = -renderer.getLightDirection();
     auto& buffer = renderer.getCurrentUniformBuffer();
     buffer.copy(ubo);
     buffer.flush();
@@ -102,13 +100,12 @@ void EditorLayer::onRender(Renderer& renderer) {
 void EditorLayer::onImGui() {
     // Note: Switch this to true to enable dockspace
     static bool opt_fullscreen_persistant = true;
-    bool opt_fullscreen = opt_fullscreen_persistant;
     static ImGuiDockNodeFlags dockspace_flags = 0;//ImGuiDockNodeFlags_PassthruCentralNode;
 
     // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
     // because it would be confusing to have two docking targets within each others.
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-    if (opt_fullscreen) {
+    if (opt_fullscreen_persistant) {
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->Pos);
         ImGui::SetNextWindowSize(viewport->Size);
@@ -134,20 +131,15 @@ void EditorLayer::onImGui() {
     ImGui::Begin("DockSpace Demo", nullptr, window_flags);
     ImGui::PopStyleVar();
 
-    if (opt_fullscreen)
+    if (opt_fullscreen_persistant)
         ImGui::PopStyleVar(2);
 
     // DockSpace
     ImGuiIO& io = ImGui::GetIO();
-    ImGuiStyle& style = ImGui::GetStyle();
-    float minWinSizeX = style.WindowMinSize.x;
-    style.WindowMinSize.x = 370;
     if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
         ImGuiID dockspace = ImGui::GetID("HUB_DockSpace");
         ImGui::DockSpace(dockspace, {0, 0}, dockspace_flags);
     }
-
-    style.WindowMinSize.x = minWinSizeX;
 
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
@@ -229,18 +221,18 @@ void EditorLayer::onImGui() {
     viewportHovered = ImGui::IsWindowHovered();
     //context.getUI().blockEvents(!viewportFocused && !viewportHovered);
 
-    ImGui::Image(context.getCurrentFrameImage(), viewportPanelSize, { 0, 1 }, { 1, 0 });
+    ImGui::Image(context.getRenderer().getCurrentFrameImage(), viewportPanelSize, { 0, 1 }, { 1, 0 });
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
             const auto path = static_cast<const wchar_t*>(payload->Data);
-            openScene(std::filesystem::path(fe::getAssetPath()) / path);
+            openScene(std::filesystem::path(getAssetPath()) / path);
         }
         ImGui::EndDragDropTarget();
     }
 
     // Gizmos
-    auto selectedEntity = sceneHierarchyPanel.getSelectedEntity();
+    entt::entity selectedEntity = sceneHierarchyPanel.getSelectedEntity();
     if (selectedEntity != entt::null && gizmoType != -1) {
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist();
@@ -250,46 +242,44 @@ void EditorLayer::onImGui() {
         // Camera
 
         // Runtime camera from entity
-        // auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-        // const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-        // const glm::mat4& cameraProjection = camera.GetProjection();
-        // glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+        glm::mat4& cameraView = editorCamera.getView();
+        const glm::mat4& cameraProjection = editorCamera.getProjection();
 
         // Entity transform
         auto& component = activeScene->registry.get<TransformComponent>(selectedEntity);
-        glm::mat4 transform = component;
+        glm::mat4 transform = component.transform();
 
         // Snapping
         bool snap = Input::GetKey(Key::LeftControl);
         float snapValue = 0.5f; // Snap to 0.5m for translation/scale
         // Snap to 45 degrees for rotation
-        if (gizmoType == ImGuizmo::OPERATION::ROTATE)
+        if (gizmoType == ImGuizmo::ROTATE)
             snapValue = 45.0f;
-
         float snapValues[3] = { snapValue, snapValue, snapValue };
 
-        // Imguimo fix for Vulkan projection
-        auto cameraView = glm::lookAtLH(editorCamera.getPosition(), -editorCamera.getForward(), -editorCamera.getUp());
-        auto cameraProjection = glm::perspectiveLH(
-                glm::radians(editorCamera.getFov()),
-                editorCamera.getAspect(),
-                editorCamera.getNearClip(),
-                editorCamera.getFarClip());
-
-        /*const glm::mat4& cameraProjection = editorCamera.getProjection();
-        glm::mat4 cameraView = editorCamera.getView();*/
+        // Bounding
+        bool bound = Input::GetKey(Key::LeftShift);
+        static float boundsSnap[] = { 0.1f, 0.1f, 0.1f };
+        static float boundsValues[6] = { -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f };
+        /*if (auto bounds = activeScene->registry.try_get<BoundsComponent>(selectedEntity)) {
+            boundsValues = {bounds->min.x, bounds->min.y, bounds->min.z, bounds->max.x, bounds->max.y, bounds->max.z};
+        }*/
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                             (ImGuizmo::OPERATION)gizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
-                             nullptr, snap ? snapValues : nullptr);
+                             static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform),
+                             nullptr, snap ? snapValues : nullptr, bound ? boundsValues : nullptr, bound ? boundsSnap : nullptr);
+
+        //ImGuizmo::ViewManipulate(glm::value_ptr(cameraView), editorCamera.getDistance(), {maxBounds.x - 128, minBounds.y}, {128, 128}, 0x10101010);
 
         if (ImGuizmo::IsUsing()) {
             glm::vec3 translation, rotation, scale;
             glm::decompose(transform, translation, rotation, scale);
 
             glm::vec3 deltaRotation = rotation - component.rotation;
+
             component.translation = translation;
-            component.rotation += deltaRotation;
+            if (!glm::any(glm::isnan(deltaRotation)))
+                component.rotation += deltaRotation;
             component.scale = scale;
         }
     }
@@ -354,11 +344,12 @@ void EditorLayer::UI_Toolbar() {
     float size = ImGui::GetWindowHeight() - 4.0f;
     ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
     if (ImGui::Button(sceneState == SceneState::Edit ? "\uF04B" : "\uF04D", {size, size})) {
-        /*if (sceneState == SceneState::Edit)
-            onScenePlay();
+        if (sceneState == SceneState::Edit)
+            sceneState = SceneState::Play;
         else if (sceneState == SceneState::Play)
-            onSceneStop();*/
+            sceneState = SceneState::Edit;
     }
+
     ImGui::PopStyleVar(2);
     ImGui::PopStyleColor(3);
     ImGui::End();

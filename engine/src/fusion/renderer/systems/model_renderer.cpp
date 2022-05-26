@@ -28,36 +28,19 @@ void ModelRenderer::createPipelineLayout() {
 
 void ModelRenderer::createPipeline() {
     vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ context.device, pipelineLayout, renderer.getDrawRenderPass() };
-    pipelineBuilder.rasterizationState.frontFace = vk::FrontFace::eClockwise;
+    pipelineBuilder.rasterizationState.frontFace = vk::FrontFace::eCounterClockwise;
 
-    vkx::model::VertexLayout vertexLayout{ {
-           vkx::model::Component::Position,
-           vkx::model::Component::Normal,
-           vkx::model::Component::UV,
-           vkx::model::Component::Color,
-   } };
-
-    model.loadFromFile(context, getAssetPath() + "/models/vulkanscenemodels.dae", vertexLayout);
+    model.loadFromFile(context, getAssetPath() + "/models/vulkanscenemodels.dae");
 
     // Binding description
-    pipelineBuilder.vertexInputState.bindingDescriptions = { { 0, vertexLayout.stride(), vk::VertexInputRate::eVertex } };
-    pipelineBuilder.vertexInputState.attributeDescriptions = {
-        // Location 0 : Position
-        { 0, 0, vk::Format::eR32G32B32Sfloat, 0 },
-        // Location 1 : Normal
-        { 1, 0, vk::Format::eR32G32B32Sfloat, sizeof(float) * 3 },
-        // Location 2 : Texture coordinates
-        { 2, 0, vk::Format::eR32G32Sfloat, sizeof(float) * 6 },
-        // Location 3 : Color
-        { 3, 0, vk::Format::eR32G32B32Sfloat, sizeof(float) * 8 },
-    };
+    pipelineBuilder.vertexInputState.appendVertexLayout(model.layout, 0, vk::VertexInputRate::eVertex);
 
     // Attribute descriptions
 
     // vk::Pipeline for the meshes (armadillo, bunny, etc.)
     // Load shaders
-    pipelineBuilder.loadShader(getAssetPath() + "/shaders/test/mesh.vert.spv", vk::ShaderStageFlagBits::eVertex);
-    pipelineBuilder.loadShader(getAssetPath() + "/shaders/test/mesh.frag.spv", vk::ShaderStageFlagBits::eFragment);
+    pipelineBuilder.loadShader(getAssetPath() + "/shaders/vulkanscene/mesh.vert.spv", vk::ShaderStageFlagBits::eVertex);
+    pipelineBuilder.loadShader(getAssetPath() + "/shaders/vulkanscene/mesh.frag.spv", vk::ShaderStageFlagBits::eFragment);
     pipeline = pipelineBuilder.create(context.pipelineCache);
 }
 
@@ -66,7 +49,7 @@ void ModelRenderer::begin() {
 
     commandBuffer = &renderer.getCurrentCommandBuffer();
 
-    std::array<vk::DescriptorSet, 1> descriptorSets { renderer.getCurrentGlobalDescriptorSets() };
+    std::array<vk::DescriptorSet, 1> descriptorSets{ renderer.getCurrentGlobalDescriptorSets() };
 
     commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
     commandBuffer->bindDescriptorSets(

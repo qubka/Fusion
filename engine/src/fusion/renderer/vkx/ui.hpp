@@ -14,8 +14,6 @@
 
 #include "fusion/core/window.hpp"
 
-#include <imgui/imgui.h>
-
 #ifdef __ANDROID__
 #include <android/native_activity.h>
 #endif
@@ -24,11 +22,10 @@ namespace vkx { namespace ui {
 
 struct UIOverlayCreateInfo {
     vk::RenderPass renderPass;
-    std::vector<vkx::Framebuffer> framebuffers;
-    vk::Format colorFormat{ vk::Format::eB8G8R8A8Unorm };
-    vk::Format depthFormat{ vk::Format::eUndefined };
     vk::Extent2D size;
     std::vector<vk::PipelineShaderStageCreateInfo> shaders;
+    vk::Format colorFormat{ vk::Format::eB8G8R8A8Unorm };
+    vk::Format depthFormat{ vk::Format::eUndefined };
     vk::SampleCountFlagBits rasterizationSamples{ vk::SampleCountFlagBits::e1 };
     uint32_t subpassCount{ 1 };
     uint32_t attachmentCount{ 1 };
@@ -49,12 +46,11 @@ private:
     vk::PipelineLayout pipelineLayout;
     vk::Pipeline pipeline;
     vk::RenderPass renderPass;
-    std::vector<ImTextureID> frameImages;
 
     vkx::Image font;
 
     fe::Window* currentWindow{ nullptr };
-    ImVec2 lastValidMousePos{ -FLT_MAX, -FLT_MAX };
+    glm::vec2 lastValidMousePos{ -FLT_MAX };
 
     struct PushConstBlock {
         glm::vec2 scale;
@@ -93,16 +89,6 @@ public:
 
     void resize(const vk::Extent2D& size);
 
-    ImTextureID addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const;
-    ImTextureID getFrameImage(uint32_t i) {
-        return frameImages[i];
-    }
-
-#if defined GLFW_INCLUDE_VULKAN
-private:
-    static void UpdateKeyModifiers(int mods);
-    static int TranslateUntranslatedKey(int key, int scancode);
-    static ImGuiKey KeyToImGuiKey(int key);
-#endif
-        };
+    vk::DescriptorSet addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const;
+};
 }}  // namespace vkx::ui

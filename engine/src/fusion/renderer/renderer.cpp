@@ -21,8 +21,7 @@ void Renderer::create(const vk::Extent2D& size, bool overlay) {
         createGui();
     }
 
-    modelRenderer = new ModelRenderer( context, *this );
-    modelRenderer->create();
+    modelRenderer = new ModelRenderer(context, *this);
 }
 
 void Renderer::destroy() {
@@ -36,7 +35,6 @@ void Renderer::destroy() {
         buffer.destroy();
     }
 
-    modelRenderer->destroy();
     delete modelRenderer;
 
     swapChain.destroy();
@@ -66,7 +64,7 @@ void Renderer::createDescriptorSets() {
         auto& descriptorAllocator = dynamicAllocators.emplace_back(context.device);
         vkx::DescriptorBuilder{descriptorLayoutCache, descriptorAllocator}
             // Binding 0 : Vertex shader uniform buffer
-            .bindBuffer(0, &uniformBuffers[i].descriptor, vk::DescriptorType::eUniformBuffer,vk::ShaderStageFlagBits::eVertex)
+            .bindBuffer(0, &uniformBuffers[i].descriptor, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eVertex)
             .build(globalDescriptorSets[i], globalDescriptorSetLayout);
     }
 
@@ -82,14 +80,10 @@ void Renderer::createCommandBuffers() {
 }
 
 void Renderer::createGui() {
-    offscreen.size = swapChain.extent;
-    offscreen.create();
-
     // Setup default overlay creation info
     vkx::ui::UIOverlayCreateInfo overlayCreateInfo;
     overlayCreateInfo.renderPass = swapChain.renderPass;
     overlayCreateInfo.size = swapChain.extent;
-    overlayCreateInfo.framebuffers = offscreen.framebuffers;
     overlayCreateInfo.window = Application::Instance().getWindow();
 
     ImGui::SetCurrentContext(ImGui::CreateContext());
@@ -100,6 +94,9 @@ void Renderer::createGui() {
         context.device.destroyShaderModule(shader.module);
         shader.module = vk::ShaderModule{};
     }
+
+    offscreen.size = swapChain.extent;
+    offscreen.create(gui);
 }
 
 void Renderer::recreateSwapChain() {
@@ -117,7 +114,10 @@ void Renderer::recreateSwapChain() {
     LOG_DEBUG << "swap chain recreating: [" << extent.width << ", " << extent.height << "]";
 
     swapChain.create(extent, false);
-    gui.resize(swapChain.extent);
+
+    if (gui.active) {
+        gui.resize(swapChain.extent);
+    }
 }
 
 uint32_t Renderer::beginFrame() {
@@ -183,7 +183,7 @@ void Renderer::beginRenderPass(uint32_t frameIndex) {
         auto& size = offscreen.size;
         renderPassInfo.renderArea.extent = size;
         vk::Rect2D scissor = vkx::util::rect2D(size, offset);
-        vk::Viewport viewport = vkx::util::flippedViewport(size);
+        vk::Viewport viewport = vkx::util::viewport(size);
 
         auto& commandBuffer = offscreen.commandBuffers[currentFrame];
         commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
@@ -251,6 +251,7 @@ bool Renderer::beginGui(float dt) const {
 
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
+
     return true;
 }
 

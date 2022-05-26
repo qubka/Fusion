@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-Ray::Ray() : origin{0}, direction{0} {
+Ray::Ray() : origin{0.0f}, direction{0.0f} {
 }
 
 Ray::Ray(const glm::vec3& origin, const glm::vec3& direction) : origin{origin}, direction{direction} {

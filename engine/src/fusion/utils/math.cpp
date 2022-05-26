@@ -5,33 +5,33 @@ namespace glm {
         // From glm::decompose in matrix_decompose.inl
         using T = float;
 
-        mat4 LocalMatrix(transform);
+        mat4 localMatrix{ transform };
 
         // Normalize the matrix.
-        if (epsilonEqual(LocalMatrix[3][3], static_cast<float>(0), epsilon<T>()))
+        if (epsilonEqual(localMatrix[3][3], static_cast<float>(0), epsilon<T>()))
             return false;
 
         // First, isolate perspective.  This is the messiest.
         if (
-                epsilonNotEqual(LocalMatrix[0][3], static_cast<T>(0), epsilon<T>()) ||
-                epsilonNotEqual(LocalMatrix[1][3], static_cast<T>(0), epsilon<T>()) ||
-                epsilonNotEqual(LocalMatrix[2][3], static_cast<T>(0), epsilon<T>()))
+                epsilonNotEqual(localMatrix[0][3], static_cast<T>(0), epsilon<T>()) ||
+                epsilonNotEqual(localMatrix[1][3], static_cast<T>(0), epsilon<T>()) ||
+                epsilonNotEqual(localMatrix[2][3], static_cast<T>(0), epsilon<T>()))
         {
             // Clear the perspective partition
-            LocalMatrix[0][3] = LocalMatrix[1][3] = LocalMatrix[2][3] = static_cast<T>(0);
-            LocalMatrix[3][3] = static_cast<T>(1);
+            localMatrix[0][3] = localMatrix[1][3] = localMatrix[2][3] = static_cast<T>(0);
+            localMatrix[3][3] = static_cast<T>(1);
         }
 
         // Next take care of translation (easy).
-        translation = vec3{LocalMatrix[3]};
-        LocalMatrix[3] = vec4{0, 0, 0, LocalMatrix[3].w};
+        translation = vec3{ localMatrix[3]};
+        localMatrix[3] = vec4{ 0, 0, 0, localMatrix[3].w};
 
         vec3 Row[3], Pdum3;
 
         // Now get scale and shear.
         for (length_t i = 0; i < 3; ++i)
             for (length_t j = 0; j < 3; ++j)
-                Row[i][j] = LocalMatrix[i][j];
+                Row[i][j] = localMatrix[i][j];
 
         // Compute X scale factor and normalize first row.
         scale.x = length(Row[0]);
@@ -72,16 +72,16 @@ namespace glm {
 
     // Gradually changes a vector towards a desired goal over time.
     glm::vec3 smoothdamp(const glm::vec3& current, const glm::vec3& target, glm::vec3& currentVelocity, float smoothTime, float maxSpeed, float deltaTime) {
-        glm::vec3 output{0};
+        vec3 output{ 0.0f };
 
         // Based on Game Programming Gems 4 Chapter 1.10
         smoothTime = std::max(0.0001f, smoothTime);
-        float omega = 2 / smoothTime;
+        float omega = 2.0f / smoothTime;
 
         float x = omega * deltaTime;
-        float exp = 1 / (1 + x + 0.48f * x * x + 0.235f * x * x * x);
+        float exp = 1.0f / (1.0f + x + 0.48f * x * x + 0.235f * x * x * x);
 
-        glm::vec3 change {current - target};
+        vec3 change {current - target};
 
         // Clamp maximum speed
         float maxChange = maxSpeed * smoothTime;
@@ -92,19 +92,19 @@ namespace glm {
             change /= std::sqrt(sqrMag) * maxChange;
         }
 
-        glm::vec3 dest { current - change };
+        vec3 dest { current - change };
 
-        glm::vec3 temp { (currentVelocity + omega * change) * deltaTime };
+        vec3 temp { (currentVelocity + omega * change) * deltaTime };
 
         currentVelocity = (currentVelocity - omega * temp) * exp;
 
         output = dest + (change + temp) * exp;
 
         // Prevent overshooting
-        glm::vec3 origMinusCurrent {target - current};
-        glm::vec3 outMinusOrig {output - target};
+        vec3 origMinusCurrent {target - current};
+        vec3 outMinusOrig {output - target};
 
-        if (glm::dot(origMinusCurrent, outMinusOrig) > 0) {
+        if (dot(origMinusCurrent, outMinusOrig) > 0) {
             output = target;
             currentVelocity = {};
         }

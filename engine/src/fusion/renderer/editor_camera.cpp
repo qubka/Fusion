@@ -34,13 +34,13 @@ void EditorCamera::update(float dt) {
 void EditorCamera::mousePan(const glm::vec2& delta) {
     auto speed = panSpeed();
     focalPoint += right * delta.x * speed.x * distance;
-    focalPoint -= up * delta.y * speed.y * distance;
+    focalPoint += up * delta.y * speed.y * distance;
 }
 
 void EditorCamera::mouseRotate(const glm::vec2& delta) {
     float yawSign = up.y > 0 ? -1.0f : 1.0f;
     yaw += yawSign * delta.x;
-    pitch -= delta.y;
+    pitch += delta.y;
 }
 
 void EditorCamera::mouseZoom(float delta) {

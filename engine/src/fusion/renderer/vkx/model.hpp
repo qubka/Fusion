@@ -39,26 +39,21 @@ enum class Component : uint8_t {
 
 /** @brief Stores vertex layout components for model loading and Vulkan vertex input and atribute bindings  */
 struct VertexLayout {
-public:
     /** @brief Components used to generate vertices from */
     std::vector<Component> components;
+    uint32_t binding;
+
     VertexLayout() = default;
-    VertexLayout(std::vector<Component>&& components)
-        : components{std::move(components)} {}
-    explicit VertexLayout(std::vector<int>& ids) {
-        components.reserve(ids.size());
-        for (int i : ids) {
-            components.push_back(magic_enum::enum_value<Component>(i));
-        }
-    }
+    VertexLayout(std::vector<Component>&& components, uint32_t binding = 0)
+        : components{std::move(components)}, binding{binding} {}
 
     uint32_t componentIndex(Component component) const {
-        for (size_t i = 0; i < components.size(); ++i) {
+        for (uint32_t i = 0; i < components.size(); ++i) {
             if (components[i] == component) {
-                return static_cast<uint32_t>(i);
+                return i;
             }
         }
-        return static_cast<uint32_t>(-1);
+        return UINT32_MAX;
     }
 
     static vk::Format componentFormat(Component component) {
@@ -120,9 +115,9 @@ public:
 
 /** @brief Used to parametrize model loading */
 struct ModelCreateInfo {
-    glm::vec3 center{ 0 };
-    glm::vec3 scale{ 1 };
-    glm::vec2 uvscale{ 1 };
+    glm::vec3 center{ 0.0f };
+    glm::vec3 scale{ 1.0f };
+    glm::vec2 uvscale{ 1.0f };
 
     ModelCreateInfo() = default;
 
@@ -139,9 +134,9 @@ struct Model {
     vk::Device device;
     Buffer vertices;
     Buffer indices;
+    VertexLayout layout;
     uint32_t indexCount{ 0 };
     uint32_t vertexCount{ 0 };
-    VertexLayout layout;
     glm::vec3 scale{ 1.0f };
     glm::vec3 center{ 0.0f };
     glm::vec2 uvscale{ 1.0f };
@@ -196,7 +191,7 @@ struct Model {
     * @param copyQueue Queue used for the memory staging copy commands (must support transfer)
     * @param (Optional) flags ASSIMP model loading flags
     */
-    void loadFromFile(const Context& context, const std::string& filename, const VertexLayout& layout, float scale = 1.0f, const int flags = defaultFlags) {
+    void loadFromFile(const Context& context, const std::string& filename, const VertexLayout& layout = {{ Component::Position, Component::Normal, Component::UV, Component::Color}}, float scale = 1.0f, const int flags = defaultFlags) {
         loadFromFile(context, filename, layout, ModelCreateInfo{ scale, 1.0f, 0.0f }, flags);
     }
 

@@ -31,7 +31,7 @@ struct Allocation {
     template <typename T = void>
     inline T* map(size_t offset = 0, VkDeviceSize size = VK_WHOLE_SIZE) {
         mapped = device.mapMemory(memory, offset, size, vk::MemoryMapFlags());
-        return (T*)mapped;
+        return reinterpret_cast<T*>(mapped);
     }
 
     /**
@@ -93,7 +93,7 @@ struct Allocation {
     }
 
     virtual void destroy() {
-        if (nullptr != mapped) {
+        if (mapped != nullptr) {
             unmap();
         }
         if (memory) {

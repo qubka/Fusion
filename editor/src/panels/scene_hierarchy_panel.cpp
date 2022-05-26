@@ -3,7 +3,6 @@
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
-#include <magic_enum/include/magic_enum.hpp>
 
 using namespace fe;
 
@@ -274,7 +273,6 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
                 ImGui::CloseCurrentPopup();
             }
         }
-
         ImGui::EndPopup();
     }
 
@@ -362,7 +360,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
         drawVec3Control("Center", component.center);
         drawVec2Control("UV Scale", component.uvscale);
 
-        if (ImGui::TreeNode("Layout")) {
+        /*if (ImGui::TreeNode("Layout")) {
             constexpr auto components = magic_enum::enum_entries<vkx::model::Component>();
 
             if (ImGui::BeginCombo("##Layout", "")) {
@@ -394,6 +392,6 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
             }
 
             ImGui::TreePop();
-        }
+        }*/
     });
 }

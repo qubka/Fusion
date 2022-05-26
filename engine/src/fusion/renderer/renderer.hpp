@@ -38,15 +38,15 @@ namespace fe {
         vk::CommandBuffer& getMainCommandBuffer() { return commandBuffers[currentFrame]; }
         vk::CommandBuffer& getCurrentCommandBuffer() { return offscreen.active ? offscreen.commandBuffers[currentFrame] : commandBuffers[currentFrame]; }
         vkx::Buffer& getCurrentUniformBuffer() { return uniformBuffers[currentFrame]; }
+        vk::DescriptorSet& getCurrentFrameImage() { return offscreen.descriptorSets[currentFrame]; }
 
-        const vk::DescriptorSet getCurrentGlobalDescriptorSets() const { return globalDescriptorSets[currentFrame]; }
+        const vk::DescriptorSet& getCurrentGlobalDescriptorSets() const { return globalDescriptorSets[currentFrame]; }
         const vk::DescriptorSetLayout& getGlobalDescriptorLayoutSet() const { return globalDescriptorSetLayout; }
 
         vkx::Offscreen& getOffscreen() { return offscreen; }
         vkx::SwapChain& getSwapChain() { return swapChain; }
         vkx::ui::UIOverlay& getGUI() { return gui; }
 
-        ImTextureID getFrameImage() { return gui.getFrameImage(currentFrame); }
         uint32_t getFrameIndex() const { return currentFrame; }
         bool isFrameInProgress() const { return frameStarted; }
 

@@ -2,10 +2,9 @@
 
 int main(int args, char** argv) {
     fe::Log::Init();
-    LOG_INFO << "Fusion Engine";
-    LOG_INFO << "Game Started";
+    LOG_INFO << "Fusion Engine Started";
 
-    auto app = fe::CreateApplication({args, argv});
+    auto app = fe::CreateApplication(fe::CommandLineArgs{args, argv});
     app->run();
     delete app;
 

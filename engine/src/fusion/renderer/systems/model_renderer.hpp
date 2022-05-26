@@ -15,19 +15,18 @@ namespace fe {
         ModelRenderer(const vkx::Context& context, Renderer& renderer)
             : context{context}, renderer{renderer} {
             assert(!instance && "Model Renderer already exists!");
+            if (instance == nullptr) {
+                create();
+            }
             instance = this;
         }
 
         ~ModelRenderer() {
+            if (instance != nullptr) {
+                destroy();
+            }
             instance = nullptr;
         };
-
-        void create() {
-            createDescriptorSets();
-            createPipelineLayout();
-            createPipeline();
-        }
-        void destroy();
 
         void begin();
         void draw(const glm::mat4& transform);
@@ -36,6 +35,13 @@ namespace fe {
         static ModelRenderer& Instance() { assert(instance && "Model Renderer was not initialized!"); return *instance; }
 
     private:
+        void create() {
+            createDescriptorSets();
+            createPipelineLayout();
+            createPipeline();
+        }
+        void destroy();
+
         const vkx::Context& context;
         Renderer& renderer;
 

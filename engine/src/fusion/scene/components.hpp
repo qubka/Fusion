@@ -29,25 +29,38 @@ namespace fe {
     };
 
     struct TransformComponent {
-        glm::vec3 translation{0};
-        glm::vec3 rotation{0};
+        glm::vec3 translation{0.0f};
+        glm::vec3 rotation{0.0f};
         glm::vec3 scale{1.0f};
 
-        operator glm::mat4() const {
+        glm::mat4 transform() const {
             glm::mat4 m{1.0f};
             return glm::translate(m, translation)
                    * glm::mat4_cast(glm::quat(rotation))
                    * glm::scale(m, scale);
         };
 
-        explicit operator glm::mat3() const {
-            return glm::transpose(glm::inverse(glm::mat3{operator glm::mat4()}));
+        glm::mat4 invTransform() const {
+            glm::mat4 m{1.0f};
+            return glm::translate(m, translation)
+                   * glm::mat4_cast(glm::quat(rotation))
+                   * glm::scale(m, {scale.x, -scale.y, scale.z});
+        };
+
+        glm::mat4 normal() const {
+            return glm::transpose(glm::inverse(glm::mat3{transform()}));
         }
+    };
+
+    struct BoundsComponent {
+        glm::vec3 min{ 0.0f };
+        glm::vec3 max{ 0.0f };
+        glm::vec3 size{ 0.0f };
     };
 
     struct ModelComponent {
         std::string path;
-        std::vector<int> layout;
+        //std::vector<int> layout;
         glm::vec3 scale{ 1.0f };
         glm::vec3 center{ 0.0f };
         glm::vec2 uvscale{ 1.0f };

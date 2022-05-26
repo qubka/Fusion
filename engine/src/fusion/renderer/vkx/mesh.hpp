@@ -7,8 +7,8 @@ namespace vkx {
     struct Mesh {
         Buffer vertices;
         Buffer indices;
-        uint32_t indexCount { 0 };
-        uint32_t vertexCount { 0 };
+        uint32_t indexCount{ 0 };
+        uint32_t vertexCount{ 0 };
 
         struct Vertex {
             glm::vec3 position{};

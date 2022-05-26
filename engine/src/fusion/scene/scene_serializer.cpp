@@ -184,7 +184,7 @@ void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity 
         out << YAML::BeginMap; // ModelComponent
 
         out << YAML::Key << "path" << YAML::Value << component->path;
-        out << YAML::Key << "layout" << YAML::Value << component->layout;
+        //out << YAML::Key << "layout" << YAML::Value << component->layout;
         out << YAML::Key << "scale" << YAML::Value << component->scale;
         out << YAML::Key << "center" << YAML::Value << component->center;
         out << YAML::Key << "uvscale" << YAML::Value << component->uvscale;
@@ -267,7 +267,7 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
             if (const auto& modelComponent = entity["ModelComponent"]) {
                 scene->registry.emplace<ModelComponent>(deserializedEntity,
                     modelComponent["path"].as<std::string>(),
-                    modelComponent["layout"].as<std::vector<int>>(),
+                    //modelComponent["layout"].as<std::vector<int>>(),
                     modelComponent["scale"].as<glm::vec3>(),
                     modelComponent["center"].as<glm::vec3>(),
                     modelComponent["uvscale"].as<glm::vec2>()

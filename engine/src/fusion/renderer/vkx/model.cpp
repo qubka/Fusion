@@ -39,9 +39,7 @@ void Model::loadFromFile(const Context& context, const std::string& filename, co
 
     if (!pScene) {
         std::string error = importer.GetErrorString();
-        throw std::runtime_error(
-            error +
-            "\n\nThe file may be part of the additional asset pack.\n\nRun \"download_assets.py\" in the repository root to download the latest version.");
+        throw std::runtime_error(error + "\n\nThe file may be part of the additional asset pack.\n\nRun \"download_assets.py\" in the repository root to download the latest version.");
     }
 
     parts.clear();
@@ -98,7 +96,7 @@ void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* pSce
     static const aiVector3D Zero3D{0.0f, 0.0f, 0.0f};
     const aiMesh* paiMesh = pScene->mMeshes[meshIndex];
     const uint32_t i = vertexIndex;
-    aiColor3D pColor{0.f, 0.f, 0.f};
+    aiColor3D pColor{0.0f, 0.0f, 0.0f};
     pScene->mMaterials[paiMesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, pColor);
     const aiVector3D& pos = paiMesh->mVertices[i];
     const aiVector3D& normal = paiMesh->mNormals[i];

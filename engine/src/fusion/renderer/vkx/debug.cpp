@@ -114,7 +114,7 @@ static std::once_flag markerDispatcherInitFlag;
 vk::DispatchLoaderDynamic markerDispatcher;
 
 void setup(const vk::Instance& instance, const vk::Device& device) {
-    std::call_once(markerDispatcherInitFlag, [&] { markerDispatcher.init(instance, &vkGetInstanceProcAddr, device, &vkGetDeviceProcAddr); });
+    std::call_once(markerDispatcherInitFlag, [&]{ markerDispatcher.init(instance, &vkGetInstanceProcAddr, device, &vkGetDeviceProcAddr); });
     // Set flag if at least one function pointer is present
     active = (markerDispatcher.vkDebugMarkerSetObjectNameEXT != VK_NULL_HANDLE);
 }

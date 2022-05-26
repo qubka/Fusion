@@ -3,7 +3,7 @@
 
 using namespace fe;
 
-Plane::Plane() : normal{0}, distance{0} {
+Plane::Plane() : normal{0.0f}, distance{0.0f} {
 }
 
 Plane::Plane(const glm::vec3& n, const glm::vec3& p) {

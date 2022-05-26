@@ -41,7 +41,7 @@ struct SwapChain {
     uint32_t currentImage{ 0 };
 
     Attachment depthStencil;
-    vk::Format depthFormat { vk::Format::eUndefined };
+    vk::Format depthFormat{ vk::Format::eUndefined };
 
     SwapChain(const vkx::Context& context) : context{context} {
         presentInfo.swapchainCount = 1;

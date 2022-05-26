@@ -11,11 +11,14 @@ layout (location = 3) in vec3 inColor;
 layout (binding = 0) uniform UBO 
 {
 	mat4 projection;
-	mat4 model;
-	mat4 normal;
 	mat4 view;
 	vec3 lightpos;
 } ubo;
+
+layout (push_constant) uniform Push {
+	mat4 model;
+	mat4 normal;
+} push;
 
 layout (location = 0) out vec2 outUV;
 layout (location = 1) out vec3 outNormal;
@@ -26,9 +29,9 @@ layout (location = 4) out vec3 outLightVec;
 void main() 
 {
 	outUV = inTexCoord.st;
-	outNormal = normalize(mat3(ubo.normal) * inNormal);
+	outNormal = normalize(mat3(push.normal) * inNormal);
 	outColor = inColor;
-	mat4 modelView = ubo.view * ubo.model;
+	mat4 modelView = ubo.view * push.model;
 	vec4 pos = modelView * inPos;	
 	gl_Position = ubo.projection * pos;
 	outEyePos = vec3(modelView * pos);

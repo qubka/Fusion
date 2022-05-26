@@ -2,22 +2,33 @@
 
 using namespace fe;
 
+CommandLineArgs::CommandLineArgs(int count, char** args) {
+    for (int i = 0; i < count; i++) {
+        std::string argument{ args[i] };
+        if (auto pos { argument.find('=') }; pos != std::string::npos) {
+            arguments.emplace(argument.substr(0, pos), argument.substr(pos + 1));
+        } else {
+            arguments.emplace(argument, "");
+        }
+    }
+}
+
 CommandLineParser::CommandLineParser() {
-    add("help", { "--help" }, 0, "Show help");
-    add("validation", {"-v", "--validation"}, 0, "Enable validation layers");
-    add("vsync", {"-vs", "--vsync"}, 0, "Enable V-Sync");
-    add("fullscreen", { "-f", "--fullscreen" }, 0, "Start in fullscreen mode");
-    add("width", { "-w", "--width" }, 1, "Set window width");
-    add("height", { "-h", "--height" }, 1, "Set window height");
-    add("shaders", { "-s", "--shaders" }, 1, "Select shader type to use (glsl or hlsl)");
-    add("gpuselection", { "-g", "--gpu" }, 1, "Select GPU to run on");
-    add("gpulist", { "-gl", "--listgpus" }, 0, "Display a list of available Vulkan devices");
-    add("benchmark", { "-b", "--benchmark" }, 0, "Run example in benchmark mode");
-    add("benchmarkwarmup", { "-bw", "--benchwarmup" }, 1, "Set warmup time for benchmark mode in seconds");
-    add("benchmarkruntime", { "-br", "--benchruntime" }, 1, "Set duration time for benchmark mode in seconds");
-    add("benchmarkresultfile", { "-bf", "--benchfilename" }, 1, "Set file name for benchmark results");
-    add("benchmarkresultframes", { "-bt", "--benchframetimes" }, 0, "Save frame times to benchmark results file");
-    add("benchmarkframes", { "-bfs", "--benchmarkframes" }, 1, "Only render the given number of frames");
+    add("help", { "--help" }, false, "Show help");
+    add("validation", {"-v", "--validation"}, false, "Enable validation layers");
+    add("vsync", {"-vs", "--vsync"}, false, "Enable V-Sync");
+    add("fullscreen", { "-f", "--fullscreen" }, false, "Start in fullscreen mode");
+    add("width", { "-w", "--width" }, true, "Set window width");
+    add("height", { "-h", "--height" }, true, "Set window height");
+    add("shaders", { "-s", "--shaders" }, true, "Select shader type to use (glsl or hlsl)");
+    add("gpuselection", { "-g", "--gpu" }, true, "Select GPU to run on");
+    add("gpulist", { "-gl", "--listgpus" }, false, "Display a list of available Vulkan devices");
+    add("benchmark", { "-b", "--benchmark" }, false, "Run example in benchmark mode");
+    add("benchmarkwarmup", { "-bw", "--benchwarmup" }, true, "Set warmup time for benchmark mode in seconds");
+    add("benchmarkruntime", { "-br", "--benchruntime" }, true, "Set duration time for benchmark mode in seconds");
+    add("benchmarkresultfile", { "-bf", "--benchfilename" }, true, "Set file name for benchmark results");
+    add("benchmarkresultframes", { "-bt", "--benchframetimes" }, false, "Save frame times to benchmark results file");
+    add("benchmarkframes", { "-bfs", "--benchmarkframes" }, true, "Only render the given number of frames");
 }
 
 void CommandLineParser::add(const std::string& name, const std::vector<std::string>& commands, bool hasValue, const std::string& help) {
@@ -30,15 +41,15 @@ void CommandLineParser::add(const std::string& name, const std::vector<std::stri
 
 void CommandLineParser::printHelp() {
     std::cout << "Available command line options:\n";
-    for (auto option : options) {
+    for (auto& [alias, option] : options) {
         std::cout << " ";
-        for (size_t i = 0; i < option.second.commands.size(); i++) {
-            std::cout << option.second.commands[i];
-            if (i < option.second.commands.size() - 1) {
+        for (size_t i = 0; i < option.commands.size(); i++) {
+            std::cout << option.commands[i];
+            if (i < option.commands.size() - 1) {
                 std::cout << ", ";
             }
         }
-        std::cout << ": " << option.second.help << "\n";
+        std::cout << ": " << option.help << "\n";
     }
     std::cout << "Press any key to close...";
 }
@@ -46,20 +57,18 @@ void CommandLineParser::printHelp() {
 void CommandLineParser::parse(const CommandLineArgs& arguments) {
     bool printHelp = false;
     // Known arguments
-    for (auto& option : options) {
-        for (auto& command : option.second.commands) {
-            for (size_t i = 0; i < arguments.count; i++) {
-                if (strcmp(arguments[i], command.c_str()) == 0) {
-                    option.second.set = true;
+    for (auto& [alias, option] : options) {
+        for (auto& command : option.commands) {
+            for (auto& [argument, parameter] : arguments) {
+                if (argument == command) {
+                    option.set = true;
                     // Get value
-                    if (option.second.hasValue) {
-                        if (arguments.count > i + 1) {
-                            option.second.value = arguments[i + 1];
-                        }
-                        if (option.second.value == "") {
+                    if (option.hasValue) {
+                        if (parameter.empty()) {
                             printHelp = true;
                             break;
                         }
+                        option.value = parameter;
                     }
                 }
             }
@@ -77,19 +86,18 @@ bool CommandLineParser::isSet(const std::string& name) {
 
 std::string CommandLineParser::getValueAsString(const std::string& name, const std::string& defaultValue) {
     assert(options.find(name) != options.end());
-    std::string value = options[name].value;
+    const std::string& value = options[name].value;
     return (!value.empty()) ? value : defaultValue;
 }
 
 int32_t CommandLineParser::getValueAsInt(const std::string& name, int32_t defaultValue) {
     assert(options.find(name) != options.end());
-    std::string value = options[name].value;
+    const std::string& value = options[name].value;
     if (!value.empty()) {
-        char* numConvPtr;
-        int32_t intVal = strtol(value.c_str(), &numConvPtr, 10);
+        int32_t intVal = std::stoi(value);
         return (intVal > 0) ? intVal : defaultValue;
     } else {
         return defaultValue;
     }
-    return int32_t();
 }
+
