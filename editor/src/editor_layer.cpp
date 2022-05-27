@@ -1,6 +1,7 @@
 #include "editor_layer.hpp"
 #include "fusion/core/application.hpp"
 #include "fusion/utils/math.hpp"
+#include "fusion/utils/files.hpp"
 #include "fusion/scene/components.hpp"
 #include "fusion/input/input.hpp"
 
@@ -120,8 +121,7 @@ void EditorLayer::onImGui() {
     // all active windows docked into it will lose their parent and become undocked.
     // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
     // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
-
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
     ImGui::Begin("DockSpace Demo", nullptr, window_flags);
     ImGui::PopStyleVar();
 
@@ -132,7 +132,7 @@ void EditorLayer::onImGui() {
     ImGuiIO& io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
         ImGuiID dockspace = ImGui::GetID("HUB_DockSpace");
-        ImGui::DockSpace(dockspace, {0, 0}, dockspace_flags);
+        ImGui::DockSpace(dockspace, { 0, 0 }, dockspace_flags);
     }
 
     if (ImGui::BeginMenuBar()) {
@@ -163,6 +163,7 @@ void EditorLayer::onImGui() {
 
     sceneHierarchyPanel.onImGui();
     contentBrowserPanel.onImGui();
+    fileExplorerPanel.onImGui();
 
     ImGui::Begin("Stats");
 
@@ -196,7 +197,7 @@ void EditorLayer::onImGui() {
 
     ImGui::End();
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
+    //ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
     ImGui::Begin("Scene");
 
     auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
@@ -219,7 +220,7 @@ void EditorLayer::onImGui() {
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            //openScene(getAssetPath() / std::filesystem::path{static_cast<const char*>(payload->Data)});
+            openScene(std::filesystem::path{static_cast<const char*>(payload->Data)});
         }
         ImGui::EndDragDropTarget();
     }
@@ -277,7 +278,7 @@ void EditorLayer::onImGui() {
         }
     }
 
-    ImGui::PopStyleVar();
+    //ImGui::PopStyleVar();
     ImGui::End();
 
     UI_Toolbar();
@@ -292,14 +293,20 @@ void EditorLayer::newScene() {
 }
 
 void EditorLayer::openScene() {
-    auto filepath = pfd::open_file("Choose scene file", getAssetPath(), { "Scene Files (.scene)", "*.scene", "All Files", "*" }, pfd::opt::none).result();
-    if (!filepath.empty())
-        openScene(filepath[0]);
+    auto filepath = pfd::open_file("Choose scene file", getAssetPath(), { "Scene File (.scene)", "*.scene" }, pfd::opt::none).result();
+    if (!filepath.empty()) {
+        // Validate that file inside working directory
+        if (filepath[0].find(std::filesystem::current_path()) != std::string::npos) {
+            openScene(filepath[0]);
+        } else {
+            pfd::message("File Location", "The selected file should be inside the project directory.", pfd::choice::ok, pfd::icon::error);
+        }
+    }
 }
 
 void EditorLayer::openScene(const std::filesystem::path& path) {
-    if (path.extension().string() != ".scene") {
-        LOG_WARNING << "Could not load " << path.filename().string() << " - not a scene file";
+    if (path.extension() != ".scene") {
+        LOG_WARNING << "Could not load " << path.filename() << " - not a scene file";
         return;
     }
 
@@ -311,12 +318,11 @@ void EditorLayer::openScene(const std::filesystem::path& path) {
         sceneHierarchyPanel.setContext(activeScene);
     }
 
-    LOG_INFO << "Scene " << path.filename().string() << " was loaded !";
+    LOG_INFO << "Scene " << path.filename() << " was loaded !";
 }
 
 void EditorLayer::saveSceneAs() {
-    auto filepath = pfd::save_file("Choose scene file", getAssetPath(), { "Scene Files (.scene)", "*.scene",
-                                                                          "All Files", "*" }, pfd::opt::force_overwrite).result();
+    auto filepath = pfd::save_file("Choose scene file", getAssetPath(), { "Scene Files (.scene)", "*.scene" }, pfd::opt::force_overwrite).result();
     if (!filepath.empty()) {
         SceneSerializer serializer{activeScene};
         serializer.serialize(filepath);
@@ -324,20 +330,20 @@ void EditorLayer::saveSceneAs() {
 }
 
 void EditorLayer::UI_Toolbar() {
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 2});
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, {0, 0});
-    ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 2.0f });
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0.0f, 0.0f });
+    ImGui::PushStyleColor(ImGuiCol_Button, { 0.0f, 0.0f, 0.0f, 0.0f });
     auto& colors = ImGui::GetStyle().Colors;
     const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f});
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f });
     const auto& buttonActive = colors[ImGuiCol_ButtonActive];
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, {buttonActive.x, buttonActive.y, buttonActive.z, 0.5f});
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, { buttonActive.x, buttonActive.y, buttonActive.z, 0.5f });
 
     ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     float size = ImGui::GetWindowHeight() - 4.0f;
     ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-    if (ImGui::Button(sceneState == SceneState::Edit ? "\uF04B" : "\uF04D", {size, size})) {
+    if (ImGui::Button(sceneState == SceneState::Edit ? fs::ICON_FA_PLAY : fs::ICON_FA_STOP, {size, size})) {
         if (sceneState == SceneState::Edit)
             sceneState = SceneState::Play;
         else if (sceneState == SceneState::Play)

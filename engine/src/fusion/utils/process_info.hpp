@@ -6,8 +6,7 @@
 #include <unistd.h>
 #endif
 
-class ProcessInfo
-{
+class ProcessInfo {
 public:
     ProcessInfo(unsigned int processId);
     ~ProcessInfo();

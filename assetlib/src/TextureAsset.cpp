@@ -18,7 +18,7 @@ TextureInfo TextureAsset::readTextureInfo(const AssetFile& file) {
     info.textureSize = texture_metadata["buffer_size"];
     info.originalFile = texture_metadata["original_file"];
 
-    for (auto& [key, value] : texture_metadata["pages"].items()) {
+    for (const auto& [key, value] : texture_metadata["pages"].items()) {
         PageInfo page;
 
         page.compressedSize = value["compressed_size"];

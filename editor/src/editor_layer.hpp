@@ -2,6 +2,7 @@
 
 #include "panels/scene_hierarchy_panel.hpp"
 #include "panels/content_browser_panel.hpp"
+#include "panels/file_explorer_panel.hpp"
 
 #include "fusion/core/layer.hpp"
 #include "fusion/input/base_input.hpp"
@@ -36,8 +37,9 @@ namespace fe {
         EditorCamera editorCamera;
 
         // Panels
-        SceneHierarchyPanel sceneHierarchyPanel;
+        FileExplorerPanel fileExplorerPanel;
         ContentBrowserPanel contentBrowserPanel;
+        SceneHierarchyPanel sceneHierarchyPanel{ contentBrowserPanel };
 
         int gizmoType{ -1 };
         enum class SceneState { Edit = 0, Play = 1 };

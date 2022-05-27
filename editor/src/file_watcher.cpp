@@ -6,8 +6,8 @@ FileWatcher::FileWatcher(const std::string& path_to_watch, std::chrono::duration
     : path_to_watch{ path_to_watch }
     , delay{ delay }
 {
-    for (auto& file: std::filesystem::recursive_directory_iterator(path_to_watch)) {
-        paths[file.path().string()] = std::filesystem::last_write_time(file);
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(path_to_watch)) {
+        paths[entry.path().string()] = std::filesystem::last_write_time(entry);
     }
 }
 
@@ -25,9 +25,9 @@ void FileWatcher::start(const std::function<void(std::string, FileStatus)>& acti
             }
         }
 
-        for (auto& file: std::filesystem::recursive_directory_iterator(path_to_watch)) {
-            auto current_file_last_write_time = std::filesystem::last_write_time(file);
-            const std::string& key = file.path().string();
+        for (const auto& entry: std::filesystem::recursive_directory_iterator(path_to_watch)) {
+            auto current_file_last_write_time = std::filesystem::last_write_time(entry);
+            const auto& key = entry.path().string();
 
             if (!contains(key)) {
                 paths[key] = current_file_last_write_time;

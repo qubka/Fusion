@@ -64,7 +64,6 @@ struct AttachmentCreateInfo {
  * @brief Encapsulates a complete Vulkan framebuffer with an arbitrary number and combination of attachments
  */
 struct Framebuffer {
-public:
     const vkx::Context& context;
     const vk::Device& device{ context.device };
     vk::Extent2D size;
@@ -200,7 +199,7 @@ public:
      */
     void createRenderPass() {
         std::vector<vk::AttachmentDescription> attachmentDescriptions;
-        for (auto& attachment : attachments) {
+        for (const auto& attachment : attachments) {
             attachmentDescriptions.push_back(attachment.description);
         };
 
@@ -210,7 +209,7 @@ public:
         bool hasDepth = false;
         bool hasColor = false;
         uint32_t attachmentIndex = 0;
-        for (auto& attachment : attachments) {
+        for (const auto& attachment : attachments) {
             if (attachment.isDepthStencil()) {
                 if (hasDepth) {
                     throw std::runtime_error("Only one depth/stencil attachment allowed");

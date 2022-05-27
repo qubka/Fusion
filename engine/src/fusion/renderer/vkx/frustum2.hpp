@@ -56,7 +56,7 @@ namespace vkx
 		}
 		
 		bool checkSphere(glm::vec3 pos, float radius) {
-			for (auto& plane : planes) {
+			for (const auto& plane : planes) {
 				if ((plane.x * pos.x) + (plane.y * pos.y) + (plane.z * pos.z) + plane.w <= -radius) {
 					return false;
 				}

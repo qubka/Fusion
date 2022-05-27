@@ -1,5 +1,7 @@
 #include "scene_hierarchy_panel.hpp"
+#include "content_browser_panel.hpp"
 #include "fusion/scene/components.hpp"
+#include "fusion/utils/files.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
@@ -24,7 +26,7 @@ void SceneHierarchyPanel::onImGui() {
         selectionContext = entt::null;
 
     // Right-click on blank space
-    if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+    if (ImGui::BeginPopupContextWindow(nullptr, 1, false)) {
         if (ImGui::MenuItem("Create Empty Entity")) {
             auto entity = context->registry.create();
             context->registry.emplace<IdComponent>(entity);
@@ -44,15 +46,85 @@ void SceneHierarchyPanel::onImGui() {
     ImGui::End();
 }
 
+void SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string& value, const std::string& file, const std::vector<std::string>& formats, float columnWidth) {
+    ImGui::PushID(label.c_str());
+
+    ImGui::Columns(2);
+    ImGui::SetColumnWidth(0, columnWidth);
+    ImGui::TextUnformatted(label.c_str());
+    ImGui::NextColumn();
+
+    float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+
+    ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 4.0f, 4.0f });
+
+    auto function = [&]() {
+        std::string pattern{" "};
+        for (const auto& format : formats) pattern += format + " ";
+        auto filepath = pfd::open_file("Choose 3D file", value.empty() ? getAssetPath() : value, { file, pattern }, pfd::opt::none).result();
+        if (!filepath.empty()) {
+            // Validate that file inside working directory
+            if (filepath[0].find(std::filesystem::current_path()) != std::string::npos) {
+                value = std::filesystem::relative(filepath[0]);
+            } else {
+                pfd::message("File Location", "The selected file should be inside the project directory.", pfd::choice::ok, pfd::icon::error);
+            }
+        }
+    };
+
+    float panelWidth = ImGui::GetContentRegionAvail().x;
+
+    std::filesystem::path path{value};
+    if (ImGui::Button(value.empty() ? "?" : path.filename().c_str(), { panelWidth - lineHeight, 0.0f })) {
+        if (value.empty()) {
+            function();
+        } else {
+            contentBrowserPanel.selectFile(path);
+        }
+    }
+
+    if (ImGui::IsItemHovered()) {
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            value = "";
+        }
+    }
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+            auto filepath = std::filesystem::path{static_cast<const char*>(payload->Data)};
+            auto extension = "*" + filepath.extension().string();
+            // Validate that file format is suitable
+            if (std::find(formats.begin(), formats.end(), extension) != formats.end()) {
+                value = filepath;
+            } else {
+                pfd::message("File Format", "The selected file format should be " + file + ".", pfd::choice::ok, pfd::icon::error);
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button(fs::ICON_FA_SEARCH)) {
+        function();
+    }
+
+    ImGui::PopStyleVar();
+
+    ImGui::Columns(1);
+
+    ImGui::PopID();
+}
+
 void SceneHierarchyPanel::drawEntity(entt::entity entity) {
     auto tag = *context->registry.get<TagComponent>(entity);
 
     ImGuiTreeNodeFlags flags = ((selectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
     flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
     bool opened = ImGui::TreeNodeEx((void*)static_cast<uintptr_t>(entity), flags, "%s", tag.c_str());
-    if (ImGui::IsItemClicked()) {
+    if (ImGui::IsItemClicked() || ImGui::IsItemFocused())
         selectionContext = entity;
-    }
 
     bool entityDeleted = false;
     if (ImGui::BeginPopupContextItem()) {
@@ -74,7 +146,7 @@ void SceneHierarchyPanel::drawEntity(entt::entity entity) {
     }
 }
 
-bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth) {
+void SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth) {
     ImGuiIO& io = ImGui::GetIO();
     auto boldFont = io.Fonts->Fonts[0];
 
@@ -97,14 +169,13 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PushFont(boldFont);
     if (ImGui::Button("X", buttonSize)) {
         values.x = resetValue;
-        return true;
+        //return true;
     }
     ImGui::PopFont();
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
     ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-    ImGui::PopItemWidth();
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
@@ -113,14 +184,13 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PushFont(boldFont);
     if (ImGui::Button("Y", buttonSize)) {
         values.y = resetValue;
-        return true;
+        //return true;
     }
     ImGui::PopFont();
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
     ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-    ImGui::PopItemWidth();
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.25f, 0.8f, 1.0f });
@@ -129,14 +199,13 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PushFont(boldFont);
     if (ImGui::Button("Z", buttonSize)) {
         values.z = resetValue;
-        return true;
+        //return true;
     }
     ImGui::PopFont();
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
     ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-    ImGui::PopItemWidth();
 
     ImGui::PopStyleVar();
 
@@ -144,10 +213,10 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
 
     ImGui::PopID();
 
-    return false;
+    //return false;
 }
 
-bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& values, float resetValue, float columnWidth) {
+void SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& values, float resetValue, float columnWidth) {
     ImGuiIO& io = ImGui::GetIO();
     auto boldFont = io.Fonts->Fonts[0];
 
@@ -170,14 +239,13 @@ bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
     ImGui::PushFont(boldFont);
     if (ImGui::Button("X", buttonSize)) {
         values.x = resetValue;
-        return true;
+        //return true;
     }
     ImGui::PopFont();
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
     ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-    ImGui::PopItemWidth();
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
@@ -186,14 +254,13 @@ bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
     ImGui::PushFont(boldFont);
     if (ImGui::Button("Y", buttonSize)) {
         values.y = resetValue;
-        return true;
+        //return true;
     }
     ImGui::PopFont();
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
     ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-    ImGui::PopItemWidth();
 
     ImGui::PopStyleVar();
 
@@ -201,20 +268,20 @@ bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
 
     ImGui::PopID();
 
-    return false;
+    //return false;
 }
 
 template<typename T>
 void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function) {
-    const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+    const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
     if (auto component = context->registry.try_get<T>(entity)) {
         ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4, 4 });
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
         float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
         ImGui::Separator();
 
-        bool opened = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
+        bool opened = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, "%s", name.c_str());
         ImGui::PopStyleVar();
         ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 
@@ -348,30 +415,9 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
         }
     });
 
-    drawComponent<ModelComponent>("Model", entity, [](ModelComponent& component)
+    drawComponent<ModelComponent>("Model", entity, [&](ModelComponent& component)
     {
-        std::filesystem::path path{component.path};
-        if (ImGui::Button(path.empty() ? " " : path.filename().c_str(), { ImGui::GetContentRegionAvail().x, 0.0f })) {
-            auto filepath = pfd::open_file("Choose 3D file", path.empty() ? getAssetPath() : path.parent_path().string(),
-                                           { "3D Files (.fbx .obj .dae .gltf .3ds)", "*.fbx *.obj *.dae *.gltf *.3ds",
-                                             "All Files", "*" }, pfd::opt::none).result();
-            if (!filepath.empty()) {
-                // Validate that file inside working directory
-                auto working_path = std::filesystem::current_path() / getAssetPath();
-                if (filepath[0].find(working_path) != std::string::npos) {
-                    component.path = std::filesystem::relative(filepath[0], working_path).string();
-                } else {
-                    pfd::message("File Location", "The selected file should be inside the project directory.", pfd::choice::ok, pfd::icon::error);
-                }
-            }
-        }
-
-        if (ImGui::BeginDragDropTarget()) {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                component.path = std::string{static_cast<const char*>(payload->Data)};
-            }
-            ImGui::EndDragDropTarget();
-        }
+        drawFileBrowser("Path", component.path, "3D Files (.fbx .obj .dae .gltf .3ds)", { "*.fbx", "*.obj", "*.dae", "*.gltf", "*.3ds" });
 
         drawVec3Control("Scale", component.scale);
         drawVec3Control("Center", component.center);

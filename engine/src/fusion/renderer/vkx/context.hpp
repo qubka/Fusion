@@ -134,7 +134,7 @@ public:
 
     static std::set<std::string> getExtensionNames() {
         std::set<std::string> extensionNames;
-        for (auto& ext : getExtensions()) {
+        for (const auto& ext : getExtensions()) {
             extensionNames.insert(ext.extensionName);
         }
         return extensionNames;
@@ -148,7 +148,7 @@ public:
 
     static std::set<std::string> getDeviceExtensionNames(const vk::PhysicalDevice& physicalDevice) {
         std::set<std::string> extensionNames;
-        for (auto& ext : getDeviceExtensions(physicalDevice)) {
+        for (const auto& ext : getDeviceExtensions(physicalDevice)) {
             extensionNames.insert(ext.extensionName);
         }
         return extensionNames;
@@ -864,7 +864,7 @@ public:
         std::vector<vk::Format> depthFormats = { vk::Format::eD32SfloatS8Uint, vk::Format::eD32Sfloat, vk::Format::eD24UnormS8Uint, vk::Format::eD16UnormS8Uint,
                                                  vk::Format::eD16Unorm };
 
-        for (auto& format : depthFormats) {
+        for (const auto& format : depthFormats) {
             vk::FormatProperties formatProps;
             formatProps = physicalDevice.getFormatProperties(format);
             // vk::Format must support depth stencil attachment for optimal tiling

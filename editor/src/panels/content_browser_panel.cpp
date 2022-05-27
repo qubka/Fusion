@@ -1,18 +1,15 @@
 #include "content_browser_panel.hpp"
+#include "fusion/utils/files.hpp"
 
 #include <imgui/imgui.h>
 
 using namespace fe;
 
-ContentBrowserPanel::ContentBrowserPanel() : currentDirectory{getAssetPath()} {
-
-}
-
 void ContentBrowserPanel::onImGui() {
     ImGui::Begin("Content Browser");
 
-    if (currentDirectory.string() != getAssetPath()) {
-        if (ImGui::Button("\uF112")) {
+    if (currentDirectory != getAssetPath()) {
+        if (ImGui::Button(fs::ICON_FA_REPLY)) {
             currentDirectory = currentDirectory.parent_path();
         }
     }
@@ -28,35 +25,39 @@ void ContentBrowserPanel::onImGui() {
 
     ImGui::Columns(columnCount, nullptr, false);
 
-    for (auto& directoryEntry : std::filesystem::directory_iterator(currentDirectory)) {
-        const auto& path = directoryEntry.path();
-        auto relativePath = std::filesystem::relative(path, getAssetPath());
-        auto filename = relativePath.filename();
+    for (const auto& entry : fs::walk(currentDirectory)) {
+        const auto& path = entry.path();
+        auto filename = path.filename();
 
         ImGui::PushID(filename.c_str());
-        ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
+        if (path == currentFile)
+            ImGui::PushStyleColor(ImGuiCol_Button, { 0.3f, 0.3f, 0.3f, 1.0f });
+        else
+            ImGui::PushStyleColor(ImGuiCol_Button, { 0.0f, 0.0f, 0.0f, 0.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f, 0.2f, 0.2f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.15f, 0.15f, 0.15f, 1.0f });
 
-        if (directoryEntry.is_directory()) {
-            ImGui::Button("\uF07C", { thumbnailSize, thumbnailSize });
+        if (entry.is_directory()) {
+            ImGui::Button(fs::ICON_FA_FOLDER, { thumbnailSize, thumbnailSize });
         } else {
-            auto key { extentions.find(filename.extension()) };
-            ImGui::Button(key != extentions.end() ? key->second.c_str() : "\uF016", { thumbnailSize, thumbnailSize });
+            auto key { fs::extentions.find(filename.extension()) };
+            ImGui::Button(key != fs::extentions.end() ? key->second.c_str() : fs::ICON_FA_FILE, { thumbnailSize, thumbnailSize });
         }
 
         if (ImGui::BeginDragDropSource()) {
-            auto itemStr = relativePath.string();
-            ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemStr.c_str(), itemStr.length());
+            const auto& pathStr = path.string();
+            ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
             ImGui::EndDragDropSource();
         }
 
-        ImGui::PopStyleColor();
+        ImGui::PopStyleColor(3);
+
         if (ImGui::IsItemHovered()) {
-            if (directoryEntry.is_directory()) {
-                if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-                    currentDirectory /= path.filename();
-            } else {
-                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-                    currentFile = directoryEntry;
+            if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                if (entry.is_directory())
+                    currentDirectory /= filename;
+            } else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                currentFile = path;
             }
         }
 
@@ -69,8 +70,8 @@ void ContentBrowserPanel::onImGui() {
 
     ImGui::Columns(1);
 
-    ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
-    ImGui::SliderFloat("Padding", &padding, 0, 32);
+    //ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
+    //ImGui::SliderFloat("Padding", &padding, 0, 32);
 
     ImGui::End();
 }

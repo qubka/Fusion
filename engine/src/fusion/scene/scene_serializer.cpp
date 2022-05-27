@@ -19,7 +19,7 @@ namespace YAML {
         }
 
         static bool decode(const Node& node, glm::vec2& rhs) {
-            if (!node.IsSequence() || node.size() != 3)
+            if (!node.IsSequence() || node.size() != 2)
                 return false;
 
             rhs.x = node[0].as<float>();
@@ -273,7 +273,6 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
                     modelComponent["uvscale"].as<glm::vec2>()
                 );
             }
-
         }
     }
 
