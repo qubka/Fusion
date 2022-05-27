@@ -6,12 +6,6 @@
 
 #include "../editor_app.hpp"
 
-#if _WIN32
-#define DEFAULT_PATH "C:\\"
-#else
-#define DEFAULT_PATH "/tmp"
-#endif
-
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
 #include <imgui/imgui.h>
@@ -225,8 +219,7 @@ void EditorLayer::onImGui() {
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            const auto path = static_cast<const wchar_t*>(payload->Data);
-            openScene(std::filesystem::path(getAssetPath()) / path);
+            //openScene(getAssetPath() / std::filesystem::path{static_cast<const char*>(payload->Data)});
         }
         ImGui::EndDragDropTarget();
     }
@@ -299,7 +292,7 @@ void EditorLayer::newScene() {
 }
 
 void EditorLayer::openScene() {
-    auto filepath = pfd::open_file("Choose scene file", DEFAULT_PATH, { "Scene Files (.scene)", "*.scene", "All Files", "*" }, pfd::opt::none).result();
+    auto filepath = pfd::open_file("Choose scene file", getAssetPath(), { "Scene Files (.scene)", "*.scene", "All Files", "*" }, pfd::opt::none).result();
     if (!filepath.empty())
         openScene(filepath[0]);
 }
@@ -322,7 +315,8 @@ void EditorLayer::openScene(const std::filesystem::path& path) {
 }
 
 void EditorLayer::saveSceneAs() {
-    auto filepath = pfd::save_file("Choose scene file", DEFAULT_PATH, { "Scene Files (.scene)", "*.scene", "All Files", "*" }, pfd::opt::force_overwrite).result();
+    auto filepath = pfd::save_file("Choose scene file", getAssetPath(), { "Scene Files (.scene)", "*.scene",
+                                                                          "All Files", "*" }, pfd::opt::force_overwrite).result();
     if (!filepath.empty()) {
         SceneSerializer serializer{activeScene};
         serializer.serialize(filepath);

@@ -195,7 +195,7 @@ void Application::mainLoop() {
 }
 
 std::string Application::getWindowTitle() {
-    return title + " - " + std::string(context.deviceProperties.deviceName) + " - " + std::to_string(frameCounter) + " fps";
+    return title + " - " + std::string{context.deviceProperties.deviceName} + " - " + std::to_string(frameCounter) + " fps";
 }
 
 void Application::update(float dt) {

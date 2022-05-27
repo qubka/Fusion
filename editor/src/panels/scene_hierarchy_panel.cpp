@@ -1,6 +1,8 @@
 #include "scene_hierarchy_panel.hpp"
 #include "fusion/scene/components.hpp"
 
+#include <portable-file-dialogs/portable-file-dialogs.h>
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
@@ -245,7 +247,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
     memset(buffer, 0, sizeof(buffer));
     std::strncpy(buffer, tag.c_str(), sizeof(buffer));
     if (ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
-        tag = std::string(buffer);
+        tag = std::string{buffer};
     }
 
     ImGui::SameLine();
@@ -348,12 +350,27 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
 
     drawComponent<ModelComponent>("Model", entity, [](ModelComponent& component)
     {
-        char buffer[256];
-        memset(buffer, 0, sizeof(buffer));
-        std::strncpy(buffer, component.path.c_str(), sizeof(buffer));
+        std::filesystem::path path{component.path};
+        if (ImGui::Button(path.empty() ? " " : path.filename().c_str(), { ImGui::GetContentRegionAvail().x, 0.0f })) {
+            auto filepath = pfd::open_file("Choose 3D file", path.empty() ? getAssetPath() : path.parent_path().string(),
+                                           { "3D Files (.fbx .obj .dae .gltf .3ds)", "*.fbx *.obj *.dae *.gltf *.3ds",
+                                             "All Files", "*" }, pfd::opt::none).result();
+            if (!filepath.empty()) {
+                // Validate that file inside working directory
+                auto working_path = std::filesystem::current_path() / getAssetPath();
+                if (filepath[0].find(working_path) != std::string::npos) {
+                    component.path = std::filesystem::relative(filepath[0], working_path).string();
+                } else {
+                    pfd::message("File Location", "The selected file should be inside the project directory.", pfd::choice::ok, pfd::icon::error);
+                }
+            }
+        }
 
-        if (ImGui::InputText("Path", buffer, sizeof(buffer))) {
-            component.path = std::string(buffer);
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                component.path = std::string{static_cast<const char*>(payload->Data)};
+            }
+            ImGui::EndDragDropTarget();
         }
 
         drawVec3Control("Scale", component.scale);

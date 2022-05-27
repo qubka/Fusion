@@ -24,7 +24,7 @@ void Gui::create(void* window, Renderer& renderer) {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
@@ -66,7 +66,7 @@ void Gui::create(void* window, Renderer& renderer) {
     // Load a first font
     io.Fonts->AddFontDefault();
     //std::string filename = getAssetPath() + "/fonts/Roboto-Black.ttf";
-    //io.Fonts->AddFontFromFileTTF(filename.c_str(), 16.0f);
+    //io.Fonts->AddFontFromFileTTF(filename.c_str(), 16.0f, nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
     // Add character ranges and merge into the previous font
     // The ranges array is not copied by the AddFont* functions and is used lazily

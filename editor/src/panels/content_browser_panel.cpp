@@ -26,7 +26,7 @@ void ContentBrowserPanel::onImGui() {
     if (columnCount < 1)
         columnCount = 1;
 
-    ImGui::Columns(columnCount, 0, false);
+    ImGui::Columns(columnCount, nullptr, false);
 
     for (auto& directoryEntry : std::filesystem::directory_iterator(currentDirectory)) {
         const auto& path = directoryEntry.path();
@@ -44,9 +44,8 @@ void ContentBrowserPanel::onImGui() {
         }
 
         if (ImGui::BeginDragDropSource()) {
-            auto itemStr = relativePath.wstring();
-            const wchar_t* itemPath = itemStr.c_str();
-            ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
+            auto itemStr = relativePath.string();
+            ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemStr.c_str(), itemStr.length());
             ImGui::EndDragDropSource();
         }
 

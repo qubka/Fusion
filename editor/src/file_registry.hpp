@@ -17,7 +17,7 @@ namespace fe {
             std::thread t1 ([&] {
                 watcher.start([&](const std::string& path, FileStatus status) {
                     // Process only regular files, all other file types are ignored
-                    if (!std::filesystem::is_regular_file(std::filesystem::path(path)) && status != FileStatus::Erased) {
+                    if (!std::filesystem::is_regular_file(path) && status != FileStatus::Erased) {
                         return;
                     }
 

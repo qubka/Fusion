@@ -274,8 +274,10 @@ void UIOverlay::prepareResources() {
 		}
         io.Fonts->Build();
 #else
-    io.Fonts->AddFontDefault();
-    std::string filename = getAssetPath() + "/fonts/fontawesome-webfont.ttf"; //TODO: Replace
+    std::string filename = getAssetPath() + "/fonts/PT Sans.ttf";
+    io.Fonts->AddFontFromFileTTF(filename.c_str(), 16.0f, nullptr, io.Fonts->GetGlyphRangesCyrillic());
+    //io.Fonts->AddFontDefault();
+    filename = getAssetPath() + "/fonts/fontawesome-webfont.ttf"; //TODO: Replace
     io.Fonts->AddFontFromFileTTF(filename.c_str(), 16.0f, &config, icons_ranges); // Merge into first font
     io.Fonts->Build();
 #endif
