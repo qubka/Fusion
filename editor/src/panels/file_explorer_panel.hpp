@@ -9,5 +9,6 @@ namespace fe {
         void onImGui();
 
     private:
+        uint32_t currentNode{ UINT32_MAX };
     };
 }

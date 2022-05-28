@@ -3,7 +3,7 @@
 namespace fe {
     class fs {
     public:
-        static std::vector<std::filesystem::directory_entry> walk(const std::filesystem::path& path);
+        static std::vector<std::filesystem::directory_entry> walk(const std::filesystem::path& dir);
 
         static const char* ICON_FA_FOLDER;
         static const char* ICON_FA_FILE;
@@ -12,6 +12,9 @@ namespace fe {
         static const char* ICON_FA_PLAY;
         static const char* ICON_FA_STOP;
 
-        static std::unordered_map<std::string, std::string> extentions;
+        static std::string extension_icon(const std::filesystem::path& file);
+
+    private:
+        static std::unordered_map<std::string, std::string> extensions;
     };
 }

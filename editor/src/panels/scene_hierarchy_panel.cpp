@@ -74,12 +74,16 @@ void SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     };
 
     float panelWidth = ImGui::GetContentRegionAvail().x;
+    ImVec2 buttonSize = { panelWidth - lineHeight, lineHeight };
 
-    std::filesystem::path path{value};
-    if (ImGui::Button(value.empty() ? "?" : path.filename().c_str(), { panelWidth - lineHeight, 0.0f })) {
-        if (value.empty()) {
+    if (value.empty()) {
+        if (ImGui::Button("?", buttonSize)) {
             function();
-        } else {
+        }
+    } else {
+        std::filesystem::path path{value};
+        auto title = fs::extension_icon(path) + (" " + path.filename().string());
+        if (ImGui::Button(title.c_str(), buttonSize)) {
             contentBrowserPanel.selectFile(path);
         }
     }

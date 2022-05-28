@@ -28,7 +28,7 @@ namespace fe {
     private:
         void newScene();
         void openScene();
-        void openScene(const std::filesystem::path& path);
+        void openScene(const std::filesystem::path& file);
         void saveSceneAs();
 
         void UI_Toolbar();

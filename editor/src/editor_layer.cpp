@@ -304,21 +304,21 @@ void EditorLayer::openScene() {
     }
 }
 
-void EditorLayer::openScene(const std::filesystem::path& path) {
-    if (path.extension() != ".scene") {
-        LOG_WARNING << "Could not load " << path.filename() << " - not a scene file";
+void EditorLayer::openScene(const std::filesystem::path& file) {
+    if (file.extension() != ".scene") {
+        LOG_WARNING << "Could not load " << file.filename() << " - not a scene file";
         return;
     }
 
     auto newScene = std::make_shared<Scene>();
     SceneSerializer serializer{newScene};
-    if (serializer.deserialize(path)) {
+    if (serializer.deserialize(file)) {
         activeScene = newScene;
         activeScene->onViewportResize(viewportSize);
         sceneHierarchyPanel.setContext(activeScene);
     }
 
-    LOG_INFO << "Scene " << path.filename() << " was loaded !";
+    LOG_INFO << "Scene " << file.filename() << " was loaded !";
 }
 
 void EditorLayer::saveSceneAs() {

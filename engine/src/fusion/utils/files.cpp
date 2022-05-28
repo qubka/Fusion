@@ -2,10 +2,10 @@
 
 using namespace fe;
 
-std::vector<std::filesystem::directory_entry> fs::walk(const std::filesystem::path& path) {
+std::vector<std::filesystem::directory_entry> fs::walk(const std::filesystem::path& dir) {
     std::vector<std::filesystem::directory_entry> files;
 
-    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+    for (const auto& entry : std::filesystem::directory_iterator(dir)) {
         files.push_back(entry);
     }
 
@@ -23,7 +23,7 @@ const char* fs::ICON_FA_REPLY{ "\uF112" };
 const char* fs::ICON_FA_PLAY{ "\uF04B" };
 const char* fs::ICON_FA_STOP{ "\uF04D" };
 
-std::unordered_map<std::string, std::string> fs::extentions {
+std::unordered_map<std::string, std::string> fs::extensions {
     {".gif", "\uF1C5"},
     {".jpeg", "\uF1C5"},
     {".jpg", "\uF1C5"},
@@ -122,3 +122,8 @@ std::unordered_map<std::string, std::string> fs::extentions {
     {".txt", "\uF016"},
     {".md", "\uF016"}
 };
+
+std::string fs::extension_icon(const std::filesystem::path& file) {
+    auto key { fs::extensions.find(file.extension()) };
+    return key != fs::extensions.end() ? key->second.c_str() : fs::ICON_FA_FILE;
+}

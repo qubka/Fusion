@@ -27,9 +27,8 @@ void ContentBrowserPanel::onImGui() {
 
     for (const auto& entry : fs::walk(currentDirectory)) {
         const auto& path = entry.path();
-        auto filename = path.filename();
 
-        ImGui::PushID(filename.c_str());
+        ImGui::PushID(path.c_str());
         if (path == currentFile)
             ImGui::PushStyleColor(ImGuiCol_Button, { 0.3f, 0.3f, 0.3f, 1.0f });
         else
@@ -40,8 +39,7 @@ void ContentBrowserPanel::onImGui() {
         if (entry.is_directory()) {
             ImGui::Button(fs::ICON_FA_FOLDER, { thumbnailSize, thumbnailSize });
         } else {
-            auto key { fs::extentions.find(filename.extension()) };
-            ImGui::Button(key != fs::extentions.end() ? key->second.c_str() : fs::ICON_FA_FILE, { thumbnailSize, thumbnailSize });
+            ImGui::Button(fs::extension_icon(path).c_str(), { thumbnailSize, thumbnailSize });
         }
 
         if (ImGui::BeginDragDropSource()) {
@@ -51,6 +49,8 @@ void ContentBrowserPanel::onImGui() {
         }
 
         ImGui::PopStyleColor(3);
+
+        auto filename = path.filename();
 
         if (ImGui::IsItemHovered()) {
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
