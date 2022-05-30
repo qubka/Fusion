@@ -22,6 +22,7 @@ void Renderer::create(const vk::Extent2D& size, bool overlay) {
     }
 
     modelRenderer = new ModelRenderer(context, *this);
+    gridRenderer = new GridRenderer(context, *this);
 }
 
 void Renderer::destroy() {
@@ -36,6 +37,7 @@ void Renderer::destroy() {
     }
 
     delete modelRenderer;
+    delete gridRenderer;
 
     swapChain.destroy();
 

@@ -2,6 +2,8 @@
 #include "components.hpp"
 
 #include "fusion/renderer/systems/model_renderer.hpp"
+#include "fusion/renderer/systems/grid_renderer.hpp"
+#include "fusion/renderer/editor_camera.hpp"
 
 using namespace fe;
 
@@ -29,16 +31,24 @@ void Scene::onRenderRuntime() {
 
 }
 
-void Scene::onRenderEditor() {
-    auto& renderer = ModelRenderer::Instance();
+void Scene::onRenderEditor(const EditorCamera& camera) {
+    auto& modelRenderer = ModelRenderer::Instance();
 
-    renderer.begin();
+    modelRenderer.begin();
 
     auto group = registry.group<TransformComponent>(entt::get<ModelComponent>);
     for (auto entity : group) {
         auto [transform, model] = group.get<TransformComponent, ModelComponent>(entity);
-        renderer.draw(transform.invTransform());
+        modelRenderer.draw(transform.invTransform());
     }
 
-    renderer.end();
+    modelRenderer.end();
+
+    auto& gridRenderer = GridRenderer::Instance();
+
+    gridRenderer.begin();
+
+    gridRenderer.draw();
+
+    gridRenderer.end();
 }

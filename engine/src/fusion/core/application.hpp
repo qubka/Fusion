@@ -43,7 +43,7 @@ namespace fe {
         std::string getWindowTitle();
         std::string title;
         // Default window size
-        vk::Extent2D size{ 1280, 720 };
+        vk::Extent2D size{ 3840, 2160 };
 
         // Used to store app singleton
         static Application* instance;

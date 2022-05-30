@@ -5,9 +5,10 @@
 #include <imgui/imgui_internal.h>
 
 using namespace fe;
+using namespace std::string_literals;
 
 void FileExplorerPanel::onImGui() {
-    ImGui::Begin("File Explorer");
+    ImGui::Begin("##fileexplorer", nullptr, ImGuiWindowFlags_NoTitleBar);
 
     std::function<void(const std::filesystem::path&, uint32_t &)> function = [&](const std::filesystem::path& dir, uint32_t& idx) {
         for (const auto& entry : fs::walk(dir)) {
@@ -16,7 +17,12 @@ void FileExplorerPanel::onImGui() {
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ((currentNode == idx) ? ImGuiTreeNodeFlags_Selected : 0);
 
             if (entry.is_directory()) {
-                if (ImGui::TreeNodeEx((void *)static_cast<intptr_t>(idx), flags, "%s %s", fs::ICON_FA_FOLDER, path.filename().c_str())) {
+                bool opened = ImGui::TreeNodeEx((void *)static_cast<intptr_t>(idx), flags, "");
+
+                ImGui::SameLine();
+                ImGui::Text("%s %s", opened ? fs::ICON_FA_FOLDER_OPEN : fs::ICON_FA_FOLDER_CLOSE, path.filename().c_str());
+
+                if (opened) {
                     if (ImGui::IsItemClicked() || ImGui::IsItemFocused())
                         currentNode = idx;
                     function(entry, ++idx);

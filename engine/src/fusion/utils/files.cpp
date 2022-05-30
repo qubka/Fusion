@@ -16,12 +16,25 @@ std::vector<std::filesystem::directory_entry> fs::walk(const std::filesystem::pa
     return files;
 }
 
-const char* fs::ICON_FA_FOLDER{ "\uF07C" };
+const char* fs::ICON_FA_FOLDER_CLOSE{ "\uF07B" };
+const char* fs::ICON_FA_FOLDER_OPEN{ "\uF07C" };
 const char* fs::ICON_FA_FILE{ "\uF016" };
 const char* fs::ICON_FA_SEARCH{ "\uF002" };
 const char* fs::ICON_FA_REPLY{ "\uF112" };
 const char* fs::ICON_FA_PLAY{ "\uF04B" };
 const char* fs::ICON_FA_STOP{ "\uF04D" };
+const char* fs::ICON_FA_OK{ "\uF00C" };
+const char* fs::ICON_FA_REMOVE{ "\uF00D" };
+const char* fs::ICON_FA_AXIS{ "\uF1E9" };
+const char* fs::ICON_FA_CAMERA{ "\uF030" };
+const char* fs::ICON_FA_CUBE{ "\uF1B2" };
+const char* fs::ICON_FA_CUBES{ "\uF1B3" };
+const char* fs::ICON_FA_MANY_CUBES{ "\uF2B8" };
+const char* fs::ICON_FA_INFO{ "\uF05A" };
+const char* fs::ICON_FA_LIST{ "\uF03A" };
+const char* fs::ICON_FA_STATS{ "\uF1EA" };
+const char* fs::ICON_FA_ARCHIVE{ "\uF187" };
+const char* fs::ICON_FA_STORAGE{ "\uF1C0" };
 
 std::unordered_map<std::string, std::string> fs::extensions {
     {".gif", "\uF1C5"},

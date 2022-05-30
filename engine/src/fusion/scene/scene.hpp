@@ -16,7 +16,7 @@ namespace fe {
         void onUpdateEditor(float dt);
 
         void onRenderRuntime();
-        void onRenderEditor();
+        void onRenderEditor(const EditorCamera& camera);
 
         entt::registry registry;
     };

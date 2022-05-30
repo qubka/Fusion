@@ -12,6 +12,7 @@
 #include "vkx/ui.hpp"
 
 #include "systems/model_renderer.hpp"
+#include "systems/grid_renderer.hpp"
 
 namespace fe {
     struct GlobalUbo {
@@ -83,6 +84,7 @@ namespace fe {
         glm::vec3 lightDirection{1, -3, -1};
 
         ModelRenderer* modelRenderer;
+        GridRenderer* gridRenderer;
 
         uint32_t currentImage{ 0 };
         uint32_t currentFrame{ 0 };

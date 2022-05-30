@@ -9,24 +9,27 @@
 #include <imgui/imgui_internal.h>
 
 using namespace fe;
+using namespace std::string_literals;
 
 void SceneHierarchyPanel::setContext(const std::shared_ptr<Scene>& scene) {
     context = scene;
     selectionContext = entt::null;
+    renameContext = entt::null;
 }
 
 void SceneHierarchyPanel::onImGui() {
-    ImGui::Begin("Scene Hierarchy");
-
+    ImGui::Begin((fs::ICON_FA_LIST + "  Hierarchy"s).c_str());
     context->registry.each([&](auto entity) {
        drawEntity(entity);
    });
 
-    if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
         selectionContext = entt::null;
+        renameContext = entt::null;
+    }
 
     // Right-click on blank space
-    if (ImGui::BeginPopupContextWindow(nullptr, 1, false)) {
+    if (ImGui::BeginPopupContextWindow("HierarchyOptions", 1, false)) {
         if (ImGui::MenuItem("Create Empty Entity")) {
             auto entity = context->registry.create();
             context->registry.emplace<IdComponent>(entity);
@@ -38,12 +41,90 @@ void SceneHierarchyPanel::onImGui() {
 
     ImGui::End();
 
-    ImGui::Begin("Properties");
+    ImGui::Begin((fs::ICON_FA_INFO + "  Inspector"s).c_str());
     if (selectionContext != entt::null) {
         drawComponents(selectionContext);
     }
 
     ImGui::End();
+}
+
+void SceneHierarchyPanel::drawEntity(entt::entity entity) {
+    auto& tag = *context->registry.get<TagComponent>(entity);
+
+    ImGuiTreeNodeFlags flags = ((selectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (entity != renameContext) {
+        flags |= ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
+    } else if (renameContext != entt::null) {
+        flags |= ImGuiTreeNodeFlags_FramePadding;
+
+        float nodeHeight = GImGui->Font->FontSize / 2.0f;
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { nodeHeight, nodeHeight });
+    }
+    bool opened = ImGui::TreeNodeEx((void*)static_cast<uintptr_t>(entity), flags, "");
+
+    if (ImGui::IsItemClicked()/* || ImGui::IsItemFocused()*/) {
+        selectionContext = entity;
+    }
+    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+        renameContext = entity;
+    }
+
+    ImGui::SameLine();
+
+    if (renameContext == entity) {
+        if (!ImGui::IsWindowFocused()) {
+            renameContext = entt::null;
+        } else {
+            if (ImGui::IsItemFocused()) {
+                ImGui::SetKeyboardFocusHere();
+            }
+            char buffer[256];
+            memset(buffer, 0, sizeof(buffer));
+            std::strncpy(buffer, tag.c_str(), sizeof(buffer));
+            if (ImGui::InputText("##rename", buffer, sizeof(buffer))) {
+                tag = std::string{buffer};
+            }
+            //ImGui::SameLine();
+            if (/*ImGui::Button(fs::ICON_FA_OK) || */ImGui::IsKeyDown(ImGuiKey_Enter)) {
+                renameContext = entt::null;
+            }
+        }
+    } else {
+        ImGui::TextUnformatted(tag.c_str());
+    }
+
+    if (ImGui::BeginPopupContextItem("EntityOptions")) {
+        if (ImGui::MenuItem("Copy")) {
+        }
+        if (ImGui::MenuItem("Paste")) {
+        }
+        ImGui::Spacing();
+        if (ImGui::MenuItem("Rename")) {
+            selectionContext = entity;
+            renameContext = entity;
+        }
+        if (ImGui::MenuItem("Duplicate")) {
+
+        }
+        if (ImGui::MenuItem("Delete")) {
+            context->registry.destroy(entity);
+            if (selectionContext == entity)
+                selectionContext = entt::null;
+            if (renameContext == entity)
+                renameContext = entt::null;
+        }
+        ImGui::EndPopup();
+    }
+
+    if (opened) {
+        //if (ImGui::TreeNodeEx((void*)9817239, ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth, "%s", tag.c_str()))
+        //    ImGui::TreePop();
+        ImGui::TreePop();
+    }
+
+    if (flags & ImGuiTreeNodeFlags_FramePadding)
+        ImGui::PopStyleVar();
 }
 
 void SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string& value, const std::string& file, const std::vector<std::string>& formats, float columnWidth) {
@@ -77,21 +158,19 @@ void SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     ImVec2 buttonSize = { panelWidth - lineHeight, lineHeight };
 
     if (value.empty()) {
-        if (ImGui::Button("?", buttonSize)) {
+        if (ImGui::Button("...", buttonSize)) {
             function();
         }
     } else {
         std::filesystem::path path{value};
-        auto title = fs::extension_icon(path) + (" " + path.filename().string());
+        auto title = fs::extension_icon(path) + " " + path.filename().string();
         if (ImGui::Button(title.c_str(), buttonSize)) {
             contentBrowserPanel.selectFile(path);
         }
     }
 
-    if (ImGui::IsItemHovered()) {
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-            value = "";
-        }
+    if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+        value = "";
     }
 
     if (ImGui::BeginDragDropTarget()) {
@@ -121,38 +200,9 @@ void SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     ImGui::PopID();
 }
 
-void SceneHierarchyPanel::drawEntity(entt::entity entity) {
-    auto tag = *context->registry.get<TagComponent>(entity);
-
-    ImGuiTreeNodeFlags flags = ((selectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
-    flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-    bool opened = ImGui::TreeNodeEx((void*)static_cast<uintptr_t>(entity), flags, "%s", tag.c_str());
-    if (ImGui::IsItemClicked() || ImGui::IsItemFocused())
-        selectionContext = entity;
-
-    bool entityDeleted = false;
-    if (ImGui::BeginPopupContextItem()) {
-        if (ImGui::MenuItem("Delete Entity"))
-            entityDeleted = true;
-        ImGui::EndPopup();
-    }
-
-    if (opened) {
-        //if (ImGui::TreeNodeEx((void*)9817239, ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth, "%s", tag.c_str()))
-        //    ImGui::TreePop();
-        ImGui::TreePop();
-    }
-
-    if (entityDeleted) {
-        context->registry.destroy(entity);
-        if (selectionContext == entity)
-            selectionContext = entt::null;
-    }
-}
-
 void SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth) {
-    ImGuiIO& io = ImGui::GetIO();
-    auto boldFont = io.Fonts->Fonts[0];
+    //ImGuiIO& io = ImGui::GetIO();
+    //auto boldFont = io.Fonts->Fonts[0];
 
     ImGui::PushID(label.c_str());
 
@@ -170,12 +220,12 @@ void SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.15f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.9f, 0.2f, 0.2f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.8f, 0.1f, 0.15f, 1.0f });
-    ImGui::PushFont(boldFont);
+    //ImGui::PushFont(boldFont);
     if (ImGui::Button("X", buttonSize)) {
         values.x = resetValue;
         //return true;
     }
-    ImGui::PopFont();
+    //ImGui::PopFont();
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -185,12 +235,12 @@ void SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f, 0.8f, 0.3f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.7f, 0.2f, 1.0f });
-    ImGui::PushFont(boldFont);
+    //ImGui::PushFont(boldFont);
     if (ImGui::Button("Y", buttonSize)) {
         values.y = resetValue;
         //return true;
     }
-    ImGui::PopFont();
+    //ImGui::PopFont();
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -200,12 +250,12 @@ void SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.25f, 0.8f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f, 0.35f, 0.9f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.1f, 0.25f, 0.8f, 1.0f });
-    ImGui::PushFont(boldFont);
+    //::PushFont(boldFont);
     if (ImGui::Button("Z", buttonSize)) {
         values.z = resetValue;
         //return true;
     }
-    ImGui::PopFont();
+    //ImGui::PopFont();
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -221,8 +271,8 @@ void SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
 }
 
 void SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& values, float resetValue, float columnWidth) {
-    ImGuiIO& io = ImGui::GetIO();
-    auto boldFont = io.Fonts->Fonts[0];
+    //ImGuiIO& io = ImGui::GetIO();
+    //auto boldFont = io.Fonts->Fonts[0];
 
     ImGui::PushID(label.c_str());
 
@@ -240,12 +290,12 @@ void SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.15f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.9f, 0.2f, 0.2f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.8f, 0.1f, 0.15f, 1.0f });
-    ImGui::PushFont(boldFont);
+    //ImGui::PushFont(boldFont);
     if (ImGui::Button("X", buttonSize)) {
         values.x = resetValue;
         //return true;
     }
-    ImGui::PopFont();
+    //ImGui::PopFont();
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -255,12 +305,12 @@ void SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f, 0.8f, 0.3f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.7f, 0.2f, 1.0f });
-    ImGui::PushFont(boldFont);
+    //ImGui::PushFont(boldFont);
     if (ImGui::Button("Y", buttonSize)) {
         values.y = resetValue;
         //return true;
     }
-    ImGui::PopFont();
+    //ImGui::PopFont();
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -289,7 +339,7 @@ void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity en
         ImGui::PopStyleVar();
         ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 
-        if (ImGui::Button("+")) {
+        if (ImGui::Button(fs::ICON_FA_REMOVE)) {
             ImGui::OpenPopup("ComponentSettings");
         }
 
@@ -311,13 +361,12 @@ void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity en
     }
 }
 
-void SceneHierarchyPanel::drawComponents(entt::entity entity)
-{
+void SceneHierarchyPanel::drawComponents(entt::entity entity) {
     auto& tag = *context->registry.get<TagComponent>(entity);
     char buffer[256];
     memset(buffer, 0, sizeof(buffer));
     std::strncpy(buffer, tag.c_str(), sizeof(buffer));
-    if (ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
+    if (ImGui::InputText("##tag", buffer, sizeof(buffer))) {
         tag = std::string{buffer};
     }
 
@@ -328,21 +377,21 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
         ImGui::OpenPopup("AddComponent");
 
     if (ImGui::BeginPopup("AddComponent")) {
-        if (!context->registry.all_of<TransformComponent>(selectionContext)) {
+        if (!context->registry.all_of<TransformComponent>(entity)) {
             if (ImGui::MenuItem("Transform")) {
-                context->registry.emplace<TransformComponent>(selectionContext);
+                context->registry.emplace<TransformComponent>(entity);
                 ImGui::CloseCurrentPopup();
             }
         }
-        if (!context->registry.all_of<CameraComponent>(selectionContext)) {
+        if (!context->registry.all_of<CameraComponent>(entity)) {
             if (ImGui::MenuItem("Camera")) {
-                context->registry.emplace<CameraComponent>(selectionContext);
+                context->registry.emplace<CameraComponent>(entity);
                 ImGui::CloseCurrentPopup();
             }
         }
-        if (!context->registry.all_of<ModelComponent>(selectionContext)) {
+        if (!context->registry.all_of<ModelComponent>(entity)) {
             if (ImGui::MenuItem("Model")) {
-                context->registry.emplace<ModelComponent>(selectionContext);
+                context->registry.emplace<ModelComponent>(entity);
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -351,7 +400,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
 
     ImGui::PopItemWidth();
 
-    drawComponent<TransformComponent>("Transform", entity, [](TransformComponent& component)
+    drawComponent<TransformComponent>(fs::ICON_FA_AXIS + "  Transform"s, entity, [](TransformComponent& component)
     {
         drawVec3Control("Translation", component.translation);
         glm::vec3 rotation = glm::degrees(component.rotation);
@@ -360,7 +409,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
         drawVec3Control("Scale", component.scale, 1.0f);
     });
 
-    drawComponent<CameraComponent>("Camera", entity, [](CameraComponent& component)
+    drawComponent<CameraComponent>(fs::ICON_FA_CAMERA + "  Camera"s, entity, [](CameraComponent& component)
     {
         auto& camera = component.camera;
 
@@ -419,7 +468,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity)
         }
     });
 
-    drawComponent<ModelComponent>("Model", entity, [&](ModelComponent& component)
+    drawComponent<ModelComponent>(fs::ICON_FA_CUBES + "  Model"s, entity, [&](ModelComponent& component)
     {
         drawFileBrowser("Path", component.path, "3D Files (.fbx .obj .dae .gltf .3ds)", { "*.fbx", "*.obj", "*.dae", "*.gltf", "*.3ds" });
 

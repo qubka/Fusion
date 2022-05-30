@@ -27,6 +27,7 @@ namespace fe {
     private:
         std::shared_ptr<Scene> context;
         entt::entity selectionContext;
+        entt::entity renameContext;
         ContentBrowserPanel& contentBrowserPanel;
     };
 }

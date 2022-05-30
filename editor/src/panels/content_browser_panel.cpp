@@ -4,9 +4,10 @@
 #include <imgui/imgui.h>
 
 using namespace fe;
+using namespace std::string_literals;
 
 void ContentBrowserPanel::onImGui() {
-    ImGui::Begin("Content Browser");
+    ImGui::Begin("##contentbrowser", nullptr, ImGuiWindowFlags_NoTitleBar);
 
     if (currentDirectory != getAssetPath()) {
         if (ImGui::Button(fs::ICON_FA_REPLY)) {
@@ -37,7 +38,7 @@ void ContentBrowserPanel::onImGui() {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.15f, 0.15f, 0.15f, 1.0f });
 
         if (entry.is_directory()) {
-            ImGui::Button(fs::ICON_FA_FOLDER, { thumbnailSize, thumbnailSize });
+            ImGui::Button(fs::ICON_FA_FOLDER_CLOSE, { thumbnailSize, thumbnailSize });
         } else {
             ImGui::Button(fs::extension_icon(path).c_str(), { thumbnailSize, thumbnailSize });
         }

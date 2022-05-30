@@ -14,6 +14,7 @@
 #include <imguizmo/ImGuizmo.h>
 
 using namespace fe;
+using namespace std::string_literals;
 
 EditorLayer::EditorLayer(EditorApp& context) : Layer{"EditorLayer"}, context{context} {
 }
@@ -23,8 +24,8 @@ EditorLayer::~EditorLayer() {
 }
 
 void EditorLayer::onAttach() {
-    activeScene = std::make_shared<Scene>();
     editorCamera = EditorCamera{30, 1.778f, 0.1f, 1000};
+    activeScene = std::make_shared<Scene>();
 
     /*auto commandLineArgs = Application::Instance().getCommandLineArgs();
     if (commandLineArgs.count > 1) {
@@ -82,7 +83,7 @@ void EditorLayer::onRender(Renderer& renderer) {
 
     switch (sceneState) {
         case SceneState::Edit:
-            activeScene->onRenderEditor();
+            activeScene->onRenderEditor(editorCamera);
             break;
 
         case SceneState::Play: {
@@ -122,7 +123,7 @@ void EditorLayer::onImGui() {
     // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
     // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
-    ImGui::Begin("DockSpace Demo", nullptr, window_flags);
+    ImGui::Begin("DockSpace", nullptr, window_flags);
     ImGui::PopStyleVar();
 
     if (opt_fullscreen_persistant)
@@ -162,10 +163,15 @@ void EditorLayer::onImGui() {
     }
 
     sceneHierarchyPanel.onImGui();
+
+    ImGui::Begin((fs::ICON_FA_ARCHIVE + "  Content Browser"s).c_str());
+
+
     contentBrowserPanel.onImGui();
     fileExplorerPanel.onImGui();
+    ImGui::End();
 
-    ImGui::Begin("Stats");
+    ImGui::Begin((fs::ICON_FA_STATS + "  Stats"s).c_str());
 
     //std::string name = "None";
     //if (hoveredEntity)
@@ -198,7 +204,7 @@ void EditorLayer::onImGui() {
     ImGui::End();
 
     //ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
-    ImGui::Begin("Scene");
+    ImGui::Begin((fs::ICON_FA_MANY_CUBES + "  Scene"s).c_str());
 
     auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
     auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
@@ -236,7 +242,7 @@ void EditorLayer::onImGui() {
         // Camera
 
         // Runtime camera from entity
-        glm::mat4& cameraView = editorCamera.getView();
+        const glm::mat4& cameraView = editorCamera.getView();
         const glm::mat4& cameraProjection = editorCamera.getProjection();
 
         // Entity transform

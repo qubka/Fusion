@@ -3,13 +3,13 @@
 namespace fe {
     class Camera {
     public:
-        glm::mat4& getProjection() { return projectionMatrix; }
+        const glm::mat4& getProjection() const { return projectionMatrix; }
         void setProjection(const glm::mat4& matrix) { projectionMatrix = matrix; }
 
-        glm::mat4& getView() { return viewMatrix; }
+        const glm::mat4& getView() const { return viewMatrix; }
         void setView(const glm::mat4& matrix) { viewMatrix = matrix; }
 
-        glm::mat4& getViewProjection() { return viewProjectionMatrix; }
+        const glm::mat4& getViewProjection() const { return viewProjectionMatrix; }
         void setViewProjection(const glm::mat4& matrix) { viewProjectionMatrix = matrix; }
 
     protected:

@@ -87,9 +87,9 @@ void Model::loadFromFile(const Context& context, const std::string& filename, co
     }
 
     // Vertex buffer
-    vertices = context.stageToDeviceBuffer(vk::BufferUsageFlagBits::eVertexBuffer, vertexBuffer);
+    vertices = context.stageToDeviceBuffer<uint8_t>(vk::BufferUsageFlagBits::eVertexBuffer, vertexBuffer);
     // Index buffer
-    indices = context.stageToDeviceBuffer(vk::BufferUsageFlagBits::eIndexBuffer, indexBuffer);
+    indices = context.stageToDeviceBuffer<uint32_t>(vk::BufferUsageFlagBits::eIndexBuffer, indexBuffer);
 };
 
 void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* pScene, uint32_t meshIndex, uint32_t vertexIndex) {

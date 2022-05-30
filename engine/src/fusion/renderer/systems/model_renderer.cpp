@@ -6,13 +6,6 @@ using namespace fe;
 
 ModelRenderer* ModelRenderer::instance{ nullptr };
 
-void ModelRenderer::destroy() {
-    context.device.destroyPipelineLayout(pipelineLayout);
-    context.device.destroyPipeline(pipeline);
-
-    model.destroy();
-}
-
 void ModelRenderer::createDescriptorSets() {
 
 }
