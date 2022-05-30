@@ -17,7 +17,11 @@ namespace fe {
         }
 
     private:
+        void drawFileExplorer();
+        void drawContentBrowser();
+
         std::filesystem::path currentDirectory;
         std::filesystem::path currentFile;
+        uint32_t currentNode{ UINT32_MAX };
     };
 }

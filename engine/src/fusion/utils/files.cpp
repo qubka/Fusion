@@ -35,6 +35,8 @@ const char* fs::ICON_FA_LIST{ "\uF03A" };
 const char* fs::ICON_FA_STATS{ "\uF1EA" };
 const char* fs::ICON_FA_ARCHIVE{ "\uF187" };
 const char* fs::ICON_FA_STORAGE{ "\uF1C0" };
+const char* fs::ICON_FA_COG{ "\uF013" };
+const char* fs::ICON_FA_COGS{ "\uF085" };
 
 std::unordered_map<std::string, std::string> fs::extensions {
     {".gif", "\uF1C5"},

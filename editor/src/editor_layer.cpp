@@ -163,13 +163,7 @@ void EditorLayer::onImGui() {
     }
 
     sceneHierarchyPanel.onImGui();
-
-    ImGui::Begin((fs::ICON_FA_ARCHIVE + "  Content Browser"s).c_str());
-
-
     contentBrowserPanel.onImGui();
-    fileExplorerPanel.onImGui();
-    ImGui::End();
 
     ImGui::Begin((fs::ICON_FA_STATS + "  Stats"s).c_str());
 
@@ -336,6 +330,8 @@ void EditorLayer::saveSceneAs() {
 }
 
 void EditorLayer::UI_Toolbar() {
+    ImGui::Begin((fs::ICON_FA_COG + "  Toolbar"s).c_str(), nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 2.0f });
     ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0.0f, 0.0f });
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.0f, 0.0f, 0.0f, 0.0f });
@@ -344,8 +340,6 @@ void EditorLayer::UI_Toolbar() {
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f });
     const auto& buttonActive = colors[ImGuiCol_ButtonActive];
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, { buttonActive.x, buttonActive.y, buttonActive.z, 0.5f });
-
-    ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     float size = ImGui::GetWindowHeight() - 4.0f;
     ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));

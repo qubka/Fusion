@@ -24,6 +24,8 @@ namespace fe {
         static const char* ICON_FA_STATS;
         static const char* ICON_FA_ARCHIVE;
         static const char* ICON_FA_STORAGE;
+        static const char* ICON_FA_COG;
+        static const char* ICON_FA_COGS;
 
         static std::string extension_icon(const std::filesystem::path& file);
 
