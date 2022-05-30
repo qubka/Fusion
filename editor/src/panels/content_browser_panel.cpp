@@ -72,7 +72,7 @@ void ContentBrowserPanel::drawContentBrowser() {
 
     static float padding = 16.0f;
     static float thumbnailSize = 64.0f;
-    float cellSize = thumbnailSize + padding;
+    static float cellSize = thumbnailSize + padding;
 
     float panelWidth = ImGui::GetContentRegionAvail().x;
     int columnCount = static_cast<int>(panelWidth / cellSize);
@@ -85,6 +85,7 @@ void ContentBrowserPanel::drawContentBrowser() {
         const auto& path = entry.path();
 
         ImGui::PushID(path.c_str());
+
         if (path == currentFile)
             ImGui::PushStyleColor(ImGuiCol_Button, { 0.3f, 0.3f, 0.3f, 1.0f });
         else
