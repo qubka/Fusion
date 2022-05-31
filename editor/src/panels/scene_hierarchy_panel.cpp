@@ -19,6 +19,18 @@ void SceneHierarchyPanel::setContext(const std::shared_ptr<Scene>& scene) {
 
 void SceneHierarchyPanel::onImGui() {
     ImGui::Begin((fs::ICON_FA_LIST + "  Hierarchy"s).c_str());
+
+    ImGui::TextUnformatted(fs::ICON_FA_SEARCH);
+    ImGui::SameLine();
+    char buffer[256];
+    memset(buffer, 0, sizeof(buffer));
+    std::strncpy(buffer, filter.c_str(), sizeof(buffer));
+    if (ImGui::InputTextWithHint("##entityfilter", "Search Entities", buffer, sizeof(buffer))) {
+        filter = std::string{buffer};
+    }
+
+    ImGui::Separator();
+
     context->registry.each([&](auto entity) {
        drawEntity(entity);
    });
@@ -32,9 +44,9 @@ void SceneHierarchyPanel::onImGui() {
     if (ImGui::BeginPopupContextWindow("HierarchyOptions", 1, false)) {
         if (ImGui::MenuItem("Create Empty Entity")) {
             auto entity = context->registry.create();
-            context->registry.emplace<IdComponent>(entity);
             context->registry.emplace<TagComponent>(entity, "Empty Entity");
             context->registry.emplace<TransformComponent>(entity);
+            //RelationshipComponent
         }
         ImGui::EndPopup();
     }
@@ -154,8 +166,7 @@ void SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         }
     };
 
-    float panelWidth = ImGui::GetContentRegionAvail().x;
-    ImVec2 buttonSize = { panelWidth - lineHeight, lineHeight };
+    ImVec2 buttonSize = { ImGui::GetContentRegionAvail().x - lineHeight, lineHeight };
 
     if (value.empty()) {
         if (ImGui::Button("...", buttonSize)) {
@@ -329,15 +340,14 @@ template<typename T>
 void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function) {
     const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding;
     if (auto component = context->registry.try_get<T>(entity)) {
-        ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
-
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
-        float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
         ImGui::Separator();
 
         bool opened = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, "%s", name.c_str());
         ImGui::PopStyleVar();
-        ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+
+        float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+        ImGui::SameLine(ImGui::GetContentRegionAvail().x - lineHeight * 0.5f);
 
         if (ImGui::Button(fs::ICON_FA_REMOVE)) {
             ImGui::OpenPopup("ComponentSettings");

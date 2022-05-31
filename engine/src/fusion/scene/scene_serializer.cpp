@@ -134,9 +134,7 @@ SceneSerializer::SceneSerializer(const std::shared_ptr<Scene>& scene) : scene{sc
 
 void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity entity) {
     out << YAML::BeginMap; // Entity
-    if (auto component = registry.try_get<IdComponent>(entity)) {
-        out << YAML::Key << "Entity" << YAML::Value << component->id;
-    }
+    out << YAML::Key << "Entity" << YAML::Value << static_cast<entt::id_type>(entity);
 
     if (auto component = registry.try_get<TagComponent>(entity)) {
         out << YAML::Key << "TagComponent";
@@ -226,9 +224,8 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
 
     if (const auto& entities = data["Entities"]) {
         for (const auto& entity : entities) {
-            auto uuid = entity["Entity"].as<uint64_t>();
-            auto deserializedEntity = scene->registry.create();
-            scene->registry.emplace<IdComponent>(deserializedEntity, uuid);
+            auto uuid = entity["Entity"].as<entt::id_type>();
+            auto deserializedEntity = scene->registry.create(static_cast<entt::entity>(uuid));
 
             std::string name;
             if (const auto& tagComponent = entity["TagComponent"]) {

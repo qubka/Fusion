@@ -3,10 +3,13 @@
 namespace fe {
     class fs {
     public:
-        static std::vector<std::filesystem::directory_entry> walk(const std::filesystem::path& dir);
+        static std::vector<std::filesystem::directory_entry> walk(const std::filesystem::path& dir, const std::string& filter = "");
+        static std::vector<std::filesystem::directory_entry> recursive_walk(const std::filesystem::path& dir, const std::string& filter = "");
+        static bool has_directories(const std::filesystem::path& dir);
 
         static const char* ICON_FA_FOLDER_CLOSE;
         static const char* ICON_FA_FOLDER_OPEN;
+        static const char* ICON_FA_FOLDER_EMPTY;
         static const char* ICON_FA_FILE;
         static const char* ICON_FA_SEARCH;
         static const char* ICON_FA_REPLY;
@@ -26,6 +29,8 @@ namespace fe {
         static const char* ICON_FA_STORAGE;
         static const char* ICON_FA_COG;
         static const char* ICON_FA_COGS;
+        static const char* ICON_FA_LOCK;
+        static const char* ICON_FA_UNLOCK;
 
         static std::string extension_icon(const std::filesystem::path& file);
 

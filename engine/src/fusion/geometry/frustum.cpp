@@ -52,7 +52,7 @@ bool Frustum::contains(const glm::vec3& center, float radius) const {
 }
 
 bool Frustum::contains(const glm::vec3& center, const glm::vec3& size) const {
-    glm::vec3 halfSize {size * 0.5f};
+    glm::vec3 halfSize{ size * 0.5f };
     AABB box{center - halfSize, center + halfSize};
     return contains(box);
 }
@@ -85,7 +85,7 @@ bool Frustum::intersects(const glm::vec3& center, float radius) const {
 }
 
 bool Frustum::intersects(const glm::vec3& center, const glm::vec3& size) const {
-    glm::vec3 halfSize {size * 0.5f};
+    glm::vec3 halfSize{ size * 0.5f };
     AABB box{center - halfSize, center + halfSize};
     return intersects(box);
 }

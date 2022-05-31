@@ -2,22 +2,57 @@
 
 using namespace fe;
 
-std::vector<std::filesystem::directory_entry> fs::walk(const std::filesystem::path& dir) {
-    std::vector<std::filesystem::directory_entry> files;
+std::vector<std::filesystem::directory_entry> fs::walk(const std::filesystem::path& dir, const std::string& filter) {
+    std::vector<std::filesystem::directory_entry> entries;
 
     for (const auto& entry : std::filesystem::directory_iterator(dir)) {
-        files.push_back(entry);
+        if (!filter.empty() && entry.is_directory() && entry.path().filename().string().find(filter) == std::string::npos)
+            continue;
+
+        entries.push_back(entry);
     }
 
-    std::sort(files.begin(), files.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
+    std::sort(entries.begin(), entries.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
         return a.is_directory() && !b.is_directory();
     });
 
-    return files;
+    return entries;
+}
+
+std::vector<std::filesystem::directory_entry> fs::recursive_walk(const std::filesystem::path& dir, const std::string& filter) {
+    std::vector<std::filesystem::directory_entry> entries;
+
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
+        if (entry.is_directory())
+            continue;
+
+        if (!filter.empty() && entry.path().filename().string().find(filter) == std::string::npos)
+            continue;
+
+        entries.push_back(entry);
+    }
+
+    std::sort(entries.begin(), entries.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
+        return a.path() < b.path();
+    });
+
+    return entries;
+}
+
+bool fs::has_directories(const std::filesystem::path& dir) {
+    if (is_directory(dir) && !is_empty(dir)) {
+        for (const auto& entry: std::filesystem::directory_iterator(dir)) {
+            if (entry.is_directory())
+                return true;
+        }
+    }
+
+    return false;
 }
 
 const char* fs::ICON_FA_FOLDER_CLOSE{ "\uF07B" };
 const char* fs::ICON_FA_FOLDER_OPEN{ "\uF07C" };
+const char* fs::ICON_FA_FOLDER_EMPTY{ "\uF114" };
 const char* fs::ICON_FA_FILE{ "\uF016" };
 const char* fs::ICON_FA_SEARCH{ "\uF002" };
 const char* fs::ICON_FA_REPLY{ "\uF112" };
@@ -37,6 +72,8 @@ const char* fs::ICON_FA_ARCHIVE{ "\uF187" };
 const char* fs::ICON_FA_STORAGE{ "\uF1C0" };
 const char* fs::ICON_FA_COG{ "\uF013" };
 const char* fs::ICON_FA_COGS{ "\uF085" };
+const char* fs::ICON_FA_LOCK{ "\uF023" };
+const char* fs::ICON_FA_UNLOCK{ "\uF13E" };
 
 std::unordered_map<std::string, std::string> fs::extensions {
     {".gif", "\uF1C5"},

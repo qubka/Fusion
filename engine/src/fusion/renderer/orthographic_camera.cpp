@@ -16,7 +16,7 @@ void OrthographicCamera::updateView() {
     if (!dirty)
         return;
 
-    glm::mat4 m{1.0f};
+    glm::mat4 m{ 1.0f };
     glm::mat4 transform {glm::translate(m, position) *
                          glm::rotate(m, glm::radians(rotation), vec3::up)};
 

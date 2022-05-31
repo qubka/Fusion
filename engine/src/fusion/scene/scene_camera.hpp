@@ -40,16 +40,16 @@ namespace fe {
     private:
         ProjectionType projectionType = ProjectionType::Orthographic;
 
-        glm::mat4 projectionMatrix{1.0f};
+        glm::mat4 projectionMatrix{ 1.0f };
 
         float perspectiveFOV = glm::radians(45.0f);
-        float perspectiveNear{0.01f};
-        float perspectiveFar{1000.0f};
+        float perspectiveNear{ 0.01f };
+        float perspectiveFar{ 1000.0f };
 
-        float orthographicSize{10.0f};
-        float orthographicNear{-1.0f};
-        float orthographicFar{1.0f};
+        float orthographicSize{ 10.0f };
+        float orthographicNear{ -1.0f };
+        float orthographicFar{ 1.0f };
 
-        float aspectRatio{0.0f};
+        float aspectRatio{ 0.0f };
     };
 }

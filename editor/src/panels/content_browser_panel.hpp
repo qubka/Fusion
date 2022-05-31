@@ -23,5 +23,8 @@ namespace fe {
         std::filesystem::path currentDirectory;
         std::filesystem::path currentFile;
         uint32_t currentNode{ UINT32_MAX };
+
+        std::string filter;
+        bool locked{ false };
     };
 }

@@ -1,11 +1,13 @@
 #pragma once
 
 #include "scene_camera.hpp"
-#include "fusion/renderer/vkx/model.hpp"
+//#include "fusion/renderer/vkx/model.hpp"
+
+#include <entt/entity/registry.hpp>
 
 namespace fe {
 
-    static std::random_device RandomDevice;
+    /*static std::random_device RandomDevice;
     static std::mt19937_64 Engine(RandomDevice());
     static std::uniform_int_distribution<uint64_t> UniformDistribution;
 
@@ -18,7 +20,7 @@ namespace fe {
         uint64_t& operator*() { return id; }
         const uint64_t& operator*() const { return id; }
         operator uint64_t() const { return id; }
-    };
+    };*/
 
     struct TagComponent {
         std::string tag;
@@ -29,19 +31,19 @@ namespace fe {
     };
 
     struct TransformComponent {
-        glm::vec3 translation{0.0f};
-        glm::vec3 rotation{0.0f};
-        glm::vec3 scale{1.0f};
+        glm::vec3 translation{ 0.0f };
+        glm::vec3 rotation{ 0.0f };
+        glm::vec3 scale{ 1.0f };
 
         glm::mat4 transform() const {
-            glm::mat4 m{1.0f};
+            glm::mat4 m{ 1.0f };
             return glm::translate(m, translation)
                    * glm::mat4_cast(glm::quat(rotation))
                    * glm::scale(m, scale);
         };
 
         glm::mat4 invTransform() const {
-            glm::mat4 m{1.0f};
+            glm::mat4 m{ 1.0f };
             return glm::translate(m, translation)
                    * glm::mat4_cast(glm::quat(rotation))
                    * glm::scale(m, {scale.x, -scale.y, scale.z});
@@ -68,7 +70,15 @@ namespace fe {
 
     struct CameraComponent {
         SceneCamera camera;
-        bool primary{true};
-        bool fixedAspectRatio{false};
+        bool primary{ true };
+        bool fixedAspectRatio{ false };
+    };
+
+    struct RelationshipComponent {
+        std::size_t children{ 0 };
+        entt::entity first{ entt::null };
+        entt::entity prev{ entt::null };
+        entt::entity next{ entt::null };
+        entt::entity parent{ entt::null };
     };
 }

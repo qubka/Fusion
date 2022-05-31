@@ -16,41 +16,35 @@ void ContentBrowserPanel::onImGui() {
 }
 
 void ContentBrowserPanel::drawFileExplorer() {
-    float panelWidth = ImGui::GetContentRegionAvail().x;
-    ImGui::BeginChild((fs::ICON_FA_ARCHIVE + "  Project"s).c_str(), { panelWidth / 6.0f, 0 });
+    ImGui::BeginChild((fs::ICON_FA_ARCHIVE + "  Project"s).c_str(), { ImGui::GetContentRegionAvail().x / 6.0f, 0 }, true);
 
     std::function<void(const std::filesystem::path&, uint32_t &)> function = [&](const std::filesystem::path& dir, uint32_t& idx) {
         for (const auto& entry : fs::walk(dir)) {
             const auto& path = entry.path();
 
-            ImGuiTreeNodeFlags flags = ((currentNode == idx) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
-
             if (entry.is_directory()) {
+                bool filled = fs::has_directories(path);
+
+                ImGuiTreeNodeFlags flags = ((currentNode == idx) ? ImGuiTreeNodeFlags_Selected : 0) |
+                                           (filled ? (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick) : ImGuiTreeNodeFlags_Leaf)
+                                           | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
+
                 bool opened = ImGui::TreeNodeEx((void *)static_cast<intptr_t>(idx), flags, "");
+                if (ImGui::IsItemClicked() || ImGui::IsItemFocused()) {
+                    if (!locked) currentDirectory = path;
+                    currentNode = idx;
+                }
 
                 ImGui::SameLine();
-                ImGui::Text("%s %s", opened ? fs::ICON_FA_FOLDER_OPEN : fs::ICON_FA_FOLDER_CLOSE, path.filename().c_str());
+                ImGui::Text("%s %s", opened && filled ? fs::ICON_FA_FOLDER_OPEN : fs::ICON_FA_FOLDER_CLOSE, path.filename().c_str());
 
                 if (opened) {
-                    if (ImGui::IsItemClicked() || ImGui::IsItemFocused())
-                        currentNode = idx;
                     function(entry, ++idx);
                     ImGui::TreePop();
                 }
-            } else {
-                flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-                ImGui::TreeNodeEx((void *)static_cast<intptr_t>(idx), flags, "%s %s", fs::extension_icon(path).c_str(), path.filename().c_str());
-                if (ImGui::IsItemClicked() || ImGui::IsItemFocused())
-                    currentNode = idx;
 
-                if (ImGui::BeginDragDropSource()) {
-                    const auto& pathStr = path.string();
-                    ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
-                    ImGui::EndDragDropSource();
-                }
+                ++idx;
             }
-
-            ++idx;
         }
     };
 
@@ -62,26 +56,43 @@ void ContentBrowserPanel::drawFileExplorer() {
 
 void ContentBrowserPanel::drawContentBrowser() {
     ImGui::SameLine();
-    ImGui::BeginChild("ContentBrowser");
+    ImGui::BeginChild("ContentBrowser", { 0, 0 }, true);
 
     if (currentDirectory != getAssetPath()) {
         if (ImGui::Button(fs::ICON_FA_REPLY)) {
             currentDirectory = currentDirectory.parent_path();
         }
+        ImGui::SameLine();
     }
+
+    ImGui::TextUnformatted(fs::ICON_FA_SEARCH);
+    ImGui::SameLine();
+
+    char buffer[256];
+    memset(buffer, 0, sizeof(buffer));
+    std::strncpy(buffer, filter.c_str(), sizeof(buffer));
+    if (ImGui::InputTextWithHint("##filesfilter", "Search Files", buffer, sizeof(buffer))) {
+        filter = std::string{buffer};
+    }
+
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x - 16.0f);
+    if (ImGui::Button(locked ? fs::ICON_FA_LOCK : fs::ICON_FA_UNLOCK)) {
+        locked = !locked;
+    }
+
+    ImGui::Separator();
 
     static float padding = 16.0f;
     static float thumbnailSize = 64.0f;
     static float cellSize = thumbnailSize + padding;
 
-    float panelWidth = ImGui::GetContentRegionAvail().x;
-    int columnCount = static_cast<int>(panelWidth / cellSize);
+    int columnCount = static_cast<int>(ImGui::GetContentRegionAvail().x / cellSize);
     if (columnCount < 1)
         columnCount = 1;
 
     ImGui::Columns(columnCount, nullptr, false);
 
-    for (const auto& entry : fs::walk(currentDirectory)) {
+    for (const auto& entry : (filter.empty() ? fs::walk(currentDirectory) : fs::recursive_walk(getAssetPath(), filter))) {
         const auto& path = entry.path();
 
         ImGui::PushID(path.c_str());
@@ -132,3 +143,38 @@ void ContentBrowserPanel::drawContentBrowser() {
 
     ImGui::EndChild();
 }
+
+/*std::function<void(const std::filesystem::path&, uint32_t &)> function = [&](const std::filesystem::path& dir, uint32_t& idx) {
+    for (const auto& entry : (folderFilter.empty() ? fs::walk(dir) : fs::recursive_walk(dir, folderFilter))) {
+        const auto& path = entry.path();
+
+        ImGuiTreeNodeFlags flags = ((currentNode == idx) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
+
+        if (entry.is_directory()) {
+            bool opened = ImGui::TreeNodeEx((void *)static_cast<intptr_t>(idx), flags, "");
+
+            ImGui::SameLine();
+            ImGui::Text("%s %s", opened ? fs::ICON_FA_FOLDER_OPEN : fs::ICON_FA_FOLDER_CLOSE, path.filename().c_str());
+
+            if (opened) {
+                if (ImGui::IsItemClicked() || ImGui::IsItemFocused())
+                    currentNode = idx;
+                function(entry, ++idx);
+                ImGui::TreePop();
+            }
+        } else {
+            flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+            ImGui::TreeNodeEx((void *)static_cast<intptr_t>(idx), flags, "%s %s", fs::extension_icon(path).c_str(), path.filename().c_str());
+            if (ImGui::IsItemClicked() || ImGui::IsItemFocused())
+                currentNode = idx;
+
+            if (ImGui::BeginDragDropSource()) {
+                const auto& pathStr = path.string();
+                ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
+                ImGui::EndDragDropSource();
+            }
+        }
+
+        ++idx;
+    }
+};*/

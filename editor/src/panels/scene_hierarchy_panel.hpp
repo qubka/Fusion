@@ -29,5 +29,6 @@ namespace fe {
         entt::entity selectionContext;
         entt::entity renameContext;
         ContentBrowserPanel& contentBrowserPanel;
+        std::string filter;
     };
 }
