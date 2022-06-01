@@ -50,7 +50,7 @@ public:
     }
 
     float getHeight(uint32_t x, uint32_t y) {
-        glm::ivec2 rpos = glm::ivec2(x, y) * glm::ivec2(scale);
+        glm::ivec2 rpos = glm::ivec2{x, y} * glm::ivec2(scale);
         rpos.x = std::max(0, std::min(rpos.x, static_cast<int>(dim - 1)));
         rpos.y = std::max(0, std::min(rpos.y, static_cast<int>(dim - 1)));
         rpos /= glm::ivec2(scale);
@@ -58,7 +58,7 @@ public:
         return heightdata[offset] / 65535.0f * heightScale;
     }
 
-    void loadFromFile(const vkx::Context& context, const std::string& filename, uint32_t patchsize, glm::vec3 scale, Topology topology) {
+    void loadFromFile(const vkx::Context& context, const std::string& filename, uint32_t patchsize, const glm::vec3& scale, Topology topology) {
         std::shared_ptr<gli::texture2d> tex2Dptr;
         vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {
             tex2Dptr = std::make_shared<gli::texture2d>(gli::load((const char*)data, size));

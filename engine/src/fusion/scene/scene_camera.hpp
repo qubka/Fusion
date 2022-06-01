@@ -3,7 +3,6 @@
 #include "fusion/renderer/camera.hpp"
 
 namespace fe {
-
     class SceneCamera {
     public:
         enum class ProjectionType { Perspective = 0, Orthographic = 1 };

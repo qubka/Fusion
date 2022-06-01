@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scene_camera.hpp"
-//#include "fusion/renderer/vkx/model.hpp"
 
 #include <entt/entity/registry.hpp>
 

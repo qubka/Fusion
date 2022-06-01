@@ -1,6 +1,7 @@
 #include "scene_hierarchy_panel.hpp"
 #include "content_browser_panel.hpp"
 #include "fusion/scene/components.hpp"
+#include "fusion/scene/entity.hpp"
 #include "fusion/utils/files.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
@@ -46,7 +47,7 @@ void SceneHierarchyPanel::onImGui() {
             auto entity = context->registry.create();
             context->registry.emplace<TagComponent>(entity, "Empty Entity");
             context->registry.emplace<TransformComponent>(entity);
-            context->registry.emplace<RelationshipComponent>(entity);
+            //context->registry.emplace<RelationshipComponent>(entity);
         }
         ImGui::EndPopup();
     }
@@ -62,6 +63,8 @@ void SceneHierarchyPanel::onImGui() {
 }
 
 void SceneHierarchyPanel::drawEntity(entt::entity entity) {
+    ImGui::PushID(("entity" + std::to_string(static_cast<int>(entity))).c_str());
+
     auto& tag = *context->registry.get<TagComponent>(entity);
 
     ImGuiTreeNodeFlags flags = ((selectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
@@ -74,11 +77,23 @@ void SceneHierarchyPanel::drawEntity(entt::entity entity) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { lineHeight, lineHeight });
     }
     bool opened = ImGui::TreeNodeEx((void*)entity, flags, "");
-    if (ImGui::IsItemClicked()/* || ImGui::IsItemFocused()*/) {
+    if (ImGui::IsItemClicked() || ImGui::IsItemFocused()) {
         selectionContext = entity;
     }
-    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+    /*if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
         renameContext = entity;
+    }*/
+
+    if (ImGui::BeginDragDropSource()) {
+        ImGui::SetDragDropPayload("SCENE_HIERARCHY_ITEM", &entity, sizeof(entt::entity));
+        ImGui::EndDragDropSource();
+    }
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
+             //entt::set_parent(entity, *static_cast<entt::entity*>(payload->Data));
+        }
+        ImGui::EndDragDropTarget();
     }
 
     ImGui::SameLine();
@@ -96,27 +111,12 @@ void SceneHierarchyPanel::drawEntity(entt::entity entity) {
             if (ImGui::InputText("##rename", buffer, sizeof(buffer))) {
                 tag = std::string{buffer};
             }
-            //ImGui::SameLine();
-            if (/*ImGui::Button(fs::ICON_FA_OK) || */ImGui::IsKeyDown(ImGuiKey_Enter)) {
+            if (ImGui::IsKeyDown(ImGuiKey_Enter)) {
                 renameContext = entt::null;
             }
         }
     } else {
-        //ImGui::TextUnformatted(tag.c_str());
-        auto id = std::to_string(static_cast<int>(entity));
-        ImGui::Button(("entity "s + id).c_str());
-
-        if (ImGui::BeginDragDropSource()) {
-            ImGui::SetDragDropPayload("SCENE_HIERARCHY_ITEM", id.c_str(), id.length() + 1);
-            ImGui::EndDragDropSource();
-        }
-
-        /*if (ImGui::BeginDragDropTarget()) {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
-
-            }
-            ImGui::EndDragDropTarget();
-        }*/
+        ImGui::TextUnformatted(tag.c_str());
     }
 
     if (ImGui::BeginPopupContextItem("EntityOptions")) {
@@ -143,13 +143,21 @@ void SceneHierarchyPanel::drawEntity(entt::entity entity) {
     }
 
     if (opened) {
-        //if (ImGui::TreeNodeEx((void*)9817239, ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth, "%s", tag.c_str()))
-        //    ImGui::TreePop();
-        ImGui::TreePop();
+        if (auto component = context->registry.try_get<RelationshipComponent>(entity)) {
+            auto curr = component->first;
+            while (curr != entt::null) {
+                drawEntity(curr);
+                curr = context->registry.get<RelationshipComponent>(curr).next;
+
+                ImGui::TreePop();
+            }
+        }
     }
 
     if (flags & ImGuiTreeNodeFlags_FramePadding)
         ImGui::PopStyleVar();
+
+    ImGui::PopID();
 }
 
 void SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string& value, const std::string& file, const std::vector<std::string>& formats, float columnWidth) {
