@@ -35,7 +35,7 @@ std::string readTextFile(const std::string& fileName) {
     if (!fileStream.is_open()) {
         throw std::runtime_error("File " + fileName + " not found");
     }
-    std::string line = "";
+    std::string line;
     while (!fileStream.eof()) {
         getline(fileStream, line);
         fileContent.append(line + "\n");

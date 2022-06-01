@@ -240,7 +240,7 @@ void EditorLayer::onImGui() {
         const glm::mat4& cameraProjection = editorCamera.getProjection();
 
         // Entity transform
-        auto& component = activeScene->registry.get<TransformComponent>(selectedEntity);
+        auto& component = activeScene->manager.get<TransformComponent>(selectedEntity);
         glm::mat4 transform = component.transform();
 
         // Snapping

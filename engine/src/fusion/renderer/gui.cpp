@@ -75,7 +75,7 @@ void Gui::create(void* window, Renderer& renderer) {
     ImFontConfig config;
     config.MergeMode = true;
 
-    std::string filename = getAssetPath() + "/fonts/fontawesome-webfont.ttf";
+    std::string filename{ getAssetPath() + "/fonts/fontawesome-webfont.ttf" };
     io.Fonts->AddFontFromFileTTF(filename.c_str(), 18.0f, &config, icons_ranges); // Merge into first font
     io.Fonts->Build();
 

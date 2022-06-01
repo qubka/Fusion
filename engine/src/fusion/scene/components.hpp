@@ -44,13 +44,21 @@ namespace fe {
         glm::mat4 invTransform() const {
             glm::mat4 m{ 1.0f };
             return glm::translate(m, translation)
-                   * glm::mat4_cast(glm::quat(rotation))
+                   * glm::mat4_cast(glm::quat{rotation})
                    * glm::scale(m, {scale.x, -scale.y, scale.z});
         };
 
         glm::mat4 normal() const {
             return glm::transpose(glm::inverse(glm::mat3{transform()}));
         }
+    };
+
+    struct RelationshipComponent {
+        size_t children{ 0 }; //! the number of children for the given entity.
+        entt::entity first{ entt::null }; //! the entity identifier of the first child, if any.
+        entt::entity prev{ entt::null }; // the previous sibling in the list of children for the parent.
+        entt::entity next{ entt::null }; // the next sibling in the list of children for the parent.
+        entt::entity parent{ entt::null }; // the entity identifier of the parent, if any.
     };
 
     struct BoundsComponent {
@@ -61,7 +69,6 @@ namespace fe {
 
     struct ModelComponent {
         std::string path;
-        //std::vector<int> layout;
         glm::vec3 scale{ 1.0f };
         glm::vec3 center{ 0.0f };
         glm::vec2 uvscale{ 1.0f };
@@ -71,13 +78,5 @@ namespace fe {
         SceneCamera camera;
         bool primary{ true };
         bool fixedAspectRatio{ false };
-    };
-
-    struct RelationshipComponent {
-        size_t children{ 0 };
-        entt::entity first{ entt::null };
-        entt::entity prev{ entt::null };
-        entt::entity next{ entt::null };
-        entt::entity parent{ entt::null };
     };
 }

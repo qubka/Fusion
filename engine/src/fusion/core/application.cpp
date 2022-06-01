@@ -22,7 +22,7 @@ Application::Application(std::string title, CommandLineArgs args) : title{std::m
     struct stat info;
     if (stat(getAssetPath().c_str(), &info) != 0) {
 #if defined(_WIN32)
-        std::string msg = "Could not locate asset path in \"" + getAssetPath() + "\" !";
+        std::string msg{ "Could not locate asset path in \"" + getAssetPath() + "\" !" };
 		MessageBox(NULL, msg.c_str(), "Fatal error", MB_OK | MB_ICONERROR);
 #else
         LOG_ERROR << "Error: Could not find asset path in " << getAssetPath();
@@ -59,7 +59,7 @@ Application::Application(std::string title, CommandLineArgs args) : title{std::m
         settings.fullscreen = true;
     }
     if (commandLineParser.isSet("shaders")) {
-        std::string value = commandLineParser.getValueAsString("shaders", "glsl");
+        std::string value{ commandLineParser.getValueAsString("shaders", "glsl") };
         if ((value != "glsl") && (value != "hlsl")) {
             LOG_ERROR << "Shader type must be one of 'glsl' or 'hlsl'";
         }/* else {

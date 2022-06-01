@@ -9,6 +9,8 @@
 #include <glm/glm/glm.hpp>
 #include <glm/glm/gtc/matrix_transform.hpp>
 
+using namespace fe;
+
 // Generate a BRDF integration map used as a look-up-table (stores roughness / NdotV)
 void vkx::pbr::generateBRDFLUT(const vkx::Context& context, vkx::texture::Texture2D& target) {
     auto tStart = std::chrono::high_resolution_clock::now();
@@ -125,8 +127,8 @@ void vkx::pbr::generateBRDFLUT(const vkx::Context& context, vkx::texture::Textur
     pipelineBuilder.rasterizationState.cullMode = vk::CullModeFlagBits::eNone;
     pipelineBuilder.depthStencilState = { false };
     // Look-up-table (from BRDF) pipeline
-    pipelineBuilder.loadShader(fe::getAssetPath() + "/shaders/pbr/genbrdflut.vert.spv", vk::ShaderStageFlagBits::eVertex);
-    pipelineBuilder.loadShader(fe::getAssetPath() + "/shaders/pbr/genbrdflut.frag.spv", vk::ShaderStageFlagBits::eFragment);
+    pipelineBuilder.loadShader(getAssetPath() + "/shaders/pbr/genbrdflut.vert.spv", vk::ShaderStageFlagBits::eVertex);
+    pipelineBuilder.loadShader(getAssetPath() + "/shaders/pbr/genbrdflut.frag.spv", vk::ShaderStageFlagBits::eFragment);
     vk::Pipeline pipeline = pipelineBuilder.create(context.pipelineCache);
 
     // Render
@@ -332,8 +334,8 @@ void vkx::pbr::generateIrradianceCube(const vkx::Context& context,
         { 0, 0, vk::Format::eR32G32B32Sfloat, 0 },
     };
 
-    pipelineBuilder.loadShader(fe::getAssetPath() + "/shaders/pbr/filtercube.vert.spv", vk::ShaderStageFlagBits::eVertex);
-    pipelineBuilder.loadShader(fe::getAssetPath() + "/shaders/pbr/irradiancecube.frag.spv", vk::ShaderStageFlagBits::eFragment);
+    pipelineBuilder.loadShader(getAssetPath() + "/shaders/pbr/filtercube.vert.spv", vk::ShaderStageFlagBits::eVertex);
+    pipelineBuilder.loadShader(getAssetPath() + "/shaders/pbr/irradiancecube.frag.spv", vk::ShaderStageFlagBits::eFragment);
     vk::Pipeline pipeline = pipelineBuilder.create(context.pipelineCache);
 
     // Render
@@ -599,8 +601,8 @@ void vkx::pbr::generatePrefilteredCube(const vkx::Context& context,
         { 0, 0, vk::Format::eR32G32B32Sfloat, 0 },
     };
 
-    pipelineBuilder.loadShader(fe::getAssetPath() + "/shaders/pbr/filtercube.vert.spv", vk::ShaderStageFlagBits::eVertex);
-    pipelineBuilder.loadShader(fe::getAssetPath() + "/shaders/pbr/prefilterenvmap.frag.spv", vk::ShaderStageFlagBits::eFragment);
+    pipelineBuilder.loadShader(getAssetPath() + "/shaders/pbr/filtercube.vert.spv", vk::ShaderStageFlagBits::eVertex);
+    pipelineBuilder.loadShader(getAssetPath() + "/shaders/pbr/prefilterenvmap.frag.spv", vk::ShaderStageFlagBits::eFragment);
     vk::Pipeline pipeline = pipelineBuilder.create(context.pipelineCache);
 
     // Render

@@ -17,6 +17,7 @@
 
 using namespace vkx;
 using namespace vkx::model;
+using namespace std::string_literals;
 
 const int Model::defaultFlags =
     aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals;
@@ -38,8 +39,7 @@ void Model::loadFromFile(const Context& context, const std::string& filename, co
     });
 
     if (!pScene) {
-        std::string error = importer.GetErrorString();
-        throw std::runtime_error(error + "\n\nThe file may be part of the additional asset pack.\n\nRun \"download_assets.py\" in the repository root to download the latest version.");
+        throw std::runtime_error(importer.GetErrorString() + "\n\nThe file may be part of the additional asset pack.\n\nRun \"download_assets.py\" in the repository root to download the latest version."s);
     }
 
     parts.clear();

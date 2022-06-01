@@ -36,7 +36,7 @@ void Scene::onRenderEditor(const EditorCamera& camera) {
 
     modelRenderer.begin();
 
-    auto group = registry.group<TransformComponent>(entt::get<ModelComponent>);
+    auto group = manager.group<TransformComponent>(entt::get<ModelComponent>);
     for (auto entity : group) {
         auto [transform, model] = group.get<TransformComponent, ModelComponent>(entity);
         modelRenderer.draw(transform.invTransform());

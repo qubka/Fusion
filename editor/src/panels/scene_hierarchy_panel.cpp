@@ -1,7 +1,6 @@
 #include "scene_hierarchy_panel.hpp"
 #include "content_browser_panel.hpp"
 #include "fusion/scene/components.hpp"
-#include "fusion/scene/entity.hpp"
 #include "fusion/utils/files.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
@@ -21,20 +20,7 @@ void SceneHierarchyPanel::setContext(const std::shared_ptr<Scene>& scene) {
 void SceneHierarchyPanel::onImGui() {
     ImGui::Begin((fs::ICON_FA_LIST + "  Hierarchy"s).c_str());
 
-    ImGui::TextUnformatted(fs::ICON_FA_SEARCH);
-    ImGui::SameLine();
-    char buffer[256];
-    memset(buffer, 0, sizeof(buffer));
-    std::strncpy(buffer, filter.c_str(), sizeof(buffer));
-    if (ImGui::InputTextWithHint("##entityfilter", "Search Entities", buffer, sizeof(buffer))) {
-        filter = std::string{buffer};
-    }
-
-    ImGui::Separator();
-
-    context->registry.each([&](auto entity) {
-       drawEntity(entity);
-   });
+    drawEntities();
 
     if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
         selectionContext = entt::null;
@@ -44,10 +30,23 @@ void SceneHierarchyPanel::onImGui() {
     // Right-click on blank space
     if (ImGui::BeginPopupContextWindow("HierarchyOptions", 1, false)) {
         if (ImGui::MenuItem("Create Empty Entity")) {
-            auto entity = context->registry.create();
-            context->registry.emplace<TagComponent>(entity, "Empty Entity");
-            context->registry.emplace<TransformComponent>(entity);
-            //context->registry.emplace<RelationshipComponent>(entity);
+            auto entity = context->manager.create();
+
+            std::string name{ "Empty Entity" };
+            size_t idx = 0;
+            for (auto [e, tag] : context->manager.view<const TagComponent>().each()) {
+               if ((*tag).find(name, 0) != std::string::npos) {
+                   idx++;
+               }
+            }
+            if (idx > 0)
+                name += " (" + std::to_string(idx) + ")";
+
+            context->manager.emplace<TagComponent>(entity, name);
+            context->manager.emplace<TransformComponent>(entity);
+
+            selectionContext = entity;
+            renameContext = entity;
         }
         ImGui::EndPopup();
     }
@@ -62,102 +61,128 @@ void SceneHierarchyPanel::onImGui() {
     ImGui::End();
 }
 
-void SceneHierarchyPanel::drawEntity(entt::entity entity) {
-    ImGui::PushID(("entity" + std::to_string(static_cast<int>(entity))).c_str());
-
-    auto& tag = *context->registry.get<TagComponent>(entity);
-
-    ImGuiTreeNodeFlags flags = ((selectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
-    if (entity != renameContext) {
-        flags |= ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
-    } else if (renameContext != entt::null) {
-        flags |= ImGuiTreeNodeFlags_FramePadding;
-
-        float lineHeight = GImGui->Font->FontSize / 2.0f;
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { lineHeight, lineHeight });
-    }
-    bool opened = ImGui::TreeNodeEx((void*)entity, flags, "");
-    if (ImGui::IsItemClicked() || ImGui::IsItemFocused()) {
-        selectionContext = entity;
-    }
-    /*if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-        renameContext = entity;
-    }*/
-
-    if (ImGui::BeginDragDropSource()) {
-        ImGui::SetDragDropPayload("SCENE_HIERARCHY_ITEM", &entity, sizeof(entt::entity));
-        ImGui::EndDragDropSource();
-    }
-
-    if (ImGui::BeginDragDropTarget()) {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
-             //entt::set_parent(entity, *static_cast<entt::entity*>(payload->Data));
-        }
-        ImGui::EndDragDropTarget();
-    }
-
+void SceneHierarchyPanel::drawEntities() {
+    ImGui::TextUnformatted(fs::ICON_FA_SEARCH);
     ImGui::SameLine();
-
-    if (renameContext == entity) {
-        if (!ImGui::IsWindowFocused()) {
-            renameContext = entt::null;
-        } else {
-            if (ImGui::IsItemFocused()) {
-                ImGui::SetKeyboardFocusHere();
-            }
-            char buffer[256];
-            memset(buffer, 0, sizeof(buffer));
-            std::strncpy(buffer, tag.c_str(), sizeof(buffer));
-            if (ImGui::InputText("##rename", buffer, sizeof(buffer))) {
-                tag = std::string{buffer};
-            }
-            if (ImGui::IsKeyDown(ImGuiKey_Enter)) {
-                renameContext = entt::null;
-            }
-        }
-    } else {
-        ImGui::TextUnformatted(tag.c_str());
+    char buffer[256];
+    memset(buffer, 0, sizeof(buffer));
+    std::strncpy(buffer, filter.c_str(), sizeof(buffer));
+    if (ImGui::InputTextWithHint("##entityfilter", "Search Entities", buffer, sizeof(buffer))) {
+        filter = std::string{buffer};
     }
 
-    if (ImGui::BeginPopupContextItem("EntityOptions")) {
-        if (ImGui::MenuItem("Copy")) {
+    ImGui::Separator();
+
+    entt::entity removeEntity{ entt::null };
+    std::function<void(entt::entity entity)> function = [&](entt::entity entity) {
+        ImGui::PushID(("Entity" + std::to_string(static_cast<int>(entity))).c_str());
+
+        auto& tag = *context->manager.get<TagComponent>(entity);
+        bool children = context->manager.has_children(entity);
+
+        ImGuiTreeNodeFlags flags = ((selectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) |
+                                   (children ? (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick) : ImGuiTreeNodeFlags_Leaf);
+
+        if (entity != renameContext) {
+            flags |= ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
+        } else if (renameContext != entt::null) {
+            flags |= ImGuiTreeNodeFlags_FramePadding;
+
+            float lineHeight = GImGui->Font->FontSize / 2.0f;
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { lineHeight, lineHeight });
         }
-        if (ImGui::MenuItem("Paste")) {
-        }
-        ImGui::Spacing();
-        if (ImGui::MenuItem("Rename")) {
+        bool opened = ImGui::TreeNodeEx((void*)entity, flags, "");
+        if (ImGui::IsItemClicked() || ImGui::IsItemFocused()) {
             selectionContext = entity;
+        }
+        /*if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
             renameContext = entity;
-        }
-        if (ImGui::MenuItem("Duplicate")) {
+        }*/
 
+        if (ImGui::BeginDragDropSource()) {
+            ImGui::SetDragDropPayload("SCENE_HIERARCHY_ITEM", &entity, sizeof(entt::entity));
+            ImGui::EndDragDropSource();
         }
-        if (ImGui::MenuItem("Delete")) {
-            context->registry.destroy(entity);
-            if (selectionContext == entity)
-                selectionContext = entt::null;
-            if (renameContext == entity)
-                renameContext = entt::null;
-        }
-        ImGui::EndPopup();
-    }
 
-    if (opened) {
-        if (auto component = context->registry.try_get<RelationshipComponent>(entity)) {
-            auto curr = component->first;
-            while (curr != entt::null) {
-                drawEntity(curr);
-                curr = context->registry.get<RelationshipComponent>(curr).next;
-
-                ImGui::TreePop();
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
+                auto child = *static_cast<entt::entity*>(payload->Data);
+                if (auto parent = context->manager.get_parent(child); parent != entt::null) {
+                    context->manager.remove_child(parent, child); // TODO: FIX ?
+                }
+                context->manager.assign_child(entity, child);
             }
+            ImGui::EndDragDropTarget();
         }
+
+        ImGui::SameLine();
+
+        if (renameContext == entity) {
+            if (!ImGui::IsWindowFocused()) {
+                renameContext = entt::null;
+            } else {
+                if (!ImGui::IsAnyItemActive()) {
+                    ImGui::SetKeyboardFocusHere();
+                }
+                char buffer[256];
+                memset(buffer, 0, sizeof(buffer));
+                std::strncpy(buffer, tag.c_str(), sizeof(buffer));
+                if (ImGui::InputText("##entityrename", buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
+                    tag = std::string{buffer};
+                }
+                if (ImGui::IsKeyDown(ImGuiKey_Enter)) {
+                    renameContext = entt::null;
+                }
+            }
+        } else {
+            ImGui::TextUnformatted(tag.c_str());
+        }
+
+        if (ImGui::BeginPopupContextItem("EntityOptions")) {
+            if (ImGui::MenuItem("Copy")) {
+            }
+            if (ImGui::MenuItem("Paste")) {
+            }
+            ImGui::Spacing();
+            if (ImGui::MenuItem("Rename")) {
+                selectionContext = entity;
+                renameContext = entity;
+            }
+            if (ImGui::MenuItem("Duplicate")) {
+
+            }
+            if (ImGui::MenuItem("Delete")) {
+                removeEntity = entity;
+            }
+            ImGui::EndPopup();
+        }
+
+        if (flags & ImGuiTreeNodeFlags_FramePadding)
+            ImGui::PopStyleVar();
+
+        ImGui::PopID();
+
+        if (opened) {
+            for (auto e: context->manager.get_children(entity)) {
+                function(e);
+            }
+            ImGui::TreePop();
+        }
+    };
+
+    context->manager.each([&](auto entity) {
+        if (context->manager.get_parent(entity) == entt::null) {
+            function(entity);
+        }
+    });
+
+    if (removeEntity != entt::null) {
+        context->manager.destroy_parent(removeEntity);
+        if (selectionContext == removeEntity)
+            selectionContext = entt::null;
+        if (renameContext == removeEntity)
+            renameContext = entt::null;
     }
-
-    if (flags & ImGuiTreeNodeFlags_FramePadding)
-        ImGui::PopStyleVar();
-
-    ImGui::PopID();
 }
 
 void SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string& value, const std::string& file, const std::vector<std::string>& formats, float columnWidth) {
@@ -359,8 +384,10 @@ void SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
 
 template<typename T>
 void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function, bool removable) {
-    const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding;
-    if (auto component = context->registry.try_get<T>(entity)) {
+    const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap |
+                                     ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth |
+                                     ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding;
+    if (auto component = context->manager.try_get<T>(entity)) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
         ImGui::Separator();
 
@@ -388,12 +415,12 @@ void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity en
         }
 
         if (removeComponent)
-            context->registry.remove<T>(entity);
+            context->manager.remove<T>(entity);
     }
 }
 
 void SceneHierarchyPanel::drawComponents(entt::entity entity) {
-    auto& tag = *context->registry.get<TagComponent>(entity);
+    auto& tag = *context->manager.get<TagComponent>(entity);
     char buffer[256];
     memset(buffer, 0, sizeof(buffer));
     std::strncpy(buffer, tag.c_str(), sizeof(buffer));
@@ -408,15 +435,15 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         ImGui::OpenPopup("AddComponent");
 
     if (ImGui::BeginPopup("AddComponent")) {
-        if (!context->registry.all_of<CameraComponent>(entity)) {
+        if (!context->manager.all_of<CameraComponent>(entity)) {
             if (ImGui::MenuItem("Camera")) {
-                context->registry.emplace<CameraComponent>(entity);
+                context->manager.emplace<CameraComponent>(entity);
                 ImGui::CloseCurrentPopup();
             }
         }
-        if (!context->registry.all_of<ModelComponent>(entity)) {
+        if (!context->manager.all_of<ModelComponent>(entity)) {
             if (ImGui::MenuItem("Model")) {
-                context->registry.emplace<ModelComponent>(entity);
+                context->manager.emplace<ModelComponent>(entity);
                 ImGui::CloseCurrentPopup();
             }
         }

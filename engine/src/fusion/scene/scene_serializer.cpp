@@ -1,6 +1,4 @@
 #include "scene_serializer.hpp"
-
-#include "components.hpp"
 #include "scene.hpp"
 
 #include <yaml-cpp/yaml.h>
@@ -231,8 +229,8 @@ void SceneSerializer::serialize(const std::string& filepath) {
     out << YAML::BeginMap;
     out << YAML::Key << "Scene" << YAML::Value << "Untitled";
     out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-    scene->registry.each([&](auto entity) {
-        serializeEntity(out, scene->registry, entity);
+    scene->manager.each([&](auto entity) {
+        serializeEntity(out, scene->manager, entity);
     });
     out << YAML::EndSeq;
     out << YAML::EndMap;
@@ -258,30 +256,30 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
     if (const auto& entities = data["Entities"]) {
         for (const auto& entity : entities) {
             auto uuid = entity["Entity"].as<entt::entity>();
-            auto deserializedEntity = scene->registry.create(uuid);
+            auto deserializedEntity = scene->manager.create(uuid);
 
             std::string name;
             if (const auto& tagComponent = entity["TagComponent"]) {
                 name = tagComponent["tag"].as<std::string>();
-                scene->registry.emplace<TagComponent>(deserializedEntity, name);
+                scene->manager.emplace<TagComponent>(deserializedEntity, name);
             }
 
             LOG_DEBUG << "Deserialized entity with ID = " << static_cast<int>(uuid) << ", name = " << name;
 
             if (const auto& transformComponent = entity["TransformComponent"]) {
-                scene->registry.emplace<TransformComponent>(deserializedEntity,
-                       transformComponent["translation"].as<glm::vec3>(),
-                       transformComponent["rotation"].as<glm::vec3>(),
-                       transformComponent["scale"].as<glm::vec3>());
+                scene->manager.emplace<TransformComponent>(deserializedEntity,
+                                                           transformComponent["translation"].as<glm::vec3>(),
+                                                           transformComponent["rotation"].as<glm::vec3>(),
+                                                           transformComponent["scale"].as<glm::vec3>());
             }
 
             if (const auto& relationshipComponent = entity["RelationshipComponent"]) {
-                scene->registry.emplace<RelationshipComponent>(deserializedEntity,
-                                                            relationshipComponent["children"].as<size_t>(),
-                                                            relationshipComponent["first"].as<entt::entity>(),
-                                                            relationshipComponent["prev"].as<entt::entity>(),
-                                                            relationshipComponent["next"].as<entt::entity>(),
-                                                            relationshipComponent["parent"].as<entt::entity>());
+                scene->manager.emplace<RelationshipComponent>(deserializedEntity,
+                                                              relationshipComponent["children"].as<size_t>(),
+                                                              relationshipComponent["first"].as<entt::entity>(),
+                                                              relationshipComponent["prev"].as<entt::entity>(),
+                                                              relationshipComponent["next"].as<entt::entity>(),
+                                                              relationshipComponent["parent"].as<entt::entity>());
             }
 
             if (const auto& cameraComponent = entity["CameraComponent"]) {
@@ -296,20 +294,20 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
                 camera.setOrthographicNearClip(cameraProps["orthographicNear"].as<float>());
                 camera.setOrthographicFarClip(cameraProps["orthographicFar"].as<float>());
 
-                scene->registry.emplace<CameraComponent>(deserializedEntity,
-                        camera,
-                        cameraComponent["primary"].as<bool>(),
-                        cameraComponent["fixedAspectRatio"].as<bool>()
+                scene->manager.emplace<CameraComponent>(deserializedEntity,
+                                                        camera,
+                                                        cameraComponent["primary"].as<bool>(),
+                                                        cameraComponent["fixedAspectRatio"].as<bool>()
                 );
             }
 
             if (const auto& modelComponent = entity["ModelComponent"]) {
-                scene->registry.emplace<ModelComponent>(deserializedEntity,
-                    modelComponent["path"].as<std::string>(),
+                scene->manager.emplace<ModelComponent>(deserializedEntity,
+                                                       modelComponent["path"].as<std::string>(),
                     //modelComponent["layout"].as<std::vector<int>>(),
                     modelComponent["scale"].as<glm::vec3>(),
-                    modelComponent["center"].as<glm::vec3>(),
-                    modelComponent["uvscale"].as<glm::vec2>()
+                                                       modelComponent["center"].as<glm::vec3>(),
+                                                       modelComponent["uvscale"].as<glm::vec2>()
                 );
             }
         }

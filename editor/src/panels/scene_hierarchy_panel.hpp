@@ -16,7 +16,7 @@ namespace fe {
         entt::entity getSelectedEntity() const { return selectionContext; }
 
     private:
-        void drawEntity(entt::entity entity);
+        void drawEntities();
         void drawComponents(entt::entity entity);
         template<typename T>
         void drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function, bool removable = true);

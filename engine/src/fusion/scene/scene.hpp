@@ -1,6 +1,6 @@
 #pragma once
 
-#include <entt/entity/registry.hpp>
+#include "entity_manager.hpp"
 
 namespace fe {
     class EditorCamera;
@@ -18,6 +18,6 @@ namespace fe {
         void onRenderRuntime();
         void onRenderEditor(const EditorCamera& camera);
 
-        entt::registry registry;
+        entt::manager manager;
     };
 }
