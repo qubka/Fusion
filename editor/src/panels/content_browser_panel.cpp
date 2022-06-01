@@ -18,7 +18,7 @@ void ContentBrowserPanel::onImGui() {
 void ContentBrowserPanel::drawFileExplorer() {
     ImGui::BeginChild((fs::ICON_FA_ARCHIVE + "  Project"s).c_str(), { ImGui::GetContentRegionAvail().x / 6.0f, 0 }, true);
 
-    std::function<void(const std::filesystem::path&, uint32_t &)> function = [&](const std::filesystem::path& dir, uint32_t& idx) {
+    std::function<void(const std::filesystem::path&, uint64_t &)> function = [&](const std::filesystem::path& dir, uint64_t& idx) {
         for (const auto& entry : fs::walk(dir)) {
             const auto& path = entry.path();
 
@@ -29,7 +29,7 @@ void ContentBrowserPanel::drawFileExplorer() {
                                            (filled ? (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick) : ImGuiTreeNodeFlags_Leaf)
                                            | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
 
-                bool opened = ImGui::TreeNodeEx((void *)static_cast<intptr_t>(idx), flags, "");
+                bool opened = ImGui::TreeNodeEx((void *)idx, flags, "");
                 if (ImGui::IsItemClicked() || ImGui::IsItemFocused()) {
                     if (!locked) currentDirectory = path;
                     currentNode = idx;
@@ -48,7 +48,7 @@ void ContentBrowserPanel::drawFileExplorer() {
         }
     };
 
-    uint32_t idx = 0;
+    uint64_t idx = 0;
     function(getAssetPath(), idx);
 
     ImGui::EndChild();
@@ -101,6 +101,7 @@ void ContentBrowserPanel::drawContentBrowser() {
             ImGui::PushStyleColor(ImGuiCol_Button, { 0.3f, 0.3f, 0.3f, 1.0f });
         else
             ImGui::PushStyleColor(ImGuiCol_Button, { 0.0f, 0.0f, 0.0f, 0.0f });
+
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f, 0.2f, 0.2f, 1.0f });
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.15f, 0.15f, 0.15f, 1.0f });
 
@@ -151,7 +152,7 @@ void ContentBrowserPanel::drawContentBrowser() {
         ImGuiTreeNodeFlags flags = ((currentNode == idx) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
 
         if (entry.is_directory()) {
-            bool opened = ImGui::TreeNodeEx((void *)static_cast<intptr_t>(idx), flags, "");
+            bool opened = ImGui::TreeNodeEx((void *)idx, flags, "");
 
             ImGui::SameLine();
             ImGui::Text("%s %s", opened ? fs::ICON_FA_FOLDER_OPEN : fs::ICON_FA_FOLDER_CLOSE, path.filename().c_str());

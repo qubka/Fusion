@@ -101,6 +101,21 @@ namespace YAML {
         }
     };
 
+    template<>
+    struct convert<entt::entity>
+    {
+        static Node encode(const entt::entity& rhs) {
+            return Node(static_cast<int>(rhs));
+        }
+
+        static bool decode(const Node& node, entt::entity& rhs) {
+            if (node.IsNull())
+                return false;
+            rhs = static_cast<entt::entity>(node.as<int>());
+            return true;
+        }
+    };
+
     Emitter& operator<<(Emitter& out, const glm::vec2& v) {
         out << Flow;
         out << BeginSeq << v.x << v.y << EndSeq;
@@ -124,6 +139,11 @@ namespace YAML {
         out << BeginSeq << q.x << q.y << q.z << q.w << EndSeq;
         return out;
     }
+
+    Emitter& operator<<(YAML::Emitter& out, entt::entity entity) {
+        out << static_cast<int>(entity);
+        return out;
+    }
 }
 
 using namespace fe;
@@ -134,7 +154,7 @@ SceneSerializer::SceneSerializer(const std::shared_ptr<Scene>& scene) : scene{sc
 
 void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity entity) {
     out << YAML::BeginMap; // Entity
-    out << YAML::Key << "Entity" << YAML::Value << static_cast<entt::id_type>(entity);
+    out << YAML::Key << "Entity" << YAML::Value << entity;
 
     if (auto component = registry.try_get<TagComponent>(entity)) {
         out << YAML::Key << "TagComponent";
@@ -152,6 +172,19 @@ void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity 
         out << YAML::Key << "scale" << YAML::Value << component->scale;
 
         out << YAML::EndMap; // TransformComponent
+    }
+
+    if (auto component = registry.try_get<RelationshipComponent>(entity)) {
+        out << YAML::Key << "RelationshipComponent";
+        out << YAML::BeginMap; // RelationshipComponent
+
+        out << YAML::Key << "children" << YAML::Value << component->children;
+        out << YAML::Key << "first" << YAML::Value << component->first;
+        out << YAML::Key << "prev" << YAML::Value << component->prev;
+        out << YAML::Key << "next" << YAML::Value << component->next;
+        out << YAML::Key << "parent" << YAML::Value << component->parent;
+
+        out << YAML::EndMap; // RelationshipComponent
     }
 
     if (auto component = registry.try_get<CameraComponent>(entity)) {
@@ -224,8 +257,8 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
 
     if (const auto& entities = data["Entities"]) {
         for (const auto& entity : entities) {
-            auto uuid = entity["Entity"].as<entt::id_type>();
-            auto deserializedEntity = scene->registry.create(static_cast<entt::entity>(uuid));
+            auto uuid = entity["Entity"].as<entt::entity>();
+            auto deserializedEntity = scene->registry.create(uuid);
 
             std::string name;
             if (const auto& tagComponent = entity["TagComponent"]) {
@@ -233,13 +266,22 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
                 scene->registry.emplace<TagComponent>(deserializedEntity, name);
             }
 
-            LOG_DEBUG << "Deserialized entity with ID = " << uuid << ", name = " << name;
+            LOG_DEBUG << "Deserialized entity with ID = " << static_cast<int>(uuid) << ", name = " << name;
 
             if (const auto& transformComponent = entity["TransformComponent"]) {
                 scene->registry.emplace<TransformComponent>(deserializedEntity,
                        transformComponent["translation"].as<glm::vec3>(),
                        transformComponent["rotation"].as<glm::vec3>(),
                        transformComponent["scale"].as<glm::vec3>());
+            }
+
+            if (const auto& relationshipComponent = entity["RelationshipComponent"]) {
+                scene->registry.emplace<RelationshipComponent>(deserializedEntity,
+                                                            relationshipComponent["children"].as<size_t>(),
+                                                            relationshipComponent["first"].as<entt::entity>(),
+                                                            relationshipComponent["prev"].as<entt::entity>(),
+                                                            relationshipComponent["next"].as<entt::entity>(),
+                                                            relationshipComponent["parent"].as<entt::entity>());
             }
 
             if (const auto& cameraComponent = entity["CameraComponent"]) {

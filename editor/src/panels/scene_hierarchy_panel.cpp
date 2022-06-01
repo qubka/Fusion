@@ -46,7 +46,7 @@ void SceneHierarchyPanel::onImGui() {
             auto entity = context->registry.create();
             context->registry.emplace<TagComponent>(entity, "Empty Entity");
             context->registry.emplace<TransformComponent>(entity);
-            //RelationshipComponent
+            context->registry.emplace<RelationshipComponent>(entity);
         }
         ImGui::EndPopup();
     }
@@ -70,11 +70,10 @@ void SceneHierarchyPanel::drawEntity(entt::entity entity) {
     } else if (renameContext != entt::null) {
         flags |= ImGuiTreeNodeFlags_FramePadding;
 
-        float nodeHeight = GImGui->Font->FontSize / 2.0f;
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { nodeHeight, nodeHeight });
+        float lineHeight = GImGui->Font->FontSize / 2.0f;
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { lineHeight, lineHeight });
     }
-    bool opened = ImGui::TreeNodeEx((void*)static_cast<uintptr_t>(entity), flags, "");
-
+    bool opened = ImGui::TreeNodeEx((void*)entity, flags, "");
     if (ImGui::IsItemClicked()/* || ImGui::IsItemFocused()*/) {
         selectionContext = entity;
     }
@@ -103,7 +102,21 @@ void SceneHierarchyPanel::drawEntity(entt::entity entity) {
             }
         }
     } else {
-        ImGui::TextUnformatted(tag.c_str());
+        //ImGui::TextUnformatted(tag.c_str());
+        auto id = std::to_string(static_cast<int>(entity));
+        ImGui::Button(("entity "s + id).c_str());
+
+        if (ImGui::BeginDragDropSource()) {
+            ImGui::SetDragDropPayload("SCENE_HIERARCHY_ITEM", id.c_str(), id.length() + 1);
+            ImGui::EndDragDropSource();
+        }
+
+        /*if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
+
+            }
+            ImGui::EndDragDropTarget();
+        }*/
     }
 
     if (ImGui::BeginPopupContextItem("EntityOptions")) {
@@ -337,7 +350,7 @@ void SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
 }
 
 template<typename T>
-void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function) {
+void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function, bool removable) {
     const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding;
     if (auto component = context->registry.try_get<T>(entity)) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
@@ -354,7 +367,7 @@ void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity en
         }
 
         bool removeComponent = false;
-        if (ImGui::BeginPopup("ComponentSettings")) {
+        if (removable && ImGui::BeginPopup("ComponentSettings")) {
             if (ImGui::MenuItem("Remove component"))
                 removeComponent = true;
 
@@ -387,12 +400,6 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         ImGui::OpenPopup("AddComponent");
 
     if (ImGui::BeginPopup("AddComponent")) {
-        if (!context->registry.all_of<TransformComponent>(entity)) {
-            if (ImGui::MenuItem("Transform")) {
-                context->registry.emplace<TransformComponent>(entity);
-                ImGui::CloseCurrentPopup();
-            }
-        }
         if (!context->registry.all_of<CameraComponent>(entity)) {
             if (ImGui::MenuItem("Camera")) {
                 context->registry.emplace<CameraComponent>(entity);
@@ -417,7 +424,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         drawVec3Control("Rotation", rotation);
         component.rotation = glm::radians(rotation);
         drawVec3Control("Scale", component.scale, 1.0f);
-    });
+    }, false);
 
     drawComponent<CameraComponent>(fs::ICON_FA_CAMERA + "  Camera"s, entity, [](CameraComponent& component)
     {

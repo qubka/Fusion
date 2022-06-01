@@ -75,7 +75,7 @@ namespace fe {
     };
 
     struct RelationshipComponent {
-        std::size_t children{ 0 };
+        size_t children{ 0 };
         entt::entity first{ entt::null };
         entt::entity prev{ entt::null };
         entt::entity next{ entt::null };
