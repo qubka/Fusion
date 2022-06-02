@@ -106,11 +106,7 @@ void SceneHierarchyPanel::drawEntities() {
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
-                auto child = *static_cast<entt::entity*>(payload->Data);
-                if (auto parent = context->manager.get_parent(child); parent != entt::null) {
-                    context->manager.remove_child(parent, child); // TODO: FIX ?
-                }
-                context->manager.assign_child(entity, child);
+                context->manager.assign_child(entity, *static_cast<entt::entity*>(payload->Data));
             }
             ImGui::EndDragDropTarget();
         }

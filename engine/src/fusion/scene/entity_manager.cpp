@@ -4,15 +4,15 @@ using namespace fe;
 using namespace entt;
 
 bool manager::has_children(const entity entity) const {
-    if (auto p = try_get<RelationshipComponent>(entity); p && p->children > 0) {
+    if (auto component = try_get<RelationshipComponent>(entity); component && component->children > 0) {
         return true;
     }
     return false;
 }
 
 entity manager::get_parent(const entity entity) const {
-    if (auto p = try_get<RelationshipComponent>(entity)) {
-        return p->parent;
+    if (auto component = try_get<RelationshipComponent>(entity)) {
+        return component->parent;
     }
     return entt::null;
 }
@@ -44,8 +44,12 @@ void manager::remove_parent(const entity parent) {
 }
 
 void manager::assign_child(const entity parent, const entity child) {
-    auto& p = get_or_emplace<RelationshipComponent>(parent);
+    // Remove child from existing parent if any
+    if (auto root = get_parent(child); root != entt::null) {
+        remove_child(root, child);
+    }
 
+    auto& p = get_or_emplace<RelationshipComponent>(parent);
     if (p.children == 0) {
         p.first = child;
 

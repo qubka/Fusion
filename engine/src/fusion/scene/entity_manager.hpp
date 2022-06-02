@@ -3,7 +3,7 @@
 #include "components.hpp"
 
 namespace entt {
-
+    /** Improved version of registry with child-parent relationship. **/
     class manager : public basic_registry<entity> {
     public:
         /**
