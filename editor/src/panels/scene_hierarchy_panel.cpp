@@ -30,20 +30,21 @@ void SceneHierarchyPanel::onImGui() {
     // Right-click on blank space
     if (ImGui::BeginPopupContextWindow("HierarchyOptions", 1, false)) {
         if (ImGui::MenuItem("Create Empty Entity")) {
-            auto entity = context->manager.create();
+            auto entity = context->world.create();
 
             std::string name{ "Empty Entity" };
             size_t idx = 0;
-            for (auto [e, tag] : context->manager.view<const TagComponent>().each()) {
-               if ((*tag).find(name, 0) != std::string::npos) {
-                   idx++;
-               }
-            }
+            context->world.view<const TagComponent>().each([&](const auto& tag){
+                if ((*tag).find(name, 0) != std::string::npos) {
+                    idx++;
+                }
+            });
+
             if (idx > 0)
                 name += " (" + std::to_string(idx) + ")";
 
-            context->manager.emplace<TagComponent>(entity, name);
-            context->manager.emplace<TransformComponent>(entity);
+            context->world.emplace<TagComponent>(entity, name);
+            context->world.emplace<TransformComponent>(entity);
 
             selectionContext = entity;
             renameContext = entity;
@@ -74,11 +75,11 @@ void SceneHierarchyPanel::drawEntities() {
     ImGui::Separator();
 
     entt::entity removeEntity{ entt::null };
-    std::function<void(entt::entity entity)> function = [&](entt::entity entity) {
+    std::function<void(entt::entity entity)> function = [&](const auto entity) {
         ImGui::PushID(("Entity" + std::to_string(static_cast<int>(entity))).c_str());
 
-        auto& tag = *context->manager.get<TagComponent>(entity);
-        bool children = context->manager.has_children(entity);
+        auto& tag = *context->world.get<TagComponent>(entity);
+        bool children = context->world.has_children(entity);
 
         ImGuiTreeNodeFlags flags = ((selectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) |
                                    (children ? (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick) : ImGuiTreeNodeFlags_Leaf);
@@ -106,7 +107,7 @@ void SceneHierarchyPanel::drawEntities() {
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
-                context->manager.assign_child(entity, *static_cast<entt::entity*>(payload->Data));
+                context->world.assign_child(entity, *static_cast<entt::entity*>(payload->Data));
             }
             ImGui::EndDragDropTarget();
         }
@@ -159,21 +160,21 @@ void SceneHierarchyPanel::drawEntities() {
         ImGui::PopID();
 
         if (opened) {
-            for (auto e: context->manager.get_children(entity)) {
+            for (auto e: context->world.get_children(entity)) {
                 function(e);
             }
             ImGui::TreePop();
         }
     };
 
-    context->manager.each([&](auto entity) {
-        if (context->manager.get_parent(entity) == entt::null) {
+    context->world.each([&](auto entity) {
+        if (context->world.get_parent(entity) == entt::null) {
             function(entity);
         }
     });
 
     if (removeEntity != entt::null) {
-        context->manager.destroy_parent(removeEntity);
+        context->world.destroy_parent(removeEntity);
         if (selectionContext == removeEntity)
             selectionContext = entt::null;
         if (renameContext == removeEntity)
@@ -383,7 +384,7 @@ void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity en
     const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap |
                                      ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth |
                                      ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding;
-    if (auto component = context->manager.try_get<T>(entity)) {
+    if (auto component = context->world.try_get<T>(entity)) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
         ImGui::Separator();
 
@@ -411,12 +412,12 @@ void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity en
         }
 
         if (removeComponent)
-            context->manager.remove<T>(entity);
+            context->world.remove<T>(entity);
     }
 }
 
 void SceneHierarchyPanel::drawComponents(entt::entity entity) {
-    auto& tag = *context->manager.get<TagComponent>(entity);
+    auto& tag = *context->world.get<TagComponent>(entity);
     char buffer[256];
     memset(buffer, 0, sizeof(buffer));
     std::strncpy(buffer, tag.c_str(), sizeof(buffer));
@@ -431,15 +432,15 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         ImGui::OpenPopup("AddComponent");
 
     if (ImGui::BeginPopup("AddComponent")) {
-        if (!context->manager.all_of<CameraComponent>(entity)) {
+        if (!context->world.all_of<CameraComponent>(entity)) {
             if (ImGui::MenuItem("Camera")) {
-                context->manager.emplace<CameraComponent>(entity);
+                context->world.emplace<CameraComponent>(entity);
                 ImGui::CloseCurrentPopup();
             }
         }
-        if (!context->manager.all_of<ModelComponent>(entity)) {
+        if (!context->world.all_of<ModelComponent>(entity)) {
             if (ImGui::MenuItem("Model")) {
-                context->manager.emplace<ModelComponent>(entity);
+                context->world.emplace<ModelComponent>(entity);
                 ImGui::CloseCurrentPopup();
             }
         }

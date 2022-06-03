@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entity_manager.hpp"
+#include "world.hpp"
 
 namespace fe {
     class EditorCamera;
@@ -8,7 +8,7 @@ namespace fe {
 
     class Scene {
     public:
-        Scene();
+        Scene(std::string name);
         ~Scene();
 
         void onViewportResize(const glm::vec2& size);
@@ -18,6 +18,7 @@ namespace fe {
         void onRenderRuntime();
         void onRenderEditor(const EditorCamera& camera);
 
-        entt::manager manager;
+        std::string name;
+        entt::world world;
     };
 }

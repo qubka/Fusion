@@ -4,7 +4,7 @@
 
 namespace entt {
     /** Improved version of registry with child-parent relationship. **/
-    class manager : public basic_registry<entity> {
+    class world : public basic_registry<entity> {
     public:
         /**
          * Check if an entity is a parent.
@@ -52,5 +52,8 @@ namespace entt {
          * @return Vector of childen, or nullptr if not parent. Will be empty if no children, not nullptr.
          */
         [[nodiscard]] std::vector<entity> get_children(const entity_type parent) const;
+
+
+        glm::mat4 transform(const entity_type entity) const;
     };
 }

@@ -25,7 +25,7 @@ EditorLayer::~EditorLayer() {
 
 void EditorLayer::onAttach() {
     editorCamera = EditorCamera{30, 1.778f, 0.1f, 1000};
-    activeScene = std::make_shared<Scene>();
+    activeScene = std::make_shared<Scene>("");
 
     /*auto commandLineArgs = Application::Instance().getCommandLineArgs();
     if (commandLineArgs.count > 1) {
@@ -240,7 +240,7 @@ void EditorLayer::onImGui() {
         const glm::mat4& cameraProjection = editorCamera.getProjection();
 
         // Entity transform
-        auto& component = activeScene->manager.get<TransformComponent>(selectedEntity);
+        auto& component = activeScene->world.get<TransformComponent>(selectedEntity);
         glm::mat4 transform = component.transform();
 
         // Snapping
@@ -275,6 +275,8 @@ void EditorLayer::onImGui() {
             if (!glm::any(glm::isnan(deltaRotation)))
                 component.rotation += deltaRotation;
             component.scale = scale;
+
+            component.update(activeScene->world, selectedEntity);
         }
     }
 
@@ -287,7 +289,7 @@ void EditorLayer::onImGui() {
 }
 
 void EditorLayer::newScene() {
-    activeScene = std::make_shared<Scene>();
+    activeScene = std::make_shared<Scene>("");
     activeScene->onViewportResize(viewportSize);
     sceneHierarchyPanel.setContext(activeScene);
 }
@@ -310,7 +312,7 @@ void EditorLayer::openScene(const std::filesystem::path& file) {
         return;
     }
 
-    auto newScene = std::make_shared<Scene>();
+    auto newScene = std::make_shared<Scene>("");
     SceneSerializer serializer{newScene};
     if (serializer.deserialize(file)) {
         activeScene = newScene;

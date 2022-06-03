@@ -1,30 +1,39 @@
-#include "entity_manager.hpp"
+#include "world.hpp"
 
 using namespace fe;
 using namespace entt;
 
-bool manager::has_children(const entity entity) const {
+glm::mat4 world::transform(const entity entity) const {
+    glm::mat4 localTransform{ get<TransformComponent>(entity).transform() };
+    if (auto component = try_get<RelationshipComponent>(entity); component && component->parent != entt::null) {
+        return localTransform * transform(component->parent);
+    } else {
+        return localTransform;
+    }
+}
+
+bool world::has_children(const entity entity) const {
     if (auto component = try_get<RelationshipComponent>(entity); component && component->children > 0) {
         return true;
     }
     return false;
 }
 
-entity manager::get_parent(const entity entity) const {
+entity world::get_parent(const entity entity) const {
     if (auto component = try_get<RelationshipComponent>(entity)) {
         return component->parent;
     }
     return entt::null;
 }
 
-void manager::destroy_parent(const entity parent) {
+void world::destroy_parent(const entity parent) {
     for (auto child : get_children(parent)) {
         destroy(child);
     }
     destroy(parent);
 }
 
-void manager::remove_parent(const entity parent) {
+void world::remove_parent(const entity parent) {
     if (auto p = try_get<RelationshipComponent>(parent); p && p->children > 0) {
         auto curr = p->first;
         while (curr != entt::null) {
@@ -43,7 +52,7 @@ void manager::remove_parent(const entity parent) {
     }
 }
 
-void manager::assign_child(const entity parent, const entity child) {
+void world::assign_child(const entity parent, const entity child) {
     // Remove child from existing parent if any
     if (auto root = get_parent(child); root != entt::null) {
         remove_child(root, child);
@@ -78,7 +87,7 @@ void manager::assign_child(const entity parent, const entity child) {
     p.children++;
 }
 
-void manager::remove_child(const entity parent, const entity child) {
+void world::remove_child(const entity parent, const entity child) {
     if (auto p = try_get<RelationshipComponent>(parent); p && p->children > 0) {
         if (p->children == 1) {
             get<RelationshipComponent>(child).parent = entt::null;
@@ -113,7 +122,7 @@ void manager::remove_child(const entity parent, const entity child) {
     }
 }
 
-std::vector<entity> manager::get_children(const entity parent) const {
+std::vector<entity> world::get_children(const entity parent) const {
     std::vector<entity> ret;
     if (auto p = try_get<RelationshipComponent>(parent); p && p->children > 0) {
         ret.reserve(p->children);

@@ -150,88 +150,86 @@ SceneSerializer::SceneSerializer(const std::shared_ptr<Scene>& scene) : scene{sc
 
 }
 
-void serializeEntity(YAML::Emitter& out, entt::registry& registry, entt::entity entity) {
-    out << YAML::BeginMap; // Entity
-    out << YAML::Key << "Entity" << YAML::Value << entity;
-
-    if (auto component = registry.try_get<TagComponent>(entity)) {
-        out << YAML::Key << "TagComponent";
-        out << YAML::BeginMap; // TagComponent
-        out << YAML::Key << "tag" << YAML::Value << component->tag;
-        out << YAML::EndMap; // TagComponent
-    }
-
-    if (auto component = registry.try_get<TransformComponent>(entity)) {
-        out << YAML::Key << "TransformComponent";
-        out << YAML::BeginMap; // TransformComponent
-
-        out << YAML::Key << "translation" << YAML::Value << component->translation;
-        out << YAML::Key << "rotation" << YAML::Value << component->rotation;
-        out << YAML::Key << "scale" << YAML::Value << component->scale;
-
-        out << YAML::EndMap; // TransformComponent
-    }
-
-    if (auto component = registry.try_get<RelationshipComponent>(entity)) {
-        out << YAML::Key << "RelationshipComponent";
-        out << YAML::BeginMap; // RelationshipComponent
-
-        out << YAML::Key << "children" << YAML::Value << component->children;
-        out << YAML::Key << "first" << YAML::Value << component->first;
-        out << YAML::Key << "prev" << YAML::Value << component->prev;
-        out << YAML::Key << "next" << YAML::Value << component->next;
-        out << YAML::Key << "parent" << YAML::Value << component->parent;
-
-        out << YAML::EndMap; // RelationshipComponent
-    }
-
-    if (auto component = registry.try_get<CameraComponent>(entity)) {
-        out << YAML::Key << "CameraComponent";
-        out << YAML::BeginMap; // CameraComponent
-
-        auto& camera = component->camera;
-
-        out << YAML::Key << "Camera" << YAML::Value;
-        out << YAML::BeginMap; // Camera
-        out << YAML::Key << "projectionType" << YAML::Value << magic_enum::enum_integer(camera.getProjectionType());
-        out << YAML::Key << "perspectiveFOV" << YAML::Value << camera.getPerspectiveVerticalFOV();
-        out << YAML::Key << "perspectiveNear" << YAML::Value << camera.getPerspectiveNearClip();
-        out << YAML::Key << "perspectiveFar" << YAML::Value << camera.getPerspectiveFarClip();
-        out << YAML::Key << "orthographicSize" << YAML::Value << camera.getOrthographicSize();
-        out << YAML::Key << "orthographicNear" << YAML::Value << camera.getOrthographicNearClip();
-        out << YAML::Key << "orthographicFar" << YAML::Value << camera.getOrthographicFarClip();
-        out << YAML::EndMap; // Camera
-
-        out << YAML::Key << "primary" << YAML::Value << component->primary;
-        out << YAML::Key << "fixedAspectRatio" << YAML::Value << component->fixedAspectRatio;
-
-        out << YAML::EndMap; // CameraComponent
-    }
-
-    if (auto component = registry.try_get<ModelComponent>(entity)) {
-        out << YAML::Key << "ModelComponent";
-        out << YAML::BeginMap; // ModelComponent
-
-        out << YAML::Key << "path" << YAML::Value << component->path;
-        //out << YAML::Key << "layout" << YAML::Value << component->layout;
-        out << YAML::Key << "scale" << YAML::Value << component->scale;
-        out << YAML::Key << "center" << YAML::Value << component->center;
-        out << YAML::Key << "uvscale" << YAML::Value << component->uvscale;
-
-        out << YAML::EndMap; // ModelComponent
-    }
-
-    out << YAML::EndMap; // Entity
-}
-
 void SceneSerializer::serialize(const std::string& filepath) {
     YAML::Emitter out;
     out << YAML::BeginMap;
     out << YAML::Key << "Scene" << YAML::Value << "Untitled";
     out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-    scene->manager.each([&](auto entity) {
-        serializeEntity(out, scene->manager, entity);
+
+    scene->world.each([&](const auto entity) {
+        out << YAML::BeginMap; // Entity
+        out << YAML::Key << "Entity" << YAML::Value << entity;
+
+        if (auto component = scene->world.try_get<TagComponent>(entity)) {
+            out << YAML::Key << "TagComponent";
+            out << YAML::BeginMap; // TagComponent
+            out << YAML::Key << "tag" << YAML::Value << component->tag;
+            out << YAML::EndMap; // TagComponent
+        }
+
+        if (auto component = scene->world.try_get<TransformComponent>(entity)) {
+            out << YAML::Key << "TransformComponent";
+            out << YAML::BeginMap; // TransformComponent
+
+            out << YAML::Key << "translation" << YAML::Value << component->translation;
+            out << YAML::Key << "rotation" << YAML::Value << component->rotation;
+            out << YAML::Key << "scale" << YAML::Value << component->scale;
+
+            out << YAML::EndMap; // TransformComponent
+        }
+
+        if (auto component = scene->world.try_get<RelationshipComponent>(entity)) {
+            out << YAML::Key << "RelationshipComponent";
+            out << YAML::BeginMap; // RelationshipComponent
+
+            out << YAML::Key << "children" << YAML::Value << component->children;
+            out << YAML::Key << "first" << YAML::Value << component->first;
+            out << YAML::Key << "prev" << YAML::Value << component->prev;
+            out << YAML::Key << "next" << YAML::Value << component->next;
+            out << YAML::Key << "parent" << YAML::Value << component->parent;
+
+            out << YAML::EndMap; // RelationshipComponent
+        }
+
+        if (auto component = scene->world.try_get<CameraComponent>(entity)) {
+            out << YAML::Key << "CameraComponent";
+            out << YAML::BeginMap; // CameraComponent
+
+            auto& camera = component->camera;
+
+            out << YAML::Key << "Camera" << YAML::Value;
+            out << YAML::BeginMap; // Camera
+            out << YAML::Key << "projectionType" << YAML::Value << magic_enum::enum_integer(camera.getProjectionType());
+            out << YAML::Key << "perspectiveFOV" << YAML::Value << camera.getPerspectiveVerticalFOV();
+            out << YAML::Key << "perspectiveNear" << YAML::Value << camera.getPerspectiveNearClip();
+            out << YAML::Key << "perspectiveFar" << YAML::Value << camera.getPerspectiveFarClip();
+            out << YAML::Key << "orthographicSize" << YAML::Value << camera.getOrthographicSize();
+            out << YAML::Key << "orthographicNear" << YAML::Value << camera.getOrthographicNearClip();
+            out << YAML::Key << "orthographicFar" << YAML::Value << camera.getOrthographicFarClip();
+            out << YAML::EndMap; // Camera
+
+            out << YAML::Key << "primary" << YAML::Value << component->primary;
+            out << YAML::Key << "fixedAspectRatio" << YAML::Value << component->fixedAspectRatio;
+
+            out << YAML::EndMap; // CameraComponent
+        }
+
+        if (auto component = scene->world.try_get<ModelComponent>(entity)) {
+            out << YAML::Key << "ModelComponent";
+            out << YAML::BeginMap; // ModelComponent
+
+            out << YAML::Key << "path" << YAML::Value << component->path;
+            //out << YAML::Key << "layout" << YAML::Value << component->layout;
+            out << YAML::Key << "scale" << YAML::Value << component->scale;
+            out << YAML::Key << "center" << YAML::Value << component->center;
+            out << YAML::Key << "uvscale" << YAML::Value << component->uvscale;
+
+            out << YAML::EndMap; // ModelComponent
+        }
+
+        out << YAML::EndMap; // Entity
     });
+
     out << YAML::EndSeq;
     out << YAML::EndMap;
 
@@ -256,30 +254,30 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
     if (const auto& entities = data["Entities"]) {
         for (const auto& entity : entities) {
             auto uuid = entity["Entity"].as<entt::entity>();
-            auto deserializedEntity = scene->manager.create(uuid);
+            auto deserializedEntity = scene->world.create(uuid);
 
             std::string name;
             if (const auto& tagComponent = entity["TagComponent"]) {
                 name = tagComponent["tag"].as<std::string>();
-                scene->manager.emplace<TagComponent>(deserializedEntity, name);
+                scene->world.emplace<TagComponent>(deserializedEntity, name);
             }
 
             LOG_DEBUG << "Deserialized entity with ID = " << static_cast<int>(uuid) << ", name = " << name;
 
             if (const auto& transformComponent = entity["TransformComponent"]) {
-                scene->manager.emplace<TransformComponent>(deserializedEntity,
-                                                           transformComponent["translation"].as<glm::vec3>(),
-                                                           transformComponent["rotation"].as<glm::vec3>(),
-                                                           transformComponent["scale"].as<glm::vec3>());
+                scene->world.emplace<TransformComponent>(deserializedEntity,
+                                                         transformComponent["translation"].as<glm::vec3>(),
+                                                         transformComponent["rotation"].as<glm::vec3>(),
+                                                         transformComponent["scale"].as<glm::vec3>());
             }
 
             if (const auto& relationshipComponent = entity["RelationshipComponent"]) {
-                scene->manager.emplace<RelationshipComponent>(deserializedEntity,
-                                                              relationshipComponent["children"].as<size_t>(),
-                                                              relationshipComponent["first"].as<entt::entity>(),
-                                                              relationshipComponent["prev"].as<entt::entity>(),
-                                                              relationshipComponent["next"].as<entt::entity>(),
-                                                              relationshipComponent["parent"].as<entt::entity>());
+                scene->world.emplace<RelationshipComponent>(deserializedEntity,
+                                                            relationshipComponent["children"].as<size_t>(),
+                                                            relationshipComponent["first"].as<entt::entity>(),
+                                                            relationshipComponent["prev"].as<entt::entity>(),
+                                                            relationshipComponent["next"].as<entt::entity>(),
+                                                            relationshipComponent["parent"].as<entt::entity>());
             }
 
             if (const auto& cameraComponent = entity["CameraComponent"]) {
@@ -294,20 +292,20 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
                 camera.setOrthographicNearClip(cameraProps["orthographicNear"].as<float>());
                 camera.setOrthographicFarClip(cameraProps["orthographicFar"].as<float>());
 
-                scene->manager.emplace<CameraComponent>(deserializedEntity,
-                                                        camera,
-                                                        cameraComponent["primary"].as<bool>(),
-                                                        cameraComponent["fixedAspectRatio"].as<bool>()
+                scene->world.emplace<CameraComponent>(deserializedEntity,
+                                                      camera,
+                                                      cameraComponent["primary"].as<bool>(),
+                                                      cameraComponent["fixedAspectRatio"].as<bool>()
                 );
             }
 
             if (const auto& modelComponent = entity["ModelComponent"]) {
-                scene->manager.emplace<ModelComponent>(deserializedEntity,
-                                                       modelComponent["path"].as<std::string>(),
+                scene->world.emplace<ModelComponent>(deserializedEntity,
+                                                     modelComponent["path"].as<std::string>(),
                     //modelComponent["layout"].as<std::vector<int>>(),
                     modelComponent["scale"].as<glm::vec3>(),
-                                                       modelComponent["center"].as<glm::vec3>(),
-                                                       modelComponent["uvscale"].as<glm::vec2>()
+                                                     modelComponent["center"].as<glm::vec3>(),
+                                                     modelComponent["uvscale"].as<glm::vec2>()
                 );
             }
         }

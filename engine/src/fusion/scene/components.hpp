@@ -2,7 +2,7 @@
 
 #include "scene_camera.hpp"
 
-#include <entt/entity/registry.hpp>
+#include <entt/entt.hpp>
 
 namespace fe {
 
@@ -29,10 +29,40 @@ namespace fe {
         operator std::string() const { return tag; }
     };
 
+    struct DirtyComponent {
+    };
+
+    struct RelationshipComponent {
+        size_t children{ 0 }; //! the number of children for the given entity.
+        entt::entity first{ entt::null }; //! the entity identifier of the first child, if any.
+        entt::entity prev{ entt::null }; // the previous sibling in the list of children for the parent.
+        entt::entity next{ entt::null }; // the next sibling in the list of children for the parent.
+        entt::entity parent{ entt::null }; // the entity identifier of the parent, if any.
+
+
+    };
+
     struct TransformComponent {
         glm::vec3 translation{ 0.0f };
         glm::vec3 rotation{ 0.0f };
         glm::vec3 scale{ 1.0f };
+        glm::mat4 model{ 1.0f };
+
+        static void update(entt::registry& registry, entt::entity entity) {
+            std::function<void(const entt::entity)> function = [&](entt::entity entity) {
+                std::cout << std::to_string(static_cast<int>(entity)) << std::endl;
+                registry.get_or_emplace<DirtyComponent>(entity);
+                if (auto p = registry.try_get<RelationshipComponent>(entity); p && p->children > 0) {
+                    auto curr = p->first;
+                    while (curr != entt::null) {
+                        function(curr);
+                        curr = registry.get<RelationshipComponent>(curr).next;
+                    }
+                }
+            };
+
+            function(entity);
+        }
 
         glm::mat4 transform() const {
             glm::mat4 m{ 1.0f };
@@ -51,14 +81,6 @@ namespace fe {
         glm::mat4 normal() const {
             return glm::transpose(glm::inverse(glm::mat3{transform()}));
         }
-    };
-
-    struct RelationshipComponent {
-        size_t children{ 0 }; //! the number of children for the given entity.
-        entt::entity first{ entt::null }; //! the entity identifier of the first child, if any.
-        entt::entity prev{ entt::null }; // the previous sibling in the list of children for the parent.
-        entt::entity next{ entt::null }; // the next sibling in the list of children for the parent.
-        entt::entity parent{ entt::null }; // the entity identifier of the parent, if any.
     };
 
     struct BoundsComponent {

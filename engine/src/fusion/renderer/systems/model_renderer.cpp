@@ -21,7 +21,7 @@ void ModelRenderer::createPipelineLayout() {
 
 void ModelRenderer::createPipeline() {
     vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ context.device, pipelineLayout, renderer.getDrawRenderPass() };
-    pipelineBuilder.rasterizationState.frontFace = vk::FrontFace::eCounterClockwise;
+    //pipelineBuilder.rasterizationState.frontFace = vk::FrontFace::eCounterClockwise;
 
     model.loadFromFile(context, getAssetPath() + "/models/vulkanscenemodels.dae");
 
