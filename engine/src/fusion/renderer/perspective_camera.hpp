@@ -38,7 +38,7 @@ namespace fe {
 
     protected:
         glm::vec3 position{ 0.0f };
-        glm::quat rotation{ 1.0f, 0.0f, 0.0f, 0.0f };
+        glm::quat rotation{ quat::identity };
 
         glm::vec3 forward;
         glm::vec3 right;

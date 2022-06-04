@@ -452,9 +452,9 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
     drawComponent<TransformComponent>(fs::ICON_FA_AXIS + "  Transform"s, entity, [](TransformComponent& component)
     {
         drawVec3Control("Translation", component.translation);
-        glm::vec3 rotation = glm::degrees(component.rotation);
+        glm::vec3 rotation = glm::degrees(glm::eulerAngles(component.rotation));
         drawVec3Control("Rotation", rotation);
-        component.rotation = glm::radians(rotation);
+        component.rotation = glm::quat{glm::radians(rotation)};
         drawVec3Control("Scale", component.scale, 1.0f);
     }, false);
 

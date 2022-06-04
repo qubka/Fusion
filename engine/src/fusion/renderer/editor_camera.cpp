@@ -12,13 +12,13 @@ EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : Per
 void EditorCamera::update(float dt) {
     if (Input::GetKey(Key::LeftAlt)) {
         if (Input::GetMouseButton(Mouse::ButtonMiddle))
-            mousePan( Input::MouseDelta() * dt);
+            mousePan(Input::MouseDelta() * dt);
         else if (Input::GetMouseButton(Mouse::ButtonLeft))
-            mouseRotate( Input::MouseDelta() * dt);
+            mouseRotate(Input::MouseDelta() * dt);
         else if (Input::GetMouseButton(Mouse::ButtonRight))
             mouseZoom(Input::MouseDelta().y * dt);
         else {
-            auto scroll = Input::MouseScroll().y;
+            float scroll = Input::MouseScroll().y;
             if (scroll != 0.0f) {
                 mouseZoom(scroll * 0.1f);
             }
@@ -32,7 +32,7 @@ void EditorCamera::update(float dt) {
 }
 
 void EditorCamera::mousePan(const glm::vec2& delta) {
-    auto speed = panSpeed();
+    glm::vec2 speed{ panSpeed() };
     focalPoint += right * delta.x * speed.x * distance;
     focalPoint += up * delta.y * speed.y * distance;
 }

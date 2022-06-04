@@ -34,27 +34,10 @@ void Scene::onRenderRuntime() {
 
 }
 
+
+
 void Scene::onRenderEditor(const EditorCamera& camera) {
 
-    /*if (Input::GetKey(Key::U)) {
-        auto group = world.group<DirtyComponent, TransformComponent, RelationshipComponent>();
-        std::cout << "___"<< std::endl;
-        group.each([&](auto entity, auto transform, auto relation){
-            std::cout << world.get<TagComponent>(entity).tag << std::endl;
-        });
-
-        group.sort([&](const entt::entity lhs, const entt::entity rhs) {
-            const auto &left = world.get<RelationshipComponent>(lhs);
-            const auto &right = world.get<RelationshipComponent>(rhs);
-            return !(left.parent != entt::null && left.children < right.children);
-
-        });
-        //group.each([](auto &&...) {  });
-        std::cout << "___"<< std::endl;
-        group.each([&](auto entity, auto transform, auto relation){
-            std::cout << world.get<TagComponent>(entity).tag << std::endl;
-        });
-    }*/
 
     auto group = world.group<DirtyComponent, RelationshipComponent, TransformComponent>();
     group.sort([&](const entt::entity lhs, const entt::entity rhs) {
@@ -63,13 +46,11 @@ void Scene::onRenderEditor(const EditorCamera& camera) {
         return !(clhs.parent != entt::null && clhs.children < crhs.children);
     });
     group.each([&](const auto entity, auto& relationship, auto& transform) {
-        glm::mat4 m{ transform.transform() };
-        if (relationship.parent != entt::null) {
-            m *= world.get<TransformComponent>(relationship.parent).transform();
-        }
-        transform.model = m;
-    });
+        std::cout << static_cast<int>(entity) << " updated" << std::endl;
+        transform.localToWorldMatrix = world.make_local_to_world(entity);
+        transform.worldToLocalMatrix = glm::inverse(transform.localToWorldMatrix);//world.make_world_to_local(entity);
 
+    });
     world.clear<DirtyComponent>();
 
     auto& modelRenderer = ModelRenderer::Instance();
@@ -77,10 +58,13 @@ void Scene::onRenderEditor(const EditorCamera& camera) {
     modelRenderer.begin();
 
     world.view<const TransformComponent>().each([&](const auto& transform) {
-        modelRenderer.draw(transform.model);
+        modelRenderer.draw(transform.localToWorldMatrix);
     });
 
     modelRenderer.end();
+
+
+
 
     /*
      * const auto& [transform, relationship] = group.get<TransformComponent, RelationshipComponent>(entity);

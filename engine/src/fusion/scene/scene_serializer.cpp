@@ -267,7 +267,7 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
             if (const auto& transformComponent = entity["TransformComponent"]) {
                 scene->world.emplace<TransformComponent>(deserializedEntity,
                                                          transformComponent["translation"].as<glm::vec3>(),
-                                                         transformComponent["rotation"].as<glm::vec3>(),
+                                                         transformComponent["rotation"].as<glm::quat>(),
                                                          transformComponent["scale"].as<glm::vec3>());
             }
 

@@ -37,11 +37,11 @@ namespace fe {
         void recalculateProjection();
 
     private:
-        ProjectionType projectionType = ProjectionType::Orthographic;
+        ProjectionType projectionType{ ProjectionType::Orthographic };
 
         glm::mat4 projectionMatrix{ 1.0f };
 
-        float perspectiveFOV = glm::radians(45.0f);
+        float perspectiveFOV{ glm::radians(45.0f) };
         float perspectiveNear{ 0.01f };
         float perspectiveFar{ 1000.0f };
 

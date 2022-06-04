@@ -241,7 +241,7 @@ void EditorLayer::onImGui() {
 
         // Entity transform
         auto& component = activeScene->world.get<TransformComponent>(selectedEntity);
-        glm::mat4 transform = component.transform();
+        //auto gizmoMode = activeScene->world.get_parent(selectedEntity) != entt::null ? ImGuizmo::WORLD : ImGuizmo::LOCAL;
 
         // Snapping
         bool snap = Input::GetKey(Key::LeftControl);
@@ -260,14 +260,14 @@ void EditorLayer::onImGui() {
         }*/
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                             static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform),
+                             static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::LOCAL, glm::value_ptr(component.worldToLocalMatrix),
                              nullptr, snap ? snapValues : nullptr, bound ? boundsValues : nullptr, bound ? boundsSnap : nullptr);
 
         //ImGuizmo::ViewManipulate(glm::value_ptr(cameraView), editorCamera.getDistance(), {maxBounds.x - 128, minBounds.y}, {128, 128}, 0x10101010);
 
-        if (ImGuizmo::IsUsing()) {
+        /*if (ImGuizmo::IsUsing()) {
             glm::vec3 translation, rotation, scale;
-            glm::decompose(transform, translation, rotation, scale);
+            glm::decompose(component.worldToLocalMatrix, translation, rotation, scale);
 
             glm::vec3 deltaRotation = rotation - component.rotation;
 
@@ -276,7 +276,24 @@ void EditorLayer::onImGui() {
                 component.rotation += deltaRotation;
             component.scale = scale;
 
-            component.update(activeScene->world, selectedEntity);
+            activeScene->world.notify_children(selectedEntity);
+        }*/
+
+        if (ImGuizmo::IsUsing()) {
+            glm::vec3 translation, rotation, scale;
+            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(component.worldToLocalMatrix), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
+
+            if (gizmoType == ImGuizmo::OPERATION::TRANSLATE) {
+                component.translation = translation;
+            }
+            if (gizmoType == ImGuizmo::OPERATION::ROTATE) {
+                component.rotation = glm::radians(rotation);
+            }
+            if (gizmoType == ImGuizmo::OPERATION::SCALE) {
+                component.scale = scale;
+            }
+
+            activeScene->world.notify_children(selectedEntity);
         }
     }
 

@@ -22,15 +22,15 @@ namespace entt {
 
         /**
          * Removes a parent and all its children.
-         * @param parent Parent entity of a relationship.
+         * @param entity A valid identifier.
          */
-        void remove_parent(const entity_type parent);
+        void remove_parent(const entity_type entity);
 
         /**
          * Destroy a parent entity and all its children.
-         * @param parent Parent entity of a relationship.
+         * @param entity A valid identifier.
          */
-        void destroy_parent(const entity_type parent);
+        void destroy_parent(const entity_type entity);
 
         /**
          * Assign an entity to a parent as a child.
@@ -48,12 +48,15 @@ namespace entt {
 
         /**
          * Get all children of a parent entity.
-         * @param parent Parent entity of a relationship.
+         * @param entity A valid identifier.
          * @return Vector of childen, or nullptr if not parent. Will be empty if no children, not nullptr.
          */
-        [[nodiscard]] std::vector<entity> get_children(const entity_type parent) const;
+        [[nodiscard]] std::vector<entity> get_children(const entity_type entity) const;
 
+        void notify_children(const entity entity);
 
-        glm::mat4 transform(const entity_type entity) const;
+        [[nodiscard]] glm::mat4 transform(const entity_type entity) const;
+        [[nodiscard]] glm::mat4 make_local_to_world(const entity_type entity) const;
+        [[nodiscard]] glm::mat4 make_world_to_local(const entity_type entity) const;
     };
 }
