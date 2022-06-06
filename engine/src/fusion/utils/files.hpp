@@ -3,8 +3,8 @@
 namespace fe {
     class fs {
     public:
-        static std::vector<std::filesystem::directory_entry> walk(const std::filesystem::path& dir, const std::string& filter = "");
-        static std::vector<std::filesystem::directory_entry> recursive_walk(const std::filesystem::path& dir, const std::string& filter = "");
+        static std::vector<std::filesystem::path> walk(const std::filesystem::path& dir, const std::string& filter = "", const std::vector<std::string>& formats = {});
+        static std::vector<std::filesystem::path> recursive_walk(const std::filesystem::path& dir, const std::string& filter = "", const std::vector<std::string>& formats = {});
         static bool has_directories(const std::filesystem::path& dir);
 
         static const char* ICON_FA_FOLDER_CLOSE;

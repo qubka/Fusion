@@ -29,10 +29,12 @@ namespace fe {
         };
 
         void begin();
-        void draw(const glm::mat4& transform);
+        void draw(const std::shared_ptr<vkx::model::Model>& model, const glm::mat4& transform);
         void end();
 
         static ModelRenderer& Instance() { assert(instance && "Model Renderer was not initialized!"); return *instance; }
+
+        std::shared_ptr<vkx::model::Model> loadModel(const std::string& filename);
 
     private:
         void create() {
@@ -44,7 +46,10 @@ namespace fe {
             context.device.destroyPipelineLayout(pipelineLayout);
             context.device.destroyPipeline(pipeline);
 
-            model.destroy();
+            for (auto [path, model] : models) {
+                model->destroy();
+            }
+            models.clear();
         }
 
         const vkx::Context& context;
@@ -57,7 +62,8 @@ namespace fe {
         vk::Pipeline pipeline;
         vk::PipelineLayout pipelineLayout;
         vk::CommandBuffer* commandBuffer{ nullptr };
-        vkx::model::Model model;
+
+        std::unordered_map<std::string, std::shared_ptr<vkx::model::Model>> models;
 
         static ModelRenderer* instance;
     };

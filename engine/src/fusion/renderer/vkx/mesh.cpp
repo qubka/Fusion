@@ -1,7 +1,6 @@
 #include "mesh.hpp"
 
 using namespace vkx;
-using namespace vkx::model;
 
 void Mesh::loadFromBuffer(const Context& context, const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer) {
     vertexCount = static_cast<uint32_t>(vertexBuffer.size());
@@ -14,20 +13,6 @@ void Mesh::loadFromBuffer(const Context& context, const std::vector<Vertex>& ver
 
     // Index buffer
     indices = indexCount > 0 ? context.stageToDeviceBuffer<uint32_t>(vk::BufferUsageFlagBits::eIndexBuffer, indexBuffer) : Buffer{};
-
-    // Vertex Layout
-    layout = {{ Component::Position, Component::Normal, Component::UV, Component::Color}};
-}
-
-void Mesh::loadFromBuffer(const Context& context, const std::vector<Point>& vertexBuffer) {
-    vertexCount = static_cast<uint32_t>(vertexBuffer.size());
-    assert(vertexCount >= 2 && "Vertex count must be at least 2");
-
-    // Vertex buffer
-    vertices = context.stageToDeviceBuffer<Point>(vk::BufferUsageFlagBits::eVertexBuffer, vertexBuffer);
-
-    // Vertex Layout
-    layout = {{ Component::Position, Component::Color}};
 }
 
 void Mesh::destroy() {

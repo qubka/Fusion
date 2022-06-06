@@ -41,7 +41,7 @@ enum class Component : uint8_t {
 struct VertexLayout {
     /** @brief Components used to generate vertices from */
     std::vector<Component> components;
-    uint32_t binding;
+    uint32_t binding{ 0 };
 
     VertexLayout() = default;
     VertexLayout(std::vector<Component>&& components, uint32_t binding = 0)
@@ -115,19 +115,19 @@ struct VertexLayout {
 
 /** @brief Used to parametrize model loading */
 struct ModelCreateInfo {
-    glm::vec3 center{ 0.0f };
     glm::vec3 scale{ 1.0f };
     glm::vec2 uvscale{ 1.0f };
+    glm::vec3 center{ 0.0f };
 
     ModelCreateInfo() = default;
 
     ModelCreateInfo(const glm::vec3& scale, const glm::vec2& uvscale, const glm::vec3& center)
-        : center{center}
-        , scale{scale}
-        , uvscale{uvscale} {}
+        : scale{scale}
+        , uvscale{uvscale}
+        , center{center} {}
 
     ModelCreateInfo(float scale, float uvscale, float center)
-        : ModelCreateInfo(glm::vec3{scale}, glm::vec2{ uvscale }, glm::vec3{center}) {}
+        : ModelCreateInfo(glm::vec3{scale}, glm::vec2{uvscale}, glm::vec3{center}) {}
 };
 
 struct Model {
@@ -152,6 +152,7 @@ struct Model {
     std::vector<ModelPart> parts;
 
     static const int defaultFlags;
+    static const VertexLayout defaultLayout;
 
     struct Dimension {
         glm::vec3 min{ FLT_MAX };
@@ -166,15 +167,15 @@ struct Model {
     }
 
     /**
-    * Loads a 3D model from a file into Vulkan buffers
-    *
-    * @param device Pointer to the Vulkan device used to generated the vertex and index buffers on
-    * @param filename File to load (must be a model format supported by ASSIMP)
-    * @param layout Vertex layout components (position, normals, tangents, etc.)
-    * @param createInfo MeshCreateInfo structure for load time settings like scale, center, etc.
-    * @param copyQueue Queue used for the memory staging copy commands (must support transfer)
-    * @param (Optional) flags ASSIMP model loading flags
-    */
+     * @brief Loads a 3D model from a file into Vulkan buffers
+     *
+     * @param device Pointer to the Vulkan device used to generated the vertex and index buffers on
+     * @param filename File to load (must be a model format supported by ASSIMP)
+     * @param layout Vertex layout components (position, normals, tangents, etc.)
+     * @param createInfo MeshCreateInfo structure for load time settings like scale, center, etc.
+     * @param copyQueue Queue used for the memory staging copy commands (must support transfer)
+     * @param (Optional) flags ASSIMP model loading flags
+     */
     void loadFromFile(const Context& context,
                       const std::string& filename,
                       const VertexLayout& layout,
@@ -182,16 +183,16 @@ struct Model {
                       int flags = defaultFlags);
 
     /**
-    * Loads a 3D model from a file into Vulkan buffers
-    *
-    * @param device Pointer to the Vulkan device used to generated the vertex and index buffers on
-    * @param filename File to load (must be a model format supported by ASSIMP)
-    * @param layout Vertex layout components (position, normals, tangents, etc.)
-    * @param scale Load time scene scale
-    * @param copyQueue Queue used for the memory staging copy commands (must support transfer)
-    * @param (Optional) flags ASSIMP model loading flags
+     * @brief Loads a 3D model from a file into Vulkan buffers
+     *
+     * @param device Pointer to the Vulkan device used to generated the vertex and index buffers on
+     * @param filename File to load (must be a model format supported by ASSIMP)
+     * @param layout Vertex layout components (position, normals, tangents, etc.)
+     * @param scale Load time scene scale
+     * @param copyQueue Queue used for the memory staging copy commands (must support transfer)
+     * @param (Optional) flags ASSIMP model loading flags
     */
-    void loadFromFile(const Context& context, const std::string& filename, const VertexLayout& layout = {{ Component::Position, Component::Normal, Component::UV, Component::Color}}, float scale = 1.0f, const int flags = defaultFlags) {
+    void loadFromFile(const Context& context, const std::string& filename, const VertexLayout& layout = defaultLayout, float scale = 1.0f, const int flags = defaultFlags) {
         loadFromFile(context, filename, layout, ModelCreateInfo{ scale, 1.0f, 0.0f }, flags);
     }
 

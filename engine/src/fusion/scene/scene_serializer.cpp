@@ -171,7 +171,7 @@ void SceneSerializer::serialize(const std::string& filepath) {
             out << YAML::Key << "TransformComponent";
             out << YAML::BeginMap; // TransformComponent
 
-            out << YAML::Key << "translation" << YAML::Value << component->translation;
+            out << YAML::Key << "position" << YAML::Value << component->position;
             out << YAML::Key << "rotation" << YAML::Value << component->rotation;
             out << YAML::Key << "scale" << YAML::Value << component->scale;
 
@@ -266,7 +266,7 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
 
             if (const auto& transformComponent = entity["TransformComponent"]) {
                 scene->world.emplace<TransformComponent>(deserializedEntity,
-                                                         transformComponent["translation"].as<glm::vec3>(),
+                                                         transformComponent["position"].as<glm::vec3>(),
                                                          transformComponent["rotation"].as<glm::quat>(),
                                                          transformComponent["scale"].as<glm::vec3>());
             }

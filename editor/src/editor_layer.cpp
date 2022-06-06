@@ -1,7 +1,5 @@
 #include "editor_layer.hpp"
 #include "fusion/core/application.hpp"
-#include "fusion/utils/math.hpp"
-#include "fusion/utils/files.hpp"
 #include "fusion/scene/components.hpp"
 #include "fusion/input/input.hpp"
 
@@ -220,7 +218,7 @@ void EditorLayer::onImGui() {
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            openScene(std::filesystem::path{static_cast<const char*>(payload->Data)});
+            openScene(std::filesystem::path{ static_cast<const char*>(payload->Data) });
         }
         ImGui::EndDragDropTarget();
     }
@@ -260,40 +258,35 @@ void EditorLayer::onImGui() {
         }*/
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                             static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::LOCAL, glm::value_ptr(component.worldToLocalMatrix),
+                             static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::WORLD, glm::value_ptr(component.localToWorldMatrix),
                              nullptr, snap ? snapValues : nullptr, bound ? boundsValues : nullptr, bound ? boundsSnap : nullptr);
 
         //ImGuizmo::ViewManipulate(glm::value_ptr(cameraView), editorCamera.getDistance(), {maxBounds.x - 128, minBounds.y}, {128, 128}, 0x10101010);
 
-        /*if (ImGuizmo::IsUsing()) {
-            glm::vec3 translation, rotation, scale;
-            glm::decompose(component.worldToLocalMatrix, translation, rotation, scale);
-
-            glm::vec3 deltaRotation = rotation - component.rotation;
-
-            component.translation = translation;
-            if (!glm::any(glm::isnan(deltaRotation)))
-                component.rotation += deltaRotation;
-            component.scale = scale;
-
-            activeScene->world.notify_children(selectedEntity);
-        }*/
-
         if (ImGuizmo::IsUsing()) {
-            glm::vec3 translation, rotation, scale;
-            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(component.worldToLocalMatrix), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
+            glm::vec3 position, rotation, scale;
+            //ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(component.localToWorldMatrix), glm::value_ptr(position), glm::value_ptr(rotation), glm::value_ptr(scale));
+            glm::decompose(component.localToWorldMatrix, position, rotation, scale);
+            // TODO: Fix negative Y scale pls !
 
-            if (gizmoType == ImGuizmo::OPERATION::TRANSLATE) {
-                component.translation = translation;
-            }
-            if (gizmoType == ImGuizmo::OPERATION::ROTATE) {
-                component.rotation = glm::radians(rotation);
-            }
-            if (gizmoType == ImGuizmo::OPERATION::SCALE) {
-                component.scale = scale;
+            switch (gizmoType) {
+                case ImGuizmo::OPERATION::TRANSLATE:
+                    component.position = position;
+                    break;
+                case ImGuizmo::OPERATION::ROTATE:
+                    component.rotation = glm::quat{glm::radians(rotation)};
+                    break;
+                case ImGuizmo::OPERATION::SCALE:
+                    component.scale = scale;
+                    break;
+                case ImGuizmo::OPERATION::UNIVERSAL:
+                    component.position = position;
+                    component.rotation = glm::quat{glm::radians(rotation)};
+                    component.scale = scale;
+                    break;
             }
 
-            activeScene->world.notify_children(selectedEntity);
+            activeScene->world.patch_children<TransformComponent>(selectedEntity);
         }
     }
 

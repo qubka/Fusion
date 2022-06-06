@@ -55,4 +55,4 @@
 #include "fusion/core/base.hpp"
 #include "fusion/core/common.hpp"
 #include "fusion/core/log.hpp"
-#include "fusion/utils/extentions.hpp"
+#include "fusion/utils/extensions.hpp"

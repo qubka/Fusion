@@ -8,8 +8,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace vkx
-{
+namespace vkx {
     class Benchmark {
     private:
         FILE* stream;

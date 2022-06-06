@@ -20,15 +20,19 @@ namespace fe {
         void drawComponents(entt::entity entity);
         template<typename T>
         void drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function, bool removable = true);
-        void drawFileBrowser(const std::string& label, std::string& value, const std::string& file, const std::vector<std::string>& formats, float columnWidth = 100.0f);
-        static void drawVec2Control(const std::string& label, glm::vec2& values, float resetValue = 0.0f, float columnWidth = 100.0f);
-        static void drawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+        bool drawFileBrowser(const std::string& label, std::string& value, const std::vector<std::string>& formats, float columnWidth = 100.0f);
+        static bool drawVec2Control(const std::string& label, glm::vec2& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+        static bool drawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 
     private:
         std::shared_ptr<Scene> context;
         entt::entity selectionContext;
         entt::entity renameContext;
         ContentBrowserPanel& contentBrowserPanel;
-        std::string filter;
+
+        std::string entityFilter;
+        std::string fileFilter;
+        std::string currentFile;
+        std::vector<std::filesystem::path> cachedFiles;
     };
 }

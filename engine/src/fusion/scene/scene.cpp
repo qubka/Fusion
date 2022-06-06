@@ -9,9 +9,11 @@
 using namespace fe;
 
 Scene::Scene(std::string name) : name{std::move(name)} {
-    world.on_construct<TransformComponent>().connect<&entt::registry::emplace<DirtyComponent>>();
-    //world.on_update<TransformComponent>().connect<&entt::registry::emplace_or_replace<DirtyComponent>>();
-    //world.on_update<TransformComponent>().connect<&TransformComponent::update>();
+    world.on_construct<TransformComponent>().connect<&entt::registry::emplace<DirtyTransformComponent>>();
+    world.on_update<TransformComponent>().connect<&entt::registry::emplace_or_replace<DirtyTransformComponent>>();
+
+    world.on_construct<ModelComponent>().connect<&entt::registry::emplace<DirtyModelComponent>>();
+    world.on_update<ModelComponent>().connect<&entt::registry::emplace_or_replace<DirtyModelComponent>>();
 }
 
 Scene::~Scene() {
@@ -34,98 +36,48 @@ void Scene::onRenderRuntime() {
 
 }
 
-
-
 void Scene::onRenderEditor(const EditorCamera& camera) {
 
-
-    auto group = world.group<DirtyComponent, RelationshipComponent, TransformComponent>();
-    group.sort([&](const entt::entity lhs, const entt::entity rhs) {
-        const auto& clhs = world.get<RelationshipComponent>(lhs);
-        const auto& crhs = world.get<RelationshipComponent>(rhs);
-        return !(clhs.parent != entt::null && clhs.children < crhs.children);
+    auto transformGroup = world.group<DirtyTransformComponent, TransformComponent>();
+    transformGroup.sort([&](const entt::entity lhs, const entt::entity rhs) {
+        auto clhs = world.try_get<RelationshipComponent>(lhs);
+        if (clhs == nullptr)
+            return false;
+        auto crhs = world.try_get<RelationshipComponent>(rhs);
+        if (crhs == nullptr)
+            return false;
+        return !(clhs->parent != entt::null && clhs->children < crhs->children);
     });
-    group.each([&](const auto entity, auto& relationship, auto& transform) {
-        std::cout << static_cast<int>(entity) << " updated" << std::endl;
-        transform.localToWorldMatrix = world.make_local_to_world(entity);
-        transform.worldToLocalMatrix = glm::inverse(transform.localToWorldMatrix);//world.make_world_to_local(entity);
-
+    transformGroup.each([&](const auto entity, auto& transform) {
+        transform.localToWorldMatrix = world.transform(entity);
+        transform.localToWorldMatrix[1] *= -1; // invert Y-Scale for vulkan flipped offscreen
+        transform.worldToLocalMatrix = glm::inverse(transform.localToWorldMatrix);
     });
-    world.clear<DirtyComponent>();
+
+    world.clear<DirtyTransformComponent>();
 
     auto& modelRenderer = ModelRenderer::Instance();
 
+    auto modelView = world.view<DirtyModelComponent, ModelComponent>();
+    modelView.each([&](const auto entity, ModelComponent& model) {
+        if (model.path.empty() || !std::filesystem::exists(model.path))
+            model.model.reset();
+        else
+            model.model = modelRenderer.loadModel(model.path);
+    });
+
+    world.clear<DirtyModelComponent>();
+
     modelRenderer.begin();
 
-    world.view<const TransformComponent>().each([&](const auto& transform) {
-        modelRenderer.draw(transform.localToWorldMatrix);
+    world.view<const TransformComponent, const ModelComponent>().each([&](const auto& transform, const auto& model) {
+        if (model.model)
+            modelRenderer.draw(model.model, transform.localToWorldMatrix);
     });
 
     modelRenderer.end();
 
-
-
-
-    /*
-     * const auto& [transform, relationship] = group.get<TransformComponent, RelationshipComponent>(entity);
-
-        glm::mat4 m{ transform.transform() };
-        if (relationship.parent != entt::null) {
-            m *= world.get<TransformComponent>(relationship.parent).transform();
-        }
-        modelRenderer.draw(m);
-     */
-
-    //world.clear<DirtyComponent>();
-
-    /*auto& modelRenderer = ModelRenderer::Instance();
-
-    modelRenderer.begin();
-
-    auto group = world.group<TransformComponent>(entt::get<ModelComponent>);
-    for (const auto entity : group) {
-        const auto& [transform, model] = group.get<TransformComponent, ModelComponent>(entity);
-        modelRenderer.draw();
-    }
-
-    modelRenderer.end();*/
-
-    //world.sort<TransformComponent>([](const auto& lhs, const auto& rhs) { return lhs.dirty != rhs.dirty; });
-
-    /*for (auto [entity, transform, localTransform] : world.view<TransformComponent, LocalTransformComponent>().each()) {
-    }
-
-    world.view<DirtyComponent>().each([&](const auto entity) {
-        const auto& transform = world.get<TransformComponent>(entity);
-    });
-
-    auto group = world.group<DirtyComponent, TransformComponent>();
-    group.sort([&](const entt::entity lhs, const entt::entity rhs) {
-        return world.get<DirtyComponent>(lhs) != world.get<DirtyComponent>(rhs);
-    });
-
-    for (const auto entity : group) {
-        const auto& [dirty, transform] = group.get<DirtyComponent, TransformComponent>(entity);
-
-
-
-        dirty.flag = false;
-    }*/
-
-    /*auto& modelRenderer = ModelRenderer::Instance();
-
-    modelRenderer.begin();
-
-    auto group = world.group<TransformComponent>(entt::get<ModelComponent>);
-    for (const auto entity : group) {
-        const auto& [transform, model] = group.get<TransformComponent, ModelComponent>(entity);
-        modelRenderer.draw(transform.invTransform());
-    }
-
-    modelRenderer.end();*/
-
     auto& gridRenderer = GridRenderer::Instance();
-
     gridRenderer.begin();
     gridRenderer.draw();
     gridRenderer.end();

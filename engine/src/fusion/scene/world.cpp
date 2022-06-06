@@ -3,16 +3,6 @@
 using namespace fe;
 using namespace entt;
 
-glm::mat4 world::transform(const entity entity) const {
-    /*glm::mat4 localTransform{ get<TransformComponent>(entity).transform() };
-    if (auto component = try_get<RelationshipComponent>(entity); component && component->parent != entt::null) {
-        return localTransform * transform(component->parent);
-    } else {
-        return localTransform;
-    }*/
-    return glm::mat4{ 1.0f };
-}
-
 bool world::has_children(const entity entity) const {
     if (auto component = try_get<RelationshipComponent>(entity); component && component->children > 0) {
         return true;
@@ -142,29 +132,10 @@ std::vector<entity> world::get_children(const entity entity) const {
     return ret;
 }
 
-void world::notify_children(const entity entity) {
-    get_or_emplace<DirtyComponent>(entity);
-    if (auto p = try_get<RelationshipComponent>(entity); p && p->children > 0) {
-        auto curr = p->first;
-        while (curr != entt::null) {
-            notify_children(curr);
-            curr = get<RelationshipComponent>(curr).next;
-        }
-    }
-}
-
-glm::mat4 world::make_local_to_world(const entity entity) const {
+glm::mat4 world::transform(const entity entity) const {
     if (auto component = try_get<RelationshipComponent>(entity); component && component->parent != entt::null) {
-        return make_local_to_world(component->parent) * get<TransformComponent>(entity).make_local_to_parent();
+        return get<TransformComponent>(entity).transform() * transform(component->parent);
     } else {
-        return get<TransformComponent>(entity).make_local_to_parent();
-    }
-}
-
-glm::mat4 world::make_world_to_local(const entity entity) const {
-    if (auto component = try_get<RelationshipComponent>(entity); component && component->parent != entt::null) {
-        return get<TransformComponent>(entity).make_parent_to_local() * make_world_to_local(component->parent);
-    } else {
-        return get<TransformComponent>(entity).make_parent_to_local();
+        return get<TransformComponent>(entity).transform();
     }
 }

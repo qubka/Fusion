@@ -8,7 +8,6 @@
 #include "fusion/scene/scene.hpp"
 #include "fusion/scene/scene_serializer.hpp"
 #include "fusion/renderer/editor_camera.hpp"
-#include "fusion/utils/process_info.hpp"
 #include "fusion/renderer/renderer.hpp"
 
 namespace fe {

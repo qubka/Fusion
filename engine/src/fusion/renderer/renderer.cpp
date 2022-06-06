@@ -157,7 +157,7 @@ void Renderer::beginRenderPass(uint32_t frameIndex) {
     assert(frameStarted && "cannot call beginRenderPass if frame is not in progress");
     assert(frameIndex == currentFrame && "cannot start render pass on command buffer from a different frame");
 
-    auto offset = vk::Offset2D{};
+    vk::Offset2D offset{};
     vk::RenderPassBeginInfo renderPassInfo;
     renderPassInfo.renderArea.offset = offset;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -169,8 +169,8 @@ void Renderer::beginRenderPass(uint32_t frameIndex) {
 
         auto& size = swapChain.extent;
         renderPassInfo.renderArea.extent = size;
-        vk::Rect2D scissor = vkx::util::rect2D(size, offset);
-        vk::Viewport viewport = vkx::util::viewport(size);
+        vk::Rect2D scissor{ vkx::util::rect2D(size, offset) };
+        vk::Viewport viewport{ vkx::util::viewport(size) };
 
         auto& commandBuffer = commandBuffers[currentFrame];
         commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
@@ -184,8 +184,8 @@ void Renderer::beginRenderPass(uint32_t frameIndex) {
 
         auto& size = offscreen.size;
         renderPassInfo.renderArea.extent = size;
-        vk::Rect2D scissor = vkx::util::rect2D(size, offset);
-        vk::Viewport viewport = vkx::util::viewport(size);
+        vk::Rect2D scissor{ vkx::util::rect2D(size, offset) };
+        vk::Viewport viewport{ vkx::util::viewport(size) };
 
         auto& commandBuffer = offscreen.commandBuffers[currentFrame];
         commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);

@@ -3,18 +3,15 @@
 namespace fe {
     class ContentBrowserPanel {
     public:
-        ContentBrowserPanel() : currentDirectory{getAssetPath()} {};
+        ContentBrowserPanel() { selectDirectory(getAssetPath()); }
         ~ContentBrowserPanel() = default;
 
         void onImGui();
 
         const std::filesystem::path& getCurrentFile() const { return currentFile; }
         const std::filesystem::path& getCurrentDirectory() const { return currentDirectory; }
-
-        void selectFile(const std::filesystem::path& file) {
-            currentDirectory = file.parent_path();
-            currentFile = file;
-        }
+        void selectFile(const std::filesystem::path& file);
+        void selectDirectory(const std::filesystem::path& dir);
 
     private:
         void drawFileExplorer();
@@ -23,8 +20,11 @@ namespace fe {
         std::filesystem::path currentDirectory;
         std::filesystem::path currentFile;
         uint32_t currentNode{ UINT32_MAX };
+        std::vector<std::filesystem::path> currentFiles;
 
         std::string filter;
+        std::vector<std::filesystem::path> cachedFiles;
+
         bool locked{ false };
     };
 }

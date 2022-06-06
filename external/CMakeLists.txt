@@ -153,9 +153,9 @@ set(IMGUI_SOURCES
         "${IMGUI_LIB_NAME}/imgui_draw.cpp"
         "${IMGUI_LIB_NAME}/imgui_tables.cpp"
         "${IMGUI_LIB_NAME}/imgui_widgets.cpp"
-        "${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.cpp"
+        #"${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.cpp"
         #"${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.cpp"
-        "${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.cpp"
+        #"${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.cpp"
 
         "${IMGUIZMO_LIB_NAME}/GraphEditor.cpp"
         "${IMGUIZMO_LIB_NAME}/ImCurveEdit.cpp"

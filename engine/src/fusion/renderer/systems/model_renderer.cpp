@@ -23,10 +23,8 @@ void ModelRenderer::createPipeline() {
     vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ context.device, pipelineLayout, renderer.getDrawRenderPass() };
     //pipelineBuilder.rasterizationState.frontFace = vk::FrontFace::eCounterClockwise;
 
-    model.loadFromFile(context, getAssetPath() + "/models/vulkanscenemodels.dae");
-
     // Binding description
-    pipelineBuilder.vertexInputState.appendVertexLayout(model.layout, 0, vk::VertexInputRate::eVertex);
+    pipelineBuilder.vertexInputState.appendVertexLayout(vkx::model::Model::defaultLayout, 0, vk::VertexInputRate::eVertex);
 
     // Attribute descriptions
 
@@ -55,21 +53,31 @@ void ModelRenderer::begin() {
             nullptr);
 }
 
-void ModelRenderer::draw(const glm::mat4& transform) {
+void ModelRenderer::draw(const std::shared_ptr<vkx::model::Model>& model, const glm::mat4& transform) {
     assert(commandBuffer && "cannot draw mesh when pipeline not bind");
 
     PushConstantData push { transform, glm::transpose(glm::inverse(glm::mat3{transform})) };
 
     commandBuffer->pushConstants<PushConstantData>(pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, push);
-    commandBuffer->bindVertexBuffers(0, model.vertices.buffer, { 0 });
-    if (model.indexCount) {
-        commandBuffer->bindIndexBuffer(model.indices.buffer, 0, vk::IndexType::eUint32);
-        commandBuffer->drawIndexed(model.indexCount, 1, 0, 0, 0);
+    commandBuffer->bindVertexBuffers(0, model->vertices.buffer, { 0 });
+    if (model->indexCount) {
+        commandBuffer->bindIndexBuffer(model->indices.buffer, 0, vk::IndexType::eUint32);
+        commandBuffer->drawIndexed(model->indexCount, 1, 0, 0, 0);
     } else {
-        commandBuffer->draw(model.vertexCount, 1, 0, 0);
+        commandBuffer->draw(model->vertexCount, 1, 0, 0);
     }
 }
 
 void ModelRenderer::end() {
     commandBuffer = nullptr;
+}
+
+std::shared_ptr<vkx::model::Model> ModelRenderer::loadModel(const std::string& filename) {
+    if (auto it{ models.find(filename) }; it != models.end()) {
+        return it->second;
+    }
+    auto model = std::make_shared<vkx::model::Model>();
+    model->loadFromFile(context, filename);
+    models.emplace(filename, model);
+    return model;
 }

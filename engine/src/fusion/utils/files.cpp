@@ -2,41 +2,51 @@
 
 using namespace fe;
 
-std::vector<std::filesystem::directory_entry> fs::walk(const std::filesystem::path& dir, const std::string& filter) {
-    std::vector<std::filesystem::directory_entry> entries;
+std::vector<std::filesystem::path> fs::walk(const std::filesystem::path& dir, const std::string& filter, const std::vector<std::string>& formats) {
+    std::vector<std::filesystem::path> paths;
 
     for (const auto& entry : std::filesystem::directory_iterator(dir)) {
-        if (!filter.empty() && entry.is_directory() && entry.path().filename().string().find(filter) == std::string::npos)
+        const auto& path = entry.path();
+
+        if (!filter.empty() && entry.is_directory() && ext::find_insensitive(path.filename().string(), filter) == std::string::npos)
             continue;
 
-        entries.push_back(entry);
+        if (!formats.empty() && std::find(formats.begin(), formats.end(), path.filename().extension().string()) == formats.end())
+            continue;
+
+        paths.push_back(path);
     }
 
-    std::sort(entries.begin(), entries.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
-        return a.is_directory() && !b.is_directory();
+    std::sort(paths.begin(), paths.end(), [](const std::filesystem::path& a, const std::filesystem::path& b) {
+        return is_directory(a) && !is_directory(b);
     });
 
-    return entries;
+    return paths;
 }
 
-std::vector<std::filesystem::directory_entry> fs::recursive_walk(const std::filesystem::path& dir, const std::string& filter) {
-    std::vector<std::filesystem::directory_entry> entries;
+std::vector<std::filesystem::path> fs::recursive_walk(const std::filesystem::path& dir, const std::string& filter, const std::vector<std::string>& formats) {
+    std::vector<std::filesystem::path> paths;
 
     for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
         if (entry.is_directory())
             continue;
 
-        if (!filter.empty() && entry.path().filename().string().find(filter) == std::string::npos)
+        const auto& path = entry.path();
+
+        if (!filter.empty() && ext::find_insensitive(path.filename().string(), filter) == std::string::npos)
             continue;
 
-        entries.push_back(entry);
+        if (!formats.empty() && std::find(formats.begin(), formats.end(), path.filename().extension().string()) == formats.end())
+            continue;
+
+        paths.push_back(path);
     }
 
-    std::sort(entries.begin(), entries.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
-        return a.path() < b.path();
+    std::sort(paths.begin(), paths.end(), [](const std::filesystem::path& a, const std::filesystem::path& b) {
+        return a < b;
     });
 
-    return entries;
+    return paths;
 }
 
 bool fs::has_directories(const std::filesystem::path& dir) {
@@ -46,7 +56,6 @@ bool fs::has_directories(const std::filesystem::path& dir) {
                 return true;
         }
     }
-
     return false;
 }
 
