@@ -236,18 +236,6 @@ set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(${JSON_LIB_NAME})
 
 
-# magic_enum
-set(SIGNALS_LIB_NAME "signals")
-set(SIGNALS_INC_PATH ${SIGNALS_LIB_NAME})
-
-add_library(${SIGNALS_LIB_NAME} INTERFACE)
-
-target_include_directories(${SIGNALS_LIB_NAME}
-        INTERFACE
-        ${SIGNALS_INC_PATH}
-        )
-
-
 # physx
 # PHYSX_ROOT_DIR - path to the `{cloned repository}/physx` repo directory git://github.com/NVIDIAGameWorks/PhysX.git
 set(PHYSX_ROOT_DIR ${CMAKE_SOURCE_DIR}/external/physx/physx) #This is needed for ${PHYSX_ROOT_DIR}/compiler/public/CMakeLists.txt

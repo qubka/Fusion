@@ -4,7 +4,7 @@
 #include "fusion/input/key_codes.hpp"
 #include "fusion/input/action_codes.hpp"
 
-#include <signals/signals.hpp>
+#include <entt/signal/sigh.hpp>
 
 namespace fe {
     class Window {
@@ -45,30 +45,30 @@ namespace fe {
         bool minimize;
 
     public:
-        fteng::signal<void(const glm::ivec2 &)> PositionChangeEvent;
-        fteng::signal<void(const glm::ivec2 &)> SizeChangeEvent;
-        fteng::signal<void(const glm::ivec2 &)> FramebufferEvent;
-        fteng::signal<void()> StartEvent;
-        fteng::signal<void()> CloseEvent;
-        fteng::signal<void()> RefreshEvent;
-        fteng::signal<void(bool)> FocusEvent;
-        fteng::signal<void(bool)> IconifyEvent;
-        fteng::signal<void(MouseData)> MouseButtonEvent;
-        fteng::signal<void(MouseCode)> MousePressEvent;
-        fteng::signal<void(MouseCode)> MouseReleaseEvent;
-        fteng::signal<void(const glm::vec2 &)> MouseMotionEvent;
-        fteng::signal<void(const glm::vec2 &)> MouseMotionNormEvent;
-        fteng::signal<void(bool)> MouseEnterEvent;
-        fteng::signal<void(const glm::vec2 &)> MouseScrollEvent;
-        fteng::signal<void(KeyData)> KeyEvent;
-        fteng::signal<void(KeyCode)> KeyPressEvent;
-        fteng::signal<void(KeyCode)> KeyReleaseEvent;
-        fteng::signal<void(KeyCode)> KeyHoldEvent;
-        fteng::signal<void(uint32_t)> CharInputEvent;
-        fteng::signal<void(const std::vector<std::string> &)> FileDropEvent;
-        fteng::signal<void(const glm::vec2 &)> ContentScaleEvent;
-        fteng::signal<void(bool)> MaximizeEvent;
-        fteng::signal<void(bool)> MonitorEvent;
-        fteng::signal<void(uint8_t, bool)> JoystickEvent;
+        entt::sigh<void(const glm::ivec2 &)> PositionChangeSignal{};
+        entt::sigh<void(const glm::ivec2 &)> SizeChangeSignal{};
+        entt::sigh<void(const glm::ivec2 &)> FramebufferSignal{};
+        entt::sigh<void()> StartSignal{};
+        entt::sigh<void()> CloseSignal{};
+        entt::sigh<void()> RefreshSignal{};
+        entt::sigh<void(bool)> FocusSignal{};
+        entt::sigh<void(bool)> IconifySignal{};
+        entt::sigh<void(MouseData)> MouseButtonSignal{};
+        entt::sigh<void(MouseCode)> MousePressSignal{};
+        entt::sigh<void(MouseCode)> MouseReleaseSignal{};
+        entt::sigh<void(const glm::vec2 &)> MouseMotionSignal{};
+        entt::sigh<void(const glm::vec2 &)> MouseMotionNormSignal{};
+        entt::sigh<void(bool)> MouseEnterSignal{};
+        entt::sigh<void(const glm::vec2 &)> MouseScrollSignal{};
+        entt::sigh<void(KeyData)> KeySignal{};
+        entt::sigh<void(KeyCode)> KeyPressSignal{};
+        entt::sigh<void(KeyCode)> KeyReleaseSignal{};
+        entt::sigh<void(KeyCode)> KeyHoldSignal{};
+        entt::sigh<void(uint32_t)> CharInputSignal{};
+        entt::sigh<void(const std::vector<std::string> &)> FileDropSignal{};
+        entt::sigh<void(const glm::vec2 &)> ContentScaleSignal{};
+        entt::sigh<void(bool)> MaximizeSignal{};
+        entt::sigh<void(bool)> MonitorSignal{};
+        entt::sigh<void(uint8_t, bool)> JoystickSignal{};
     };
 }

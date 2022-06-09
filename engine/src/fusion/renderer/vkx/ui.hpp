@@ -90,5 +90,13 @@ namespace vkx { namespace ui {
         void resize(const vk::Extent2D& size);
 
         vk::DescriptorSet addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const;
+
+        void onMouseButtonEvent(fe::MouseData data);
+        void onMouseMotionEvent(const glm::vec2& pos);
+        void onMouseScrollEvent(const glm::vec2& offset);
+        void onMouseEnterEvent(bool entered);
+        void onKeyEvent(fe::KeyData data);
+        void onCharInputEvent(uint32_t c);
+        void onFocusEvent(bool focuses);
     };
 }}  // namespace vkx::ui

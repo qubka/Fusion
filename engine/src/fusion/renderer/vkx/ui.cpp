@@ -449,62 +449,13 @@ void UIOverlay::prepareRenderPass() {
 /** Set the window events callbacks */
 void UIOverlay::prepareEvents() {
     assert(createInfo.window && "Window not initialized to set up events!");
-
-    createInfo.window->MouseButtonEvent.connect([](MouseData data) {
-        if (data.button >= 0 && data.button < ImGuiMouseButton_COUNT) {
-            ImGuiIO& io = ImGui::GetIO();
-            io.AddMouseButtonEvent(data.button, data.action == Action::Press);
-        }
-    });
-
-    createInfo.window->MouseMotionEvent.connect([](const glm::vec2& pos) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddMousePosEvent(pos.x, pos.y);
-    });
-
-    createInfo.window->MouseScrollEvent.connect([](const glm::vec2& offset) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddMouseWheelEvent(offset.x, offset.y);
-    });
-
-    createInfo.window->KeyEvent.connect([](KeyData data) {
-        if (data.action >= Action::Repeat)
-            return;
-
-        //UpdateKeyModifiers(data.mods);
-
-        int keycode = TranslateUntranslatedKey(data.key, data.scancode);
-
-        ImGuiIO& io = ImGui::GetIO();
-        ImGuiKey imgui_key = KeyToImGuiKey(keycode);
-        io.AddKeyEvent(imgui_key, data.action == Action::Press);
-        io.SetKeyEventNativeData(imgui_key, keycode,  data.scancode); // To support legacy indexing (<1.87 user code)
-    });
-
-    createInfo.window->CharInputEvent.connect([](uint32_t c) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddInputCharacter(c);
-    });
-
-    createInfo.window->FocusEvent.connect([](bool focuses) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddFocusEvent(focuses);
-    });
-
-    // Workaround: X11 seems to send spurious Leave/Enter events which would make us lose our position,
-    // so we back it up and restore on Leave/Enter (see https://github.com/ocornut/imgui/issues/4984)
-    createInfo.window->MouseEnterEvent.connect([&](bool entered) {
-        ImGuiIO& io = ImGui::GetIO();
-        if (entered) {
-            currentWindow = createInfo.window;
-            io.AddMousePosEvent(lastValidMousePos.x, lastValidMousePos.y);
-        } else if (currentWindow == createInfo.window) {
-            auto& mouse = io.MousePos;
-            lastValidMousePos = {mouse.x, mouse.y};
-            currentWindow = nullptr;
-            io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
-        }
-    });
+    entt::sink{createInfo.window->MouseButtonSignal}.connect<&UIOverlay::onMouseButtonEvent>(this);
+    entt::sink{createInfo.window->MouseMotionSignal}.connect<&UIOverlay::onMouseMotionEvent>(this);
+    entt::sink{createInfo.window->MouseScrollSignal}.connect<&UIOverlay::onMouseScrollEvent>(this);
+    entt::sink{createInfo.window->MouseEnterSignal}.connect<&UIOverlay::onMouseEnterEvent>(this);
+    entt::sink{createInfo.window->KeySignal}.connect<&UIOverlay::onKeyEvent>(this);
+    entt::sink{createInfo.window->CharInputSignal}.connect<&UIOverlay::onCharInputEvent>(this);
+    entt::sink{createInfo.window->FocusSignal}.connect<&UIOverlay::onFocusEvent>(this);
 }
 
 /** Update the command buffers to reflect UI changes */
@@ -719,4 +670,60 @@ vk::DescriptorSet UIOverlay::addTexture(const vk::Sampler& sampler, const vk::Im
     vk::WriteDescriptorSet writeDescriptorSet{ descriptorSet, 0, 0, 1, vk::DescriptorType::eCombinedImageSampler, &imageInfo };
     context.device.updateDescriptorSets(writeDescriptorSet, {});
     return descriptorSet;
+}
+
+void UIOverlay::onMouseButtonEvent(MouseData data) {
+    if (data.button >= 0 && data.button < ImGuiMouseButton_COUNT) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(data.button, data.action == Action::Press);
+    }
+}
+
+void UIOverlay::onMouseMotionEvent(const glm::vec2& pos) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddMousePosEvent(pos.x, pos.y);
+}
+
+void UIOverlay::onMouseScrollEvent(const glm::vec2& offset) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddMouseWheelEvent(offset.x, offset.y);
+}
+
+// Workaround: X11 seems to send spurious Leave/Enter events which would make us lose our position,
+// so we back it up and restore on Leave/Enter (see https://github.com/ocornut/imgui/issues/4984)
+void UIOverlay::onMouseEnterEvent(bool entered) {
+    ImGuiIO& io = ImGui::GetIO();
+    if (entered) {
+        currentWindow = createInfo.window;
+        io.AddMousePosEvent(lastValidMousePos.x, lastValidMousePos.y);
+    } else if (currentWindow == createInfo.window) {
+        auto& mouse = io.MousePos;
+        lastValidMousePos = {mouse.x, mouse.y};
+        currentWindow = nullptr;
+        io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+    }
+}
+
+void UIOverlay::onKeyEvent(KeyData data) {
+    if (data.action >= Action::Repeat)
+        return;
+
+    //UpdateKeyModifiers(data.mods);
+
+    int keycode = TranslateUntranslatedKey(data.key, data.scancode);
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImGuiKey imgui_key = KeyToImGuiKey(keycode);
+    io.AddKeyEvent(imgui_key, data.action == Action::Press);
+    io.SetKeyEventNativeData(imgui_key, keycode,  data.scancode); // To support legacy indexing (<1.87 user code)
+}
+
+void UIOverlay::onCharInputEvent(uint32_t c) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddInputCharacter(c);
+}
+
+void UIOverlay::onFocusEvent(bool focuses) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddFocusEvent(focuses);
 }

@@ -23,8 +23,8 @@ Scene::Scene() {
     world.on_construct<ModelComponent>().connect<&entt::registry::emplace<DirtyModelComponent>>();
     world.on_update<ModelComponent>().connect<&entt::registry::emplace_or_replace<DirtyModelComponent>>();
 
-    world.on_destroy<RigidbodyComponent>().connect<>();
-    world.on_destroy<PhysicsMaterialComponent>().connect<>();
+    //world.on_destroy<RigidbodyComponent>().connect<>();
+    //world.on_destroy<PhysicsMaterialComponent>().connect<>();
 
     // init physx
     if (!foundation) {

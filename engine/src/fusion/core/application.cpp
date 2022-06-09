@@ -286,11 +286,11 @@ void Application::setupWindow() {
         window = new glfw::Window{title, { size.width, size.height }};
     }
 
-    window->KeyEvent.connect<&KeyInput::onKeyPressed>(&keyInput);
-    window->MouseButtonEvent.connect<&MouseInput::onMouseButton>(&mouseInput);
-    window->MouseMotionEvent.connect<&MouseInput::onMouseMotion>(&mouseInput);
-    window->MouseMotionNormEvent.connect<&MouseInput::onMouseMotionNorm>(&mouseInput);
-    window->MouseScrollEvent.connect<&MouseInput::onMouseScroll>(&mouseInput);
+    entt::sink{window->KeySignal}.connect<&KeyInput::onKeyPressed>(&keyInput);
+    entt::sink{window->MouseButtonSignal}.connect<&MouseInput::onMouseButton>(&mouseInput);
+    entt::sink{window->MouseMotionSignal}.connect<&MouseInput::onMouseMotion>(&mouseInput);
+    entt::sink{window->MouseMotionNormSignal}.connect<&MouseInput::onMouseMotionNorm>(&mouseInput);
+    entt::sink{window->MouseScrollSignal}.connect<&MouseInput::onMouseScroll>(&mouseInput);
 }
 #endif
 

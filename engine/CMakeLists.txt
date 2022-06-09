@@ -37,7 +37,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     gli
     entt
     magic_enum
-    signals
     plog
     yaml-cpp
     Vulkan::Vulkan

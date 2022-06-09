@@ -96,7 +96,7 @@ void Window::initWindow(bool fullscreen) {
     glfwSetWindowContentScaleCallback(window, ContentScaleCallback);
 #endif
 
-    StartEvent();
+    StartSignal.publish();
 }
 
 #if defined(VULKAN_HPP)
@@ -128,7 +128,7 @@ void Window::PosCallback(GLFWwindow* handle, int x, int y) {
 
     LOG_VERBOSE << "PositionChangeEvent: " << glm::to_string(pos);
 
-    window.PositionChangeEvent(pos);
+    window.PositionChangeSignal.publish(pos);
 }
 
 void Window::SizeCallback(GLFWwindow* handle, int width, int height) {
@@ -138,7 +138,7 @@ void Window::SizeCallback(GLFWwindow* handle, int width, int height) {
 
     LOG_VERBOSE << "SizeChangeEvent: " << glm::to_string(size);
 
-    window.SizeChangeEvent(size);
+    window.SizeChangeSignal.publish(size);
 }
 
 void Window::CloseCallback(GLFWwindow* handle) {
@@ -146,7 +146,7 @@ void Window::CloseCallback(GLFWwindow* handle) {
 
     LOG_VERBOSE << "CloseEvent";
 
-    window.CloseEvent();
+    window.CloseSignal.publish();
 }
 
 void Window::RefreshCallback(GLFWwindow* handle) {
@@ -154,7 +154,7 @@ void Window::RefreshCallback(GLFWwindow* handle) {
 
     LOG_VERBOSE << "RefreshEvent";
 
-    window.RefreshEvent();
+    window.RefreshSignal.publish();
 }
 
 void Window::FocusCallback(GLFWwindow* handle, int focused) {
@@ -162,7 +162,7 @@ void Window::FocusCallback(GLFWwindow* handle, int focused) {
 
     LOG_VERBOSE << "FocusEvent: " << (focused ? "TRUE" : "FALSE");
 
-    window.FocusEvent(focused);
+    window.FocusSignal.publish(focused);
 }
 
 void Window::IconifyCallback(GLFWwindow* handle, int iconified) {
@@ -170,7 +170,7 @@ void Window::IconifyCallback(GLFWwindow* handle, int iconified) {
 
     LOG_VERBOSE << "IconifyEvent: " << (iconified ? "TRUE" : "FALSE");
 
-    window.IconifyEvent(iconified);
+    window.IconifySignal.publish(iconified);
 }
 
 void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) {
@@ -183,7 +183,7 @@ void Window::FramebufferSizeCallback(GLFWwindow* handle, int width, int height) 
 
     LOG_VERBOSE << "FramebufferEvent: " << glm::to_string(size);
 
-    window.FramebufferEvent(size);
+    window.FramebufferSignal.publish(size);
 }
 
 void Window::CursorPosCallback(GLFWwindow* handle, double posX, double posY) {
@@ -193,14 +193,14 @@ void Window::CursorPosCallback(GLFWwindow* handle, double posX, double posY) {
 
     LOG_VERBOSE << "MouseMotionEvent: " << glm::to_string(pos);
 
-    window.MouseMotionEvent(pos);
+    window.MouseMotionSignal.publish(pos);
 
     glm::vec2 norm {
         2.0f * pos.x / static_cast<float>(window.width - 1),
         2.0f * pos.y / static_cast<float>(window.height - 1)
     };
 
-    window.MouseMotionNormEvent(norm);
+    window.MouseMotionNormSignal.publish(norm);
 }
 
 void Window::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {
@@ -210,7 +210,7 @@ void Window::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) 
 
     LOG_VERBOSE << "MouseScrollEvent: " << glm::to_string(offset);
 
-    window.MouseScrollEvent(offset);
+    window.MouseScrollSignal.publish(offset);
 }
 
 void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mods) {
@@ -218,14 +218,14 @@ void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int
 
     LOG_VERBOSE << "MouseButtonEvent: " << glm::to_string(glm::ivec3{button, action, mods});
 
-    window.MouseButtonEvent(fe::MouseData{ static_cast<uint8_t>(button), static_cast<uint8_t>(action), static_cast<uint8_t>(mods) });
+    window.MouseButtonSignal.publish(fe::MouseData{ static_cast<uint8_t>(button), static_cast<uint8_t>(action), static_cast<uint8_t>(mods) });
 
     switch (action) {
         case GLFW_PRESS:
-            window.MousePressEvent(button);
+            window.MousePressSignal.publish(button);
             break;
         case GLFW_RELEASE:
-            window.MouseReleaseEvent(button);
+            window.MouseReleaseSignal.publish(button);
             break;
     }
 }
@@ -235,17 +235,17 @@ void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, 
 
     LOG_VERBOSE << "KeyEvent: " << glm::to_string(glm::ivec4{key, scancode, action, mods});
 
-    window.KeyEvent(fe::KeyData{static_cast<uint16_t>(key), static_cast<uint8_t>(scancode), static_cast<uint8_t>(action), static_cast<uint8_t>(mods)});
+    window.KeySignal.publish(fe::KeyData{static_cast<uint16_t>(key), static_cast<uint8_t>(scancode), static_cast<uint8_t>(action), static_cast<uint8_t>(mods)});
 
     switch (action) {
         case GLFW_PRESS:
-            window.KeyPressEvent(key);
+            window.KeyPressSignal.publish(key);
             break;
         case GLFW_RELEASE:
-            window.KeyReleaseEvent(key);
+            window.KeyReleaseSignal.publish(key);
             break;
         case GLFW_REPEAT:
-            window.KeyHoldEvent(key);
+            window.KeyHoldSignal.publish(key);
             break;
     }
 }
@@ -255,7 +255,7 @@ void Window::CursorEnterCallback(GLFWwindow* handle, int entered) {
 
     LOG_VERBOSE << "MouseEnterEvent: " << (entered ? "TRUE" : "FALSE");
 
-    window.MouseEnterEvent(entered);
+    window.MouseEnterSignal.publish(entered);
 }
 
 void Window::CharCallback(GLFWwindow* handle, unsigned int keycode) {
@@ -263,7 +263,7 @@ void Window::CharCallback(GLFWwindow* handle, unsigned int keycode) {
 
     LOG_VERBOSE << "CharInputEvent: " << keycode;
 
-    window.CharInputEvent(keycode);
+    window.CharInputSignal.publish(keycode);
 }
 
 #if GLFW_VERSION_MINOR >= 1
@@ -279,7 +279,7 @@ void Window::FileDropCallback(GLFWwindow* handle, int count, const char** paths)
 
     LOG_VERBOSE << "FileDropEvent: " << count;
 
-    window.FileDropEvent(result);
+    window.FileDropSignal.publish(result);
 }
 #endif
 
@@ -292,10 +292,10 @@ void Window::JoystickCallback(int jid, int action) {
 
         switch (action) {
             case GLFW_CONNECTED:
-                window.JoystickEvent(jid, true);
+                window.JoystickSignal.publish(jid, true);
                 break;
             case GLFW_DISCONNECTED:
-                window.JoystickEvent(jid, false);
+                window.JoystickSignal.publish(jid, false);
                 break;
         }
     }
@@ -320,7 +320,7 @@ void Window::MaximizeCallback(GLFWwindow* handle, int maximized) {
         window.minimize = true;
     }*/
 
-    window.MaximizeEvent(maximized);
+    window.MaximizeSignal.publish(maximized);
 }
 
 void Window::ContentScaleCallback(GLFWwindow* handle, float scaleX, float scaleY) {
@@ -330,7 +330,7 @@ void Window::ContentScaleCallback(GLFWwindow* handle, float scaleX, float scaleY
 
     LOG_VERBOSE << "ContentScaleEvent: " << glm::to_string(scale);
 
-    window.ContentScaleEvent(scale);
+    window.ContentScaleSignal.publish(scale);
 }
 #endif
 
@@ -342,10 +342,10 @@ void Window::MonitorCallback(GLFWmonitor* monitor, int action) {
 
         switch (action) {
             case GLFW_CONNECTED:
-                window.MonitorEvent(true);
+                window.MonitorSignal.publish(true);
                 break;
             case GLFW_DISCONNECTED:
-                window.MonitorEvent(false);
+                window.MonitorSignal.publish(false);
                 break;
         }
     }
