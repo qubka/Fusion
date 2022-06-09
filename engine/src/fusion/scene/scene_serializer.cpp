@@ -114,6 +114,31 @@ namespace YAML {
         }
     };
 
+    /* other */
+
+    template<>
+    struct convert<glm::bvec3>
+    {
+        static Node encode(const glm::bvec3& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::bvec3& rhs) {
+            if (!node.IsSequence() || node.size() != 3)
+                return false;
+
+            rhs.x = node[0].as<bool>();
+            rhs.y = node[1].as<bool>();
+            rhs.z = node[2].as<bool>();
+            return true;
+        }
+    };
+
     Emitter& operator<<(Emitter& out, const glm::vec2& v) {
         out << Flow;
         out << BeginSeq << v.x << v.y << EndSeq;
@@ -140,6 +165,12 @@ namespace YAML {
 
     Emitter& operator<<(YAML::Emitter& out, entt::entity entity) {
         out << static_cast<int>(entity);
+        return out;
+    }
+
+    Emitter& operator<<(Emitter& out, const glm::bvec3& v) {
+        out << Flow;
+        out << BeginSeq << v.x << v.y << v.z << EndSeq;
         return out;
     }
 }
@@ -227,6 +258,43 @@ void SceneSerializer::serialize(const std::string& filepath) {
             out << YAML::EndMap; // ModelComponent
         }
 
+        if (auto component = scene->world.try_get<RigidbodyComponent>(entity)) {
+            out << YAML::Key << "RigidbodyComponent";
+            out << YAML::BeginMap; // RigidbodyComponent
+
+            out << YAML::Key << "type" << YAML::Value << magic_enum::enum_integer(component->type);
+            out << YAML::Key << "mass" << YAML::Value << component->mass;
+            out << YAML::Key << "linearDrag" << YAML::Value << component->linearDrag;
+            out << YAML::Key << "angularDrag" << YAML::Value << component->angularDrag;
+            out << YAML::Key << "disableGravity" << YAML::Value << component->disableGravity;
+            out << YAML::Key << "kinematic" << YAML::Value << component->kinematic;
+            out << YAML::Key << "freezePosition" << YAML::Value << component->freezePosition;
+            out << YAML::Key << "freezeRotation" << YAML::Value << component->freezeRotation;
+
+            out << YAML::EndMap; // RigidbodyComponent
+        }
+
+        if (auto component = scene->world.try_get<BoxColliderComponent>(entity)) {
+            out << YAML::Key << "BoxColliderComponent";
+            out << YAML::BeginMap; // BoxColliderComponent
+
+            out << YAML::Key << "center" << YAML::Value << component->center;
+            out << YAML::Key << "size" << YAML::Value << component->size;
+            out << YAML::Key << "trigger" << YAML::Value << component->trigger;
+
+            out << YAML::EndMap; // BoxColliderComponent
+        }
+
+        if (auto component = scene->world.try_get<PhysicsMaterialComponent>(entity)) {
+            out << YAML::Key << "PhysicsMaterialComponent";
+            out << YAML::BeginMap; // PhysicsMaterialComponent
+
+            out << YAML::Key << "friction" << YAML::Value << component->friction;
+            out << YAML::Key << "restitution" << YAML::Value << component->restitution;
+
+            out << YAML::EndMap; // PhysicsMaterialComponent
+        }
+
         out << YAML::EndMap; // Entity
     });
 
@@ -264,24 +332,24 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
 
             LOG_DEBUG << "Deserialized entity with ID = " << static_cast<int>(uuid) << ", name = " << name;
 
-            if (const auto& transformComponent = entity["TransformComponent"]) {
+            if (const auto& component = entity["TransformComponent"]) {
                 scene->world.emplace<TransformComponent>(deserializedEntity,
-                                                         transformComponent["position"].as<glm::vec3>(),
-                                                         transformComponent["rotation"].as<glm::quat>(),
-                                                         transformComponent["scale"].as<glm::vec3>());
+                    component["position"].as<glm::vec3>(),
+                    component["rotation"].as<glm::quat>(),
+                    component["scale"].as<glm::vec3>());
             }
 
-            if (const auto& relationshipComponent = entity["RelationshipComponent"]) {
+            if (const auto& component = entity["RelationshipComponent"]) {
                 scene->world.emplace<RelationshipComponent>(deserializedEntity,
-                                                            relationshipComponent["children"].as<size_t>(),
-                                                            relationshipComponent["first"].as<entt::entity>(),
-                                                            relationshipComponent["prev"].as<entt::entity>(),
-                                                            relationshipComponent["next"].as<entt::entity>(),
-                                                            relationshipComponent["parent"].as<entt::entity>());
+                    component["children"].as<size_t>(),
+                    component["first"].as<entt::entity>(),
+                    component["prev"].as<entt::entity>(),
+                    component["next"].as<entt::entity>(),
+                    component["parent"].as<entt::entity>());
             }
 
-            if (const auto& cameraComponent = entity["CameraComponent"]) {
-                const auto& cameraProps = cameraComponent["Camera"];
+            if (const auto& component = entity["CameraComponent"]) {
+                const auto& cameraProps = component["Camera"];
 
                 SceneCamera camera;
                 camera.setProjectionType(magic_enum::enum_value<SceneCamera::ProjectionType>(cameraProps["projectionType"].as<int>()));
@@ -293,20 +361,43 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
                 camera.setOrthographicFarClip(cameraProps["orthographicFar"].as<float>());
 
                 scene->world.emplace<CameraComponent>(deserializedEntity,
-                                                      camera,
-                                                      cameraComponent["primary"].as<bool>(),
-                                                      cameraComponent["fixedAspectRatio"].as<bool>()
-                );
+                    camera,
+                    component["primary"].as<bool>(),
+                    component["fixedAspectRatio"].as<bool>());
             }
 
             if (const auto& modelComponent = entity["ModelComponent"]) {
                 scene->world.emplace<ModelComponent>(deserializedEntity,
-                                                     modelComponent["path"].as<std::string>(),
+                    modelComponent["path"].as<std::string>(),
                     //modelComponent["layout"].as<std::vector<int>>(),
                     modelComponent["scale"].as<glm::vec3>(),
-                                                     modelComponent["center"].as<glm::vec3>(),
-                                                     modelComponent["uvscale"].as<glm::vec2>()
-                );
+                    modelComponent["center"].as<glm::vec3>(),
+                    modelComponent["uvscale"].as<glm::vec2>());
+            }
+
+            if (const auto& component = entity["RigidbodyComponent"]) {
+                scene->world.emplace<RigidbodyComponent>(deserializedEntity,
+                    magic_enum::enum_value<RigidbodyComponent::BodyType>(component["type"].as<int>()),
+                    component["mass"].as<float>(),
+                    component["linearDrag"].as<float>(),
+                    component["angularDrag"].as<float>(),
+                    component["disableGravity"].as<bool>(),
+                    component["kinematic"].as<bool>(),
+                    component["freezePosition"].as<glm::bvec3>(),
+                    component["freezeRotation"].as<glm::bvec3>());
+            }
+
+            if (const auto& component = entity["BoxColliderComponent"]) {
+                scene->world.emplace<BoxColliderComponent>(deserializedEntity,
+                    component["center"].as<glm::vec3>(),
+                    component["size"].as<glm::vec3>(),
+                    component["trigger"].as<bool>());
+            }
+
+            if (const auto& component = entity["PhysicsMaterialComponent"]) {
+                scene->world.emplace<PhysicsMaterialComponent>(deserializedEntity,
+                    component["friction"].as<float>(),
+                    component["restitution"].as<float>());
             }
         }
     }

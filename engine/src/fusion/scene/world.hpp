@@ -4,7 +4,7 @@
 
 namespace entt {
     /** Improved version of registry with child-parent relationship. **/
-    class world : public basic_registry<entity> {
+    class world : public entt::basic_registry<entity> {
     public:
         /**
          * @brief Check if an entity is a parent.
@@ -70,6 +70,14 @@ namespace entt {
                     patch_children<Component>(curr);
                     curr = get<fe::RelationshipComponent>(curr).next;
                 }
+            }
+        }
+
+        template<typename Component>
+        void clone(const basic_registry<entity>& src) {
+            auto view = src.view<const Component>();
+            for (auto [entity, component] : view.each()) {
+                emplace<Component>(entity, component);
             }
         }
 

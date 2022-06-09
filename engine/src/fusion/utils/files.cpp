@@ -74,6 +74,7 @@ const char* fs::ICON_FA_CAMERA{ "\uF030" };
 const char* fs::ICON_FA_CUBE{ "\uF1B2" };
 const char* fs::ICON_FA_CUBES{ "\uF1B3" };
 const char* fs::ICON_FA_MANY_CUBES{ "\uF2B8" };
+const char* fs::ICON_FA_BOUNDS{ "\uF248" };
 const char* fs::ICON_FA_INFO{ "\uF05A" };
 const char* fs::ICON_FA_LIST{ "\uF03A" };
 const char* fs::ICON_FA_STATS{ "\uF1EA" };

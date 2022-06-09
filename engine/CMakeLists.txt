@@ -10,6 +10,17 @@ endif()
 
 find_package(Vulkan REQUIRED)
 find_package(assimp REQUIRED) # https://ittone.ma/ittone/c-how-do-i-add-assimp-as-a-dependency-using-cmake-and-clion/
+set(PHYSX_LIBRARIES
+        PhysXExtensions
+        PhysX
+        PhysXPvdSDK
+        PhysXVehicle
+        PhysXCharacterKinematic
+        PhysXCooking
+        PhysXCommon
+        PhysXFoundation
+        # SnippetUtils
+        )
 
 file(GLOB_RECURSE SRC_SOURCES src/fusion/*.cpp)
 file(GLOB_RECURSE SRC_HEADERS src/Fusion/*.hpp)
@@ -31,6 +42,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     yaml-cpp
     Vulkan::Vulkan
     assimp::assimp
+    ${PHYSX_LIBRARIES}
 )
 
 if (ANDROID)
@@ -58,7 +70,7 @@ if (NOT WIN32)
 endif()
 
 # defines
-target_compile_definitions(${PROJECT_NAME} PUBLIC FE_DEBUG)
+target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLFW_INCLUDE_VULKAN)
 #target_compile_definitions(${PROJECT_NAME} PUBLIC VULKAN_HPP_DISABLE_ENHANCED_MODE)
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLM_FORCE_DEPTH_ZERO_TO_ONE)

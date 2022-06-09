@@ -10,6 +10,9 @@ Application* Application::instance{nullptr};
 Application::Application(std::string title, CommandLineArgs args) : title{std::move(title)} {
     assert(!instance && "Application already exists!");
     instance = this;
+
+    Random::Init();
+
 #if defined(__ANDROID__)
     vkx::storage::setAssetManager(vkx::android::androidApp->activity->assetManager);
     vkx::android::androidApp->userData = this;

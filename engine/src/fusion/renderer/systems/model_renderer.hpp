@@ -29,7 +29,7 @@ namespace fe {
         };
 
         void begin();
-        void draw(const std::shared_ptr<vkx::model::Model>& model, const glm::mat4& transform);
+        void draw(const std::shared_ptr<vkx::model::Model>& model, glm::mat4 transform);
         void end();
 
         static ModelRenderer& Instance() { assert(instance && "Model Renderer was not initialized!"); return *instance; }

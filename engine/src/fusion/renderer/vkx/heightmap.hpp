@@ -64,7 +64,7 @@ namespace vkx {
             vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {
                 tex2Dptr = std::make_shared<gli::texture2d>(gli::load((const char*)data, size));
             });
-
+            destroy();
             const auto& heightTex = *tex2Dptr;
             dim = static_cast<uint32_t>(heightTex.extent().x);
             heightdata.resize(dim * dim);

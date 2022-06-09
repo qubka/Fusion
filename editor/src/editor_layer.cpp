@@ -8,11 +8,12 @@
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
 #include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
 #include <imguizmo/ImGuizmo.h>
 
 using namespace fe;
 using namespace std::string_literals;
+
+// TODO: Fix editorScene -> activeScene
 
 EditorLayer::EditorLayer(EditorApp& context) : Layer{"EditorLayer"}, context{context} {
 }
@@ -23,7 +24,7 @@ EditorLayer::~EditorLayer() {
 
 void EditorLayer::onAttach() {
     editorCamera = EditorCamera{30, 1.778f, 0.1f, 1000};
-    activeScene = std::make_shared<Scene>("");
+    activeScene = std::make_shared<Scene>();
 
     /*auto commandLineArgs = Application::Instance().getCommandLineArgs();
     if (commandLineArgs.count > 1) {
@@ -54,6 +55,27 @@ void EditorLayer::onUpdate(float dt) {
         }
     }
 
+    bool control = Input::GetKey(Key::LeftControl) || Input::GetKey(Key::RightControl);
+    bool shift = Input::GetKey(Key::LeftShift) || Input::GetKey(Key::RightShift);
+
+    if (Input::GetKeyDown(Key::N)) {
+        if (control)
+            newScene();
+    } else if (Input::GetKeyDown(Key::O)) {
+        if (control)
+            openScene();
+    } else if (Input::GetKeyDown(Key::S)) {
+        if (control) {
+            if (shift)
+                saveSceneAs();
+            else
+                saveScene();
+        }
+    }/* else if (Input::GetKeyDown(Key::D)) {
+        if (control)
+            duplicateEntity();
+    }*/
+
     if (!ImGuizmo::IsUsing()) {
         if (Input::GetKeyDown(Key::Q)) {
             gizmoType = -1;
@@ -65,6 +87,8 @@ void EditorLayer::onUpdate(float dt) {
             gizmoType = ImGuizmo::SCALE;
         } else if (Input::GetKeyDown(Key::T)) {
             gizmoType = ImGuizmo::UNIVERSAL;
+        } else if (Input::GetKeyDown(Key::Y)) {
+            gizmoType = ImGuizmo::BOUNDS;
         }
     }
 }
@@ -89,6 +113,8 @@ void EditorLayer::onRender(Renderer& renderer) {
             break;
         }
     }
+
+    //onOverlayRender();
 }
 
 void EditorLayer::onImGui() {
@@ -204,7 +230,7 @@ void EditorLayer::onImGui() {
     glm::vec2 minBounds { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
     glm::vec2 maxBounds { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+    ImVec2 viewportPanelSize{ ImGui::GetContentRegionAvail() };
     viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
     editorCamera.setViewport(viewportSize);
@@ -214,11 +240,17 @@ void EditorLayer::onImGui() {
     viewportHovered = ImGui::IsWindowHovered();
     //context.getUI().blockEvents(!viewportFocused && !viewportHovered);
 
+    /*ImGui::Button("Tools");
+    ImGui::SameLine();
+    ImGui::Button("Camera");
+    ImGui::SameLine();
+    ImGui::Button("Gizmos");*/
+
     ImGui::Image(context.getRenderer().getCurrentFrameImage(), viewportPanelSize, { 0, 1 }, { 1, 0 });
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            openScene(std::filesystem::path{ static_cast<const char*>(payload->Data) });
+            openScene(std::filesystem::path{ reinterpret_cast<const char*>(payload->Data) });
         }
         ImGui::EndDragDropTarget();
     }
@@ -238,8 +270,7 @@ void EditorLayer::onImGui() {
         const glm::mat4& cameraProjection = editorCamera.getProjection();
 
         // Entity transform
-        auto& component = activeScene->world.get<TransformComponent>(selectedEntity);
-        //auto gizmoMode = activeScene->world.get_parent(selectedEntity) != entt::null ? ImGuizmo::WORLD : ImGuizmo::LOCAL;
+        auto& transform = activeScene->world.get<TransformComponent>(selectedEntity);
 
         // Snapping
         bool snap = Input::GetKey(Key::LeftControl);
@@ -247,42 +278,39 @@ void EditorLayer::onImGui() {
         // Snap to 45 degrees for rotation
         if (gizmoType == ImGuizmo::ROTATE)
             snapValue = 45.0f;
-        float snapValues[3] = { snapValue, snapValue, snapValue };
+        glm::vec3 snapValues{ snapValue };
 
         // Bounding
-        bool bound = Input::GetKey(Key::LeftShift);
-        static float boundsSnap[] = { 0.1f, 0.1f, 0.1f };
-        static float boundsValues[6] = { -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f };
-        /*if (auto bounds = activeScene->registry.try_get<BoundsComponent>(selectedEntity)) {
-            boundsValues = {bounds->min.x, bounds->min.y, bounds->min.z, bounds->max.x, bounds->max.y, bounds->max.z};
-        }*/
+        auto bounds = gizmoType == ImGuizmo::BOUNDS;
+        glm::vec3 boundsSnap{ 0.1f };  // Snap to 0.1m for bound change
+        static float boundsValues[6] = { -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f };
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                             static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::WORLD, glm::value_ptr(component.localToWorldMatrix),
-                             nullptr, snap ? snapValues : nullptr, bound ? boundsValues : nullptr, bound ? boundsSnap : nullptr);
+                             static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::WORLD, glm::value_ptr(transform.localToWorldMatrix),
+                             nullptr, snap ? glm::value_ptr(snapValues) : nullptr,
+                             bounds ? boundsValues : nullptr, bounds ? glm::value_ptr(boundsSnap) : nullptr);
 
         //ImGuizmo::ViewManipulate(glm::value_ptr(cameraView), editorCamera.getDistance(), {maxBounds.x - 128, minBounds.y}, {128, 128}, 0x10101010);
 
         if (ImGuizmo::IsUsing()) {
             glm::vec3 position, rotation, scale;
             //ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(component.localToWorldMatrix), glm::value_ptr(position), glm::value_ptr(rotation), glm::value_ptr(scale));
-            glm::decompose(component.localToWorldMatrix, position, rotation, scale);
-            // TODO: Fix negative Y scale pls !
+            glm::decompose(transform.localToWorldMatrix, position, rotation, scale);
 
             switch (gizmoType) {
-                case ImGuizmo::OPERATION::TRANSLATE:
-                    component.position = position;
+                case ImGuizmo::TRANSLATE:
+                    transform.position = position;
                     break;
-                case ImGuizmo::OPERATION::ROTATE:
-                    component.rotation = glm::quat{glm::radians(rotation)};
+                case ImGuizmo::ROTATE:
+                    transform.rotation = rotation;
                     break;
-                case ImGuizmo::OPERATION::SCALE:
-                    component.scale = scale;
+                case ImGuizmo::SCALE:
+                    transform.scale = scale;
                     break;
-                case ImGuizmo::OPERATION::UNIVERSAL:
-                    component.position = position;
-                    component.rotation = glm::quat{glm::radians(rotation)};
-                    component.scale = scale;
+                default:
+                    transform.position = position;
+                    transform.rotation = rotation;
+                    transform.scale = scale;
                     break;
             }
 
@@ -299,9 +327,10 @@ void EditorLayer::onImGui() {
 }
 
 void EditorLayer::newScene() {
-    activeScene = std::make_shared<Scene>("");
+    activeScene = std::make_shared<Scene>();
     activeScene->onViewportResize(viewportSize);
     sceneHierarchyPanel.setContext(activeScene);
+    editorScenePath = std::filesystem::path{};
 }
 
 void EditorLayer::openScene() {
@@ -317,32 +346,47 @@ void EditorLayer::openScene() {
 }
 
 void EditorLayer::openScene(const std::filesystem::path& file) {
+    if (sceneState != SceneState::Edit)
+        onSceneStop();
+
     if (file.extension() != ".scene") {
         LOG_WARNING << "Could not load " << file.filename() << " - not a scene file";
         return;
     }
 
-    auto newScene = std::make_shared<Scene>("");
-    SceneSerializer serializer{newScene};
+    auto newScene = std::make_shared<Scene>();
+    SceneSerializer serializer{ newScene };
     if (serializer.deserialize(file)) {
-        activeScene = newScene;
-        activeScene->onViewportResize(viewportSize);
-        sceneHierarchyPanel.setContext(activeScene);
+        editorScene = newScene;
+        editorScene->onViewportResize(viewportSize);
+        sceneHierarchyPanel.setContext(editorScene);
+
+        activeScene = editorScene;
+        editorScenePath = file;
     }
 
     LOG_INFO << "Scene " << file.filename() << " was loaded !";
 }
 
+void EditorLayer::saveScene() {
+    if (!editorScenePath.empty()) {
+        SceneSerializer serializer{ activeScene };
+        serializer.serialize(editorScenePath);
+    } else
+        saveSceneAs();
+}
+
 void EditorLayer::saveSceneAs() {
     auto filepath = pfd::save_file("Choose scene file", getAssetPath(), { "Scene Files (.scene)", "*.scene" }, pfd::opt::force_overwrite).result();
     if (!filepath.empty()) {
-        SceneSerializer serializer{activeScene};
+        SceneSerializer serializer{ activeScene };
         serializer.serialize(filepath);
+        editorScenePath = filepath;
     }
 }
 
 void EditorLayer::UI_Toolbar() {
-    ImGui::Begin((fs::ICON_FA_COG + "  Toolbar"s).c_str(), nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    ImGui::Begin((fs::ICON_FA_COGS + "  Toolbar"s).c_str(), nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 2.0f });
     ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0.0f, 0.0f });
@@ -357,12 +401,30 @@ void EditorLayer::UI_Toolbar() {
     ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
     if (ImGui::Button(sceneState == SceneState::Edit ? fs::ICON_FA_PLAY : fs::ICON_FA_STOP, {size, size})) {
         if (sceneState == SceneState::Edit)
-            sceneState = SceneState::Play;
+            onScenePlay();
         else if (sceneState == SceneState::Play)
-            sceneState = SceneState::Edit;
+            onSceneStop();
     }
 
     ImGui::PopStyleVar(2);
     ImGui::PopStyleColor(3);
     ImGui::End();
+}
+
+void EditorLayer::onScenePlay() {
+    sceneState = SceneState::Play;
+
+    activeScene = std::make_shared<Scene>(*editorScene);
+    activeScene->onRuntimeStart();
+
+    sceneHierarchyPanel.setContext(activeScene);
+}
+
+void EditorLayer::onSceneStop() {
+    sceneState = SceneState::Edit;
+
+    activeScene->onRuntimeStop();
+    activeScene = editorScene;
+
+    sceneHierarchyPanel.setContext(activeScene);
 }

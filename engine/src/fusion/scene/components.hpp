@@ -7,26 +7,6 @@
 
 namespace fe {
 
-    enum Space {
-        World,
-        Local
-    };
-
-    /*static std::random_device RandomDevice;
-    static std::mt19937_64 Engine(RandomDevice());
-    static std::uniform_int_distribution<uint64_t> UniformDistribution;
-
-    struct IdComponent {
-        uint64_t id;
-
-        IdComponent() : id{UniformDistribution(Engine)} {}
-        explicit IdComponent(uint64_t id) : id{id} {}
-
-        uint64_t& operator*() { return id; }
-        const uint64_t& operator*() const { return id; }
-        operator uint64_t() const { return id; }
-    };*/
-
     struct TagComponent {
         std::string tag;
 
@@ -77,12 +57,17 @@ namespace fe {
         glm::vec3 inverseTransformVector(const glm::vec3& vector) const { return glm::rotate(glm::inverse(rotation), vector / scale); }
         glm::vec3 inverseTransformPoint(const glm::vec3& point) const { return glm::rotate(glm::inverse(rotation), (point - position) / scale); }
     };
-    struct DirtyTransformComponent { };
+    struct DirtyTransformComponent {};
 
-    struct BoundsComponent {
-        glm::vec3 min{ 0.0f };
-        glm::vec3 max{ 0.0f };
-        glm::vec3 size{ 0.0f };
+    /*struct BoundsComponent {
+        glm::vec3 min{ -1.0f };
+        glm::vec3 max{ 1.0f };
+    };*/
+
+    struct CameraComponent {
+        SceneCamera camera;
+        bool primary{ true };
+        bool fixedAspectRatio{ false };
     };
 
     struct ModelComponent {
@@ -92,11 +77,38 @@ namespace fe {
         glm::vec2 uvscale{ 1.0f };
         std::shared_ptr<vkx::model::Model> model;
     };
-    struct DirtyModelComponent { };
+    struct DirtyModelComponent {};
 
-    struct CameraComponent {
-        SceneCamera camera;
-        bool primary{ true };
-        bool fixedAspectRatio{ false };
+    struct RigidbodyComponent {
+        enum class BodyType { Static = 0, Dynamic };
+        BodyType type{ BodyType::Static };
+        //Layer layer;
+        float mass{ 1.0f };
+        float linearDrag{ 0.0f };
+        float angularDrag{ 0.05f };
+        bool disableGravity{ false };
+        bool kinematic{ false };
+        glm::bvec3 freezePosition{ false };
+        glm::bvec3 freezeRotation{ false };
+
+        // Storage for runtime
+        void* runtimeBody{ nullptr };
+    };
+
+    struct BoxColliderComponent {
+        glm::vec3 center{ 0.0f };
+        glm::vec3 size{ 1.0f };
+        bool trigger{ false };
+
+        // Storage for runtime
+        void* runtimeFixture{ nullptr };
+    };
+
+    struct PhysicsMaterialComponent {
+        float friction{ 0.5f };
+        float restitution{ 0.5f };
+
+        // Storage for runtime
+        void* runtimeMaterial{ nullptr };
     };
 }

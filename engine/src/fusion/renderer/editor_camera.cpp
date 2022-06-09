@@ -24,7 +24,7 @@ void EditorCamera::update(float dt) {
             }
         }
 
-        setRotation(glm::quat{glm::vec3{pitch, yaw, 0}});
+        setRotation(glm::vec3{pitch, yaw, 0});
         setPosition(calculatePosition());
     }
 

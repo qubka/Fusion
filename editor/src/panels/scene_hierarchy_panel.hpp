@@ -19,10 +19,11 @@ namespace fe {
         void drawEntities();
         void drawComponents(entt::entity entity);
         template<typename T>
-        void drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function, bool removable = true);
-        bool drawFileBrowser(const std::string& label, std::string& value, const std::vector<std::string>& formats, float columnWidth = 100.0f);
-        static bool drawVec2Control(const std::string& label, glm::vec2& values, float resetValue = 0.0f, float columnWidth = 100.0f);
-        static bool drawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+        void drawComponent(const std::string& label, entt::entity entity, std::function<void(T& comp)>&& function);
+        bool drawFileBrowser(const std::string& label, std::string& value, const std::vector<std::string>& formats, float columnWidth = 120.0f);
+        static bool drawVec2Control(const std::string& label, glm::vec2& values, float resetValue = 0.0f, float columnWidth = 120.0f);
+        static bool drawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 120.0f);
+        static bool drawValueControl(const std::string& label, std::function<bool()>&& function, float columnWidth = 120.0f);
 
     private:
         std::shared_ptr<Scene> context;
@@ -32,7 +33,7 @@ namespace fe {
 
         std::string entityFilter;
         std::string fileFilter;
-        std::string currentFile;
+        std::filesystem::path currentFile;
         std::vector<std::filesystem::path> cachedFiles;
     };
 }

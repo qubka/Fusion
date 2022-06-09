@@ -22,6 +22,7 @@ namespace fe {
         static const char* ICON_FA_CUBE;
         static const char* ICON_FA_CUBES;
         static const char* ICON_FA_MANY_CUBES;
+        static const char* ICON_FA_BOUNDS;
         static const char* ICON_FA_INFO;
         static const char* ICON_FA_LIST;
         static const char* ICON_FA_STATS;

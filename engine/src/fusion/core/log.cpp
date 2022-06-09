@@ -4,7 +4,7 @@
 
 namespace fe {
     void Log::Init() {
-#ifdef FE_DEBUG
+#ifdef _DEBUG
         static plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
         plog::init(plog::debug, &consoleAppender);
 #else

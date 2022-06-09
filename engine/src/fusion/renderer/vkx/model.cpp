@@ -20,11 +20,9 @@ using namespace vkx::model;
 using namespace std::string_literals;
 
 const int Model::defaultFlags = aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals;
-const VertexLayout Model::defaultLayout = {{ Component::Position, Component::Normal, Component::UV, Component::Color}};
+const VertexLayout Model::defaultLayout = {{ Component::Position, Component::Normal, Component::UV, Component::Color }};
 
 void Model::loadFromFile(const Context& context, const std::string& filename, const VertexLayout& layout, const ModelCreateInfo& createInfo, const int flags) {
-
-
     this->layout = layout;
     scale = createInfo.scale;
     uvscale = createInfo.uvscale;
@@ -97,20 +95,20 @@ void Model::loadFromFile(const Context& context, const std::string& filename, co
 void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* pScene, uint32_t meshIndex, uint32_t vertexIndex) {
     static const aiVector3D Zero3D{0.0f, 0.0f, 0.0f};
     const aiMesh* paiMesh = pScene->mMeshes[meshIndex];
-    const uint32_t i = vertexIndex;
     aiColor3D pColor{0.0f, 0.0f, 0.0f};
     pScene->mMaterials[paiMesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, pColor);
-    const aiVector3D& pos = paiMesh->mVertices[i];
-    const aiVector3D& normal = paiMesh->mNormals[i];
-    const aiVector3D& texCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
-    const aiVector3D& tangent = paiMesh->HasTangentsAndBitangents() ? paiMesh->mTangents[i] : Zero3D;
-    const aiVector3D& biTangent = paiMesh->HasTangentsAndBitangents() ? paiMesh->mBitangents[i] : Zero3D;
-    std::vector<float> vertexBuffer;
+    const aiVector3D& pos = paiMesh->mVertices[vertexIndex];
+    const aiVector3D& normal = paiMesh->mNormals[vertexIndex];
+    const aiVector3D& texCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][vertexIndex] : Zero3D;
+    const aiVector3D& tangent = paiMesh->HasTangentsAndBitangents() ? paiMesh->mTangents[vertexIndex] : Zero3D;
+    const aiVector3D& biTangent = paiMesh->HasTangentsAndBitangents() ? paiMesh->mBitangents[vertexIndex] : Zero3D;
+
     glm::vec3 scaledPos{ pos.x, -pos.y, pos.z };
     scaledPos *= scale;
     scaledPos += center;
 
     // preallocate float buffer with approximate size
+    std::vector<float> vertexBuffer;
     vertexBuffer.reserve(layout.components.size() * 4);
     for (auto& component : layout.components) {
         switch (component) {

@@ -57,10 +57,10 @@ void SceneHierarchyPanel::drawEntities() {
         } else if (renameContext != entt::null) {
             flags |= ImGuiTreeNodeFlags_FramePadding;
 
-            float lineHeight = GImGui->FontSize / 2.0f;
+            float lineHeight = ImGui::GetFontSize() / 2.0f;
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { lineHeight, lineHeight });
         }
-        bool opened = ImGui::TreeNodeEx((void*)entity, flags, "");
+        bool opened = ImGui::TreeNodeEx((void*)static_cast<intptr_t>(entity), flags, "");
         if (ImGui::IsItemClicked() || ImGui::IsItemFocused()) {
             selectionContext = entity;
         }
@@ -75,7 +75,7 @@ void SceneHierarchyPanel::drawEntities() {
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
-                context->world.assign_child(entity, *static_cast<entt::entity*>(payload->Data));
+                context->world.assign_child(entity, *reinterpret_cast<entt::entity*>(payload->Data));
             }
             ImGui::EndDragDropTarget();
         }
@@ -104,7 +104,7 @@ void SceneHierarchyPanel::drawEntities() {
         }
 
         if (ImGui::BeginPopupContextItem("EntityOptions")) {
-            if (ImGui::MenuItem("Copy")) {
+            /*if (ImGui::MenuItem("Copy")) {
             }
             if (ImGui::MenuItem("Paste")) {
             }
@@ -115,7 +115,7 @@ void SceneHierarchyPanel::drawEntities() {
             }
             if (ImGui::MenuItem("Duplicate")) {
 
-            }
+            }*/
             if (ImGui::MenuItem("Delete")) {
                 removeEntity = entity;
             }
@@ -128,7 +128,7 @@ void SceneHierarchyPanel::drawEntities() {
         ImGui::PopID();
 
         if (opened) {
-            for (auto e: context->world.get_children(entity)) {
+            for (auto e : context->world.get_children(entity)) {
                 function(e);
             }
             ImGui::TreePop();
@@ -162,11 +162,12 @@ void SceneHierarchyPanel::drawEntities() {
 
             std::string name{ "Empty Entity" };
             size_t idx = 0;
-            context->world.view<const TagComponent>().each([&](const auto& tag){
+            auto view = context->world.view<const TagComponent>();
+            for (auto [e, tag] : view.each()) {
                 if ((*tag).find(name, 0) != std::string::npos) {
                     idx++;
                 }
-            });
+            }
 
             if (idx > 0)
                 name += " (" + std::to_string(idx) + ")";
@@ -193,7 +194,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     ImGui::TextUnformatted(label.c_str());
     ImGui::NextColumn();
 
-    float lineHeight = GImGui->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+    float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
 
     ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 4.0f, 4.0f });
@@ -227,7 +228,11 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         ImGui::EndChild();
         ImGui::Separator();
 
-        ImGui::TextUnformatted(currentFile.c_str());
+        if (!currentFile.empty()) {
+            std::string title{ fs::extension_icon(currentFile) + " " + currentFile.string() };
+            ImGui::TextUnformatted(title.c_str());
+        }
+
         ImGui::EndPopup();
     }
 
@@ -270,7 +275,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            std::filesystem::path file{ static_cast<const char*>(payload->Data) };
+            std::filesystem::path file{ reinterpret_cast<const char*>(payload->Data) };
             // Validate that file format is suitable
             if (std::find(formats.begin(), formats.end(), file.extension().string()) != formats.end()) {
                 value = file;
@@ -315,7 +320,7 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 0 });
 
-    float lineHeight = GImGui->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+    float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
     ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.15f, 1.0f });
@@ -384,7 +389,7 @@ bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
     ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 0 });
 
-    float lineHeight = GImGui->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+    float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
     ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.15f, 1.0f });
@@ -425,26 +430,49 @@ bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
     return modify;
 }
 
+bool SceneHierarchyPanel::drawValueControl(const std::string& label, std::function<bool()>&& function, float columnWidth) {
+    ImGui::PushID(label.c_str());
+
+    ImGui::Columns(2);
+    ImGui::SetColumnWidth(0, columnWidth);
+    ImGui::TextUnformatted(label.c_str());
+    ImGui::NextColumn();
+
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 4.0f, 4.0f });
+
+    bool modify = function();
+
+    ImGui::PopStyleVar();
+
+    ImGui::Columns(1);
+
+    ImGui::PopID();
+
+    return modify;
+}
+
 template<typename T>
-void SceneHierarchyPanel::drawComponent(const std::string& name, entt::entity entity, std::function<void(T& comp)>&& function, bool removable) {
+void SceneHierarchyPanel::drawComponent(const std::string& label, entt::entity entity, std::function<void(T& comp)>&& function) {
     const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap |
                                      ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth |
                                      ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding;
     if (auto component = context->world.try_get<T>(entity)) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
+        float lineHeight = ImGui::GetContentRegionAvail().x - ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y;
         ImGui::Separator();
 
-        bool opened = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, "%s", name.c_str());
+        bool opened = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, "%s", label.c_str());
         ImGui::PopStyleVar();
 
-        ImGui::SameLine(ImGui::GetContentRegionAvail().x - GImGui->FontSize);
+        ImGui::SameLine(lineHeight);
 
-        if (ImGui::Button(fs::ICON_FA_REMOVE)) {
+        if (ImGui::Button(fs::ICON_FA_COG)) {
             ImGui::OpenPopup("ComponentSettings");
         }
 
         bool removeComponent = false;
-        if (removable && ImGui::BeginPopup("ComponentSettings")) {
+        if (ImGui::BeginPopup("ComponentSettings")) {
             if (ImGui::MenuItem("Remove component"))
                 removeComponent = true;
 
@@ -477,6 +505,12 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         ImGui::OpenPopup("AddComponent");
 
     if (ImGui::BeginPopup("AddComponent")) {
+        if (!context->world.all_of<TransformComponent>(entity)) {
+            if (ImGui::MenuItem("Transform")) {
+                context->world.emplace<TransformComponent>(entity);
+                ImGui::CloseCurrentPopup();
+            }
+        }
         if (!context->world.all_of<CameraComponent>(entity)) {
             if (ImGui::MenuItem("Camera")) {
                 context->world.emplace<CameraComponent>(entity);
@@ -486,6 +520,24 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         if (!context->world.all_of<ModelComponent>(entity)) {
             if (ImGui::MenuItem("Model")) {
                 context->world.emplace<ModelComponent>(entity);
+                ImGui::CloseCurrentPopup();
+            }
+        }
+        if (!context->world.all_of<RigidbodyComponent>(entity)) {
+            if (ImGui::MenuItem("Rigidbody")) {
+                context->world.emplace<RigidbodyComponent>(entity);
+                ImGui::CloseCurrentPopup();
+            }
+        }
+        if (!context->world.all_of<PhysicsMaterialComponent>(entity)) {
+            if (ImGui::MenuItem("Physics Material")) {
+                context->world.emplace<PhysicsMaterialComponent>(entity);
+                ImGui::CloseCurrentPopup();
+            }
+        }
+        if (!context->world.all_of<BoxColliderComponent>(entity)) {
+            if (ImGui::MenuItem("Box Collider")) {
+                context->world.emplace<BoxColliderComponent>(entity);
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -500,76 +552,107 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         notify += drawVec3Control("Position", component.position);
         glm::vec3 rotation{ glm::degrees(glm::eulerAngles(component.rotation)) };
         notify += drawVec3Control("Rotation", rotation);
-        component.rotation = glm::quat{glm::radians(rotation)};
+        component.rotation = glm::radians(rotation);
         notify += drawVec3Control("Scale", component.scale, 1.0f);
 
         if (notify)
             context->world.patch_children<TransformComponent>(entity);
-    }, false);
+    });
 
     drawComponent<CameraComponent>(fs::ICON_FA_CAMERA + "  Camera"s, entity, [&](CameraComponent& component)
     {
         auto& camera = component.camera;
 
-        ImGui::Checkbox("Primary", &component.primary);
+        drawValueControl("Is Primary", [&component] { return ImGui::Checkbox("##primary", &component.primary); });
 
         constexpr auto projections = magic_enum::enum_entries<SceneCamera::ProjectionType>();
         auto currentProjection = camera.getProjectionType();
 
-        if (ImGui::BeginCombo("Projection", projections[magic_enum::enum_integer(currentProjection)].second.data())) {
-            for (const auto& [type, name] : projections) {
-                bool isSelected = currentProjection == type;
-                if (ImGui::Selectable(name.data(), isSelected)) {
-                    currentProjection = type;
-                    camera.setProjectionType(type);
+        drawValueControl("Type", [&] {
+            bool modify = false;
+            if (ImGui::BeginCombo("##projection", projections[magic_enum::enum_integer(currentProjection)].second.data())) {
+                for (const auto& [type, name]: projections) {
+                    bool isSelected = currentProjection == type;
+                    if (ImGui::Selectable(name.data(), isSelected)) {
+                        currentProjection = type;
+                        camera.setProjectionType(type);
+                        modify = true;
+                    }
+
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();
                 }
 
-                if (isSelected)
-                    ImGui::SetItemDefaultFocus();
+                ImGui::EndCombo();
             }
-
-            ImGui::EndCombo();
-        }
+            return modify;
+        });
 
         switch (camera.getProjectionType()) {
             case SceneCamera::ProjectionType::Perspective: {
-                float perspectiveVerticalFov = glm::degrees(camera.getPerspectiveVerticalFOV());
-                if (ImGui::DragFloat("Vertical FOV", &perspectiveVerticalFov))
-                    camera.setPerspectiveVerticalFOV(glm::radians(perspectiveVerticalFov));
-
-                float perspectiveNear = camera.getPerspectiveNearClip();
-                if (ImGui::DragFloat("Near", &perspectiveNear))
-                    camera.setPerspectiveNearClip(perspectiveNear);
-
-                float perspectiveFar = camera.getPerspectiveFarClip();
-                if (ImGui::DragFloat("Far", &perspectiveFar))
-                    camera.setPerspectiveFarClip(perspectiveFar);
+                drawValueControl("Vertical FOV", [&] {
+                    float perspectiveVerticalFov = glm::degrees(camera.getPerspectiveVerticalFOV());
+                    if (ImGui::DragFloat("##verticalfOV", &perspectiveVerticalFov)) {
+                        camera.setPerspectiveVerticalFOV(glm::radians(perspectiveVerticalFov));
+                        return true;
+                    }
+                    return false;
+                });
+                drawValueControl("Near Clip", [&] {
+                    float perspectiveNear = camera.getPerspectiveNearClip();
+                    if (ImGui::DragFloat("##nearclip", &perspectiveNear)) {
+                        camera.setPerspectiveNearClip(perspectiveNear);
+                        return true;
+                    }
+                    return false;
+                });
+                drawValueControl("Far Clip", [&] {
+                    float perspectiveFar = camera.getPerspectiveFarClip();
+                    if (ImGui::DragFloat("##farclip", &perspectiveFar)) {
+                        camera.setPerspectiveFarClip(perspectiveFar);
+                        return true;
+                    }
+                    return false;
+                });
                 break;
             }
 
             case SceneCamera::ProjectionType::Orthographic: {
-                float orthoSize = camera.getOrthographicSize();
-                if (ImGui::DragFloat("Size", &orthoSize))
-                    camera.setOrthographicSize(orthoSize);
+                drawValueControl("Size", [&] {
+                    float orthoSize = camera.getOrthographicSize();
+                    if (ImGui::DragFloat("##size", &orthoSize)) {
+                        camera.setOrthographicSize(orthoSize);
+                        return true;
+                    }
+                    return false;
+                });
+                drawValueControl("Near Clip", [&] {
+                    float orthoNear = camera.getOrthographicNearClip();
+                    if (ImGui::DragFloat("##nearclip", &orthoNear)) {
+                        camera.setOrthographicNearClip(orthoNear);
+                        return true;
+                    }
+                    return false;
+                });
+                drawValueControl("Far Clip", [&] {
+                    float orthoFar = camera.getOrthographicFarClip();
+                    if (ImGui::DragFloat("##farclip", &orthoFar)) {
+                        camera.setOrthographicFarClip(orthoFar);
+                        return true;
+                    }
+                    return false;
+                });
 
-                float orthoNear = camera.getOrthographicNearClip();
-                if (ImGui::DragFloat("Near", &orthoNear))
-                    camera.setOrthographicNearClip(orthoNear);
-
-                float orthoFar = camera.getOrthographicFarClip();
-                if (ImGui::DragFloat("Far", &orthoFar))
-                    camera.setOrthographicFarClip(orthoFar);
-
-                ImGui::Checkbox("Fixed Aspect Ratio", &component.fixedAspectRatio);
+                drawValueControl("Fixed Aspect", [&component] { return ImGui::Checkbox("##fixedaspect", &component.fixedAspectRatio); });
                 break;
             }
         }
     });
 
-    drawComponent<ModelComponent>(fs::ICON_FA_CUBES + "  Model"s, entity, [&](ModelComponent& component)
+    drawComponent<ModelComponent>(fs::ICON_FA_CUBE + "  Model"s, entity, [&](ModelComponent& component)
     {
         uint8_t notify = 0;
-        notify += drawFileBrowser("Path", component.path, { ".fbx", ".obj", ".dae", ".gltf", ".3ds" });
+        notify += drawFileBrowser("File Path", component.path, { ".fbx", ".obj", ".dae", ".gltf", ".3ds" });
         notify += drawVec3Control("Scale", component.scale);
         notify += drawVec3Control("Center", component.center);
         notify += drawVec2Control("UV Scale", component.uvscale);
@@ -611,4 +694,56 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
             ImGui::TreePop();
         }*/
     });
+
+    drawComponent<RigidbodyComponent>(fs::ICON_FA_BOUNDS + "  Rigidbody"s, entity, [&](RigidbodyComponent& component)
+    {
+        drawValueControl("Type", [&component] {
+            bool modify = false;
+            constexpr auto bodytypes = magic_enum::enum_entries<RigidbodyComponent::BodyType>();
+            if (ImGui::BeginCombo("##body", bodytypes[magic_enum::enum_integer(component.type)].second.data())) {
+                for (const auto& [type, name] : bodytypes) {
+                    bool isSelected = component.type == type;
+                    if (ImGui::Selectable(name.data(), isSelected)) {
+                        component.type = type;
+                        modify = true;
+                    }
+
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();
+                }
+
+                ImGui::EndCombo();
+            }
+            return modify;
+        });
+
+        if (component.type == RigidbodyComponent::BodyType::Dynamic) {
+            drawValueControl("Mass", [&component] { return ImGui::DragFloat("##mass", &component.mass, 0.1f, 0.0f, 10000.0f, "%.2f"); });
+            drawValueControl("Linear Drag", [&component] { return ImGui::DragFloat("##linear", &component.linearDrag, 0.1f, 0.0f, 10000.0f, "%.2f"); });
+            drawValueControl("Angular Drag", [&component] { return ImGui::DragFloat("##angular", &component.angularDrag, 0.1f, 0.0f, 10000.0f, "%.2f"); });
+            drawValueControl("Disable Gravity", [&component] { return ImGui::Checkbox("##gravity", &component.disableGravity); });
+            drawValueControl("Is Kinematic", [&component] { return ImGui::Checkbox("##kinematic", &component.kinematic); });
+        }
+    });
+
+    drawComponent<PhysicsMaterialComponent>(fs::ICON_FA_BOUNDS + "  Physics Material"s, entity, [&](PhysicsMaterialComponent& component)
+    {
+        /*drawValueControl("Density", [&component] { return ImGui::DragFloat("##density", &component.density, 0.1f, 0.0f, 0.0f, "%.2f"); });
+        drawValueControl("Friction", [&component] { return ImGui::DragFloat("##friction", &component.friction, 0.1f, 0.0f, 0.0f, "%.2f"); });
+        drawValueControl("Restitution", [&component] { return ImGui::DragFloat("##restitution", &component.x, 0.1f, 0.0f, 0.0f, "%.2f"); });
+        drawValueControl("Restitution Threshold", [&component] { return ImGui::DragFloat("##threshold", &component.x, 0.1f, 0.0f, 0.0f, "%.2f"); });*/
+    });
+
+    drawComponent<BoxColliderComponent>(fs::ICON_FA_BOUNDS + "  Box Collider"s, entity, [&](BoxColliderComponent& component)
+    {
+        drawVec3Control("Center", component.center);
+        drawVec3Control("Size", component.size);
+        drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("##trigger", &component.trigger); });
+    });
+
+    /*drawComponent<BoundsComponent>(fs::ICON_FA_BOUNDS + "  Bounds"s, entity, [&](BoundsComponent& component)
+    {
+        drawVec3Control("Min", component.min);
+        drawVec3Control("Max", component.max);
+    });*/
 }

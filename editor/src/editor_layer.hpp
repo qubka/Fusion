@@ -27,11 +27,17 @@ namespace fe {
         void newScene();
         void openScene();
         void openScene(const std::filesystem::path& file);
+        void saveScene();
         void saveSceneAs();
+
+        void onScenePlay();
+        void onSceneStop();
 
         void UI_Toolbar();
 
         std::shared_ptr<Scene> activeScene;
+        std::shared_ptr<Scene> editorScene;
+        std::filesystem::path editorScenePath;
         EditorCamera editorCamera;
 
         // Panels

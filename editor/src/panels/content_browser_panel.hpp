@@ -19,12 +19,9 @@ namespace fe {
 
         std::filesystem::path currentDirectory;
         std::filesystem::path currentFile;
-        uint32_t currentNode{ UINT32_MAX };
         std::vector<std::filesystem::path> currentFiles;
 
         std::string filter;
         std::vector<std::filesystem::path> cachedFiles;
-
-        bool locked{ false };
     };
 }

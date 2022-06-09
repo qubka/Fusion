@@ -72,8 +72,11 @@ namespace vkx { namespace texture {
                           vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                           vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal,
                           bool forceLinear = false) {
+            destroy();
+            device = context.device;
             this->imageLayout = imageLayout;
             descriptor.imageLayout = imageLayout;
+
             std::shared_ptr<gli::texture2d> tex2Dptr;
             vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {
                 tex2Dptr = std::make_shared<gli::texture2d>(gli::load((const char*)data, size));
@@ -81,7 +84,6 @@ namespace vkx { namespace texture {
             const auto& tex2D = *tex2Dptr;
             assert(!tex2D.empty());
 
-            device = context.device;
             extent.width = static_cast<uint32_t>(tex2D[0].extent().x);
             extent.height = static_cast<uint32_t>(tex2D[0].extent().y);
             extent.depth = 1;
@@ -156,10 +158,11 @@ namespace vkx { namespace texture {
                         vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                         vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
             assert(buffer);
-
+            destroy();
             device = context.device;
             this->format = format;
             this->imageLayout = imageLayout;
+
             extent.width = size.width;
             extent.height = size.height;
             extent.depth = 1;
@@ -233,10 +236,11 @@ namespace vkx { namespace texture {
          *
          */
         void loadFromFile(const vkx::Context& context,
-                          std::string filename,
+                          const std::string& filename,
                           vk::Format format,
                           vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                           vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
+            destroy();
             device = context.device;
             this->imageLayout = imageLayout;
             descriptor.imageLayout = imageLayout;
@@ -245,8 +249,8 @@ namespace vkx { namespace texture {
             vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {
                 texPtr = std::make_shared<gli::texture2d_array>(gli::load((const char*)data, size));
             });
-
             const gli::texture2d_array& tex2DArray = *texPtr;
+            assert(!tex2DArray.empty());
 
             extent.width = static_cast<uint32_t>(tex2DArray.extent().x);
             extent.height = static_cast<uint32_t>(tex2DArray.extent().y);
@@ -352,6 +356,7 @@ namespace vkx { namespace texture {
                           vk::Format format,
                           vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                           vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
+            destroy();
             device = context.device;
             this->imageLayout = imageLayout;
             descriptor.imageLayout = imageLayout;
