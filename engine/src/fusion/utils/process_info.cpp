@@ -13,7 +13,9 @@
 #define LINEBUFFLEN 2048
 #endif
 
-ProcessInfo::ProcessInfo(unsigned int processId) : processId(processId) {
+using namespace fe;
+
+ProcessInfo::ProcessInfo(unsigned int processId) : processId{processId} {
 #ifdef _WIN32
     // get number of processors
 	SYSTEM_INFO lSysInfo;

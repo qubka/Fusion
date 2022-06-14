@@ -20,15 +20,14 @@
 #include "image.hpp"
 #include "filesystem.hpp"
 
-namespace vkx { namespace texture {
+namespace vkx {
     /** @brief Vulkan texture base class */
-    class Texture : public Image {
+    struct Texture : public Image {
         using Parent = Image;
 
-    public:
         vk::Device device;
         vk::ImageLayout imageLayout;
-        uint32_t mipLevels;
+        uint32_t mipLevels{ 1 };
         uint32_t layerCount{ 1 };
         vk::DescriptorImageInfo descriptor;
 
@@ -50,45 +49,38 @@ namespace vkx { namespace texture {
     };
 
     /** @brief 2D texture */
-    class Texture2D : public Texture {
-        using Parent = Texture;
-
-    public:
+    struct Texture2D : public Texture {
         /**
          * Load a 2D texture including all mip levels
          *
-         * @param filename File to load (supports .ktx and .dds)
-         * @param format Vulkan format of the image data stored in the file
          * @param device Vulkan device to create the texture on
-         * @param copyQueue Queue used for the texture staging copy commands (must support transfer)
+         * @param filename File to load (supports .ktx and .dds)
+         * @param format Vulkan format of the image data stored in the file (defaults to R8G8B8A8_UNORM)
+         * @param (Optional) format Vulkan format of the image data stored in the file (defaults to R8G8B8A8_UNORM)
+         * @param (Optional) filter Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
          * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
          * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-         * @param (Optional) forceLinear Force linear tiling (not advised, defaults to false)
-         *
          */
         void loadFromFile(const vkx::Context& context,
                           const std::string& filename,
                           vk::Format format = vk::Format::eR8G8B8A8Unorm,
+                          vk::Filter filter = vk::Filter::eLinear,
                           vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
-                          vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal,
-                          bool forceLinear = false) {
+                          vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
             destroy();
-            device = context.device;
             this->imageLayout = imageLayout;
-            descriptor.imageLayout = imageLayout;
 
             std::shared_ptr<gli::texture2d> tex2Dptr;
             vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {
-                tex2Dptr = std::make_shared<gli::texture2d>(gli::load((const char*)data, size));
+                tex2Dptr = std::make_shared<gli::texture2d>(gli::load(reinterpret_cast<const char*>(data), size));
             });
             const auto& tex2D = *tex2Dptr;
             assert(!tex2D.empty());
 
-            extent.width = static_cast<uint32_t>(tex2D[0].extent().x);
-            extent.height = static_cast<uint32_t>(tex2D[0].extent().y);
-            extent.depth = 1;
             mipLevels = static_cast<uint32_t>(tex2D.levels());
             layerCount = 1;
+
+            auto texExtent = tex2D[0].extent();
 
             // Create optimal tiled target image
             vk::ImageCreateInfo imageCreateInfo;
@@ -96,15 +88,17 @@ namespace vkx { namespace texture {
             imageCreateInfo.format = format;
             imageCreateInfo.mipLevels = mipLevels;
             imageCreateInfo.arrayLayers = 1;
-            imageCreateInfo.extent = extent;
+            imageCreateInfo.extent.width = static_cast<uint32_t>(texExtent.x);
+            imageCreateInfo.extent.height = static_cast<uint32_t>(texExtent.y);
+            imageCreateInfo.extent.depth = 1;
             imageCreateInfo.usage = imageUsageFlags | vk::ImageUsageFlagBits::eTransferDst;
 
             static_cast<vkx::Image&>(*this) = context.stageToDeviceImage(imageCreateInfo, vk::MemoryPropertyFlagBits::eDeviceLocal, tex2D, imageLayout);
 
             // Create sampler
             vk::SamplerCreateInfo samplerCreateInfo;
-            samplerCreateInfo.magFilter = vk::Filter::eLinear;
-            samplerCreateInfo.minFilter = vk::Filter::eLinear;
+            samplerCreateInfo.magFilter = filter;
+            samplerCreateInfo.minFilter = filter;
             samplerCreateInfo.mipmapMode = vk::SamplerMipmapMode::eLinear;
             // Max level-of-detail should match mip level count
             samplerCreateInfo.maxLod = static_cast<float>(mipLevels);
@@ -136,37 +130,32 @@ namespace vkx { namespace texture {
         }
 
         /**
-            * Creates a 2D texture from a buffer
-            *
-            * @param buffer Buffer containing texture data to upload
-            * @param bufferSize Size of the buffer in machine units
-            * @param width Width of the texture to create
-            * @param height Height of the texture to create
-            * @param format Vulkan format of the image data stored in the file
-            * @param device Vulkan device to create the texture on
-            * @param copyQueue Queue used for the texture staging copy commands (must support transfer)
-            * @param (Optional) filter Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
-            * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
-            * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-            */
+         * Creates a 2D texture from a buffer
+         *
+         * @param device Vulkan device to create the texture on
+         * @param buffer Buffer containing texture data to upload
+         * @param bufferSize Size of the buffer in machine units
+         * @param width Width of the texture to create
+         * @param height Height of the texture to create
+         * @param (Optional) format Vulkan format of the image data stored in the file (defaults to R8G8B8A8_UNORM)
+         * @param (Optional) filter Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
+         * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
+         * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+         */
         void fromBuffer(const vkx::Context& context,
                         void* buffer,
                         vk::DeviceSize bufferSize,
-                        vk::Format format,
                         const vk::Extent2D& size,
+                        vk::Format format = vk::Format::eR8G8B8A8Unorm,
                         vk::Filter filter = vk::Filter::eLinear,
                         vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                         vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
             assert(buffer);
             destroy();
-            device = context.device;
-            this->format = format;
             this->imageLayout = imageLayout;
 
-            extent.width = size.width;
-            extent.height = size.height;
-            extent.depth = 1;
             mipLevels = 1;
+            layerCount = 1;
 
             // Create optimal tiled target image
             vk::ImageCreateInfo imageCreateInfo;
@@ -174,7 +163,9 @@ namespace vkx { namespace texture {
             imageCreateInfo.format = format;
             imageCreateInfo.mipLevels = mipLevels;
             imageCreateInfo.arrayLayers = 1;
-            imageCreateInfo.extent = extent;
+            imageCreateInfo.extent.width = size.width;
+            imageCreateInfo.extent.height = size.height;
+            imageCreateInfo.extent.depth = 1;
             // Ensure that the TRANSFER_DST bit is set for staging
             imageCreateInfo.usage = imageUsageFlags | vk::ImageUsageFlagBits::eTransferDst;
             static_cast<vkx::Image&>(*this) = context.createImage(imageCreateInfo);
@@ -185,8 +176,7 @@ namespace vkx { namespace texture {
 
                 // Copy mip levels from staging buffer
                 context.withPrimaryCommandBuffer([&](const vk::CommandBuffer& commandBuffer) {
-                    context.setImageLayout(commandBuffer, this->image, vk::ImageAspectFlagBits::eColor, vk::ImageLayout::eUndefined,
-                                           vk::ImageLayout::eTransferDstOptimal);
+                    context.setImageLayout(commandBuffer, image, vk::ImageAspectFlagBits::eColor, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
                     vk::BufferImageCopy bufferCopyRegion;
                     bufferCopyRegion.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
                     bufferCopyRegion.imageSubresource.layerCount = 1;
@@ -195,7 +185,7 @@ namespace vkx { namespace texture {
                     bufferCopyRegion.imageExtent.depth = 1;
 
                     commandBuffer.copyBufferToImage(stagingBuffer.buffer, image, vk::ImageLayout::eTransferDstOptimal, bufferCopyRegion);
-                    context.setImageLayout(commandBuffer, this->image, vk::ImageAspectFlagBits::eColor, vk::ImageLayout::eTransferDstOptimal, imageLayout);
+                    context.setImageLayout(commandBuffer, image, vk::ImageAspectFlagBits::eColor, vk::ImageLayout::eTransferDstOptimal, imageLayout);
                 });
                 stagingBuffer.destroy();
             }
@@ -222,39 +212,34 @@ namespace vkx { namespace texture {
     };
 
     /** @brief 2D array texture */
-    class Texture2DArray : public Texture {
-    public:
+    struct Texture2DArray : public Texture {
         /**
          * Load a 2D texture array including all mip levels
          *
-         * @param filename File to load (supports .ktx and .dds)
-         * @param format Vulkan format of the image data stored in the file
          * @param device Vulkan device to create the texture on
-         * @param copyQueue Queue used for the texture staging copy commands (must support transfer)
+         * @param filename File to load (supports .ktx and .dds)
+         * @param format Vulkan format of the image data stored in the file (defaults to R8G8B8A8_UNORM)
+         * @param (Optional) format Vulkan format of the image data stored in the file (defaults to R8G8B8A8_UNORM)
+         * @param (Optional) filter Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
          * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
          * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-         *
          */
         void loadFromFile(const vkx::Context& context,
                           const std::string& filename,
-                          vk::Format format,
+                          vk::Format format = vk::Format::eR8G8B8A8Unorm,
+                          vk::Filter filter = vk::Filter::eLinear,
                           vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                           vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
             destroy();
-            device = context.device;
             this->imageLayout = imageLayout;
-            descriptor.imageLayout = imageLayout;
 
             std::shared_ptr<gli::texture2d_array> texPtr;
             vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {
-                texPtr = std::make_shared<gli::texture2d_array>(gli::load((const char*)data, size));
+                texPtr = std::make_shared<gli::texture2d_array>(gli::load(reinterpret_cast<const char*>(data), size));
             });
             const gli::texture2d_array& tex2DArray = *texPtr;
             assert(!tex2DArray.empty());
 
-            extent.width = static_cast<uint32_t>(tex2DArray.extent().x);
-            extent.height = static_cast<uint32_t>(tex2DArray.extent().y);
-            extent.depth = 1;
             layerCount = static_cast<uint32_t>(tex2DArray.layers());
             mipLevels = static_cast<uint32_t>(tex2DArray.levels());
 
@@ -286,7 +271,9 @@ namespace vkx { namespace texture {
             vk::ImageCreateInfo imageCreateInfo;
             imageCreateInfo.imageType = vk::ImageType::e2D;
             imageCreateInfo.format = format;
-            imageCreateInfo.extent = extent;
+            imageCreateInfo.extent.width = static_cast<uint32_t>(tex2DArray.extent().x);
+            imageCreateInfo.extent.height = static_cast<uint32_t>(tex2DArray.extent().y);
+            imageCreateInfo.extent.depth = 1;
             imageCreateInfo.usage = imageUsageFlags | vk::ImageUsageFlagBits::eTransferDst;
             imageCreateInfo.arrayLayers = layerCount;
             imageCreateInfo.mipLevels = mipLevels;
@@ -313,8 +300,8 @@ namespace vkx { namespace texture {
 
             // Create sampler
             vk::SamplerCreateInfo samplerCreateInfo;
-            samplerCreateInfo.magFilter = vk::Filter::eLinear;
-            samplerCreateInfo.minFilter = vk::Filter::eLinear;
+            samplerCreateInfo.magFilter = filter;
+            samplerCreateInfo.minFilter = filter;
             samplerCreateInfo.mipmapMode = vk::SamplerMipmapMode::eLinear;
             samplerCreateInfo.addressModeU = vk::SamplerAddressMode::eClampToEdge;
             samplerCreateInfo.addressModeV = vk::SamplerAddressMode::eClampToEdge;
@@ -338,28 +325,25 @@ namespace vkx { namespace texture {
     };
 
     /** @brief Cube map texture */
-    class TextureCubeMap : public Texture {
-    public:
+    struct TextureCubeMap : public Texture {
         /**
          * Load a cubemap texture including all mip levels from a single file
          *
-         * @param filename File to load (supports .ktx and .dds)
-         * @param format Vulkan format of the image data stored in the file
          * @param device Vulkan device to create the texture on
-         * @param copyQueue Queue used for the texture staging copy commands (must support transfer)
+         * @param filename File to load (supports .ktx and .dds)
+         * @param (Optional) format Vulkan format of the image data stored in the file (defaults to R8G8B8A8_UNORM)
+         * @param (Optional) filter Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
          * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
          * @param (Optional) imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-         *
          */
         void loadFromFile(const vkx::Context& context,
                           const std::string& filename,
-                          vk::Format format,
+                          vk::Format format = vk::Format::eR8G8B8A8Unorm,
+                          vk::Filter filter = vk::Filter::eLinear,
                           vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                           vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
             destroy();
-            device = context.device;
             this->imageLayout = imageLayout;
-            descriptor.imageLayout = imageLayout;
 
             std::shared_ptr<const gli::texture_cube> texPtr;
             vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {
@@ -368,10 +352,9 @@ namespace vkx { namespace texture {
             const auto& texCube = *texPtr;
             assert(!texCube.empty());
 
-            extent.width = static_cast<uint32_t>(texCube.extent().x);
-            extent.height = static_cast<uint32_t>(texCube.extent().y);
-            extent.depth = 1;
             mipLevels = static_cast<uint32_t>(texCube.levels());
+            layerCount = 1;
+
             auto stagingBuffer = context.createStagingBuffer(texCube);
 
             // Setup buffer copy regions for each face including all of it's miplevels
@@ -383,7 +366,7 @@ namespace vkx { namespace texture {
             bufferImageCopy.imageExtent.depth = 1;
             for (uint32_t face = 0; face < 6; face++) {
                 for (uint32_t level = 0; level < mipLevels; level++) {
-                    auto image = (texCube)[face][level];
+                    auto image = texCube[face][level];
                     auto imageExtent = image.extent();
                     bufferImageCopy.bufferOffset = offset;
                     bufferImageCopy.imageSubresource.mipLevel = level;
@@ -396,12 +379,16 @@ namespace vkx { namespace texture {
                 }
             }
 
+            auto texExtent = texCube.extent();
+
             // Create optimal tiled target image
             vk::ImageCreateInfo imageCreateInfo;
             imageCreateInfo.imageType = vk::ImageType::e2D;
             imageCreateInfo.format = format;
             imageCreateInfo.mipLevels = mipLevels;
-            imageCreateInfo.extent = extent;
+            imageCreateInfo.extent.width = static_cast<uint32_t>(texExtent.x);
+            imageCreateInfo.extent.height = static_cast<uint32_t>(texExtent.y);
+            imageCreateInfo.extent.depth = 1;
             // Cube faces count as array layers in Vulkan
             imageCreateInfo.arrayLayers = 6;
             // Ensure that the TRANSFER_DST bit is set for staging
@@ -418,15 +405,14 @@ namespace vkx { namespace texture {
                 // Copy the cube map faces from the staging buffer to the optimal tiled image
                 copyCmd.copyBufferToImage(stagingBuffer.buffer, image, vk::ImageLayout::eTransferDstOptimal, bufferCopyRegions);
                 // Change texture image layout to shader read after all faces have been copied
-                this->imageLayout = imageLayout;
                 context.setImageLayout(copyCmd, image, vk::ImageLayout::eTransferDstOptimal, imageLayout, subresourceRange);
             });
 
             // Create sampler
             // Create a defaultsampler
             vk::SamplerCreateInfo samplerCreateInfo;
-            samplerCreateInfo.magFilter = vk::Filter::eLinear;
-            samplerCreateInfo.minFilter = vk::Filter::eLinear;
+            samplerCreateInfo.magFilter = filter;
+            samplerCreateInfo.minFilter = filter;
             samplerCreateInfo.mipmapMode = vk::SamplerMipmapMode::eLinear;
             samplerCreateInfo.addressModeU = vk::SamplerAddressMode::eClampToEdge;
             samplerCreateInfo.addressModeV = vk::SamplerAddressMode::eClampToEdge;
@@ -455,4 +441,4 @@ namespace vkx { namespace texture {
             updateDescriptor();
         }
     };
-}}  // namespace vkx::texture
+}  // namespace vkx

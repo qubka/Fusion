@@ -26,7 +26,7 @@ namespace vkx {
         Offscreen(const vkx::Context& context)
                 : context{ context } {}
 
-        void create(vkx::ui::UIOverlay& ui) {
+        void create(vkx::UIOverlay& ui) {
             assert(!colorFormats.empty());
             assert(size != vk::Extent2D{});
 

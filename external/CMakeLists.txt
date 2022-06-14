@@ -143,9 +143,11 @@ target_include_directories(${STB_LIB_NAME}
         ${STB_INC_PATH}
         )
 
-# imgui and imguizmo
+
+# imgui, imguizmo & iconfontcppheaders
 set(IMGUI_LIB_NAME "imgui")
 set(IMGUIZMO_LIB_NAME "imguizmo")
+set(ICON_HEADERS_LIB_NAME "iconfontcppheaders")
 
 set(IMGUI_SOURCES
         "${IMGUI_LIB_NAME}/imgui.cpp"
@@ -204,8 +206,8 @@ target_include_directories(${IMGUI_LIB_NAME}
         "${IMGUIZMO_INC_PATH}"
         "${GLFW_INC_PATH}"
         "${GLAD_INC_PATH}"
+        "${ICON_HEADERS_LIB_NAME}"
         )
-
 
 # yaml-cpp
 set(YAML_LIB_NAME "yaml-cpp")
@@ -228,13 +230,18 @@ set(LZ4_LIB_NAME "lz4")
 add_subdirectory(${LZ4_LIB_NAME}/build/cmake/)
 
 
+# freetype
+set(FREETYPE_LIB_NAME "freetype")
+
+add_subdirectory(${FREETYPE_LIB_NAME})
+
+
 # nlohmann_json
 set(JSON_LIB_NAME "json")
 
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 
 add_subdirectory(${JSON_LIB_NAME})
-
 
 # physx
 # PHYSX_ROOT_DIR - path to the `{cloned repository}/physx` repo directory git://github.com/NVIDIAGameWorks/PhysX.git

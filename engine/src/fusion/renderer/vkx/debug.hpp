@@ -94,7 +94,7 @@ namespace vkx { namespace debug {
         class Marker {
         public:
             Marker(const vk::CommandBuffer& commandBuffer, const std::string& name, const glm::vec4& color = glm::vec4{0.8f})
-                : commandBuffer(commandBuffer) {
+                : commandBuffer{commandBuffer} {
                 if (active) {
                     beginRegion(commandBuffer, name, color);
                 }

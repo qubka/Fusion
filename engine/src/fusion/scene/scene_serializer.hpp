@@ -7,11 +7,11 @@ namespace fe {
     public:
         SceneSerializer(const std::shared_ptr<Scene>& scene);
 
-        void serialize(const std::string& filepath);
-        void serializeRuntime(const std::string& filepath);
+        void serialize(const std::string& filename);
+        void serializeRuntime(const std::string& filename);
 
-        bool deserialize(const std::string& filepath);
-        bool deserializeRuntime(const std::string& filepath);
+        bool deserialize(const std::string& filename);
+        bool deserializeRuntime(const std::string& filename);
     private:
         std::shared_ptr<Scene> scene;
     };

@@ -21,7 +21,7 @@ void Renderer::create(const vk::Extent2D& size, bool overlay) {
         createGui();
     }
 
-    modelRenderer = new ModelRenderer(context, *this);
+    meshRenderer = new MeshRenderer(context, *this);
     gridRenderer = new GridRenderer(context, *this);
 }
 
@@ -36,7 +36,7 @@ void Renderer::destroy() {
         buffer.destroy();
     }
 
-    delete modelRenderer;
+    delete meshRenderer;
     delete gridRenderer;
 
     swapChain.destroy();
@@ -83,7 +83,7 @@ void Renderer::createCommandBuffers() {
 
 void Renderer::createGui() {
     // Setup default overlay creation info
-    vkx::ui::UIOverlayCreateInfo overlayCreateInfo;
+    vkx::UIOverlayCreateInfo overlayCreateInfo;
     overlayCreateInfo.renderPass = swapChain.renderPass;
     overlayCreateInfo.size = swapChain.extent;
     overlayCreateInfo.window = Application::Instance().getWindow();

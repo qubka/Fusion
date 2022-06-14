@@ -9,10 +9,8 @@ namespace vkx {
     // The sampler is not populated by the allocation code, but is provided
     // for convenience and easy cleanup if it is populated.
     struct Image : public Allocation {
-    private:
         using Parent = Allocation;
 
-    public:
         vk::Image image;
         vk::Extent3D extent;
         vk::ImageView view;

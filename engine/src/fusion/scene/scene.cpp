@@ -1,74 +1,71 @@
 #include "scene.hpp"
 #include "components.hpp"
 
-#include "fusion/renderer/systems/model_renderer.hpp"
+#include "fusion/renderer/systems/mesh_renderer.hpp"
 #include "fusion/renderer/systems/grid_renderer.hpp"
 #include "fusion/renderer/editor_camera.hpp"
 #include "fusion/input/input.hpp"
 
 using namespace fe;
+using namespace physx;
 
-physx::PxDefaultAllocator Scene::defaultAllocatorCallback{};
-physx::PxDefaultErrorCallback Scene::defaultErrorCallback{};
-physx::PxFoundation* Scene::foundation{ nullptr };
-physx::PxDefaultCpuDispatcher* Scene::dispatcher{ nullptr };
-physx::PxPhysics* Scene::physics{ nullptr };
-physx::PxPvd* Scene::pvd{ nullptr };
+PxDefaultAllocator Scene::defaultAllocatorCallback{};
+PxDefaultErrorCallback Scene::defaultErrorCallback{};
+PxFoundation* Scene::foundation{ nullptr };
+PxDefaultCpuDispatcher* Scene::dispatcher{ nullptr };
+PxPhysics* Scene::physics{ nullptr };
+PxPvd* Scene::pvd{ nullptr };
 
-Scene::Scene() {
-
-    world.on_construct<TransformComponent>().connect<&entt::registry::emplace<DirtyTransformComponent>>();
-    world.on_update<TransformComponent>().connect<&entt::registry::emplace_or_replace<DirtyTransformComponent>>();
-
-    world.on_construct<ModelComponent>().connect<&entt::registry::emplace<DirtyModelComponent>>();
-    world.on_update<ModelComponent>().connect<&entt::registry::emplace_or_replace<DirtyModelComponent>>();
-
-    //world.on_destroy<RigidbodyComponent>().connect<>();
-    //world.on_destroy<PhysicsMaterialComponent>().connect<>();
+Scene::Scene() : PxSimulationEventCallback{} {
+    init();
 
     // init physx
     if (!foundation) {
         foundation = PxCreateFoundation(PX_PHYSICS_VERSION, defaultAllocatorCallback, defaultErrorCallback);
         if (!foundation) throw std::runtime_error("Failed to create PhysX foundation!");
         pvd = PxCreatePvd(*foundation);
-        physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-        pvd->connect(*transport, physx::PxPvdInstrumentationFlag::eALL);
-        dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
-        physx::PxTolerancesScale toleranceScale;
+        PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+        pvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+        dispatcher = PxDefaultCpuDispatcherCreate(2);
+        PxTolerancesScale toleranceScale;
         toleranceScale.length = 100; // typical length of an object
-        toleranceScale.speed = 981;         // typical speed of an object, gravity*1s is a reasonable choice
+        toleranceScale.speed = 981; // typical speed of an object, gravity*1s is a reasonable choice
         physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, toleranceScale, true, pvd);
     }
 
-    physx::PxSceneDesc sceneDesc{physics->getTolerancesScale()};
-    sceneDesc.gravity = physx::PxVec3{0.0f, -9.81f, 0.0f};
+    PxSceneDesc sceneDesc{physics->getTolerancesScale()};
+    sceneDesc.gravity = PxVec3{0.0f, -9.81f, 0.0f};
     sceneDesc.cpuDispatcher	= dispatcher;
-    sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+    sceneDesc.filterShader = PxDefaultSimulationFilterShader;
     scene = physics->createScene(sceneDesc);
+    scene->setSimulationEventCallback(this);
 
-    physx::PxPvdSceneClient* pvdClient = scene->getScenePvdClient();
+    PxPvdSceneClient* pvdClient = scene->getScenePvdClient();
     if (pvdClient) {
-        pvdClient->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
-        pvdClient->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
-        pvdClient->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
+        pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
+        pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
+        pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
     }
+
+    defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
 }
 
 Scene::~Scene() {
     scene->release();
     defaultMaterial->release();
+    active = false;
 }
 
-Scene::Scene(const Scene& other) : Scene() {
-    world.assign(other.world.data(), other.world.data() + other.world.size(), other.world.released());
-    world.clone<TagComponent>(other.world);
-    world.clone<RelationshipComponent>(other.world);
-    world.clone<TransformComponent>(other.world);
-    world.clone<ModelComponent>(other.world);
-    world.clone<CameraComponent>(other.world);
-    world.clone<RigidbodyComponent>(other.world);
-    world.clone<BoxColliderComponent>(other.world);
-    world.clone<PhysicsMaterialComponent>(other.world);
+Scene::Scene(const Scene& other) : Scene{} {
+    registry.assign(other.registry.data(), other.registry.data() + other.registry.size(), other.registry.released());
+    clone<TagComponent>(other.registry);
+    clone<RelationshipComponent>(other.registry);
+    clone<TransformComponent>(other.registry);
+    clone<MeshComponent>(other.registry);
+    clone<CameraComponent>(other.registry);
+    clone<RigidbodyComponent>(other.registry);
+    clone<BoxColliderComponent>(other.registry);
+    clone<PhysicsMaterialComponent>(other.registry);
 }
 
 void Scene::onViewportResize(const glm::vec2& size) {
@@ -76,48 +73,108 @@ void Scene::onViewportResize(const glm::vec2& size) {
 }
 
 void Scene::onRuntimeStart() {
-    defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
+    active = true;
 
-    auto view = world.view<const TransformComponent, RigidbodyComponent>();
+    auto view = registry.view<const TransformComponent, RigidbodyComponent>();
     for (auto [entity, transform, rigidbody] : view.each()) {
-        physx::PxTransform t{
-            physx::PxVec3{ transform.position.z, transform.position.y, transform.position.z },
-            physx::PxQuat{ transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w }
+        PxTransform t{
+            PxVec3{ transform.position.z, transform.position.y, transform.position.z },
+            PxQuat{ transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w }
         };
 
-        physx::PxRigidActor* body;
+        PxRigidActor* body;
         if (rigidbody.type == RigidbodyComponent::BodyType::Dynamic) {
             auto rigid = physics->createRigidDynamic(t);
             rigid->setMass(rigidbody.mass);
             rigid->setLinearDamping(rigidbody.linearDrag);
             rigid->setAngularDamping(rigidbody.angularDrag);
+            rigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, rigidbody.kinematic);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_X, rigidbody.freezePosition.x);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Y, rigidbody.freezePosition.y);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Z, rigidbody.freezePosition.z);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, rigidbody.freezeRotation.x);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, rigidbody.freezeRotation.y);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, rigidbody.freezeRotation.z);
+
             body = rigid;
         } else {
             body = physics->createRigidStatic(t);
         }
 
-        if (auto collider = world.try_get<BoxColliderComponent>(entity)) {
-            glm::vec3 halfExtent{ collider->size * transform.scale };
+        float scalar = glm::max(transform.scale.x, transform.scale.y, transform.scale.z);
 
-            physx::PxMaterial* mat;
-            if (auto material = world.try_get<PhysicsMaterialComponent>(entity)) {
-                mat = physics->createMaterial(material->friction, material->friction, material->restitution);
-                material->runtimeMaterial = mat;
-            } else {
-                mat = defaultMaterial;
-            }
-
-            physx::PxShape* shape = physics->createShape(physx::PxBoxGeometry(physx::PxVec3{ halfExtent.x, halfExtent.y, halfExtent.z }), *mat);
-            body->attachShape(*shape);
-            rigidbody.runtimeBody = body;
+        PxMaterial* mat;
+        if (auto material = registry.try_get<PhysicsMaterialComponent>(entity)) {
+            mat = physics->createMaterial(material->staticFriction, material->dynamicFriction, material->restitution);
+            mat->setRestitutionCombineMode(me::enum_value<PxCombineMode::Enum>(me::enum_index(material->restitutionCombine).value_or(0)));
+            mat->setFrictionCombineMode(me::enum_value<PxCombineMode::Enum>(me::enum_index(material->frictionCombine).value_or(0)));
+            material->runtimeMaterial = mat;
+        } else {
+            mat = defaultMaterial;
         }
 
-       scene->addActor(*body);
+        if (auto collider = registry.try_get<BoxColliderComponent>(entity)) {
+            glm::vec3 halfExtent{ collider->extent / 2.0f * transform.scale };
+
+            PxShape* shape = physics->createShape(PxBoxGeometry{{ halfExtent.x, halfExtent.y, halfExtent.z }}, *mat);
+            if (collider->trigger) {
+                shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+                shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+            }
+            body->attachShape(*shape);
+            collider->runtimeShape = shape;
+        }
+
+        if (auto collider = registry.try_get<SphereColliderComponent>(entity)) {
+            float radius = collider->radius * scalar;
+
+            PxShape* shape = physics->createShape(PxSphereGeometry{ radius }, *mat);
+            if (collider->trigger) {
+                shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+                shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+            }
+            body->attachShape(*shape);
+            collider->runtimeShape = shape;
+        }
+
+        if (auto collider = registry.try_get<CapsuleColliderComponent>(entity)) {
+            float radius = collider->radius * scalar;
+            float height = collider->height / 2.0f * scalar;
+
+            PxShape* shape = physics->createShape(PxCapsuleGeometry{ radius, height }, *mat);
+            if (collider->trigger) {
+                shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+                shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+            }
+            body->attachShape(*shape);
+            collider->runtimeShape = shape;
+        }
+
+        if (auto collider = registry.try_get<PlaneColliderComponent>(entity)) {
+            if (rigidbody.type != RigidbodyComponent::BodyType::Static) {
+                LOG_DEBUG << "Shapes with a PxPlaneGeometry may only be created for static actors.";
+            } else {
+                PxShape* shape = physics->createShape(PxPlaneGeometry{}, *mat);
+                if (collider->trigger) {
+                    shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+                    shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+                }
+                body->attachShape(*shape);
+                collider->runtimeShape = shape;
+            }
+        }
+
+        /*if (auto collider = world.try_get<MeshColliderComponent>(entity)) {
+
+        }*/
+
+        rigidbody.runtimeBody = body;
+        scene->addActor(*body);
     }
 }
 
 void Scene::onRuntimeStop() {
-
+    active = false;
 }
 
 void Scene::onUpdateRuntime(float dt) {
@@ -127,15 +184,15 @@ void Scene::onUpdateRuntime(float dt) {
         scene->fetchResults(true);
 
         // Retrieve transform from PhysX
-        auto view = world.view<TransformComponent, const RigidbodyComponent>();
+        auto view = registry.view<TransformComponent, const RigidbodyComponent>();
         for (auto [entity, transform, rigidbody] : view.each()) {
             if (rigidbody.type == RigidbodyComponent::BodyType::Static)
                 continue;
-            auto body = reinterpret_cast<physx::PxRigidBody*>(rigidbody.runtimeBody);
-            physx::PxTransform t{ body->getGlobalPose() };
+            auto body = reinterpret_cast<PxRigidBody*>(rigidbody.runtimeBody);
+            PxTransform t{ body->getGlobalPose() };
             transform.position = { t.p.x, t.p.y, t.p.z };
             transform.rotation = { t.q.w, t.q.x, t.q.y, t.q.z };
-            world.patch<TransformComponent>(entity);
+            registry.patch<TransformComponent>(entity);
         }
     }
 }
@@ -157,43 +214,181 @@ void Scene::onRenderEditor(const EditorCamera& camera) {
     gridRenderer.end();
 }
 
+glm::mat4 getTRS(const entt::registry& registry, const entt::entity entity) {
+    if (auto component = registry.try_get<RelationshipComponent>(entity); component && component->parent != entt::null) {
+        return registry.get<TransformComponent>(entity).transform() * getTRS(registry, component->parent);
+    } else {
+        return registry.get<TransformComponent>(entity).transform();
+    }
+}
+
 void Scene::render() {
-    auto transformGroup = world.group<DirtyTransformComponent, TransformComponent>();
+    auto transformGroup = registry.group<DirtyTransformComponent, TransformComponent>();
     transformGroup.sort([&](const entt::entity lhs, const entt::entity rhs) {
-        auto clhs = world.try_get<RelationshipComponent>(lhs);
+        auto clhs = registry.try_get<RelationshipComponent>(lhs);
         if (clhs == nullptr)
             return false;
-        auto crhs = world.try_get<RelationshipComponent>(rhs);
+        auto crhs = registry.try_get<RelationshipComponent>(rhs);
         if (crhs == nullptr)
             return false;
         return !(clhs->parent != entt::null && clhs->children < crhs->children);
     });
     for (auto [entity, transform] : transformGroup.each()) {
-        transform.localToWorldMatrix = world.transform(entity);
+        transform.localToWorldMatrix = getTRS(registry, entity);
         transform.worldToLocalMatrix = glm::inverse(transform.localToWorldMatrix);
     }
 
-    world.clear<DirtyTransformComponent>();
+    registry.clear<DirtyTransformComponent>();
 
-    auto& modelRenderer = ModelRenderer::Instance();
+    auto& meshRenderer = MeshRenderer::Instance();
 
-    auto modelView = world.view<DirtyModelComponent, ModelComponent>();
-    for (auto [entity, model] : modelView.each()) {
-        if (model.path.empty() || !std::filesystem::exists(model.path))
-            model.model.reset();
+    auto meshView = registry.view<DirtyMeshComponent, MeshComponent>();
+    for (auto [entity, mesh] : meshView.each()) {
+        if (!mesh.path.empty() && std::filesystem::exists(mesh.path))
+            mesh.runtimeModel = meshRenderer.loadModel(mesh.path);
         else
-            model.model = modelRenderer.loadModel(model.path);
+            mesh.runtimeModel = nullptr;
     }
 
-    world.clear<DirtyModelComponent>();
+    registry.clear<DirtyMeshComponent>();
 
-    modelRenderer.begin();
+    meshRenderer.begin();
 
-    auto transformView = world.view<const TransformComponent, const ModelComponent>();
-    for (auto [entity, transform, model] : transformView.each()) {
-        if (model.model)
-            modelRenderer.draw(model.model, transform.localToWorldMatrix);
+    auto transformView = registry.view<const TransformComponent, const MeshComponent>();
+    for (auto [entity, transform, mesh] : transformView.each()) {
+        if (auto model = reinterpret_cast<vkx::Model*>(mesh.runtimeModel))
+            meshRenderer.draw(*model, transform.localToWorldMatrix);
     }
 
-    modelRenderer.end();
+    meshRenderer.end();
+}
+
+template<typename Component>
+void Scene::onComponentConstruct(entt::registry& registry, entt::entity entity) {
+}
+
+template<typename Component>
+void Scene::onComponentUpdate(entt::registry& registry, entt::entity entity) {
+}
+
+template<typename Component>
+void Scene::onComponentDestroy(entt::registry& registry, entt::entity entity) {
+}
+
+template<>
+void Scene::onComponentUpdate<RigidbodyComponent>(entt::registry& registry, entt::entity entity) {
+    if (!active) return;
+    auto& rigidbody = registry.get<RigidbodyComponent>(entity);
+    if (rigidbody.type == RigidbodyComponent::BodyType::Dynamic) {
+        if (auto rigid = reinterpret_cast<PxRigidDynamic*>(rigidbody.runtimeBody)) {
+            rigid->setMass(rigidbody.mass);
+            rigid->setLinearDamping(rigidbody.linearDrag);
+            rigid->setAngularDamping(rigidbody.angularDrag);
+            rigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, rigidbody.kinematic);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_X, rigidbody.freezePosition.x);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Y, rigidbody.freezePosition.y);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Z, rigidbody.freezePosition.z);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, rigidbody.freezePosition.x);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, rigidbody.freezePosition.y);
+            rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, rigidbody.freezePosition.z);
+        }
+    }
+}
+
+template<>
+void Scene::onComponentDestroy<RigidbodyComponent>(entt::registry& registry, entt::entity entity) {
+    if (!active) return;
+    auto& rigidbody = registry.get<RigidbodyComponent>(entity);
+    if (auto body = reinterpret_cast<PxRigidActor*>(rigidbody.runtimeBody)) {
+        scene->removeActor(*body);
+    }
+}
+
+template<>
+void Scene::onComponentUpdate<BoxColliderComponent>(entt::registry& registry, entt::entity entity) {
+    if (!active) return;
+    auto& collider = registry.get<BoxColliderComponent>(entity);
+    if (auto shape = reinterpret_cast<PxShape*>(collider.runtimeShape)) {
+        auto& transform = registry.get<TransformComponent>(entity);
+        glm::vec3 halfExtent{ collider.extent / 2.0f * transform.scale };
+        shape->setGeometry(PxBoxGeometry(PxVec3{ halfExtent.x, halfExtent.y, halfExtent.z }));
+        shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, !collider.trigger);
+        shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, collider.trigger);
+    }
+}
+
+template<>
+void Scene::onComponentUpdate<SphereColliderComponent>(entt::registry& registry, entt::entity entity) {
+    if (!active) return;
+    auto& collider = registry.get<SphereColliderComponent>(entity);
+    if (auto shape = reinterpret_cast<PxShape*>(collider.runtimeShape)) {
+        auto& transform = registry.get<TransformComponent>(entity);
+        float scalar = glm::max(transform.scale.x, transform.scale.y, transform.scale.z);
+        float radius = collider.radius * scalar;
+        shape->setGeometry(PxSphereGeometry{ radius });
+        shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, !collider.trigger);
+        shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, collider.trigger);
+    }
+}
+
+template<>
+void Scene::onComponentUpdate<CapsuleColliderComponent>(entt::registry& registry, entt::entity entity) {
+    if (!active) return;
+    auto& collider = registry.get<CapsuleColliderComponent>(entity);
+    if (auto shape = reinterpret_cast<PxShape*>(collider.runtimeShape)) {
+        auto& transform = registry.get<TransformComponent>(entity);
+        float scalar = glm::max(transform.scale.x, transform.scale.y, transform.scale.z);
+        float radius = collider.radius * scalar;
+        float height = collider.height / 2.0f * scalar;
+        shape->setGeometry(PxCapsuleGeometry{ radius, height });
+        shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, !collider.trigger);
+        shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, collider.trigger);
+    }
+}
+
+template<>
+void Scene::onComponentUpdate<PlaneColliderComponent>(entt::registry& registry, entt::entity entity) {
+    if (!active) return;
+    auto& collider = registry.get<PlaneColliderComponent>(entity);
+    if (auto shape = reinterpret_cast<PxShape*>(collider.runtimeShape)) {
+        shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, !collider.trigger);
+        shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, collider.trigger);
+    }
+}
+
+template<>
+void Scene::onComponentUpdate<PhysicsMaterialComponent>(entt::registry& registry, entt::entity entity) {
+    if (!active) return;
+    auto& material = registry.get<PhysicsMaterialComponent>(entity);
+    if (auto mat = reinterpret_cast<PxMaterial*>(material.runtimeMaterial)) {
+        mat->setDynamicFriction(material.dynamicFriction);
+        mat->setStaticFriction(material.staticFriction);
+        mat->setRestitution(material.restitution);
+        mat->setFrictionCombineMode(me::enum_value<PxCombineMode::Enum>(me::enum_index(material.frictionCombine).value_or(0)));
+        mat->setRestitutionCombineMode(me::enum_value<PxCombineMode::Enum>(me::enum_index(material.restitutionCombine).value_or(0)));
+    }
+}
+
+void Scene::init() {
+    registry.on_construct<TransformComponent>().connect<&entt::registry::emplace<DirtyTransformComponent>>();
+    registry.on_update<TransformComponent>().connect<&entt::registry::emplace<DirtyTransformComponent>>();
+    registry.on_destroy<TransformComponent>().connect<&entt::registry::remove<DirtyTransformComponent>>();
+
+    //
+    registry.on_construct<MeshComponent>().connect<&entt::registry::emplace<DirtyMeshComponent>>();
+    registry.on_update<MeshComponent>().connect<&entt::registry::emplace_or_replace<DirtyMeshComponent>>();
+    registry.on_destroy<MeshComponent>().connect<&entt::registry::remove<DirtyMeshComponent>>();
+
+    //
+
+    registry.on_update<RigidbodyComponent>().connect<&Scene::onComponentUpdate<RigidbodyComponent>>(this);
+    registry.on_destroy<RigidbodyComponent>().connect<&Scene::onComponentDestroy<RigidbodyComponent>>(this);
+
+    //
+    registry.on_update<BoxColliderComponent>().connect<&Scene::onComponentUpdate<BoxColliderComponent>>(this);
+    registry.on_update<SphereColliderComponent>().connect<&Scene::onComponentUpdate<SphereColliderComponent>>(this);
+    registry.on_update<CapsuleColliderComponent>().connect<&Scene::onComponentUpdate<CapsuleColliderComponent>>(this);
+    registry.on_update<PlaneColliderComponent>().connect<&Scene::onComponentUpdate<PlaneColliderComponent>>(this);
+
+    registry.on_update<PhysicsMaterialComponent>().connect<&Scene::onComponentUpdate<PhysicsMaterialComponent>>(this);
 }

@@ -9,6 +9,7 @@
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
+#include <IconsFontAwesome4.h>
 
 using namespace fe;
 using namespace std::string_literals;
@@ -42,14 +43,14 @@ void EditorLayer::onDetach() {
 
 void EditorLayer::onUpdate(float dt) {
     switch (sceneState) {
-        case SceneState::Edit: {
+        case Edit: {
             if (viewportFocused)
                 editorCamera.update(dt);
             activeScene->onUpdateEditor(dt);
             break;
         }
 
-        case SceneState::Play: {
+        case Play: {
             activeScene->onUpdateRuntime(dt);
             break;
         }
@@ -98,17 +99,19 @@ void EditorLayer::onRender(Renderer& renderer) {
     GlobalUbo ubo{};
     ubo.projection = editorCamera.getProjection();
     ubo.view = editorCamera.getView();
+    //ubo.ortho = viewportOrtho;
     ubo.lightDirection = -renderer.getLightDirection();
+
     auto& buffer = renderer.getCurrentUniformBuffer();
     buffer.copy(ubo);
     buffer.flush();
 
     switch (sceneState) {
-        case SceneState::Edit:
+        case Edit:
             activeScene->onRenderEditor(editorCamera);
             break;
 
-        case SceneState::Play: {
+        case Play: {
             activeScene->onRenderRuntime();
             break;
         }
@@ -189,7 +192,7 @@ void EditorLayer::onImGui() {
     sceneHierarchyPanel.onImGui();
     contentBrowserPanel.onImGui();
 
-    ImGui::Begin((fs::ICON_FA_STATS + "  Stats"s).c_str());
+    ImGui::Begin((ICON_FA_NEWSPAPER_O + "  Stats"s).c_str());
 
     //std::string name = "None";
     //if (hoveredEntity)
@@ -222,7 +225,7 @@ void EditorLayer::onImGui() {
     ImGui::End();
 
     //ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
-    ImGui::Begin((fs::ICON_FA_MANY_CUBES + "  Scene"s).c_str());
+    ImGui::Begin((ICON_FA_LINODE + "  Scene"s).c_str());
 
     auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
     auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
@@ -231,13 +234,15 @@ void EditorLayer::onImGui() {
     glm::vec2 maxBounds { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
     ImVec2 viewportPanelSize{ ImGui::GetContentRegionAvail() };
-    viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-    editorCamera.setViewport(viewportSize);
-    activeScene->onViewportResize(viewportSize);
+    if (viewportPanelSize.x != viewportSize.x || viewportPanelSize.y != viewportSize.y) {
+        viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+        onViewportResize();
+    }
 
     viewportFocused = ImGui::IsWindowFocused();
     viewportHovered = ImGui::IsWindowHovered();
+
     //context.getUI().blockEvents(!viewportFocused && !viewportHovered);
 
     /*ImGui::Button("Tools");
@@ -257,20 +262,19 @@ void EditorLayer::onImGui() {
 
     // Gizmos
     entt::entity selectedEntity = sceneHierarchyPanel.getSelectedEntity();
-    if (selectedEntity != entt::null && gizmoType != -1) {
+    if (gizmoType != -1 && activeScene->registry.valid(selectedEntity)) {
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist();
 
         ImGuizmo::SetRect(minBounds.x, minBounds.y, maxBounds.x - minBounds.x, maxBounds.y - minBounds.y);
 
         // Camera
-
         // Runtime camera from entity
         const glm::mat4& cameraView = editorCamera.getView();
         const glm::mat4& cameraProjection = editorCamera.getProjection();
 
         // Entity transform
-        auto& transform = activeScene->world.get<TransformComponent>(selectedEntity);
+        auto& transform = activeScene->registry.get<TransformComponent>(selectedEntity);
 
         // Snapping
         bool snap = Input::GetKey(Key::LeftControl);
@@ -283,18 +287,17 @@ void EditorLayer::onImGui() {
         // Bounding
         auto bounds = gizmoType == ImGuizmo::BOUNDS;
         glm::vec3 boundsSnap{ 0.1f };  // Snap to 0.1m for bound change
-        static float boundsValues[6] = { -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f };
+        static glm::mat2x3 boundsValues = { glm::vec3{-1.0f}, glm::vec3{1.0f} };
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                              static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::WORLD, glm::value_ptr(transform.localToWorldMatrix),
                              nullptr, snap ? glm::value_ptr(snapValues) : nullptr,
-                             bounds ? boundsValues : nullptr, bounds ? glm::value_ptr(boundsSnap) : nullptr);
+                             bounds ? glm::value_ptr(boundsValues) : nullptr, bounds ? glm::value_ptr(boundsSnap) : nullptr);
 
         //ImGuizmo::ViewManipulate(glm::value_ptr(cameraView), editorCamera.getDistance(), {maxBounds.x - 128, minBounds.y}, {128, 128}, 0x10101010);
 
         if (ImGuizmo::IsUsing()) {
             glm::vec3 position, rotation, scale;
-            //ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(component.localToWorldMatrix), glm::value_ptr(position), glm::value_ptr(rotation), glm::value_ptr(scale));
             glm::decompose(transform.localToWorldMatrix, position, rotation, scale);
 
             switch (gizmoType) {
@@ -314,7 +317,7 @@ void EditorLayer::onImGui() {
                     break;
             }
 
-            activeScene->world.patch_children<TransformComponent>(selectedEntity);
+            activeScene->registry.patch<TransformComponent>(selectedEntity);
         }
     }
 
@@ -346,7 +349,7 @@ void EditorLayer::openScene() {
 }
 
 void EditorLayer::openScene(const std::filesystem::path& file) {
-    if (sceneState != SceneState::Edit)
+    if (sceneState != Edit)
         onSceneStop();
 
     if (file.extension() != ".scene") {
@@ -385,8 +388,14 @@ void EditorLayer::saveSceneAs() {
     }
 }
 
+void EditorLayer::onViewportResize() {
+    editorCamera.setViewport(viewportSize);
+    activeScene->onViewportResize(viewportSize);
+    viewportOrtho = glm::ortho(0.0f, viewportSize.x, 0.0f, viewportSize.y);
+}
+
 void EditorLayer::UI_Toolbar() {
-    ImGui::Begin((fs::ICON_FA_COGS + "  Toolbar"s).c_str(), nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    ImGui::Begin((ICON_FA_COGS + "  Toolbar"s).c_str(), nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 2.0f });
     ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0.0f, 0.0f });
@@ -399,10 +408,10 @@ void EditorLayer::UI_Toolbar() {
 
     float size = ImGui::GetWindowHeight() - 4.0f;
     ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-    if (ImGui::Button(sceneState == SceneState::Edit ? fs::ICON_FA_PLAY : fs::ICON_FA_STOP, {size, size})) {
-        if (sceneState == SceneState::Edit)
+    if (ImGui::Button(sceneState == Edit ? ICON_FA_PLAY : ICON_FA_STOP, {size, size})) {
+        if (sceneState == Edit)
             onScenePlay();
-        else if (sceneState == SceneState::Play)
+        else if (sceneState == Play)
             onSceneStop();
     }
 
@@ -412,7 +421,7 @@ void EditorLayer::UI_Toolbar() {
 }
 
 void EditorLayer::onScenePlay() {
-    sceneState = SceneState::Play;
+    sceneState = Play;
 
     activeScene = std::make_shared<Scene>(*editorScene);
     activeScene->onRuntimeStart();
@@ -421,7 +430,7 @@ void EditorLayer::onScenePlay() {
 }
 
 void EditorLayer::onSceneStop() {
-    sceneState = SceneState::Edit;
+    sceneState = Edit;
 
     activeScene->onRuntimeStop();
     activeScene = editorScene;

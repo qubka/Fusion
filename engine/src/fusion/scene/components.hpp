@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scene_camera.hpp"
-#include "fusion/renderer/vkx/model.hpp"
 
 #include <entt/entt.hpp>
 
@@ -70,14 +69,16 @@ namespace fe {
         bool fixedAspectRatio{ false };
     };
 
-    struct ModelComponent {
+    struct MeshComponent {
         std::string path;
         glm::vec3 scale{ 1.0f };
         glm::vec3 center{ 0.0f };
         glm::vec2 uvscale{ 1.0f };
-        std::shared_ptr<vkx::model::Model> model;
+
+        // Storage for runtime
+        void* runtimeModel{ nullptr };
     };
-    struct DirtyModelComponent {};
+    struct DirtyMeshComponent {};
 
     struct RigidbodyComponent {
         enum class BodyType { Static = 0, Dynamic };
@@ -96,17 +97,49 @@ namespace fe {
     };
 
     struct BoxColliderComponent {
-        glm::vec3 center{ 0.0f };
-        glm::vec3 size{ 1.0f };
+        glm::vec3 extent{ 1.0f };
         bool trigger{ false };
 
         // Storage for runtime
-        void* runtimeFixture{ nullptr };
+        void* runtimeShape{ nullptr };
     };
 
+    struct SphereColliderComponent {
+        float radius{ 0.0f };
+        bool trigger{ false };
+
+        // Storage for runtime
+        void* runtimeShape{ nullptr };
+    };
+
+    struct CapsuleColliderComponent {
+        float radius{ 0.0f };
+        float height{ 0.0f };
+        bool trigger{ false };
+
+        // Storage for runtime
+        void* runtimeShape{ nullptr };
+    };
+
+    struct PlaneColliderComponent {
+        bool trigger{ false };
+        // Storage for runtime
+        void* runtimeShape{ nullptr };
+    };
+
+    /*struct MeshColliderComponent {
+        // Storage for runtime
+        void* runtimeShape{ nullptr };
+    };*/
+
     struct PhysicsMaterialComponent {
-        float friction{ 0.5f };
+        enum class CombineMode { Average = 0, Minimum, Multiply, Maximum };
+
+        float dynamicFriction{ 0.5f };
+        float staticFriction{ 0.5f };
         float restitution{ 0.5f };
+        CombineMode frictionCombine{ CombineMode::Average };
+        CombineMode restitutionCombine{ CombineMode::Average };
 
         // Storage for runtime
         void* runtimeMaterial{ nullptr };

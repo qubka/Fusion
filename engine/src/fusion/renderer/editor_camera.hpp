@@ -20,6 +20,11 @@ namespace fe {
         float getSpeed() const { return speed; }
         void setSpeed(float value) { speed = value; }
 
+        void setViewport(const glm::vec2& size) {
+            viewport = size;
+            setAspect(size.x / size.y);
+        }
+
         void mousePan(const glm::vec2& delta);
         void mouseRotate(const glm::vec2& delta);
         void mouseZoom(float delta);
@@ -32,6 +37,7 @@ namespace fe {
 
     private:
         glm::vec3 focalPoint{ 0.0f };
+        glm::vec2 viewport{ 0.0f };
 
         float distance{ 10.0f };
         float speed{ 1.0f };

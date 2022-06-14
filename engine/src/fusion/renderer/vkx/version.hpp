@@ -11,24 +11,27 @@
 #include <string>
 #include <sstream>
 
-namespace vkx {
+#include <vulkan/vulkan.hpp>
 
+namespace vkx {
     // Version information for Vulkan is stored in a single 32 bit integer
     // with individual bits representing the major, minor and patch versions.
     // The maximum possible major and minor version is 512 (look out nVidia)
     // while the maximum possible patch version is 2048
     struct Version {
         Version()
-            : vulkan_major(0)
-            , vulkan_minor(0)
-            , vulkan_patch(0) {}
+            : major{ 0 }
+            , minor{ 0 }
+            , patch{ 0 } {}
         Version(uint32_t version)
-            : Version() {
+            : Version{} {
             *this = version;
         }
 
         Version& operator=(uint32_t version) {
-            memcpy(this, &version, sizeof(uint32_t));
+            major = VK_VERSION_MAJOR(version);
+            minor = VK_VERSION_MINOR(version);
+            patch = VK_VERSION_PATCH(version);
             return *this;
         }
 
@@ -42,14 +45,14 @@ namespace vkx {
             return (operator uint32_t()) >= (other.operator uint32_t());
         }
 
-        std::string toString() const {
+        std::string to_string() const {
             std::stringstream buffer;
-            buffer << vulkan_major << "." << vulkan_minor << "." << vulkan_patch;
+            buffer << major << "." << minor << "." << patch;
             return buffer.str();
         }
 
-        const uint32_t vulkan_patch : 12;
-        const uint32_t vulkan_minor : 10;
-        const uint32_t vulkan_major : 10;
+        uint32_t patch{ 12 };
+        uint32_t minor{ 10 };
+        uint32_t major{ 10 };
     };
 }  // namespace vkx

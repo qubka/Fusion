@@ -55,3 +55,9 @@
 [submodule "external/physx"]
 	path = external/physx
 	url = https://github.com/NVIDIAGameWorks/PhysX.git
+[submodule "external/iconfontcppheaders"]
+	path = external/iconfontcppheaders
+	url = https://github.com/juliettef/IconFontCppHeaders.git
+[submodule "external/freetype"]
+	path = external/freetype
+	url = https://github.com/freetype/freetype.git

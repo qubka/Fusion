@@ -32,9 +32,9 @@ void EditorCamera::update(float dt) {
 }
 
 void EditorCamera::mousePan(const glm::vec2& delta) {
-    glm::vec2 speed{ panSpeed() };
-    focalPoint += right * delta.x * speed.x * distance;
-    focalPoint += up * delta.y * speed.y * distance;
+    glm::vec2 pans{ panSpeed() };
+    focalPoint += right * delta.x * pans.x * distance;
+    focalPoint += up * delta.y * pans.y * distance;
 }
 
 void EditorCamera::mouseRotate(const glm::vec2& delta) {
@@ -52,10 +52,10 @@ void EditorCamera::mouseZoom(float delta) {
 }
 
 glm::vec2 EditorCamera::panSpeed() const {
-    float x = std::min(viewportWidth / 1000.0f, 2.4f); // max = 2.4f
+    float x = std::min(viewport.x / 1000.0f, 2.4f); // max = 2.4f
     float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
 
-    float y = std::min(viewportHeight / 1000.0f, 2.4f); // max = 2.4f
+    float y = std::min(viewport.y / 1000.0f, 2.4f); // max = 2.4f
     float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
 
     return { xFactor, yFactor };

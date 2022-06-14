@@ -12,7 +12,6 @@
 #include "pipelines.hpp"
 
 using namespace vkx;
-using namespace vkx::ui;
 using namespace fe;
 
 #include <imgui/imgui.h>
@@ -222,12 +221,12 @@ void UIOverlay::destroy() {
     vertexBuffer.destroy();
     indexBuffer.destroy();
     font.destroy();
-    context.device.destroyDescriptorSetLayout(descriptorSetLayout);
-    context.device.destroyDescriptorPool(descriptorPool);
-    context.device.destroyPipelineLayout(pipelineLayout);
-    context.device.destroyPipeline(pipeline);
+    device.destroyDescriptorSetLayout(descriptorSetLayout);
+    device.destroyDescriptorPool(descriptorPool);
+    device.destroyPipelineLayout(pipelineLayout);
+    device.destroyPipeline(pipeline);
     if (!createInfo.renderPass) {
-        context.device.destroyRenderPass(renderPass);
+        device.destroyRenderPass(renderPass);
     }
 
     if (ImGui::GetCurrentContext()) {
@@ -282,60 +281,26 @@ void UIOverlay::prepareResources() {
     io.Fonts->Build();
 #endif
 
+    // Load font
     {
         unsigned char* fontBuffer;
         io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
-        vk::DeviceSize uploadSize = texWidth * texHeight * 4 * sizeof(char);
+        vk::DeviceSize uploadSize = texWidth * texHeight * 4 * sizeof(unsigned char);
         fontData.resize(uploadSize);
         memcpy(fontData.data(), fontBuffer, uploadSize);
     }
-
-    // Create target image for copy
-    vk::ImageCreateInfo imageInfo;
-    imageInfo.imageType = vk::ImageType::e2D;
-    imageInfo.format = vk::Format::eR8G8B8A8Unorm;
-    imageInfo.extent.width = texWidth;
-    imageInfo.extent.height = texHeight;
-    imageInfo.extent.depth = 1;
-    imageInfo.mipLevels = 1;
-    imageInfo.arrayLayers = 1;
-    imageInfo.usage = vk::ImageUsageFlagBits::eSampled;
-
-    font = context.stageToDeviceImage(imageInfo, fontData);
-
-    // Image view
-    vk::ImageViewCreateInfo viewInfo;
-    viewInfo.image = font.image;
-    viewInfo.viewType = vk::ImageViewType::e2D;
-    viewInfo.format = vk::Format::eR8G8B8A8Unorm;
-    viewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-    viewInfo.subresourceRange.levelCount = 1;
-    viewInfo.subresourceRange.layerCount = 1;
-    font.view = context.device.createImageView(viewInfo);
-
-    // Font texture Sampler
-    vk::SamplerCreateInfo samplerInfo;
-    samplerInfo.magFilter = vk::Filter::eLinear;
-    samplerInfo.minFilter = vk::Filter::eLinear;
-    samplerInfo.mipmapMode = vk::SamplerMipmapMode::eLinear;
-    samplerInfo.addressModeU = vk::SamplerAddressMode::eClampToEdge;
-    samplerInfo.addressModeV = vk::SamplerAddressMode::eClampToEdge;
-    samplerInfo.addressModeW = vk::SamplerAddressMode::eClampToEdge;
-    samplerInfo.borderColor = vk::BorderColor::eFloatOpaqueWhite;
-    font.sampler = context.device.createSampler(samplerInfo);
-
-    // Command buffer
+    font.fromBuffer(context, fontData, { static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight) });
 
     // Descriptor pool
     vk::DescriptorPoolSize poolSize;
     poolSize.type = vk::DescriptorType::eCombinedImageSampler;
     poolSize.descriptorCount = 1;
-    descriptorPool = context.device.createDescriptorPool({ {}, 3, 1, &poolSize });
+    descriptorPool = device.createDescriptorPool({ {}, 3, 1, &poolSize });
 
     // Descriptor set layout
     vk::DescriptorSetLayoutBinding setLayoutBinding{ 0, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment };
 
-    descriptorSetLayout = context.device.createDescriptorSetLayout({ {}, 1, &setLayoutBinding });
+    descriptorSetLayout = device.createDescriptorSetLayout({ {}, 1, &setLayoutBinding });
 
     // Descriptor set
     ImTextureID fontDescriptorSet = addTexture(font.sampler, font.view, vk::ImageLayout::eShaderReadOnlyOptimal);
@@ -345,13 +310,13 @@ void UIOverlay::prepareResources() {
     // Push constants for UI rendering parameters
     vk::PushConstantRange pushConstantRange{ vk::ShaderStageFlagBits::eVertex, 0, sizeof(PushConstBlock) };
     vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ {}, 1, &descriptorSetLayout, 1, &pushConstantRange };
-    pipelineLayout = context.device.createPipelineLayout(pipelineLayoutCreateInfo);
+    pipelineLayout = device.createPipelineLayout(pipelineLayoutCreateInfo);
 }
 
 /** Prepare a separate pipeline for the UI overlay rendering decoupled from the main application */
 void UIOverlay::preparePipeline() {
     // Setup graphics pipeline for UI rendering
-    vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder(context.device, pipelineLayout, renderPass);
+    vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ device, pipelineLayout, renderPass };
     pipelineBuilder.depthStencilState = { false };
     pipelineBuilder.rasterizationState.cullMode = vk::CullModeFlagBits::eNone;
 
@@ -375,8 +340,8 @@ void UIOverlay::preparePipeline() {
     if (!createInfo.shaders.empty()) {
         pipelineBuilder.shaderStages = createInfo.shaders;
     } else {
-        pipelineBuilder.loadShader(getAssetPath() + "/shaders/base/uioverlay.vert.spv", vk::ShaderStageFlagBits::eVertex);
-        pipelineBuilder.loadShader(getAssetPath() + "/shaders/base/uioverlay.frag.spv", vk::ShaderStageFlagBits::eFragment);
+        pipelineBuilder.loadShader(getAssetPath() + "/shaders/imgui/uioverlay.vert.spv", vk::ShaderStageFlagBits::eVertex);
+        pipelineBuilder.loadShader(getAssetPath() + "/shaders/imgui/uioverlay.frag.spv", vk::ShaderStageFlagBits::eFragment);
     }
 
     // Vertex bindings an attributes based on ImGui vertex definition
@@ -443,7 +408,7 @@ void UIOverlay::prepareRenderPass() {
     renderPassInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());
     renderPassInfo.pDependencies = subpassDependencies.data();
 
-    renderPass = context.device.createRenderPass(renderPassInfo);
+    renderPass = device.createRenderPass(renderPassInfo);
 }
 
 /** Set the window events callbacks */
@@ -508,7 +473,7 @@ bool UIOverlay::update() {
 
     if (!imDrawData) {
         return false;
-    };
+    }
 
     // Note: Alignment is done inside buffer creation
     vk::DeviceSize vertexBufferSize = imDrawData->TotalVtxCount * sizeof(ImDrawVert);
@@ -578,57 +543,6 @@ void UIOverlay::resize(const vk::Extent2D& size) {
     createInfo.size = size;
 }
 
-bool UIOverlay::header(const char* caption) const {
-    return ImGui::CollapsingHeader(caption, ImGuiTreeNodeFlags_DefaultOpen);
-}
-
-bool UIOverlay::checkBox(const char* caption, bool* value) const {
-    return ImGui::Checkbox(caption, value);
-}
-
-bool UIOverlay::checkBox(const char* caption, int32_t* value) const {
-    bool val = (*value == 1);
-    bool res = ImGui::Checkbox(caption, &val);
-    *value = val;
-    return res;
-}
-
-bool UIOverlay::inputFloat(const char* caption, float* value, float step, uint32_t precision) const {
-    return ImGui::InputFloat(caption, value, step, step * 10.0f);
-}
-
-bool UIOverlay::sliderFloat(const char* caption, float* value, float min, float max) const {
-    return ImGui::SliderFloat(caption, value, min, max);
-}
-
-bool UIOverlay::sliderInt(const char* caption, int32_t* value, int32_t min, int32_t max) const {
-    return ImGui::SliderInt(caption, value, min, max);
-}
-
-bool UIOverlay::comboBox(const char* caption, int32_t* itemindex, const std::vector<std::string>& items) const {
-    if (items.empty()) {
-        return false;
-    }
-    std::vector<const char*> charitems;
-    charitems.reserve(items.size());
-    for (const auto& item : items) {
-        charitems.push_back(item.c_str());
-    }
-    uint32_t itemCount = static_cast<uint32_t>(charitems.size());
-    return ImGui::Combo(caption, itemindex, &charitems[0], itemCount, itemCount);
-}
-
-bool UIOverlay::button(const char* caption) const {
-    return ImGui::Button(caption);
-}
-
-void UIOverlay::text(const char* formatstr, ...) const {
-    va_list args;
-    va_start(args, formatstr);
-    ImGui::TextV(formatstr, args);
-    va_end(args);
-}
-
 void UIOverlay::setStyleColors() {
     // Color scheme
     auto& colors = ImGui::GetStyle().Colors;
@@ -665,10 +579,10 @@ void UIOverlay::setStyleColors() {
 // Register a texture
 // FIXME: This is experimental in the sense that we are unsure how to best design/tackle this problem, please post to https://github.com/ocornut/imgui/pull/914 if you have suggestions.
 vk::DescriptorSet UIOverlay::addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const {
-    vk::DescriptorSet descriptorSet = context.device.allocateDescriptorSets({ descriptorPool, 1, &descriptorSetLayout })[0];
+    vk::DescriptorSet descriptorSet = device.allocateDescriptorSets({ descriptorPool, 1, &descriptorSetLayout })[0];
     vk::DescriptorImageInfo imageInfo { sampler, view, layout };
     vk::WriteDescriptorSet writeDescriptorSet{ descriptorSet, 0, 0, 1, vk::DescriptorType::eCombinedImageSampler, &imageInfo };
-    context.device.updateDescriptorSets(writeDescriptorSet, {});
+    device.updateDescriptorSets(writeDescriptorSet, {});
     return descriptorSet;
 }
 

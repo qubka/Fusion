@@ -45,8 +45,8 @@ namespace vkx { namespace pipelines {
         std::vector<PipelineColorBlendAttachmentState> blendAttachmentStates{ PipelineColorBlendAttachmentState() };
 
         void update() {
-            this->attachmentCount = static_cast<uint32_t>(blendAttachmentStates.size());
-            this->pAttachments = blendAttachmentStates.data();
+            attachmentCount = static_cast<uint32_t>(blendAttachmentStates.size());
+            pAttachments = blendAttachmentStates.data();
         }
     };
 
@@ -56,8 +56,8 @@ namespace vkx { namespace pipelines {
         PipelineDynamicStateCreateInfo() { dynamicStateEnables = { vk::DynamicState::eViewport, vk::DynamicState::eScissor }; }
 
         void update() {
-            this->dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
-            this->pDynamicStates = dynamicStateEnables.data();
+            dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
+            pDynamicStates = dynamicStateEnables.data();
         }
     };
 
@@ -65,7 +65,7 @@ namespace vkx { namespace pipelines {
         std::vector<vk::VertexInputBindingDescription> bindingDescriptions;
         std::vector<vk::VertexInputAttributeDescription> attributeDescriptions;
 
-        void appendVertexLayout(const vkx::model::VertexLayout& vertexLayout, uint32_t binding = 0, vk::VertexInputRate rate = vk::VertexInputRate::eVertex) {
+        void appendVertexLayout(const vkx::VertexLayout& vertexLayout, uint32_t binding = 0, vk::VertexInputRate rate = vk::VertexInputRate::eVertex) {
             bindingDescriptions.emplace_back(binding, vertexLayout.stride(), rate);
             auto componentsSize = vertexLayout.components.size();
             attributeDescriptions.reserve(attributeDescriptions.size() + componentsSize);
@@ -133,7 +133,7 @@ namespace vkx { namespace pipelines {
 
     public:
         GraphicsPipelineBuilder(const vk::Device& device, const vk::PipelineLayout layout, const vk::RenderPass& renderPass)
-            : device(device) {
+            : device{device} {
             pipelineCreateInfo.layout = layout;
             pipelineCreateInfo.renderPass = renderPass;
             init();

@@ -101,7 +101,6 @@ Application::~Application() {
     instance = nullptr;
 
     renderer.destroy();
-
     context.destroy();
 
 #if defined(__ANDROID__)

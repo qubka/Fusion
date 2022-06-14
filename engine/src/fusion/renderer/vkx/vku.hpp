@@ -28,7 +28,7 @@
 #include <functional>
 #include <cstddef>
 
-#include <vulkan/spirv.hpp11>
+#include <vulkan/spirv.hpp>
 #include <vulkan/vulkan.hpp>
 
 namespace vku {
@@ -89,7 +89,7 @@ namespace vku {
             size_t size = file.tellg();
             file.seekg(0);
             bytes.resize(size);
-            file.read((char*)bytes.data(), size);
+            file.read(reinterpret_cast<char*>(bytes.data()), size);
         }
         return bytes;
     }
@@ -610,7 +610,7 @@ namespace vku {
 
             s.opcodes_.resize(static_cast<size_t>(length / 4));
             file.seekg(0, std::ios::beg);
-            file.read((char*)s.opcodes_.data(), s.opcodes_.size() * 4);
+            file.read(reinterpret_cast<char*>(s.opcodes_.data()), s.opcodes_.size() * 4);
 
             vk::ShaderModuleCreateInfo ci;
             ci.codeSize = s.opcodes_.size() * 4;
@@ -680,7 +680,7 @@ namespace vku {
                     }
                 } else if (op == spv::Op::OpName) {
                     int name = s.opcodes_[i + 1];
-                    debugNames[name] = (const char*)&s.opcodes_[i + 2];
+                    debugNames[name] = reinterpret_cast<const char*>(&s.opcodes_[i + 2]);
                 }
             }
 

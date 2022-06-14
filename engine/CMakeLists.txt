@@ -38,6 +38,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     entt
     magic_enum
     plog
+    freetype
     yaml-cpp
     Vulkan::Vulkan
     assimp::assimp

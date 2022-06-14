@@ -2,6 +2,8 @@
 
 using namespace fe;
 
+#include <IconsFontAwesome4.h>
+
 std::vector<std::filesystem::path> fs::walk(const std::filesystem::path& dir, const std::string& filter, const std::vector<std::string>& formats) {
     std::vector<std::filesystem::path> paths;
 
@@ -59,133 +61,111 @@ bool fs::has_directories(const std::filesystem::path& dir) {
     return false;
 }
 
-const char* fs::ICON_FA_FOLDER_CLOSE{ "\uF07B" };
-const char* fs::ICON_FA_FOLDER_OPEN{ "\uF07C" };
-const char* fs::ICON_FA_FOLDER_EMPTY{ "\uF114" };
-const char* fs::ICON_FA_FILE{ "\uF016" };
-const char* fs::ICON_FA_SEARCH{ "\uF002" };
-const char* fs::ICON_FA_REPLY{ "\uF112" };
-const char* fs::ICON_FA_PLAY{ "\uF04B" };
-const char* fs::ICON_FA_STOP{ "\uF04D" };
-const char* fs::ICON_FA_OK{ "\uF00C" };
-const char* fs::ICON_FA_REMOVE{ "\uF00D" };
-const char* fs::ICON_FA_AXIS{ "\uF1E9" };
-const char* fs::ICON_FA_CAMERA{ "\uF030" };
-const char* fs::ICON_FA_CUBE{ "\uF1B2" };
-const char* fs::ICON_FA_CUBES{ "\uF1B3" };
-const char* fs::ICON_FA_MANY_CUBES{ "\uF2B8" };
-const char* fs::ICON_FA_BOUNDS{ "\uF248" };
-const char* fs::ICON_FA_INFO{ "\uF05A" };
-const char* fs::ICON_FA_LIST{ "\uF03A" };
-const char* fs::ICON_FA_STATS{ "\uF1EA" };
-const char* fs::ICON_FA_ARCHIVE{ "\uF187" };
-const char* fs::ICON_FA_STORAGE{ "\uF1C0" };
-const char* fs::ICON_FA_COG{ "\uF013" };
-const char* fs::ICON_FA_COGS{ "\uF085" };
-const char* fs::ICON_FA_LOCK{ "\uF023" };
-const char* fs::ICON_FA_UNLOCK{ "\uF13E" };
-
 std::unordered_map<std::string, std::string> fs::extensions {
-    {".gif", "\uF1C5"},
-    {".jpeg", "\uF1C5"},
-    {".jpg", "\uF1C5"},
-    {".png", "\uF1C5"},
-    {".ktx", "\uF1C5"},
+    {".gif", ICON_FA_FILE_IMAGE_O},
+    {".jpeg", ICON_FA_FILE_IMAGE_O},
+    {".jpg", ICON_FA_FILE_IMAGE_O},
+    {".png", ICON_FA_FILE_IMAGE_O},
+    {".ktx", ICON_FA_FILE_IMAGE_O},
 
-    {".pdf", "\uF1C1"},
+    {".pdf", ICON_FA_FILE_PDF_O},
 
-    {".doc", "\uF1C2"},
-    {".docx", "\uF1C2"},
+    {".doc", ICON_FA_FILE_WORD_O},
+    {".docx", ICON_FA_FILE_WORD_O},
 
-    {".ppt", "\uF1C4"},
-    {".pptx", "\uF1C4"},
+    {".ppt", ICON_FA_FILE_POWERPOINT_O},
+    {".pptx", ICON_FA_FILE_POWERPOINT_O},
 
-    {".xls", "\uF1C3"},
-    {".xlsx", "\uF1C3"},
+    {".xls", ICON_FA_FILE_EXCEL_O},
+    {".xlsx", ICON_FA_FILE_EXCEL_O},
 
-    {".csv", "\uF1C0"},
-    {".db", "\uF1C0"},
+    {".aac", ICON_FA_FILE_AUDIO_O},
+    {".mp3", ICON_FA_FILE_AUDIO_O},
+    {".ogg", ICON_FA_FILE_AUDIO_O},
 
-    {".aac", "\uF1C7"},
-    {".mp3", "\uF1C7"},
-    {".ogg", "\uF1C7"},
+    {".avi", ICON_FA_FILE_VIDEO_O},
+    {".flv", ICON_FA_FILE_VIDEO_O},
+    {".mkv", ICON_FA_FILE_VIDEO_O},
+    {".mp4", ICON_FA_FILE_VIDEO_O},
 
-    {".avi", "\uF1C8"},
-    {".flv", "\uF1C8"},
-    {".mkv", "\uF1C8"},
-    {".mp4", "\uF1C8"},
+    {".gz", ICON_FA_FILE_ARCHIVE_O},
+    {".zip", ICON_FA_FILE_ARCHIVE_O},
+    {".7z", ICON_FA_FILE_ARCHIVE_O},
+    {".tar", ICON_FA_FILE_ARCHIVE_O},
+    {".tar.bz2", ICON_FA_FILE_ARCHIVE_O},
+    {".tar.Z", ICON_FA_FILE_ARCHIVE_O},
+    {".tar.gz", ICON_FA_FILE_ARCHIVE_O},
+    {".tar.lz4", ICON_FA_FILE_ARCHIVE_O},
+    {".tar.lz", ICON_FA_FILE_ARCHIVE_O},
+    {".tar.lzma", ICON_FA_FILE_ARCHIVE_O},
+    {".tar.xz", ICON_FA_FILE_ARCHIVE_O},
+    {".tar.zst", ICON_FA_FILE_ARCHIVE_O},
 
-    {".gz", "\uF1C6"},
-    {".zip", "\uF1C6"},
-    {".7z", "\uF1C6"},
-    {".tar", "\uF1C6"},
-    {".tar.bz2", "\uF1C6"},
-    {".tar.Z", "\uF1C6"},
-    {".tar.gz", "\uF1C6"},
-    {".tar.lz4", "\uF1C6"},
-    {".tar.lz", "\uF1C6"},
-    {".tar.lzma", "\uF1C6"},
-    {".tar.xz", "\uF1C6"},
-    {".tar.zst", "\uF1C6"},
+    {".fbx", ICON_FA_CODEPEN},
+    {".dae", ICON_FA_CODEPEN},
+    {".gltf", ICON_FA_CODEPEN},
+    {".glb", ICON_FA_CODEPEN},
+    {".blend", ICON_FA_CODEPEN},
+    {".3ds", ICON_FA_CODEPEN},
+    {".ase", ICON_FA_CODEPEN},
+    {".obj", ICON_FA_CODEPEN},
+    {".ifc", ICON_FA_CODEPEN},
+    {".xgl", ICON_FA_CODEPEN},
+    {".zgl", ICON_FA_CODEPEN},
+    {".ply", ICON_FA_CODEPEN},
+    {".dxf", ICON_FA_CODEPEN},
+    {".lwo", ICON_FA_CODEPEN},
+    {".lws", ICON_FA_CODEPEN},
+    {".lxo", ICON_FA_CODEPEN},
+    {".stl", ICON_FA_CODEPEN},
+    {".x", ICON_FA_CODEPEN},
+    {".ac", ICON_FA_CODEPEN},
+    {".ms3d", ICON_FA_CODEPEN},
+    {".cob", ICON_FA_CODEPEN},
+    {".scn", ICON_FA_CODEPEN},
+    {".bvh", ICON_FA_CODEPEN},
+    {".csm", ICON_FA_CODEPEN},
+    {".irrmesh", ICON_FA_CODEPEN},
+    {".irr", ICON_FA_CODEPEN},
+    {".mdl", ICON_FA_CODEPEN},
+    {".md2", ICON_FA_CODEPEN},
+    {".md3", ICON_FA_CODEPEN},
+    {".pk3", ICON_FA_CODEPEN},
+    {".mdc", ICON_FA_CODEPEN},
+    {".md5*", ICON_FA_CODEPEN},
+    {".smd", ICON_FA_CODEPEN},
+    {".vta", ICON_FA_CODEPEN},
+    {".ogex", ICON_FA_CODEPEN},
+    {".3d", ICON_FA_CODEPEN},
+    {".b3d", ICON_FA_CODEPEN},
+    {".q3d", ICON_FA_CODEPEN},
+    {".q3s", ICON_FA_CODEPEN},
+    {".nff", ICON_FA_CODEPEN},
+    {".off", ICON_FA_CODEPEN},
+    {".raw", ICON_FA_CODEPEN},
+    {".ter", ICON_FA_CODEPEN},
+    {".hmp", ICON_FA_CODEPEN},
+    {".ndo", ICON_FA_CODEPEN},
 
-    {".css", "\uF1C9"},
-    {".html", "\uF1C9"},
-    {".js", "\uF1C9"},
-    {".xml", "\uF1C9"},
+    {".txt", ICON_FA_FILE_TEXT_O},
 
-    {".yaml", "\uF1D4"},
+    {".cpp", ICON_FA_FILE_CODE_O},
+    {".c", ICON_FA_FILE_CODE_O},
+    {".cs", ICON_FA_FILE_CODE_O},
+    {".md", ICON_FA_FILE_CODE_O},
+    {".css", ICON_FA_FILE_CODE_O},
+    {".html", ICON_FA_FILE_CODE_O},
+    {".js", ICON_FA_FILE_CODE_O},
+    {".xml", ICON_FA_FILE_CODE_O},
+    {".ini", ICON_FA_FILE_CODE_O},
+    {".json", ICON_FA_FILE_CODE_O},
+    {".yaml", ICON_FA_FILE_CODE_O},
+    {".csv", ICON_FA_FILE_CODE_O},
 
-    {".fbx", "\uF1CB"},
-    {".dae", "\uF1CB"},
-    {".gltf", "\uF1CB"},
-    {".glb", "\uF1CB"},
-    {".blend", "\uF1CB"},
-    {".3ds", "\uF1CB"},
-    {".ase", "\uF1CB"},
-    {".obj", "\uF1CB"},
-    {".ifc", "\uF1CB"},
-    {".xgl", "\uF1CB"},
-    {".zgl", "\uF1CB"},
-    {".ply", "\uF1CB"},
-    {".dxf", "\uF1CB"},
-    {".lwo", "\uF1CB"},
-    {".lws", "\uF1CB"},
-    {".lxo", "\uF1CB"},
-    {".stl", "\uF1CB"},
-    {".x", "\uF1CB"},
-    {".ac", "\uF1CB"},
-    {".ms3d", "\uF1CB"},
-    {".cob", "\uF1CB"},
-    {".scn", "\uF1CB"},
-    {".bvh", "\uF1CB"},
-    {".csm", "\uF1CB"},
-    {".irrmesh", "\uF1CB"},
-    {".irr", "\uF1CB"},
-    {".mdl", "\uF1CB"},
-    {".md2", "\uF1CB"},
-    {".md3", "\uF1CB"},
-    {".pk3", "\uF1CB"},
-    {".mdc", "\uF1CB"},
-    {".md5*", "\uF1CB"},
-    {".smd", "\uF1CB"},
-    {".vta", "\uF1CB"},
-    {".ogex", "\uF1CB"},
-    {".3d", "\uF1CB"},
-    {".b3d", "\uF1CB"},
-    {".q3d", "\uF1CB"},
-    {".q3s", "\uF1CB"},
-    {".nff", "\uF1CB"},
-    {".off", "\uF1CB"},
-    {".raw", "\uF1CB"},
-    {".ter", "\uF1CB"},
-    {".hmp", "\uF1CB"},
-    {".ndo", "\uF1CB"},
-
-    {".txt", "\uF016"},
-    {".md", "\uF016"}
+    {".db", ICON_FA_DATABASE},
 };
 
 std::string fs::extension_icon(const std::filesystem::path& file) {
     auto key { fs::extensions.find(file.extension()) };
-    return key != fs::extensions.end() ? key->second.c_str() : fs::ICON_FA_FILE;
+    return key != fs::extensions.end() ? key->second.c_str() : ICON_FA_FILE;
 }

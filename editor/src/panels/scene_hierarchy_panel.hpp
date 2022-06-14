@@ -18,12 +18,19 @@ namespace fe {
     private:
         void drawEntities();
         void drawComponents(entt::entity entity);
-        template<typename T>
-        void drawComponent(const std::string& label, entt::entity entity, std::function<void(T& comp)>&& function);
-        bool drawFileBrowser(const std::string& label, std::string& value, const std::vector<std::string>& formats, float columnWidth = 120.0f);
-        static bool drawVec2Control(const std::string& label, glm::vec2& values, float resetValue = 0.0f, float columnWidth = 120.0f);
-        static bool drawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 120.0f);
-        static bool drawValueControl(const std::string& label, std::function<bool()>&& function, float columnWidth = 120.0f);
+        template<typename Component>
+        void drawComponent(const std::string& label, entt::entity entity, std::function<void(Component&)>&& function);
+        template<typename Component>
+        void drawComponentMenuItem(const std::string& label, entt::entity entity);
+
+        bool drawFileBrowser(const std::string& label, std::string& value, const std::vector<std::string>& formats, float columnWidth = 150.0f);
+        static bool drawVec2Control(const std::string& label, glm::vec2& values, float minValue = 0.0f, float maxValue = 0.0f, float resetValue = 0.0f, float columnWidth = 150.0f);
+        static bool drawVec3Control(const std::string& label, glm::vec3& values, float minValue = 0.0f, float maxValue = 0.0f, float resetValue = 0.0f, float columnWidth = 150.0f);
+        static bool drawValueControl(const std::string& label, std::function<bool()>&& function, float columnWidth = 150.0f);
+        template<typename Enum>
+        static bool drawEnumControl(const std::string& label, Enum& value, float columnWidth = 150.0f);
+
+        enum ComponentMode { None, MoveUp, MoveDown, Reset, Remove, Copy, Paste };
 
     private:
         std::shared_ptr<Scene> context;

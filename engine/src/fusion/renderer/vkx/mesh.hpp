@@ -21,9 +21,23 @@ namespace vkx {
         };
 
         /** @brief Generate mesh from list of vertices and indices */
-        void loadFromBuffer(const Context& context, const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer = {});
+        void loadFromBuffer(const Context& context, const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer = {}) {
+            vertexCount = static_cast<uint32_t>(vertexBuffer.size());
+            assert(vertexCount >= 3 && "Vertex count must be at least 3");
+
+            // Vertex buffer
+            vertices = context.stageToDeviceBuffer<Vertex>(vk::BufferUsageFlagBits::eVertexBuffer, vertexBuffer);
+
+            indexCount = static_cast<uint32_t>(indexBuffer.size());
+
+            // Index buffer
+            indices = indexCount > 0 ? context.stageToDeviceBuffer<uint32_t>(vk::BufferUsageFlagBits::eIndexBuffer, indexBuffer) : Buffer{};
+        }
 
         /** @brief Release all Vulkan resources of this mesh */
-        void destroy();
+        void destroy() {
+            vertices.destroy();
+            indices.destroy();
+        }
     };
 }

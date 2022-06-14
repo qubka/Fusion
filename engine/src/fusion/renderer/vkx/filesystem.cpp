@@ -9,7 +9,6 @@
 #include "storage.hpp"
 
 namespace vkx { namespace file {
-
     void withBinaryFileContents(const std::string& filename, std::function<void(size_t size, const void* data)> handler) {
         withBinaryFileContents(filename, [&](const char* filename, size_t size, const void* data) { handler(size, data); });
     }

@@ -32,6 +32,7 @@ namespace fe {
 
         void onScenePlay();
         void onSceneStop();
+        void onViewportResize();
 
         void UI_Toolbar();
 
@@ -45,12 +46,13 @@ namespace fe {
         SceneHierarchyPanel sceneHierarchyPanel{ contentBrowserPanel };
 
         int gizmoType{ -1 };
-        enum class SceneState { Edit = 0, Play = 1 };
-        SceneState sceneState = SceneState::Edit;
+        enum SceneState { Edit = 0, Play = 1 };
+        SceneState sceneState{ Edit };
 
-        glm::vec2 viewportSize;
-        bool viewportFocused;
-        bool viewportHovered;
+        glm::vec2 viewportSize{ -1.0f };
+        glm::mat4 viewportOrtho{ 1.0f };
+        bool viewportFocused{ false };
+        bool viewportHovered{ false };
 
         EditorApp& context;
     };

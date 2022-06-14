@@ -11,7 +11,7 @@
 #include "vkx/offscreen.hpp"
 #include "vkx/ui.hpp"
 
-#include "systems/model_renderer.hpp"
+#include "systems/mesh_renderer.hpp"
 #include "systems/grid_renderer.hpp"
 
 namespace fe {
@@ -46,7 +46,7 @@ namespace fe {
 
         vkx::Offscreen& getOffscreen() { return offscreen; }
         vkx::SwapChain& getSwapChain() { return swapChain; }
-        vkx::ui::UIOverlay& getGUI() { return gui; }
+        vkx::UIOverlay& getGUI() { return gui; }
 
         uint32_t getFrameIndex() const { return currentFrame; }
         bool isFrameInProgress() const { return frameStarted; }
@@ -66,7 +66,7 @@ namespace fe {
 
         vkx::Offscreen offscreen{ context };
         vkx::SwapChain swapChain{ context };
-        vkx::ui::UIOverlay gui{ context };
+        vkx::UIOverlay gui{ context };
 
         vk::CommandPool commandPool;
         std::vector<vk::CommandBuffer> commandBuffers;
@@ -83,7 +83,7 @@ namespace fe {
         glm::vec3 color{0.7f, 0.85f, 1.0f};
         glm::vec3 lightDirection{1, -3, -1};
 
-        ModelRenderer* modelRenderer;
+        MeshRenderer* meshRenderer;
         GridRenderer* gridRenderer;
 
         uint32_t currentImage{ 0 };

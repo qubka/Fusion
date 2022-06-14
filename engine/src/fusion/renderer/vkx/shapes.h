@@ -18,7 +18,6 @@
 #include "glm/glm/glm.hpp"
 
 namespace vkx { namespace geometry {
-
     using Index = uint32_t;
     using Vec = glm::vec3;
     using VertexVector = std::vector<Vec>;

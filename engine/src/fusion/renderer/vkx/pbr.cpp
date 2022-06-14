@@ -12,7 +12,7 @@
 using namespace fe;
 
 // Generate a BRDF integration map used as a look-up-table (stores roughness / NdotV)
-void vkx::pbr::generateBRDFLUT(const vkx::Context& context, vkx::texture::Texture2D& target) {
+void vkx::pbr::generateBRDFLUT(const vkx::Context& context, vkx::Texture2D& target) {
     auto tStart = std::chrono::high_resolution_clock::now();
 
     const vk::Format format = vk::Format::eR16G16Sfloat;  // R16G16 is supported pretty much everywhere
@@ -170,9 +170,9 @@ void vkx::pbr::generateBRDFLUT(const vkx::Context& context, vkx::texture::Textur
 
 // Generate an irradiance cube map from the environment cube map
 void vkx::pbr::generateIrradianceCube(const vkx::Context& context,
-                                      vkx::texture::Texture& target,
-                                      const vkx::model::Model& skybox,
-                                      const vkx::model::VertexLayout& vertexLayout,
+                                      vkx::Texture& target,
+                                      const vkx::Model& skybox,
+                                      const vkx::VertexLayout& vertexLayout,
                                       const vk::DescriptorImageInfo& skyboxDescriptor) {
     auto tStart = std::chrono::high_resolution_clock::now();
 
@@ -445,9 +445,9 @@ void vkx::pbr::generateIrradianceCube(const vkx::Context& context,
 // Prefilter environment cubemap
 // See https://placeholderart.wordpress.com/2015/07/28/implementation-notes-runtime-environment-map-filtering-for-image-based-lighting/
 void vkx::pbr::generatePrefilteredCube(const vkx::Context& context,
-                                       vkx::texture::Texture& target,
-                                       const vkx::model::Model& skybox,
-                                       const vkx::model::VertexLayout& vertexLayout,
+                                       vkx::Texture& target,
+                                       const vkx::Model& skybox,
+                                       const vkx::VertexLayout& vertexLayout,
                                        const vk::DescriptorImageInfo& skyboxDescriptor) {
     auto tStart = std::chrono::high_resolution_clock::now();
 

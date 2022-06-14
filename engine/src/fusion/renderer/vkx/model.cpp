@@ -16,7 +16,6 @@
 #include <assimp/material.h>
 
 using namespace vkx;
-using namespace vkx::model;
 using namespace std::string_literals;
 
 const int Model::defaultFlags = aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals;

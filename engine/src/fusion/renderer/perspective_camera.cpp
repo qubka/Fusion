@@ -14,15 +14,6 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float 
     updateView();
 }
 
-void PerspectiveCamera::setViewport(const glm::vec2& size) {
-    if (viewportWidth == size.x && viewportHeight == size.y)
-        return;
-
-    viewportWidth = size.x;
-    viewportHeight = size.y;
-    setAspect(viewportWidth / viewportHeight);
-}
-
 void PerspectiveCamera::setPerspective(float fov, float aspectRatio, float nearClip, float farClip) {
     fovy = fov;
     aspect = aspectRatio;

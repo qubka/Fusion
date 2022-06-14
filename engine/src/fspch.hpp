@@ -44,6 +44,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include <magic_enum.hpp>
+namespace me = magic_enum;
 
 #if defined(__ANDROID__)
 #include <android/native_activity.h>

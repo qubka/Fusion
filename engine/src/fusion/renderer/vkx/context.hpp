@@ -87,7 +87,7 @@ namespace vkx {
     using FencedLambda = std::pair<vk::Fence, VoidLambda>;
     using FencedLambdaQueue = std::queue<FencedLambda>;
 
-    struct Context {
+    class Context {
     private:
         static CStringVector toCStrings(const StringList& values) {
             CStringVector result;
@@ -119,6 +119,10 @@ namespace vkx {
         }
 
     public:
+        Context() = default;
+        ~Context() = default;
+        FE_NONCOPYABLE(Context);
+
         // Create application wide Vulkan instance
         static std::set<std::string> getAvailableLayers() {
             std::set<std::string> result;

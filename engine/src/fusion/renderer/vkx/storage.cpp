@@ -21,7 +21,7 @@
 namespace vkx { namespace storage {
 
     #if defined(__ANDROID__)
-    AAssetManager* assetManager = nullptr;
+    AAssetManager* assetManager{ nullptr };
     void setAssetManager(AAssetManager* assetManager) {
         vkx::storage::assetManager = assetManager;
     }

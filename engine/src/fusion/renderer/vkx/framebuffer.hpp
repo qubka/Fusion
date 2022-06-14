@@ -46,8 +46,8 @@ namespace vkx {
                     const vk::RenderPass& renderPass,
                     vk::ImageUsageFlags colorUsage = vk::ImageUsageFlagBits::eSampled,
                     vk::ImageUsageFlags depthUsage = vk::ImageUsageFlags()) {
-            device = context.device;
             destroy();
+            device = context.device;
 
             colors.resize(colorFormats.size());
 

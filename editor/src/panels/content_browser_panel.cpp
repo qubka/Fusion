@@ -1,12 +1,13 @@
 #include "content_browser_panel.hpp"
 
 #include <imgui/imgui.h>
+#include <IconsFontAwesome4.h>
 
 using namespace fe;
 using namespace std::string_literals;
 
 void ContentBrowserPanel::onImGui() {
-    ImGui::Begin((fs::ICON_FA_ARCHIVE + "  Content Browser"s).c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    ImGui::Begin((ICON_FA_ARCHIVE + "  Content Browser"s).c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     drawFileExplorer();
     drawContentBrowser();
@@ -15,34 +16,37 @@ void ContentBrowserPanel::onImGui() {
 }
 
 void ContentBrowserPanel::drawFileExplorer() {
-    ImGui::BeginChild((fs::ICON_FA_ARCHIVE + "  Project"s).c_str(), { ImGui::GetContentRegionAvail().x / 6.0f, 0 }, true);
+    ImGui::BeginChild("ProjectHierarchy", { ImGui::GetContentRegionAvail().x / 6.0f, 0 }, true);
 
-    std::function<void(const std::filesystem::path&)> function = [&](const std::filesystem::path& dir) {
+    std::function<void(const std::function<void(const std::filesystem::path&)>&, const std::filesystem::path&)> fileNode = [&](const std::function<void(const std::filesystem::path&)>& function, const std::filesystem::path& file) {
+        bool filled = fs::has_directories(file);
+        ImGuiTreeNodeFlags flags = ((currentDirectory == file) ? ImGuiTreeNodeFlags_Selected : 0) |
+                                   (filled ? (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick) : ImGuiTreeNodeFlags_Leaf)
+                                   | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
+
+        bool opened = ImGui::TreeNodeEx(file.c_str(), flags, "");
+        if (ImGui::IsItemClicked() || ImGui::IsItemFocused()) {
+            currentDirectory = file;
+        }
+
+        ImGui::SameLine();
+        ImGui::Text("%s %s", opened && filled ? ICON_FA_FOLDER_OPEN : ICON_FA_FOLDER, file.filename().c_str());
+
+        if (opened) {
+            function(file);
+            ImGui::TreePop();
+        }
+    };
+
+    std::function<void(const std::filesystem::path&)> directoryTree = [&](const std::filesystem::path& dir) {
         for (const auto& file : fs::walk(dir)) {
             if (is_directory(file)) {
-                bool filled = fs::has_directories(file);
-
-                ImGuiTreeNodeFlags flags = ((currentDirectory == file) ? ImGuiTreeNodeFlags_Selected : 0) |
-                                           (filled ? (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick) : ImGuiTreeNodeFlags_Leaf)
-                                           | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
-
-                bool opened = ImGui::TreeNodeEx(file.c_str(), flags, "");
-                if (ImGui::IsItemClicked() || ImGui::IsItemFocused()) {
-                    selectDirectory(file);
-                }
-
-                ImGui::SameLine();
-                ImGui::Text("%s %s", opened && filled ? fs::ICON_FA_FOLDER_OPEN : fs::ICON_FA_FOLDER_CLOSE, file.filename().c_str());
-
-                if (opened) {
-                    function(file);
-                    ImGui::TreePop();
-                }
+                fileNode(directoryTree, file);
             }
         }
     };
 
-    function(getAssetPath());
+    fileNode(directoryTree, getAssetPath());
 
     ImGui::EndChild();
 }
@@ -52,12 +56,12 @@ void ContentBrowserPanel::drawContentBrowser() {
     ImGui::BeginChild("ContentPanel", { 0, 0 }, true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     if (currentDirectory != getAssetPath()) {
-        if (ImGui::Button(fs::ICON_FA_REPLY))
-            selectDirectory(currentDirectory.parent_path());
+        if (ImGui::Button(ICON_FA_BACKWARD))
+            currentDirectory = currentDirectory.parent_path();
         ImGui::SameLine();
     }
 
-    ImGui::TextUnformatted(fs::ICON_FA_SEARCH);
+    ImGui::TextUnformatted(ICON_FA_SEARCH);
     ImGui::SameLine();
 
     static char buffer[256];
@@ -74,8 +78,8 @@ void ContentBrowserPanel::drawContentBrowser() {
     ImGui::BeginChild("ContentBrowser", { 0, contentRegionAvail.y - ImGui::GetFontSize() * 1.5f });
 
     static int padding = 16;
-    float thumbnailSize = padding * 4.0f;
-    float cellSize = thumbnailSize + padding;
+    float thumbnailSize = static_cast<float>(padding) * 4.0f;
+    float cellSize = thumbnailSize + static_cast<float>(padding);
 
     int columnCount = static_cast<int>(contentRegionAvail.x / cellSize);
     if (columnCount < 1)
@@ -83,9 +87,7 @@ void ContentBrowserPanel::drawContentBrowser() {
 
     ImGui::Columns(columnCount, nullptr, false);
 
-    bool updateFiles = false;
-
-    for (const auto& file : (filter.empty() ? currentFiles : cachedFiles)) {
+    for (const auto& file : (filter.empty() ? fs::walk(currentDirectory) : cachedFiles)) {
         ImGui::PushID(file.c_str());
 
         if (currentFile == file)
@@ -97,7 +99,7 @@ void ContentBrowserPanel::drawContentBrowser() {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.15f, 0.15f, 0.15f, 1.0f });
 
         if (is_directory(file)) {
-            ImGui::Button(fs::ICON_FA_FOLDER_CLOSE, { thumbnailSize, thumbnailSize });
+            ImGui::Button(ICON_FA_FOLDER, { thumbnailSize, thumbnailSize });
         } else {
             ImGui::Button(fs::extension_icon(file).c_str(), { thumbnailSize, thumbnailSize });
         }
@@ -116,7 +118,6 @@ void ContentBrowserPanel::drawContentBrowser() {
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 if (is_directory(file)) {
                     currentDirectory /= filename;
-                    updateFiles = true;
                 }
             } else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
                 currentFile = file;
@@ -130,9 +131,6 @@ void ContentBrowserPanel::drawContentBrowser() {
         ImGui::PopID();
     }
 
-    if (updateFiles)
-        currentFiles = fs::walk(currentDirectory);
-
     ImGui::Columns(1);
 
     if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
@@ -145,6 +143,8 @@ void ContentBrowserPanel::drawContentBrowser() {
     if (!currentFile.empty()) {
         std::string title{ fs::extension_icon(currentFile) + " " + currentFile.string() };
         ImGui::TextUnformatted(title.c_str());
+    } else {
+        ImGui::TextUnformatted("");
     }
 
     ImGui::SameLine(contentRegionAvail.x - 150.0f);
@@ -155,14 +155,4 @@ void ContentBrowserPanel::drawContentBrowser() {
     ImGui::NewLine();
 
     ImGui::EndChild();
-}
-
-void ContentBrowserPanel::selectFile(const std::filesystem::path& file) {
-    selectDirectory(file.parent_path());
-    currentFile = file;
-}
-
-void ContentBrowserPanel::selectDirectory(const std::filesystem::path& dir) {
-    currentDirectory = dir;
-    currentFiles = fs::walk(dir);
 }

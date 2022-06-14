@@ -1,5 +1,6 @@
 #include "scene_serializer.hpp"
 #include "scene.hpp"
+#include "components.hpp"
 
 #include <yaml-cpp/yaml.h>
 
@@ -27,6 +28,48 @@ namespace YAML {
     };
 
     template<>
+    struct convert<glm::ivec2>
+    {
+        static Node encode(const glm::ivec2& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::ivec2& rhs) {
+            if (!node.IsSequence() || node.size() != 2)
+                return false;
+
+            rhs.x = node[0].as<int>();
+            rhs.y = node[1].as<int>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<glm::bvec2>
+    {
+        static Node encode(const glm::bvec2& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::bvec2& rhs) {
+            if (!node.IsSequence() || node.size() != 2)
+                return false;
+
+            rhs.x = node[0].as<bool>();
+            rhs.y = node[1].as<bool>();
+            return true;
+        }
+    };
+
+    template<>
     struct convert<glm::vec3>
     {
         static Node encode(const glm::vec3& rhs) {
@@ -45,6 +88,52 @@ namespace YAML {
             rhs.x = node[0].as<float>();
             rhs.y = node[1].as<float>();
             rhs.z = node[2].as<float>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<glm::ivec3>
+    {
+        static Node encode(const glm::ivec3& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::ivec3& rhs) {
+            if (!node.IsSequence() || node.size() != 3)
+                return false;
+
+            rhs.x = node[0].as<int>();
+            rhs.y = node[1].as<int>();
+            rhs.z = node[2].as<int>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<glm::bvec3>
+    {
+        static Node encode(const glm::bvec3& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::bvec3& rhs) {
+            if (!node.IsSequence() || node.size() != 3)
+                return false;
+
+            rhs.x = node[0].as<bool>();
+            rhs.y = node[1].as<bool>();
+            rhs.z = node[2].as<bool>();
             return true;
         }
     };
@@ -75,6 +164,56 @@ namespace YAML {
     };
 
     template<>
+    struct convert<glm::ivec4>
+    {
+        static Node encode(const glm::ivec4& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.push_back(rhs.w);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::ivec4& rhs) {
+            if (!node.IsSequence() || node.size() != 4)
+                return false;
+
+            rhs.x = node[0].as<int>();
+            rhs.y = node[1].as<int>();
+            rhs.z = node[2].as<int>();
+            rhs.w = node[3].as<int>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<glm::bvec4>
+    {
+        static Node encode(const glm::bvec4& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.push_back(rhs.w);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::bvec4& rhs) {
+            if (!node.IsSequence() || node.size() != 4)
+                return false;
+
+            rhs.x = node[0].as<bool>();
+            rhs.y = node[1].as<bool>();
+            rhs.z = node[2].as<bool>();
+            rhs.w = node[3].as<bool>();
+            return true;
+        }
+    };
+
+    template<>
     struct convert<glm::quat>
     {
         static Node encode(const glm::quat& rhs) {
@@ -100,6 +239,38 @@ namespace YAML {
     };
 
     template<>
+    struct convert<glm::mat4>
+    {
+        static Node encode(const glm::mat4& rhs) {
+            Node node;
+            for (int i = 0; i < 4; i++) {
+                auto& col = rhs[i];
+                node.push_back(col.x);
+                node.push_back(col.y);
+                node.push_back(col.z);
+                node.push_back(col.w);
+            }
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::mat4& rhs) {
+            if (!node.IsSequence() || node.size() != 16)
+                return false;
+
+            for (int i = 0, j = 0; i < 4; i++, j+=4) {
+                rhs[i] = {
+                    node[j+0].as<float>(),
+                    node[j+1].as<float>(),
+                    node[j+2].as<float>(),
+                    node[j+3].as<float>()
+                };
+            }
+            return true;
+        }
+    };
+
+    template<>
     struct convert<entt::entity>
     {
         static Node encode(const entt::entity& rhs) {
@@ -110,31 +281,6 @@ namespace YAML {
             if (node.IsNull())
                 return false;
             rhs = static_cast<entt::entity>(node.as<int>());
-            return true;
-        }
-    };
-
-    /* other */
-
-    template<>
-    struct convert<glm::bvec3>
-    {
-        static Node encode(const glm::bvec3& rhs) {
-            Node node;
-            node.push_back(rhs.x);
-            node.push_back(rhs.y);
-            node.push_back(rhs.z);
-            node.SetStyle(EmitterStyle::Flow);
-            return node;
-        }
-
-        static bool decode(const Node& node, glm::bvec3& rhs) {
-            if (!node.IsSequence() || node.size() != 3)
-                return false;
-
-            rhs.x = node[0].as<bool>();
-            rhs.y = node[1].as<bool>();
-            rhs.z = node[2].as<bool>();
             return true;
         }
     };
@@ -181,24 +327,24 @@ SceneSerializer::SceneSerializer(const std::shared_ptr<Scene>& scene) : scene{sc
 
 }
 
-void SceneSerializer::serialize(const std::string& filepath) {
+void SceneSerializer::serialize(const std::string& filename) {
     YAML::Emitter out;
     out << YAML::BeginMap;
     out << YAML::Key << "Scene" << YAML::Value << "Untitled";
     out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
-    scene->world.each([&](const auto entity) {
+    scene->registry.each([&](const auto entity) {
         out << YAML::BeginMap; // Entity
         out << YAML::Key << "Entity" << YAML::Value << entity;
 
-        if (auto component = scene->world.try_get<TagComponent>(entity)) {
+        if (auto component = scene->registry.try_get<TagComponent>(entity)) {
             out << YAML::Key << "TagComponent";
             out << YAML::BeginMap; // TagComponent
             out << YAML::Key << "tag" << YAML::Value << component->tag;
             out << YAML::EndMap; // TagComponent
         }
 
-        if (auto component = scene->world.try_get<TransformComponent>(entity)) {
+        if (auto component = scene->registry.try_get<TransformComponent>(entity)) {
             out << YAML::Key << "TransformComponent";
             out << YAML::BeginMap; // TransformComponent
 
@@ -209,7 +355,7 @@ void SceneSerializer::serialize(const std::string& filepath) {
             out << YAML::EndMap; // TransformComponent
         }
 
-        if (auto component = scene->world.try_get<RelationshipComponent>(entity)) {
+        if (auto component = scene->registry.try_get<RelationshipComponent>(entity)) {
             out << YAML::Key << "RelationshipComponent";
             out << YAML::BeginMap; // RelationshipComponent
 
@@ -222,7 +368,7 @@ void SceneSerializer::serialize(const std::string& filepath) {
             out << YAML::EndMap; // RelationshipComponent
         }
 
-        if (auto component = scene->world.try_get<CameraComponent>(entity)) {
+        if (auto component = scene->registry.try_get<CameraComponent>(entity)) {
             out << YAML::Key << "CameraComponent";
             out << YAML::BeginMap; // CameraComponent
 
@@ -230,7 +376,7 @@ void SceneSerializer::serialize(const std::string& filepath) {
 
             out << YAML::Key << "Camera" << YAML::Value;
             out << YAML::BeginMap; // Camera
-            out << YAML::Key << "projectionType" << YAML::Value << magic_enum::enum_integer(camera.getProjectionType());
+            out << YAML::Key << "projectionType" << YAML::Value << me::enum_index(camera.getProjectionType()).value_or(0);
             out << YAML::Key << "perspectiveFOV" << YAML::Value << camera.getPerspectiveVerticalFOV();
             out << YAML::Key << "perspectiveNear" << YAML::Value << camera.getPerspectiveNearClip();
             out << YAML::Key << "perspectiveFar" << YAML::Value << camera.getPerspectiveFarClip();
@@ -245,9 +391,9 @@ void SceneSerializer::serialize(const std::string& filepath) {
             out << YAML::EndMap; // CameraComponent
         }
 
-        if (auto component = scene->world.try_get<ModelComponent>(entity)) {
-            out << YAML::Key << "ModelComponent";
-            out << YAML::BeginMap; // ModelComponent
+        if (auto component = scene->registry.try_get<MeshComponent>(entity)) {
+            out << YAML::Key << "MeshComponent";
+            out << YAML::BeginMap; // MeshComponent
 
             out << YAML::Key << "path" << YAML::Value << component->path;
             //out << YAML::Key << "layout" << YAML::Value << component->layout;
@@ -255,14 +401,14 @@ void SceneSerializer::serialize(const std::string& filepath) {
             out << YAML::Key << "center" << YAML::Value << component->center;
             out << YAML::Key << "uvscale" << YAML::Value << component->uvscale;
 
-            out << YAML::EndMap; // ModelComponent
+            out << YAML::EndMap; // MeshComponent
         }
 
-        if (auto component = scene->world.try_get<RigidbodyComponent>(entity)) {
+        if (auto component = scene->registry.try_get<RigidbodyComponent>(entity)) {
             out << YAML::Key << "RigidbodyComponent";
             out << YAML::BeginMap; // RigidbodyComponent
 
-            out << YAML::Key << "type" << YAML::Value << magic_enum::enum_integer(component->type);
+            out << YAML::Key << "type" << YAML::Value << me::enum_index(component->type).value_or(0);
             out << YAML::Key << "mass" << YAML::Value << component->mass;
             out << YAML::Key << "linearDrag" << YAML::Value << component->linearDrag;
             out << YAML::Key << "angularDrag" << YAML::Value << component->angularDrag;
@@ -274,23 +420,55 @@ void SceneSerializer::serialize(const std::string& filepath) {
             out << YAML::EndMap; // RigidbodyComponent
         }
 
-        if (auto component = scene->world.try_get<BoxColliderComponent>(entity)) {
+        if (auto component = scene->registry.try_get<BoxColliderComponent>(entity)) {
             out << YAML::Key << "BoxColliderComponent";
             out << YAML::BeginMap; // BoxColliderComponent
 
-            out << YAML::Key << "center" << YAML::Value << component->center;
-            out << YAML::Key << "size" << YAML::Value << component->size;
+            out << YAML::Key << "extent" << YAML::Value << component->extent;
             out << YAML::Key << "trigger" << YAML::Value << component->trigger;
 
             out << YAML::EndMap; // BoxColliderComponent
         }
 
-        if (auto component = scene->world.try_get<PhysicsMaterialComponent>(entity)) {
+        if (auto component = scene->registry.try_get<SphereColliderComponent>(entity)) {
+            out << YAML::Key << "SphereColliderComponent";
+            out << YAML::BeginMap; // SphereColliderComponent
+
+            out << YAML::Key << "radius" << YAML::Value << component->radius;
+            out << YAML::Key << "trigger" << YAML::Value << component->trigger;
+
+            out << YAML::EndMap; // SphereColliderComponent
+        }
+
+        if (auto component = scene->registry.try_get<CapsuleColliderComponent>(entity)) {
+            out << YAML::Key << "CapsuleColliderComponent";
+            out << YAML::BeginMap; // CapsuleColliderComponent
+
+            out << YAML::Key << "radius" << YAML::Value << component->radius;
+            out << YAML::Key << "height" << YAML::Value << component->height;
+            out << YAML::Key << "trigger" << YAML::Value << component->trigger;
+
+            out << YAML::EndMap; // CapsuleColliderComponent
+        }
+
+        if (auto component = scene->registry.try_get<PlaneColliderComponent>(entity)) {
+            out << YAML::Key << "PlaneColliderComponent";
+            out << YAML::BeginMap; // PlaneColliderComponent
+
+            out << YAML::Key << "trigger" << YAML::Value << component->trigger;
+
+            out << YAML::EndMap; // PlaneColliderComponent
+        }
+
+        if (auto component = scene->registry.try_get<PhysicsMaterialComponent>(entity)) {
             out << YAML::Key << "PhysicsMaterialComponent";
             out << YAML::BeginMap; // PhysicsMaterialComponent
 
-            out << YAML::Key << "friction" << YAML::Value << component->friction;
+            out << YAML::Key << "dynamicFriction" << YAML::Value << component->dynamicFriction;
+            out << YAML::Key << "staticFriction" << YAML::Value << component->staticFriction;
             out << YAML::Key << "restitution" << YAML::Value << component->restitution;
+            out << YAML::Key << "frictionCombine" << YAML::Value << me::enum_index(component->frictionCombine).value_or(0);
+            out << YAML::Key << "restitutionCombine" << YAML::Value << me::enum_index(component->restitutionCombine).value_or(0);
 
             out << YAML::EndMap; // PhysicsMaterialComponent
         }
@@ -301,14 +479,14 @@ void SceneSerializer::serialize(const std::string& filepath) {
     out << YAML::EndSeq;
     out << YAML::EndMap;
 
-    std::ofstream fout(filepath);
+    std::ofstream fout(filename);
     fout << out.c_str();
 }
 
-bool SceneSerializer::deserialize(const std::string& filepath) {
+bool SceneSerializer::deserialize(const std::string& filename) {
     YAML::Node data;
     try {
-        data = YAML::LoadFile(filepath);
+        data = YAML::LoadFile(filename);
     } catch (YAML::ParserException& e) {
         return false;
     }
@@ -322,37 +500,37 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
     if (const auto& entities = data["Entities"]) {
         for (const auto& entity : entities) {
             auto uuid = entity["Entity"].as<entt::entity>();
-            auto deserializedEntity = scene->world.create(uuid);
+            auto deserializedEntity = scene->registry.create(uuid);
 
             std::string name;
             if (const auto& tagComponent = entity["TagComponent"]) {
                 name = tagComponent["tag"].as<std::string>();
-                scene->world.emplace<TagComponent>(deserializedEntity, name);
+                scene->registry.emplace<TagComponent>(deserializedEntity, name);
             }
 
             LOG_DEBUG << "Deserialized entity with ID = " << static_cast<int>(uuid) << ", name = " << name;
 
             if (const auto& component = entity["TransformComponent"]) {
-                scene->world.emplace<TransformComponent>(deserializedEntity,
-                    component["position"].as<glm::vec3>(),
-                    component["rotation"].as<glm::quat>(),
-                    component["scale"].as<glm::vec3>());
+                scene->registry.emplace<TransformComponent>(deserializedEntity,
+                                                            component["position"].as<glm::vec3>(),
+                                                            component["rotation"].as<glm::quat>(),
+                                                            component["scale"].as<glm::vec3>());
             }
 
             if (const auto& component = entity["RelationshipComponent"]) {
-                scene->world.emplace<RelationshipComponent>(deserializedEntity,
-                    component["children"].as<size_t>(),
-                    component["first"].as<entt::entity>(),
-                    component["prev"].as<entt::entity>(),
-                    component["next"].as<entt::entity>(),
-                    component["parent"].as<entt::entity>());
+                scene->registry.emplace<RelationshipComponent>(deserializedEntity,
+                                                               component["children"].as<size_t>(),
+                                                               component["first"].as<entt::entity>(),
+                                                               component["prev"].as<entt::entity>(),
+                                                               component["next"].as<entt::entity>(),
+                                                               component["parent"].as<entt::entity>());
             }
 
             if (const auto& component = entity["CameraComponent"]) {
                 const auto& cameraProps = component["Camera"];
 
                 SceneCamera camera;
-                camera.setProjectionType(magic_enum::enum_value<SceneCamera::ProjectionType>(cameraProps["projectionType"].as<int>()));
+                camera.setProjectionType(me::enum_value<SceneCamera::ProjectionType>(cameraProps["projectionType"].as<size_t>()));
                 camera.setPerspectiveVerticalFOV(cameraProps["perspectiveFOV"].as<float>());
                 camera.setPerspectiveNearClip(cameraProps["perspectiveNear"].as<float>());
                 camera.setPerspectiveFarClip(cameraProps["perspectiveFar"].as<float>());
@@ -360,44 +538,63 @@ bool SceneSerializer::deserialize(const std::string& filepath) {
                 camera.setOrthographicNearClip(cameraProps["orthographicNear"].as<float>());
                 camera.setOrthographicFarClip(cameraProps["orthographicFar"].as<float>());
 
-                scene->world.emplace<CameraComponent>(deserializedEntity,
-                    camera,
-                    component["primary"].as<bool>(),
-                    component["fixedAspectRatio"].as<bool>());
+                scene->registry.emplace<CameraComponent>(deserializedEntity,
+                                                         camera,
+                                                         component["primary"].as<bool>(),
+                                                         component["fixedAspectRatio"].as<bool>());
             }
 
-            if (const auto& modelComponent = entity["ModelComponent"]) {
-                scene->world.emplace<ModelComponent>(deserializedEntity,
-                    modelComponent["path"].as<std::string>(),
-                    //modelComponent["layout"].as<std::vector<int>>(),
-                    modelComponent["scale"].as<glm::vec3>(),
-                    modelComponent["center"].as<glm::vec3>(),
-                    modelComponent["uvscale"].as<glm::vec2>());
+            if (const auto& meshComponent = entity["MeshComponent"]) {
+                scene->registry.emplace<MeshComponent>(deserializedEntity,
+                                                       meshComponent["path"].as<std::string>(),
+                                                       //meshComponent["layout"].as<std::vector<int>>(),
+                                                       meshComponent["scale"].as<glm::vec3>(),
+                                                       meshComponent["center"].as<glm::vec3>(),
+                                                       meshComponent["uvscale"].as<glm::vec2>());
             }
 
             if (const auto& component = entity["RigidbodyComponent"]) {
-                scene->world.emplace<RigidbodyComponent>(deserializedEntity,
-                    magic_enum::enum_value<RigidbodyComponent::BodyType>(component["type"].as<int>()),
-                    component["mass"].as<float>(),
-                    component["linearDrag"].as<float>(),
-                    component["angularDrag"].as<float>(),
-                    component["disableGravity"].as<bool>(),
-                    component["kinematic"].as<bool>(),
-                    component["freezePosition"].as<glm::bvec3>(),
-                    component["freezeRotation"].as<glm::bvec3>());
+                scene->registry.emplace<RigidbodyComponent>(deserializedEntity,
+                                                            me::enum_value<RigidbodyComponent::BodyType>(component["type"].as<size_t>()),
+                                                            component["mass"].as<float>(),
+                                                            component["linearDrag"].as<float>(),
+                                                            component["angularDrag"].as<float>(),
+                                                            component["disableGravity"].as<bool>(),
+                                                            component["kinematic"].as<bool>(),
+                                                            component["freezePosition"].as<glm::bvec3>(),
+                                                            component["freezeRotation"].as<glm::bvec3>());
             }
 
             if (const auto& component = entity["BoxColliderComponent"]) {
-                scene->world.emplace<BoxColliderComponent>(deserializedEntity,
-                    component["center"].as<glm::vec3>(),
-                    component["size"].as<glm::vec3>(),
-                    component["trigger"].as<bool>());
+                scene->registry.emplace<BoxColliderComponent>(deserializedEntity,
+                                                              component["extent"].as<glm::vec3>(),
+                                                              component["trigger"].as<bool>());
+            }
+
+            if (const auto& component = entity["SphereColliderComponent"]) {
+                scene->registry.emplace<SphereColliderComponent>(deserializedEntity,
+                                                                 component["radius"].as<float>(),
+                                                                 component["trigger"].as<bool>());
+            }
+
+            if (const auto& component = entity["CapsuleColliderComponent"]) {
+                scene->registry.emplace<CapsuleColliderComponent>(deserializedEntity,
+                                                                  component["radius"].as<float>(),
+                                                                  component["height"].as<float>(),
+                                                                  component["trigger"].as<bool>());
+            }
+
+            if (const auto& component = entity["PlaneColliderComponent"]) {
+                scene->registry.emplace<PlaneColliderComponent>(deserializedEntity, component["trigger"].as<bool>());
             }
 
             if (const auto& component = entity["PhysicsMaterialComponent"]) {
-                scene->world.emplace<PhysicsMaterialComponent>(deserializedEntity,
-                    component["friction"].as<float>(),
-                    component["restitution"].as<float>());
+                scene->registry.emplace<PhysicsMaterialComponent>(deserializedEntity,
+                                                                  component["dynamicFriction"].as<float>(),
+                                                                  component["staticFriction"].as<float>(),
+                                                                  component["restitution"].as<float>(),
+                                                                  me::enum_value<PhysicsMaterialComponent::CombineMode>(component["frictionCombine"].as<size_t>()),
+                                                                  me::enum_value<PhysicsMaterialComponent::CombineMode>(component["restitutionCombine"].as<size_t>()));
             }
         }
     }

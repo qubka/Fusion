@@ -1,16 +1,16 @@
-#include "model_renderer.hpp"
+#include "mesh_renderer.hpp"
 #include "fusion/renderer/vkx/pipelines.hpp"
 #include "fusion/renderer/renderer.hpp"
 
 using namespace fe;
 
-ModelRenderer* ModelRenderer::instance{ nullptr };
+MeshRenderer* MeshRenderer::instance{ nullptr };
 
-void ModelRenderer::createDescriptorSets() {
+void MeshRenderer::createDescriptorSets() {
 
 }
 
-void ModelRenderer::createPipelineLayout() {
+void MeshRenderer::createPipelineLayout() {
     std::array<vk::DescriptorSetLayout, 1> descriptorSetLayouts{ renderer.getGlobalDescriptorLayoutSet() };
 
     vk::PushConstantRange pushConstantRange{ vk::ShaderStageFlagBits::eVertex, 0, sizeof(PushConstantData) };
@@ -19,12 +19,12 @@ void ModelRenderer::createPipelineLayout() {
     pipelineLayout = context.device.createPipelineLayout(pipelineLayoutCreateInfo);
 }
 
-void ModelRenderer::createPipeline() {
+void MeshRenderer::createPipeline() {
     vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ context.device, pipelineLayout, renderer.getDrawRenderPass() };
     //pipelineBuilder.rasterizationState.frontFace = vk::FrontFace::eCounterClockwise;
 
     // Binding description
-    pipelineBuilder.vertexInputState.appendVertexLayout(vkx::model::Model::defaultLayout, 0, vk::VertexInputRate::eVertex);
+    pipelineBuilder.vertexInputState.appendVertexLayout(vkx::Model::defaultLayout, 0, vk::VertexInputRate::eVertex);
 
     // Attribute descriptions
 
@@ -35,7 +35,7 @@ void ModelRenderer::createPipeline() {
     pipeline = pipelineBuilder.create(context.pipelineCache);
 }
 
-void ModelRenderer::begin() {
+void MeshRenderer::begin() {
     assert(!commandBuffer && "pipeline already was bind");
 
     commandBuffer = &renderer.getCurrentCommandBuffer();
@@ -53,34 +53,34 @@ void ModelRenderer::begin() {
             nullptr);
 }
 
-void ModelRenderer::draw(const std::shared_ptr<vkx::model::Model>& model, glm::mat4 transform) {
+void MeshRenderer::draw(const vkx::Model& model, glm::mat4 transform) {
     assert(commandBuffer && "cannot draw mesh when pipeline not bind");
 
-    // invert Y-Scale for vulkan flipped offscreen
+    // Invert Y-Scale for vulkan flipped offscreen
     if (renderer.getOffscreen().active)
         transform[1] *= -1.0f;
     PushConstantData push { transform, glm::transpose(glm::inverse(glm::mat3{transform})) };
 
     commandBuffer->pushConstants<PushConstantData>(pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, push);
-    commandBuffer->bindVertexBuffers(0, model->vertices.buffer, { 0 });
-    if (model->indexCount) {
-        commandBuffer->bindIndexBuffer(model->indices.buffer, 0, vk::IndexType::eUint32);
-        commandBuffer->drawIndexed(model->indexCount, 1, 0, 0, 0);
+    commandBuffer->bindVertexBuffers(0, model.vertices.buffer, { 0 });
+    if (model.indexCount) {
+        commandBuffer->bindIndexBuffer(model.indices.buffer, 0, vk::IndexType::eUint32);
+        commandBuffer->drawIndexed(model.indexCount, 1, 0, 0, 0);
     } else {
-        commandBuffer->draw(model->vertexCount, 1, 0, 0);
+        commandBuffer->draw(model.vertexCount, 1, 0, 0);
     }
 }
 
-void ModelRenderer::end() {
+void MeshRenderer::end() {
     commandBuffer = nullptr;
 }
 
-std::shared_ptr<vkx::model::Model> ModelRenderer::loadModel(const std::string& filename) {
+vkx::Model* MeshRenderer::loadModel(const std::string& filename) {
     if (auto it{ models.find(filename) }; it != models.end()) {
-        return it->second;
+        return &it->second;
     }
-    auto model = std::make_shared<vkx::model::Model>();
-    model->loadFromFile(context, filename);
-    models.emplace(filename, model);
-    return model;
+    auto [it, result] = models.emplace(filename, vkx::Model{});
+    auto& model = it->second;
+    model.loadFromFile(context, filename);
+    return &model;
 }

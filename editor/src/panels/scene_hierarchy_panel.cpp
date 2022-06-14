@@ -2,11 +2,13 @@
 #include "content_browser_panel.hpp"
 
 #include "fusion/scene/components.hpp"
+#include "fusion/systems/parent_system.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
+#include <IconsFontAwesome4.h>
 
 using namespace fe;
 using namespace std::string_literals;
@@ -18,19 +20,19 @@ void SceneHierarchyPanel::setContext(const std::shared_ptr<Scene>& scene) {
 }
 
 void SceneHierarchyPanel::onImGui() {
-    ImGui::Begin((fs::ICON_FA_LIST + "  Hierarchy"s).c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    ImGui::Begin((ICON_FA_LIST + "  Hierarchy"s).c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     drawEntities();
     ImGui::End();
 
-    ImGui::Begin((fs::ICON_FA_INFO + "  Inspector"s).c_str());
-    if (selectionContext != entt::null) {
+    ImGui::Begin((ICON_FA_INFO_CIRCLE + "  Inspector"s).c_str());
+    if (context->registry.valid(selectionContext)) {
         drawComponents(selectionContext);
     }
     ImGui::End();
 }
 
 void SceneHierarchyPanel::drawEntities() {
-    ImGui::TextUnformatted(fs::ICON_FA_SEARCH);
+    ImGui::TextUnformatted(ICON_FA_SEARCH);
     ImGui::SameLine();
     char buffer[256];
     memset(buffer, 0, sizeof(buffer));
@@ -42,19 +44,21 @@ void SceneHierarchyPanel::drawEntities() {
     ImGui::Separator();
     ImGui::BeginChild("EntityList");
 
-    entt::entity removeEntity{ entt::null };
+    ParentSystem parentSystem{ context->registry };
+
+    entt::entity removeEntity = entt::null;
     std::function<void(entt::entity entity)> function = [&](const auto entity) {
         ImGui::PushID(("Entity" + std::to_string(static_cast<int>(entity))).c_str());
 
-        auto& tag = *context->world.get<TagComponent>(entity);
-        bool children = context->world.has_children(entity);
+        auto& tag = *context->registry.get<TagComponent>(entity);
+        bool children = parentSystem.has_children(entity);
 
         ImGuiTreeNodeFlags flags = ((selectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) |
                                    (children ? (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick) : ImGuiTreeNodeFlags_Leaf);
 
         if (entity != renameContext) {
             flags |= ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
-        } else if (renameContext != entt::null) {
+        } else if (context->registry.valid(renameContext)) {
             flags |= ImGuiTreeNodeFlags_FramePadding;
 
             float lineHeight = ImGui::GetFontSize() / 2.0f;
@@ -75,7 +79,7 @@ void SceneHierarchyPanel::drawEntities() {
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
-                context->world.assign_child(entity, *reinterpret_cast<entt::entity*>(payload->Data));
+                ParentSystem{ context->registry }.assign_child(entity, *reinterpret_cast<entt::entity*>(payload->Data));
             }
             ImGui::EndDragDropTarget();
         }
@@ -128,21 +132,19 @@ void SceneHierarchyPanel::drawEntities() {
         ImGui::PopID();
 
         if (opened) {
-            for (auto e : context->world.get_children(entity)) {
-                function(e);
-            }
+            parentSystem.each_child(entity, function);
             ImGui::TreePop();
         }
     };
 
-    context->world.each([&](auto entity) {
-        if (context->world.get_parent(entity) == entt::null) {
+    context->registry.each([&](auto entity) {
+        if (parentSystem.get_parent(entity) == entt::null) {
             function(entity);
         }
     });
 
     if (removeEntity != entt::null) {
-        context->world.destroy_parent(removeEntity);
+        //context->registry.destroy_parent(removeEntity);
         if (selectionContext == removeEntity)
             selectionContext = entt::null;
         if (renameContext == removeEntity)
@@ -158,22 +160,21 @@ void SceneHierarchyPanel::drawEntities() {
     // Right-click on blank space
     if (ImGui::BeginPopupContextWindow("HierarchyOptions", 1, false)) {
         if (ImGui::MenuItem("Create Empty Entity")) {
-            auto entity = context->world.create();
+            auto entity = context->registry.create();
 
             std::string name{ "Empty Entity" };
             size_t idx = 0;
-            auto view = context->world.view<const TagComponent>();
+            auto view = context->registry.view<const TagComponent>();
             for (auto [e, tag] : view.each()) {
                 if ((*tag).find(name, 0) != std::string::npos) {
                     idx++;
                 }
             }
-
             if (idx > 0)
                 name += " (" + std::to_string(idx) + ")";
 
-            context->world.emplace<TagComponent>(entity, name);
-            context->world.emplace<TransformComponent>(entity);
+            context->registry.emplace<TagComponent>(entity, name);
+            context->registry.emplace<TransformComponent>(entity);
 
             selectionContext = entity;
             renameContext = entity;
@@ -200,7 +201,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 4.0f, 4.0f });
 
     if (ImGui::BeginPopup("FileExplorer")) {
-        ImGui::TextUnformatted(fs::ICON_FA_SEARCH);
+        ImGui::TextUnformatted(ICON_FA_SEARCH);
         ImGui::SameLine();
         char buffer[256];
         memset(buffer, 0, sizeof(buffer));
@@ -291,7 +292,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
 
     ImGui::SameLine();
 
-    if (ImGui::Button(fs::ICON_FA_SEARCH)) {
+    if (ImGui::Button(ICON_FA_SEARCH)) {
         fileFilter = "";
         currentFile = "";
         cachedFiles = fs::recursive_walk(getAssetPath(), fileFilter, formats);
@@ -307,7 +308,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     return modify;
 }
 
-bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth) {
+bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& values, float minValue, float maxValue, float resetValue, float columnWidth) {
     uint8_t modify = 0;
 
     ImGui::PushID(label.c_str());
@@ -335,7 +336,7 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    modify += ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+    modify += ImGui::DragFloat("##X", &values.x, 0.1f, minValue, maxValue, "%.2f");
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
@@ -350,13 +351,13 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    modify += ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+    modify += ImGui::DragFloat("##Y", &values.y, 0.1f, minValue, maxValue, "%.2f");
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.25f, 0.8f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f, 0.35f, 0.9f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.1f, 0.25f, 0.8f, 1.0f });
-    //::PushFont(boldFont);
+    //ImGui::PushFont(boldFont);
     if (ImGui::Button("Z", buttonSize)) {
         values.z = resetValue;
         modify += 1;
@@ -365,7 +366,7 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    modify += ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+    modify += ImGui::DragFloat("##Z", &values.z, 0.1f, minValue, maxValue, "%.2f");
 
     ImGui::PopStyleVar();
 
@@ -376,7 +377,7 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     return modify;
 }
 
-bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& values, float resetValue, float columnWidth) {
+bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& values, float minValue, float maxValue, float resetValue, float columnWidth) {
     uint8_t modify = 0;
 
     ImGui::PushID(label.c_str());
@@ -404,7 +405,7 @@ bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    modify += ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+    modify += ImGui::DragFloat("##X", &values.x, 0.1f, minValue, maxValue, "%.2f");
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
@@ -419,7 +420,7 @@ bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    modify += ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+    modify += ImGui::DragFloat("##Y", &values.y, 0.1f, minValue, maxValue, "%.2f");
 
     ImGui::PopStyleVar();
 
@@ -452,30 +453,63 @@ bool SceneHierarchyPanel::drawValueControl(const std::string& label, std::functi
     return modify;
 }
 
-template<typename T>
-void SceneHierarchyPanel::drawComponent(const std::string& label, entt::entity entity, std::function<void(T& comp)>&& function) {
+template<typename Enum>
+bool SceneHierarchyPanel::drawEnumControl(const std::string& label, Enum& value, float columnWidth) {
+    return drawValueControl(label, [&value]() {
+        bool modify = false;
+        constexpr auto entries = me::enum_entries<Enum>();
+        if (ImGui::BeginCombo("", entries[me::enum_index(value).value_or(0)].second.data())) {
+            for (const auto& [type, name] : entries) {
+                bool isSelected = value == type;
+                if (ImGui::Selectable(name.data(), isSelected)) {
+                    value = type;
+                    modify = true;
+                }
+
+                if (isSelected)
+                    ImGui::SetItemDefaultFocus();
+            }
+
+            ImGui::EndCombo();
+        }
+        return modify;
+    }, columnWidth);
+}
+
+template<typename Component>
+void SceneHierarchyPanel::drawComponent(const std::string& label, entt::entity entity, std::function<void(Component&)>&& function) {
     const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap |
                                      ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth |
                                      ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding;
-    if (auto component = context->world.try_get<T>(entity)) {
+    if (auto component = context->registry.try_get<Component>(entity)) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
         float lineHeight = ImGui::GetContentRegionAvail().x - ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y;
         ImGui::Separator();
 
-        bool opened = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, "%s", label.c_str());
+        bool opened = ImGui::TreeNodeEx((void*)typeid(Component).hash_code(), flags, "%s", label.c_str());
         ImGui::PopStyleVar();
 
         ImGui::SameLine(lineHeight);
 
-        if (ImGui::Button(fs::ICON_FA_COG)) {
+        if (ImGui::Button(ICON_FA_ELLIPSIS_V)) {
             ImGui::OpenPopup("ComponentSettings");
         }
 
-        bool removeComponent = false;
+        ComponentMode mode { None };
         if (ImGui::BeginPopup("ComponentSettings")) {
-            if (ImGui::MenuItem("Remove component"))
-                removeComponent = true;
-
+            if (ImGui::MenuItem("Move Up"))
+                mode = MoveUp;
+            if (ImGui::MenuItem("Move Down"))
+                mode = MoveDown;
+            ImGui::Separator();
+            if (ImGui::MenuItem("Reset Component"))
+                mode = Reset;
+            if (ImGui::MenuItem("Remove Component"))
+                mode = Remove;
+            if (ImGui::MenuItem("Copy Component"))
+                mode = Copy;
+            if (ImGui::MenuItem("Paste Component As New"))
+                mode = Paste;
             ImGui::EndPopup();
         }
 
@@ -484,13 +518,27 @@ void SceneHierarchyPanel::drawComponent(const std::string& label, entt::entity e
             ImGui::TreePop();
         }
 
-        if (removeComponent)
-            context->world.remove<T>(entity);
+        switch (mode) {
+            case MoveUp:
+                break;
+            case MoveDown:
+                break;
+            case Reset:
+                context->registry.replace<Component>(entity);
+                break;
+            case Remove:
+                context->registry.erase<Component>(entity);
+                break;
+            case Copy:
+                break;
+            case Paste:
+                break;
+        }
     }
 }
 
 void SceneHierarchyPanel::drawComponents(entt::entity entity) {
-    auto& tag = *context->world.get<TagComponent>(entity);
+    auto& tag = *context->registry.get<TagComponent>(entity);
     char buffer[256];
     memset(buffer, 0, sizeof(buffer));
     std::strncpy(buffer, tag.c_str(), sizeof(buffer));
@@ -505,94 +553,49 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         ImGui::OpenPopup("AddComponent");
 
     if (ImGui::BeginPopup("AddComponent")) {
-        if (!context->world.all_of<TransformComponent>(entity)) {
-            if (ImGui::MenuItem("Transform")) {
-                context->world.emplace<TransformComponent>(entity);
-                ImGui::CloseCurrentPopup();
-            }
-        }
-        if (!context->world.all_of<CameraComponent>(entity)) {
-            if (ImGui::MenuItem("Camera")) {
-                context->world.emplace<CameraComponent>(entity);
-                ImGui::CloseCurrentPopup();
-            }
-        }
-        if (!context->world.all_of<ModelComponent>(entity)) {
-            if (ImGui::MenuItem("Model")) {
-                context->world.emplace<ModelComponent>(entity);
-                ImGui::CloseCurrentPopup();
-            }
-        }
-        if (!context->world.all_of<RigidbodyComponent>(entity)) {
-            if (ImGui::MenuItem("Rigidbody")) {
-                context->world.emplace<RigidbodyComponent>(entity);
-                ImGui::CloseCurrentPopup();
-            }
-        }
-        if (!context->world.all_of<PhysicsMaterialComponent>(entity)) {
-            if (ImGui::MenuItem("Physics Material")) {
-                context->world.emplace<PhysicsMaterialComponent>(entity);
-                ImGui::CloseCurrentPopup();
-            }
-        }
-        if (!context->world.all_of<BoxColliderComponent>(entity)) {
-            if (ImGui::MenuItem("Box Collider")) {
-                context->world.emplace<BoxColliderComponent>(entity);
-                ImGui::CloseCurrentPopup();
-            }
-        }
+        drawComponentMenuItem<TransformComponent>(ICON_FA_YELP + " Transform"s, entity);
+        drawComponentMenuItem<CameraComponent>(ICON_FA_CAMERA + " Camera"s, entity);
+        drawComponentMenuItem<MeshComponent>(ICON_FA_CODEPEN + " Mesh"s, entity);
+        drawComponentMenuItem<RigidbodyComponent>(ICON_FA_CUBE + " Rigidbody"s, entity);
+        drawComponentMenuItem<PhysicsMaterialComponent>(ICON_FA_TENCENT_WEIBO + " Physics Material"s, entity);
+        drawComponentMenuItem<BoxColliderComponent>(ICON_FA_SQUARE_O + " Box Collider"s, entity);
+        drawComponentMenuItem<SphereColliderComponent>(ICON_FA_CIRCLE_O + " Sphere Collider"s, entity);
+        drawComponentMenuItem<CapsuleColliderComponent>(ICON_FA_TOGGLE_OFF + " Capsule Collider"s, entity);
+        drawComponentMenuItem<PlaneColliderComponent>(ICON_FA_MAP_O + " Plane Collider"s, entity);
         ImGui::EndPopup();
     }
 
     ImGui::PopItemWidth();
 
-    drawComponent<TransformComponent>(fs::ICON_FA_AXIS + "  Transform"s, entity, [&](TransformComponent& component)
+    drawComponent<TransformComponent>(ICON_FA_YELP + "  Transform"s, entity, [&](TransformComponent& component)
     {
         uint8_t notify = 0;
         notify += drawVec3Control("Position", component.position);
         glm::vec3 rotation{ glm::degrees(glm::eulerAngles(component.rotation)) };
-        notify += drawVec3Control("Rotation", rotation);
+        notify += drawVec3Control("Rotation", rotation, -180.0f, 180.0f);
         component.rotation = glm::radians(rotation);
-        notify += drawVec3Control("Scale", component.scale, 1.0f);
+        notify += drawVec3Control("Scale", component.scale, 0.0f, FLT_MAX, 1.0f);
 
         if (notify)
-            context->world.patch_children<TransformComponent>(entity);
+            context->registry.patch<TransformComponent>(entity);
     });
 
-    drawComponent<CameraComponent>(fs::ICON_FA_CAMERA + "  Camera"s, entity, [&](CameraComponent& component)
+    drawComponent<CameraComponent>(ICON_FA_CAMERA + "  Camera"s, entity, [&](CameraComponent& component)
     {
         auto& camera = component.camera;
 
-        drawValueControl("Is Primary", [&component] { return ImGui::Checkbox("##primary", &component.primary); });
+        drawValueControl("Is Primary", [&component] { return ImGui::Checkbox("", &component.primary); });
 
-        constexpr auto projections = magic_enum::enum_entries<SceneCamera::ProjectionType>();
         auto currentProjection = camera.getProjectionType();
-
-        drawValueControl("Type", [&] {
-            bool modify = false;
-            if (ImGui::BeginCombo("##projection", projections[magic_enum::enum_integer(currentProjection)].second.data())) {
-                for (const auto& [type, name]: projections) {
-                    bool isSelected = currentProjection == type;
-                    if (ImGui::Selectable(name.data(), isSelected)) {
-                        currentProjection = type;
-                        camera.setProjectionType(type);
-                        modify = true;
-                    }
-
-                    if (isSelected)
-                        ImGui::SetItemDefaultFocus();
-                }
-
-                ImGui::EndCombo();
-            }
-            return modify;
-        });
+        if (drawEnumControl<SceneCamera::ProjectionType>("Type", currentProjection)) {
+            camera.setProjectionType(currentProjection);
+        }
 
         switch (camera.getProjectionType()) {
             case SceneCamera::ProjectionType::Perspective: {
                 drawValueControl("Vertical FOV", [&] {
                     float perspectiveVerticalFov = glm::degrees(camera.getPerspectiveVerticalFOV());
-                    if (ImGui::DragFloat("##verticalfOV", &perspectiveVerticalFov)) {
+                    if (ImGui::DragFloat("", &perspectiveVerticalFov)) {
                         camera.setPerspectiveVerticalFOV(glm::radians(perspectiveVerticalFov));
                         return true;
                     }
@@ -600,7 +603,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
                 });
                 drawValueControl("Near Clip", [&] {
                     float perspectiveNear = camera.getPerspectiveNearClip();
-                    if (ImGui::DragFloat("##nearclip", &perspectiveNear)) {
+                    if (ImGui::DragFloat("", &perspectiveNear)) {
                         camera.setPerspectiveNearClip(perspectiveNear);
                         return true;
                     }
@@ -608,7 +611,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
                 });
                 drawValueControl("Far Clip", [&] {
                     float perspectiveFar = camera.getPerspectiveFarClip();
-                    if (ImGui::DragFloat("##farclip", &perspectiveFar)) {
+                    if (ImGui::DragFloat("", &perspectiveFar)) {
                         camera.setPerspectiveFarClip(perspectiveFar);
                         return true;
                     }
@@ -620,7 +623,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
             case SceneCamera::ProjectionType::Orthographic: {
                 drawValueControl("Size", [&] {
                     float orthoSize = camera.getOrthographicSize();
-                    if (ImGui::DragFloat("##size", &orthoSize)) {
+                    if (ImGui::DragFloat("", &orthoSize)) {
                         camera.setOrthographicSize(orthoSize);
                         return true;
                     }
@@ -628,7 +631,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
                 });
                 drawValueControl("Near Clip", [&] {
                     float orthoNear = camera.getOrthographicNearClip();
-                    if (ImGui::DragFloat("##nearclip", &orthoNear)) {
+                    if (ImGui::DragFloat("", &orthoNear)) {
                         camera.setOrthographicNearClip(orthoNear);
                         return true;
                     }
@@ -636,110 +639,75 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
                 });
                 drawValueControl("Far Clip", [&] {
                     float orthoFar = camera.getOrthographicFarClip();
-                    if (ImGui::DragFloat("##farclip", &orthoFar)) {
+                    if (ImGui::DragFloat("", &orthoFar)) {
                         camera.setOrthographicFarClip(orthoFar);
                         return true;
                     }
                     return false;
                 });
 
-                drawValueControl("Fixed Aspect", [&component] { return ImGui::Checkbox("##fixedaspect", &component.fixedAspectRatio); });
+                drawValueControl("Fixed Aspect", [&component] { return ImGui::Checkbox("", &component.fixedAspectRatio); });
                 break;
             }
         }
     });
 
-    drawComponent<ModelComponent>(fs::ICON_FA_CUBE + "  Model"s, entity, [&](ModelComponent& component)
+    drawComponent<MeshComponent>(ICON_FA_CODEPEN + "  Mesh"s, entity, [&](MeshComponent& component)
     {
         uint8_t notify = 0;
         notify += drawFileBrowser("File Path", component.path, { ".fbx", ".obj", ".dae", ".gltf", ".3ds" });
-        notify += drawVec3Control("Scale", component.scale);
+        notify += drawVec3Control("Scale", component.scale, 0.0f, FLT_MAX);
         notify += drawVec3Control("Center", component.center);
         notify += drawVec2Control("UV Scale", component.uvscale);
-
         if (notify)
-            context->world.patch<ModelComponent>(entity);
-
-        /*if (ImGui::TreeNode("Layout")) {
-            constexpr auto components = magic_enum::enum_entries<vkx::model::Component>();
-
-            if (ImGui::BeginCombo("##Layout", "")) {
-                for (const auto& [type, name] : components) {
-                    if (ImGui::Selectable(name.data(), false)) {
-                        component.layout.push_back(magic_enum::enum_integer(type));
-                    }
-                }
-                ImGui::EndCombo();
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Button("Clear All"))
-                component.layout.clear();
-
-            for (int i = 0; i < component.layout.size(); i++) {
-                auto id = component.layout[i];
-
-                ImGui::Selectable(magic_enum::enum_name(magic_enum::enum_value<vkx::model::Component>(id)).data());
-
-                if (ImGui::IsItemActive() && !ImGui::IsItemHovered()) {
-                    int n = i + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
-                    if (n >= 0 && n < component.layout.size()) {
-                        component.layout[i] = component.layout[n];
-                        component.layout[n] = id;
-                        ImGui::ResetMouseDragDelta();
-                    }
-                }
-            }
-
-            ImGui::TreePop();
-        }*/
+            context->registry.patch<MeshComponent>(entity);
     });
 
-    drawComponent<RigidbodyComponent>(fs::ICON_FA_BOUNDS + "  Rigidbody"s, entity, [&](RigidbodyComponent& component)
+    drawComponent<RigidbodyComponent>(ICON_FA_CUBE + "  Rigidbody"s, entity, [&](RigidbodyComponent& component)
     {
-        drawValueControl("Type", [&component] {
-            bool modify = false;
-            constexpr auto bodytypes = magic_enum::enum_entries<RigidbodyComponent::BodyType>();
-            if (ImGui::BeginCombo("##body", bodytypes[magic_enum::enum_integer(component.type)].second.data())) {
-                for (const auto& [type, name] : bodytypes) {
-                    bool isSelected = component.type == type;
-                    if (ImGui::Selectable(name.data(), isSelected)) {
-                        component.type = type;
-                        modify = true;
-                    }
-
-                    if (isSelected)
-                        ImGui::SetItemDefaultFocus();
-                }
-
-                ImGui::EndCombo();
-            }
-            return modify;
-        });
-
+        drawEnumControl<RigidbodyComponent::BodyType>("Type", component.type);
         if (component.type == RigidbodyComponent::BodyType::Dynamic) {
-            drawValueControl("Mass", [&component] { return ImGui::DragFloat("##mass", &component.mass, 0.1f, 0.0f, 10000.0f, "%.2f"); });
-            drawValueControl("Linear Drag", [&component] { return ImGui::DragFloat("##linear", &component.linearDrag, 0.1f, 0.0f, 10000.0f, "%.2f"); });
-            drawValueControl("Angular Drag", [&component] { return ImGui::DragFloat("##angular", &component.angularDrag, 0.1f, 0.0f, 10000.0f, "%.2f"); });
-            drawValueControl("Disable Gravity", [&component] { return ImGui::Checkbox("##gravity", &component.disableGravity); });
-            drawValueControl("Is Kinematic", [&component] { return ImGui::Checkbox("##kinematic", &component.kinematic); });
+            drawValueControl("Mass", [&component] { return ImGui::DragFloat("", &component.mass, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
+            drawValueControl("Linear Drag", [&component] { return ImGui::DragFloat("", &component.linearDrag, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
+            drawValueControl("Angular Drag", [&component] { return ImGui::DragFloat("", &component.angularDrag, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
+            drawValueControl("Disable Gravity", [&component] { return ImGui::Checkbox("", &component.disableGravity); });
+            drawValueControl("Is Kinematic", [&component] { return ImGui::Checkbox("", &component.kinematic); });
         }
     });
 
-    drawComponent<PhysicsMaterialComponent>(fs::ICON_FA_BOUNDS + "  Physics Material"s, entity, [&](PhysicsMaterialComponent& component)
+    drawComponent<PhysicsMaterialComponent>(ICON_FA_TENCENT_WEIBO + "  Physics Material"s, entity, [&](PhysicsMaterialComponent& component)
     {
-        /*drawValueControl("Density", [&component] { return ImGui::DragFloat("##density", &component.density, 0.1f, 0.0f, 0.0f, "%.2f"); });
-        drawValueControl("Friction", [&component] { return ImGui::DragFloat("##friction", &component.friction, 0.1f, 0.0f, 0.0f, "%.2f"); });
-        drawValueControl("Restitution", [&component] { return ImGui::DragFloat("##restitution", &component.x, 0.1f, 0.0f, 0.0f, "%.2f"); });
-        drawValueControl("Restitution Threshold", [&component] { return ImGui::DragFloat("##threshold", &component.x, 0.1f, 0.0f, 0.0f, "%.2f"); });*/
+        drawValueControl("Dynamic Friction", [&component] { return ImGui::DragFloat("", &component.dynamicFriction, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
+        drawValueControl("Static Friction", [&component] { return ImGui::DragFloat("", &component.staticFriction, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
+        drawValueControl("Restitution", [&component] { return ImGui::DragFloat("", &component.restitution, 0.1f, 0.0f, 1.0f, "%.2f"); });
+        drawEnumControl<PhysicsMaterialComponent::CombineMode>("Friction Combine", component.frictionCombine);
+        drawEnumControl<PhysicsMaterialComponent::CombineMode>("Restitution Combine", component.restitutionCombine);
     });
 
-    drawComponent<BoxColliderComponent>(fs::ICON_FA_BOUNDS + "  Box Collider"s, entity, [&](BoxColliderComponent& component)
+    drawComponent<BoxColliderComponent>(ICON_FA_SQUARE_O + "  Box Collider"s, entity, [&](BoxColliderComponent& component)
     {
-        drawVec3Control("Center", component.center);
-        drawVec3Control("Size", component.size);
-        drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("##trigger", &component.trigger); });
+        drawVec3Control("Extent", component.extent);
+        drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("", &component.trigger); });
     });
+
+    drawComponent<SphereColliderComponent>(ICON_FA_CIRCLE_O + "  Sphere Collider"s, entity, [&](SphereColliderComponent& component)
+    {
+        drawValueControl("Radius", [&component] { return ImGui::DragFloat("", &component.radius, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
+        drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("", &component.trigger); });
+    });
+
+    drawComponent<CapsuleColliderComponent>(ICON_FA_TOGGLE_OFF + "  Capsule Collider"s, entity, [&](CapsuleColliderComponent& component)
+    {
+        drawValueControl("Radius", [&component] { return ImGui::DragFloat("", &component.radius, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
+        drawValueControl("Height", [&component] { return ImGui::DragFloat("", &component.height, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
+        drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("", &component.trigger); });
+    });
+
+    drawComponent<PlaneColliderComponent>(ICON_FA_MAP_O + "  Plane Collider"s, entity, [&](PlaneColliderComponent& component)
+    {
+        drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("", &component.trigger); });
+    });
+
 
     /*drawComponent<BoundsComponent>(fs::ICON_FA_BOUNDS + "  Bounds"s, entity, [&](BoundsComponent& component)
     {
@@ -747,3 +715,47 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         drawVec3Control("Max", component.max);
     });*/
 }
+
+template<typename Component>
+void SceneHierarchyPanel::drawComponentMenuItem(const std::string& label, entt::entity entity) {
+    if (!context->registry.all_of<Component>(entity)) {
+        if (ImGui::MenuItem(label.c_str())) {
+            context->registry.emplace<Component>(entity);
+            ImGui::CloseCurrentPopup();
+        }
+    }
+}
+
+/*if (ImGui::TreeNode("Layout")) {
+    constexpr auto components = me::enum_entries<vkx::Component>();
+
+    if (ImGui::BeginCombo("##Layout", "")) {
+        for (const auto& [type, name] : components) {
+            if (ImGui::Selectable(name.data(), false)) {
+                component.layout.push_back(me::enum_index(type));
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("Clear All"))
+        component.layout.clear();
+
+    for (int i = 0; i < component.layout.size(); i++) {
+        auto id = component.layout[i];
+
+        ImGui::Selectable(me::enum_name(me::enum_value<vkx::Component>(id)).data());
+
+        if (ImGui::IsItemActive() && !ImGui::IsItemHovered()) {
+            int n = i + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
+            if (n >= 0 && n < component.layout.size()) {
+                component.layout[i] = component.layout[n];
+                component.layout[n] = id;
+                ImGui::ResetMouseDragDelta();
+            }
+        }
+    }
+
+    ImGui::TreePop();
+}*/

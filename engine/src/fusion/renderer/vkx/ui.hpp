@@ -10,7 +10,7 @@
 
 #include "context.hpp"
 #include "framebuffer.hpp"
-#include "texture.hpp"
+#include "font.hpp"
 
 #include "fusion/core/window.hpp"
 
@@ -18,8 +18,7 @@
 #include <android/native_activity.h>
 #endif
 
-namespace vkx { namespace ui {
-
+namespace vkx {
     struct UIOverlayCreateInfo {
         vk::RenderPass renderPass;
         vk::Extent2D size;
@@ -36,6 +35,8 @@ namespace vkx { namespace ui {
     private:
         UIOverlayCreateInfo createInfo;
         const vkx::Context& context;
+        const vk::Device& device{ context.device };
+
         vkx::Buffer vertexBuffer;
         vkx::Buffer indexBuffer;
         int32_t vertexCount{ 0 };
@@ -47,7 +48,7 @@ namespace vkx { namespace ui {
         vk::Pipeline pipeline;
         vk::RenderPass renderPass;
 
-        vkx::Image font;
+        vkx::Font font;
 
         fe::Window* currentWindow{ nullptr };
         glm::vec2 lastValidMousePos{ -FLT_MAX };
@@ -76,20 +77,9 @@ namespace vkx { namespace ui {
         bool update();
 
         void draw(const vk::CommandBuffer& commandBuffer);
-        bool header(const char* caption) const;
-        bool checkBox(const char* caption, bool* value) const;
-        bool checkBox(const char* caption, int32_t* value) const;
-        bool inputFloat(const char* caption, float* value, float step, uint32_t precision) const;
-        bool sliderFloat(const char* caption, float* value, float min, float max) const;
-        bool sliderInt(const char* caption, int32_t* value, int32_t min, int32_t max) const;
-        bool comboBox(const char* caption, int32_t* itemindex, const std::vector<std::string>& items) const;
-        bool button(const char* caption) const;
-
-        void text(const char* formatstr, ...) const;
-
         void resize(const vk::Extent2D& size);
 
-        vk::DescriptorSet addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const;
+        [[nodiscard]] vk::DescriptorSet addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const;
 
         void onMouseButtonEvent(fe::MouseData data);
         void onMouseMotionEvent(const glm::vec2& pos);
@@ -99,4 +89,4 @@ namespace vkx { namespace ui {
         void onCharInputEvent(uint32_t c);
         void onFocusEvent(bool focuses);
     };
-}}  // namespace vkx::ui
+}  // namespace vkx

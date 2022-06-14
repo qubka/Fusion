@@ -14,6 +14,7 @@ namespace fe {
         virtual void onImGui() {}
 
         const std::string& getName() const { return name; }
+
     protected:
         std::string name;
     };

@@ -5,23 +5,23 @@
 
 namespace fe {
     class Renderer;
-    class ModelRenderer {
+    class MeshRenderer {
         struct PushConstantData {
             alignas(16) glm::mat4 model{1};
             alignas(16) glm::mat4 normal{1};
         };
 
     public:
-        ModelRenderer(const vkx::Context& context, Renderer& renderer)
+        MeshRenderer(const vkx::Context& context, Renderer& renderer)
             : context{context}, renderer{renderer} {
             assert(!instance && "Model Renderer already exists!");
             if (instance == nullptr) {
                 create();
+                instance = this;
             }
-            instance = this;
         }
 
-        ~ModelRenderer() {
+        ~MeshRenderer() {
             if (instance != nullptr) {
                 destroy();
             }
@@ -29,12 +29,12 @@ namespace fe {
         };
 
         void begin();
-        void draw(const std::shared_ptr<vkx::model::Model>& model, glm::mat4 transform);
+        void draw(const vkx::Model& model, glm::mat4 transform);
         void end();
 
-        static ModelRenderer& Instance() { assert(instance && "Model Renderer was not initialized!"); return *instance; }
+        static MeshRenderer& Instance() { assert(instance && "Model Renderer was not initialized!"); return *instance; }
 
-        std::shared_ptr<vkx::model::Model> loadModel(const std::string& filename);
+        vkx::Model* loadModel(const std::string& filename);
 
     private:
         void create() {
@@ -47,7 +47,7 @@ namespace fe {
             context.device.destroyPipeline(pipeline);
 
             for (auto [path, model] : models) {
-                model->destroy();
+                model.destroy();
             }
             models.clear();
         }
@@ -63,8 +63,8 @@ namespace fe {
         vk::PipelineLayout pipelineLayout;
         vk::CommandBuffer* commandBuffer{ nullptr };
 
-        std::unordered_map<std::string, std::shared_ptr<vkx::model::Model>> models;
+        std::unordered_map<std::string, vkx::Model> models;
 
-        static ModelRenderer* instance;
+        static MeshRenderer* instance;
     };
 }

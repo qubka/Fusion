@@ -8,14 +8,13 @@ layout (location = 1) in vec3 inNormal;
 layout (location = 2) in vec2 inTexCoord;
 layout (location = 3) in vec3 inColor;
 
-layout (binding = 0) uniform UBO 
-{
+layout (binding = 0) uniform UBO {
 	mat4 projection;
 	mat4 view;
 	vec3 lightpos;
 } ubo;
 
-layout (push_constant) uniform Push {
+layout (push_constant) uniform PushConstants {
 	mat4 model;
 	mat4 normal;
 } push;
@@ -26,8 +25,7 @@ layout (location = 2) out vec3 outColor;
 layout (location = 3) out vec3 outEyePos;
 layout (location = 4) out vec3 outLightVec;
 
-void main() 
-{
+void main() {
 	outUV = inTexCoord.st;
 	outNormal = normalize(mat3(push.normal) * inNormal);
 	outColor = inColor;

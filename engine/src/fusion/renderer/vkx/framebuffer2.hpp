@@ -66,6 +66,7 @@ namespace vkx {
     struct Framebuffer {
         const vkx::Context& context;
         const vk::Device& device{ context.device };
+
         vk::Extent2D size;
         vk::Framebuffer framebuffer;
         vk::RenderPass renderPass;
