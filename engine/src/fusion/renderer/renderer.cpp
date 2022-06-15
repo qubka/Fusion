@@ -38,6 +38,7 @@ void Renderer::destroy() {
 
     delete meshRenderer;
     delete gridRenderer;
+    delete skyRenderer;
 
     swapChain.destroy();
 

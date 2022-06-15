@@ -3,6 +3,7 @@
 
 #include "fusion/renderer/systems/mesh_renderer.hpp"
 #include "fusion/renderer/systems/grid_renderer.hpp"
+#include "fusion/renderer/systems/sky_renderer.hpp"
 #include "fusion/renderer/editor_camera.hpp"
 #include "fusion/input/input.hpp"
 
@@ -207,6 +208,11 @@ void Scene::onRenderRuntime() {
 
 void Scene::onRenderEditor(const EditorCamera& camera) {
     render();
+
+    /*auto& skyRenderer = SkyRenderer::Instance();
+    skyRenderer.begin();
+    skyRenderer.draw();
+    skyRenderer.end();*/
 
     auto& gridRenderer = GridRenderer::Instance();
     gridRenderer.begin();
