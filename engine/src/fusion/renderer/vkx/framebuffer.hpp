@@ -86,7 +86,7 @@ namespace vkx {
                 vk::ImageViewCreateInfo depthStencilView;
                 depthStencilView.viewType = vk::ImageViewType::e2D;
                 depthStencilView.format = depthFormat;
-                depthStencilView.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth;
+                depthStencilView.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
                 depthStencilView.subresourceRange.levelCount = 1;
                 depthStencilView.subresourceRange.layerCount = 1;
                 depthStencilView.image = depth.image;

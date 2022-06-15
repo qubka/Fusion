@@ -546,7 +546,7 @@ void UIOverlay::resize(const vk::Extent2D& size) {
 void UIOverlay::setStyleColors() {
     // Color scheme
     auto& colors = ImGui::GetStyle().Colors;
-    colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 0.0f };
+    colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 1.0f };
 
     // Headers
     colors[ImGuiCol_Header] = { 0.2f, 0.205f, 0.21f, 1.0f };

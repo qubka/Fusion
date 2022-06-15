@@ -60,7 +60,7 @@ namespace fe {
             /** @brief Set to true if v-sync will be forced for the swapchain */
             bool vsync{ false };
             /** @brief Enable UI overlay */
-            bool overlay{ false };
+            bool overlay{ true };
         } settings;
 
         vkx::Benchmark benchmark;

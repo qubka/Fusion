@@ -99,7 +99,7 @@ void Renderer::createGui() {
         shader.module = vk::ShaderModule{};
     }
 
-    offscreen.size = swapChain.extent;
+    offscreen.size = vk::Extent2D{swapChain.extent.width / 2, swapChain.extent.height / 2};
     offscreen.create(gui);
 }
 

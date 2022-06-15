@@ -150,15 +150,15 @@ namespace vkx {
                     (colorFinalLayout != vk::ImageLayout::eUndefined)) {
                     // Implicit transition
                     vk::SubpassDependency dependency;
-                    dependency.srcSubpass = 0;
-                    dependency.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+                    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+                    dependency.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite; //renderpass A wrote to the image as an attachment.
                     dependency.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
 
-                    dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
-                    dependency.dstAccessMask = vkx::util::accessFlagsForLayout(colorFinalLayout);
-                    dependency.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+                    dependency.dstSubpass = 0;
+                    dependency.dstAccessMask = vkx::util::accessFlagsForLayout(colorFinalLayout);  //renderpass B is reading from the image in a shader.
+                    dependency.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader; //Assuming you're reading the image in the fragment shader. Insert other shader stage(s) if otherwise.
 
-                    dependency.dependencyFlags = vk::DependencyFlagBits::eByRegion;
+                    //dependency.dependencyFlags = vk::DependencyFlagBits::eByRegion;
                     subpassDependencies.push_back(dependency);
                 }
 
@@ -168,13 +168,13 @@ namespace vkx {
                     vk::SubpassDependency dependency;
                     dependency.srcSubpass = 0;
                     dependency.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-                    dependency.srcStageMask = vk::PipelineStageFlagBits::eLateFragmentTests;
+                    dependency.srcStageMask = vk::PipelineStageFlagBits::eFragmentShader;
 
                     dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
                     dependency.dstAccessMask = vkx::util::accessFlagsForLayout(depthFinalLayout);
                     dependency.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
 
-                    dependency.dependencyFlags = vk::DependencyFlagBits::eByRegion;
+                    //dependency.dependencyFlags = vk::DependencyFlagBits::eByRegion;
                     subpassDependencies.push_back(dependency);
                 }
             }

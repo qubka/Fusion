@@ -31,7 +31,7 @@ void GridRenderer::createPipeline() {
     blendAttachmentState.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
     blendAttachmentState.colorBlendOp = vk::BlendOp::eAdd;
     blendAttachmentState.srcAlphaBlendFactor = vk::BlendFactor::eOne;
-    blendAttachmentState.dstAlphaBlendFactor = vk::BlendFactor::eZero;
+    blendAttachmentState.dstAlphaBlendFactor = vk::BlendFactor::eOne; // eZero before
     blendAttachmentState.alphaBlendOp = vk::BlendOp::eAdd;
 
     // Attribute descriptions
