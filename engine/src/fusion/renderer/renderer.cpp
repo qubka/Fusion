@@ -23,6 +23,7 @@ void Renderer::create(const vk::Extent2D& size, bool overlay) {
 
     meshRenderer = new MeshRenderer(context, *this);
     gridRenderer = new GridRenderer(context, *this);
+    skyRenderer = new SkyRenderer(context, *this);
 }
 
 void Renderer::destroy() {

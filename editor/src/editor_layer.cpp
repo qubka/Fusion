@@ -106,6 +106,17 @@ void EditorLayer::onRender(Renderer& renderer) {
     buffer.copy(ubo);
     buffer.flush();
 
+    // TEMP
+    if (!renderer.getOffscreen().active) {
+        auto size = Application::Instance().getWindow()->getSize();
+        if (size != viewportSize) {
+            viewportSize = size;
+            onViewportResize();
+        }
+        viewportFocused = true;
+        viewportHovered = true;
+    }
+
     switch (sceneState) {
         case Edit:
             activeScene->onRenderEditor(editorCamera);

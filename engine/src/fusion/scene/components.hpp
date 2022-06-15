@@ -5,7 +5,6 @@
 #include <entt/entt.hpp>
 
 namespace fe {
-
     struct TagComponent {
         std::string tag;
 
@@ -81,7 +80,7 @@ namespace fe {
     struct DirtyMeshComponent {};
 
     struct RigidbodyComponent {
-        enum class BodyType { Static = 0, Dynamic };
+        enum class BodyType { Static = 0, Dynamic = 1 };
         BodyType type{ BodyType::Static };
         //Layer layer;
         float mass{ 1.0f };

@@ -13,11 +13,13 @@
 
 #include "systems/mesh_renderer.hpp"
 #include "systems/grid_renderer.hpp"
+#include "systems/sky_renderer.hpp"
 
 namespace fe {
     struct GlobalUbo {
         alignas(16) glm::mat4 projection;
         alignas(16) glm::mat4 view;
+        alignas(16) glm::mat4 viewproj;
         alignas(16) glm::vec3 lightDirection;
     };
 
@@ -80,11 +82,12 @@ namespace fe {
         vkx::DescriptorLayoutCache descriptorLayoutCache{ context.device };
 
         std::array<vk::ClearValue, 2> clearValues{};
-        glm::vec3 color{0.7f, 0.85f, 1.0f};
+        glm::vec3 color{0.0f, 0.0f, 0.0f};
         glm::vec3 lightDirection{1, -3, -1};
 
         MeshRenderer* meshRenderer;
         GridRenderer* gridRenderer;
+        SkyRenderer* skyRenderer;
 
         uint32_t currentImage{ 0 };
         uint32_t currentFrame{ 0 };

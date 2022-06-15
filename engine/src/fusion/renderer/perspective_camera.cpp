@@ -40,5 +40,6 @@ void PerspectiveCamera::updateView() {
 
 void PerspectiveCamera::updateProjection() {
     projectionMatrix = glm::perspective(glm::radians(fovy), aspect, near, far);
+    //projectionMatrix[1][1] *= -1;
     dirty = true;
 }

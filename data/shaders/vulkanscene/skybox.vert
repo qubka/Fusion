@@ -5,8 +5,7 @@
 
 layout (location = 0) in vec3 inPos;
 
-layout (binding = 0) uniform UBO 
-{
+layout (binding = 0) uniform UniformBufferObject {
 	mat4 projection;
 	mat4 model;
 } ubo;

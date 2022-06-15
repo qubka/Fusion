@@ -1,27 +1,24 @@
 #pragma once
 
 #include "fusion/renderer/vkx/context.hpp"
-#include "fusion/renderer/vkx/model.hpp"
 
 namespace fe {
     class Renderer;
-    class MeshRenderer {
+    class SkyRenderer {
         struct PushConstantData {
-            glm::mat4 model{1};
-            glm::mat4 normal{1};
+            glm::vec4 resolution_mouse{0};
+            float time{0};
         };
-
     public:
-        MeshRenderer(const vkx::Context& context, Renderer& renderer)
-            : context{context}, renderer{renderer} {
-            assert(!instance && "Model Renderer already exists!");
+        SkyRenderer(const vkx::Context& context, Renderer& renderer) : context{context}, renderer{renderer} {
+            assert(!instance && "Sky Renderer already exists!");
             if (instance == nullptr) {
                 create();
                 instance = this;
             }
         }
 
-        ~MeshRenderer() {
+        ~SkyRenderer() {
             if (instance != nullptr) {
                 destroy();
             }
@@ -29,12 +26,10 @@ namespace fe {
         };
 
         void begin();
-        void draw(const vkx::Model& model, glm::mat4 transform);
+        void draw();
         void end();
 
-        static MeshRenderer& Instance() { assert(instance && "Model Renderer was not initialized!"); return *instance; }
-
-        vkx::Model* loadModel(const std::string& filename);
+        static SkyRenderer& Instance() { assert(instance && "Sky Renderer was not initialized!"); return *instance; }
 
     private:
         void create() {
@@ -42,14 +37,10 @@ namespace fe {
             createPipelineLayout();
             createPipeline();
         }
+
         void destroy() {
             context.device.destroyPipelineLayout(pipelineLayout);
             context.device.destroyPipeline(pipeline);
-
-            for (auto [path, model] : models) {
-                model.destroy();
-            }
-            models.clear();
         }
 
         const vkx::Context& context;
@@ -63,8 +54,6 @@ namespace fe {
         vk::PipelineLayout pipelineLayout;
         vk::CommandBuffer* commandBuffer{ nullptr };
 
-        std::unordered_map<std::string, vkx::Model> models;
-
-        static MeshRenderer* instance;
+        static SkyRenderer* instance;
     };
 }

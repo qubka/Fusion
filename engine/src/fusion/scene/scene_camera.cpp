@@ -25,7 +25,8 @@ void SceneCamera::setOrthographic(float size, float nearClip, float farClip) {
 void SceneCamera::recalculateProjection() {
     switch (projectionType) {
         case ProjectionType::Perspective:
-            projectionMatrix = glm::perspective(perspectiveFOV, aspectRatio, perspectiveNear, perspectiveFar);
+            projectionMatrix = glm::perspective(glm::radians(perspectiveFOV), aspectRatio, perspectiveNear, perspectiveFar);
+            //projectionMatrix[1][1] *= -1;
             break;
         case ProjectionType::Orthographic:
             float orthoLeft = -orthographicSize * aspectRatio * 0.5f;

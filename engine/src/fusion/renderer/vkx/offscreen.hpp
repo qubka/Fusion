@@ -79,10 +79,10 @@ namespace vkx {
             sampler.addressModeV = vk::SamplerAddressMode::eClampToEdge;
             sampler.addressModeW = vk::SamplerAddressMode::eClampToEdge;
             sampler.mipLodBias = 0.0f;
-            sampler.maxAnisotropy = 0;
+            sampler.maxAnisotropy = 1.0f;
             sampler.compareOp = vk::CompareOp::eNever;
             sampler.minLod = 0.0f;
-            sampler.maxLod = 0.0f;
+            sampler.maxLod = 1.0f;
             sampler.borderColor = vk::BorderColor::eFloatOpaqueWhite;
             for (auto& framebuffer: framebuffers) {
                 if (attachmentUsage | vk::ImageUsageFlagBits::eSampled) {
@@ -107,8 +107,11 @@ namespace vkx {
             // Color attachment
             for (uint32_t i = 0; i < attachments.size(); ++i) {
                 attachments[i].format = colorFormats[i];
+                attachments[i].samples = vk::SampleCountFlagBits::e1;
                 attachments[i].loadOp = vk::AttachmentLoadOp::eClear;
                 attachments[i].storeOp = colorFinalLayout == vk::ImageLayout::eColorAttachmentOptimal ? vk::AttachmentStoreOp::eDontCare : vk::AttachmentStoreOp::eStore;
+                attachments[i].stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
+                attachments[i].stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
                 attachments[i].initialLayout = vk::ImageLayout::eUndefined;
                 attachments[i].finalLayout = colorFinalLayout;
 
@@ -125,15 +128,17 @@ namespace vkx {
             if (depthFormat != vk::Format::eUndefined) {
                 vk::AttachmentDescription depthAttachment;
                 depthAttachment.format = depthFormat;
+                depthAttachment.samples = vk::SampleCountFlagBits::e1;
                 depthAttachment.loadOp = vk::AttachmentLoadOp::eClear;
                 // We might be using the depth attacment for something, so preserve it if it's final layout is not undefined
                 depthAttachment.storeOp = depthFinalLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal
                                           ? vk::AttachmentStoreOp::eDontCare : vk::AttachmentStoreOp::eStore;
-                depthAttachment.stencilLoadOp = vk::AttachmentLoadOp::eClear;
+                depthAttachment.stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
                 depthAttachment.stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
                 depthAttachment.initialLayout = vk::ImageLayout::eUndefined;
                 depthAttachment.finalLayout = depthFinalLayout;
                 attachments.push_back(depthAttachment);
+
                 depthAttachmentReference.attachment = static_cast<uint32_t>(attachments.size() - 1);
                 depthAttachmentReference.layout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
                 subpass.pDepthStencilAttachment = &depthAttachmentReference;
@@ -153,6 +158,7 @@ namespace vkx {
                     dependency.dstAccessMask = vkx::util::accessFlagsForLayout(colorFinalLayout);
                     dependency.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
 
+                    dependency.dependencyFlags = vk::DependencyFlagBits::eByRegion;
                     subpassDependencies.push_back(dependency);
                 }
 
@@ -167,6 +173,8 @@ namespace vkx {
                     dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
                     dependency.dstAccessMask = vkx::util::accessFlagsForLayout(depthFinalLayout);
                     dependency.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+
+                    dependency.dependencyFlags = vk::DependencyFlagBits::eByRegion;
                     subpassDependencies.push_back(dependency);
                 }
             }

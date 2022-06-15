@@ -24,7 +24,7 @@ namespace fe {
         void setMinimized(bool flag) { minimize = flag; }
 
         float getAspect() const { return static_cast<float>(width) / static_cast<float>(height); }
-        glm::uvec2 getSize() const { return {width, height}; }
+        glm::vec2 getSize() const { return {width, height}; }
 #if defined(VULKAN_HPP)
         glm::vec4 getViewport() const { return { 0, 0, width, height }; }
         vk::Extent2D getExtent() const { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; }
