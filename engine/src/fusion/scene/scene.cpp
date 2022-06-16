@@ -152,20 +152,6 @@ void Scene::onRuntimeStart() {
             collider->runtimeShape = shape;
         }
 
-        if (auto collider = registry.try_get<PlaneColliderComponent>(entity)) {
-            if (rigidbody.type != RigidbodyComponent::BodyType::Static) {
-                LOG_DEBUG << "Shapes with a PxPlaneGeometry may only be created for static actors.";
-            } else {
-                PxShape* shape = physics->createShape(PxPlaneGeometry{}, *mat);
-                if (collider->trigger) {
-                    shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-                    shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
-                }
-                body->attachShape(*shape);
-                collider->runtimeShape = shape;
-            }
-        }
-
         /*if (auto collider = world.try_get<MeshColliderComponent>(entity)) {
 
         }*/
@@ -241,8 +227,7 @@ void Scene::render() {
         return !(clhs->parent != entt::null && clhs->children < crhs->children);
     });
     for (auto [entity, transform] : transformGroup.each()) {
-        transform.localToWorldMatrix = getTRS(registry, entity);
-        transform.worldToLocalMatrix = glm::inverse(transform.localToWorldMatrix);
+        transform.model = getTRS(registry, entity);
     }
 
     registry.clear<DirtyTransformComponent>();
@@ -264,7 +249,7 @@ void Scene::render() {
     auto transformView = registry.view<const TransformComponent, const MeshComponent>();
     for (auto [entity, transform, mesh] : transformView.each()) {
         if (auto model = reinterpret_cast<vkx::Model*>(mesh.runtimeModel))
-            meshRenderer.draw(*model, transform.localToWorldMatrix);
+            meshRenderer.draw(*model, transform.model);
     }
 
     meshRenderer.end();
@@ -354,16 +339,6 @@ void Scene::onComponentUpdate<CapsuleColliderComponent>(entt::registry& registry
 }
 
 template<>
-void Scene::onComponentUpdate<PlaneColliderComponent>(entt::registry& registry, entt::entity entity) {
-    if (!active) return;
-    auto& collider = registry.get<PlaneColliderComponent>(entity);
-    if (auto shape = reinterpret_cast<PxShape*>(collider.runtimeShape)) {
-        shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, !collider.trigger);
-        shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, collider.trigger);
-    }
-}
-
-template<>
 void Scene::onComponentUpdate<PhysicsMaterialComponent>(entt::registry& registry, entt::entity entity) {
     if (!active) return;
     auto& material = registry.get<PhysicsMaterialComponent>(entity);
@@ -378,7 +353,7 @@ void Scene::onComponentUpdate<PhysicsMaterialComponent>(entt::registry& registry
 
 void Scene::init() {
     registry.on_construct<TransformComponent>().connect<&entt::registry::emplace<DirtyTransformComponent>>();
-    registry.on_update<TransformComponent>().connect<&entt::registry::emplace<DirtyTransformComponent>>();
+    registry.on_update<TransformComponent>().connect<&entt::registry::emplace_or_replace<DirtyTransformComponent>>();
     registry.on_destroy<TransformComponent>().connect<&entt::registry::remove<DirtyTransformComponent>>();
 
     //
@@ -395,7 +370,6 @@ void Scene::init() {
     registry.on_update<BoxColliderComponent>().connect<&Scene::onComponentUpdate<BoxColliderComponent>>(this);
     registry.on_update<SphereColliderComponent>().connect<&Scene::onComponentUpdate<SphereColliderComponent>>(this);
     registry.on_update<CapsuleColliderComponent>().connect<&Scene::onComponentUpdate<CapsuleColliderComponent>>(this);
-    registry.on_update<PlaneColliderComponent>().connect<&Scene::onComponentUpdate<PlaneColliderComponent>>(this);
 
     registry.on_update<PhysicsMaterialComponent>().connect<&Scene::onComponentUpdate<PhysicsMaterialComponent>>(this);
 }

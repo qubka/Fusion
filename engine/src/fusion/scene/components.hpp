@@ -26,8 +26,7 @@ namespace fe {
         glm::quat rotation{ quat::identity };
         glm::vec3 scale{ 1.0f };
 
-        glm::mat4 localToWorldMatrix{ 1.0f };
-        glm::mat4 worldToLocalMatrix{ 1.0f };
+        glm::mat4 model{ 1.0f };
 
         glm::mat4 transform() const {
             return glm::mat4{ //translate
@@ -116,12 +115,6 @@ namespace fe {
         float height{ 0.0f };
         bool trigger{ false };
 
-        // Storage for runtime
-        void* runtimeShape{ nullptr };
-    };
-
-    struct PlaneColliderComponent {
-        bool trigger{ false };
         // Storage for runtime
         void* runtimeShape{ nullptr };
     };

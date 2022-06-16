@@ -308,7 +308,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     return modify;
 }
 
-bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& values, float minValue, float maxValue, float resetValue, float columnWidth) {
+bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& values, float minValue, float maxValue, float resetValue, float speedValue, float columnWidth) {
     uint8_t modify = 0;
 
     ImGui::PushID(label.c_str());
@@ -336,7 +336,7 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    modify += ImGui::DragFloat("##X", &values.x, 0.1f, minValue, maxValue, "%.2f");
+    modify += ImGui::DragFloat("##X", &values.x, speedValue, minValue, maxValue, "%.2f");
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
@@ -351,7 +351,7 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    modify += ImGui::DragFloat("##Y", &values.y, 0.1f, minValue, maxValue, "%.2f");
+    modify += ImGui::DragFloat("##Y", &values.y, speedValue, minValue, maxValue, "%.2f");
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.25f, 0.8f, 1.0f });
@@ -366,7 +366,7 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    modify += ImGui::DragFloat("##Z", &values.z, 0.1f, minValue, maxValue, "%.2f");
+    modify += ImGui::DragFloat("##Z", &values.z, speedValue, minValue, maxValue, "%.2f");
 
     ImGui::PopStyleVar();
 
@@ -377,7 +377,7 @@ bool SceneHierarchyPanel::drawVec3Control(const std::string& label, glm::vec3& v
     return modify;
 }
 
-bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& values, float minValue, float maxValue, float resetValue, float columnWidth) {
+bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& values, float minValue, float maxValue, float resetValue, float speedValue, float columnWidth) {
     uint8_t modify = 0;
 
     ImGui::PushID(label.c_str());
@@ -405,7 +405,7 @@ bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    modify += ImGui::DragFloat("##X", &values.x, 0.1f, minValue, maxValue, "%.2f");
+    modify += ImGui::DragFloat("##X", &values.x, speedValue, minValue, maxValue, "%.2f");
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
@@ -420,7 +420,7 @@ bool SceneHierarchyPanel::drawVec2Control(const std::string& label, glm::vec2& v
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    modify += ImGui::DragFloat("##Y", &values.y, 0.1f, minValue, maxValue, "%.2f");
+    modify += ImGui::DragFloat("##Y", &values.y, speedValue, minValue, maxValue, "%.2f");
 
     ImGui::PopStyleVar();
 
@@ -561,7 +561,6 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         drawComponentMenuItem<BoxColliderComponent>(ICON_FA_SQUARE_O + " Box Collider"s, entity);
         drawComponentMenuItem<SphereColliderComponent>(ICON_FA_CIRCLE_O + " Sphere Collider"s, entity);
         drawComponentMenuItem<CapsuleColliderComponent>(ICON_FA_TOGGLE_OFF + " Capsule Collider"s, entity);
-        drawComponentMenuItem<PlaneColliderComponent>(ICON_FA_MAP_O + " Plane Collider"s, entity);
         ImGui::EndPopup();
     }
 
@@ -574,7 +573,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         glm::vec3 rotation{ glm::degrees(glm::eulerAngles(component.rotation)) };
         notify += drawVec3Control("Rotation", rotation, -180.0f, 180.0f);
         component.rotation = glm::radians(rotation);
-        notify += drawVec3Control("Scale", component.scale, 0.0f, FLT_MAX, 1.0f);
+        notify += drawVec3Control("Scale", component.scale, 0.01f, FLT_MAX, 1.0f, 0.01f);
 
         if (notify)
             context->registry.patch<TransformComponent>(entity);
@@ -656,9 +655,9 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
     {
         uint8_t notify = 0;
         notify += drawFileBrowser("File Path", component.path, { ".fbx", ".obj", ".dae", ".gltf", ".3ds" });
-        notify += drawVec3Control("Scale", component.scale, 0.0f, FLT_MAX);
+        notify += drawVec3Control("Scale", component.scale, 0.01f, FLT_MAX, 1.0f, 0.01f);
         notify += drawVec3Control("Center", component.center);
-        notify += drawVec2Control("UV Scale", component.uvscale);
+        notify += drawVec2Control("UV Scale", component.uvscale, 0.01f, FLT_MAX, 1.0f, 0.01f);
         if (notify)
             context->registry.patch<MeshComponent>(entity);
     });
@@ -677,37 +676,31 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
 
     drawComponent<PhysicsMaterialComponent>(ICON_FA_TENCENT_WEIBO + "  Physics Material"s, entity, [&](PhysicsMaterialComponent& component)
     {
-        drawValueControl("Dynamic Friction", [&component] { return ImGui::DragFloat("", &component.dynamicFriction, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
-        drawValueControl("Static Friction", [&component] { return ImGui::DragFloat("", &component.staticFriction, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
-        drawValueControl("Restitution", [&component] { return ImGui::DragFloat("", &component.restitution, 0.1f, 0.0f, 1.0f, "%.2f"); });
+        drawValueControl("Dynamic Friction", [&component] { return ImGui::DragFloat("", &component.dynamicFriction, 0.01f, 0.0f, FLT_MAX, "%.2f"); });
+        drawValueControl("Static Friction", [&component] { return ImGui::DragFloat("", &component.staticFriction, 0.01f, 0.0f, FLT_MAX, "%.2f"); });
+        drawValueControl("Restitution", [&component] { return ImGui::DragFloat("", &component.restitution, 0.01f, 0.0f, 1.0f, "%.2f"); });
         drawEnumControl<PhysicsMaterialComponent::CombineMode>("Friction Combine", component.frictionCombine);
         drawEnumControl<PhysicsMaterialComponent::CombineMode>("Restitution Combine", component.restitutionCombine);
     });
 
     drawComponent<BoxColliderComponent>(ICON_FA_SQUARE_O + "  Box Collider"s, entity, [&](BoxColliderComponent& component)
     {
-        drawVec3Control("Extent", component.extent);
+        drawVec3Control("Extent", component.extent, 0.01f, FLT_MAX, 1.0f, 0.01f);
         drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("", &component.trigger); });
     });
 
     drawComponent<SphereColliderComponent>(ICON_FA_CIRCLE_O + "  Sphere Collider"s, entity, [&](SphereColliderComponent& component)
     {
-        drawValueControl("Radius", [&component] { return ImGui::DragFloat("", &component.radius, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
+        drawValueControl("Radius", [&component] { return ImGui::DragFloat("", &component.radius, 0.01f, 0.01f, FLT_MAX, "%.2f"); });
         drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("", &component.trigger); });
     });
 
     drawComponent<CapsuleColliderComponent>(ICON_FA_TOGGLE_OFF + "  Capsule Collider"s, entity, [&](CapsuleColliderComponent& component)
     {
-        drawValueControl("Radius", [&component] { return ImGui::DragFloat("", &component.radius, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
-        drawValueControl("Height", [&component] { return ImGui::DragFloat("", &component.height, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
+        drawValueControl("Radius", [&component] { return ImGui::DragFloat("", &component.radius, 0.01f, 0.01f, FLT_MAX, "%.2f"); });
+        drawValueControl("Height", [&component] { return ImGui::DragFloat("", &component.height, 0.01f, 0.01f, FLT_MAX, "%.2f"); });
         drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("", &component.trigger); });
     });
-
-    drawComponent<PlaneColliderComponent>(ICON_FA_MAP_O + "  Plane Collider"s, entity, [&](PlaneColliderComponent& component)
-    {
-        drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("", &component.trigger); });
-    });
-
 
     /*drawComponent<BoundsComponent>(fs::ICON_FA_BOUNDS + "  Bounds"s, entity, [&](BoundsComponent& component)
     {

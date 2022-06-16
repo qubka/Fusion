@@ -16,11 +16,15 @@ void OrthographicCamera::updateView() {
     if (!dirty)
         return;
 
-    glm::mat4 m{ 1.0f };
-    glm::mat4 transform {glm::translate(m, position) *
-                         glm::rotate(m, glm::radians(rotation), vec3::up)};
+    transformMatrix = { //translate
+        { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f },
+        { position, 1.0f }
+    };
+    transformMatrix = glm::rotate(transformMatrix, glm::radians(rotation), vec3::up); //rotate
 
-    viewMatrix = glm::inverse(transform);
+    viewMatrix = glm::inverse(transformMatrix);
     viewProjectionMatrix = projectionMatrix * viewMatrix;
 
     dirty = false;

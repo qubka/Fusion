@@ -17,10 +17,10 @@
 
 namespace fe {
     struct GlobalUbo {
-        alignas(16) glm::mat4 projection;
-        alignas(16) glm::mat4 view;
-        alignas(16) glm::mat4 viewproj;
-        alignas(16) glm::vec3 lightDirection;
+        alignas(16) glm::mat4 projectionMatrix;
+        alignas(16) glm::mat4 viewMatrix;
+        alignas(16) glm::mat4 cameraMatrix;
+        alignas(16) float frameTime;
     };
 
     class Renderer {

@@ -35,6 +35,13 @@ void PerspectiveCamera::updateView() {
     viewMatrix = glm::lookAt(position, position + forward, up);
     viewProjectionMatrix = projectionMatrix * viewMatrix;
 
+    transformMatrix = glm::mat4{ //translate
+        { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f },
+        { position, 1.0f }
+    } * glm::mat4_cast(rotation); //rotate;
+
     dirty = false;
 }
 

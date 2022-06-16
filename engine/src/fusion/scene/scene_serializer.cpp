@@ -451,15 +451,6 @@ void SceneSerializer::serialize(const std::string& filename) {
             out << YAML::EndMap; // CapsuleColliderComponent
         }
 
-        if (auto component = scene->registry.try_get<PlaneColliderComponent>(entity)) {
-            out << YAML::Key << "PlaneColliderComponent";
-            out << YAML::BeginMap; // PlaneColliderComponent
-
-            out << YAML::Key << "trigger" << YAML::Value << component->trigger;
-
-            out << YAML::EndMap; // PlaneColliderComponent
-        }
-
         if (auto component = scene->registry.try_get<PhysicsMaterialComponent>(entity)) {
             out << YAML::Key << "PhysicsMaterialComponent";
             out << YAML::BeginMap; // PhysicsMaterialComponent
@@ -582,10 +573,6 @@ bool SceneSerializer::deserialize(const std::string& filename) {
                                                                   component["radius"].as<float>(),
                                                                   component["height"].as<float>(),
                                                                   component["trigger"].as<bool>());
-            }
-
-            if (const auto& component = entity["PlaneColliderComponent"]) {
-                scene->registry.emplace<PlaneColliderComponent>(deserializedEntity, component["trigger"].as<bool>());
             }
 
             if (const auto& component = entity["PhysicsMaterialComponent"]) {

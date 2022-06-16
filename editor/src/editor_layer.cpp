@@ -97,10 +97,10 @@ void EditorLayer::onUpdate(float dt) {
 void EditorLayer::onRender(Renderer& renderer) {
     // update
     GlobalUbo ubo{};
-    ubo.projection = editorCamera.getProjection();
-    ubo.view = editorCamera.getView();
-    //ubo.ortho = viewportOrtho;
-    ubo.lightDirection = -renderer.getLightDirection();
+    ubo.projectionMatrix = editorCamera.getProjection();
+    ubo.viewMatrix = editorCamera.getView();
+    ubo.cameraMatrix = editorCamera.getTransform();
+    ubo.frameTime = 0.0f;
 
     auto& buffer = renderer.getCurrentUniformBuffer();
     buffer.copy(ubo);
@@ -301,7 +301,7 @@ void EditorLayer::onImGui() {
         static glm::mat2x3 boundsValues = { glm::vec3{-1.0f}, glm::vec3{1.0f} };
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                             static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::WORLD, glm::value_ptr(transform.localToWorldMatrix),
+                             static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::WORLD, glm::value_ptr(transform.model),
                              nullptr, snap ? glm::value_ptr(snapValues) : nullptr,
                              bounds ? glm::value_ptr(boundsValues) : nullptr, bounds ? glm::value_ptr(boundsSnap) : nullptr);
 
@@ -309,7 +309,7 @@ void EditorLayer::onImGui() {
 
         if (ImGuizmo::IsUsing()) {
             glm::vec3 position, rotation, scale;
-            glm::decompose(transform.localToWorldMatrix, position, rotation, scale);
+            glm::decompose(transform.model, position, rotation, scale);
 
             switch (gizmoType) {
                 case ImGuizmo::TRANSLATE:

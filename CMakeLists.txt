@@ -3,7 +3,7 @@ project(fusion)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SHADER_DIR "${PROJECT_SOURCE_DIR}/data/shaders")
+set(SHADER_DIR "${PROJECT_SOURCE_DIR}/assets/shaders")
 file(GLOB_RECURSE GLSL_SOURCE_FILES
         ${SHADER_DIR}/*.vert
         ${SHADER_DIR}/*.frag

@@ -24,8 +24,8 @@ namespace fe {
         void drawComponentMenuItem(const std::string& label, entt::entity entity);
 
         bool drawFileBrowser(const std::string& label, std::string& value, const std::vector<std::string>& formats, float columnWidth = 150.0f);
-        static bool drawVec2Control(const std::string& label, glm::vec2& values, float minValue = 0.0f, float maxValue = 0.0f, float resetValue = 0.0f, float columnWidth = 150.0f);
-        static bool drawVec3Control(const std::string& label, glm::vec3& values, float minValue = 0.0f, float maxValue = 0.0f, float resetValue = 0.0f, float columnWidth = 150.0f);
+        static bool drawVec2Control(const std::string& label, glm::vec2& values, float minValue = 0.0f, float maxValue = 0.0f, float resetValue = 0.0f, float speedValue = 0.1f, float columnWidth = 150.0f);
+        static bool drawVec3Control(const std::string& label, glm::vec3& values, float minValue = 0.0f, float maxValue = 0.0f, float resetValue = 0.0f, float speedValue = 0.1f, float columnWidth = 150.0f);
         static bool drawValueControl(const std::string& label, std::function<bool()>&& function, float columnWidth = 150.0f);
         template<typename Enum>
         static bool drawEnumControl(const std::string& label, Enum& value, float columnWidth = 150.0f);

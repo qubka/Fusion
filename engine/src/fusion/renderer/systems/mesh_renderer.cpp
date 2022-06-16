@@ -57,8 +57,8 @@ void MeshRenderer::draw(const vkx::Model& model, glm::mat4 transform) {
     assert(commandBuffer && "cannot draw mesh when pipeline not bind");
 
     // Invert Y-Scale for vulkan flipped offscreen
-    //if (renderer.getOffscreen().active)
-    //    transform[1] *= -1.0f;
+    if (renderer.getOffscreen().active)
+        transform[1] *= -1.0f;
     PushConstantData push { transform, glm::transpose(glm::inverse(glm::mat3{transform})) };
 
     commandBuffer->pushConstants<PushConstantData>(pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, push);

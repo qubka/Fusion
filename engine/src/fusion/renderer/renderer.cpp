@@ -54,7 +54,7 @@ void Renderer::destroy() {
 void Renderer::createUniformBuffers() {
     uniformBuffers.reserve(MAX_FRAMES_IN_FLIGHT);
 
-    /* Global Ubo */
+    /* Global Uniform Buffer Object */
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         uniformBuffers.push_back(context.createUniformBuffer(GlobalUbo{}));
     }
@@ -67,8 +67,8 @@ void Renderer::createDescriptorSets() {
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         auto& descriptorAllocator = dynamicAllocators.emplace_back(context.device);
         vkx::DescriptorBuilder{descriptorLayoutCache, descriptorAllocator}
-            // Binding 0 : Vertex shader uniform buffer
-            .bindBuffer(0, &uniformBuffers[i].descriptor, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eVertex)
+            // Binding 0 : Global uniform buffer
+            .bindBuffer(0, &uniformBuffers[i].descriptor, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eAllGraphics)
             .build(globalDescriptorSets[i], globalDescriptorSetLayout);
     }
 
