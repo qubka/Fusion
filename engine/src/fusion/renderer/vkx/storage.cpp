@@ -30,17 +30,17 @@ namespace vkx { namespace storage {
     class ViewStorage : public Storage {
     public:
         ViewStorage(const StoragePointer& owner, size_t size, const uint8_t* data)
-            : _owner(owner)
-            , _size(size)
-            , _data(data) {}
-        const uint8_t* data() const override { return _data; }
-        size_t size() const override { return _size; }
-        bool isFast() const override { return _owner->isFast(); }
+            : owner_{owner}
+            , size_{size}
+            , data_{data} {}
+        const uint8_t* data() const override { return data_; }
+        size_t size() const override { return size_; }
+        bool isFast() const override { return owner_->isFast(); }
 
     private:
-        const StoragePointer _owner;
-        const size_t _size;
-        const uint8_t* _data;
+        const StoragePointer owner_;
+        const size_t size_;
+        const uint8_t* data_;
     };
 
     StoragePointer Storage::createView(size_t viewSize, size_t offset) const {
@@ -59,17 +59,17 @@ namespace vkx { namespace storage {
     class MemoryStorage : public Storage {
     public:
         MemoryStorage(size_t size, const uint8_t* data = nullptr) {
-            _data.resize(size);
+            data_.resize(size);
             if (data) {
-                memcpy(_data.data(), data, size);
+                memcpy(data_.data(), data, size);
             }
         }
-        const uint8_t* data() const override { return _data.data(); }
-        size_t size() const override { return _data.size(); }
+        const uint8_t* data() const override { return data_.data(); }
+        size_t size() const override { return data_.size(); }
         bool isFast() const override { return true; }
 
     private:
-        std::vector<uint8_t> _data;
+        std::vector<uint8_t> data_;
     };
 
     #if defined(__ANDROID__) || defined(WIN32)
@@ -107,6 +107,7 @@ namespace vkx { namespace storage {
     };
 
     FileStorage::FileStorage(const std::string& filename) {
+        assert(std::filesystem::exists(filename));
     #if defined(__ANDROID__)
         // Load shader from compressed asset
         _asset = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);

@@ -89,7 +89,7 @@ namespace vkx { namespace debug {
         void setDescriptorSetName(const vk::Device& device, const VkDescriptorSet& descriptorSet, const char* name);
         void setSemaphoreName(const vk::Device& device, const VkSemaphore& semaphore, const char* name);
         void setFenceName(const vk::Device& device, const VkFence& fence, const char* name);
-        void setEventName(const vk::Device& device, const VkEvent& _event, const char* name);
+        void setEventName(const vk::Device& device, const VkEvent& event, const char* name);
 
         class Marker {
         public:

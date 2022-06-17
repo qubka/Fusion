@@ -363,7 +363,7 @@ void EditorLayer::openScene(const std::filesystem::path& file) {
     if (sceneState != Edit)
         onSceneStop();
 
-    if (file.extension() != ".scene") {
+    if (file.extension().string() != ".scene") {
         LOG_WARNING << "Could not load " << file.filename() << " - not a scene file";
         return;
     }

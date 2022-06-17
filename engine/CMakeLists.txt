@@ -20,7 +20,7 @@ set(PHYSX_LIBRARIES
         PhysXCommon
         PhysXFoundation
         # SnippetUtils
-        )
+)
 
 file(GLOB_RECURSE SRC_SOURCES src/fusion/*.cpp)
 file(GLOB_RECURSE SRC_HEADERS src/Fusion/*.hpp)
@@ -31,19 +31,19 @@ target_precompile_headers(${PROJECT_NAME} PUBLIC ${HEADER_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC src ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    glfw
-    imgui
-    glm
-    gli
-    stb
-    entt
-    magic_enum
-    plog
-    freetype
-    yaml-cpp
-    Vulkan::Vulkan
-    assimp::assimp
-    ${PHYSX_LIBRARIES}
+        glfw
+        imgui
+        glm
+        gli
+        stb
+        entt
+        magic_enum
+        plog
+        freetype
+        yaml-cpp
+        Vulkan::Vulkan
+        assimp::assimp
+        ${PHYSX_LIBRARIES}
 )
 
 if (ANDROID)
@@ -74,6 +74,7 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLFW_INCLUDE_VULKAN)
 #target_compile_definitions(${PROJECT_NAME} PUBLIC VULKAN_HPP_DISABLE_ENHANCED_MODE)
+#target_compile_definitions(${PROJECT_NAME} PUBLIC VK_ENABLE_BETA_EXTENSIONS)
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLM_FORCE_DEPTH_ZERO_TO_ONE)
 
 add_dependencies(${PROJECT_NAME} Shaders)

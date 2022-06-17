@@ -29,7 +29,9 @@ const VertexLayout Model::defaultLayout = {
         }
 };
 
-void Model::loadFromFile(const Context& context, const std::string& filename, const VertexLayout& layout, const ModelCreateInfo& createInfo, const int flags) {
+void Model::fromFile(const Context& context, const std::string& filename, const VertexLayout& layout, const ModelCreateInfo& createInfo, const int flags) {
+    assert(std::filesystem::exists(filename));
+
     this->layout = layout;
     scale = createInfo.scale;
     uvscale = createInfo.uvscale;

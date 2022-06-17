@@ -79,7 +79,7 @@ namespace vkx {
             sampler.addressModeV = vk::SamplerAddressMode::eClampToEdge;
             sampler.addressModeW = vk::SamplerAddressMode::eClampToEdge;
             sampler.mipLodBias = 0.0f;
-            sampler.maxAnisotropy = 1.0f;
+            sampler.maxAnisotropy = context.deviceFeatures.samplerAnisotropy ? context.deviceProperties.limits.maxSamplerAnisotropy : 1.0f;
             sampler.compareOp = vk::CompareOp::eNever;
             sampler.minLod = 0.0f;
             sampler.maxLod = 1.0f;

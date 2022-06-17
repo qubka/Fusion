@@ -28,6 +28,8 @@ namespace vkx { namespace file {
     }
 
     std::string readTextFile(const std::string& filename) {
+        assert(std::filesystem::exists(filename));
+
         std::string content;
         std::ifstream file(filename, std::ios::in);
         if (!file.is_open()) {

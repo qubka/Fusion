@@ -14,6 +14,14 @@
 
 namespace vkx { namespace util {
 
+    template<typename T> static constexpr T numMipmapLevels(T width, T height) {
+        T levels = 1;
+        while((width|height) >> levels) {
+            ++levels;
+        }
+        return levels;
+    }
+
     inline vk::ColorComponentFlags fullColorWriteMask() {
         return vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
     }

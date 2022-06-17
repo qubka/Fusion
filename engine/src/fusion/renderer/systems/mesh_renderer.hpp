@@ -99,9 +99,14 @@ namespace fe {
             parametersBuffer.destroy();
             lightsBuffer.destroy();
 
-            diffuseTexture.destroy();
-            //normalTexture.destroy();
-           // specularTexture.destroy();
+            albedoTexture.destroy();
+            normalTexture.destroy();
+            metalnessTexture.destroy();
+            roughnessTexture.destroy();
+
+            envTexture.destroy();
+            irmapTexture.destroy();
+            spBRDF_LUT.destroy();
         }
 
         const vkx::Context& context;
@@ -123,9 +128,15 @@ namespace fe {
         vk::DescriptorSetLayout uniformDescriptorSetLayout;
 
         vk::DescriptorSet textureSet;
-        vkx::Texture2D diffuseTexture;
+        vkx::Texture2D albedoTexture;
         vkx::Texture2D normalTexture;
-        vkx::Texture2D specularTexture;
+        vkx::Texture2D metalnessTexture;
+        vkx::Texture2D roughnessTexture;
+
+        vkx::TextureCubeMap envTexture;
+        vkx::TextureCubeMap irmapTexture;
+        vkx::Texture2D spBRDF_LUT;
+
         vk::DescriptorSetLayout textureDescriptorSetLayout;
 
         std::unordered_map<std::string, vkx::Model> models;

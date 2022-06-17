@@ -22,15 +22,15 @@ namespace vkx {
         void destroy() override {
             if (sampler) {
                 device.destroySampler(sampler);
-                sampler = vk::Sampler();
+                sampler = vk::Sampler{};
             }
             if (view) {
                 device.destroyImageView(view);
-                view = vk::ImageView();
+                view = vk::ImageView{};
             }
             if (image) {
                 device.destroyImage(image);
-                image = vk::Image();
+                image = vk::Image{};
             }
             Parent::destroy();
         }

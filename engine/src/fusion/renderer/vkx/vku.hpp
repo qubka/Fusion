@@ -28,7 +28,7 @@
 #include <functional>
 #include <cstddef>
 
-#include <vulkan/spirv.hpp>
+//#include <vulkan/spirv.hpp>
 #include <vulkan/vulkan.hpp>
 
 namespace vku {
@@ -633,7 +633,7 @@ namespace vku {
         }
 
         /// A variable in a shader.
-        struct Variable {
+        /*struct Variable {
             // The name of the variable from the GLSL/HLSL
             std::string debugName;
 
@@ -689,7 +689,8 @@ namespace vku {
                 spv::Op op = spv::Op(s.opcodes_[i] & 0xffff);
                 if (op == spv::Op::OpVariable) {
                     int name = s.opcodes_[i + 1];
-                    auto sc = spv::StorageClass(s.opcodes_[i + 3]);
+                    auto sc;
+                    sc = spv::StorageClass(s.opcodes_[i + 3]);
                     Variable b;
                     b.debugName = debugNames[name];
                     b.name = name;
@@ -701,7 +702,7 @@ namespace vku {
                 }
             }
             return std::move(result);
-        }
+        }*/
 
         bool ok() const { return s.ok_; }
         VkShaderModule module() { return *s.module_; }
@@ -848,7 +849,7 @@ namespace vku {
             pipelineInfo.pDynamicState = dynamicState_.empty() ? nullptr : &dynState;
             pipelineInfo.subpass = subpass_;
 
-            return device.createGraphicsPipelineUnique(pipelineCache, pipelineInfo);
+            return device.createGraphicsPipelineUnique(pipelineCache, pipelineInfo).value;
         }
 
         /// Add a shader module to the pipeline.
@@ -1107,7 +1108,7 @@ namespace vku {
             return *this;
         }
 
-        PipelineMaker& dynamicState(vk::DynamicState value) { dynamicState_.push_back(value); }
+        PipelineMaker& dynamicState(vk::DynamicState value) { dynamicState_.push_back(value); return *this; }
 
     private:
         vk::PipelineInputAssemblyStateCreateInfo inputAssemblyState_;
@@ -1138,7 +1139,7 @@ namespace vku {
         }
 
         /// Set the compute shader module.
-        ComputePipelineMaker& module(const vk::PipelineShaderStageCreateInfo& value) { stage_ = value; }
+        ComputePipelineMaker& module(const vk::PipelineShaderStageCreateInfo& value) { stage_ = value; return *this; }
 
         /// Create a managed handle to a compute shader.
         vk::UniquePipeline createUnique(vk::Device device, const vk::PipelineCache& pipelineCache, const vk::PipelineLayout& pipelineLayout) {
@@ -1147,7 +1148,7 @@ namespace vku {
             pipelineInfo.stage = stage_;
             pipelineInfo.layout = pipelineLayout;
 
-            return device.createComputePipelineUnique(pipelineCache, pipelineInfo);
+            return device.createComputePipelineUnique(pipelineCache, pipelineInfo).value;
         }
 
     private:

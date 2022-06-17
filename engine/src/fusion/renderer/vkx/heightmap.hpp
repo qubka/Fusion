@@ -59,7 +59,9 @@ namespace vkx {
             return heightdata[offset] / 65535.0f * heightScale;
         }
 
-        void loadFromFile(const vkx::Context& context, const std::string& filename, uint32_t patchsize, const glm::vec3& scale, Topology topology) {
+        void fromFile(const vkx::Context& context, const std::string& filename, uint32_t patchsize, const glm::vec3& scale, Topology topology) {
+            assert(std::filesystem::exists(filename));
+
             std::shared_ptr<gli::texture2d> tex2Dptr;
             vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {
                 tex2Dptr = std::make_shared<gli::texture2d>(gli::load(reinterpret_cast<const char*>(data), size));

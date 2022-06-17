@@ -186,7 +186,7 @@ namespace vkx {
             samplerInfo.addressModeV = adressMode;
             samplerInfo.addressModeW = adressMode;
             samplerInfo.mipLodBias = 0.0f;
-            samplerInfo.maxAnisotropy = 1.0f;
+            samplerInfo.maxAnisotropy = context.deviceFeatures.samplerAnisotropy ? context.deviceProperties.limits.maxSamplerAnisotropy : 1.0f;
             samplerInfo.minLod = 0.0f;
             samplerInfo.maxLod = 1.0f;
             samplerInfo.borderColor = vk::BorderColor::eFloatOpaqueWhite;

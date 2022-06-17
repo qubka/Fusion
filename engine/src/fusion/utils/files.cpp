@@ -166,6 +166,6 @@ std::unordered_map<std::string, std::string> fs::extensions {
 };
 
 std::string fs::extension_icon(const std::filesystem::path& file) {
-    auto key { fs::extensions.find(file.extension()) };
+    auto key { fs::extensions.find(file.extension().string()) };
     return key != fs::extensions.end() ? key->second.c_str() : ICON_FA_FILE;
 }

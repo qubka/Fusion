@@ -36,7 +36,7 @@ namespace vkx {
          * @param (Optional) filter Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
          * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
          */
-        /*void loadFromFile(const vkx::Context& context,
+        /*void fromFile(const vkx::Context& context,
                           const std::string& filename,
                           const vk::Extent2D& size,
                           vk::Format format = vk::Format::eR8G8B8A8Unorm,
@@ -114,7 +114,7 @@ namespace vkx {
          * @param (Optional) filter Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
          * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
          */
-        void loadFromFile(const vkx::Context& context,
+        void fromFile(const vkx::Context& context,
                           const std::string& filename,
                           const vk::Extent2D& size,
                           vk::Format format = vk::Format::eR8G8B8A8Unorm,

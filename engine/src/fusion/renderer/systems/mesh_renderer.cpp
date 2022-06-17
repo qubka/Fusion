@@ -1,20 +1,35 @@
 #include "mesh_renderer.hpp"
 #include "fusion/renderer/vkx/pipelines.hpp"
 #include "fusion/renderer/renderer.hpp"
-#include "fusion/utils/image.hpp"
 
 using namespace fe;
 
 MeshRenderer* MeshRenderer::instance{ nullptr };
 
-void MeshRenderer::createUniformBuffers() {
-    stb::Image image{ getAssetPath() + "/models/hq/loggerhead_8bit_albedo2.png", 4 };
+// Parameters
+static constexpr uint32_t kEnvMapSize = 1024;
+static constexpr uint32_t kIrradianceMapSize = 32;
+static constexpr uint32_t kBRDF_LUT_Size = 256;
+static constexpr uint32_t kEnvMapLevels = vkx::util::numMipmapLevels(kEnvMapSize, kEnvMapSize);
+static constexpr VkDeviceSize kUniformBufferSize = 64 * 1024;
 
-    diffuseTexture.loadFromFile(context, getAssetPath() + "/textures/metalplate01_rgba.ktx");
+void MeshRenderer::createUniformBuffers() {
+    albedoTexture.fromFile(context, getAssetPath() + "/textures/cerberus_A.png", vk::Format::eR8G8B8A8Srgb);
+    normalTexture.fromFile(context, getAssetPath() + "/textures/cerberus_N.png", vk::Format::eR8G8B8A8Unorm);
+    metalnessTexture.fromFile(context, getAssetPath() + "/textures/cerberus_M.png", vk::Format::eR8Unorm);
+    roughnessTexture.fromFile(context, getAssetPath() + "/textures/cerberus_R.png", vk::Format::eR8Unorm);
+
+    // Environment map (with pre-filtered mip chain)
+    envTexture.fromBuffer(context, nullptr, 0, {kEnvMapSize, kEnvMapSize}, 6, 0, vk::Format::eR16G16B16A16Sfloat, vk::Filter::eLinear, vk::ImageUsageFlagBits::eStorage);
+    // Irradiance map
+    irmapTexture.fromBuffer(context, nullptr, 0, {kIrradianceMapSize, kIrradianceMapSize}, 6, 1, vk::Format::eR16G16B16A16Sfloat, vk::Filter::eLinear, vk::ImageUsageFlagBits::eStorage);
+    // 2D LUT for split-sum approximation
+    spBRDF_LUT.fromBuffer(context, nullptr, 0, {kBRDF_LUT_Size, kBRDF_LUT_Size}, 1, 1, vk::Format::eR16G16Sfloat, vk::Filter::eLinear, vk::ImageUsageFlagBits::eStorage);
+
     //diffuseTexture.fromBuffer(context, image.pixels, image.width * image.height * image.channels, vk::Extent2D{ static_cast<uint32_t>(image.width), static_cast<uint32_t>(image.height) });
-    //diffuseTexture.loadFromFile(context, getAssetPath() + "/models/hq/loggerhead_8bit_albedo2.png");
-    //normalTexture.loadFromFile(context, getAssetPath() + "/models/hq/loggerhead_8bit_normal.dds");
-    //specularTexture.loadFromFile(context, getAssetPath() + "/models/hq/loggerhead_8bit_roughness.dds");
+    //diffuseTexture.fromFile(context, getAssetPath() + "/models/hq/loggerhead_8bit_albedo2.png");
+    //normalTexture.fromFile(context, getAssetPath() + "/models/hq/loggerhead_8bit_normal.dds");
+    //specularTexture.fromFile(context, getAssetPath() + "/models/hq/loggerhead_8bit_roughness.dds");
 
     lightsBuffer = context.createUniformBuffer(Lights{});
     materialBuffer = context.createUniformBuffer(Material{});
@@ -30,9 +45,12 @@ void MeshRenderer::createDescriptorSets() {
 
 
     vkx::DescriptorBuilder{renderer.getDescriptorLayoutCache(), renderer.getGlobalAllocator()}
-        .bindImage(0, &diffuseTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
-        .bindImage(1, &diffuseTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
-        .bindImage(2, &diffuseTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
+        .bindImage(0, &albedoTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
+        .bindImage(1, &normalTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
+        .bindImage(2, &metalnessTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
+        .bindImage(3, &roughnessTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
+
+
         .build(textureSet, textureDescriptorSetLayout);
 }
 
@@ -112,6 +130,6 @@ vkx::Model* MeshRenderer::loadModel(const std::string& filename) {
     }
     auto [it, result] = models.emplace(filename, vkx::Model{});
     auto& model = it->second;
-    model.loadFromFile(context, filename);
+    model.fromFile(context, filename);
     return &model;
 }

@@ -218,8 +218,8 @@ void setFenceName(const vk::Device& device, const VkFence& fence, const char* na
     setObjectName(device, reinterpret_cast<uint64_t>(fence), vk::DebugReportObjectTypeEXT::eFence, name);
 }
 
-void setEventName(const vk::Device& device, const VkEvent& _event, const char* name) {
-    setObjectName(device, reinterpret_cast<uint64_t>(_event), vk::DebugReportObjectTypeEXT::eEvent, name);
+void setEventName(const vk::Device& device, const VkEvent& event, const char* name) {
+    setObjectName(device, reinterpret_cast<uint64_t>(event), vk::DebugReportObjectTypeEXT::eEvent, name);
 }
 };  // namespace marker
 }}  // namespace vkx::debug

@@ -24,7 +24,9 @@ FT_UInt countChars(const FT_Face& face) {
     return index;
 }
 
-void FontAtlas::loadFromFile(const vkx::Context& context, const std::string& filename, const vk::Extent2D& size, vk::Format format, vk::Filter filter, vk::ImageUsageFlags imageUsageFlags) {
+void FontAtlas::fromFile(const vkx::Context& context, const std::string& filename, const vk::Extent2D& size, vk::Format format, vk::Filter filter, vk::ImageUsageFlags imageUsageFlags) {
+    assert(std::filesystem::exists(filename));
+
     device = context.device;
 
     // TODO: make be move ft to wrapper?
@@ -114,7 +116,7 @@ void FontAtlas::loadFromFile(const vkx::Context& context, const std::string& fil
     samplerCreateInfo.addressModeV = vk::SamplerAddressMode::eClampToEdge;
     samplerCreateInfo.addressModeW = vk::SamplerAddressMode::eClampToEdge;
     samplerCreateInfo.borderColor = vk::BorderColor::eFloatOpaqueWhite;
-    samplerCreateInfo.maxAnisotropy = 1.0f;
+    samplerCreateInfo.maxAnisotropy = context.deviceFeatures.samplerAnisotropy ? context.deviceProperties.limits.maxSamplerAnisotropy : 1.0f;
     sampler = device.createSampler(samplerCreateInfo);
 
     FT_Done_Face(face);

@@ -175,7 +175,7 @@ namespace vkx {
          * @param copyQueue Queue used for the memory staging copy commands (must support transfer)
          * @param (Optional) flags ASSIMP model loading flags
          */
-        void loadFromFile(const Context& context,
+        void fromFile(const Context& context,
                           const std::string& filename,
                           const VertexLayout& layout,
                           const ModelCreateInfo& createInfo,
@@ -191,8 +191,8 @@ namespace vkx {
          * @param copyQueue Queue used for the memory staging copy commands (must support transfer)
          * @param (Optional) flags ASSIMP model loading flags
         */
-        void loadFromFile(const Context& context, const std::string& filename, const VertexLayout& layout = defaultLayout, float scale = 1.0f, const int flags = defaultFlags) {
-            loadFromFile(context, filename, layout, { scale, 1.0f, 0.0f }, flags);
+        void fromFile(const Context& context, const std::string& filename, const VertexLayout& layout = defaultLayout, float scale = 1.0f, const int flags = defaultFlags) {
+            fromFile(context, filename, layout, { scale, 1.0f, 0.0f }, flags);
         }
 
         virtual void onLoad(const Context& context, Assimp::Importer& importer, const aiScene* pScene) {}
