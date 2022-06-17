@@ -20,7 +20,7 @@ namespace fe {
         alignas(16) glm::mat4 projectionMatrix;
         alignas(16) glm::mat4 viewMatrix;
         alignas(16) glm::mat4 cameraMatrix;
-        alignas(16) float frameTime;
+        alignas(4) float frameTime;
     };
 
     class Renderer {

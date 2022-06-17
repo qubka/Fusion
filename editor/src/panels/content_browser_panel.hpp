@@ -11,14 +11,8 @@ namespace fe {
         const std::filesystem::path& getCurrentFile() const { return currentFile; }
         const std::filesystem::path& getCurrentDirectory() const { return currentDirectory; }
 
-        void selectFile(const std::filesystem::path& file) {
-            selectDirectory(file.parent_path());
-            currentFile = file;
-        }
-
-        void selectDirectory(const std::filesystem::path& dir) {
-            currentDirectory = dir;
-        }
+        void selectFile(const std::filesystem::path& file);
+        void selectDirectory(const std::filesystem::path& dir);
 
     private:
         void drawFileExplorer();
@@ -26,8 +20,9 @@ namespace fe {
 
         std::filesystem::path currentDirectory;
         std::filesystem::path currentFile;
+        std::vector<std::filesystem::path> currentFiles;
 
         std::string filter;
-        std::vector<std::filesystem::path> cachedFiles;
+        std::vector<std::filesystem::path> filteredFiles;
     };
 }

@@ -561,6 +561,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         drawComponentMenuItem<BoxColliderComponent>(ICON_FA_SQUARE_O + " Box Collider"s, entity);
         drawComponentMenuItem<SphereColliderComponent>(ICON_FA_CIRCLE_O + " Sphere Collider"s, entity);
         drawComponentMenuItem<CapsuleColliderComponent>(ICON_FA_TOGGLE_OFF + " Capsule Collider"s, entity);
+        drawComponentMenuItem<MaterialComponent>(ICON_FA_DELICIOUS + " Material"s, entity);
         ImGui::EndPopup();
     }
 
@@ -700,6 +701,11 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         drawValueControl("Radius", [&component] { return ImGui::DragFloat("", &component.radius, 0.01f, 0.01f, FLT_MAX, "%.2f"); });
         drawValueControl("Height", [&component] { return ImGui::DragFloat("", &component.height, 0.01f, 0.01f, FLT_MAX, "%.2f"); });
         drawValueControl("Is Trigger", [&component]{ return ImGui::Checkbox("", &component.trigger); });
+    });
+
+    drawComponent<MaterialComponent>(ICON_FA_DELICIOUS + "  Material"s, entity, [&](MaterialComponent& component)
+    {
+
     });
 
     /*drawComponent<BoundsComponent>(fs::ICON_FA_BOUNDS + "  Bounds"s, entity, [&](BoundsComponent& component)

@@ -136,4 +136,12 @@ namespace fe {
         // Storage for runtime
         void* runtimeMaterial{ nullptr };
     };
+
+    struct MaterialComponent {
+        glm::vec4 ambient;
+        glm::vec4 diffuse;
+        glm::vec4 emission;
+        glm::vec3 specular;
+        float shininess;
+    };
 }

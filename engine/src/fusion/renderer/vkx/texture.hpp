@@ -67,7 +67,7 @@ namespace vkx {
                           vk::Filter filter = vk::Filter::eLinear,
                           vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                           vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
-            destroy();
+            device = context.device;
             this->imageLayout = imageLayout;
 
             std::shared_ptr<gli::texture2d> tex2Dptr;
@@ -151,7 +151,7 @@ namespace vkx {
                         vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                         vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
             assert(buffer);
-            destroy();
+            device = context.device;
             this->imageLayout = imageLayout;
 
             mipLevels = 1;
@@ -230,7 +230,7 @@ namespace vkx {
                           vk::Filter filter = vk::Filter::eLinear,
                           vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                           vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
-            destroy();
+            device = context.device;
             this->imageLayout = imageLayout;
 
             std::shared_ptr<gli::texture2d_array> texPtr;
@@ -342,7 +342,7 @@ namespace vkx {
                           vk::Filter filter = vk::Filter::eLinear,
                           vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                           vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
-            destroy();
+            device = context.device;
             this->imageLayout = imageLayout;
 
             std::shared_ptr<const gli::texture_cube> texPtr;

@@ -19,15 +19,15 @@ using namespace vkx;
 using namespace std::string_literals;
 
 const int Model::defaultFlags = aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals;
-const VertexLayout Model::defaultLayout = {{
-    Component::Position,
-    Component::Normal,
-    Component::Color,
-    Component::UV,
-    Component::UV,
-    Component::Bitangent,
-    Component::Tangent
-}};
+const VertexLayout Model::defaultLayout = {
+        {
+            Component::Position,
+            Component::Normal,
+            Component::Bitangent,
+            Component::Tangent,
+            Component::UV,
+        }
+};
 
 void Model::loadFromFile(const Context& context, const std::string& filename, const VertexLayout& layout, const ModelCreateInfo& createInfo, const int flags) {
     this->layout = layout;

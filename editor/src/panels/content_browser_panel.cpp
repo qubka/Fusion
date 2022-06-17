@@ -26,7 +26,7 @@ void ContentBrowserPanel::drawFileExplorer() {
 
         bool opened = ImGui::TreeNodeEx(file.c_str(), flags, "");
         if (ImGui::IsItemClicked() || ImGui::IsItemFocused()) {
-            currentDirectory = file;
+            selectDirectory(file);
         }
 
         ImGui::SameLine();
@@ -57,7 +57,7 @@ void ContentBrowserPanel::drawContentBrowser() {
 
     if (currentDirectory != getAssetPath()) {
         if (ImGui::Button(ICON_FA_BACKWARD))
-            currentDirectory = currentDirectory.parent_path();
+            selectDirectory(currentDirectory.parent_path());
         ImGui::SameLine();
     }
 
@@ -69,7 +69,7 @@ void ContentBrowserPanel::drawContentBrowser() {
     std::strncpy(buffer, filter.c_str(), sizeof(buffer));
     if (ImGui::InputTextWithHint("##filesfilter", "Search Files", buffer, sizeof(buffer))) {
         filter = std::string{buffer};
-        cachedFiles = fs::recursive_walk(getAssetPath(), filter);
+        filteredFiles = fs::recursive_walk(getAssetPath(), filter);
     }
 
     ImGui::Separator();
@@ -87,7 +87,9 @@ void ContentBrowserPanel::drawContentBrowser() {
 
     ImGui::Columns(columnCount, nullptr, false);
 
-    for (const auto& file : (filter.empty() ? fs::walk(currentDirectory) : cachedFiles)) {
+    bool updateDirectory = false;
+
+    for (const auto& file : (filter.empty() ? currentFiles : filteredFiles)) {
         ImGui::PushID(file.c_str());
 
         if (currentFile == file)
@@ -118,6 +120,7 @@ void ContentBrowserPanel::drawContentBrowser() {
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 if (is_directory(file)) {
                     currentDirectory /= filename;
+                    updateDirectory = true;
                 }
             } else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
                 currentFile = file;
@@ -130,6 +133,9 @@ void ContentBrowserPanel::drawContentBrowser() {
 
         ImGui::PopID();
     }
+
+    if (updateDirectory)
+        selectDirectory(currentDirectory);
 
     ImGui::Columns(1);
 
@@ -155,4 +161,14 @@ void ContentBrowserPanel::drawContentBrowser() {
     ImGui::NewLine();
 
     ImGui::EndChild();
+}
+
+void ContentBrowserPanel::selectFile(const std::filesystem::path& file) {
+    selectDirectory(file.parent_path());
+    currentFile = file;
+}
+
+void ContentBrowserPanel::selectDirectory(const std::filesystem::path& dir) {
+    currentDirectory = dir;
+    currentFiles = fs::walk(dir);
 }

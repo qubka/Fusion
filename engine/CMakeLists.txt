@@ -35,6 +35,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     imgui
     glm
     gli
+    stb
     entt
     magic_enum
     plog

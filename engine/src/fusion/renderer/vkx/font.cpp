@@ -25,7 +25,7 @@ FT_UInt countChars(const FT_Face& face) {
 }
 
 void FontAtlas::loadFromFile(const vkx::Context& context, const std::string& filename, const vk::Extent2D& size, vk::Format format, vk::Filter filter, vk::ImageUsageFlags imageUsageFlags) {
-    destroy();
+    device = context.device;
 
     // TODO: make be move ft to wrapper?
     FT_Library library;

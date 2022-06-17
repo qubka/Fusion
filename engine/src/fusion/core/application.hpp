@@ -11,7 +11,6 @@
 #include "fusion/renderer/vkx/texture.hpp"
 #include "fusion/renderer/vkx/benchmark.hpp"
 #include "fusion/renderer/renderer.hpp"
-#include "fusion/utils/random.hpp"
 
 #if defined(__ANDROID__)
 #include "fusion/renderer/android/window.hpp"

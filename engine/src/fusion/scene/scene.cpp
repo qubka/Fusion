@@ -68,6 +68,7 @@ Scene::Scene(const Scene& other) : Scene{} {
     clone<RigidbodyComponent>(other.registry);
     clone<BoxColliderComponent>(other.registry);
     clone<PhysicsMaterialComponent>(other.registry);
+    clone<MaterialComponent>(other.registry);
 }
 
 void Scene::onViewportResize(const glm::vec2& size) {

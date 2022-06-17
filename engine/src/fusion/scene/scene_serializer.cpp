@@ -464,6 +464,19 @@ void SceneSerializer::serialize(const std::string& filename) {
             out << YAML::EndMap; // PhysicsMaterialComponent
         }
 
+        if (auto component = scene->registry.try_get<MaterialComponent>(entity)) {
+            out << YAML::Key << "MaterialComponent";
+            out << YAML::BeginMap; // MaterialComponent
+
+            /*out << YAML::Key << "ambient" << YAML::Value << component->ambient;
+            out << YAML::Key << "diffuse" << YAML::Value << component->diffuse;
+            out << YAML::Key << "emission" << YAML::Value << component->emission;
+            out << YAML::Key << "specular" << YAML::Value << component->specular;
+            out << YAML::Key << "shininess" << YAML::Value << component->shininess;*/
+
+            out << YAML::EndMap; // MaterialComponent
+        }
+
         out << YAML::EndMap; // Entity
     });
 
@@ -582,6 +595,15 @@ bool SceneSerializer::deserialize(const std::string& filename) {
                                                                   component["restitution"].as<float>(),
                                                                   me::enum_value<PhysicsMaterialComponent::CombineMode>(component["frictionCombine"].as<size_t>()),
                                                                   me::enum_value<PhysicsMaterialComponent::CombineMode>(component["restitutionCombine"].as<size_t>()));
+            }
+
+            if (const auto& component = entity["MaterialComponent"]) {
+                /*scene->registry.emplace<MaterialComponent>(deserializedEntity,
+                                                           component["ambient"].as<glm::vec4>(),
+                                                           component["diffuse"].as<glm::vec4>(),
+                                                           component["emission"].as<glm::vec4>(),
+                                                           component["specular"].as<glm::vec3>(),
+                                                           component["shininess"].as<float>());*/
             }
         }
     }

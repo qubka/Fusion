@@ -60,7 +60,7 @@ namespace vkx {
                         vk::Format format = vk::Format::eR8G8B8A8Unorm,
                         vk::Filter filter = vk::Filter::eLinear,
                         vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled) {
-            destroy();
+            device = context.device;
 
             // Create target image for copy
             vk::ImageCreateInfo imageCreateInfo;
