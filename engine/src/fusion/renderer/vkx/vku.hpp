@@ -1327,7 +1327,7 @@ namespace vku {
             : GenericBuffer(device,
                             memprops,
                             vk::BufferUsageFlagBits::eUniformBuffer | vk::BufferUsageFlagBits::eTransferDst,
-                            (vk::DeviceSize)size,
+                            static_cast<vk::DeviceSize>(size),
                             vk::MemoryPropertyFlagBits::eDeviceLocal) {}
     };
 
@@ -1600,7 +1600,7 @@ namespace vku {
         }
 
         void upload(vk::Device device, std::vector<uint8_t>& bytes, vk::CommandPool commandPool, vk::PhysicalDeviceMemoryProperties memprops, vk::Queue queue) {
-            vku::GenericBuffer stagingBuffer(device, memprops, (vk::BufferUsageFlags)vk::BufferUsageFlagBits::eTransferSrc, (vk::DeviceSize)bytes.size(),
+            vku::GenericBuffer stagingBuffer(device, memprops, (vk::BufferUsageFlags)vk::BufferUsageFlagBits::eTransferSrc, static_cast<vk::DeviceSize>(bytes.size()),
                                              vk::MemoryPropertyFlagBits::eHostVisible);
             stagingBuffer.updateLocal(device, (const void*)bytes.data(), bytes.size());
 
@@ -2141,7 +2141,7 @@ namespace vku {
                     vk::CommandPool commandPool,
                     vk::PhysicalDeviceMemoryProperties memprops,
                     vk::Queue queue) {
-            vku::GenericBuffer stagingBuffer(device, memprops, (vk::BufferUsageFlags)vk::BufferUsageFlagBits::eTransferSrc, (vk::DeviceSize)bytes.size(),
+            vku::GenericBuffer stagingBuffer(device, memprops, (vk::BufferUsageFlags)vk::BufferUsageFlagBits::eTransferSrc, static_cast<vk::DeviceSize>(bytes.size()),
                                              vk::MemoryPropertyFlagBits::eHostVisible);
             stagingBuffer.updateLocal(device, (const void*)bytes.data(), bytes.size());
 

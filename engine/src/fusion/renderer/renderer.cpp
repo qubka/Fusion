@@ -56,7 +56,7 @@ void Renderer::createUniformBuffers() {
 
     /* Global Uniform Buffer Object */
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        uniformBuffers.push_back(context.createUniformBuffer(GlobalUbo{}));
+        uniformBuffers.push_back(context.createUniformBuffer(GlobalUniforms{}));
     }
 }
 

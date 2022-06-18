@@ -60,7 +60,7 @@ namespace vkx {
         }
 
         void fromFile(const vkx::Context& context, const std::string& filename, uint32_t patchsize, const glm::vec3& scale, Topology topology) {
-            assert(std::filesystem::exists(filename));
+            assert(std::fs::exists(filename));
 
             std::shared_ptr<gli::texture2d> tex2Dptr;
             vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {

@@ -10,6 +10,7 @@ namespace fe {
         int channels() const { return channels_; }
         int bytesPerPixel() const { return channels_ * (hdr_ ? sizeof(float) : sizeof(unsigned char)); }
         int pitch() const { return width_ * bytesPerPixel(); }
+        size_t size() const { return height_ * width_ * bytesPerPixel(); }
 
         bool empty() const { return !pixels_ || width_ == 0 || height_ == 0; }
         bool HDR() const { return hdr_; }

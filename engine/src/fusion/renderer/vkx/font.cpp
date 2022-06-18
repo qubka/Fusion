@@ -25,7 +25,9 @@ FT_UInt countChars(const FT_Face& face) {
 }
 
 void FontAtlas::fromFile(const vkx::Context& context, const std::string& filename, const vk::Extent2D& size, vk::Format format, vk::Filter filter, vk::ImageUsageFlags imageUsageFlags) {
-    assert(std::filesystem::exists(filename));
+    assert(std::fs::exists(filename));
+
+    LOG_DEBUG << "Loading font texture: " << filename.c_str();
 
     device = context.device;
 
@@ -115,8 +117,11 @@ void FontAtlas::fromFile(const vkx::Context& context, const std::string& filenam
     samplerCreateInfo.addressModeU = vk::SamplerAddressMode::eClampToEdge;
     samplerCreateInfo.addressModeV = vk::SamplerAddressMode::eClampToEdge;
     samplerCreateInfo.addressModeW = vk::SamplerAddressMode::eClampToEdge;
-    samplerCreateInfo.borderColor = vk::BorderColor::eFloatOpaqueWhite;
+    samplerCreateInfo.minLod = 0.0f;
+    samplerCreateInfo.maxLod = 1.0f;
     samplerCreateInfo.maxAnisotropy = context.deviceFeatures.samplerAnisotropy ? context.deviceProperties.limits.maxSamplerAnisotropy : 1.0f;
+    samplerCreateInfo.anisotropyEnable = context.deviceFeatures.samplerAnisotropy;
+    samplerCreateInfo.borderColor = vk::BorderColor::eFloatOpaqueWhite;
     sampler = device.createSampler(samplerCreateInfo);
 
     FT_Done_Face(face);

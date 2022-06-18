@@ -7,52 +7,6 @@
 namespace fe {
     class Renderer;
     class MeshRenderer {
-        struct PushConstantData {
-            alignas(16) glm::mat4 model{ 1.0f };
-            alignas(16) glm::mat4 normal{ 1.0f };
-        };
-
-        struct Material {
-            alignas(16) glm::vec4 ambient{ 0.0f };
-            alignas(16) glm::vec4 diffuse{ 0.0f };
-            alignas(16) glm::vec4 emission{ 0.0f };
-            alignas(16) glm::vec3 specular{ 0.0f };
-            alignas(4) float shininess{ 0.0f };
-        };
-
-        struct Parameters {
-            alignas(8) glm::vec2 flowMapsEnabled{ 0.0f };
-            alignas(4) float sunPosition{ 0.5f };
-            alignas(4) uint32_t normalMapsEnabled{ 0 };
-            alignas(4) uint32_t fresnelEnabled{ 0 };
-            alignas(4) uint32_t rimLightEnabled{ 0 };
-            alignas(4) uint32_t blinnPhongEnabled{ 0 };
-            alignas(4) uint32_t celShadingEnabled{ 0 };
-            alignas(4) uint32_t specularOnly{ 0 };
-            alignas(4) uint32_t isParticle{ 0 };
-            alignas(4) uint32_t isWater{ 0 };
-        };
-
-        struct Light {
-            alignas(16) glm::vec4 color{ 1.0f };
-            alignas(16) glm::vec4 ambient{ 1.0f };
-            alignas(16) glm::vec4 diffuse{ 1.0f };
-            alignas(16) glm::vec4 specular{ 1.0f };
-            alignas(16) glm::vec4 position{ 0.0f };
-            alignas(16) glm::vec3 spotDirection{ 0.0f, -1.0f, 0.0f };
-            alignas(4) float spotExponent{ 0.0f };
-            alignas(4) float spotCutoff{ 0.0f };
-            alignas(4) float spotCosCutoff{ 0.0f };
-            alignas(4) float constantAttenuation{ 0.0f };
-            alignas(4) float linearAttenuation{ 0.0f };
-            alignas(4) float quadraticAttenuation{ 0.0f };
-            alignas(16) glm::vec3 attenuation{ 0.0f };
-            alignas(16) glm::mat4 shadowViewMatrix{ 1.0f };
-        };
-
-        struct Lights {
-            Light light[1];
-        };
 
     public:
         MeshRenderer(const vkx::Context& context, Renderer& renderer)
@@ -95,9 +49,7 @@ namespace fe {
             }
             models.clear();
 
-            materialBuffer.destroy();
-            parametersBuffer.destroy();
-            lightsBuffer.destroy();
+            uniformBuffer.destroy();
 
             albedoTexture.destroy();
             normalTexture.destroy();
@@ -116,15 +68,14 @@ namespace fe {
         void createDescriptorSets();
         void createPipelineLayout();
         void createPipeline();
+        void setup();
 
         vk::Pipeline pipeline;
         vk::PipelineLayout pipelineLayout;
         vk::CommandBuffer* commandBuffer{ nullptr };
 
         vk::DescriptorSet uniformSet;
-        vkx::Buffer materialBuffer;
-        vkx::Buffer parametersBuffer;
-        vkx::Buffer lightsBuffer;
+        vkx::Buffer uniformBuffer;
         vk::DescriptorSetLayout uniformDescriptorSetLayout;
 
         vk::DescriptorSet textureSet;

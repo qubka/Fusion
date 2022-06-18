@@ -26,7 +26,7 @@ namespace fe {
     private:
         void newScene();
         void openScene();
-        void openScene(const std::filesystem::path& file);
+        void openScene(const std::fs::path& file);
         void saveScene();
         void saveSceneAs();
 
@@ -38,7 +38,7 @@ namespace fe {
 
         std::shared_ptr<Scene> activeScene;
         std::shared_ptr<Scene> editorScene;
-        std::filesystem::path editorScenePath;
+        std::fs::path editorScenePath;
         EditorCamera editorCamera;
 
         // Panels

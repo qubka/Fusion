@@ -107,7 +107,7 @@ namespace vkx { namespace storage {
     };
 
     FileStorage::FileStorage(const std::string& filename) {
-        assert(std::filesystem::exists(filename));
+        assert(std::fs::exists(filename));
     #if defined(__ANDROID__)
         // Load shader from compressed asset
         _asset = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);

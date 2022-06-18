@@ -96,11 +96,11 @@ void EditorLayer::onUpdate(float dt) {
 
 void EditorLayer::onRender(Renderer& renderer) {
     // update
-    GlobalUbo ubo{};
+    GlobalUniforms ubo{};
     ubo.projectionMatrix = editorCamera.getProjection();
     ubo.viewMatrix = editorCamera.getView();
-    ubo.cameraMatrix = editorCamera.getTransform();
-    ubo.frameTime = 0.0f;
+    //ubo.cameraMatrix = editorCamera.getTransform();
+    //ubo.frameTime = 0.0f;
 
     auto& buffer = renderer.getCurrentUniformBuffer();
     buffer.copy(ubo);
@@ -266,7 +266,7 @@ void EditorLayer::onImGui() {
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            openScene(std::filesystem::path{ reinterpret_cast<const char*>(payload->Data) });
+            openScene(std::fs::path{ reinterpret_cast<const char*>(payload->Data) });
         }
         ImGui::EndDragDropTarget();
     }
@@ -344,14 +344,14 @@ void EditorLayer::newScene() {
     activeScene = std::make_shared<Scene>();
     activeScene->onViewportResize(viewportSize);
     sceneHierarchyPanel.setContext(activeScene);
-    editorScenePath = std::filesystem::path{};
+    editorScenePath = std::fs::path{};
 }
 
 void EditorLayer::openScene() {
     auto filepath = pfd::open_file("Choose scene file", getAssetPath(), { "Scene File (.scene)", "*.scene" }, pfd::opt::none).result();
     if (!filepath.empty()) {
         // Validate that file inside working directory
-        if (filepath[0].find(std::filesystem::current_path()) != std::string::npos) {
+        if (filepath[0].find(std::fs::current_path()) != std::string::npos) {
             openScene(filepath[0]);
         } else {
             pfd::message("File Location", "The selected file should be inside the project directory.", pfd::choice::ok, pfd::icon::error);
@@ -359,7 +359,7 @@ void EditorLayer::openScene() {
     }
 }
 
-void EditorLayer::openScene(const std::filesystem::path& file) {
+void EditorLayer::openScene(const std::fs::path& file) {
     if (sceneState != Edit)
         onSceneStop();
 

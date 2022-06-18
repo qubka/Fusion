@@ -12,7 +12,6 @@
 #include <cstdlib>
 #include <cstddef>
 #include <cstdint>
-#include <filesystem>
 #include <cstring>
 #include <string>
 #include <deque>
@@ -29,6 +28,11 @@
 #include <mutex>
 #include <numeric>
 #include <random>
+
+#include <filesystem>
+namespace std {
+    namespace fs = std::filesystem;
+}
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>

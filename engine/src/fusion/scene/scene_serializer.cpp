@@ -328,7 +328,7 @@ SceneSerializer::SceneSerializer(const std::shared_ptr<Scene>& scene) : scene{sc
 }
 
 void SceneSerializer::serialize(const std::string& filename) {
-    assert(std::filesystem::exists(filename));
+    assert(std::fs::exists(filename));
 
     YAML::Emitter out;
     out << YAML::BeginMap;
@@ -490,7 +490,7 @@ void SceneSerializer::serialize(const std::string& filename) {
 }
 
 bool SceneSerializer::deserialize(const std::string& filename) {
-    assert(std::filesystem::exists(filename));
+    assert(std::fs::exists(filename));
 
     YAML::Node data;
     try {

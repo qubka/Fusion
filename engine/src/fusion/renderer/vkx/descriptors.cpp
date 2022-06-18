@@ -179,13 +179,13 @@ size_t DescriptorLayoutCache::DescriptorLayoutInfo::hash() const{
     return seed;
 }
 
-DescriptorBuilder& DescriptorBuilder::bindBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags) {
+DescriptorBuilder& DescriptorBuilder::bindBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags, vk::Sampler* sampler) {
     /// create the descriptor binding for the layout
     vk::DescriptorSetLayoutBinding newBinding;
     newBinding.binding = binding;
     newBinding.descriptorCount = 1;
     newBinding.descriptorType = type;
-    newBinding.pImmutableSamplers = nullptr;
+    newBinding.pImmutableSamplers = sampler;
     newBinding.stageFlags = stageFlags;
 
     bindings.push_back(newBinding);
@@ -202,13 +202,13 @@ DescriptorBuilder& DescriptorBuilder::bindBuffer(uint32_t binding, vk::Descripto
     return *this;
 }
 
-DescriptorBuilder& DescriptorBuilder::bindImage(uint32_t binding, vk::DescriptorImageInfo* imageInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags) {
+DescriptorBuilder& DescriptorBuilder::bindImage(uint32_t binding, vk::DescriptorImageInfo* imageInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags, vk::Sampler* sampler) {
     /// create the descriptor binding for the layout
     vk::DescriptorSetLayoutBinding newBinding;
     newBinding.binding = binding;
     newBinding.descriptorCount = 1;
     newBinding.descriptorType = type;
-    newBinding.pImmutableSamplers = nullptr;
+    newBinding.pImmutableSamplers = sampler;
     newBinding.stageFlags = stageFlags;
 
     bindings.push_back(newBinding);
@@ -222,6 +222,20 @@ DescriptorBuilder& DescriptorBuilder::bindImage(uint32_t binding, vk::Descriptor
     newWrite.pNext = nullptr;
 
     writes.push_back(newWrite);
+    return *this;
+}
+
+DescriptorBuilder& DescriptorBuilder::bindSampler(uint32_t binding, uint32_t count, vk::Sampler* sampler, vk::DescriptorType type, vk::ShaderStageFlags stageFlags) {
+    /// create the descriptor binding for the layout
+    vk::DescriptorSetLayoutBinding newBinding;
+    newBinding.binding = binding;
+    newBinding.descriptorCount = count;
+    newBinding.descriptorType = type;
+    newBinding.pImmutableSamplers = sampler;
+    newBinding.stageFlags = stageFlags;
+
+    bindings.push_back(newBinding);
+
     return *this;
 }
 

@@ -687,7 +687,7 @@ namespace vkx {
                 const auto dims = mip.extent();
                 mips.push_back({ vk::Extent3D{ static_cast<uint32_t>(dims.x), static_cast<uint32_t>(dims.y), 1 }, static_cast<uint32_t>(mip.size()) });
             }
-            return stageToDeviceImage(imageCreateInfo, memoryPropertyFlags, (vk::DeviceSize)tex2D.size(), tex2D.data(), mips, layout);
+            return stageToDeviceImage(imageCreateInfo, memoryPropertyFlags, static_cast<vk::DeviceSize>(tex2D.size()), tex2D.data(), mips, layout);
         }
 
         Buffer createBuffer(const vk::BufferUsageFlags& usageFlags, const vk::MemoryPropertyFlags& memoryPropertyFlags, vk::DeviceSize size) const {

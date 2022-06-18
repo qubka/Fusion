@@ -16,11 +16,9 @@
 #include "systems/sky_renderer.hpp"
 
 namespace fe {
-    struct GlobalUbo {
-        alignas(16) glm::mat4 projectionMatrix;
-        alignas(16) glm::mat4 viewMatrix;
-        alignas(16) glm::mat4 cameraMatrix;
-        alignas(4) float frameTime;
+    struct GlobalUniforms {
+        glm::mat4 projectionMatrix{ 1.0f };
+        glm::mat4 viewMatrix{ 1.0f };
     };
 
     class Renderer {
@@ -33,8 +31,10 @@ namespace fe {
         glm::vec3& getColor() { return color; }
         glm::vec3& getLightDirection() { return lightDirection; }
 
+        // TODO: Rework that may be?
         vkx::DescriptorLayoutCache& getDescriptorLayoutCache() { return descriptorLayoutCache; };
         vkx::DescriptorAllocator& getGlobalAllocator() { return globalAllocator; }
+        vkx::DescriptorAllocator& getDynamicAllocator(uint32_t frameIndex) { return dynamicAllocators[frameIndex]; }
         vkx::DescriptorAllocator& getCurrentDynamicAllocator() { return dynamicAllocators[currentFrame]; }
 
         vk::RenderPass& getDrawRenderPass() { return offscreen.active ? offscreen.renderPass : swapChain.renderPass; }

@@ -6,9 +6,7 @@
 using namespace fe;
 
 std::shared_ptr<Image> Image::fromFile(const std::string& filename, int channels, bool flip) {
-    assert(std::filesystem::exists(filename));
-
-    LOG_DEBUG << "Loading image: " << filename.c_str();
+    assert(std::fs::exists(filename));
 
     std::shared_ptr<Image> image{new Image};
 

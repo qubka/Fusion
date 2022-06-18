@@ -23,14 +23,14 @@ const VertexLayout Model::defaultLayout = {
         {
             Component::Position,
             Component::Normal,
-            Component::Bitangent,
             Component::Tangent,
+            Component::Bitangent,
             Component::UV,
         }
 };
 
 void Model::fromFile(const Context& context, const std::string& filename, const VertexLayout& layout, const ModelCreateInfo& createInfo, const int flags) {
-    assert(std::filesystem::exists(filename));
+    assert(std::fs::exists(filename));
 
     this->layout = layout;
     scale = createInfo.scale;

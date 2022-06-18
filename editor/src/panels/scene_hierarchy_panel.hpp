@@ -40,7 +40,7 @@ namespace fe {
 
         std::string entityFilter;
         std::string fileFilter;
-        std::filesystem::path currentFile;
-        std::vector<std::filesystem::path> cachedFiles;
+        std::fs::path currentFile;
+        std::vector<std::fs::path> cachedFiles;
     };
 }

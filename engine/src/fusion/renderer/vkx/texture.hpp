@@ -72,40 +72,61 @@ namespace vkx {
                       vk::Filter filter = vk::Filter::eLinear,
                       vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                       vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
-            assert(std::filesystem::exists(filename));
+            assert(std::fs::exists(filename));
 
-            auto extension { std::filesystem::path{ filename }.extension().string() };
-            if (extension != ".ktx" && extension != ".dds") {
-                throw std::runtime_error("Invalid texture format: " + filename);
-            }
+            LOG_DEBUG << "Loading 2D texture: " << filename.c_str();
 
             device = context.device;
             this->imageLayout = imageLayout;
 
-            std::shared_ptr<gli::texture2d> tex2Dptr;
-            vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {
-                tex2Dptr = std::make_shared<gli::texture2d>(gli::load(reinterpret_cast<const char*>(data), size));
-            });
-            const auto& tex2D = *tex2Dptr;
-            assert(!tex2D.empty());
+            // Temporary work with old image formats for simple 2D textures
+            auto extension { std::fs::path{ filename }.extension().string() };
+            if (extension != ".ktx" && extension != ".dds") {
+                auto image = fe::Image::fromFile(filename, vku::getBlockParams(format).bytesPerBlock);
+                assert(!image->empty());
 
-            layerCount = 1;
-            mipLevels = static_cast<uint32_t>(tex2D.levels());
+                layerCount = 1;
+                mipLevels = 1;
 
-            auto texExtent = tex2D[0].extent();
+                // Create optimal tiled target image
+                vk::ImageCreateInfo imageCreateInfo;
+                imageCreateInfo.imageType = vk::ImageType::e2D;
+                imageCreateInfo.format = format;
+                imageCreateInfo.mipLevels = mipLevels;
+                imageCreateInfo.arrayLayers = layerCount;
+                imageCreateInfo.extent.width = static_cast<uint32_t>(image->width());
+                imageCreateInfo.extent.height = static_cast<uint32_t>(image->height());
+                imageCreateInfo.extent.depth = 1;
+                imageCreateInfo.usage = imageUsageFlags | vk::ImageUsageFlagBits::eTransferDst;
 
-            // Create optimal tiled target image
-            vk::ImageCreateInfo imageCreateInfo;
-            imageCreateInfo.imageType = vk::ImageType::e2D;
-            imageCreateInfo.format = format;
-            imageCreateInfo.mipLevels = mipLevels;
-            imageCreateInfo.arrayLayers = layerCount;
-            imageCreateInfo.extent.width = static_cast<uint32_t>(texExtent.x);
-            imageCreateInfo.extent.height = static_cast<uint32_t>(texExtent.y);
-            imageCreateInfo.extent.depth = 1;
-            imageCreateInfo.usage = imageUsageFlags | vk::ImageUsageFlagBits::eTransferDst;
+                static_cast<vkx::Image&>(*this) = context.stageToDeviceImage(imageCreateInfo, vk::MemoryPropertyFlagBits::eDeviceLocal, image->size(), image->pixels<void>(), {}, imageLayout);
 
-            static_cast<vkx::Image&>(*this) = context.stageToDeviceImage(imageCreateInfo, vk::MemoryPropertyFlagBits::eDeviceLocal, tex2D, imageLayout);
+            } else {
+                std::shared_ptr<gli::texture2d> tex2Dptr;
+                vkx::file::withBinaryFileContents(filename, [&](size_t size, const void* data) {
+                    tex2Dptr = std::make_shared<gli::texture2d>(gli::load(reinterpret_cast<const char*>(data), size));
+                });
+                const auto& tex2D = *tex2Dptr;
+                assert(!tex2D.empty());
+
+                layerCount = 1;
+                mipLevels = static_cast<uint32_t>(tex2D.levels());
+
+                auto texExtent = tex2D[0].extent();
+
+                // Create optimal tiled target image
+                vk::ImageCreateInfo imageCreateInfo;
+                imageCreateInfo.imageType = vk::ImageType::e2D;
+                imageCreateInfo.format = format;
+                imageCreateInfo.mipLevels = mipLevels;
+                imageCreateInfo.arrayLayers = layerCount;
+                imageCreateInfo.extent.width = static_cast<uint32_t>(texExtent.x);
+                imageCreateInfo.extent.height = static_cast<uint32_t>(texExtent.y);
+                imageCreateInfo.extent.depth = 1;
+                imageCreateInfo.usage = imageUsageFlags | vk::ImageUsageFlagBits::eTransferDst;
+
+                static_cast<vkx::Image&>(*this) = context.stageToDeviceImage(imageCreateInfo, vk::MemoryPropertyFlagBits::eDeviceLocal, tex2D, imageLayout);
+            }
 
             // Create sampler
             vk::SamplerCreateInfo samplerCreateInfo;
@@ -169,6 +190,8 @@ namespace vkx {
             assert(size.width > 0);
             assert(size.height > 0);
             assert(layers == 1 || layers == 6);
+
+            LOG_DEBUG << "Creating 2D texture";
 
             device = context.device;
             this->imageLayout = imageLayout;
@@ -254,9 +277,11 @@ namespace vkx {
                       vk::Filter filter = vk::Filter::eLinear,
                       vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                       vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
-            assert(std::filesystem::exists(filename));
+            assert(std::fs::exists(filename));
 
-            auto extension { std::filesystem::path{ filename }.extension().string() };
+            LOG_DEBUG << "Loading 2D texture array: " << filename.c_str();
+
+            auto extension { std::fs::path{ filename }.extension().string() };
             if (extension != ".ktx" && extension != ".dds") {
                 throw std::runtime_error("Invalid texture format: " + filename);
             }
@@ -383,6 +408,8 @@ namespace vkx {
             assert(size.height > 0);
             assert(layers == 1 || layers == 6);
 
+            LOG_DEBUG << "Creating 2D texture array";
+
             device = context.device;
             this->imageLayout = imageLayout;
 
@@ -490,9 +517,11 @@ namespace vkx {
                           vk::Filter filter = vk::Filter::eLinear,
                           vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled,
                           vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal) {
-            assert(std::filesystem::exists(filename));
+            assert(std::fs::exists(filename));
 
-            auto extension { std::filesystem::path{ filename }.extension().string() };
+            LOG_DEBUG << "Loading cubemap texture: " << filename.c_str();
+
+            auto extension { std::fs::path{ filename }.extension().string() };
             if (extension != ".ktx" && extension != ".dds") {
                 throw std::runtime_error("Invalid texture format: " + filename);
             }
@@ -625,6 +654,8 @@ namespace vkx {
             assert(size.width > 0);
             assert(size.height > 0);
             assert(layers == 1 || layers == 6);
+
+            LOG_DEBUG << "Creating cubemap texture";
 
             device = context.device;
             this->imageLayout = imageLayout;

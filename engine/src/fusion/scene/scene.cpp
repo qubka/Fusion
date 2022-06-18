@@ -237,7 +237,7 @@ void Scene::render() {
 
     auto meshView = registry.view<DirtyMeshComponent, MeshComponent>();
     for (auto [entity, mesh] : meshView.each()) {
-        if (!mesh.path.empty() && std::filesystem::exists(mesh.path))
+        if (!mesh.path.empty() && std::fs::exists(mesh.path))
             mesh.runtimeModel = meshRenderer.loadModel(mesh.path);
         else
             mesh.runtimeModel = nullptr;

@@ -71,8 +71,9 @@ namespace vkx {
         DescriptorBuilder(DescriptorLayoutCache& cache, DescriptorAllocator& allocator)
             : cache{cache}, allocator{allocator} {};
 
-        DescriptorBuilder& bindBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
-        DescriptorBuilder& bindImage(uint32_t binding, vk::DescriptorImageInfo* imageInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
+        DescriptorBuilder& bindBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags, vk::Sampler* sampler = nullptr);
+        DescriptorBuilder& bindImage(uint32_t binding, vk::DescriptorImageInfo* imageInfo, vk::DescriptorType type, vk::ShaderStageFlags stageFlags, vk::Sampler* sampler = nullptr);
+        DescriptorBuilder& bindSampler(uint32_t binding, uint32_t count, vk::Sampler* sampler, vk::DescriptorType type, vk::ShaderStageFlags stageFlags);
 
         bool build(vk::DescriptorSet& set, vk::DescriptorSetLayout& layout);
         bool build(vk::DescriptorSet& set);

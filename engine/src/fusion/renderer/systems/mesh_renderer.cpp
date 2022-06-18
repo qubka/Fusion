@@ -6,12 +6,22 @@ using namespace fe;
 
 MeshRenderer* MeshRenderer::instance{ nullptr };
 
-// Parameters
-static constexpr uint32_t kEnvMapSize = 1024;
-static constexpr uint32_t kIrradianceMapSize = 32;
-static constexpr uint32_t kBRDF_LUT_Size = 256;
-static constexpr uint32_t kEnvMapLevels = vkx::util::numMipmapLevels(kEnvMapSize, kEnvMapSize);
-static constexpr VkDeviceSize kUniformBufferSize = 64 * 1024;
+struct PushConstantData {
+    glm::mat4 model{ 1.0f };
+    glm::mat4 normal{ 1.0f };
+};
+
+struct ShadingUniforms {
+    struct {
+        glm::vec4 direction{ 0.1f, 0.5f, 0.3f, 0.5f };
+        glm::vec4 radiance{ 0.5f };
+    } lights[1];
+    glm::vec4 eyePosition{ 100.0f };
+};
+
+void MeshRenderer::setup() {
+
+}
 
 void MeshRenderer::createUniformBuffers() {
     albedoTexture.fromFile(context, getAssetPath() + "/textures/cerberus_A.png", vk::Format::eR8G8B8A8Srgb);
@@ -19,46 +29,43 @@ void MeshRenderer::createUniformBuffers() {
     metalnessTexture.fromFile(context, getAssetPath() + "/textures/cerberus_M.png", vk::Format::eR8Unorm);
     roughnessTexture.fromFile(context, getAssetPath() + "/textures/cerberus_R.png", vk::Format::eR8Unorm);
 
+    static constexpr uint32_t kEnvMapSize = 1024;
+    static constexpr uint32_t kIrradianceMapSize = 32;
+    static constexpr uint32_t kBRDF_LUT_Size = 256;
+    static constexpr uint32_t kEnvMapLevels = vkx::util::numMipmapLevels(kEnvMapSize, kEnvMapSize);
+    static constexpr VkDeviceSize kUniformBufferSize = 64 * 1024;
+
     // Environment map (with pre-filtered mip chain)
-    envTexture.fromBuffer(context, nullptr, 0, {kEnvMapSize, kEnvMapSize}, 6, 0, vk::Format::eR16G16B16A16Sfloat, vk::Filter::eLinear, vk::ImageUsageFlagBits::eStorage);
+    //envTexture.fromBuffer(context, nullptr, 0, { kEnvMapSize, kEnvMapSize }, 6, 0, vk::Format::eR16G16B16A16Sfloat, vk::Filter::eLinear, vk::ImageUsageFlagBits::eStorage);
     // Irradiance map
-    irmapTexture.fromBuffer(context, nullptr, 0, {kIrradianceMapSize, kIrradianceMapSize}, 6, 1, vk::Format::eR16G16B16A16Sfloat, vk::Filter::eLinear, vk::ImageUsageFlagBits::eStorage);
+    //irmapTexture.fromBuffer(context, nullptr, 0, { kIrradianceMapSize, kIrradianceMapSize }, 6, 1, vk::Format::eR16G16B16A16Sfloat, vk::Filter::eLinear, vk::ImageUsageFlagBits::eStorage);
     // 2D LUT for split-sum approximation
-    spBRDF_LUT.fromBuffer(context, nullptr, 0, {kBRDF_LUT_Size, kBRDF_LUT_Size}, 1, 1, vk::Format::eR16G16Sfloat, vk::Filter::eLinear, vk::ImageUsageFlagBits::eStorage);
+    //spBRDF_LUT.fromBuffer(context, nullptr, 0, { kBRDF_LUT_Size, kBRDF_LUT_Size }, 1, 1, vk::Format::eR16G16Sfloat, vk::Filter::eLinear, vk::ImageUsageFlagBits::eStorage);
 
-    //diffuseTexture.fromBuffer(context, image.pixels, image.width * image.height * image.channels, vk::Extent2D{ static_cast<uint32_t>(image.width), static_cast<uint32_t>(image.height) });
-    //diffuseTexture.fromFile(context, getAssetPath() + "/models/hq/loggerhead_8bit_albedo2.png");
-    //normalTexture.fromFile(context, getAssetPath() + "/models/hq/loggerhead_8bit_normal.dds");
-    //specularTexture.fromFile(context, getAssetPath() + "/models/hq/loggerhead_8bit_roughness.dds");
-
-    lightsBuffer = context.createUniformBuffer(Lights{});
-    materialBuffer = context.createUniformBuffer(Material{});
-    parametersBuffer = context.createUniformBuffer(Parameters{});
+    uniformBuffer = context.createUniformBuffer(ShadingUniforms{});
 }
 
 void MeshRenderer::createDescriptorSets() {
     vkx::DescriptorBuilder{renderer.getDescriptorLayoutCache(), renderer.getGlobalAllocator()}
-        .bindBuffer(0, &lightsBuffer.descriptor, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eVertex)
-        .bindBuffer(1, &materialBuffer.descriptor, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eFragment)
-        .bindBuffer(2, &parametersBuffer.descriptor, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eFragment)
-        .build(uniformSet, uniformDescriptorSetLayout);
-
+            .bindBuffer(0, &uniformBuffer.descriptor, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eFragment)
+            .build(uniformSet, uniformDescriptorSetLayout);
 
     vkx::DescriptorBuilder{renderer.getDescriptorLayoutCache(), renderer.getGlobalAllocator()}
         .bindImage(0, &albedoTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
         .bindImage(1, &normalTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
         .bindImage(2, &metalnessTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
         .bindImage(3, &roughnessTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
-
-
+        /*.bindImage(4, &envTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
+        .bindImage(5, &irmapTexture.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
+        .bindImage(6, &spBRDF_LUT.descriptor, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)*/
         .build(textureSet, textureDescriptorSetLayout);
 }
 
 void MeshRenderer::createPipelineLayout() {
     std::array<vk::DescriptorSetLayout, 3> descriptorSetLayouts{
-        renderer.getGlobalDescriptorLayoutSet(),
-        uniformDescriptorSetLayout,
-        textureDescriptorSetLayout
+            renderer.getGlobalDescriptorLayoutSet(),
+            uniformDescriptorSetLayout,
+            textureDescriptorSetLayout
     };
 
     vk::PushConstantRange pushConstantRange{ vk::ShaderStageFlagBits::eVertex, 0, sizeof(PushConstantData) };
@@ -69,7 +76,7 @@ void MeshRenderer::createPipelineLayout() {
 
 void MeshRenderer::createPipeline() {
     vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ context.device, pipelineLayout, renderer.getDrawRenderPass() };
-    pipelineBuilder.rasterizationState.frontFace = vk::FrontFace::eCounterClockwise;
+    //pipelineBuilder.rasterizationState.frontFace = vk::FrontFace::eCounterClockwise;
 
     // Binding description
     pipelineBuilder.vertexInputState.appendVertexLayout(vkx::Model::defaultLayout, 0, vk::VertexInputRate::eVertex);
@@ -78,13 +85,19 @@ void MeshRenderer::createPipeline() {
 
     // vk::Pipeline for the meshes (armadillo, bunny, etc.)
     // Load shaders
-    pipelineBuilder.loadShader(getAssetPath() + "/shaders/mesh/blinn_phong.vert.spv", vk::ShaderStageFlagBits::eVertex);
-    pipelineBuilder.loadShader(getAssetPath() + "/shaders/mesh/blinn_phong.frag.spv", vk::ShaderStageFlagBits::eFragment);
+    pipelineBuilder.loadShader(getAssetPath() + "/shaders/mesh/pbr.vert.spv", vk::ShaderStageFlagBits::eVertex);
+    pipelineBuilder.loadShader(getAssetPath() + "/shaders/mesh/pbr.frag.spv", vk::ShaderStageFlagBits::eFragment);
     pipeline = pipelineBuilder.create(context.pipelineCache);
 }
 
 void MeshRenderer::begin() {
     assert(!commandBuffer && "pipeline already was bind");
+
+    // update
+    /*ShadingUniforms ubo{};
+    ubo.eyePosition = ca;
+    //ubo.cameraMatrix = editorCamera.getTransform();
+    //ubo.frameTime = 0.0f;*/
 
     commandBuffer = &renderer.getCurrentCommandBuffer();
 
@@ -124,7 +137,7 @@ void MeshRenderer::end() {
 }
 
 vkx::Model* MeshRenderer::loadModel(const std::string& filename) {
-    assert(std::filesystem::exists(filename));
+    assert(std::fs::exists(filename));
     if (auto it{ models.find(filename) }; it != models.end()) {
         return &it->second;
     }

@@ -243,8 +243,8 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         auto filepath = pfd::open_file("Choose 3D file", value.empty() ? getAssetPath() : value, { file, pattern }, pfd::opt::none).result();
         if (!filepath.empty()) {
             // Validate that file inside working directory
-            if (filepath[0].find(std::filesystem::current_path()) != std::string::npos) {
-                value = std::filesystem::relative(filepath[0]);
+            if (filepath[0].find(std::fs::current_path()) != std::string::npos) {
+                value = std::fs::relative(filepath[0]);
                 modify = true;
             } else {
                 pfd::message("File Location", "The selected file should be inside the project directory.", pfd::choice::ok, pfd::icon::error);
@@ -262,7 +262,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
             ImGui::OpenPopup("FileExplorer");
         }
     } else {
-        std::filesystem::path file{ value };
+        std::fs::path file{ value };
         std::string title{ fs::extension_icon(file) + " " + file.filename().string() };
         if (ImGui::Button(title.c_str(), buttonSize)) {
             contentBrowserPanel.selectFile(file);
@@ -276,7 +276,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            std::filesystem::path file{ reinterpret_cast<const char*>(payload->Data) };
+            std::fs::path file{ reinterpret_cast<const char*>(payload->Data) };
             // Validate that file format is suitable
             if (std::find(formats.begin(), formats.end(), file.extension().string()) != formats.end()) {
                 value = file;

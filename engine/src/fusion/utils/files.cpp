@@ -4,10 +4,10 @@ using namespace fe;
 
 #include <IconsFontAwesome4.h>
 
-std::vector<std::filesystem::path> fs::walk(const std::filesystem::path& dir, const std::string& filter, const std::vector<std::string>& formats) {
-    std::vector<std::filesystem::path> paths;
+std::vector<std::fs::path> fs::walk(const std::fs::path& dir, const std::string& filter, const std::vector<std::string>& formats) {
+    std::vector<std::fs::path> paths;
 
-    for (const auto& entry : std::filesystem::directory_iterator(dir)) {
+    for (const auto& entry : std::fs::directory_iterator(dir)) {
         const auto& path = entry.path();
 
         if (!filter.empty() && entry.is_directory() && ext::find_insensitive(path.filename().string(), filter) == std::string::npos)
@@ -19,17 +19,17 @@ std::vector<std::filesystem::path> fs::walk(const std::filesystem::path& dir, co
         paths.push_back(path);
     }
 
-    std::sort(paths.begin(), paths.end(), [](const std::filesystem::path& a, const std::filesystem::path& b) {
+    std::sort(paths.begin(), paths.end(), [](const std::fs::path& a, const std::fs::path& b) {
         return is_directory(a) && !is_directory(b);
     });
 
     return paths;
 }
 
-std::vector<std::filesystem::path> fs::recursive_walk(const std::filesystem::path& dir, const std::string& filter, const std::vector<std::string>& formats) {
-    std::vector<std::filesystem::path> paths;
+std::vector<std::fs::path> fs::recursive_walk(const std::fs::path& dir, const std::string& filter, const std::vector<std::string>& formats) {
+    std::vector<std::fs::path> paths;
 
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
+    for (const auto& entry : std::fs::recursive_directory_iterator(dir)) {
         if (entry.is_directory())
             continue;
 
@@ -44,16 +44,16 @@ std::vector<std::filesystem::path> fs::recursive_walk(const std::filesystem::pat
         paths.push_back(path);
     }
 
-    std::sort(paths.begin(), paths.end(), [](const std::filesystem::path& a, const std::filesystem::path& b) {
+    std::sort(paths.begin(), paths.end(), [](const std::fs::path& a, const std::fs::path& b) {
         return a < b;
     });
 
     return paths;
 }
 
-bool fs::has_directories(const std::filesystem::path& dir) {
+bool fs::has_directories(const std::fs::path& dir) {
     if (is_directory(dir) && !is_empty(dir)) {
-        for (const auto& entry: std::filesystem::directory_iterator(dir)) {
+        for (const auto& entry: std::fs::directory_iterator(dir)) {
             if (entry.is_directory())
                 return true;
         }
@@ -165,7 +165,7 @@ std::unordered_map<std::string, std::string> fs::extensions {
     {".db", ICON_FA_DATABASE},
 };
 
-std::string fs::extension_icon(const std::filesystem::path& file) {
+std::string fs::extension_icon(const std::fs::path& file) {
     auto key { fs::extensions.find(file.extension().string()) };
     return key != fs::extensions.end() ? key->second.c_str() : ICON_FA_FILE;
 }

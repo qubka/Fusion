@@ -18,7 +18,7 @@ void ContentBrowserPanel::onImGui() {
 void ContentBrowserPanel::drawFileExplorer() {
     ImGui::BeginChild("ProjectHierarchy", { ImGui::GetContentRegionAvail().x / 6.0f, 0 }, true);
 
-    std::function<void(const std::function<void(const std::filesystem::path&)>&, const std::filesystem::path&)> fileNode = [&](const std::function<void(const std::filesystem::path&)>& function, const std::filesystem::path& file) {
+    std::function<void(const std::function<void(const std::fs::path&)>&, const std::fs::path&)> fileNode = [&](const std::function<void(const std::fs::path&)>& function, const std::fs::path& file) {
         bool filled = fs::has_directories(file);
         ImGuiTreeNodeFlags flags = ((currentDirectory == file) ? ImGuiTreeNodeFlags_Selected : 0) |
                                    (filled ? (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick) : ImGuiTreeNodeFlags_Leaf)
@@ -38,7 +38,7 @@ void ContentBrowserPanel::drawFileExplorer() {
         }
     };
 
-    std::function<void(const std::filesystem::path&)> directoryTree = [&](const std::filesystem::path& dir) {
+    std::function<void(const std::fs::path&)> directoryTree = [&](const std::fs::path& dir) {
         for (const auto& file : fs::walk(dir)) {
             if (is_directory(file)) {
                 fileNode(directoryTree, file);
@@ -163,12 +163,12 @@ void ContentBrowserPanel::drawContentBrowser() {
     ImGui::EndChild();
 }
 
-void ContentBrowserPanel::selectFile(const std::filesystem::path& file) {
+void ContentBrowserPanel::selectFile(const std::fs::path& file) {
     selectDirectory(file.parent_path());
     currentFile = file;
 }
 
-void ContentBrowserPanel::selectDirectory(const std::filesystem::path& dir) {
+void ContentBrowserPanel::selectDirectory(const std::fs::path& dir) {
     currentDirectory = dir;
     currentFiles = fs::walk(dir);
 }

@@ -26,24 +26,6 @@ namespace vkx {
     /** @brief font texture */
     struct Font : public Image {
         /**
-         * Load a 2D texture
-         *
-         * @param device Vulkan device to create the texture on
-         * @param filename File to load (supports .otf and .ttf)
-         * @param width Width of the glyph to create
-         * @param height Height of glyph to create
-         * @param (Optional) format Vulkan format of the image data stored in the file (defaults to R8G8B8A8_UNORM)
-         * @param (Optional) filter Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
-         * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
-         */
-        /*void fromFile(const vkx::Context& context,
-                          const std::string& filename,
-                          const vk::Extent2D& size,
-                          vk::Format format = vk::Format::eR8G8B8A8Unorm,
-                          vk::Filter filter = vk::Filter::eLinear,
-                          vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled);*/
-
-        /**
          * Creates a 2D texture from a buffer
          *
          * @param device Vulkan device to create the texture on
@@ -61,6 +43,8 @@ namespace vkx {
                         vk::Filter filter = vk::Filter::eLinear,
                         vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled) {
             device = context.device;
+
+            LOG_DEBUG << "Creating font texture";
 
             // Create target image for copy
             vk::ImageCreateInfo imageCreateInfo;
@@ -94,9 +78,32 @@ namespace vkx {
             samplerCreateInfo.addressModeU = vk::SamplerAddressMode::eClampToEdge;
             samplerCreateInfo.addressModeV = vk::SamplerAddressMode::eClampToEdge;
             samplerCreateInfo.addressModeW = vk::SamplerAddressMode::eClampToEdge;
+            samplerCreateInfo.minLod = 0.0f;
+            samplerCreateInfo.maxLod = 1.0f;
+            samplerCreateInfo.maxAnisotropy = context.deviceFeatures.samplerAnisotropy ? context.deviceProperties.limits.maxSamplerAnisotropy : 1.0f;
+            samplerCreateInfo.anisotropyEnable = context.deviceFeatures.samplerAnisotropy;
             samplerCreateInfo.borderColor = vk::BorderColor::eFloatOpaqueWhite;
             sampler = device.createSampler(samplerCreateInfo);
         }
+
+        /**
+         * Load a 2D texture
+         *
+         * @param device Vulkan device to create the texture on
+         * @param filename File to load (supports .otf and .ttf)
+         * @param width Width of the glyph to create
+         * @param height Height of glyph to create
+         * @param (Optional) format Vulkan format of the image data stored in the file (defaults to R8G8B8A8_UNORM)
+         * @param (Optional) filter Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
+         * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
+         */
+        /*void fromFile(const vkx::Context& context,
+                      const std::string& filename,
+                      const vk::Extent2D& size,
+                      vk::Format format = vk::Format::eR8G8B8A8Unorm,
+                      vk::Filter filter = vk::Filter::eLinear,
+                      vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled);*/
+
     };
 
     /** @brief font atlas texture with cache */
@@ -115,10 +122,10 @@ namespace vkx {
          * @param (Optional) imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
          */
         void fromFile(const vkx::Context& context,
-                          const std::string& filename,
-                          const vk::Extent2D& size,
-                          vk::Format format = vk::Format::eR8G8B8A8Unorm,
-                          vk::Filter filter = vk::Filter::eLinear,
-                          vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled);
+                      const std::string& filename,
+                      const vk::Extent2D& size,
+                      vk::Format format = vk::Format::eR8G8B8A8Unorm,
+                      vk::Filter filter = vk::Filter::eLinear,
+                      vk::ImageUsageFlags imageUsageFlags = vk::ImageUsageFlagBits::eSampled);
     };
 } // namespace vkx
