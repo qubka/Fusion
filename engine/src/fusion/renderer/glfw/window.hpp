@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.hpp>
 
-#include "fusion/core/window.hpp"
+#include "fusion/renderer/window.hpp"
 #include "fusion/input/key_input.hpp"
 #include "fusion/input/mouse_input.hpp"
 

@@ -312,9 +312,12 @@ namespace vkx {
             static_cast<vkx::Image&>(*this) = context.createImage(imageCreateInfo);
 
             auto stagingBuffer = context.createStagingBuffer(tex2DArray);
+            auto imageSize = layerCount * mipLevels;
 
             // Setup buffer copy regions for each layer including all of it's miplevels
             std::vector<vk::BufferImageCopy> bufferCopyRegions;
+            bufferCopyRegions.reserve(imageSize);
+
             size_t offset = 0;
             vk::BufferImageCopy bufferCopyRegion;
             bufferCopyRegion.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
@@ -434,6 +437,8 @@ namespace vkx {
 
                 // Setup buffer copy regions for each layer including all of it's miplevels
                 std::vector<vk::BufferImageCopy> bufferCopyRegions;
+                bufferCopyRegions.reserve(imageSize);
+
                 size_t offset = 0;
                 vk::BufferImageCopy bufferCopyRegion;
                 bufferCopyRegion.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
@@ -558,9 +563,12 @@ namespace vkx {
             static_cast<vkx::Image&>(*this) = context.createImage(imageCreateInfo);
 
             auto stagingBuffer = context.createStagingBuffer(texCube);
+            auto imageSize = layerCount * mipLevels;
 
             // Setup buffer copy regions for each face including all of it's miplevels
             std::vector<vk::BufferImageCopy> bufferCopyRegions;
+            bufferCopyRegions.reserve(imageSize);
+
             size_t offset = 0;
             vk::BufferImageCopy bufferImageCopy;
             bufferImageCopy.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
@@ -685,6 +693,8 @@ namespace vkx {
 
                 // Setup buffer copy regions for each face including all of it's miplevels
                 std::vector<vk::BufferImageCopy> bufferCopyRegions;
+                bufferCopyRegions.reserve(imageSize);
+
                 size_t offset = 0;
                 vk::BufferImageCopy bufferImageCopy;
                 bufferImageCopy.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;

@@ -1,12 +1,12 @@
 #include "scene.hpp"
 #include "components.hpp"
 
-#include "fusion/renderer/systems/mesh_renderer.hpp"
-#include "fusion/renderer/systems/grid_renderer.hpp"
-#include "fusion/renderer/systems/sky_renderer.hpp"
+//#include "fusion/renderer/systems/mesh_renderer.hpp"
+//#include "fusion/renderer/systems/grid_renderer.hpp"
+//#include "fusion/renderer/systems/sky_renderer.hpp"
 
 #include "fusion/renderer/editor_camera.hpp"
-#include "fusion/input/input.hpp"
+//#include "fusion/input/input.hpp"
 
 using namespace fe;
 using namespace physx;
@@ -195,7 +195,7 @@ void Scene::onRenderRuntime() {
 }
 
 void Scene::onRenderEditor(const EditorCamera& camera) {
-    render();
+    /*render();
 
     auto& skyRenderer = SkyRenderer::Instance();
     skyRenderer.begin();
@@ -205,7 +205,7 @@ void Scene::onRenderEditor(const EditorCamera& camera) {
     auto& gridRenderer = GridRenderer::Instance();
     gridRenderer.begin();
     gridRenderer.draw();
-    gridRenderer.end();
+    gridRenderer.end();*/
 }
 
 glm::mat4 getTRS(const entt::registry& registry, const entt::entity entity) {
@@ -217,7 +217,7 @@ glm::mat4 getTRS(const entt::registry& registry, const entt::entity entity) {
 }
 
 void Scene::render() {
-    auto transformGroup = registry.group<DirtyTransformComponent, TransformComponent>();
+    /*auto transformGroup = registry.group<DirtyTransformComponent, TransformComponent>();
     transformGroup.sort([&](const entt::entity lhs, const entt::entity rhs) {
         auto clhs = registry.try_get<RelationshipComponent>(lhs);
         if (clhs == nullptr)
@@ -253,7 +253,7 @@ void Scene::render() {
             meshRenderer.draw(*model, transform.model);
     }
 
-    meshRenderer.end();
+    meshRenderer.end();*/
 }
 
 template<typename Component>

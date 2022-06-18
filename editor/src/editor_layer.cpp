@@ -1,9 +1,8 @@
 #include "editor_layer.hpp"
-#include "fusion/core/application.hpp"
+#include "editor_app.hpp"
+
 #include "fusion/scene/components.hpp"
 #include "fusion/input/input.hpp"
-
-#include "../editor_app.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
@@ -16,11 +15,10 @@ using namespace std::string_literals;
 
 // TODO: Fix editorScene -> activeScene
 
-EditorLayer::EditorLayer(EditorApp& context) : Layer{"EditorLayer"}, context{context} {
+EditorLayer::EditorLayer() : Layer{"EditorLayer"} {
 }
 
 EditorLayer::~EditorLayer() {
-
 }
 
 void EditorLayer::onAttach() {
@@ -96,11 +94,9 @@ void EditorLayer::onUpdate(float dt) {
 
 void EditorLayer::onRender(Renderer& renderer) {
     // update
-    GlobalUniforms ubo{};
+    /*GlobalUniformObject ubo{};
     ubo.projectionMatrix = editorCamera.getProjection();
     ubo.viewMatrix = editorCamera.getView();
-    //ubo.cameraMatrix = editorCamera.getTransform();
-    //ubo.frameTime = 0.0f;
 
     auto& buffer = renderer.getCurrentUniformBuffer();
     buffer.copy(ubo);
@@ -115,7 +111,7 @@ void EditorLayer::onRender(Renderer& renderer) {
         }
         viewportFocused = true;
         viewportHovered = true;
-    }
+    }*/
 
     switch (sceneState) {
         case Edit:

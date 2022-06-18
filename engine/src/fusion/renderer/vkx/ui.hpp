@@ -12,7 +12,7 @@
 #include "framebuffer.hpp"
 #include "font.hpp"
 
-#include "fusion/core/window.hpp"
+#include "fusion/renderer/window.hpp"
 
 #ifdef __ANDROID__
 #include <android/native_activity.h>

@@ -77,4 +77,8 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC GLFW_INCLUDE_VULKAN)
 #target_compile_definitions(${PROJECT_NAME} PUBLIC VK_ENABLE_BETA_EXTENSIONS)
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLM_FORCE_DEPTH_ZERO_TO_ONE)
 
+target_compile_definitions(${PROJECT_NAME} PUBLIC FUSION_VERSION_MAJOR=3)
+target_compile_definitions(${PROJECT_NAME} PUBLIC FUSION_VERSION_MINOR=4)
+target_compile_definitions(${PROJECT_NAME} PUBLIC FUSION_VERSION_PATCH=5)
+
 add_dependencies(${PROJECT_NAME} Shaders)

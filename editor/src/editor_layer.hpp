@@ -11,10 +11,9 @@
 #include "fusion/renderer/renderer.hpp"
 
 namespace fe {
-    class EditorApp;
     class EditorLayer : public Layer {
     public:
-        EditorLayer(EditorApp& context);
+        EditorLayer();
         ~EditorLayer() override;
 
         void onAttach() override;
@@ -53,7 +52,5 @@ namespace fe {
         glm::mat4 viewportOrtho{ 1.0f };
         bool viewportFocused{ false };
         bool viewportHovered{ false };
-
-        EditorApp& context;
     };
 }

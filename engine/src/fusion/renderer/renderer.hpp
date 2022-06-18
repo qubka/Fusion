@@ -1,102 +1,80 @@
 #pragma once
 
-#include "vkx/helpers.hpp"
-#include "vkx/filesystem.hpp"
-#include "vkx/model.hpp"
-#include "vkx/shaders.hpp"
-#include "vkx/pipelines.hpp"
-#include "vkx/texture.hpp"
-#include "vkx/swapchain.hpp"
-#include "vkx/descriptors.hpp"
-#include "vkx/offscreen.hpp"
-#include "vkx/ui.hpp"
-
-#include "systems/mesh_renderer.hpp"
-#include "systems/grid_renderer.hpp"
-#include "systems/sky_renderer.hpp"
+#include "subrender.hpp"
 
 namespace fe {
-    struct GlobalUniforms {
-        glm::mat4 projectionMatrix{ 1.0f };
-        glm::mat4 viewMatrix{ 1.0f };
-    };
-
     class Renderer {
+        friend class Subrender;
     public:
+        /**
+         * Creates a new renderer.
+         */
         Renderer(const vkx::Context& context) : context{context} { }
+        virtual ~Renderer() = default;
 
-        void create(const vk::Extent2D& size, bool overlay = false);
-        void destroy();
+        /**
+         * Run when switching to this scene from another, use this method to create {@link Subrender}'s.
+         */
+        virtual void onStart() = 0;
 
-        glm::vec3& getColor() { return color; }
-        glm::vec3& getLightDirection() { return lightDirection; }
+        /**
+         * Run when updating the renderer manager.
+         */
+        virtual void onUpdate() = 0;
 
-        // TODO: Rework that may be?
-        vkx::DescriptorLayoutCache& getDescriptorLayoutCache() { return descriptorLayoutCache; };
-        vkx::DescriptorAllocator& getGlobalAllocator() { return globalAllocator; }
-        vkx::DescriptorAllocator& getDynamicAllocator(uint32_t frameIndex) { return dynamicAllocators[frameIndex]; }
-        vkx::DescriptorAllocator& getCurrentDynamicAllocator() { return dynamicAllocators[currentFrame]; }
+        /**
+         * Checks whether a Subrender exists or not.
+         * @tparam T The Subrender type.
+         * @return If the Subrender has the System.
+         */
+        template<typename T>
+        bool hasSubrender() const  {
+            return subrenders.find(typeid(T)) != subrenders.end();
+        }
 
-        vk::RenderPass& getDrawRenderPass() { return offscreen.active ? offscreen.renderPass : swapChain.renderPass; }
-        vk::CommandBuffer& getMainCommandBuffer() { return commandBuffers[currentFrame]; }
-        vk::CommandBuffer& getCurrentCommandBuffer() { return offscreen.active ? offscreen.commandBuffers[currentFrame] : commandBuffers[currentFrame]; }
-        vkx::Buffer& getCurrentUniformBuffer() { return uniformBuffers[currentFrame]; }
-        vk::DescriptorSet& getCurrentFrameImage() { return offscreen.descriptorSets[currentFrame]; }
+        /**
+         * Gets a Subrender.
+         * @tparam T The Subrender type.
+         * @return The Subrender.
+         */
+        template<typename T>
+        T* getSubrender() const {
+            if (auto it{ subrenders.find(typeid(T)) }; it != subrenders.end()) {
+                return it->second.get();
+            }
+            return nullptr;
+        }
 
-        const vk::DescriptorSet& getCurrentGlobalDescriptorSets() const { return globalDescriptorSets[currentFrame]; }
-        const vk::DescriptorSetLayout& getGlobalDescriptorLayoutSet() const { return globalDescriptorSetLayout; }
+        /**
+         * Adds a Subrender.
+         * @tparam T The Subrender type.
+         * @tparam Args The constructor arg types.
+         * @param args The constructor arguments.
+         */
+        template<typename T, typename... Args>
+        T* addSubrender(Args &&...args) {
+            auto [it, result] = subrenders.emplace(typeid(T), std::make_unique<T>(std::forward<Args>(args)...));
+            return it->second.get();
+        }
 
-        vkx::Offscreen& getOffscreen() { return offscreen; }
-        vkx::SwapChain& getSwapChain() { return swapChain; }
-        vkx::UIOverlay& getGUI() { return gui; }
+        /**
+         * Removes a Subrender.
+         * @tparam T The Subrender type.
+         */
+        template<typename T>
+        void removeSubrender() {
+            subrenders.erase(std::remove(subrenders.begin(), subrenders.end(), typeid(T)), subrenders.end());
+        }
 
-        uint32_t getFrameIndex() const { return currentFrame; }
-        bool isFrameInProgress() const { return frameStarted; }
-
-        uint32_t beginFrame();
-
-        void beginRenderPass(uint32_t frameIndex);
-        void endRenderPass(uint32_t frameIndex);
-
-        void endFrame(uint32_t frameIndex);
-
-        bool beginGui(float dt) const;
-        void endGui();
+        /**
+         * Clears all Subrenders.
+         */
+        void clearSubrenders() {
+            subrenders.clear();
+        }
 
     private:
         const vkx::Context& context;
-
-        vkx::Offscreen offscreen{ context };
-        vkx::SwapChain swapChain{ context };
-        vkx::UIOverlay gui{ context };
-
-        vk::CommandPool commandPool;
-        std::vector<vk::CommandBuffer> commandBuffers;
-
-        std::vector<vkx::Buffer> uniformBuffers;
-        vk::DescriptorSetLayout globalDescriptorSetLayout;
-        std::vector<vk::DescriptorSet> globalDescriptorSets;
-
-        std::vector<vkx::DescriptorAllocator> dynamicAllocators;
-        vkx::DescriptorAllocator globalAllocator{ context.device };
-        vkx::DescriptorLayoutCache descriptorLayoutCache{ context.device };
-
-        std::array<vk::ClearValue, 2> clearValues{};
-        glm::vec3 color{ 1.0f, 1.0f, 1.0f };
-        glm::vec3 lightDirection{ 1, -3, -1 };
-
-        MeshRenderer* meshRenderer;
-        GridRenderer* gridRenderer;
-        SkyRenderer* skyRenderer;
-
-        uint32_t currentImage{ 0 };
-        uint32_t currentFrame{ 0 };
-        bool frameStarted{ false };
-
-        void createCommandBuffers();
-        void createUniformBuffers();
-        void createDescriptorSets();
-        void createGui();
-        void recreateSwapChain();
+        std::unordered_map<std::type_index, std::unique_ptr<Subrender>> subrenders;
     };
 }
