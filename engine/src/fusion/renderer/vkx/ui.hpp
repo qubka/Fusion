@@ -9,7 +9,7 @@
 #pragma once
 
 #include "context.hpp"
-#include "framebuffer.hpp"
+#include "framebuffers.hpp"
 #include "font.hpp"
 
 #include "fusion/renderer/window.hpp"
@@ -35,7 +35,6 @@ namespace vkx {
     private:
         UIOverlayCreateInfo createInfo;
         const vkx::Context& context;
-        const vk::Device& device{ context.device };
 
         vkx::Buffer vertexBuffer;
         vkx::Buffer indexBuffer;

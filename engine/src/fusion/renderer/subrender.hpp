@@ -13,6 +13,7 @@ namespace fe {
          */
         Subrender(Renderer& renderer) : renderer{renderer} {};
         virtual ~Subrender() = default;
+        FE_NONCOPYABLE(Subrender);
 
         /**
          * Runs the render pipeline in the current renderpass.

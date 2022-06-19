@@ -78,7 +78,7 @@ namespace fe {
 
         void pushOverlay(Layer* layer) { layers.pushBack(layer); }
 
-    private:
+    protected:
         std::string name;
         Version version;
         bool started{ false };

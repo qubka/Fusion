@@ -167,6 +167,7 @@ void Window::FocusCallback(GLFWwindow* handle, int focused) {
 
 void Window::IconifyCallback(GLFWwindow* handle, int iconified) {
     auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
+    window.minimize = iconified;
 
     LOG_VERBOSE << "IconifyEvent: " << (iconified ? "TRUE" : "FALSE");
 

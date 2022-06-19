@@ -40,6 +40,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         magic_enum
         plog
         freetype
+        glslang
+        SPIRV
         yaml-cpp
         Vulkan::Vulkan
         assimp::assimp

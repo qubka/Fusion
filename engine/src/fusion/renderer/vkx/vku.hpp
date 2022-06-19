@@ -594,7 +594,7 @@ namespace vku {
     };
 
     /// Class for building shader modules and extracting metadata from shaders.
-    class ShaderModule {
+    /*class ShaderModule {
     public:
         ShaderModule() {}
 
@@ -633,7 +633,7 @@ namespace vku {
         }
 
         /// A variable in a shader.
-        /*struct Variable {
+        struct Variable {
             // The name of the variable from the GLSL/HLSL
             std::string debugName;
 
@@ -702,7 +702,7 @@ namespace vku {
                 }
             }
             return std::move(result);
-        }*/
+        }
 
         bool ok() const { return s.ok_; }
         VkShaderModule module() { return *s.module_; }
@@ -1153,7 +1153,7 @@ namespace vku {
 
     private:
         vk::PipelineShaderStageCreateInfo stage_;
-    };
+    };*/
 
     /// A generic buffer that may be used as a vertex buffer, uniform buffer or other kinds of memory resident data.
     /// Buffers require memory objects which represent GPU and CPU resources.

@@ -153,7 +153,7 @@ void vkx::pbr::generateBRDFLUT(const vkx::Context& context, vkx::Texture2D& targ
         cmdBuf.draw(3, 1, 0, 0);
         cmdBuf.endRenderPass();
     });
-    context.queue.waitIdle();
+    context.graphicsQueue.waitIdle();
 
     // todo: cleanup
     device.destroyPipeline(pipeline);

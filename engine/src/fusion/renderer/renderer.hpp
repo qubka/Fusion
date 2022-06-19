@@ -1,16 +1,18 @@
 #pragma once
 
 #include "subrender.hpp"
+#include "renderstage.hpp"
 
 namespace fe {
     class Renderer {
-        friend class Subrender;
+        friend class Graphics;
     public:
         /**
          * Creates a new renderer.
          */
-        Renderer(const vkx::Context& context) : context{context} { }
+        Renderer() = default;
         virtual ~Renderer() = default;
+        FE_NONCOPYABLE(Renderer);
 
         /**
          * Run when switching to this scene from another, use this method to create {@link Subrender}'s.
@@ -39,7 +41,7 @@ namespace fe {
          */
         template<typename T>
         T* getSubrender() const {
-            if (auto it{ subrenders.find(typeid(T)) }; it != subrenders.end()) {
+            if (auto it = subrenders.find(typeid(T)); it != subrenders.end()) {
                 return it->second.get();
             }
             return nullptr;
@@ -73,8 +75,21 @@ namespace fe {
             subrenders.clear();
         }
 
+        RenderStage* getRenderStage(uint32_t index) const {
+            if (renderStages.empty() || renderStages.size() < index)
+                return nullptr;
+            return renderStages.at(index).get();
+        }
+
+        void addRenderStage(std::unique_ptr<RenderStage>&& renderStage) {
+            renderStages.emplace_back(std::move(renderStage));
+        }
+
     private:
-        const vkx::Context& context;
+        //const vkx::Context& context;
+        std::vector<std::unique_ptr<RenderStage>> renderStages;
         std::unordered_map<std::type_index, std::unique_ptr<Subrender>> subrenders;
+        //SubrenderHolder subrenderHolder;
+        bool started{ false };
     };
 }

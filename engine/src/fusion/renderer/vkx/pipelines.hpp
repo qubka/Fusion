@@ -190,7 +190,7 @@ namespace vkx { namespace pipelines {
             update();
             auto resultValue = device.createGraphicsPipeline(cache, pipelineCreateInfo);
             if (resultValue.result != vk::Result::eSuccess) {
-                throw std::runtime_error("Failed to create graphics pipeline: " + to_string(resultValue.result));
+                throw std::runtime_error("Failed to create graphics pipeline: " + vk::to_string(resultValue.result));
             }
             return resultValue.value;
         }

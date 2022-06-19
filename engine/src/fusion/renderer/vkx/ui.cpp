@@ -221,12 +221,12 @@ void UIOverlay::destroy() {
     vertexBuffer.destroy();
     indexBuffer.destroy();
     font.destroy();
-    device.destroyDescriptorSetLayout(descriptorSetLayout);
-    device.destroyDescriptorPool(descriptorPool);
-    device.destroyPipelineLayout(pipelineLayout);
-    device.destroyPipeline(pipeline);
+    context.device.destroyDescriptorSetLayout(descriptorSetLayout);
+    context.device.destroyDescriptorPool(descriptorPool);
+    context.device.destroyPipelineLayout(pipelineLayout);
+    context.device.destroyPipeline(pipeline);
     if (!createInfo.renderPass) {
-        device.destroyRenderPass(renderPass);
+        context.device.destroyRenderPass(renderPass);
     }
 
     if (ImGui::GetCurrentContext()) {
@@ -295,12 +295,12 @@ void UIOverlay::prepareResources() {
     vk::DescriptorPoolSize poolSize;
     poolSize.type = vk::DescriptorType::eCombinedImageSampler;
     poolSize.descriptorCount = 1;
-    descriptorPool = device.createDescriptorPool({ {}, 3, 1, &poolSize });
+    descriptorPool = context.device.createDescriptorPool({ {}, 3, 1, &poolSize });
 
     // Descriptor set layout
     vk::DescriptorSetLayoutBinding setLayoutBinding{ 0, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment };
 
-    descriptorSetLayout = device.createDescriptorSetLayout({ {}, 1, &setLayoutBinding });
+    descriptorSetLayout = context.device.createDescriptorSetLayout({ {}, 1, &setLayoutBinding });
 
     // Descriptor set
     ImTextureID fontDescriptorSet = addTexture(font.sampler, font.view, vk::ImageLayout::eShaderReadOnlyOptimal);
@@ -310,13 +310,13 @@ void UIOverlay::prepareResources() {
     // Push constants for UI rendering parameters
     vk::PushConstantRange pushConstantRange{ vk::ShaderStageFlagBits::eVertex, 0, sizeof(PushConstBlock) };
     vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{ {}, 1, &descriptorSetLayout, 1, &pushConstantRange };
-    pipelineLayout = device.createPipelineLayout(pipelineLayoutCreateInfo);
+    pipelineLayout = context.device.createPipelineLayout(pipelineLayoutCreateInfo);
 }
 
 /** Prepare a separate pipeline for the UI overlay rendering decoupled from the main application */
 void UIOverlay::preparePipeline() {
     // Setup graphics pipeline for UI rendering
-    vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ device, pipelineLayout, renderPass };
+    vkx::pipelines::GraphicsPipelineBuilder pipelineBuilder{ context.device, pipelineLayout, renderPass };
     pipelineBuilder.depthStencilState = { false };
     pipelineBuilder.rasterizationState.cullMode = vk::CullModeFlagBits::eNone;
 
@@ -408,7 +408,7 @@ void UIOverlay::prepareRenderPass() {
     renderPassInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());
     renderPassInfo.pDependencies = subpassDependencies.data();
 
-    renderPass = device.createRenderPass(renderPassInfo);
+    renderPass = context.device.createRenderPass(renderPassInfo);
 }
 
 /** Set the window events callbacks */
@@ -579,10 +579,10 @@ void UIOverlay::setStyleColors() {
 // Register a texture
 // FIXME: This is experimental in the sense that we are unsure how to best design/tackle this problem, please post to https://github.com/ocornut/imgui/pull/914 if you have suggestions.
 vk::DescriptorSet UIOverlay::addTexture(const vk::Sampler& sampler, const vk::ImageView& view, const vk::ImageLayout& layout) const {
-    vk::DescriptorSet descriptorSet = device.allocateDescriptorSets({ descriptorPool, 1, &descriptorSetLayout })[0];
+    vk::DescriptorSet descriptorSet = context.device.allocateDescriptorSets({ descriptorPool, 1, &descriptorSetLayout })[0];
     vk::DescriptorImageInfo imageInfo { sampler, view, layout };
     vk::WriteDescriptorSet writeDescriptorSet{ descriptorSet, 0, 0, 1, vk::DescriptorType::eCombinedImageSampler, &imageInfo };
-    device.updateDescriptorSets(writeDescriptorSet, {});
+    context.device.updateDescriptorSets(writeDescriptorSet, {});
     return descriptorSet;
 }
 

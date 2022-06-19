@@ -243,12 +243,13 @@ namespace vkx {
             samplerCreateInfo.maxAnisotropy = context.deviceFeatures.samplerAnisotropy ? context.deviceProperties.limits.maxSamplerAnisotropy : 1.0f;
             samplerCreateInfo.maxLod = static_cast<float>(mipLevels);
             samplerCreateInfo.borderColor = vk::BorderColor::eFloatOpaqueWhite;
+
             sampler = device.createSampler(samplerCreateInfo);
 
             // Create image view
             vk::ImageViewCreateInfo viewCreateInfo;
-            viewCreateInfo.image = image;
             viewCreateInfo.viewType = vk::ImageViewType::e2D;
+            viewCreateInfo.image = image;
             viewCreateInfo.format = format;
             viewCreateInfo.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
             view = device.createImageView(viewCreateInfo);

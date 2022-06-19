@@ -245,8 +245,11 @@ namespace vkx {
             pipelineCache = device.createPipelineCache({});
             // Find a queue that supports graphics operations
 
-            // Get the graphics queue
-            queue = device.getQueue(queueIndices.graphics, 0);
+            // Get the queues
+            graphicsQueue = device.getQueue(queueIndices.graphics, 0);
+            presentQueue = device.getQueue(queueIndices.present, 0);
+            transferQueue = device.getQueue(queueIndices.transfer, 0);
+            computeQueue = device.getQueue(queueIndices.compute, 0);
 
             // Save our surface
             if (surf) {
@@ -255,8 +258,17 @@ namespace vkx {
         }
 
         void destroy() {
-            if (queue) {
-                queue.waitIdle();
+            if (graphicsQueue) {
+                graphicsQueue.waitIdle();
+            }
+            if (presentQueue) {
+                presentQueue.waitIdle();
+            }
+            if (transferQueue) {
+                transferQueue.waitIdle();
+            }
+            if (computeQueue) {
+                computeQueue.waitIdle();
             }
             device.waitIdle();
             for (const auto& trash : dumpster) {
@@ -456,7 +468,8 @@ namespace vkx {
             deviceFeatures = physicalDevice.getFeatures();
             // Gather physical device memory properties
             deviceMemoryProperties = physicalDevice.getMemoryProperties();
-            queueIndices.graphics = findQueue(vk::QueueFlagBits::eGraphics, surface);
+            queueIndices.graphics = findQueue(vk::QueueFlagBits::eGraphics);
+            queueIndices.present = findQueue(vk::QueueFlagBits::eGraphics, surface);
             queueIndices.compute = findQueue(vk::QueueFlagBits::eCompute);
             queueIndices.transfer = findQueue(vk::QueueFlagBits::eTransfer);
         }
@@ -538,13 +551,30 @@ namespace vkx {
 
         struct QueueIndices {
             uint32_t graphics{ VK_QUEUE_FAMILY_IGNORED };
+            uint32_t present{ VK_QUEUE_FAMILY_IGNORED };
             uint32_t transfer{ VK_QUEUE_FAMILY_IGNORED };
             uint32_t compute{ VK_QUEUE_FAMILY_IGNORED };
         } queueIndices;
 
-        vk::Queue queue;
+        vk::Queue graphicsQueue;
+        vk::Queue presentQueue;
+        vk::Queue computeQueue;
+        vk::Queue transferQueue;
 
-        vk::CommandPool getCommandPool() const {
+        const vk::Queue& getQueue(vk::QueueFlagBits queueType) const {
+            switch(queueType) {
+                case vk::QueueFlagBits::eGraphics:
+                    return graphicsQueue;
+                case vk::QueueFlagBits::eCompute:
+                    return computeQueue;
+                case vk::QueueFlagBits::eTransfer:
+                    return computeQueue;
+                default:
+                    throw std::runtime_error("Unsupported queue type!");
+            }
+        }
+
+        const vk::CommandPool& getCommandPool(/*const std::thread::id &threadId = std::this_thread::get_id()*/) const {
             if (!s_cmdPool) {
                 vk::CommandPoolCreateInfo cmdPoolInfo;
                 cmdPoolInfo.queueFamilyIndex = queueIndices.graphics;
@@ -589,10 +619,11 @@ namespace vkx {
             return cmdBuffer;
         }
 
-        void flushCommandBuffer(vk::CommandBuffer& commandBuffer) const {
+        void flushCommandBuffer(const vk::CommandBuffer& commandBuffer, vk::QueueFlagBits queueType = vk::QueueFlagBits::eGraphics) const {
             if (!commandBuffer) {
                 return;
             }
+            auto& queue = getQueue(queueType);
             queue.submit(vk::SubmitInfo{ 0, nullptr, nullptr, 1, &commandBuffer }, vk::Fence());
             queue.waitIdle();
             device.waitIdle();
@@ -812,11 +843,61 @@ namespace vkx {
             return result;
         }
 
+        void submitIdle(const vk::CommandBuffer& commandBuffer, vk::QueueFlagBits queueType = vk::QueueFlagBits::eGraphics) const {
+            vk::SubmitInfo info;
+            info.commandBufferCount = 1;
+            info.pCommandBuffers = &commandBuffer;
+
+            vk::Fence fence = device.createFence({});
+
+            auto result = device.resetFences(1, &fence);
+            if (result != vk::Result::eSuccess) {
+                throw std::runtime_error("failed to reset fence: " + vk::to_string(result));
+            }
+
+            getQueue(queueType).submit(info, fence);
+
+            result = device.waitForFences(1, &fence, VK_TRUE, UINT64_MAX);
+            if (result != vk::Result::eSuccess) {
+                throw std::runtime_error("failed to wait for fence: " + vk::to_string(result));
+            }
+
+            device.destroyFence(fence);
+        }
+
+        void submit(const vk::CommandBuffer& commandBuffer,
+                    const vk::Semaphore& wait = {},
+                    const vk::PipelineStageFlags& waitStage = {},
+                    const vk::Semaphore& signal = {},
+                    const vk::Fence& fence = {},
+                    vk::QueueFlagBits queueType = vk::QueueFlagBits::eGraphics) const {
+            vk::SubmitInfo info;
+            info.commandBufferCount = 1;
+            info.pCommandBuffers = &commandBuffer;
+
+            info.signalSemaphoreCount = signal ? 1 : 0;
+            info.pSignalSemaphores = &signal;
+
+            info.waitSemaphoreCount = wait ? 1 : 0;
+            info.pWaitSemaphores = &wait;
+            info.pWaitDstStageMask = wait ? &waitStage : nullptr;
+
+            if (fence) {
+                auto result = device.resetFences(1, &fence);
+                if (result != vk::Result::eSuccess) {
+                    throw std::runtime_error("failed to reset fence: " + vk::to_string(result));
+                }
+            }
+
+            getQueue(queueType).submit(info, fence);
+        }
+
         void submit(const vk::ArrayProxy<const vk::CommandBuffer>& commandBuffers,
                     const vk::ArrayProxy<const vk::Semaphore>& wait = {},
                     const vk::ArrayProxy<const vk::PipelineStageFlags>& waitStages = {},
                     const vk::ArrayProxy<const vk::Semaphore>& signals = {},
-                    const vk::Fence& fence = {}) const {
+                    const vk::Fence& fence = {},
+                    vk::QueueFlagBits queueType = vk::QueueFlagBits::eGraphics) const {
             vk::SubmitInfo info;
             info.commandBufferCount = commandBuffers.size();
             info.pCommandBuffers = commandBuffers.data();
@@ -834,7 +915,14 @@ namespace vkx {
             }
             info.pWaitDstStageMask = waitStages.data();
 
-            queue.submit(info, fence);
+            if (fence) {
+                auto result = device.resetFences(1, &fence);
+                if (result != vk::Result::eSuccess) {
+                    throw std::runtime_error("failed to reset fence: " + vk::to_string(result));
+                }
+            }
+
+            getQueue(queueType).submit(info, fence);
         }
 
         using SemaphoreStagePair = std::pair<const vk::Semaphore, const vk::PipelineStageFlags>;
@@ -842,7 +930,8 @@ namespace vkx {
         void submit(const vk::ArrayProxy<const vk::CommandBuffer>& commandBuffers,
                     const vk::ArrayProxy<const SemaphoreStagePair>& wait = {},
                     const vk::ArrayProxy<const vk::Semaphore>& signals = {},
-                    const vk::Fence& fence = {}) const {
+                    const vk::Fence& fence = {},
+                    vk::QueueFlagBits queueType = vk::QueueFlagBits::eGraphics) const {
             std::vector<vk::Semaphore> waitSemaphores;
             std::vector<vk::PipelineStageFlags> waitStages;
             for (size_t i = 0; i < wait.size(); ++i) {
@@ -850,15 +939,16 @@ namespace vkx {
                 waitSemaphores.push_back(pair.first);
                 waitStages.push_back(pair.second);
             }
-            submit(commandBuffers, waitSemaphores, waitStages, signals, fence);
+            submit(commandBuffers, waitSemaphores, waitStages, signals, fence, queueType);
         }
 
         // Helper submit function when there is only one wait semaphore, to remove ambiguity
         void submit(const vk::ArrayProxy<const vk::CommandBuffer>& commandBuffers,
                     const SemaphoreStagePair& wait,
                     const vk::ArrayProxy<const vk::Semaphore>& signals = {},
-                    const vk::Fence& fence = {}) const {
-            submit(commandBuffers, wait.first, wait.second, signals, fence);
+                    const vk::Fence& fence = {},
+                    vk::QueueFlagBits queueType = vk::QueueFlagBits::eGraphics) const {
+            submit(commandBuffers, wait.first, wait.second, signals, fence, queueType);
         }
 
         vk::Format getSupportedDepthFormat() const {
@@ -907,6 +997,7 @@ namespace vkx {
         static __declspec(thread) vk::CommandPool s_cmdPool;
     #else
         static thread_local vk::CommandPool s_cmdPool;
+        //std::map<std::thread::id, vk::CommandPool> commandPools;
     #endif
     };
 

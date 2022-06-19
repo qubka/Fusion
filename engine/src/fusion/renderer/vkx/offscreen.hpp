@@ -1,7 +1,7 @@
 #pragma once
 
 #include "context.hpp"
-#include "framebuffer.hpp"
+#include "framebuffers.hpp"
 #include "ui.hpp"
 
 namespace vkx {

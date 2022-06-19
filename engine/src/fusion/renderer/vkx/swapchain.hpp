@@ -1,85 +1,70 @@
-/*
-* Class wrapping access to the swap chain
-*
-* A swap chain is a collection of framebuffers used for rendering
-* The swap chain images can then presented to the windowing system
-*
-* Copyright (C) 2022 by Nikita Ushakov
-*/
 #pragma once
 
 #include "context.hpp"
 
 namespace vkx {
-
-    struct SwapChainImage {
+    struct SwapchainImage {
         vk::Image image;
         vk::ImageView view;
     };
 
-    using FramebufferAttachment = Image;
-    #define MAX_FRAMES_IN_FLIGHT 2
-
-    struct SwapChain {
-        using Attachment = FramebufferAttachment;
-
+    struct Swapchain {
         const vkx::Context& context;
-        const vk::Device& device{ context.device };
-        const vk::Queue& queue{ context.queue };
+
         vk::Extent2D extent;
-        vk::SwapchainKHR swapChain;
-        vk::RenderPass renderPass;
+        vk::PresentModeKHR presentMode;
         vk::PresentInfoKHR presentInfo;
-        std::vector<SwapChainImage> images;
-        vk::Format colorFormat{ vk::Format::eB8G8R8A8Unorm };
-        std::vector<vk::Framebuffer> framebuffers;
-        std::vector<vk::Semaphore> imageAvailableSemaphores;
-        std::vector<vk::Semaphore> renderFinishedSemaphores;
-        std::vector<vk::Fence> inFlightFences;
-        std::vector<vk::Fence*> imagesInFlight;
+        vk::SurfaceTransformFlagBitsKHR preTransform;
+        std::vector<SwapchainImage> images;
+        vk::SwapchainKHR swapchain;
+        vk::SurfaceFormatKHR surfaceFormat;
+        vk::Fence fenceImage;
         uint32_t imageCount{ 0 };
         uint32_t currentImage{ 0 };
 
-        Attachment depthStencil;
+        vk::Format colorFormat{ vk::Format::eB8G8R8A8Unorm };
         vk::Format depthFormat{ vk::Format::eUndefined };
+        vk::CompositeAlphaFlagBitsKHR compositeAlpha{ vk::CompositeAlphaFlagBitsKHR::eOpaque };
 
-        SwapChain(const vkx::Context& context) : context{context} {
+        Swapchain(const vkx::Context& context) : context{context} {
             presentInfo.swapchainCount = 1;
-            presentInfo.pSwapchains = &swapChain;
+            presentInfo.pSwapchains = &swapchain;
             presentInfo.pImageIndices = &currentImage;
         }
 
-        vk::Result acquireNextImage(uint32_t& imageIndex) const;
-        vk::Result submitCommandBuffers(const vk::ArrayProxy<const vk::CommandBuffer>& buffers, uint32_t imageIndex);
-        const vk::Fence& getSubmitFence(uint32_t imageIndex);
-
         // Creates an os specific surface
         // Tries to find a graphics and a present queue
-        void create(const vk::Extent2D& size, bool vsync) {
-            createSwapChain(size, vsync);
-            createImages();
-            createDepthStencil();
-            createRenderPass();
-            createFramebuffers();
-            createSyncObjects();
-        }
+        void create(const vk::Extent2D& size, bool vsync);
 
         // Free all Vulkan resources used by the swap chain
-        void destroy(const vk::SwapchainKHR& oldSwapChain = {});
+        void destroy(const vk::SwapchainKHR& oldSwapchain = {});
 
-    private:
-        void createSwapChain(const vk::Extent2D& size, bool vsync);
-        void createImages();
-        void createDepthStencil();
-        void createRenderPass();
-        void createFramebuffers();
-        void createSyncObjects();
+        /**
+         * Acquires the next image in the swapchain into the internal acquired image. The function will always wait until the next image has been acquired by setting timeout to UINT64_MAX.
+         * @param presentCompleteSemaphore A optional semaphore that is signaled when the image is ready for use.
+         * @param fence A optional fence that is signaled once the previous command buffer has completed.
+         * @return Result of the image acquisition.
+         */
+        vk::Result acquireNextImage(const vk::Semaphore& presentCompleteSemaphore = {}, const vk::Fence& fence = {}) {
+            if (fence) {
+                auto result = context.device.waitForFences(1, &fence, VK_TRUE, UINT64_MAX);
+                if (result != vk::Result::eSuccess) {
+                    throw std::runtime_error("failed to wait for fence: " + vk::to_string(result));
+                }
+            }
 
-        // Present the current image to the queue
-        vk::Result queuePresent(const vk::Semaphore& waitSemaphore);
+            return context.device.acquireNextImageKHR(swapchain, UINT64_MAX, presentCompleteSemaphore, nullptr, &currentImage);
+        }
 
-        static vk::SurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats);
-        static vk::PresentModeKHR chooseSwapPresentMode(bool vsync, const std::vector<vk::PresentModeKHR>& availablePresentModes);
-        static vk::Extent2D chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities, const vk::Extent2D& size);
+        /**
+         * Queue an image for presentation using the internal acquired image for queue presentation.
+         * @param waitSemaphore A optional semaphore that is waited on before the image is presented.
+         * @return Result of the queue presentation.
+         */
+        vk::Result queuePresent(const vk::Semaphore& waitSemaphore = {}) {
+            presentInfo.waitSemaphoreCount = waitSemaphore ? 1 : 0;
+            presentInfo.pWaitSemaphores = &waitSemaphore;
+            return context.presentQueue.presentKHR(&presentInfo);
+        }
     };
-}  // namespace vkx
+}

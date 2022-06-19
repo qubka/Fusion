@@ -45,7 +45,6 @@ namespace vkx { namespace renderpass {
     };
 
     struct RenderPassCreateInfo : public vk::RenderPassCreateInfo {
-        using Parent = vk::RenderPassCreateInfo;
         RenderPassCreateInfo() {}
 
         std::vector<SubpassDescription> subpasses;
