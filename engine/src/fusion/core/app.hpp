@@ -8,12 +8,13 @@
 #include "fusion/renderer/graphics.hpp"
 
 namespace fe {
+    class Time;
     class App {
         friend class Engine;
     public:
         App(std::string name, const Version& version = {1, 0, 0}) : name{std::move(name)}, version{version} { }
         virtual ~App() = default;
-        FE_NONCOPYABLE(App);
+        NONCOPYABLE(App);
 
         /**
          * Run when switching to this app from another.
@@ -23,7 +24,7 @@ namespace fe {
         /**
          * Every frame as long as the app has work to do.
          */
-        virtual void onUpdate() = 0;
+        virtual void onUpdate(const Time& dt) = 0;
 
         /**
          * Gets the application's name.
@@ -57,9 +58,9 @@ namespace fe {
 
         /**
          * Sets the current graphics context to the application.
-         * @param win The new graphics context.
+         * @param graphics The new graphics context.
          */
-        void setGraphics(std::unique_ptr<Graphics>&& ptr) { graphics = std::move(ptr); }
+        void setGraphics(std::unique_ptr<Graphics>&& graphics) { this->graphics = std::move(graphics); }
 
         /**
          * Gets the application's key input interface.

@@ -11,35 +11,35 @@
 using namespace fe;
 using namespace physx;
 
-PxDefaultAllocator Scene::defaultAllocatorCallback{};
-PxDefaultErrorCallback Scene::defaultErrorCallback{};
-PxFoundation* Scene::foundation{ nullptr };
-PxDefaultCpuDispatcher* Scene::dispatcher{ nullptr };
-PxPhysics* Scene::physics{ nullptr };
-PxPvd* Scene::pvd{ nullptr };
+PxDefaultAllocator Scene::DefaultAllocatorCallback{};
+PxDefaultErrorCallback Scene::DefaultErrorCallback{};
+PxFoundation* Scene::Foundation{ nullptr };
+PxDefaultCpuDispatcher* Scene::Dispatcher{ nullptr };
+PxPhysics* Scene::Physics{ nullptr };
+PxPvd* Scene::Pvd{ nullptr };
 
 Scene::Scene() : PxSimulationEventCallback{} {
     init();
 
     // init physx
-    if (!foundation) {
-        foundation = PxCreateFoundation(PX_PHYSICS_VERSION, defaultAllocatorCallback, defaultErrorCallback);
-        if (!foundation) throw std::runtime_error("Failed to create PhysX foundation!");
-        pvd = PxCreatePvd(*foundation);
+    if (!Foundation) {
+        Foundation = PxCreateFoundation(PX_PHYSICS_VERSION, DefaultAllocatorCallback, DefaultErrorCallback);
+        if (!Foundation) throw std::runtime_error("Failed to create PhysX foundation!");
+        Pvd = PxCreatePvd(*Foundation);
         PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-        pvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
-        dispatcher = PxDefaultCpuDispatcherCreate(2);
+        Pvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+        Dispatcher = PxDefaultCpuDispatcherCreate(2);
         PxTolerancesScale toleranceScale;
         toleranceScale.length = 100; // typical length of an object
         toleranceScale.speed = 981; // typical speed of an object, gravity*1s is a reasonable choice
-        physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, toleranceScale, true, pvd);
+        Physics = PxCreatePhysics(PX_PHYSICS_VERSION, *Foundation, toleranceScale, true, Pvd);
     }
 
-    PxSceneDesc sceneDesc{physics->getTolerancesScale()};
+    PxSceneDesc sceneDesc{ Physics->getTolerancesScale() };
     sceneDesc.gravity = PxVec3{0.0f, -9.81f, 0.0f};
-    sceneDesc.cpuDispatcher	= dispatcher;
+    sceneDesc.cpuDispatcher	= Dispatcher;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-    scene = physics->createScene(sceneDesc);
+    scene = Physics->createScene(sceneDesc);
     scene->setSimulationEventCallback(this);
 
     PxPvdSceneClient* pvdClient = scene->getScenePvdClient();
@@ -49,7 +49,7 @@ Scene::Scene() : PxSimulationEventCallback{} {
         pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
     }
 
-    defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
+    defaultMaterial = Physics->createMaterial(0.5f, 0.5f, 0.6f);
 }
 
 Scene::~Scene() {
@@ -87,7 +87,7 @@ void Scene::onRuntimeStart() {
 
         PxRigidActor* body;
         if (rigidbody.type == RigidbodyComponent::BodyType::Dynamic) {
-            auto rigid = physics->createRigidDynamic(t);
+            auto rigid = Physics->createRigidDynamic(t);
             rigid->setMass(rigidbody.mass);
             rigid->setLinearDamping(rigidbody.linearDrag);
             rigid->setAngularDamping(rigidbody.angularDrag);
@@ -101,14 +101,14 @@ void Scene::onRuntimeStart() {
 
             body = rigid;
         } else {
-            body = physics->createRigidStatic(t);
+            body = Physics->createRigidStatic(t);
         }
 
         float scalar = glm::max(transform.scale.x, transform.scale.y, transform.scale.z);
 
         PxMaterial* mat;
         if (auto material = registry.try_get<PhysicsMaterialComponent>(entity)) {
-            mat = physics->createMaterial(material->staticFriction, material->dynamicFriction, material->restitution);
+            mat = Physics->createMaterial(material->staticFriction, material->dynamicFriction, material->restitution);
             mat->setRestitutionCombineMode(me::enum_value<PxCombineMode::Enum>(me::enum_index(material->restitutionCombine).value_or(0)));
             mat->setFrictionCombineMode(me::enum_value<PxCombineMode::Enum>(me::enum_index(material->frictionCombine).value_or(0)));
             material->runtimeMaterial = mat;
@@ -119,7 +119,7 @@ void Scene::onRuntimeStart() {
         if (auto collider = registry.try_get<BoxColliderComponent>(entity)) {
             glm::vec3 halfExtent{ collider->extent / 2.0f * transform.scale };
 
-            PxShape* shape = physics->createShape(PxBoxGeometry{{ halfExtent.x, halfExtent.y, halfExtent.z }}, *mat);
+            PxShape* shape = Physics->createShape(PxBoxGeometry{{ halfExtent.x, halfExtent.y, halfExtent.z }}, *mat);
             if (collider->trigger) {
                 shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
                 shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
@@ -131,7 +131,7 @@ void Scene::onRuntimeStart() {
         if (auto collider = registry.try_get<SphereColliderComponent>(entity)) {
             float radius = collider->radius * scalar;
 
-            PxShape* shape = physics->createShape(PxSphereGeometry{ radius }, *mat);
+            PxShape* shape = Physics->createShape(PxSphereGeometry{ radius }, *mat);
             if (collider->trigger) {
                 shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
                 shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
@@ -144,7 +144,7 @@ void Scene::onRuntimeStart() {
             float radius = collider->radius * scalar;
             float height = collider->height / 2.0f * scalar;
 
-            PxShape* shape = physics->createShape(PxCapsuleGeometry{ radius, height }, *mat);
+            PxShape* shape = Physics->createShape(PxCapsuleGeometry{ radius, height }, *mat);
             if (collider->trigger) {
                 shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
                 shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
@@ -237,7 +237,7 @@ void Scene::render() {
 
     auto meshView = registry.view<DirtyMeshComponent, MeshComponent>();
     for (auto [entity, mesh] : meshView.each()) {
-        if (!mesh.path.empty() && std::fs::exists(mesh.path))
+        if (!mesh.path.empty() && std::filesystem::exists(mesh.path))
             mesh.runtimeModel = meshRenderer.loadModel(mesh.path);
         else
             mesh.runtimeModel = nullptr;

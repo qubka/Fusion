@@ -19,6 +19,20 @@ namespace fe {
     };
 
     class CommandLineParser {
+    public:
+        CommandLineParser();
+        ~CommandLineParser() = default;
+
+        void add(const std::string& name, const std::vector<std::string>& commands, bool hasValue, const std::string& help);
+        void parse(const CommandLineArgs& arguments);
+
+        void printHelp();
+        bool isSet(const std::string& name);
+
+        template<typename T>
+        T getValue(const std::string& name, const T& defaultValue);
+
+    private:
         struct CommandLineOption {
             std::vector<std::string> commands;
             std::string value;
@@ -27,14 +41,5 @@ namespace fe {
             bool set{ false };
         };
         std::unordered_map<std::string, CommandLineOption> options;
-
-    public:
-        CommandLineParser();
-        void add(const std::string& name, const std::vector<std::string>& commands, bool hasValue, const std::string& help);
-        void printHelp();
-        void parse(const CommandLineArgs& arguments);
-        bool isSet(const std::string& name);
-        std::string getValueAsString(const std::string& name, const std::string& defaultValue);
-        int32_t getValueAsInt(const std::string& name, int32_t defaultValue);
     };
 }

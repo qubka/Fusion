@@ -12,6 +12,7 @@ namespace fe {
     /// if extracted from model*view*projection planes will be in model space
     class Frustum {
         Plane planes[6];
+
     public:
         enum FrustumSection { TOP, BOTTOM, LEFT, RIGHT, NEAR, FAR };
 

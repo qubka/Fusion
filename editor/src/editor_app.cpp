@@ -18,6 +18,6 @@ void EditorApp::onStart() {
     pushLayer(new EditorLayer());
 }
 
-void EditorApp::onUpdate() {
+void EditorApp::onUpdate(const Time& dt) {
     graphics->update();
 }

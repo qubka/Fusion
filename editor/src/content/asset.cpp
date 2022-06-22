@@ -4,10 +4,10 @@
 
 using namespace fe;
 
-bool asset::save(const std::string& filename, const AssetInfo& file) {
+bool asset::save(const std::filesystem::path& filename, const AssetInfo& file) {
     return false;
 }
 
-bool asset::load(const std::string& filename, AssetInfo& outputFile) {
+bool asset::load(const std::filesystem::path& filename, AssetInfo& outputFile) {
     return false;
 }

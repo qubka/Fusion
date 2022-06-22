@@ -1,14 +1,18 @@
 #pragma once
 
-namespace fe {
-    struct KeyData {
-        uint16_t key;
-        uint8_t scancode;
-        uint8_t action;
-        uint8_t mods;
-    };
+#include "action_codes.hpp"
 
+namespace fe {
     using KeyCode = uint16_t;
+    using ModCode = uint8_t;
+    using ScanCode = uint8_t;
+
+    struct KeyData {
+        KeyCode key;
+        ActionCode action;
+        ScanCode scancode;
+        ModCode mods;
+    };
 
     namespace Key {
         // From glfw3.h
@@ -145,6 +149,18 @@ namespace fe {
             Menu                = 348,
 
             KeyLast             = Menu
+        };
+    }
+
+    namespace KeyMod {
+        // From glfw3.h
+        enum : ModCode {
+            Shift       = 0x0001, /// If this bit is set one or more Shift keys were held down.
+            Control     = 0x0002, /// If this bit is set one or more Control keys were held down.
+            Alt         = 0x0004, /// If this bit is set one or more Alt keys were held down.
+            Super       = 0x0008, /// If this bit is set one or more Super keys were held down.
+            CapsLock    = 0x0010, /// If this bit is set the Caps Lock key is enabled.
+            NumLock     = 0x0020, /// If this bit is set the Num Lock key is enabled.
         };
     }
 }

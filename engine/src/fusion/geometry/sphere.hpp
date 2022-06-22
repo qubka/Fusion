@@ -7,6 +7,7 @@ namespace fe {
     class Sphere {
         glm::vec3 center;
         float radius;
+
     public:
         Sphere();
         Sphere(const glm::vec3& center, float radius);
@@ -28,9 +29,9 @@ namespace fe {
         glm::vec3 closestPoint(const Ray& ray) const;
 
         //! Generate \c sphere from the given sequence of \a points.
-        static Sphere calculateBoundingSphere(const std::vector<glm::vec3>& points);
+        static Sphere CalculateBoundingSphere(const std::vector<glm::vec3>& points);
         //! Generate \c sphere from the given sequence of \a points.
-        static Sphere calculateBoundingSphere(const glm::vec3* points, size_t size);
+        static Sphere CalculateBoundingSphere(const glm::vec3* points, size_t size);
 
         //! Converts sphere to another coordinate system. Note that it will not return correct results if there are non-uniform scaling, shears, or other unusual transforms in \a transform.
         void transform(const glm::mat4& transform);

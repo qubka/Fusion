@@ -39,21 +39,6 @@ void CommandLineParser::add(const std::string& name, const std::vector<std::stri
     options[name].value = "";
 }
 
-void CommandLineParser::printHelp() {
-    std::cout << "Available command line options:\n";
-    for (const auto& [alias, option] : options) {
-        std::cout << " ";
-        for (size_t i = 0; i < option.commands.size(); i++) {
-            std::cout << option.commands[i];
-            if (i < option.commands.size() - 1) {
-                std::cout << ", ";
-            }
-        }
-        std::cout << ": " << option.help << "\n";
-    }
-    std::cout << "Press any key to close...";
-}
-
 void CommandLineParser::parse(const CommandLineArgs& arguments) {
     bool printHelp = false;
     // Known arguments
@@ -80,22 +65,58 @@ void CommandLineParser::parse(const CommandLineArgs& arguments) {
     }
 }
 
+void CommandLineParser::printHelp() {
+    std::cout << "Available command line options:\n";
+
+    for (const auto& [alias, option] : options) {
+        std::cout << " ";
+        for (size_t i = 0; i < option.commands.size(); i++) {
+            std::cout << option.commands[i];
+            if (i < option.commands.size() - 1) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << ": " << option.help << "\n";
+    }
+
+    std::cout << "Press any key to close...";
+}
+
 bool CommandLineParser::isSet(const std::string& name) {
     return ((options.find(name) != options.end()) && options[name].set);
 }
 
-std::string CommandLineParser::getValueAsString(const std::string& name, const std::string& defaultValue) {
-    assert(options.find(name) != options.end());
-    const std::string& value = options[name].value;
-    return (!value.empty()) ? value : defaultValue;
+template<typename T>
+T CommandLineParser::getValue(const std::string& name, const T& defaultValue) {
+    throw std::runtime_error("Unknown value");
 }
 
-int32_t CommandLineParser::getValueAsInt(const std::string& name, int32_t defaultValue) {
+template<>
+std::string CommandLineParser::getValue<std::string>(const std::string& name, const std::string& defaultValue) {
+    assert(options.find(name) != options.end());
+    const std::string& value = options[name].value;
+    return !value.empty() ? value : defaultValue;
+}
+
+template<>
+int CommandLineParser::getValue<int>(const std::string& name, const int& defaultValue) {
     assert(options.find(name) != options.end());
     const std::string& value = options[name].value;
     if (!value.empty()) {
-        int32_t intVal = std::stoi(value);
-        return (intVal > 0) ? intVal : defaultValue;
+        int result = std::stoi(value);
+        return (result > 0) ? result : defaultValue;
+    } else {
+        return defaultValue;
+    }
+}
+
+template<>
+float CommandLineParser::getValue<float>(const std::string& name, const float& defaultValue) {
+    assert(options.find(name) != options.end());
+    const std::string& value = options[name].value;
+    if (!value.empty()) {
+        float result = std::stof(value);
+        return (result > 0) ? result : defaultValue;
     } else {
         return defaultValue;
     }

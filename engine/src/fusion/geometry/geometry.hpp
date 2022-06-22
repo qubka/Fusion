@@ -5,6 +5,6 @@ namespace fe {
 
     class Geometry {
     public:
-        static glm::vec3 intersectionPoint(const Plane& a, const Plane& b, const Plane& c);
+        static glm::vec3 IntersectionPoint(const Plane& a, const Plane& b, const Plane& c);
     };
 }

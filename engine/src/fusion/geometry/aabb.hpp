@@ -7,6 +7,7 @@ namespace fe {
     class AABB {
         glm::vec3 center;
         glm::vec3 extents;
+
     public:
         AABB();
         AABB(const glm::vec3& min, const glm::vec3& max);

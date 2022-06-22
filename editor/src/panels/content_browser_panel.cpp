@@ -1,10 +1,12 @@
 #include "content_browser_panel.hpp"
 
+#include "fusion/utils/directory.hpp"
+#include "fusion/utils/file.hpp"
+
 #include <imgui/imgui.h>
 #include <IconsFontAwesome4.h>
 
 using namespace fe;
-using namespace std::string_literals;
 
 void ContentBrowserPanel::onImGui() {
     ImGui::Begin((ICON_FA_ARCHIVE + "  Content Browser"s).c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
@@ -18,8 +20,8 @@ void ContentBrowserPanel::onImGui() {
 void ContentBrowserPanel::drawFileExplorer() {
     ImGui::BeginChild("ProjectHierarchy", { ImGui::GetContentRegionAvail().x / 6.0f, 0 }, true);
 
-    std::function<void(const std::function<void(const std::fs::path&)>&, const std::fs::path&)> fileNode = [&](const std::function<void(const std::fs::path&)>& function, const std::fs::path& file) {
-        bool filled = fs::has_directories(file);
+    std::function<void(const std::function<void(const std::filesystem::path&)>&, const std::filesystem::path&)> fileNode = [&](const std::function<void(const std::filesystem::path&)>& function, const std::filesystem::path& file) {
+        bool filled = Directory::HasDirectories(file);
         ImGuiTreeNodeFlags flags = ((currentDirectory == file) ? ImGuiTreeNodeFlags_Selected : 0) |
                                    (filled ? (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick) : ImGuiTreeNodeFlags_Leaf)
                                    | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
@@ -38,8 +40,8 @@ void ContentBrowserPanel::drawFileExplorer() {
         }
     };
 
-    std::function<void(const std::fs::path&)> directoryTree = [&](const std::fs::path& dir) {
-        for (const auto& file : fs::walk(dir)) {
+    std::function<void(const std::filesystem::path&)> directoryTree = [&](const std::filesystem::path& dir) {
+        for (const auto& file : Directory::GetFiles(dir)) {
             if (is_directory(file)) {
                 fileNode(directoryTree, file);
             }
@@ -69,7 +71,7 @@ void ContentBrowserPanel::drawContentBrowser() {
     std::strncpy(buffer, filter.c_str(), sizeof(buffer));
     if (ImGui::InputTextWithHint("##filesfilter", "Search Files", buffer, sizeof(buffer))) {
         filter = std::string{buffer};
-        filteredFiles = fs::recursive_walk(getAssetPath(), filter);
+        filteredFiles = Directory::GetFilesRecursive(getAssetPath(), filter);
     }
 
     ImGui::Separator();
@@ -103,7 +105,7 @@ void ContentBrowserPanel::drawContentBrowser() {
         if (is_directory(file)) {
             ImGui::Button(ICON_FA_FOLDER, { thumbnailSize, thumbnailSize });
         } else {
-            ImGui::Button(fs::extension_icon(file).c_str(), { thumbnailSize, thumbnailSize });
+            ImGui::Button(File::ExtensionIcon(file).c_str(), { thumbnailSize, thumbnailSize });
         }
 
         if (ImGui::BeginDragDropSource()) {
@@ -147,7 +149,7 @@ void ContentBrowserPanel::drawContentBrowser() {
     ImGui::Separator();
 
     if (!currentFile.empty()) {
-        std::string title{ fs::extension_icon(currentFile) + " " + currentFile.string() };
+        std::string title{ File::ExtensionIcon(currentFile) + " " + currentFile.string() };
         ImGui::TextUnformatted(title.c_str());
     } else {
         ImGui::TextUnformatted("");
@@ -163,12 +165,12 @@ void ContentBrowserPanel::drawContentBrowser() {
     ImGui::EndChild();
 }
 
-void ContentBrowserPanel::selectFile(const std::fs::path& file) {
+void ContentBrowserPanel::selectFile(const std::filesystem::path& file) {
     selectDirectory(file.parent_path());
     currentFile = file;
 }
 
-void ContentBrowserPanel::selectDirectory(const std::fs::path& dir) {
+void ContentBrowserPanel::selectDirectory(const std::filesystem::path& dir) {
     currentDirectory = dir;
-    currentFiles = fs::walk(dir);
+    currentFiles = Directory::GetFiles(dir);
 }

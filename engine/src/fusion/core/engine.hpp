@@ -4,28 +4,33 @@
 #include "command_line.hpp"
 #include "app.hpp"
 
+#include "fusion/utils/time.hpp"
+
+int main(int argc, char** argv);
+
 namespace fe {
     class Engine {
-    public:
-        /**
-         * Gets the engines instance.
-         * @return The current engine instance.
-         */
-        static Engine* Get() { return Instance; }
-
+    protected:
         /**
          * Carries out the setup for basic engine components and the engine. Call {@link Engine#Run} after creating a instance.
          * @param args The arguments passed to main.
          */
         Engine(const CommandLineArgs& args);
         ~Engine();
-        FE_NONCOPYABLE(Engine);
+        NONCOPYABLE(Engine);
 
         /**
          * The update function for the updater.
          * @return {@code EXIT_SUCCESS} or {@code EXIT_FAILURE}
          */
         int32_t run();
+
+    public:
+        /**
+         * Gets the engines instance.
+         * @return The current engine instance.
+         */
+        static Engine* Get() { return Instance; }
 
         /**
          * Gets the command argument passed to main.
@@ -49,7 +54,7 @@ namespace fe {
          * Sets the current application to the engine.
          * @param app The new application.
          */
-        void setApp(std::unique_ptr<App>&& ptr) { application = std::move(ptr); }
+        void setApp(std::unique_ptr<App>&& app) { application = std::move(app); }
 
         /**
          * Gets if the engine is running.
@@ -57,8 +62,47 @@ namespace fe {
          */
         bool isRunning() const { return running; }
 
+        /**
+         * This value starts at 0 and increases by 1 on each run phase.
+         * @return The total number of frames since the start of the game.
+         */
+        uint64_t frameCount() const { return frameNumber; }
+
+        /**
+         * Requests the engine to stop the game-loop.
+         */
+        void requestClose() { running = false; }
 
     private:
+        struct DeltaTime {
+            Time currentTime;
+            Time lastTime;
+            Time time;
+
+            void update() {
+                currentTime = Time::Now();
+                time = currentTime - lastTime;
+                lastTime = currentTime;
+            }
+        } deltaTime;
+
+        /*struct ChangePerSecond {
+            uint32_t value{ 0 };
+            uint32_t tempValue{ 0 };
+            Time valueTime;
+
+            void update(const Time &time) {
+                tempValue++;
+
+                if (std::floor(time.asSeconds()) > std::floor(valueTime.asSeconds())) {
+                    value = tempValue;
+                    tempValue = 0;
+                }
+
+                valueTime = time;
+            }
+        } fps;*/
+
         static Engine* Instance;
 
         CommandLineParser commandLineParser;
@@ -66,6 +110,9 @@ namespace fe {
 
         std::unique_ptr<App> application;
 
-        bool running;
+        uint64_t frameNumber{ 0 };
+        bool running{ false };
+
+        friend int ::main(int argc, char** argv);
     };
 }

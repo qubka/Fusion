@@ -1,5 +1,7 @@
 #include "orthographic_camera.hpp"
 
+#include "fusion/utils/math.hpp"
+
 using namespace fe;
 
 OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top) : Camera{} {

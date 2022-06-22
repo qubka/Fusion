@@ -2,6 +2,8 @@
 
 #include "scene_camera.hpp"
 
+#include "fusion/utils/math.hpp"
+
 #include <entt/entt.hpp>
 
 namespace fe {

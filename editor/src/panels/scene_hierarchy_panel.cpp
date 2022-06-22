@@ -3,6 +3,8 @@
 
 #include "fusion/scene/components.hpp"
 #include "fusion/systems/parent_system.hpp"
+#include "fusion/utils/directory.hpp"
+#include "fusion/utils/file.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
@@ -11,7 +13,6 @@
 #include <IconsFontAwesome4.h>
 
 using namespace fe;
-using namespace std::string_literals;
 
 void SceneHierarchyPanel::setContext(const std::shared_ptr<Scene>& scene) {
     context = scene;
@@ -208,14 +209,14 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         std::strncpy(buffer, fileFilter.c_str(), sizeof(buffer));
         if (ImGui::InputTextWithHint("##filefilter", "Search File", buffer, sizeof(buffer))) {
             fileFilter = std::string{buffer};
-            cachedFiles = fs::recursive_walk(getAssetPath(), fileFilter, formats);
+            cachedFiles = Directory::GetFilesRecursive(getAssetPath(), fileFilter, formats);
         }
 
         ImGui::Separator();
         ImGui::BeginChild("FileBrowser", { 300.0f, 500.0f });
 
         for (const auto& file : cachedFiles) {
-            std::string title{ fs::extension_icon(file) + " " + file.filename().string() };
+            std::string title{ File::ExtensionIcon(file) + " " + file.filename().string() };
             if (ImGui::Selectable(title.c_str(), currentFile == file, ImGuiSelectableFlags_AllowDoubleClick)) {
                 currentFile = file;
                 if (ImGui::IsMouseDoubleClicked(0)) {
@@ -230,7 +231,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         ImGui::Separator();
 
         if (!currentFile.empty()) {
-            std::string title{ fs::extension_icon(currentFile) + " " + currentFile.string() };
+            std::string title{ File::ExtensionIcon(currentFile) + " " + currentFile.string() };
             ImGui::TextUnformatted(title.c_str());
         }
 
@@ -243,8 +244,8 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         auto filepath = pfd::open_file("Choose 3D file", value.empty() ? getAssetPath() : value, { file, pattern }, pfd::opt::none).result();
         if (!filepath.empty()) {
             // Validate that file inside working directory
-            if (filepath[0].find(std::fs::current_path()) != std::string::npos) {
-                value = std::fs::relative(filepath[0]);
+            if (filepath[0].find(std::filesystem::current_path()) != std::string::npos) {
+                value = std::filesystem::relative(filepath[0]);
                 modify = true;
             } else {
                 pfd::message("File Location", "The selected file should be inside the project directory.", pfd::choice::ok, pfd::icon::error);
@@ -258,12 +259,12 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         if (ImGui::Button("...", buttonSize)) {
             fileFilter = "";
             currentFile = "";
-            cachedFiles = fs::recursive_walk(getAssetPath(), fileFilter, formats);
+            cachedFiles = Directory::GetFilesRecursive(getAssetPath(), fileFilter, formats);
             ImGui::OpenPopup("FileExplorer");
         }
     } else {
-        std::fs::path file{ value };
-        std::string title{ fs::extension_icon(file) + " " + file.filename().string() };
+        std::filesystem::path file{ value };
+        std::string title{ File::ExtensionIcon(file) + " " + file.filename().string() };
         if (ImGui::Button(title.c_str(), buttonSize)) {
             contentBrowserPanel.selectFile(file);
         }
@@ -276,7 +277,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            std::fs::path file{ reinterpret_cast<const char*>(payload->Data) };
+            std::filesystem::path file{ reinterpret_cast<const char*>(payload->Data) };
             // Validate that file format is suitable
             if (std::find(formats.begin(), formats.end(), file.extension().string()) != formats.end()) {
                 value = file;
@@ -295,7 +296,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     if (ImGui::Button(ICON_FA_SEARCH)) {
         fileFilter = "";
         currentFile = "";
-        cachedFiles = fs::recursive_walk(getAssetPath(), fileFilter, formats);
+        cachedFiles = Directory::GetFilesRecursive(getAssetPath(), fileFilter, formats);
         ImGui::OpenPopup("FileExplorer");
     }
 

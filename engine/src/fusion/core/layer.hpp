@@ -8,10 +8,10 @@ namespace fe {
         virtual ~Layer() = default;
 
         virtual void onAttach() {}
-        virtual void onDetach() {}
         virtual void onUpdate(float dt) {}
         virtual void onRender(Renderer& renderer) {}
         virtual void onImGui() {}
+        virtual void onDetach() {}
 
         const std::string& getName() const { return name; }
 

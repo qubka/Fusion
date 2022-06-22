@@ -49,13 +49,13 @@ namespace fe {
         void render();
 
         // physics
-        static physx::PxDefaultAllocator defaultAllocatorCallback;
-        static physx::PxDefaultErrorCallback defaultErrorCallback;
+        static physx::PxDefaultAllocator DefaultAllocatorCallback;
+        static physx::PxDefaultErrorCallback DefaultErrorCallback;
 
-        static physx::PxFoundation* foundation;
-        static physx::PxDefaultCpuDispatcher* dispatcher;
-        static physx::PxPvd* pvd;
-        static physx::PxPhysics* physics;
+        static physx::PxFoundation* Foundation;
+        static physx::PxDefaultCpuDispatcher* Dispatcher;
+        static physx::PxPvd* Pvd;
+        static physx::PxPhysics* Physics;
 
         void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) override {};
         void onWake(physx::PxActor** actors, physx::PxU32 count) override {};

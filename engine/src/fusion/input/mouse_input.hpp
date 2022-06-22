@@ -1,50 +1,50 @@
 #pragma once
 
 #include "base_input.hpp"
-#include "mouse_codes.hpp"
 
 namespace fe {
-    class MouseInput : public BaseInput<MouseCode> {
+    class MouseInput : public BaseInput {
     public:
-        MouseInput()
-            : BaseInput<MouseCode>{std::make_pair(Mouse::Button0, Mouse::ButtonLast)} {} //! use all possible buttonmaps
-        MouseInput(const std::initializer_list<MouseCode>& buttonsToMonitor)
-            : BaseInput<MouseCode>{buttonsToMonitor} {};
+        MouseInput(const std::pair<MouseButton, MouseButton>& range) : BaseInput{} {
+            std::vector<MouseButton> buttonsToMonitor(range.second - range.first + 1);
+            std::iota(buttonsToMonitor.begin(), buttonsToMonitor.end(), range.first);
+            for (MouseButton button : buttonsToMonitor) {
+                buttons.emplace(button, KeyState{});
+            }
+        }
+
+        MouseInput(const std::initializer_list<MouseButton>& buttonsToMonitor) : BaseInput{} {
+            for (MouseButton button : buttonsToMonitor) {
+                buttons.emplace(button, KeyState{});
+            }
+        }
 
         void onUpdate() override {
             delta = {};
             scroll = {};
-            BaseInput::onUpdate();
         }
 
         //! Returns whether the given mouse button is held down.
-        bool getMouseButton(MouseCode button) const { return isKey(button); }
+        bool getMouseButton(MouseButton button) const { return IsKey<MouseButton>(buttons, button); }
         //!	Returns true during the frame the user releases the given mouse button.
-        bool getMouseButtonUp(MouseCode button) const { return isKeyUp(button); }
+        bool getMouseButtonUp(MouseButton button) const { return IsKeyUp<MouseButton>(buttons, button); }
         //! Returns true during the frame the user pressed the given mouse button.
-        bool getMouseButtonDown(MouseCode button) const { return isKeyDown(button); }
+        bool getMouseButtonDown(MouseButton button) const { return IsKeyDown<MouseButton>(buttons, button); }
 
         //! The current mouse position in pixel coordinates.
         const glm::vec2& mousePosition() const { return position; }
         //! The current mouse position in normalized screen coordinates [0, 1].
         const glm::vec2& mouseNormalizedPosition() const { return normalized; }
         //! The current mouse position delta.
-        const glm::vec2& mouseDelta() const { return delta; }
+        const glm::vec2& mousePositionDelta() const { return delta; }
         //! The current mouse scroll delta.
         const glm::vec2& mouseScroll() const { return scroll; }
 
-    public:
         //! Used internally to update mouse data. Should be called by the GLFW callbacks
-        void onMouseMotion(const glm::vec2& pos) { setMousePosition(pos); }
-        void onMouseMotionNorm(const glm::vec2& pos) { setMousePositionNorm(pos); }
-        void onMouseScroll(const glm::vec2& offset) { setScrollOffset(offset); }
-        void onMouseButton(MouseData data) { setKey(data.button, data.action); };
 
-    private:
-        glm::vec2 position{};
-        glm::vec2 normalized{};
-        glm::vec2 delta{};
-        glm::vec2 scroll{};
+        void setMouseButton(MouseData data) {
+            SetKey(buttons, data.button, data.action);
+        }
 
         void setMousePosition(const glm::vec2& pos) {
             delta += pos - position;
@@ -58,5 +58,12 @@ namespace fe {
         void setScrollOffset(const glm::vec2& offset) {
             scroll = offset;
         }
+
+    private:
+        std::map<MouseButton, KeyState> buttons;
+        glm::vec2 position{};
+        glm::vec2 normalized{};
+        glm::vec2 delta{};
+        glm::vec2 scroll{};
     };
 }

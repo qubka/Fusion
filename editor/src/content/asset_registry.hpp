@@ -10,10 +10,10 @@ namespace fe {
 
     private:
 
-        void registerAllAssets(const std::string& filename);
-        void registerAsset(const std::string& filename);
+        void registerAllAssets(const std::filesystem::path& filename);
+        void registerAsset(const std::filesystem::path& filename);
 
 
-        std::unordered_map<std::string, AssetInfo> assets;
+        std::unordered_map<std::filesystem::path, AssetInfo> assets;
     };
 }

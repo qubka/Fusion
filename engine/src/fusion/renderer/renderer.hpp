@@ -1,18 +1,20 @@
 #pragma once
 
-#include "subrender.hpp"
-#include "renderstage.hpp"
+#include "render_stage.hpp"
+#include "SubrenderHolder.hpp"
 
 namespace fe {
+    /**
+     * @brief Class used to manage {@link Subrender} objects to create a list of render pass.
+     */
     class Renderer {
         friend class Graphics;
     public:
         /**
-         * Creates a new renderer.
+         * Creates a new renderer, fill {@link renderStages} in your subclass of this.
          */
         Renderer() = default;
         virtual ~Renderer() = default;
-        FE_NONCOPYABLE(Renderer);
 
         /**
          * Run when switching to this scene from another, use this method to create {@link Subrender}'s.
@@ -29,34 +31,31 @@ namespace fe {
          * @tparam T The Subrender type.
          * @return If the Subrender has the System.
          */
-        template<typename T>
-        bool hasSubrender() const  {
-            return subrenders.find(typeid(T)) != subrenders.end();
-        }
+         template<typename T>
+         bool hasSubrender() const  {
+             return subrenderHolder.Has<T>();
+         }
 
-        /**
-         * Gets a Subrender.
-         * @tparam T The Subrender type.
-         * @return The Subrender.
-         */
+         /**
+          * Gets a Subrender.
+          * @tparam T The Subrender type.
+          * @return The Subrender.
+          */
         template<typename T>
         T* getSubrender() const {
-            if (auto it = subrenders.find(typeid(T)); it != subrenders.end()) {
-                return it->second.get();
-            }
-            return nullptr;
+            return subrenderHolder.Get<T>();
         }
 
         /**
          * Adds a Subrender.
          * @tparam T The Subrender type.
          * @tparam Args The constructor arg types.
+         * @param pipelineStage The Subrender pipeline stage.
          * @param args The constructor arguments.
          */
         template<typename T, typename... Args>
-        T* addSubrender(Args &&...args) {
-            auto [it, result] = subrenders.emplace(typeid(T), std::make_unique<T>(std::forward<Args>(args)...));
-            return it->second.get();
+        T* addSubrender(const Pipeline::Stage& pipelineStage, Args&&...args) {
+            return subrenderHolder.Add<T>(pipelineStage, std::make_unique<T>(pipelineStage, std::forward<Args>(args)...));
         }
 
         /**
@@ -65,31 +64,29 @@ namespace fe {
          */
         template<typename T>
         void removeSubrender() {
-            subrenders.erase(std::remove(subrenders.begin(), subrenders.end(), typeid(T)), subrenders.end());
+            subrenderHolder.Remove<T>();
         }
 
         /**
          * Clears all Subrenders.
          */
         void clearSubrenders() {
-            subrenders.clear();
+            subrenderHolder.Clear();
         }
 
         RenderStage* getRenderStage(uint32_t index) const {
             if (renderStages.empty() || renderStages.size() < index)
                 return nullptr;
-            return renderStages.at(index).get();
+            return renderStages[index].get();
         }
 
         void addRenderStage(std::unique_ptr<RenderStage>&& renderStage) {
-            renderStages.emplace_back(std::move(renderStage));
+            renderStages.push_back(std::move(renderStage));
         }
 
     private:
-        //const vkx::Context& context;
         std::vector<std::unique_ptr<RenderStage>> renderStages;
-        std::unordered_map<std::type_index, std::unique_ptr<Subrender>> subrenders;
-        //SubrenderHolder subrenderHolder;
+        SubrenderHolder subrenderHolder;
         bool started{ false };
     };
 }

@@ -1,9 +1,10 @@
 #include "perspective_camera.hpp"
 
+#include "fusion/utils/math.hpp"
+
 using namespace fe;
 
-PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float far)
-    : Camera{}
+PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float far) : Camera{}
     , fovy{fov}
     , aspect{aspect}
     , near{near}

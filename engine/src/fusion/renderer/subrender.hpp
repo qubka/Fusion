@@ -1,31 +1,36 @@
 #pragma once
 
-namespace vk {
-    class CommandBuffer;
-}
+#include "fusion/renderer/pipelines/pipeline.hpp"
 
 namespace fe {
-    class Renderer;
+    /**
+     * @brief Represents a render pipeline that is used to render a type of pipeline.
+     */
     class Subrender {
     public:
         /**
          * Creates a new render pipeline.
+         * @param stage The stage this renderer will be used in.
          */
-        Subrender(Renderer& renderer) : renderer{renderer} {};
+        explicit Subrender(Pipeline::Stage stage) : stage{std::move(stage)} { }
         virtual ~Subrender() = default;
-        FE_NONCOPYABLE(Subrender);
+        NONCOPYABLE(Subrender);
 
         /**
          * Runs the render pipeline in the current renderpass.
          * @param commandBuffer The command buffer to record render command into.
          */
-        virtual void onRender(const vk::CommandBuffer& commandBuffer) = 0;
+        virtual void render(const CommandBuffer& commandBuffer) = 0;
+
+        const Pipeline::Stage& getStage() const { return stage; }
 
         bool isEnabled() const { return enabled; }
-        void setEnabled(bool flag) { enabled = flag; }
+        void setEnabled(bool enable) { this->enabled = enable; }
 
     private:
-        Renderer& renderer;
         bool enabled{ true };
+        Pipeline::Stage stage;
     };
+
+    //template class TypeInfo<Subrender>;
 }

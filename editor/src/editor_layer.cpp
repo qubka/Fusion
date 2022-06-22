@@ -3,6 +3,7 @@
 
 #include "fusion/scene/components.hpp"
 #include "fusion/input/input.hpp"
+#include "fusion/utils/math.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
@@ -11,7 +12,6 @@
 #include <IconsFontAwesome4.h>
 
 using namespace fe;
-using namespace std::string_literals;
 
 // TODO: Fix editorScene -> activeScene
 
@@ -216,7 +216,7 @@ void EditorLayer::onImGui() {
     //ImGui::Text("XYZ: " + glm::to_string(camera.position());
     ImGui::Text("Mouse Position: %s", glm::to_string(Input::MousePosition()).c_str());
     ImGui::Text("Mouse Normalized Position: %s", glm::to_string(Input::MouseNormalizedPosition()).c_str());
-    ImGui::Text("Mouse Delta: %s", glm::to_string(Input::MouseDelta()).c_str());
+    ImGui::Text("Mouse Delta: %s", glm::to_string(Input::MousePositionDelta()).c_str());
     ImGui::Text("Mouse Scroll: %s", glm::to_string(Input::MouseScroll()).c_str());
     ImGui::Text("Viewport Focused: %s", viewportFocused ? "TRUE" : "FALSE");
     ImGui::Text("Viewport Hovered: %s", viewportHovered ? "TRUE" : "FALSE");
@@ -262,7 +262,7 @@ void EditorLayer::onImGui() {
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            openScene(std::fs::path{ reinterpret_cast<const char*>(payload->Data) });
+            openScene(std::filesystem::path{ reinterpret_cast<const char*>(payload->Data) });
         }
         ImGui::EndDragDropTarget();
     }
@@ -340,14 +340,14 @@ void EditorLayer::newScene() {
     activeScene = std::make_shared<Scene>();
     activeScene->onViewportResize(viewportSize);
     sceneHierarchyPanel.setContext(activeScene);
-    editorScenePath = std::fs::path{};
+    editorScenePath = std::filesystem::path{};
 }
 
 void EditorLayer::openScene() {
     auto filepath = pfd::open_file("Choose scene file", getAssetPath(), { "Scene File (.scene)", "*.scene" }, pfd::opt::none).result();
     if (!filepath.empty()) {
         // Validate that file inside working directory
-        if (filepath[0].find(std::fs::current_path()) != std::string::npos) {
+        if (filepath[0].find(std::filesystem::current_path()) != std::string::npos) {
             openScene(filepath[0]);
         } else {
             pfd::message("File Location", "The selected file should be inside the project directory.", pfd::choice::ok, pfd::icon::error);
@@ -355,7 +355,7 @@ void EditorLayer::openScene() {
     }
 }
 
-void EditorLayer::openScene(const std::fs::path& file) {
+void EditorLayer::openScene(const std::filesystem::path& file) {
     if (sceneState != Edit)
         onSceneStop();
 

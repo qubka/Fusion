@@ -16,7 +16,7 @@ namespace fe {
     };
 
     namespace asset {
-        bool save(const std::string& filename, const AssetInfo& file);
-        bool load(const std::string& filename, AssetInfo& outputFile);
+        bool save(const std::filesystem::path& filename, const AssetInfo& file);
+        bool load(const std::filesystem::path& filename, AssetInfo& outputFile);
     };
 }

@@ -64,3 +64,6 @@
 [submodule "external/glslang"]
 	path = external/glslang
 	url = https://github.com/KhronosGroup/glslang.git
+[submodule "external/volk"]
+	path = external/volk
+	url = https://github.com/zeux/volk

@@ -1,47 +1,119 @@
 #pragma once
 
-#include "mouse_codes.hpp"
+#include "fusion/core/engine.hpp"
+
+#include "mouse_buttons.hpp"
 #include "key_codes.hpp"
 #include "action_codes.hpp"
+#include "joystick_states.hpp"
 
 namespace fe {
-    /* Template class */
-    /// Regards to Jonathan Heard
-    /// @link https://stackoverflow.com/questions/55573238/how-do-i-do-a-proper-input-class-in-glfw-for-a-game-engine
-    template<class T>
+    struct KeyState {
+        bool pressed{ false };
+        uint64_t lastFrame{ UINT64_MAX };
+    };
+
+    class Engine;
+
     class BaseInput {
     public:
         //! Takes a list of which keys to keep state for
-        BaseInput(const std::pair<T, T>& range);
-        BaseInput(const std::initializer_list<T>& keysToMonitor);
-        FE_NONCOPYABLE(BaseInput);
+        BaseInput() = default;
+        virtual ~BaseInput() = default;
+        NONCOPYABLE(BaseInput);
 
-        virtual void onAttach() {}
-        virtual void onUpdate() { currentFrame++; }
-        virtual void onDetach() {}
-
-        //! If disabled, Input.isKey_ always returns false
-        bool isEnabled() const { return enabled; }
-        void isEnabled(bool flag) { enabled = flag; }
+        virtual void onUpdate() = 0;
 
     protected:
-        bool isKey(T keycode) const;
-        bool isKeyUp(T keycode) const;
-        bool isKeyDown(T keycode) const;
+        template<class T>
+        static bool IsKey(const std::map<T, KeyState>& keys, T keycode) {
+            if (auto it = keys.find(keycode); it != keys.end()) {
+                const auto& key = it->second;
+                return key.pressed;
+            }
+            return false;
+        }
 
-        //! Used internally to update key states. Should be called by the GLFW callbacks
-        void setKey(T keycode, ActionCode action);
+        template<class T>
+        static bool IsKeyUp(const std::map<T, KeyState>& keys, T keycode) {
+            if (auto it = keys.find(keycode); it != keys.end()) {
+                const auto& key = it->second;
+                return !key.pressed && key.lastFrame == Engine::Get()->frameCount();
+            }
+            return false;
+        }
 
-        struct KeyState {
-            bool pressed{ false };
-            uint32_t lastFrame{ UINT32_MAX };
-        };
+        template<class T>
+        static bool IsKeyDown(const std::map<T, KeyState>& keys, T keycode) {
+            if (auto it = keys.find(keycode); it != keys.end()) {
+                const auto& key = it->second;
+                return key.pressed && key.lastFrame == Engine::Get()->frameCount();
+            }
+            return false;
+        }
 
-        std::map<T, KeyState> keys;
-        uint32_t currentFrame{ 0 };
-        bool enabled{ true };
+        template<class T>
+        static void SetKey(std::map<T, KeyState>& keys, T keycode, ActionCode action) {
+            if (action == Action::Repeat)
+                return;
+            if (auto it = keys.find(keycode); it != keys.end()) {
+                auto& key = it->second;
+                switch (action) {
+                    case Action::Press:
+                        key.pressed = true;
+                        key.lastFrame = Engine::Get()->frameCount();
+                        break;
+                    case Action::Release:
+                        key.pressed = false;
+                        key.lastFrame = Engine::Get()->frameCount();
+                        break;
+                    default: // Repeat
+                        break;
+                }
+            }
+        }
+
+        template<class T>
+        static bool IsKey(const std::vector<KeyState>& keys, T keycode) {
+            if (keycode >= keys.size())
+                return false;
+            const auto& key = keys[keycode];
+            return key.pressed;
+        }
+
+        template<class T>
+        static bool IsKeyUp(const std::vector<KeyState>& keys, T keycode) {
+            if (keycode >= keys.size())
+                return false;
+            const auto& key = keys[keycode];
+            return !key.pressed && key.lastFrame == Engine::Get()->frameCount();
+        }
+
+        template<class T>
+        static bool IsKeyDown(const std::vector<KeyState>& keys, T keycode) {
+            if (keycode >= keys.size())
+                return false;
+            const auto& key = keys[keycode];
+            return key.pressed && key.lastFrame == Engine::Get()->frameCount();
+        }
+
+        template<class T>
+        static void SetKey(std::vector<KeyState>& keys, T keycode, ActionCode action) {
+            if (action == Action::Repeat || keycode >= keys.size())
+                return;
+            auto& key = keys[keycode];
+            switch (action) {
+                case Action::Press:
+                    key.pressed = true;
+                    key.lastFrame = Engine::Get()->frameCount();
+                    break;
+                case Action::Release:
+                    key.pressed = false;
+                    key.lastFrame = Engine::Get()->frameCount();
+                    break;
+                default: // Repeat
+                    break;
+            }
+        }
     };
-
-    template class BaseInput<MouseCode>;
-    template class BaseInput<KeyCode>;
 }
