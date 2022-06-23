@@ -2,13 +2,13 @@
 
 #include <utility>
 
-#if defined(WIN32)
+#if PLATFORM_WINDOWS
 #include <windows.h>
 #endif
 
 using namespace fe;
 
-#if defined(__ANDROID__)
+#if PLATFORM_ANDROID
 AAssetManager* assetManager{ nullptr };
 void setAssetManager(AAssetManager* assetManager) {
     vkx::storage::assetManager = assetManager;
@@ -61,7 +61,7 @@ private:
     ByteArray data_;
 };
 
-#if defined(__ANDROID__) || defined(WIN32)
+#if PLATFORM_ANDROID || PLATFORM_WINDOWS
 #define MAPPED_FILES 1
 #else
 #define MAPPED_FILES 0
@@ -84,7 +84,7 @@ public:
 private:
     size_t _size{ 0 };
     uint8_t* _mapped{ nullptr };
-#if defined(__ANDROID__)
+#if PLATFORM_ANDROID
     AAsset* _asset{ nullptr };
 #elif (WIN32)
     HANDLE _file{ INVALID_HANDLE_VALUE };
@@ -96,7 +96,7 @@ private:
 
 FileStorage::FileStorage(const std::filesystem::path& filename) {
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
-#if defined(__ANDROID__)
+#if PLATFORM_ANDROID
     // Load shader from compressed asset
     _asset = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
     assert(_asset);
@@ -122,7 +122,7 @@ FileStorage::FileStorage(const std::filesystem::path& filename) {
 }
 
 FileStorage::~FileStorage() {
-#if defined(__ANDROID__)
+#if PLATFORM_ANDROID
     AAsset_close(_asset);
 #elif (WIN32)
     UnmapViewOfFile(_mapped);

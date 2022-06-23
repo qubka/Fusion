@@ -1,11 +1,5 @@
 #include "surface.hpp"
 
-#if defined(__ANDROID__)
-#include "fusion/devices/android/window.hpp"
-#else
-#include "fusion/devices/glfw/window.hpp"
-#endif
-
 #include "fusion/renderer/graphics.hpp"
 #include "fusion/renderer/devices/instance.hpp"
 #include "fusion/renderer/devices/logical_device.hpp"

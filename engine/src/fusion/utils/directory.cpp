@@ -1,4 +1,5 @@
 #include "directory.hpp"
+#include "string.hpp"
 
 using namespace fe;
 

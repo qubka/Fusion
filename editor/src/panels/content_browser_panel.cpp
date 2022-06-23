@@ -2,6 +2,7 @@
 
 #include "fusion/utils/directory.hpp"
 #include "fusion/utils/file.hpp"
+#include "fusion/utils/string.hpp"
 
 #include <imgui/imgui.h>
 #include <IconsFontAwesome4.h>

@@ -14,6 +14,6 @@ namespace fe {
         void registerAsset(const std::filesystem::path& filename);
 
 
-        std::unordered_map<std::filesystem::path, AssetInfo> assets;
+        std::unordered_map<std::string, AssetInfo> assets;
     };
 }

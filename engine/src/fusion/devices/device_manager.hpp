@@ -20,6 +20,8 @@ namespace fe {
         virtual ~DeviceManager();
         NONCOPYABLE(DeviceManager);
 
+        static std::unique_ptr<DeviceManager> Create();
+
         static DeviceManager* Get() { return Instance; }
 
         /**

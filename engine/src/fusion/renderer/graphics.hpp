@@ -24,7 +24,7 @@ namespace fe {
 
         void update();
 
-        static Graphics* Get() { return Instance_; }
+        static Graphics* Get() { return Instance; }
 
         static std::string StringifyResultVk(VkResult result);
         static void CheckVk(VkResult result);
@@ -62,7 +62,7 @@ namespace fe {
         void setFramebufferResized(size_t id) { perSurfaceBuffers[id]->framebufferResized = true; }
 
     private:
-        static Graphics* Instance_;
+        static Graphics* Instance;
 
         void createPipelineCache();
         void resetRenderStages();
@@ -94,7 +94,7 @@ namespace fe {
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;
 
-        Instance instance;
+        fe::Instance instance;
         PhysicalDevice physicalDevice;
         LogicalDevice logicalDevice;
         VkPipelineCache pipelineCache{ VK_NULL_HANDLE };

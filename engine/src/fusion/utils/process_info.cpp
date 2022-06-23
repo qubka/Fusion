@@ -1,15 +1,12 @@
 #include "process_info.hpp"
 
-#ifdef _WIN32
+#ifdef PLATFORM_WINDOWS
 #include "psapi.h"
 #pragma comment(lib, "psapi.lib")
 #include "tlhelp32.h"
-#endif
-
-#ifdef linux
+#elif PLATFORM_LINUX
 #include <sys/sysinfo.h>
 #include <unistd.h>
-
 #define LINEBUFFLEN 2048
 #endif
 
@@ -43,7 +40,7 @@ ProcessInfo::ProcessInfo(unsigned int processId) : processId{processId} {
 		CloseHandle(lProcessHandle);
 	}
 
-#elif defined(linux)
+#elif PLATFORM_LINUX
     jiffiesPerSecond = sysconf(_SC_CLK_TCK);
     prevSystemTime = 0;
     prevUserTime = 0;
@@ -113,8 +110,8 @@ unsigned long long ProcessInfo::getProcessUptime() {
 
 	return lUptimeInSec;
 
-#elif defined(linux)
-    struct sysinfo lSysinfo{};
+#elif PLATFORM_LINUX
+    struct sysinfo lSysinfo;
     int lReturn = sysinfo(&lSysinfo);
 
     if (lReturn == 0)
@@ -158,7 +155,7 @@ double ProcessInfo::getProcessCpuUsage() {
 		CloseHandle(lProcessHandle);
 	}
 
-#elif defined(linux)
+#elif PLATFORM_LINUX
     unsigned long long lCurrSystemTime = 0;
     unsigned long long lCurrUserTime = 0;
     unsigned long long lCurrKernelTime = 0;
@@ -224,7 +221,7 @@ double ProcessInfo::getProcessMemoryUsed() {
 		CloseHandle(lProcessHandle);
 	}
 
-#elif defined(linux)
+#elif PLATFORM_LINUX
     char lFileName[256];
     sprintf(lFileName, "/proc/%d/status", processId);
     FILE* lpFile = fopen(lFileName, "r");
@@ -278,7 +275,7 @@ unsigned long ProcessInfo::getProcessThreadCount() {
 		CloseHandle(lSnapshot);
 	}
 
-#elif defined(linux)
+#elif PLATFORM_LINUX
     // get number of threads from file /proc/[pid]/stat
     char lFileName[256];
     sprintf(lFileName, "/proc/%d/stat", processId);

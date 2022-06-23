@@ -1,6 +1,6 @@
 #include "window.hpp"
 // TODO: Refactor
-#if defined(ANDROID)
+#if PLATFORM_ANDROID
 #include "fusion/input/input.hpp"
 #include "fusion/input/key_input.hpp"
 #include "fusion/input/mouse_input.hpp"

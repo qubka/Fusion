@@ -1,5 +1,4 @@
 #include "joystick.hpp"
-#include "device_manager.hpp"
 
 using namespace glfw;
 
@@ -12,9 +11,6 @@ Joystick::Joystick(uint8_t port)
         throw std::runtime_error("GLFW joystick failed to be identified");
 
     glfwSetJoystickUserPointer(port, this);
-}
-
-Joystick::~Joystick() {
 }
 
 void Joystick::update() {

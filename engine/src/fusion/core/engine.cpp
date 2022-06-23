@@ -4,15 +4,20 @@ using namespace fe;
 
 Engine* Engine::Instance{ nullptr };
 
-Engine::Engine(const CommandLineArgs& args) : version{FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
+Engine::Engine(const CommandLineArgs& args)
+    : version{FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH}
+    , deviceManager{DeviceManager::Create()}
+{
     Instance = this;
 
     Log::Init();
 
+    deviceManager->getWindow(0)->OnClose().connect<&Engine::requestClose>(this);
+
     commandLineParser.parse(args);
 
     LOG_INFO << "Version: " << version.to_string();
-    LOG_INFO << "Git: [" << FUSION_GIT_SHA1 << "]:(" << FUSION_GIT_TAG << ") - " << FUSION_GIT_COMMIT_SUBJECT << " on " << FUSION_GIT_BRANCH << " at " << FUSION_GIT_DATE;
+    LOG_INFO << "Git: [" << GIT_COMMIT_HASH << "]:(" << GIT_TAG << ") - " << GIT_COMMIT_SUBJECT << " on " << GIT_BRANCH << " at " << GIT_COMMIT_DATE;
     LOG_INFO << "Compiled on: " << FUSION_COMPILED_SYSTEM << " from: " << FUSION_COMPILED_GENERATOR << " with: " << FUSION_COMPILED_COMPILER;
 
     running = true;
@@ -27,6 +32,8 @@ int32_t Engine::run() {
         try {
             frameNumber++;
             deltaTime.update();
+
+            deviceManager->update();
 
             if (application) {
                 if (!application->started) {

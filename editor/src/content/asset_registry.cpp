@@ -1,10 +1,11 @@
 #include "asset_registry.hpp"
+#include "fusion/utils/directory.hpp"
 
 using namespace fe;
 
 void AssetRegistry::registerAllAssets(const std::filesystem::path& filename) {
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
-    for (const auto& file : Directory::GetFilesRecu(filename)) {
+    for (const auto& file : Directory::GetFiles(filename)) {
         if (!is_directory(file)) {
             registerAsset(file);
         }
@@ -15,7 +16,7 @@ void AssetRegistry::registerAsset(const std::filesystem::path& filename) {
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
     auto ftime = std::filesystem::last_write_time(filename);
 
-    if (auto it = assets.find(filename); it == assets.end() || it->second.importDate) {
+    if (auto it = assets.find(filename.string()); it == assets.end() || it->second.importDate) {
         AssetInfo info;
         if (asset::load(filename, info)) {
             assets[filename] = info;

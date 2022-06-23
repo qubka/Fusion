@@ -1,6 +1,6 @@
 #pragma once
 // TODO: Refactor
-#if defined(ANDROID)
+#if PLATFORM_ANDROID
 #include "fusion/core/android.hpp"
 #include "fusion/devices/window.hpp"
 

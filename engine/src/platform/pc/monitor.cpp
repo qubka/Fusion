@@ -19,9 +19,6 @@ Monitor::Monitor(GLFWmonitor* monitor)
         modes.push_back(*reinterpret_cast<const fe::VideoMode *>(&videoModes[i]));
 }
 
-Monitor::~Monitor() {
-}
-
 glm::uvec4 Monitor::getWorkarea() const {
     glm::ivec4 workarea;
     glfwGetMonitorWorkarea(monitor, &workarea.x, &workarea.y, &workarea.z, &workarea.w);

@@ -1,17 +1,14 @@
 #pragma once
 
 #include "fusion/devices/monitor.hpp"
-#include "glm/fwd.hpp"
 
 #include <GLFW/glfw3.h>
-#include <string>
-#include <vector>
 
 namespace glfw {
     class Monitor : public fe::Monitor {
     public:
-        Monitor(GLFWmonitor* monitor);
-        ~Monitor();
+        explicit Monitor(GLFWmonitor* monitor);
+        ~Monitor() override = default;
 
         bool isPrimary() const override{ return monitor == glfwGetPrimaryMonitor(); }
 

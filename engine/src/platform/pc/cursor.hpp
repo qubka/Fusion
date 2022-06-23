@@ -18,7 +18,7 @@ namespace glfw {
          * Creates the cursor with a system style.
          * @param standard The standard shape.
          */
-        Cursor(fe::CursorStandard standard);
+        explicit Cursor(fe::CursorStandard standard);
 
 
         ~Cursor() override;

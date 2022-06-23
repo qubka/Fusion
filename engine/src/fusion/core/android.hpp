@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(__ANDROID__)
+#if PLATFORM_ANDROID
 #include <android_native_app_glue.h>
 #include <android/asset_manager.h>
 

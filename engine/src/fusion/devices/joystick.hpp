@@ -87,7 +87,7 @@ namespace fe {
          * @param hat The hat id to get the value from.
          * @return The value of the joystick's hat.
          */
-        virtual int getHat(JoystickHat hat) const;
+        virtual int getHat(JoystickHat hat) const = 0;
 
         /**
          * This function retrieves the state of the specified joystick remapped to an Xbox-like gamepad.

@@ -18,15 +18,15 @@ if (NOT "${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
     message(FATAL_ERROR "Only 64 bit builds supported.")
 endif()
 
-file(GLOB_RECURSE SRC_SOURCES "src/fusion/*.cpp")
-file(GLOB_RECURSE SRC_HEADERS "src/fusion/*.hpp")
+if (ANDROID)
+    set(PLATFORM_FOLDER "android")
+else()
+    set(PLATFORM_FOLDER "pc")
+endif()
+
+file(GLOB_RECURSE SRC_SOURCES "src/fusion/*.cpp" "src/platform/${PLATFORM_FILES}/*.cpp")
+file(GLOB_RECURSE SRC_HEADERS "src/fusion/*.hpp" "src/platform/${PLATFORM_FILES}/*.hpp")
 set(HEADER_FILES "src/pch.hpp")
-
-# generate config.cpp
-configure_file("src/config.cpp.in" "src/config.cpp" @ONLY)
-
-list(APPEND SRC_SOURCES "src/config.cpp")
-list(APPEND HEADER_FILES "src/config.hpp")
 
 # create library and exectuable
 add_library(${PROJECT_NAME} STATIC ${SRC_SOURCES} ${SRC_HEADERS})
@@ -61,6 +61,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         glslang
         SPIRV
         yaml-cpp
+        git-info
         assimp::assimp
         ${PHYSX_LIBRARIES}
         )
@@ -83,5 +84,11 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLM_FORCE_DEPTH_ZERO_TO_ONE)
 target_compile_definitions(${PROJECT_NAME} PUBLIC FUSION_DEBUG)
 target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
-
-add_dependencies(${PROJECT_NAME} Shaders)
+target_compile_definitions(${PROJECT_NAME} PUBLIC
+        FUSION_VERSION_MAJOR=${FUSION_VERSION_MAJOR}
+        FUSION_VERSION_MINOR=${FUSION_VERSION_MINOR}
+        FUSION_VERSION_PATCH=${FUSION_VERSION_PATCH}
+        FUSION_COMPILED_COMPILER="${CMAKE_CXX_COMPILER}"
+        FUSION_COMPILED_SYSTEM="${CMAKE_SYSTEM}"
+        FUSION_COMPILED_GENERATOR="${CMAKE_GENERATOR}"
+        )

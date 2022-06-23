@@ -2,6 +2,7 @@
 
 #include "fusion/renderer/graphics.hpp"
 #include "fusion/devices/device_manager.hpp"
+#include "fusion/core/engine.hpp"
 
 using namespace fe;
 
@@ -142,18 +143,18 @@ std::vector<const char*> Instance::getExtensions() const {
 }
 
 void Instance::createInstance() {
-	//const auto& engineVersion = Engine::Get()->getVersion();
-	//const auto& appVersion = Engine::Get()->getApp()->getVersion();
-	//const auto& appName = Engine::Get()->getApp()->getName();
+	const auto& engineVersion = Engine::Get()->getVersion();
+	const auto& appVersion = Engine::Get()->getApp()->getVersion();
+	const auto& appName = Engine::Get()->getApp()->getName();
 
 	Graphics::CheckVk(volkInitialize());
 	
 	VkApplicationInfo applicationInfo = {};
 	applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	//applicationInfo.pApplicationName = appName.c_str();
-	//applicationInfo.applicationVersion =  static_cast<uint32_t>(appVersion);
+	applicationInfo.pApplicationName = appName.c_str();
+	applicationInfo.applicationVersion =  static_cast<uint32_t>(appVersion);
 	applicationInfo.pEngineName = "Fusion";
-	//applicationInfo.engineVersion = static_cast<uint32_t>(engineVersion);
+	applicationInfo.engineVersion = static_cast<uint32_t>(engineVersion);
 	applicationInfo.apiVersion = volkGetInstanceVersion() >= VK_API_VERSION_1_1 ? VK_API_VERSION_1_1 : VK_MAKE_VERSION(1, 0, 57);
 
 	if (enableValidationLayers && !checkValidationLayerSupport()) {

@@ -15,7 +15,7 @@ int main(int args, char** argv) {
     auto exitCode = engine.run();
 
     // Pauses the console.
-    std::cout << "Press enter to continue...";
-    std::cin.get();
+    //std::cout << "Press enter to continue...";
+    //std::cin.get();
     return exitCode;
 }

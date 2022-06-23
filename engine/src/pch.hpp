@@ -48,8 +48,6 @@
 #include <magic_enum.hpp>
 namespace me = magic_enum;
 
-
-
 #include "fusion/core/base.hpp"
 #include "fusion/core/common.hpp"
 #include "fusion/core/log.hpp"

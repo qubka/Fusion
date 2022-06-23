@@ -1,11 +1,11 @@
 #pragma once
 
-#if defined(__ANDROID__)
+#if PLATFORM_ANDROID
 #include <android/asset_manager.h>
 #endif
 
 namespace fe {
-#if defined(__ANDROID__)
+#if PLATFORM_ANDROID
     void setAssetManager(AAssetManager* assetManager);
 #endif
     class Storage;

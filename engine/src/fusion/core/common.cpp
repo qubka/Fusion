@@ -1,7 +1,7 @@
 #include "common.hpp"
 
 const std::string& fe::getAssetPath() {
-#if defined(__ANDROID__)
+#if PLATFORM_ANDROID
     static const std::string NOTHING;
     return NOTHING;
 #else

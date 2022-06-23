@@ -5,6 +5,7 @@
 #include "app.hpp"
 
 #include "fusion/utils/time.hpp"
+#include "fusion/devices/device_manager.hpp"
 
 int main(int argc, char** argv);
 
@@ -108,6 +109,7 @@ namespace fe {
         CommandLineParser commandLineParser;
         Version version;
 
+        std::unique_ptr<DeviceManager> deviceManager;
         std::unique_ptr<App> application;
 
         uint64_t frameNumber{ 0 };

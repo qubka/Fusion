@@ -10,6 +10,8 @@
 
 using namespace fe;
 
+Graphics* Graphics::Instance{ nullptr };
+
 Graphics::Graphics()
     : elapsedPurge(5s)
     , instance{}

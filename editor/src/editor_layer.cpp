@@ -2,7 +2,7 @@
 #include "editor_app.hpp"
 
 #include "fusion/scene/components.hpp"
-#include "fusion/input/input.hpp"
+//#include "fusion/input/input.hpp"
 #include "fusion/utils/math.hpp"
 #include "fusion/utils/string.hpp"
 
@@ -55,7 +55,7 @@ void EditorLayer::onUpdate(float dt) {
         }
     }
 
-    bool control = Input::GetKey(Key::LeftControl) || Input::GetKey(Key::RightControl);
+    /*bool control = Input::GetKey(Key::LeftControl) || Input::GetKey(Key::RightControl);
     bool shift = Input::GetKey(Key::LeftShift) || Input::GetKey(Key::RightShift);
 
     if (Input::GetKeyDown(Key::N)) {
@@ -71,10 +71,10 @@ void EditorLayer::onUpdate(float dt) {
             else
                 saveScene();
         }
-    }/* else if (Input::GetKeyDown(Key::D)) {
+    } else if (Input::GetKeyDown(Key::D)) {
         if (control)
             duplicateEntity();
-    }*/
+    }
 
     if (!ImGuizmo::IsUsing()) {
         if (Input::GetKeyDown(Key::Q)) {
@@ -90,7 +90,7 @@ void EditorLayer::onUpdate(float dt) {
         } else if (Input::GetKeyDown(Key::Y)) {
             gizmoType = ImGuizmo::BOUNDS;
         }
-    }
+    }*/
 }
 
 void EditorLayer::onRender(Renderer& renderer) {
@@ -215,12 +215,12 @@ void EditorLayer::onImGui() {
     //ImGui::Text(version);
     //ImGui::Text("FPS: %d", Time::FramesPerSecond());
     //ImGui::Text("XYZ: " + glm::to_string(camera.position());
-    ImGui::Text("Mouse Position: %s", glm::to_string(Input::MousePosition()).c_str());
+    /*ImGui::Text("Mouse Position: %s", glm::to_string(Input::MousePosition()).c_str());
     ImGui::Text("Mouse Normalized Position: %s", glm::to_string(Input::MouseNormalizedPosition()).c_str());
     ImGui::Text("Mouse Delta: %s", glm::to_string(Input::MousePositionDelta()).c_str());
     ImGui::Text("Mouse Scroll: %s", glm::to_string(Input::MouseScroll()).c_str());
     ImGui::Text("Viewport Focused: %s", viewportFocused ? "TRUE" : "FALSE");
-    ImGui::Text("Viewport Hovered: %s", viewportHovered ? "TRUE" : "FALSE");
+    ImGui::Text("Viewport Hovered: %s", viewportHovered ? "TRUE" : "FALSE");*/
 
     //ImGui::Text("Renderer Stats:");
     //ImGui::Text("Draw Calls: %d", stats.DrawCalls);
@@ -285,7 +285,7 @@ void EditorLayer::onImGui() {
         auto& transform = activeScene->registry.get<TransformComponent>(selectedEntity);
 
         // Snapping
-        bool snap = Input::GetKey(Key::LeftControl);
+        bool snap = false;//Input::GetKey(Key::LeftControl);
         float snapValue = 0.5f; // Snap to 0.5m for translation/scale
         // Snap to 45 degrees for rotation
         if (gizmoType == ImGuizmo::ROTATE)

@@ -7,8 +7,8 @@
 namespace glfw {
     class Joystick : public fe::Joystick {
     public:
-        Joystick(uint8_t port);
-        ~Joystick() override;
+        explicit Joystick(uint8_t port);
+        ~Joystick() override = default;
 
         void update() override;
 
