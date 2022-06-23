@@ -26,7 +26,7 @@ PhysicalDevice::PhysicalDevice(const Instance& instance) : instance{instance} {
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
     msaaSamples = getMaxUsableSampleCount();
 
-    LOG_DEBUG << "Selected Physical Device: " << properties.deviceID << " " << std::quoted(properties.deviceName), '\n');
+    LOG_DEBUG << "Selected Physical Device: " << properties.deviceID << " " << std::quoted(properties.deviceName);
 }
 
 VkPhysicalDevice PhysicalDevice::choosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices) {

@@ -3,7 +3,7 @@
 
 using namespace fe;
 
-glm::vec3 Geometry::intersectionPoint(const Plane& a, const Plane& b, const Plane& c) {
+glm::vec3 Geometry::IntersectionPoint(const Plane& a, const Plane& b, const Plane& c) {
     float f = -glm::dot(a.getNormal(), glm::cross(b.getNormal(), c.getNormal()));
 
     glm::vec3 v1 {a.getDistance() * glm::cross(b.getNormal(), c.getNormal())};

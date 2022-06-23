@@ -1,7 +1,7 @@
 #pragma once
 
 #include "render_stage.hpp"
-#include "SubrenderHolder.hpp"
+#include "subrender_holder.hpp"
 
 namespace fe {
     /**
@@ -33,7 +33,7 @@ namespace fe {
          */
          template<typename T>
          bool hasSubrender() const  {
-             return subrenderHolder.Has<T>();
+             return subrenderHolder.has<T>();
          }
 
          /**
@@ -43,7 +43,7 @@ namespace fe {
           */
         template<typename T>
         T* getSubrender() const {
-            return subrenderHolder.Get<T>();
+            return subrenderHolder.get<T>();
         }
 
         /**
@@ -55,7 +55,7 @@ namespace fe {
          */
         template<typename T, typename... Args>
         T* addSubrender(const Pipeline::Stage& pipelineStage, Args&&...args) {
-            return subrenderHolder.Add<T>(pipelineStage, std::make_unique<T>(pipelineStage, std::forward<Args>(args)...));
+            return subrenderHolder.add<T>(pipelineStage, std::make_unique<T>(pipelineStage, std::forward<Args>(args)...));
         }
 
         /**
@@ -64,14 +64,14 @@ namespace fe {
          */
         template<typename T>
         void removeSubrender() {
-            subrenderHolder.Remove<T>();
+            subrenderHolder.remove<T>();
         }
 
         /**
          * Clears all Subrenders.
          */
         void clearSubrenders() {
-            subrenderHolder.Clear();
+            subrenderHolder.clear();
         }
 
         RenderStage* getRenderStage(uint32_t index) const {

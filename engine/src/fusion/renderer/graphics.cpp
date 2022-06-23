@@ -91,7 +91,7 @@ void Graphics::update() {
                 stage.second = subpass.binding;
 
                 // Renders subpass subrender pipelines.
-                renderer->subrenderHolder.RenderStage(stage, *commandBuffer);
+                renderer->subrenderHolder.renderStage(stage, *commandBuffer);
 
                 if (subpass.binding != renderStage->getSubpasses().back().binding)
                     vkCmdNextSubpass(*commandBuffer, VK_SUBPASS_CONTENTS_INLINE);

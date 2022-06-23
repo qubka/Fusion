@@ -108,18 +108,17 @@ namespace glfw {
 
         LOG_VERBOSE << "MonitorEvent: name: [" << glfwGetMonitorName(monitor) << "] - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
 
-        switch (action) {
-            case GLFW_CONNECTED:
-                monitors.push_back(std::make_unique<Monitor>(monitor));
-                manager->onMonitorConnect.publish(this, true);
-                break;
-
-            case GLFW_DISCONNECTED:
-                manager->onMonitorConnect.publish(this, false);
-                monitors.erase(std::remove_if(monitors.begin(), monitors.end(), [monitor](const auto& m) {
-                    return monitor == m->getNativeMonitor();
-                }), monitors.end());
-                break;
+        if (action == GLFW_CONNECTED) {
+            auto& it = monitors.emplace_back(std::make_unique<Monitor>(monitor));
+            manager->onMonitorConnect.publish(it.get(), true);
+        } else if (action == GLFW_DISCONNECTED) {
+            auto it = std::find_if(monitors.begin(), monitors.end(), [monitor](const auto& m) {
+                return monitor == m->getNativeMonitor();
+            });
+            if (it != monitors.end()) {
+                manager->onMonitorConnect.publish(it->get(), false);
+                monitors.erase(it);
+            }
         }
     }
 
@@ -130,17 +129,17 @@ namespace glfw {
 
         LOG_VERBOSE << "JoystickEvent: id: [" << jid << "] | name: [" << glfwGetJoystickName(jid) << "] - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
 
-        switch (action) {
-            case GLFW_CONNECTED:
-                joysticks.push_back(std::make_unique<Joystick>(jid));
-                manager->onJoystickConnect.publish(this, true);
-                break;
-            case GLFW_DISCONNECTED:
-                manager->onJoystickConnect.publish(this, false);
-                joysticks.erase(std::remove_if(joysticks.begin(), joysticks.end(), [jid](const auto& j) {
-                    return jid == j->getPort();
-                }), joysticks.end());
-                break;
+        if (action == GLFW_CONNECTED) {
+            auto& it = joysticks.emplace_back(std::make_unique<Joystick>(jid));
+            manager->onJoystickConnect.publish(it.get(), true);
+        } else if (action == GLFW_DISCONNECTED) {
+            auto it = std::find_if(joysticks.begin(), joysticks.end(), [jid](const auto& j) {
+                return jid == j->getPort();
+            });
+            if (it != joysticks.end()) {
+                manager->onJoystickConnect.publish(it->get(), false);
+                joysticks.erase(it);
+            }
         }
     }
     #endif

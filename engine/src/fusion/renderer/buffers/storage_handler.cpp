@@ -15,7 +15,7 @@ StorageHandler::StorageHandler(const Shader::UniformBlock& uniformBlock, bool mu
     , handlerStatus{Buffer::Status::Changed} {
 }
 
-bool StorageHandler::Update(const std::optional<Shader::UniformBlock>& uniformBlock) {
+bool StorageHandler::update(const std::optional<Shader::UniformBlock>& uniformBlock) {
 	if (handlerStatus == Buffer::Status::Reset || multipipeline && !this->uniformBlock || !multipipeline && this->uniformBlock != uniformBlock) {
 		if (size == 0 && !this->uniformBlock || this->uniformBlock && this->uniformBlock != uniformBlock && static_cast<uint32_t>(this->uniformBlock->getSize()) == size) {
 			size = static_cast<uint32_t>(uniformBlock->getSize());

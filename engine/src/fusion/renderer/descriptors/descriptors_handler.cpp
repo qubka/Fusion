@@ -72,8 +72,8 @@ bool DescriptorsHandler::update(const Pipeline& pipeline) {
 
 void DescriptorsHandler::bindDescriptor(const CommandBuffer& commandBuffer, const Pipeline& pipeline) {
 	if (pushDescriptors) {
-		auto logicalDevice = Graphics::Get()->getLogicalDevice();
-		Instance::FvkCmdPushDescriptorSetKHR(*logicalDevice, commandBuffer, pipeline.getPipelineBindPoint(), pipeline.getPipelineLayout(), 0, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data());
+        const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
+		Instance::FvkCmdPushDescriptorSetKHR(logicalDevice, commandBuffer, pipeline.getPipelineBindPoint(), pipeline.getPipelineLayout(), 0, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data());
 	} else {
 		descriptorSet->bindDescriptor(commandBuffer);
 	}

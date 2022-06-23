@@ -143,11 +143,11 @@ Sphere Sphere::transformed(const glm::mat4& transform) const {
     };
 }
 
-Sphere Sphere::calculateBoundingSphere(const std::vector<glm::vec3>& points) {
-    return calculateBoundingSphere(points.data(), points.size());
+Sphere Sphere::CalculateBoundingSphere(const std::vector<glm::vec3>& points) {
+    return CalculateBoundingSphere(points.data(), points.size());
 }
 
-Sphere Sphere::calculateBoundingSphere(const glm::vec3* points, size_t size) {
+Sphere Sphere::CalculateBoundingSphere(const glm::vec3* points, size_t size) {
     if (!size)
         return {};
 

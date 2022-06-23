@@ -15,9 +15,9 @@ EditorApp::~EditorApp() {
 }
 
 void EditorApp::onStart() {
-    pushLayer(new EditorLayer());
+    //pushLayer(new EditorLayer());
 }
 
 void EditorApp::onUpdate(const Time& dt) {
-    graphics->update();
+    //graphics->update();
 }

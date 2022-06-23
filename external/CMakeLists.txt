@@ -1,6 +1,14 @@
 # vulkan
 set(VULKAN_LIB_NAME "volk")
 
+if (ANDROID)
+    set(VOLK_STATIC_DEFINES VK_USE_PLATFORM_ANDROID_KHR)
+elseif (WIN32)
+    set(VOLK_STATIC_DEFINES VK_USE_PLATFORM_WIN32_KHR)
+else()
+    set(VOLK_STATIC_DEFINES VK_USE_PLATFORM_XCB_KHR)
+endif()
+
 add_subdirectory(${VULKAN_LIB_NAME})
 
 

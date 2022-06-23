@@ -18,10 +18,14 @@ namespace fe {
         class UniformBlock;
         class Constant;
 
-        /*struct VertexInput {
+        struct VertexInput {
             uint32_t binding{ 0 };
             std::vector<VkVertexInputBindingDescription> bindingDescriptions;
             std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+
+            bool operator<(const VertexInput& rhs) const {
+                return bindingDescriptions.front().binding < rhs.bindingDescriptions.front().binding;
+            }
         };
 
         struct Uniform {
@@ -32,6 +36,15 @@ namespace fe {
             bool readOnly{ false };
             bool writeOnly{ false };
             VkShaderStageFlags stageFlags{ 0 };
+
+            bool operator==(const Uniform& rhs) const {
+                return binding == rhs.binding && offset == rhs.offset && size == rhs.size && glType == rhs.glType && readOnly == rhs.readOnly &&
+                       writeOnly == rhs.writeOnly && stageFlags == rhs.stageFlags;
+            }
+
+            bool operator!=(const Uniform& rhs) const {
+                return !operator==(rhs);
+            }
         };
 
         struct UniformBlock {
@@ -41,6 +54,20 @@ namespace fe {
             VkShaderStageFlags stageFlags{ 0 };
             Type type{ Type::Uniform };
             std::map<std::string, Uniform> uniforms;
+
+            std::optional<Uniform> getUniform(const std::string& name) const {
+                if (auto it = uniforms.find(name); it != uniforms.end())
+                    return it->second;
+                return std::nullopt;
+            }
+
+            bool operator==(const UniformBlock& rhs) const {
+                return binding == rhs.binding && size == rhs.size && stageFlags == rhs.stageFlags && type == rhs.type && uniforms == rhs.uniforms;
+            }
+
+            bool operator!=(const UniformBlock& rhs) const {
+                return !operator==(rhs);
+            }
         };
 
         struct Attribute {
@@ -48,6 +75,14 @@ namespace fe {
             int32_t location{ -1 };
             int32_t size{ -1 };
             int32_t glType{ -1 };
+
+            bool operator==(const Attribute& rhs) const {
+                return set == rhs.set && location == rhs.location && size == rhs.size && glType == rhs.glType;
+            }
+
+            bool operator!=(const Attribute& rhs) const {
+                return !operator==(rhs);
+            }
         };
 
         struct Constant {
@@ -55,7 +90,15 @@ namespace fe {
             int32_t size{ -1 };
             VkShaderStageFlags stageFlags{ 0 };
             int32_t glType{ -1 };
-        };*/
+
+            bool operator==(const Constant& rhs) const {
+                return binding == rhs.binding && size == rhs.size && stageFlags == rhs.stageFlags && glType == rhs.glType;
+            }
+
+            bool operator!=(const Constant& rhs) const {
+                return !operator==(rhs);
+            }
+        };
 
         /**
          * A define added to the start of a shader, first value is the define name and second is the value to be set.
@@ -118,7 +161,7 @@ namespace fe {
         /**
          * @brief Class used to define sets of vertex inputs used in a shader.
          */
-        class VertexInput {
+        /*class VertexInput {
         public:
             VertexInput(std::vector<VkVertexInputBindingDescription> bindingDescriptions = {}, std::vector<VkVertexInputAttributeDescription> attributeDescriptions = {})
                 : binding{0}
@@ -277,6 +320,6 @@ namespace fe {
             int32_t size;
             VkShaderStageFlags stageFlags;
             int32_t glType;
-        };
+        };*/
     };
 }

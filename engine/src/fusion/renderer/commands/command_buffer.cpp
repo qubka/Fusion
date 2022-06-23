@@ -8,23 +8,23 @@ CommandBuffer::CommandBuffer(bool begin, VkQueueFlagBits queueType, VkCommandBuf
     : commandPool{Graphics::Get()->getCommandPool()}
     , queueType{queueType}
 {
-	auto logicalDevice = Graphics::Get()->getLogicalDevice();
+	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	commandBufferAllocateInfo.commandPool = *commandPool;
 	commandBufferAllocateInfo.level = bufferLevel;
 	commandBufferAllocateInfo.commandBufferCount = 1;
-	Graphics::CheckVk(vkAllocateCommandBuffers(*logicalDevice, &commandBufferAllocateInfo, &commandBuffer));
+	Graphics::CheckVk(vkAllocateCommandBuffers(logicalDevice, &commandBufferAllocateInfo, &commandBuffer));
 
 	if (begin)
         CommandBuffer::begin();
 }
 
 CommandBuffer::~CommandBuffer() {
-	auto logicalDevice = Graphics::Get()->getLogicalDevice();
+    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	vkFreeCommandBuffers(*logicalDevice, commandPool->getCommandPool(), 1, &commandBuffer);
+	vkFreeCommandBuffers(logicalDevice, commandPool->getCommandPool(), 1, &commandBuffer);
 }
 
 void CommandBuffer::begin(VkCommandBufferUsageFlags usage) {
@@ -47,7 +47,7 @@ void CommandBuffer::end() {
 }
 
 void CommandBuffer::submitIdle() {
-	auto logicalDevice = Graphics::Get()->getLogicalDevice();
+    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 	auto queueSelected = getQueue();
 
 	if (running)
@@ -62,16 +62,16 @@ void CommandBuffer::submitIdle() {
 	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 
 	VkFence fence;
-	Graphics::CheckVk(vkCreateFence(*logicalDevice, &fenceCreateInfo, nullptr, &fence));
-	Graphics::CheckVk(vkResetFences(*logicalDevice, 1, &fence));
+	Graphics::CheckVk(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &fence));
+	Graphics::CheckVk(vkResetFences(logicalDevice, 1, &fence));
 	Graphics::CheckVk(vkQueueSubmit(queueSelected, 1, &submitInfo, fence));
-	Graphics::CheckVk(vkWaitForFences(*logicalDevice, 1, &fence, VK_TRUE, std::numeric_limits<uint64_t>::max()));
+	Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, std::numeric_limits<uint64_t>::max()));
 
-	vkDestroyFence(*logicalDevice, fence, nullptr);
+	vkDestroyFence(logicalDevice, fence, nullptr);
 }
 
 void CommandBuffer::submit(const VkSemaphore& waitSemaphore, const VkSemaphore& signalSemaphore, VkFence fence, VkPipelineStageFlags submitPipelineStages) {
-	auto logicalDevice = Graphics::Get()->getLogicalDevice();
+    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 	auto queueSelected = getQueue();
 
 	if (running)
@@ -94,19 +94,19 @@ void CommandBuffer::submit(const VkSemaphore& waitSemaphore, const VkSemaphore& 
 	}
 
 	if (fence != VK_NULL_HANDLE)
-		Graphics::CheckVk(vkResetFences(*logicalDevice, 1, &fence));
+		Graphics::CheckVk(vkResetFences(logicalDevice, 1, &fence));
 
 	Graphics::CheckVk(vkQueueSubmit(queueSelected, 1, &submitInfo, fence));
 }
 
 VkQueue CommandBuffer::getQueue() const {
-	auto logicalDevice = Graphics::Get()->getLogicalDevice();
+    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
 	switch (queueType) {
         case VK_QUEUE_GRAPHICS_BIT:
-            return logicalDevice->getGraphicsQueue();
+            return logicalDevice.getGraphicsQueue();
         case VK_QUEUE_COMPUTE_BIT:
-            return logicalDevice->getComputeQueue();
+            return logicalDevice.getComputeQueue();
         default:
             return nullptr;
 	}

@@ -102,7 +102,7 @@ FileStorage::FileStorage(const std::filesystem::path& filename) {
     assert(_asset);
     _size = AAsset_getLength(_asset);
     assert(_size > 0);
-    _mapped = (uint8_t*)(AAsset_getBuffer(_asset));
+    _mapped = reinterpret_cast<uint8_t*>(AAsset_getBuffer(_asset));
 #elif (WIN32)
     _file = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     if (_file == INVALID_HANDLE_VALUE) {
@@ -117,7 +117,7 @@ FileStorage::FileStorage(const std::filesystem::path& filename) {
     if (_mapFile == INVALID_HANDLE_VALUE) {
         throw std::runtime_error("Failed to create mapping");
     }
-    _mapped = (uint8_t*)MapViewOfFile(_mapFile, FILE_MAP_READ, 0, 0, 0);
+    _mapped = reinterpret_cast<uint8_t*>(MapViewOfFile(_mapFile, FILE_MAP_READ, 0, 0, 0));
 #endif
 }
 

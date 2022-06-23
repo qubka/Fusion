@@ -10,6 +10,8 @@ namespace fe {
     static std::string FUSION_COMPILED_SYSTEM;
     static std::string FUSION_COMPILED_GENERATOR;
     static std::string FUSION_GIT_SHA1;
+    static std::string FUSION_GIT_TAG;
     static std::string FUSION_GIT_DATE;
+    static std::string FUSION_GIT_BRANCH;
     static std::string FUSION_GIT_COMMIT_SUBJECT;
 }

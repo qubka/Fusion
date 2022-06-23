@@ -6,7 +6,7 @@ namespace fe {
     class MainRenderer : public Renderer {
     public:
         MainRenderer() = default;
-        ~MainRenderer() override= default;
+        ~MainRenderer() override = default;
 
         void onStart() override {}
         void onUpdate() override {}

@@ -1,5 +1,7 @@
 #include "bitmap.hpp"
 
+#include "fusion/utils/file.hpp"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -7,8 +9,8 @@
 
 using namespace fe;
 
-Bitmap::Bitmap(const std::filesystem::path& filename, int desired_channels, bool flip) {
-    load(filename, desired_channels, flip);
+Bitmap::Bitmap(const std::filesystem::path& filename, int desired_channels) {
+    load(filename, desired_channels);
 }
 
 Bitmap::Bitmap(const glm::ivec2& size, int channels, bool hdr)
@@ -27,23 +29,20 @@ Bitmap::Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::ivec2& size, int ch
     , pixels{std::move(data)} {
 }
 
-void Bitmap::load(const std::filesystem::path& filename, int desired_channels, bool flip) {
+void Bitmap::load(const std::filesystem::path& filename, int desired_channels) {
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
 
-    stbi_set_flip_vertically_on_load(flip);
-
-    if (stbi_is_hdr(filename.c_str())) {
-        float* pixels = stbi_loadf(filename.c_str(), &width, &height, &channels, desired_channels);
-        if (pixels) {
-            //data_.reset(reinterpret_cast<uint8_t*>(pixels));
-            hdr = true;
-        }
+    auto fileExt = filename.extension().string();
+    if (fileExt == ".pic" || fileExt == ".hdr") {
+        File::WithBinaryFileContents(filename, [&](size_t size, const void* data) {
+            pixels = std::unique_ptr<uint8_t[]>(reinterpret_cast<uint8_t*>(stbi_loadf_from_memory(reinterpret_cast<const uint8_t*>(data), static_cast<int>(size), &width, &height, &channels, desired_channels)));
+        });
+        hdr = true;
     } else {
-        uint8_t* pixels = stbi_load(filename.c_str(), &width, &height, &channels, desired_channels);
-        if (pixels) {
-            //data_.reset(pixels);
-            hdr = false;
-        }
+        File::WithBinaryFileContents(filename, [&](size_t size, const void* data) {
+            pixels = std::unique_ptr<uint8_t[]>(stbi_load_from_memory(reinterpret_cast<const uint8_t*>(data), static_cast<int>(size), &width, &height, &channels, desired_channels));
+        });
+        hdr = false;
     }
 
     if (!pixels) {

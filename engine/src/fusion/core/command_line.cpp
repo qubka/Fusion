@@ -1,4 +1,5 @@
 #include "command_line.hpp"
+#include "fusion/utils/string.hpp"
 
 using namespace fe;
 
@@ -117,6 +118,17 @@ float CommandLineParser::getValue<float>(const std::string& name, const float& d
     if (!value.empty()) {
         float result = std::stof(value);
         return (result > 0) ? result : defaultValue;
+    } else {
+        return defaultValue;
+    }
+}
+
+template<>
+bool CommandLineParser::getValue<bool>(const std::string& name, const bool& defaultValue) {
+    assert(options.find(name) != options.end());
+    const std::string& value = options[name].value;
+    if (!value.empty()) {
+        return String::ConvertBool(value);
     } else {
         return defaultValue;
     }

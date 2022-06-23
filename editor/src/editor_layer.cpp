@@ -4,6 +4,7 @@
 #include "fusion/scene/components.hpp"
 #include "fusion/input/input.hpp"
 #include "fusion/utils/math.hpp"
+#include "fusion/utils/string.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
@@ -347,7 +348,7 @@ void EditorLayer::openScene() {
     auto filepath = pfd::open_file("Choose scene file", getAssetPath(), { "Scene File (.scene)", "*.scene" }, pfd::opt::none).result();
     if (!filepath.empty()) {
         // Validate that file inside working directory
-        if (filepath[0].find(std::filesystem::current_path()) != std::string::npos) {
+        if (String::Contains(filepath[0], std::filesystem::current_path().string())) {
             openScene(filepath[0]);
         } else {
             pfd::message("File Location", "The selected file should be inside the project directory.", pfd::choice::ok, pfd::icon::error);

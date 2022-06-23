@@ -11,7 +11,7 @@ namespace fe {
     class Surface {
         friend class Graphics;
     public:
-        Surface(const Instance& instance, const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, Window& window);
+        Surface(const Instance& instance, const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Window& window);
         ~Surface();
         NONCOPYABLE(Surface);
 

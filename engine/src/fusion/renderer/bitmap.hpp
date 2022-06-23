@@ -6,12 +6,12 @@ namespace fe {
     class Bitmap {
     public:
         Bitmap() = default;
-        explicit Bitmap(const std::filesystem::path& filename, int desired_channels = 0, bool flip = false);
+        explicit Bitmap(const std::filesystem::path& filename, int desired_channels = 0);
         explicit Bitmap(const glm::ivec2& size, int channels = 4, bool hdr = false);
         Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::ivec2& size, int channels = 4, bool hdr = false);
         ~Bitmap() = default;
 
-        void load(const std::filesystem::path& filename, int desired_channels = 0, bool flip = false);
+        void load(const std::filesystem::path& filename, int desired_channels = 0);
         void write(const std::filesystem::path& filename) const;
 
         operator bool() const { return pixels.get(); }

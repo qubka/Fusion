@@ -6,12 +6,8 @@
 using namespace fe;
 
 void File::WithBinaryFileContents(const std::filesystem::path& filename, const File::SimpleHandler& handler) {
-    WithBinaryFileContents(filename, [&](const char* filename, size_t size, const void* data) { handler(size, data); });
-}
-
-void File::WithBinaryFileContents(const std::filesystem::path& filename, const File::NamedHandler& handler) {
     auto storage = Storage::ReadFile(filename);
-    handler(filename.c_str(), storage->size(), storage->data());
+    handler(storage->size(), storage->data());
 }
 
 std::vector<uint8_t> File::ReadBinaryFile(const std::filesystem::path& filename) {

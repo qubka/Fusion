@@ -75,7 +75,7 @@ Window::~Window() {
 }
 
 void Window::update() {
-    auto delta = Engine::Get()->getDelta().asSeconds();
+    /*auto delta = Engine::Get()->getDelta().asSeconds();
 
     // Updates the position delta.
     mousePositionDelta = delta * (mouseLastPosition - mousePosition);
@@ -83,7 +83,7 @@ void Window::update() {
 
     // Updates the scroll delta.
     mouseScrollDelta = delta * (mouseLastScroll - mouseScroll);
-    mouseLastScroll = mouseScroll;
+    mouseLastScroll = mouseScroll;*/
 }
 
 void Window::setBorderless(bool flag) {

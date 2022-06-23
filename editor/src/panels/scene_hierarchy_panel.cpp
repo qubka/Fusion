@@ -5,6 +5,7 @@
 #include "fusion/systems/parent_system.hpp"
 #include "fusion/utils/directory.hpp"
 #include "fusion/utils/file.hpp"
+#include "fusion/utils/string.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
 
@@ -167,7 +168,7 @@ void SceneHierarchyPanel::drawEntities() {
             size_t idx = 0;
             auto view = context->registry.view<const TagComponent>();
             for (auto [e, tag] : view.each()) {
-                if ((*tag).find(name, 0) != std::string::npos) {
+                if (String::Contains(*tag, name)) {
                     idx++;
                 }
             }

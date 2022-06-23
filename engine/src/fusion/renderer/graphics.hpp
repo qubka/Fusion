@@ -1,6 +1,5 @@
 #pragma once
 
-#include "fusion/core/engine.hpp"
 #include "fusion/devices/window.hpp"
 #include "fusion/utils/elapsed_time.hpp"
 

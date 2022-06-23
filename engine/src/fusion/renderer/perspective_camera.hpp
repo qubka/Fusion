@@ -1,6 +1,7 @@
 #pragma once
 
 #include "camera.hpp"
+#include "fusion/utils/math.hpp"
 
 namespace fe {
     class PerspectiveCamera : public Camera {

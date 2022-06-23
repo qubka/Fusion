@@ -1,6 +1,8 @@
 #pragma once
 
 #include "monitor.hpp"
+#include "window.hpp"
+#include "joystick.hpp"
 
 #include "fusion/input/key_codes.hpp"
 
@@ -9,9 +11,6 @@
 #include <entt/signal/sigh.hpp>
 
 namespace fe {
-    class Window;
-    class Joystick;
-
     /**
      * @brief Module used for managing a window.
      */
@@ -71,6 +70,16 @@ namespace fe {
             auto& it = windows.emplace_back(std::make_unique<T>(getPrimaryMonitor()->getVideoMode(), std::forward<Args>(args)...));
             onWindowCreate.publish(it.get(), true);
         }
+        void destroyWindow(const Window* window) {
+            auto it = std::find_if(windows.begin(), windows.end(), [window](const auto& w) {
+                return window == w->getNativeWindow();
+            });
+            if (it != windows.end()) {
+                onWindowCreate.publish(it->get(), false);
+                windows.erase(it);
+            }
+        }
+
         const Window* getWindow(size_t id) const { return id < windows.size() ? windows[id].get() : nullptr; }
         Window* getWindow(size_t id) { return id < windows.size() ? windows[id].get() : nullptr; }
 

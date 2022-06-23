@@ -12,7 +12,7 @@ Engine::Engine(const CommandLineArgs& args) : version{FUSION_VERSION_MAJOR, FUSI
     commandLineParser.parse(args);
 
     LOG_INFO << "Version: " << version.to_string();
-    LOG_INFO << "Git: " << FUSION_COMPILED_COMMIT_HASH << " on " << FUSION_COMPILED_BRANCH;
+    LOG_INFO << "Git: [" << FUSION_GIT_SHA1 << "]:(" << FUSION_GIT_TAG << ") - " << FUSION_GIT_COMMIT_SUBJECT << " on " << FUSION_GIT_BRANCH << " at " << FUSION_GIT_DATE;
     LOG_INFO << "Compiled on: " << FUSION_COMPILED_SYSTEM << " from: " << FUSION_COMPILED_GENERATOR << " with: " << FUSION_COMPILED_COMPILER;
 
     running = true;
@@ -20,7 +20,6 @@ Engine::Engine(const CommandLineArgs& args) : version{FUSION_VERSION_MAJOR, FUSI
 
 Engine::~Engine() {
     Instance = nullptr;
-    application = nullptr;
 }
 
 int32_t Engine::run() {

@@ -3,12 +3,11 @@
 #include "version.hpp"
 #include "layer_stack.hpp"
 
-#include "fusion/input/key_input.hpp"
-#include "fusion/input/mouse_input.hpp"
 #include "fusion/renderer/graphics.hpp"
 
 namespace fe {
     class Time;
+
     class App {
         friend class Engine;
     public:
@@ -62,19 +61,6 @@ namespace fe {
          */
         void setGraphics(std::unique_ptr<Graphics>&& graphics) { this->graphics = std::move(graphics); }
 
-        /**
-         * Gets the application's key input interface.
-         * @return The application's key input interface.
-         */
-        KeyInput& getKeyInput() { return keyInput; }
-
-        /**
-         * Gets the application's mouse input interface.
-         * @return The application's mouse input interface.
-         */
-        MouseInput& getMouseInput() { return mouseInput; }
-
-
         void pushLayer(Layer* layer) { layers.pushFront(layer); }
 
         void pushOverlay(Layer* layer) { layers.pushBack(layer); }
@@ -84,11 +70,11 @@ namespace fe {
         Version version;
         bool started{ false };
 
-        std::unique_ptr<Graphics> graphics;
+        std::unique_ptr<fe::Graphics> graphics;
 
         LayerStack layers;
 
-        KeyInput keyInput{/*all keys*/};
-        MouseInput mouseInput{/*all buttons*/};
+        //KeyInput keyInput{/*all keys*/};
+        //MouseInput mouseInput{/*all buttons*/};
     };
 }
