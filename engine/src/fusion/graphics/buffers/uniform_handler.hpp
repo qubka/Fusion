@@ -52,11 +52,11 @@ namespace fe {
 
     private:
         std::optional<Shader::UniformBlock> uniformBlock;
-        void *data = nullptr;
-        uint32_t size = 0;
+        void *data{ nullptr };
+        uint32_t size{ 0 };
         std::unique_ptr<UniformBuffer> uniformBuffer;
         Buffer::Status handlerStatus;
-        bool bound = false;
+        bool bound{ false };
         bool multipipeline;
     };
 }

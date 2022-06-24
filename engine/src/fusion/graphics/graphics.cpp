@@ -12,6 +12,8 @@ using namespace fe;
 
 Graphics* Graphics::Instance{ nullptr };
 
+#define MAX_FRAMES_IN_FLIGHT 2
+
 Graphics::Graphics()
     : elapsedPurge(5s)
     , instance{}
@@ -77,9 +79,9 @@ void Graphics::update() {
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
-        auto& frame = perSurfaceBuffer->currentFrame;
+        auto& currentFrame = perSurfaceBuffer->currentFrame;
 
-        auto acquireResult = swapchain->acquireNextImage(perSurfaceBuffer->presentCompletes[frame], perSurfaceBuffer->flightFences[frame]);
+        auto acquireResult = swapchain->acquireNextImage(perSurfaceBuffer->presentCompletes[currentFrame], perSurfaceBuffer->flightFences[currentFrame]);
 
 #ifndef PLATFORM_ANDROID
         if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR) {
@@ -100,7 +102,7 @@ void Graphics::update() {
             if (!startRenderpass(id, *renderStage))
                 return;
 
-            auto& commandBuffer = perSurfaceBuffer->commandBuffers[swapchain->getActiveImageIndex()];
+            auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
 
             for (const auto& subpass : renderStage->getSubpasses()) {
                 stage.second = subpass.binding;
@@ -112,7 +114,8 @@ void Graphics::update() {
                     vkCmdNextSubpass(*commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
             }
 
-            endRenderpass(id, *renderStage);
+            if (!endRenderpass(id, *renderStage))
+                return;
             stage.first++;
         }
     }
@@ -135,11 +138,11 @@ void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t i
     auto debugStart = Time::Now();
 #endif
 
-    auto size = Devices::Get()->getWindow(0)->getSize();
+    const auto& size = Devices::Get()->getWindow(0)->getSize();
 
     VkImage dstImage;
     VkDeviceMemory dstImageMemory;
-    auto supportsBlit = Image::CopyImage(swapchains[id]->getActiveImage(), dstImage, dstImageMemory, surfaces[id]->getFormat().format, {size.x, size.y, 1}, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
+    //auto supportsBlit = Image::CopyImage(swapchains[id]->getActiveImage(), dstImage, dstImageMemory, surfaces[id]->getFormat().format, {size.x, size.y, 1}, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
 
     // Get layout of the image (including row pitch).
     VkImageSubresource imageSubresource = {};
@@ -199,7 +202,7 @@ void Graphics::resetRenderStages() {
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
-        if (perSurfaceBuffer->flightFences.size() != swapchain->getImageCount())
+        if (perSurfaceBuffer->flightFences.size() != MAX_FRAMES_IN_FLIGHT)
             recreateCommandBuffers(id);
 
         for (const auto& renderStage : renderer->renderStages)
@@ -212,7 +215,7 @@ void Graphics::resetRenderStages() {
 void Graphics::recreateSwapchain() {
     vkDeviceWaitIdle(logicalDevice);
 
-    auto size = Devices::Get()->getWindow(0)->getSize();
+    auto& size = Devices::Get()->getWindow(0)->getSize();
 
     for (auto& swapchain : swapchains) {
         LOG_DEBUG << "Recreating swapchain old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")";
@@ -221,7 +224,7 @@ void Graphics::recreateSwapchain() {
     swapchains.resize(surfaces.size());
     perSurfaceBuffers.resize(surfaces.size());
     for (const auto& [id, surface] : enumerate(surfaces)) {
-        swapchains[id] = std::make_unique<Swapchain>(physicalDevice, *surface, logicalDevice, *reinterpret_cast<VkExtent2D*>(&size), swapchains[id].get());
+        swapchains[id] = std::make_unique<Swapchain>(physicalDevice, *surface, logicalDevice, vku::uvec2_cast(size), swapchains[id].get());
         perSurfaceBuffers[id] = std::make_unique<PerSurfaceBuffers>();
         recreateCommandBuffers(id);
     }
@@ -243,10 +246,11 @@ void Graphics::recreateCommandBuffers(size_t id) {
         vkDestroySemaphore(logicalDevice, semaphore, nullptr);
     }
 
-    perSurfaceBuffer->presentCompletes.resize(swapchain->getImageCount());
-    perSurfaceBuffer->renderCompletes.resize(swapchain->getImageCount());
-    perSurfaceBuffer->flightFences.resize(swapchain->getImageCount());
-    perSurfaceBuffer->commandBuffers.resize(swapchain->getImageCount());
+    perSurfaceBuffer->commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+    perSurfaceBuffer->presentCompletes.resize(MAX_FRAMES_IN_FLIGHT);
+    perSurfaceBuffer->renderCompletes.resize(MAX_FRAMES_IN_FLIGHT);
+    perSurfaceBuffer->flightFences.resize(MAX_FRAMES_IN_FLIGHT);
+    perSurfaceBuffer->imagesInFlight.resize(swapchain->getImageCount(), VK_NULL_HANDLE);
 
     VkSemaphoreCreateInfo semaphoreCreateInfo = {};
     semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -274,14 +278,14 @@ void Graphics::recreatePass(size_t id, RenderStage& renderStage) {
     auto graphicsQueue = logicalDevice.getGraphicsQueue();
     auto& perSurfaceBuffer = perSurfaceBuffers[id];
 
-    auto size = Devices::Get()->getWindow(0)->getSize();
+    const auto& size = Devices::Get()->getWindow(0)->getSize();
 
     CheckVk(vkQueueWaitIdle(graphicsQueue));
 
     for (const auto& swapchain : swapchains) {
-        if (renderStage.hasSwapchain() && (perSurfaceBuffer->framebufferResized || !swapchain->isSameExtent(*reinterpret_cast<VkExtent2D*>(&size)))) {
+        if (renderStage.hasSwapchain() && (/*perSurfaceBuffer->framebufferResized || */!swapchain->isSameExtent(vku::uvec2_cast(size)))) {
             recreateSwapchain();
-            perSurfaceBuffer->framebufferResized = false;
+            //perSurfaceBuffer->framebufferResized = false;
         }
         renderStage.rebuild(*swapchain);
     }
@@ -303,7 +307,8 @@ bool Graphics::startRenderpass(size_t id, RenderStage& renderStage) {
 
     auto& swapchain = swapchains[id];
     auto& perSurfaceBuffer = perSurfaceBuffers[id];
-    auto& commandBuffer = perSurfaceBuffer->commandBuffers[swapchain->getActiveImageIndex()];
+    auto& currentFrame = perSurfaceBuffer->currentFrame;
+    auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
 
     if (!commandBuffer->isRunning())
         commandBuffer->begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
@@ -330,40 +335,54 @@ bool Graphics::startRenderpass(size_t id, RenderStage& renderStage) {
     return true;
 }
 
-void Graphics::endRenderpass(size_t id, RenderStage& renderStage) {
+bool Graphics::endRenderpass(size_t id, RenderStage& renderStage) {
     auto presentQueue = logicalDevice.getPresentQueue();
     auto& swapchain = swapchains[id];
     auto& perSurfaceBuffer = perSurfaceBuffers[id];
-    auto& commandBuffer = perSurfaceBuffer->commandBuffers[swapchain->getActiveImageIndex()];
+    auto& currentFrame = perSurfaceBuffer->currentFrame;
+    auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
 
     vkCmdEndRenderPass(*commandBuffer);
 
     if (!renderStage.hasSwapchain())
-        return;
+        return false;
 
     commandBuffer->end();
 
-    auto& frame = perSurfaceBuffer->currentFrame;
+    auto imageIndex = swapchain->getActiveImageIndex();
 
-    commandBuffer->submit(perSurfaceBuffer->presentCompletes[frame], perSurfaceBuffer->renderCompletes[frame], perSurfaceBuffer->flightFences[frame]);
+    VkFence curr = perSurfaceBuffer->flightFences[currentFrame];
+    VkFence prev = perSurfaceBuffer->imagesInFlight[imageIndex];
+    if (prev != VK_NULL_HANDLE) {
+        Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &prev, VK_TRUE, UINT64_MAX));
+    }
+    prev = curr;
 
-    auto presentResult = swapchain->queuePresent(presentQueue, perSurfaceBuffer->renderCompletes[frame]);
+    commandBuffer->submit(perSurfaceBuffer->presentCompletes[currentFrame], perSurfaceBuffer->renderCompletes[currentFrame], curr);
+
+    auto presentResult = swapchain->queuePresent(presentQueue, perSurfaceBuffer->renderCompletes[currentFrame]);
+
+    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+
 #ifndef PLATFORM_ANDROID
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR) {
-        perSurfaceBuffer->framebufferResized = true;
-        //recreateSwapchain();
+        //perSurfaceBuffer->framebufferResized = true;
+        recreateSwapchain();
+        return false;
     } else if (presentResult != VK_SUCCESS) {
-        CheckVk(presentResult);
         LOG_ERROR << "Failed to present swap chain image!";
+        CheckVk(presentResult);
+        return false;
     }
 #else
     if (presentResult != VK_SUCCESS) {
-        CheckVk(presentResult);
         LOG_ERROR << "Failed to present swap chain image!";
+        CheckVk(presentResult);
+        return false;
     }
 #endif
 
-    frame = (frame + 1) % swapchain->getImageCount();
+    return true;
 }
 
 void Graphics::onWindowCreate(Window* window, bool create) {

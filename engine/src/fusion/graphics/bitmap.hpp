@@ -21,9 +21,9 @@ namespace fe {
         VkExtent3D getExtent() const { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1}; }
 
         int getChannels() const { return channels; }
-        int getBytesPerPixel() const { return channels * (hdr ? sizeof(float) : sizeof(uint8_t)); }
+        uint8_t getBytesPerPixel() const { return channels * (hdr ? sizeof(float) : sizeof(uint8_t)); }
 
-        int getPitch() const { return width * getBytesPerPixel(); }
+        uint32_t getPitch() const { return width * getBytesPerPixel(); }
         size_t getSize() const { return height * width * getBytesPerPixel(); }
 
         template<typename T>

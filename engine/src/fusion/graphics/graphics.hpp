@@ -51,7 +51,7 @@ namespace fe {
 
         const RenderStage* getRenderStage(uint32_t index) const;
 
-        const Descriptor* getAttachment(const std::string &name) const;
+        const Descriptor* getAttachment(const std::string& name) const;
 
         const PhysicalDevice& getPhysicalDevice() const { return physicalDevice; }
         const LogicalDevice& getLogicalDevice() const { return logicalDevice; }
@@ -59,7 +59,7 @@ namespace fe {
 
         const Surface* getSurface(size_t id) const { return surfaces[id].get(); }
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
-        void setFramebufferResized(size_t id) { perSurfaceBuffers[id]->framebufferResized = true; }
+        //void setFramebufferResized(size_t id) { perSurfaceBuffers[id]->framebufferResized = true; }
 
     private:
         static Graphics* Instance;
@@ -71,7 +71,7 @@ namespace fe {
         void recreatePass(size_t id, RenderStage& renderStage);
         void recreateAttachmentsMap();
         bool startRenderpass(size_t id, RenderStage& renderStage);
-        void endRenderpass(size_t id, RenderStage& renderStage);
+        bool endRenderpass(size_t id, RenderStage& renderStage);
 
         void onWindowCreate(Window* window, bool create);
 
@@ -93,9 +93,9 @@ namespace fe {
             std::vector<VkSemaphore> presentCompletes;
             std::vector<VkSemaphore> renderCompletes;
             std::vector<VkFence> flightFences;
+            std::vector<VkFence> imagesInFlight;
             size_t currentFrame{ 0 };
-            bool framebufferResized{ false };
-
+            //bool framebufferResized{ false };
             std::vector<std::unique_ptr<CommandBuffer>> commandBuffers;
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;

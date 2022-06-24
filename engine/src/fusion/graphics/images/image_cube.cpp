@@ -27,7 +27,7 @@ ImageCube::ImageCube(std::unique_ptr<Bitmap>&& bitmap, VkFormat format, VkImageL
 	ImageCube::load(std::move(bitmap));
 }
 
-std::unique_ptr<Bitmap> ImageCube::GetBitmap(uint32_t mipLevel) const {
+std::unique_ptr<Bitmap> ImageCube::getBitmap(uint32_t mipLevel) const {
 	auto size = glm::uvec2{extent.width, extent.height} >> mipLevel;
 	auto sizeSide = size.x * size.y * components;
 	auto bitmap = std::make_unique<Bitmap>(glm::uvec2{size.x, size.y * arrayLayers}, components);
