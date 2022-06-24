@@ -5,7 +5,7 @@
 
 using namespace glfw;
 
-DeviceManager::DeviceManager() : fe::DeviceManager{} {
+DeviceManager::DeviceManager() : fe::Devices{} {
     // Set the error error callback.
     glfwSetErrorCallback(ErrorCallback);
 

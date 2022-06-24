@@ -3,7 +3,7 @@
 
 #include "fusion/scene/components.hpp"
 //#include "fusion/input/input.hpp"
-#include "fusion/utils/math.hpp"
+#include "fusion/utils/glm_extention.hpp"
 #include "fusion/utils/string.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
@@ -345,7 +345,7 @@ void EditorLayer::newScene() {
 }
 
 void EditorLayer::openScene() {
-    auto filepath = pfd::open_file("Choose scene file", getAssetPath(), { "Scene File (.scene)", "*.scene" }, pfd::opt::none).result();
+    auto filepath = pfd::open_file("Choose scene file", std::filesystem::current_path(), { "Scene File (.scene)", "*.scene" }, pfd::opt::none).result();
     if (!filepath.empty()) {
         // Validate that file inside working directory
         if (String::Contains(filepath[0], std::filesystem::current_path().string())) {
@@ -388,7 +388,7 @@ void EditorLayer::saveScene() {
 }
 
 void EditorLayer::saveSceneAs() {
-    auto filepath = pfd::save_file("Choose scene file", getAssetPath(), { "Scene Files (.scene)", "*.scene" }, pfd::opt::force_overwrite).result();
+    auto filepath = pfd::save_file("Choose scene file", std::filesystem::current_path(), { "Scene Files (.scene)", "*.scene" }, pfd::opt::force_overwrite).result();
     if (!filepath.empty()) {
         SceneSerializer serializer{ activeScene };
         serializer.serialize(filepath);

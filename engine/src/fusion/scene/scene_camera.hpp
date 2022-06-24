@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fusion/renderer/camera.hpp"
+#include "fusion/graphics/camera.hpp"
 
 namespace fe {
     class SceneCamera {

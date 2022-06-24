@@ -1,6 +1,6 @@
 #include "window.hpp"
 
-#include "fusion/renderer/bitmap.hpp"
+#include "fusion/graphics/bitmap.hpp"
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/devices/cursor.hpp"
 
@@ -245,7 +245,7 @@ int overlappingArea(const glm::ivec2& l1, const glm::ivec2& r1, const glm::ivec2
 const fe::Monitor* Window::getCurrentMonitor() const {
     if (fullscreen) {
         auto glfwMonitor = glfwGetWindowMonitor(window);
-        for (const auto& monitor : fe::DeviceManager::Get()->getMonitors()) {
+        for (const auto& monitor : fe::Devices::Get()->getMonitors()) {
             if (monitor->getNativeMonitor() == glfwMonitor)
                 return monitor.get();
         }
@@ -255,7 +255,7 @@ const fe::Monitor* Window::getCurrentMonitor() const {
     std::multimap<int, const fe::Monitor*> rankedMonitor;
     auto where = rankedMonitor.end();
 
-    for (const auto& monitor : fe::DeviceManager::Get()->getMonitors()) {
+    for (const auto& monitor : fe::Devices::Get()->getMonitors()) {
         where = rankedMonitor.insert(where, { overlappingArea(monitor->getWorkareaPosition(), monitor->getWorkareaPosition() + monitor->getWorkareaSize(), position, position + size), monitor.get() });
     }
 

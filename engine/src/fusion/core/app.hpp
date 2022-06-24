@@ -3,7 +3,7 @@
 #include "version.hpp"
 #include "layer_stack.hpp"
 
-#include "fusion/renderer/graphics.hpp"
+#include "fusion/graphics/graphics.hpp"
 
 namespace fe {
     class Time;
@@ -24,6 +24,11 @@ namespace fe {
          * Every frame as long as the app has work to do.
          */
         virtual void onUpdate(const Time& dt) = 0;
+
+        /**
+         * @brief When the app is about to close.
+         */
+        virtual void onClose() = 0;
 
         /**
          * Gets the application's name.
@@ -70,7 +75,7 @@ namespace fe {
         Version version;
         bool started{ false };
 
-        std::unique_ptr<fe::Graphics> graphics;
+        std::unique_ptr<Graphics> graphics;
 
         LayerStack layers;
 

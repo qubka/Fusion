@@ -9,17 +9,17 @@
 namespace fe {
     class ProcessInfo {
     public:
-        ProcessInfo(unsigned int processId);
+        ProcessInfo(uint32_t processId);
         ~ProcessInfo();
-
-        unsigned int getProcessId();
-        unsigned long long getProcessUptime();
+        
+        uint32_t getProcessId();
+        uint64_t getProcessUptime();
         double getProcessCpuUsage();
         double getProcessMemoryUsed();
-        unsigned long getProcessThreadCount();
+        uint64_t getProcessThreadCount();
 
     private:
-        unsigned int processId;
+        uint32_t processId;
 #ifdef PLATFORM_WINDOWS
         int numOfProcessors; // numbre of processors
         ULARGE_INTEGER creationTime; // process creation time
@@ -27,11 +27,11 @@ namespace fe {
         ULARGE_INTEGER prevKernelTime; // amount of time ran in kernel mode
         ULARGE_INTEGER prevUserTime; // amount of time ran in user mode
 #elif PLATFORM_LINUX
-        long jiffiesPerSecond;
-        unsigned long long startTimeSinceBoot;
-        unsigned long long prevSystemTime;
-        unsigned long long prevUserTime;
-        unsigned long long prevKernelTime;
+        int64_t jiffiesPerSecond;
+        uint64_t startTimeSinceBoot;
+        uint64_t prevSystemTime;
+        uint64_t prevUserTime;
+        uint64_t prevKernelTime;
 #endif
     };
 }

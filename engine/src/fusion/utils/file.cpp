@@ -5,21 +5,22 @@
 
 using namespace fe;
 
-void File::WithBinaryFileContents(const std::filesystem::path& filename, const File::SimpleHandler& handler) {
+void File::Read(const std::filesystem::path& filename, const File::SimpleHandler& handler) {
     auto storage = Storage::ReadFile(filename);
     handler(storage->size(), storage->data());
 }
 
-std::vector<uint8_t> File::ReadBinaryFile(const std::filesystem::path& filename) {
+std::vector<uint8_t> File::ReadAllBytes(const std::filesystem::path& filename) {
     std::vector<uint8_t> result;
-    WithBinaryFileContents(filename, [&](size_t size, const void* data) {
+    Read(filename, [&](size_t size, const void* data) {
         result.resize(size);
         memcpy(result.data(), data, size);
     });
     return result;
 }
 
-std::string File::ReadTextFile(const std::filesystem::path& filename) {
+std::string File::ReadAllText(const std::filesystem::path& filename) {
+    //return {reinterpret_cast<const char*>(ReadAllBytes(filename).data())};
     std::string content;
     std::ifstream infile{filename, std::ios::in};
     if (!infile.is_open()) {

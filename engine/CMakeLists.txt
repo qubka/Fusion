@@ -1,24 +1,10 @@
 cmake_minimum_required(VERSION 3.21)
 project(fusion)
 
-# Force all compilers to use the correct C and C++ standard versions.
-# Needed to allow for CheckCXXSourceCompiles to work correctly.
-set(CMAKE_REQUIRED_FLAGS "-std=c++17 -std=c11")
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
-
 include(version.cmake)
 include(git_version.cmake)
 
-if (NOT "${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
-    message(FATAL_ERROR "Only 64 bit builds supported.")
-endif()
-
-if (ANDROID)
+if(ANDROID)
     set(PLATFORM_FOLDER "android")
 else()
     set(PLATFORM_FOLDER "pc")
@@ -33,40 +19,12 @@ add_library(${PROJECT_NAME} STATIC ${SRC_SOURCES} ${SRC_HEADERS})
 target_precompile_headers(${PROJECT_NAME} PUBLIC ${HEADER_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC "src")
 
-find_package(assimp REQUIRED) # https://ittone.ma/ittone/c-how-do-i-add-assimp-as-a-dependency-using-cmake-and-clion/
-
-set(PHYSX_LIBRARIES
-        PhysXExtensions
-        PhysX
-        PhysXPvdSDK
-        PhysXVehicle
-        PhysXCharacterKinematic
-        PhysXCooking
-        PhysXCommon
-        PhysXFoundation
-        # SnippetUtils
-        )
-
 target_link_libraries(${PROJECT_NAME} PUBLIC
-        volk
-        glfw
-        imgui
-        glm
-        gli
-        stb
-        entt
-        magic_enum
-        plog
-        freetype
-        glslang
-        SPIRV
-        yaml-cpp
         git-info
-        assimp::assimp
-        ${PHYSX_LIBRARIES}
+        ${FUSION_ALL_SYSTEM_LIBS}
         )
 
-if (ANDROID)
+if(ANDROID)
     #target_compile_definitions(${PROJECT_NAME} PUBLIC VULKAN_HPP_NO_SMART_HANDLE)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     set(APP_GLUE_DIR ${ANDROID_NDK}/sources/android/native_app_glue)
@@ -74,7 +32,7 @@ if (ANDROID)
     add_library(app-glue STATIC ${APP_GLUE_DIR}/android_native_app_glue.c)
 endif()
 
-if (NOT WIN32)
+if(NOT WIN32)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
     link_libraries(${CMAKE_THREAD_LIBS_INIT})

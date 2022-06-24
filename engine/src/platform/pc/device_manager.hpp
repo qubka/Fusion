@@ -3,7 +3,7 @@
 #include "fusion/devices/device_manager.hpp"
 
 namespace glfw {
-    class DeviceManager : public fe::DeviceManager {
+    class DeviceManager : public fe::Devices {
     public:
         DeviceManager();
         ~DeviceManager() override;

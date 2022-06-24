@@ -29,7 +29,7 @@ namespace fe {
 
         std::string to_string() const {
             std::stringstream buffer;
-            buffer << major << "." << minor << "." << patch;
+            buffer << std::to_string(major) << "." << std::to_string(minor) << "." << std::to_string(patch);
             return buffer.str();
         }
 

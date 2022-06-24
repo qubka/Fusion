@@ -38,6 +38,18 @@ std::vector<std::string> String::Split(const std::string& str, char sep) {
     return tokens;
 }
 
+std::string String::Join(const std::vector<std::string>& strings, const std::string& separator) {
+    switch (strings.size()) {
+        case 0: return {};
+        case 1: return strings[0];
+        default:
+            std::ostringstream os;
+            std::copy(strings.begin(), strings.end() - 1, std::ostream_iterator<std::string>(os, separator.c_str()));
+            os << *strings.rbegin();
+            return os.str();
+    }
+}
+
 bool String::StartsWith(const std::string& str, const std::string& token) {
     if (str.length() < token.length())
         return false;

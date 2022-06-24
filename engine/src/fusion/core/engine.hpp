@@ -109,7 +109,7 @@ namespace fe {
         CommandLineParser commandLineParser;
         Version version;
 
-        std::unique_ptr<DeviceManager> deviceManager;
+        std::unique_ptr<Devices> devices;
         std::unique_ptr<App> application;
 
         uint64_t frameNumber{ 0 };

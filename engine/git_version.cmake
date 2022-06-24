@@ -1,6 +1,6 @@
 find_package(Git QUIET)
 
-if (GIT_SCM)
+if(GIT_SCM)
     # the commit's SHA1, and whether the building workspace was dirty or not
     # describe --match=NeVeRmAtCh --always --tags --abbrev=40 --dirty
     execute_process(COMMAND

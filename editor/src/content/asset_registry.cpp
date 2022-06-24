@@ -16,10 +16,11 @@ void AssetRegistry::registerAsset(const std::filesystem::path& filename) {
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
     auto ftime = std::filesystem::last_write_time(filename);
 
-    if (auto it = assets.find(filename.string()); it == assets.end() || it->second.importDate) {
+    auto key = filename.wstring();
+    if (auto it = assets.find(key); it == assets.end() || it->second.importDate) {
         AssetInfo info;
         if (asset::load(filename, info)) {
-            assets[filename] = info;
+            assets[key] = info;
         }
 
     }

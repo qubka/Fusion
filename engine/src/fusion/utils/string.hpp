@@ -50,7 +50,16 @@ namespace fe {
          * @param sep The separator.
          * @return The split string vector.
          */
-        static std::vector <std::string> Split(const std::string& str, char sep);
+        static std::vector<std::string> Split(const std::string& str, char sep);
+
+        /**
+         * Concatenates a strings, using the specified separator between each member.
+         * @param strings A collection that contains the strings to concatenate.
+         * @param separator The string to use as a separator is included in the returned string only if values has more than one element.
+         * @return A string that consists of the elements of values delimited by the separator string.
+         * @link https://programming-idioms.org/idiom/53/join-a-list-of-strings/1552/cpp
+         */
+        static std::string Join(const std::vector<std::string>& strings, const std::string& separator);
 
         /**
          * Gets if a string starts with a token.

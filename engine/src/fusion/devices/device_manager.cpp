@@ -11,17 +11,17 @@
 
 using namespace fe;
 
-DeviceManager* DeviceManager::Instance{ nullptr };
+Devices* Devices::Instance{ nullptr };
 
-DeviceManager::DeviceManager() {
+Devices::Devices() {
     Instance = this;
 }
 
-DeviceManager::~DeviceManager() {
+Devices::~Devices() {
     Instance = nullptr;
 }
 
-const Monitor* DeviceManager::getPrimaryMonitor() {
+const Monitor* Devices::getPrimaryMonitor() {
     for (const auto& monitor : monitors) {
         if (monitor->isPrimary())
             return monitor.get();
@@ -29,7 +29,7 @@ const Monitor* DeviceManager::getPrimaryMonitor() {
     return nullptr;
 }
 
-std::unique_ptr<DeviceManager> DeviceManager::Create() {
+std::unique_ptr<Devices> Devices::Create() {
 #if PLATFORM_ANDROID
     return std::make_unique<android::DeviceManager>();
 #elif PLATFORM_LINUX || PLATFORM_WINDOWS || PLATFORM_MAC

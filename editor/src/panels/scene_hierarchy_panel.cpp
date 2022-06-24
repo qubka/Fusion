@@ -210,7 +210,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         std::strncpy(buffer, fileFilter.c_str(), sizeof(buffer));
         if (ImGui::InputTextWithHint("##filefilter", "Search File", buffer, sizeof(buffer))) {
             fileFilter = std::string{buffer};
-            cachedFiles = Directory::GetFilesRecursive(getAssetPath(), fileFilter, formats);
+            cachedFiles = Directory::GetFilesRecursive(std::filesystem::current_path(), fileFilter, formats);
         }
 
         ImGui::Separator();
@@ -242,7 +242,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     /*auto function = [&]() {
         std::string pattern{" "};
         for (const auto& format : formats) pattern += format + " ";
-        auto filepath = pfd::open_file("Choose 3D file", value.empty() ? getAssetPath() : value, { file, pattern }, pfd::opt::none).result();
+        auto filepath = pfd::open_file("Choose 3D file", value.empty() ? std::filesystem::current_path() : value, { file, pattern }, pfd::opt::none).result();
         if (!filepath.empty()) {
             // Validate that file inside working directory
             if (filepath[0].find(std::filesystem::current_path()) != std::string::npos) {
@@ -260,7 +260,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         if (ImGui::Button("...", buttonSize)) {
             fileFilter = "";
             currentFile = "";
-            cachedFiles = Directory::GetFilesRecursive(getAssetPath(), fileFilter, formats);
+            cachedFiles = Directory::GetFilesRecursive(std::filesystem::current_path(), fileFilter, formats);
             ImGui::OpenPopup("FileExplorer");
         }
     } else {
@@ -297,7 +297,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     if (ImGui::Button(ICON_FA_SEARCH)) {
         fileFilter = "";
         currentFile = "";
-        cachedFiles = Directory::GetFilesRecursive(getAssetPath(), fileFilter, formats);
+        cachedFiles = Directory::GetFilesRecursive(std::filesystem::current_path(), fileFilter, formats);
         ImGui::OpenPopup("FileExplorer");
     }
 

@@ -49,7 +49,7 @@ void ContentBrowserPanel::drawFileExplorer() {
         }
     };
 
-    fileNode(directoryTree, getAssetPath());
+    fileNode(directoryTree, std::filesystem::current_path());
 
     ImGui::EndChild();
 }
@@ -58,7 +58,7 @@ void ContentBrowserPanel::drawContentBrowser() {
     ImGui::SameLine();
     ImGui::BeginChild("ContentPanel", { 0, 0 }, true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
-    if (currentDirectory != getAssetPath()) {
+    if (currentDirectory != std::filesystem::current_path()) {
         if (ImGui::Button(ICON_FA_BACKWARD))
             selectDirectory(currentDirectory.parent_path());
         ImGui::SameLine();
@@ -72,7 +72,7 @@ void ContentBrowserPanel::drawContentBrowser() {
     std::strncpy(buffer, filter.c_str(), sizeof(buffer));
     if (ImGui::InputTextWithHint("##filesfilter", "Search Files", buffer, sizeof(buffer))) {
         filter = std::string{buffer};
-        filteredFiles = Directory::GetFilesRecursive(getAssetPath(), filter);
+        filteredFiles = Directory::GetFilesRecursive(std::filesystem::current_path(), filter);
     }
 
     ImGui::Separator();

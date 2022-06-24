@@ -12,7 +12,7 @@
 
 using namespace fe;
 
-ProcessInfo::ProcessInfo(unsigned int processId) : processId{processId} {
+ProcessInfo::ProcessInfo(uint32_t processId) : processId{processId} {
 #ifdef _WIN32
     // get number of processors
 	SYSTEM_INFO lSysInfo;
@@ -52,7 +52,7 @@ ProcessInfo::ProcessInfo(unsigned int processId) : processId{processId} {
     if (lpFile) {
         // skip unnecessary content
         fscanf(lpFile, "cpu");
-        unsigned long long lTime;
+        uint64_t lTime;
         int lValuesToRead = 4;
         for (int i = 0; i < lValuesToRead; i++) {
             fscanf(lpFile, "%llu", &lTime);
@@ -78,7 +78,7 @@ ProcessInfo::ProcessInfo(unsigned int processId) : processId{processId} {
         lValuesToSkip = 6;
         for (int i = 0; i < lValuesToSkip; i++)
             fscanf(lpFile, "%s", lTemp);
-        unsigned long long lStartTimeSinceBoot;
+        uint64_t lStartTimeSinceBoot;
         fscanf(lpFile, "%llu", &lStartTimeSinceBoot);
         startTimeSinceBoot = lStartTimeSinceBoot / jiffiesPerSecond;
 
@@ -90,17 +90,17 @@ ProcessInfo::ProcessInfo(unsigned int processId) : processId{processId} {
 ProcessInfo::~ProcessInfo() {
 }
 
-unsigned int ProcessInfo::getProcessId() {
+uint32_t ProcessInfo::getProcessId() {
     return processId;
 }
 
-unsigned long long ProcessInfo::getProcessUptime() {
-    unsigned long long lUptimeInSec = -1;
+uint64_t ProcessInfo::getProcessUptime() {
+    uint64_t lUptimeInSec = -1;
 
 #ifdef _WIN32
     FILETIME lCurrTime;
 	GetSystemTimeAsFileTime(&lCurrTime);
-	
+
 	ULARGE_INTEGER ulCurrTime;
 	memcpy(&ulCurrTime, &lCurrTime, sizeof(FILETIME));
 
@@ -145,7 +145,7 @@ double ProcessInfo::getProcessCpuUsage() {
 			ULONGLONG lTotalSystem = lCurrSystemTime.QuadPart - mPrevSystemTime.QuadPart;
 			if (lTotalSystem > 0)
 				lCPUUsage = (lTotalProcess * 100.0) / (lTotalSystem * mNumOfProcessors);
-			
+
 			// store current time info
 			mPrevSystemTime = lCurrSystemTime;
 			mPrevKernelTime = lCurrKernelTime;
@@ -156,9 +156,9 @@ double ProcessInfo::getProcessCpuUsage() {
 	}
 
 #elif PLATFORM_LINUX
-    unsigned long long lCurrSystemTime = 0;
-    unsigned long long lCurrUserTime = 0;
-    unsigned long long lCurrKernelTime = 0;
+    uint64_t lCurrSystemTime = 0;
+    uint64_t lCurrUserTime = 0;
+    uint64_t lCurrKernelTime = 0;
 
     // calculate total system time from file /proc/stat,
     // the content is like: cpu 7967 550 4155 489328
@@ -166,7 +166,7 @@ double ProcessInfo::getProcessCpuUsage() {
     if (lpFile) {
         // skip unnecessary content
         fscanf(lpFile, "cpu");
-        unsigned long long lTime;
+        uint64_t lTime;
         int lValuesToRead = 4;
         for (int i = 0; i < lValuesToRead; i++) {
             fscanf(lpFile, "%llu", &lTime);
@@ -191,8 +191,8 @@ double ProcessInfo::getProcessCpuUsage() {
         fclose(lpFile);
     }
 
-    unsigned long long lTotalProcess = (lCurrUserTime - prevUserTime) + (lCurrKernelTime - prevKernelTime);
-    unsigned long long lTotalSystem = lCurrSystemTime - prevSystemTime;
+    uint64_t lTotalProcess = (lCurrUserTime - prevUserTime) + (lCurrKernelTime - prevKernelTime);
+    uint64_t lTotalSystem = lCurrSystemTime - prevSystemTime;
     if (lTotalSystem > 0)
         lCPUUsage = (lTotalProcess * 100.0) / lTotalSystem;
 
@@ -226,8 +226,8 @@ double ProcessInfo::getProcessMemoryUsed() {
     sprintf(lFileName, "/proc/%d/status", processId);
     FILE* lpFile = fopen(lFileName, "r");
     char lLineBuf[LINEBUFFLEN];
-    if(lpFile) {
-        while(fgets(lLineBuf, LINEBUFFLEN, lpFile)) {
+    if (lpFile) {
+        while (fgets(lLineBuf, LINEBUFFLEN, lpFile)) {
             if (0 == strncmp(lLineBuf, "VmRSS:", 6)) {
                 char* cursor = lLineBuf + 6;
                 /* Get rid of preceding blanks */
@@ -251,8 +251,8 @@ double ProcessInfo::getProcessMemoryUsed() {
     return lMemUsed;
 }
 
-unsigned long ProcessInfo::getProcessThreadCount() {
-    unsigned long lThreadCnt = -1;
+uint64_t ProcessInfo::getProcessThreadCount() {
+    uint64_t lThreadCnt = -1;
 
 #ifdef _WIN32
     // get a process list snapshot

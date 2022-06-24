@@ -1,11 +1,11 @@
 #include "scene.hpp"
 #include "components.hpp"
 
-//#include "fusion/renderer/systems/mesh_renderer.hpp"
-//#include "fusion/renderer/systems/grid_renderer.hpp"
-//#include "fusion/renderer/systems/sky_renderer.hpp"
+//#include "fusion/graphics/systems/mesh_renderer.hpp"
+//#include "fusion/graphics/systems/grid_renderer.hpp"
+//#include "fusion/graphics/systems/sky_renderer.hpp"
 
-#include "fusion/renderer/editor_camera.hpp"
+#include "fusion/graphics/editor_camera.hpp"
 //#include "fusion/input/input.hpp"
 
 using namespace fe;

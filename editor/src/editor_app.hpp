@@ -10,6 +10,7 @@ namespace fe {
 
         void onStart() override;
         void onUpdate(const Time& dt) override;
+        void onClose() override { };
 
     private:
 

@@ -2,7 +2,7 @@
 
 #include "scene_camera.hpp"
 
-#include "fusion/utils/math.hpp"
+#include "fusion/utils/glm_extention.hpp"
 
 #include <entt/entt.hpp>
 

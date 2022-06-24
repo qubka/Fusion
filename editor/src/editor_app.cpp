@@ -5,9 +5,6 @@
 using namespace fe;
 
 EditorApp::EditorApp(const std::string& name, const Version& version) : App{name, version} {
-    auto graphics = std::make_unique<Graphics>();
-    graphics->setRenderer(std::make_unique<MainRenderer>());
-    setGraphics(std::move(graphics));
 }
 
 EditorApp::~EditorApp() {
@@ -15,9 +12,11 @@ EditorApp::~EditorApp() {
 }
 
 void EditorApp::onStart() {
-    //pushLayer(new EditorLayer());
+    auto graphics = std::make_unique<Graphics>();
+    graphics->setRenderer(std::make_unique<MainRenderer>());
+    setGraphics(std::move(graphics));
 }
 
 void EditorApp::onUpdate(const Time& dt) {
-    //graphics->update();
+    graphics->update();
 }
