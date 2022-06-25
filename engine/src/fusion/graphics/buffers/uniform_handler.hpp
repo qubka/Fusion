@@ -24,7 +24,7 @@ namespace fe {
             }
 
             // If the buffer is already changed we can skip a memory comparison and just copy.
-            if (handlerStatus == Buffer::Status::Changed || std::memcmp(static_cast<char*>(this->data), &object, size) != 0) {
+            if (handlerStatus == Buffer::Status::Changed || memcmp(static_cast<char*>(this->data), &object, size) != 0) {
                 memcpy(static_cast<char *>(this->data) + offset, &object, size);
                 handlerStatus = Buffer::Status::Changed;
             }

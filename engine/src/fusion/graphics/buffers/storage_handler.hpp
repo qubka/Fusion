@@ -29,7 +29,7 @@ namespace fe {
             }
 
             // If the buffer is already changed we can skip a memory comparison and just copy.
-            if (handlerStatus == Buffer::Status::Changed || std::memcmp(static_cast<char*>(this->data), data, size) != 0) {
+            if (handlerStatus == Buffer::Status::Changed || memcmp(static_cast<char*>(this->data), data, size) != 0) {
                 memcpy(static_cast<char*>(this->data), data, size);
                 handlerStatus = Buffer::Status::Changed;
             }
@@ -46,7 +46,7 @@ namespace fe {
             }
 
             // If the buffer is already changed we can skip a memory comparison and just copy.
-            if (handlerStatus == Buffer::Status::Changed || std::memcmp(static_cast<char *>(this->data) + offset, &object, size) != 0) {
+            if (handlerStatus == Buffer::Status::Changed || memcmp(static_cast<char *>(this->data) + offset, &object, size) != 0) {
                 memcpy(static_cast<char *>(this->data) + offset, &object, size);
                 handlerStatus = Buffer::Status::Changed;
             }
@@ -74,11 +74,11 @@ namespace fe {
 
     private:
         std::optional<Shader::UniformBlock> uniformBlock;
-        void* data = nullptr;
-        uint32_t size = 0;
+        void* data{ nullptr };
+        uint32_t size{ 0 };
         std::unique_ptr<StorageBuffer> storageBuffer;
         Buffer::Status handlerStatus;
-        bool bound = false;
+        bool bound{ false };
         bool multipipeline;
     };
 }

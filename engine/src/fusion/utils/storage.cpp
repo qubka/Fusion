@@ -77,20 +77,20 @@ public:
     FileStorage(const FileStorage& other) = delete;
     FileStorage& operator=(const FileStorage& other) = delete;
 
-    const uint8_t* data() const override { return _mapped; }
-    size_t size() const override { return _size; }
+    const uint8_t* data() const override { return mapped_; }
+    size_t size() const override { return size_; }
     bool isFast() const override { return false; }
 
 private:
-    size_t _size{ 0 };
-    uint8_t* _mapped{ nullptr };
+    size_t size_{ 0 };
+    uint8_t* mapped_{ nullptr };
 #if PLATFORM_ANDROID
-    AAsset* _asset{ nullptr };
+    AAsset* asset_{ nullptr };
 #elif (WIN32)
-    HANDLE _file{ INVALID_HANDLE_VALUE };
-    HANDLE _mapFile{ INVALID_HANDLE_VALUE };
+    HANDLE file_{ INVALID_HANDLE_VALUE };
+    HANDLE mapFile_{ INVALID_HANDLE_VALUE };
 #else
-    ByteArray _data;
+    ByteArray data_;
 #endif
 };
 
@@ -98,36 +98,36 @@ FileStorage::FileStorage(const std::filesystem::path& filename) {
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
 #if PLATFORM_ANDROID
     // Load shader from compressed asset
-    _asset = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
-    assert(_asset);
-    _size = AAsset_getLength(_asset);
+    asset_ = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
+    assert(asset_);
+    _size = AAsset_getLength(asset_);
     assert(_size > 0);
-    _mapped = reinterpret_cast<uint8_t*>(AAsset_getBuffer(_asset));
+    mapped_ = reinterpret_cast<uint8_t*>(AAsset_getBuffer(asset_));
 #elif (WIN32)
-    _file = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
-    if (_file == INVALID_HANDLE_VALUE) {
+    file_ = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    if (file_ == INVALID_HANDLE_VALUE) {
         throw std::runtime_error("Failed to open file");
     }
     {
         DWORD dwFileSizeHigh;
-        _size = GetFileSize(_file, &dwFileSizeHigh);
+        _size = GetFileSize(file_, &dwFileSizeHigh);
         _size += (((size_t)dwFileSizeHigh) << 32);
     }
-    _mapFile = CreateFileMappingA(_file, NULL, PAGE_READONLY, 0, 0, NULL);
-    if (_mapFile == INVALID_HANDLE_VALUE) {
+    mapFile_ = CreateFileMappingA(file_, NULL, PAGE_READONLY, 0, 0, NULL);
+    if (mapFile_ == INVALID_HANDLE_VALUE) {
         throw std::runtime_error("Failed to create mapping");
     }
-    _mapped = reinterpret_cast<uint8_t*>(MapViewOfFile(_mapFile, FILE_MAP_READ, 0, 0, 0));
+    mapped_ = reinterpret_cast<uint8_t*>(MapViewOfFile(mapFile_, FILE_MAP_READ, 0, 0, 0));
 #endif
 }
 
 FileStorage::~FileStorage() {
 #if PLATFORM_ANDROID
-    AAsset_close(_asset);
+    AAsset_close(asset_);
 #elif (WIN32)
-    UnmapViewOfFile(_mapped);
-    CloseHandle(_mapFile);
-    CloseHandle(_file);
+    UnmapViewOfFile(mapped_);
+    CloseHandle(mapFile_);
+    CloseHandle(file_);
 #endif
 }
 #endif

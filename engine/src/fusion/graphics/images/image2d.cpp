@@ -54,7 +54,7 @@ void Image2d::load(std::unique_ptr<Bitmap> loadBitmap) {
 	if (!filename.empty() && !loadBitmap) {
 		loadBitmap = std::make_unique<Bitmap>(filename);
 		extent = loadBitmap->getExtent();
-		components = loadBitmap->getChannels();
+		components = static_cast<uint32_t>(loadBitmap->getChannels());
 	}
 		
 	if (extent.width == 0 || extent.height == 0)

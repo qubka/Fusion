@@ -30,7 +30,7 @@ ImageCube::ImageCube(std::unique_ptr<Bitmap>&& bitmap, VkFormat format, VkImageL
 std::unique_ptr<Bitmap> ImageCube::getBitmap(uint32_t mipLevel) const {
 	auto size = glm::uvec2{extent.width, extent.height} >> mipLevel;
 	auto sizeSide = size.x * size.y * components;
-	auto bitmap = std::make_unique<Bitmap>(glm::uvec2{size.x, size.y * arrayLayers}, components);
+	auto bitmap = std::make_unique<Bitmap>(glm::uvec2{size.x, size.y * arrayLayers}, static_cast<BitmapChannels>(components));
 	auto offset = bitmap->getData<uint8_t>();
 
 	for (uint32_t i = 0; i < 6; i++) {
@@ -72,7 +72,7 @@ void ImageCube::load(std::unique_ptr<Bitmap> loadBitmap) {
 		}
 
 		extent = loadBitmap->getExtent();
-		components = loadBitmap->getChannels();
+		components = static_cast<uint32_t>(loadBitmap->getChannels());
 	}
 
 	if (extent.width == 0 || extent.height == 0) {
