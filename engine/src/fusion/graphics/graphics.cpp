@@ -155,7 +155,7 @@ void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t i
 
     Bitmap bitmap{std::make_unique<uint8_t[]>(dstSubresourceLayout.size), size};
 
-    void *data;
+    void* data;
     vkMapMemory(logicalDevice, dstImageMemory, dstSubresourceLayout.offset, dstSubresourceLayout.size, 0, &data);
     memcpy(bitmap.getData<void>(), data, static_cast<size_t>(dstSubresourceLayout.size));
     vkUnmapMemory(logicalDevice, dstImageMemory);

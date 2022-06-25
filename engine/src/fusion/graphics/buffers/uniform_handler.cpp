@@ -30,7 +30,7 @@ bool UniformHandler::update(const std::optional<Shader::UniformBlock>& uniformBl
 
 	if (handlerStatus != Buffer::Status::Normal) {
 		if (bound) {
-			uniformBuffer->unmapMemory();
+			uniformBuffer->unmap();
 			bound = false;
 		}
 

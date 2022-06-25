@@ -16,7 +16,7 @@ void SubrenderHolder::removeSubrenderStage(const std::type_index& id) {
 	}
 }
 
-void SubrenderHolder::renderStage(const Pipeline::Stage &stage, const CommandBuffer &commandBuffer) {
+void SubrenderHolder::renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer) {
 	for (const auto& [stageIndex, typeId] : stages) {
 		if (stageIndex.first != stage) {
 			continue;

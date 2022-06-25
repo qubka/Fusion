@@ -6,8 +6,7 @@ InstanceBuffer::InstanceBuffer(VkDeviceSize size) : Buffer{size, VK_BUFFER_USAGE
 }
 
 void InstanceBuffer::update(const CommandBuffer& commandBuffer, const void* newData) {
-	void* data;
-	mapMemory(&data);
-	memcpy(data, newData, static_cast<size_t>(size));
-	unmapMemory();
+	map();
+    copy(newData, size);
+	unmap();
 }

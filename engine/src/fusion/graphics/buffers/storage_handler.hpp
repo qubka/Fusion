@@ -24,13 +24,13 @@ namespace fe {
                 return;
 
             if (!bound) {
-                storageBuffer->mapMemory(&this->data);
+                storageBuffer->map();
                 bound = true;
             }
 
             // If the buffer is already changed we can skip a memory comparison and just copy.
-            if (handlerStatus == Buffer::Status::Changed || memcmp(static_cast<char*>(this->data), data, size) != 0) {
-                memcpy(static_cast<char*>(this->data), data, size);
+            if (handlerStatus == Buffer::Status::Changed || storageBuffer->compare(data, size) != 0) {
+                storageBuffer->copy(data, size);
                 handlerStatus = Buffer::Status::Changed;
             }
         }
@@ -41,13 +41,13 @@ namespace fe {
                 return;
 
             if (!bound) {
-                storageBuffer->mapMemory(&this->data);
+                storageBuffer->unmap();
                 bound = true;
             }
 
             // If the buffer is already changed we can skip a memory comparison and just copy.
-            if (handlerStatus == Buffer::Status::Changed || memcmp(static_cast<char *>(this->data) + offset, &object, size) != 0) {
-                memcpy(static_cast<char *>(this->data) + offset, &object, size);
+            if (handlerStatus == Buffer::Status::Changed || storageBuffer->compare(&object, size, offset) != 0) {
+                storageBuffer->copy(&object, size, offset);
                 handlerStatus = Buffer::Status::Changed;
             }
         }
@@ -74,7 +74,6 @@ namespace fe {
 
     private:
         std::optional<Shader::UniformBlock> uniformBlock;
-        void* data{ nullptr };
         uint32_t size{ 0 };
         std::unique_ptr<StorageBuffer> storageBuffer;
         Buffer::Status handlerStatus;

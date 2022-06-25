@@ -44,10 +44,9 @@ Image2dArray::Image2dArray(std::unique_ptr<Bitmap>&& bitmap, uint32_t arrayLayer
 	Buffer bufferStaging{ bitmap->getLength() * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 
-	uint8_t* data;
-	bufferStaging.mapMemory(reinterpret_cast<void**>(&data));
-	memcpy(data, bitmap->getData<void>(), bufferStaging.getSize());
-	bufferStaging.unmapMemory();
+	bufferStaging.map();
+    bufferStaging.copy(bitmap->getData<void>());
+	bufferStaging.unmap();
 
 	std::vector<VkBufferImageCopy> bufferCopyRegions;
 	bufferCopyRegions.reserve(arrayLayers);
@@ -76,10 +75,9 @@ void Image2dArray::setPixels(const float* pixels, uint32_t arrayLayer) {
 	Buffer bufferStaging{extent.width * extent.height * 3, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 
-	void* data;
-	bufferStaging.mapMemory(&data);
-	memcpy(data, pixels, bufferStaging.getSize());
-	bufferStaging.unmapMemory();
+	bufferStaging.map();
+    bufferStaging.copy(pixels);
+	bufferStaging.unmap();
 
 	CopyBufferToImage(bufferStaging, image, extent, 1, arrayLayer);
 }

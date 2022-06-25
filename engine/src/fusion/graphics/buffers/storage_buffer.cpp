@@ -7,10 +7,9 @@ StorageBuffer::StorageBuffer(VkDeviceSize size, const void *data) :
 }
 
 void StorageBuffer::update(const void* newData) {
-	void* data;
-	mapMemory(&data);
-	memcpy(data, newData, static_cast<size_t>(size));
-	unmapMemory();
+    map();
+    copy(newData, size);
+    unmap();
 }
 
 WriteDescriptorSet StorageBuffer::getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const {

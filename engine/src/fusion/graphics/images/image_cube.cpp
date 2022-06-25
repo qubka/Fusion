@@ -46,10 +46,9 @@ void ImageCube::setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t b
 	Buffer bufferStaging{extent.width * extent.height * components * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 
-	void* data;
-	bufferStaging.mapMemory(&data);
-	memcpy(data, pixels, bufferStaging.getSize());
-	bufferStaging.unmapMemory();
+	bufferStaging.map();
+    bufferStaging.copy(pixels);
+	bufferStaging.unmap();
 
 	CopyBufferToImage(bufferStaging, image, extent, layerCount, baseArrayLayer);
 }
@@ -93,10 +92,9 @@ void ImageCube::load(std::unique_ptr<Bitmap> loadBitmap) {
 		Buffer bufferStaging{ loadBitmap->getLength() * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 
-		uint8_t* data;
-		bufferStaging.mapMemory(reinterpret_cast<void**>(&data));
-		memcpy(data, loadBitmap->getData<void>(), bufferStaging.getSize());
-		bufferStaging.unmapMemory();
+		bufferStaging.map();
+        bufferStaging.copy(loadBitmap->getData<void>());
+		bufferStaging.unmap();
 
 		CopyBufferToImage(bufferStaging, image, extent, arrayLayers, 0);
 	}
