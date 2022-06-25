@@ -9,7 +9,7 @@ namespace fe {
 
     class Swapchain {
     public:
-        Swapchain(const PhysicalDevice& physicalDevice, const Surface& surface, const LogicalDevice& logicalDevice, const VkExtent2D& extent, const Swapchain* oldSwapchain = nullptr);
+        Swapchain(const PhysicalDevice& physicalDevice, const Surface& surface, const LogicalDevice& logicalDevice, const VkExtent2D& size, bool vsync, const Swapchain* oldSwapchain = nullptr);
         ~Swapchain();
 
         /**
@@ -34,8 +34,6 @@ namespace fe {
 
         const VkExtent2D& getExtent() const { return extent; }
         uint32_t getImageCount() const { return imageCount; }
-        VkSurfaceTransformFlagsKHR getPreTransform() const { return preTransform; }
-        VkCompositeAlphaFlagBitsKHR getCompositeAlpha() const { return compositeAlpha; }
         const std::vector<VkImage>& getImages() const { return images; }
         const VkImage& getActiveImage() const { return images[activeImageIndex]; }
         const std::vector<VkImageView>& getImageViews() const { return imageViews; }
@@ -48,18 +46,17 @@ namespace fe {
         const LogicalDevice& logicalDevice;
 
         VkExtent2D extent;
-        VkPresentModeKHR presentMode;
 
-        uint32_t imageCount{ 0 };
-        VkSurfaceTransformFlagsKHR preTransform;
-        VkCompositeAlphaFlagBitsKHR compositeAlpha;
         std::vector<VkImage> images;
         std::vector<VkImageView> imageViews;
-        VkSwapchainKHR swapchain{ VK_NULL_HANDLE };
-
+        uint32_t imageCount{ 0 };
         VkPresentInfoKHR presentInfo = {};
-
+        VkSwapchainKHR swapchain{ VK_NULL_HANDLE };
         VkFence fenceImage{ VK_NULL_HANDLE };
         uint32_t activeImageIndex{ 0 };
+
+        static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+        static VkPresentModeKHR ChooseSwapPresentMode(bool vsync, const std::vector<VkPresentModeKHR>& availablePresentModes);
+        static VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, const VkExtent2D& size);
     };
 }

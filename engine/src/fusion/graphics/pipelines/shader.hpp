@@ -75,6 +75,8 @@ namespace fe {
         std::map<uint32_t, VkDescriptorType> descriptorTypes;
         std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 
+        mutable std::vector<std::string> notFoundNames;
+
     public:
         /**
          * @brief Class used to define sets of vertex inputs used in a shader.

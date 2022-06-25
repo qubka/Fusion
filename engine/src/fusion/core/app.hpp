@@ -26,11 +26,6 @@ namespace fe {
         virtual void onUpdate(const Time& dt) = 0;
 
         /**
-         * @brief When the app is about to close.
-         */
-        virtual void onClose() = 0;
-
-        /**
          * Gets the application's name.
          * @return The application's name.
          */

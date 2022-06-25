@@ -46,6 +46,8 @@ namespace fe {
         bool hdr{ false };
 
     private:
+        static size_t CalculateLength(const glm::uvec2& size, BitmapChannels channels = BitmapChannels::RgbAlpha, bool hdr = false);
+
         friend class StbLoader;
         friend class GliLoader;
     };

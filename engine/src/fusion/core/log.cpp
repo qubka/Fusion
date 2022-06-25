@@ -5,7 +5,7 @@
 using namespace fe;
 
 void Log::Init() {
-#ifdef FUSION_DEBUG
+#if FUSION_DEBUG
     static plog::ColorConsoleAppender<plog::TxtFormatter> ConsoleAppender;
     plog::init(plog::debug, &ConsoleAppender);
 #else

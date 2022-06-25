@@ -41,9 +41,9 @@ namespace fe {
             auto location = shader->getDescriptorLocation(descriptorName);
 
             if (!location) {
-    #ifdef ACID_DEBUG
-                if (shader->ReportedNotFound(descriptorName, true)) {
-                    Log::Error("Could not find descriptor in shader ", shader->GetName(), " of name ", std::quoted(descriptorName), '\n');
+    #if FUSION_DEBUG
+                if (shader->reportedNotFound(descriptorName, true)) {
+                    LOG_ERROR << "Could not find descriptor in shader " << shader->getName() << " of name " << std::quoted(descriptorName);
                 }
     #endif
 
@@ -53,9 +53,9 @@ namespace fe {
             auto descriptorType = shader->getDescriptorType(*location);
 
             if (!descriptorType) {
-    #ifdef ACID_DEBUG
-                if (shader->ReportedNotFound(descriptorName, true)) {
-                    Log::Error("Could not find descriptor in shader ", shader->GetName(), " of name ", std::quoted(descriptorName), " at location ", *location, '\n');
+    #if FUSION_DEBUG
+                if (shader->reportedNotFound(descriptorName, true)) {
+                    LOG_ERROR << "Could not find descriptor in shader " << shader->getName() << " of name " << std::quoted(descriptorName) << " at location " << *location;
                 }
     #endif
                 return;

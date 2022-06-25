@@ -38,13 +38,13 @@ void CommandLineParser::add(const std::string& name, const std::vector<std::stri
 
 void CommandLineParser::parse(const CommandLineArgs& arguments) {
     bool printHelp = false;
-    // Known arguments
+    // Known arguments.
     for (auto& [alias, option] : options) {
         for (const auto& command : option.commands) {
             for (const auto& [argument, parameter] : arguments) {
                 if (argument == command) {
                     option.set = true;
-                    // Get value
+                    // Get value.
                     if (option.hasValue) {
                         if (parameter.empty()) {
                             printHelp = true;
@@ -56,7 +56,7 @@ void CommandLineParser::parse(const CommandLineArgs& arguments) {
             }
         }
     }
-    // Print help for unknown arguments or missing argument values
+    // Print help for unknown arguments or missing argument values.
     if (printHelp) {
         options["help"].set = true;
     }

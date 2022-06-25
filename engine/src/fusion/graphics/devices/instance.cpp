@@ -86,7 +86,7 @@ uint32_t Instance::findMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties* d
 }
 
 Instance::Instance() {
-#ifdef FUSION_DEBUG
+#if FUSION_DEBUG
 	enableValidationLayers = true;
 #endif
 	
@@ -109,7 +109,7 @@ bool Instance::checkValidationLayerSupport() const {
 	std::vector<VkLayerProperties> instanceLayerProperties(instanceLayerPropertyCount);
 	vkEnumerateInstanceLayerProperties(&instanceLayerPropertyCount, instanceLayerProperties.data());
 
-#ifdef FUSION_DEBUG
+#if FUSION_DEBUG
 	logVulkanLayers(instanceLayerProperties);
 #endif
 

@@ -82,6 +82,16 @@ VkFormat Shader::GlTypeToVk(int32_t type) {
 	}
 }
 
+bool Shader::reportedNotFound(const std::string& name, bool reportIfFound) const {
+    if (std::find(notFoundNames.begin(), notFoundNames.end(), name) == notFoundNames.end()) {
+        if (reportIfFound) {
+            notFoundNames.push_back(name);
+        }
+        return true;
+    }
+    return false;
+}
+
 std::optional<uint32_t> Shader::getDescriptorLocation(const std::string& name) const {
 	if (auto it = descriptorLocations.find(name); it != descriptorLocations.end())
 		return it->second;
@@ -287,7 +297,7 @@ VkShaderModule Shader::createShaderModule(const std::filesystem::path& moduleNam
 
 	// Enable SPIR-V and Vulkan rules when parsing GLSL.
 	auto messages = static_cast<EShMessages>(EShMsgSpvRules | EShMsgVulkanRules | EShMsgDefault);
-#ifdef FUSION_DEBUG
+#if FUSION_DEBUG
 	messages = static_cast<EShMessages>(messages | EShMsgDebugInfo);
 #endif
 
@@ -342,7 +352,7 @@ VkShaderModule Shader::createShaderModule(const std::filesystem::path& moduleNam
 		loadAttribute(program, moduleFlag, i);
 
 	glslang::SpvOptions spvOptions;
-#ifdef FUSION_DEBUG
+#if FUSION_DEBUG
 	spvOptions.generateDebugInfo = true;
 	spvOptions.disableOptimizer = true;
 	spvOptions.optimizeSize = false;

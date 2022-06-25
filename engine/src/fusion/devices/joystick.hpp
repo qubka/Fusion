@@ -9,7 +9,7 @@ namespace fe {
      * @brief Class used to describe the gamepad input state.
      */
     struct GamepadState {
-        /// The states of each [gamepad button](@ref gamepad_buttons), `GLFW_PRESS` or `GLFW_RELEASE`.
+        /// The states of each [gamepad button](@ref gamepad_buttons), `Action::Press` or `Action::Release`.
         ActionCode buttons[15];
         /// The states of each [gamepad axis](@ref gamepad_axes), in the range -1.0 to 1.0 inclusive.
         float axes[6];

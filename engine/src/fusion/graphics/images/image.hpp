@@ -27,7 +27,7 @@ namespace fe {
          */
         Image(VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, VkImageLayout layout, VkImageUsageFlags usage,
             VkFormat format, uint32_t mipLevels, uint32_t arrayLayers, const VkExtent3D& extent);
-        ~Image();
+        ~Image() override;
 
         WriteDescriptorSet getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const override;
         static VkDescriptorSetLayoutBinding GetDescriptorSetLayout(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stage, uint32_t count);
