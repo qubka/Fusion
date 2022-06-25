@@ -141,9 +141,7 @@ std::optional<VkDescriptorType> Shader::getDescriptorType(uint32_t location) con
 VkShaderStageFlagBits Shader::GetShaderStage(const std::filesystem::path& filename) {
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
 
-	auto fileExt = filename.extension().string();
-	std::transform(fileExt.begin(), fileExt.end(), fileExt.begin(), ::tolower);
-
+	auto fileExt = String::Lowercase(filename.extension().string());
 	if (fileExt == ".comp")
 		return VK_SHADER_STAGE_COMPUTE_BIT;
 	if (fileExt == ".vert")

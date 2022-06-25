@@ -23,7 +23,7 @@ namespace fe {
         CommandLineParser();
         ~CommandLineParser() = default;
 
-        void add(const std::string& name, const std::vector<std::string>& commands, bool hasValue, const std::string& help);
+        void add(const std::string& name, const std::vector<std::string>& commands, bool hasValue, const std::string& help = "");
         void parse(const CommandLineArgs& arguments);
 
         void printHelp();
@@ -40,6 +40,6 @@ namespace fe {
             bool hasValue{ false };
             bool set{ false };
         };
-        std::unordered_map<std::string, CommandLineOption> options;
+        std::map<std::string, CommandLineOption> options;
     };
 }

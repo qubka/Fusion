@@ -3,7 +3,7 @@
 
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/bitmap.hpp"
+#include "fusion/bitmaps/bitmap.hpp"
 
 using namespace fe;
 
@@ -71,7 +71,7 @@ void Image2d::load(std::unique_ptr<Bitmap> loadBitmap) {
 	}
 
 	if (loadBitmap) {
-		Buffer bufferStaging{loadBitmap->getSize(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+		Buffer bufferStaging{ loadBitmap->getLength(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 
 		uint8_t* data;

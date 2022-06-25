@@ -5,9 +5,6 @@ namespace fe {
     class Ray;
 
     class Sphere {
-        glm::vec3 center;
-        float radius;
-
     public:
         Sphere();
         Sphere(const glm::vec3& center, float radius);
@@ -37,6 +34,10 @@ namespace fe {
         void transform(const glm::mat4& transform);
         //! Converts sphere to another coordinate system. Note that it will not return correct results if there are non-uniform scaling, shears, or other unusual transforms in \a transform.
         Sphere transformed(const glm::mat4& transform) const;
+
+    private:
+        glm::vec3 center;
+        float radius;
     };
 }
 

@@ -1,6 +1,6 @@
 #include "image2d_array.hpp"
 
-#include "fusion/graphics/bitmap.hpp"
+#include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 
@@ -41,7 +41,7 @@ Image2dArray::Image2dArray(std::unique_ptr<Bitmap>&& bitmap, uint32_t arrayLayer
 	CreateImageView(image, view, VK_IMAGE_VIEW_TYPE_2D_ARRAY, format, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
 	TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
 
-	Buffer bufferStaging{bitmap->getSize() * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+	Buffer bufferStaging{ bitmap->getLength() * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 
 	uint8_t* data;

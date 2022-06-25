@@ -11,8 +11,6 @@ namespace fe {
     /// if extracted from view*projection, planes will be in world space
     /// if extracted from model*view*projection planes will be in model space
     class Frustum {
-        Plane planes[6];
-
     public:
         enum FrustumSection { TOP, BOTTOM, LEFT, RIGHT, NEAR, FAR };
 
@@ -56,5 +54,8 @@ namespace fe {
         Plane& operator[](FrustumSection section) { return planes[section]; }
         //! Returns a const reference to the Plane associated with /a section of the Frustum.
         const Plane& operator[](FrustumSection section) const { return planes[section]; }
+
+    private:
+        Plane planes[6];
     };
 }

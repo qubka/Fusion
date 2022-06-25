@@ -33,11 +33,7 @@ CommandLineParser::CommandLineParser() {
 }
 
 void CommandLineParser::add(const std::string& name, const std::vector<std::string>& commands, bool hasValue, const std::string& help) {
-    options[name].commands = commands;
-    options[name].help = help;
-    options[name].set = false;
-    options[name].hasValue = hasValue;
-    options[name].value = "";
+    options.emplace(name, CommandLineOption{commands, "", help, hasValue, false});
 }
 
 void CommandLineParser::parse(const CommandLineArgs& arguments) {

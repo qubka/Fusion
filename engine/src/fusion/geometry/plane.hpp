@@ -4,9 +4,6 @@ namespace fe {
     class Ray;
 
     class Plane {
-        glm::vec3 normal;
-        float distance;
-
     public:
         Plane();
         Plane(const glm::vec3& normal, const glm::vec3& point);
@@ -52,6 +49,10 @@ namespace fe {
         bool sameSide(const glm::vec3& p0, const glm::vec3& p1) const;
         //! Intersects a ray with the plane.
         bool rayCast(const Ray& ray, float& enter) const;
+
+    private:
+        glm::vec3 normal;
+        float distance;
     };
 }
 

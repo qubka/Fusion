@@ -1,6 +1,6 @@
 #include "window.hpp"
 
-#include "fusion/graphics/bitmap.hpp"
+#include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/devices/cursor.hpp"
 

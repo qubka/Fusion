@@ -5,9 +5,6 @@ namespace fe {
     class Sphere;
 
     class AABB {
-        glm::vec3 center;
-        glm::vec3 extents;
-
     public:
         AABB();
         AABB(const glm::vec3& min, const glm::vec3& max);
@@ -54,6 +51,10 @@ namespace fe {
         void transform(const glm::mat4& transform);
         //! Converts axis-aligned box to another coordinate space.
         AABB transformed(const glm::mat4& transform) const;
+
+    private:
+        glm::vec3 center;
+        glm::vec3 extents;
     };
 }
 

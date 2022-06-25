@@ -1,5 +1,6 @@
 #include "file.hpp"
 #include "storage.hpp"
+#include "string.hpp"
 
 #include <IconsFontAwesome4.h>
 
@@ -36,7 +37,7 @@ std::string File::ReadAllText(const std::filesystem::path& filename) {
 }
 
 std::string File::ExtensionIcon(const std::filesystem::path& filename) {
-    auto key = Extensions.find(filename.extension().string());
+    auto key = Extensions.find(String::Lowercase(filename.extension().string()));
     return key != Extensions.end() ? key->second.c_str() : ICON_FA_FILE;
 }
 

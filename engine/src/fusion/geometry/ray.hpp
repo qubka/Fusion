@@ -2,9 +2,6 @@
 
 namespace fe {
     class Ray {
-        glm::vec3 origin;
-        glm::vec3 direction;
-
     public:
         Ray();
         Ray(const glm::vec3& origin, const glm::vec3& direction);
@@ -25,6 +22,10 @@ namespace fe {
         bool triangleIntersection(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& result) const;
         //! Returns true if plane is within ray.
         bool planeIntersection(const glm::vec3& planeOrigin, const glm::vec3& normal, float& result) const;
+
+    private:
+        glm::vec3 origin;
+        glm::vec3 direction;
     };
 }
 

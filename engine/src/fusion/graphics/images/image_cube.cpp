@@ -3,7 +3,7 @@
 
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/bitmap.hpp"
+#include "fusion/bitmaps/bitmap.hpp"
 
 using namespace fe;
 
@@ -60,7 +60,7 @@ void ImageCube::load(std::unique_ptr<Bitmap> loadBitmap) {
 
 		for (const auto& side : fileSides) {
 			Bitmap bitmapSide{filename / (side + fileSuffix)};
-			auto lengthSide = bitmapSide.getSize();
+			auto lengthSide = bitmapSide.getLength();
 
 			if (!loadBitmap) {
 				loadBitmap = std::make_unique<Bitmap>(std::make_unique<uint8_t[]>(lengthSide * arrayLayers), glm::uvec2{ bitmapSide.getWidth(), bitmapSide.getHeight() }, bitmapSide.getChannels(), bitmapSide.isHDR());
@@ -90,7 +90,7 @@ void ImageCube::load(std::unique_ptr<Bitmap> loadBitmap) {
 	}
 
 	if (loadBitmap) {
-		Buffer bufferStaging{loadBitmap->getSize() * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+		Buffer bufferStaging{ loadBitmap->getLength() * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 
 		uint8_t* data;

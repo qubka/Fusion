@@ -1,7 +1,7 @@
 #include "image.hpp"
 
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/bitmap.hpp"
+#include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 

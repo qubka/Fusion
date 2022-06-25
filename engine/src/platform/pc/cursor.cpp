@@ -1,6 +1,6 @@
 #include "cursor.hpp"
 
-#include "fusion/graphics/bitmap.hpp"
+#include "fusion/bitmaps/bitmap.hpp"
 
 using namespace glfw;
 
