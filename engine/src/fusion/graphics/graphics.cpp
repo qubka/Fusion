@@ -1,10 +1,10 @@
 #include "graphics.hpp"
 #include "subrender.hpp"
-#include "bitmap.hpp"
 
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/devices/window.hpp"
 #include "fusion/utils/enumerate.hpp"
+#include "fusion/bitmaps/bitmap.hpp"
 
 #include <glslang/Public/ShaderLang.h>
 
