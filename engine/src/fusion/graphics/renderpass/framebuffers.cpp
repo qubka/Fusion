@@ -1,10 +1,11 @@
 #include "framebuffers.hpp"
 
+#include "fusion/graphics/render_stage.hpp"
 #include "fusion/graphics/images/image_depth.hpp"
 #include "fusion/graphics/images/image2d.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
+#include "fusion/graphics/renderpass/swapchain.hpp"
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/render_stage.hpp"
 
 using namespace fe;
 

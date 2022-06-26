@@ -5,8 +5,6 @@
 #include "joystick.hpp"
 
 #include "fusion/input/key_codes.hpp"
-#include "fusion/core/module_factory.hpp"
-#include "fusion/core/module.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -19,7 +17,7 @@ namespace fe {
     class Devices {
     public:
         Devices();
-        ~Devices();
+        virtual ~Devices();
         NONCOPYABLE(Devices);
 
         static std::unique_ptr<Devices> Create();

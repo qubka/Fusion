@@ -1,8 +1,9 @@
 ﻿#pragma once
 
-#include "swapchain.hpp"
+#include <volk.h>
 
 namespace fe {
+    class Swapchain;
     class LogicalDevice;
     class ImageDepth;
     class Renderpass;
