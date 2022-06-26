@@ -9,7 +9,7 @@ namespace glfw {
         ~DeviceManager() override;
 
         void update() override;
-        void wait() override;
+        void waitEvents() override;
 
         fe::ScanCode getScanCode(fe::KeyCode key) const override;
         std::string getKeyName(fe::KeyCode key, fe::ScanCode scancode) const override;

@@ -73,8 +73,8 @@ void Instance::FvkCmdPushDescriptorSetKHR(VkDevice device, VkCommandBuffer comma
 	if (func) func(commandBuffer, pipelineBindPoint, layout, set, descriptorWriteCount, pDescriptorWrites);
 }
 
-uint32_t Instance::findMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties* deviceMemoryProperties, const VkMemoryRequirements* memoryRequirements,
-    VkMemoryPropertyFlags requiredProperties) {
+uint32_t Instance::FindMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties* deviceMemoryProperties, const VkMemoryRequirements* memoryRequirements,
+                                       VkMemoryPropertyFlags requiredProperties) {
 	for (uint32_t i = 0; i < deviceMemoryProperties->memoryTypeCount; ++i) {
 		if (memoryRequirements->memoryTypeBits & (1 << i)) {
 			if ((deviceMemoryProperties->memoryTypes[i].propertyFlags & requiredProperties) == requiredProperties) {
@@ -110,7 +110,7 @@ bool Instance::checkValidationLayerSupport() const {
 	vkEnumerateInstanceLayerProperties(&instanceLayerPropertyCount, instanceLayerProperties.data());
 
 #if FUSION_DEBUG
-	logVulkanLayers(instanceLayerProperties);
+    LogVulkanLayers(instanceLayerProperties);
 #endif
 
 	for (const auto& layerName : ValidationLayers) {
@@ -225,7 +225,7 @@ void Instance::createDebugMessenger() {
 #endif
 }
 
-void Instance::logVulkanLayers(const std::vector<VkLayerProperties>& layerProperties) {
+void Instance::LogVulkanLayers(const std::vector<VkLayerProperties>& layerProperties) {
 	std::stringstream ss;
 	
 	ss << "Instance Layers: ";

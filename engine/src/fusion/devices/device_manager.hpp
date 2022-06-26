@@ -32,7 +32,7 @@ namespace fe {
         /**
          * Waits until events are queued and processes them.
          */
-        virtual void wait() = 0;
+        virtual void waitEvents() = 0;
 
         /**
          * This function returns the platform-specific scancode of the specified key.

@@ -107,8 +107,7 @@ void LogicalDevice::createLogicalDevice() {
 		transferFamily = graphicsFamily;
 	}
 
-	auto physicalDeviceFeatures = physicalDevice.getFeatures();
-	VkPhysicalDeviceFeatures enabledFeatures = {};
+    auto physicalDeviceFeatures = physicalDevice.getFeatures();
 
 	// Enable sample rate shading filtering if supported.
 	if (physicalDeviceFeatures.sampleRateShading)

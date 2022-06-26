@@ -36,7 +36,7 @@ namespace fe {
         const PhysicalDevice& physicalDevice;
 
         VkDevice logicalDevice{ VK_NULL_HANDLE };
-        VkPhysicalDeviceFeatures enabledFeatures{};
+        VkPhysicalDeviceFeatures enabledFeatures = {};
 
         VkQueueFlags supportedQueues{};
         uint32_t graphicsFamily{ 0 };

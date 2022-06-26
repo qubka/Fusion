@@ -61,7 +61,7 @@ void DeviceManager::update() {
     }
 }
 
-void DeviceManager::wait() {
+void DeviceManager::waitEvents() {
     // Wait for GLFW events.
     glfwWaitEvents();
 }
