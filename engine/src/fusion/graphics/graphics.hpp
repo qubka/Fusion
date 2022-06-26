@@ -66,7 +66,7 @@ namespace fe {
 
         void createPipelineCache();
         void resetRenderStages();
-        void recreateSwapchain();
+        void recreateSwapchain(VkResult reason);
         void recreateCommandBuffers(size_t id);
         void recreatePass(size_t id, RenderStage& renderStage);
         void recreateAttachmentsMap();
@@ -97,6 +97,8 @@ namespace fe {
             size_t currentFrame{ 0 };
             //bool framebufferResized{ false };
             std::vector<std::unique_ptr<CommandBuffer>> commandBuffers;
+
+            //~PerSurfaceBuffers();
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;
     };

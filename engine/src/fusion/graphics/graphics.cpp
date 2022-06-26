@@ -46,8 +46,6 @@ Graphics::~Graphics() {
 
     vkDestroyPipelineCache(logicalDevice, pipelineCache, nullptr);
 
-    commandPools.clear();
-
     for (const auto& perSurfaceBuffer : perSurfaceBuffers) {
         for (const auto& fence : perSurfaceBuffer->flightFences) {
             vkDestroyFence(logicalDevice, fence, nullptr);
@@ -60,6 +58,8 @@ Graphics::~Graphics() {
         }
         perSurfaceBuffer->commandBuffers.clear();
     }
+
+    commandPools.clear();
 
     renderer = nullptr;
     Instance = nullptr;
@@ -81,15 +81,15 @@ void Graphics::update() {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
         auto& currentFrame = perSurfaceBuffer->currentFrame;
 
-        auto acquireResult = swapchain->acquireNextImage(perSurfaceBuffer->presentCompletes[currentFrame], perSurfaceBuffer->flightFences[currentFrame]);
+        auto result = swapchain->acquireNextImage(perSurfaceBuffer->presentCompletes[currentFrame], perSurfaceBuffer->flightFences[currentFrame]);
 
 #ifndef PLATFORM_ANDROID
-        if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapchain();
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            recreateSwapchain(result);
             return;
         }
 #endif
-        if (acquireResult != VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR) {
+        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             LOG_ERROR << "Failed to acquire swap chain image!";
             return;
         }
@@ -97,7 +97,7 @@ void Graphics::update() {
         Pipeline::Stage stage;
 
         for (auto& renderStage : renderer->renderStages) {
-            renderStage->update();
+            renderStage->update(id);
 
             if (!startRenderpass(id, *renderStage))
                 return;
@@ -116,6 +116,7 @@ void Graphics::update() {
 
             if (!endRenderpass(id, *renderStage))
                 return;
+
             stage.first++;
         }
     }
@@ -138,7 +139,7 @@ void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t i
     auto debugStart = Time::Now();
 #endif
 
-    const auto& size = Devices::Get()->getWindow(0)->getSize();
+    const auto& size = Devices::Get()->getWindow(id)->getSize();
 
     VkImage dstImage;
     VkDeviceMemory dstImageMemory;
@@ -198,7 +199,7 @@ void Graphics::createPipelineCache() {
 }
 
 void Graphics::resetRenderStages() {
-    recreateSwapchain();
+    recreateSwapchain(VK_EVENT_RESET);
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
@@ -206,25 +207,29 @@ void Graphics::resetRenderStages() {
             recreateCommandBuffers(id);
 
         for (const auto& renderStage : renderer->renderStages)
-            renderStage->rebuild(*swapchain);
+            renderStage->rebuild(id, *swapchain);
     }
 
     recreateAttachmentsMap();
 }
 
-void Graphics::recreateSwapchain() {
+void Graphics::recreateSwapchain(VkResult reason) {
     vkDeviceWaitIdle(logicalDevice);
 
-    auto& size = Devices::Get()->getWindow(0)->getSize();
-
-    for (auto& swapchain : swapchains) {
-        LOG_DEBUG << "Recreating swapchain old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")";
-    }
+    LOG_DEBUG << "Reason of recreating: " << StringifyResultVk(reason);
 
     swapchains.resize(surfaces.size());
     perSurfaceBuffers.resize(surfaces.size());
     for (const auto& [id, surface] : enumerate(surfaces)) {
-        swapchains[id] = std::make_unique<Swapchain>(physicalDevice, *surface, logicalDevice, vku::uvec2_cast(size), swapchains[id].get());
+        auto& window = surface->getWindow();
+        auto& size = window.getSize();
+        auto& swapchain = swapchains[id];
+        if (swapchain) {
+            LOG_DEBUG << "Recreating swapchain old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")";
+        } else {
+            LOG_DEBUG << "Creating swapchain (" << size.x << ", " << size.y << ")";
+        }
+        swapchains[id] = std::make_unique<Swapchain>(logicalDevice, *surface, vku::uvec2_cast(size), window.isVSync(), swapchain.get());
         perSurfaceBuffers[id] = std::make_unique<PerSurfaceBuffers>();
         recreateCommandBuffers(id);
     }
@@ -234,7 +239,7 @@ void Graphics::recreateCommandBuffers(size_t id) {
     auto& swapchain = swapchains[id];
     auto& perSurfaceBuffer = perSurfaceBuffers[id];
 
-    perSurfaceBuffer->commandBuffers.clear();
+    //perSurfaceBuffer->commandBuffers.clear();
 
     for (const auto& fence : perSurfaceBuffer->flightFences) {
         vkDestroyFence(logicalDevice, fence, nullptr);
@@ -272,24 +277,28 @@ void Graphics::recreateCommandBuffers(size_t id) {
     for (auto& fence : perSurfaceBuffer->flightFences) {
         CheckVk(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &fence));
     }
+    for (auto fence : perSurfaceBuffer->imagesInFlight) {
+        fence = VK_NULL_HANDLE;
+    }
 }
 
-void Graphics::recreatePass(size_t id, RenderStage& renderStage) {
+void Graphics::recreatePass(size_t idx, RenderStage& renderStage) {
     auto graphicsQueue = logicalDevice.getGraphicsQueue();
-    auto& perSurfaceBuffer = perSurfaceBuffers[id];
-
-    const auto& size = Devices::Get()->getWindow(0)->getSize();
-
     CheckVk(vkQueueWaitIdle(graphicsQueue));
 
-    for (const auto& swapchain : swapchains) {
-        if (renderStage.hasSwapchain() && (/*perSurfaceBuffer->framebufferResized || */!swapchain->isSameExtent(vku::uvec2_cast(size)))) {
-            recreateSwapchain();
-            //perSurfaceBuffer->framebufferResized = false;
+    for (const auto& [id, swapchain] : enumerate(swapchains)) {
+        const auto& extent = vku::uvec2_cast(surfaces[id]->getWindow().getSize());
+        while (extent.width == 0 || extent.height == 0) {
+            Devices::Get()->waitEvents();
+            LOG_DEBUG << "Wait to get extent. Current is unvalid " << "(" << extent.width << ", " << extent.height << ")";
         }
-        renderStage.rebuild(*swapchain);
+
+        if (renderStage.hasSwapchain() && !swapchain->isSameExtent(extent)) {
+            recreateSwapchain(VK_ERROR_INCOMPATIBLE_DISPLAY_KHR);
+        }
+        renderStage.rebuild(id, *swapchain);
     }
-    recreateAttachmentsMap(); // TODO: Maybe not recreate on a single change.
+    recreateAttachmentsMap();
 }
 
 void Graphics::recreateAttachmentsMap() {
@@ -366,8 +375,7 @@ bool Graphics::endRenderpass(size_t id, RenderStage& renderStage) {
 
 #ifndef PLATFORM_ANDROID
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR) {
-        //perSurfaceBuffer->framebufferResized = true;
-        recreateSwapchain();
+        recreateSwapchain(presentResult);
         return false;
     } else if (presentResult != VK_SUCCESS) {
         LOG_ERROR << "Failed to present swap chain image!";
