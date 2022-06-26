@@ -17,20 +17,21 @@ namespace fe {
 
         operator const VkSurfaceKHR&() const { return surface; }
 
+        struct SupportDetails {
+            VkSurfaceCapabilitiesKHR capabilities;
+            std::vector<VkSurfaceFormatKHR> formats;
+            std::vector<VkPresentModeKHR> presentModes;
+        };
+        SupportDetails getSupportDetails() const;
+
         const VkSurfaceKHR& getSurface() const { return surface; }
         const Window& getWindow() const { return window; }
 
-        const VkSurfaceCapabilitiesKHR& getCapabilities() const { return capabilities; }
-        const std::vector<VkSurfaceFormatKHR>& getFormat() const { return formats; }
-        const std::vector<VkPresentModeKHR>& getPresentModes() const { return presentModes; }
-
     private:
         const Instance& instance;
+        const PhysicalDevice& physicalDevice;
         const Window& window;
 
         VkSurfaceKHR surface{ VK_NULL_HANDLE };
-        VkSurfaceCapabilitiesKHR capabilities =  {};
-        std::vector<VkSurfaceFormatKHR> formats;
-        std::vector<VkPresentModeKHR> presentModes;
     };
 }

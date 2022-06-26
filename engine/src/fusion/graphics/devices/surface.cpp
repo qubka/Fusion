@@ -9,17 +9,11 @@ using namespace fe;
 
 Surface::Surface(const Instance& instance, const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Window& window)
     : instance{instance}
+    , physicalDevice{physicalDevice}
     , window{window}
 {
     // Creates the surface.
     Graphics::CheckVk(window.createSurface(instance, nullptr, &surface));
-
-    Graphics::CheckVk(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities));
-
-    uint32_t surfaceFormatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &surfaceFormatCount, nullptr);
-    formats.resize(surfaceFormatCount);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &surfaceFormatCount, formats.data());
 
     // Check for presentation support.
     VkBool32 presentSupport;
@@ -27,13 +21,26 @@ Surface::Surface(const Instance& instance, const PhysicalDevice& physicalDevice,
 
     if (!presentSupport)
         throw std::runtime_error("Present queue family does not have presentation support");
-
-    uint32_t physicalPresentModeCount;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &physicalPresentModeCount, nullptr);
-    presentModes.resize(physicalPresentModeCount);
-    vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &physicalPresentModeCount, presentModes.data());
 }
 
 Surface::~Surface() {
     vkDestroySurfaceKHR(instance, surface, nullptr);
+}
+
+Surface::SupportDetails Surface::getSupportDetails() const {
+    SupportDetails details;
+
+    Graphics::CheckVk(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &details.capabilities));
+
+    uint32_t surfaceFormatCount;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &surfaceFormatCount, nullptr);
+    details.formats.resize(surfaceFormatCount);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &surfaceFormatCount, details.formats.data());
+
+    uint32_t physicalPresentModeCount;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &physicalPresentModeCount, nullptr);
+    details.presentModes.resize(physicalPresentModeCount);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &physicalPresentModeCount, details.presentModes.data());
+
+    return details;
 }
