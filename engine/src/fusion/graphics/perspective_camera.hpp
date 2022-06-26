@@ -1,6 +1,7 @@
 #pragma once
 
 #include "camera.hpp"
+
 #include "fusion/utils/glm_extention.hpp"
 
 namespace fe {
