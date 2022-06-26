@@ -1,12 +1,14 @@
 #pragma once
 
+#include "descriptor.hpp"
+
 #include "fusion/graphics/descriptors/descriptor_set.hpp"
-#include "fusion/graphics/buffers/uniform_handler.hpp"
-#include "fusion/graphics/buffers/storage_handler.hpp"
-#include "fusion/graphics/buffers/push_handler.hpp"
 #include "fusion/graphics/pipelines/shader.hpp"
 
 namespace fe {
+    class UniformHandler;
+    class StorageHandler;
+    class PushHandler;
     /**
      * @brief Class that handles a descriptor set.
      */

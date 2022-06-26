@@ -1,6 +1,9 @@
 #include "descriptors_handler.hpp"
 
 #include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/buffers/uniform_handler.hpp"
+#include "fusion/graphics/buffers/storage_handler.hpp"
+#include "fusion/graphics/buffers/push_handler.hpp"
 
 using namespace fe;
 
