@@ -1,6 +1,7 @@
 #include "buffer.hpp"
 
 #include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/commands/command_buffer.hpp"
 
 using namespace fe;
 
