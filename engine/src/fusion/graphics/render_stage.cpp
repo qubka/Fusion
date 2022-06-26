@@ -46,7 +46,7 @@ RenderStage::RenderStage(std::vector<Attachment> images, std::vector<SubpassType
 	}
 }
 
-void RenderStage::update() {
+void RenderStage::update(size_t id) {
 	auto lastRenderArea = renderArea;
 
 	renderArea.offset = viewport.offset;
@@ -54,23 +54,22 @@ void RenderStage::update() {
 	if (viewport.size)
 		renderArea.extent = viewport.scale * glm::vec2{*viewport.size};
 	else
-		renderArea.extent = viewport.scale * glm::vec2{ Devices::Get()->getWindow(0)->getSize()};
+		renderArea.extent = viewport.scale * glm::vec2{ Devices::Get()->getWindow(id)->getSize()};
 
 	renderArea.extent += renderArea.offset;
 
 	outOfDate = renderArea != lastRenderArea;
 }
 
-void RenderStage::rebuild(const Swapchain& swapchain) {
+void RenderStage::rebuild(size_t id, const Swapchain& swapchain) {
 #if FUSION_DEBUG
 	auto debugStart = Time::Now();
 #endif
 
-	update();
+	update(id);
 
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
 	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-	auto surface = Graphics::Get()->getSurface(0);
 
 	auto msaaSamples = physicalDevice.getMsaaSamples();
 
@@ -78,7 +77,7 @@ void RenderStage::rebuild(const Swapchain& swapchain) {
 		depthStencil = std::make_unique<ImageDepth>(renderArea.extent, depthAttachment->multisampled ? msaaSamples : VK_SAMPLE_COUNT_1_BIT);
 
 	if (!renderpass)
-		renderpass = std::make_unique<Renderpass>(logicalDevice, *this, depthStencil ? depthStencil->getFormat() : VK_FORMAT_UNDEFINED, surface->getFormat().format, msaaSamples);
+		renderpass = std::make_unique<Renderpass>(logicalDevice, *this, depthStencil ? depthStencil->getFormat() : VK_FORMAT_UNDEFINED, swapchain.getSurfaceFormat().format, msaaSamples);
 
 	framebuffers = std::make_unique<Framebuffers>(logicalDevice, swapchain, *this, *renderpass, *depthStencil, renderArea.extent, msaaSamples);
 	outOfDate = false;
