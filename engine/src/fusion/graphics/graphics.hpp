@@ -90,15 +90,12 @@ namespace fe {
         ElapsedTime elapsedPurge;
 
         struct PerSurfaceBuffers {
+            size_t currentFrame{ 0 };
             std::vector<VkSemaphore> presentCompletes;
             std::vector<VkSemaphore> renderCompletes;
             std::vector<VkFence> flightFences;
             std::vector<VkFence> imagesInFlight;
-            size_t currentFrame{ 0 };
-            //bool framebufferResized{ false };
             std::vector<std::unique_ptr<CommandBuffer>> commandBuffers;
-
-            //~PerSurfaceBuffers();
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;
     };

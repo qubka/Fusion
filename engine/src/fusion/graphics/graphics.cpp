@@ -229,8 +229,10 @@ void Graphics::recreateSwapchain(VkResult reason) {
         } else {
             LOG_DEBUG << "Creating swapchain (" << size.x << ", " << size.y << ")";
         }
-        swapchains[id] = std::make_unique<Swapchain>(logicalDevice, *surface, vku::uvec2_cast(size), window.isVSync(), swapchain.get());
-        perSurfaceBuffers[id] = std::make_unique<PerSurfaceBuffers>();
+        swapchain = std::make_unique<Swapchain>(logicalDevice, *surface, vku::uvec2_cast(size), window.isVSync(), swapchain.get());
+
+        auto& perSurfaceBuffer = perSurfaceBuffers[id];
+        perSurfaceBuffer = std::make_unique<PerSurfaceBuffers>();
         recreateCommandBuffers(id);
     }
 }
@@ -238,8 +240,6 @@ void Graphics::recreateSwapchain(VkResult reason) {
 void Graphics::recreateCommandBuffers(size_t id) {
     auto& swapchain = swapchains[id];
     auto& perSurfaceBuffer = perSurfaceBuffers[id];
-
-    //perSurfaceBuffer->commandBuffers.clear();
 
     for (const auto& fence : perSurfaceBuffer->flightFences) {
         vkDestroyFence(logicalDevice, fence, nullptr);
@@ -250,6 +250,8 @@ void Graphics::recreateCommandBuffers(size_t id) {
     for (const auto& semaphore : perSurfaceBuffer->presentCompletes) {
         vkDestroySemaphore(logicalDevice, semaphore, nullptr);
     }
+    perSurfaceBuffer->imagesInFlight.clear();
+    perSurfaceBuffer->commandBuffers.clear();
 
     perSurfaceBuffer->commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
     perSurfaceBuffer->presentCompletes.resize(MAX_FRAMES_IN_FLIGHT);
@@ -267,7 +269,6 @@ void Graphics::recreateCommandBuffers(size_t id) {
     for (auto& commandBuffer : perSurfaceBuffer->commandBuffers) {
         commandBuffer = std::make_unique<CommandBuffer>(false);
     }
-
     for (auto& semaphore : perSurfaceBuffer->presentCompletes) {
         CheckVk(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &semaphore));
     }
@@ -276,9 +277,6 @@ void Graphics::recreateCommandBuffers(size_t id) {
     }
     for (auto& fence : perSurfaceBuffer->flightFences) {
         CheckVk(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &fence));
-    }
-    for (auto fence : perSurfaceBuffer->imagesInFlight) {
-        fence = VK_NULL_HANDLE;
     }
 }
 

@@ -84,10 +84,6 @@ Swapchain::Swapchain(const LogicalDevice& logicalDevice, const Surface& surface,
 			1, 0, 1, 0);
 	}
 
-	VkFenceCreateInfo fenceCreateInfo = {};
-	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    Graphics::CheckVk(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &fenceImage));
-
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = &swapchain;
@@ -100,14 +96,12 @@ Swapchain::~Swapchain() {
 	for (const auto& imageView : imageViews) {
 		vkDestroyImageView(logicalDevice, imageView, nullptr);
 	}
-
-	vkDestroyFence(logicalDevice, fenceImage, nullptr);
 }
 
 VkResult Swapchain::acquireNextImage(const VkSemaphore& presentCompleteSemaphore, VkFence fence) {
 	if (fence != VK_NULL_HANDLE)
-		Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
-	
+		Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, 1000000000));
+
 	auto acquireResult = vkAcquireNextImageKHR(logicalDevice, swapchain, UINT64_MAX, presentCompleteSemaphore, VK_NULL_HANDLE, &activeImageIndex);
 
 	if (acquireResult != VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR && acquireResult != VK_ERROR_OUT_OF_DATE_KHR)
