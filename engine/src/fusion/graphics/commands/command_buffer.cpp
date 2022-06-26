@@ -1,4 +1,5 @@
 #include "command_buffer.hpp"
+#include "command_pool.hpp"
 
 #include "fusion/graphics/graphics.hpp"
 
