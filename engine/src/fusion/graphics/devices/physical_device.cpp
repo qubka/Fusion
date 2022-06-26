@@ -17,7 +17,7 @@ PhysicalDevice::PhysicalDevice(const Instance& instance) : instance{instance} {
     vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, physicalDevices.data());
 
     // TODO: Allow user to configure graphics preference.
-    physicalDevice = choosePhysicalDevice(physicalDevices);
+    physicalDevice = ChoosePhysicalDevice(physicalDevices);
     if (!physicalDevice)
         throw std::runtime_error("Vulkan runtime error, failed to find a suitable GPU");
 
@@ -29,14 +29,14 @@ PhysicalDevice::PhysicalDevice(const Instance& instance) : instance{instance} {
     LOG_DEBUG << "Selected Physical Device: " << properties.deviceID << " " << std::quoted(properties.deviceName);
 }
 
-VkPhysicalDevice PhysicalDevice::choosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices) {
+VkPhysicalDevice PhysicalDevice::ChoosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices) {
     // Maps to hold devices and sort by rank.
     std::multimap<uint32_t, VkPhysicalDevice> rankedDevices;
     auto where = rankedDevices.end();
 
     // Iterates through all devices and rate their suitability.
     for (const auto& device : devices)
-        where = rankedDevices.insert(where, { scorePhysicalDevice(device), device });
+        where = rankedDevices.insert(where, { ScorePhysicalDevice(device), device });
 
     // Checks to make sure the best candidate scored higher than 0  rbegin points to last element of ranked devices(highest rated), first is its rating.
     if (rankedDevices.rbegin()->first > 0)
@@ -45,7 +45,7 @@ VkPhysicalDevice PhysicalDevice::choosePhysicalDevice(const std::vector<VkPhysic
     return nullptr;
 }
 
-uint32_t PhysicalDevice::scorePhysicalDevice(const VkPhysicalDevice& device) {
+uint32_t PhysicalDevice::ScorePhysicalDevice(const VkPhysicalDevice& device) {
     uint32_t score = 0;
 
     // Checks if the requested extensions are supported.
@@ -77,8 +77,8 @@ uint32_t PhysicalDevice::scorePhysicalDevice(const VkPhysicalDevice& device) {
     vkGetPhysicalDeviceProperties(device, &physicalDeviceProperties);
     vkGetPhysicalDeviceFeatures(device, &physicalDeviceFeatures);
 
-#ifdef FUSION_DEBUG
-    logVulkanDevice(physicalDeviceProperties, extensionProperties);
+#if FUSION_DEBUG
+    LogVulkanDevice(physicalDeviceProperties, extensionProperties);
 #endif
 
     // Adds a large score boost for discrete GPUs (dedicated graphics cards).
@@ -104,7 +104,7 @@ VkSampleCountFlagBits PhysicalDevice::getMaxUsableSampleCount() const {
     return VK_SAMPLE_COUNT_1_BIT;
 }
 
-void PhysicalDevice::logVulkanDevice(const VkPhysicalDeviceProperties& physicalDeviceProperties, const std::vector<VkExtensionProperties>& extensionProperties) {
+void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalDeviceProperties, const std::vector<VkExtensionProperties>& extensionProperties) {
     std::stringstream ss;
     switch (static_cast<int32_t>(physicalDeviceProperties.deviceType)) {
         case 1:

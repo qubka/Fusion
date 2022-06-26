@@ -21,11 +21,11 @@ namespace fe {
         const VkSampleCountFlagBits& getMsaaSamples() const { return msaaSamples; }
 
     private:
-        VkPhysicalDevice choosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices);
-        static uint32_t scorePhysicalDevice(const VkPhysicalDevice& device);
+        static VkPhysicalDevice ChoosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices);
+        static uint32_t ScorePhysicalDevice(const VkPhysicalDevice& device);
         VkSampleCountFlagBits getMaxUsableSampleCount() const;
 
-        static void logVulkanDevice(const VkPhysicalDeviceProperties& physicalDeviceProperties, const std::vector<VkExtensionProperties>& extensionProperties);
+        static void LogVulkanDevice(const VkPhysicalDeviceProperties& physicalDeviceProperties, const std::vector<VkExtensionProperties>& extensionProperties);
 
         const Instance& instance;
 
