@@ -4,6 +4,7 @@
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/utils/file.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
+#include "fusion/graphics/graphics.hpp"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
@@ -179,7 +180,7 @@ void ImGuiSubrender::updateBuffers() {
         return;
 
     // Update buffers only if vertex or index count has been changed compared to current buffer size.
-    bool updateCmdBuffers = false;
+    Graphics::Get()->getC;
 
     // Vertex buffer.
     if (!vertexBuffer || (vertexCount != drawData->TotalVtxCount)) {
