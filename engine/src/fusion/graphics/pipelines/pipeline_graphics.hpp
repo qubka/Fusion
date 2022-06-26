@@ -2,11 +2,10 @@
 
 #include "pipeline.hpp"
 
-#include "fusion/graphics/render_stage.hpp"
-
 namespace fe {
     class ImageDepth;
     class Image2d;
+    class RenderArea;
 
     /**
      * @brief Class that represents a graphics pipeline.

@@ -1,5 +1,8 @@
 #include "push_handler.hpp"
 
+#include "fusion/graphics/pipelines/pipeline.hpp"
+#include "fusion/graphics/commands/command_buffer.hpp"
+
 using namespace fe;
 
 PushHandler::PushHandler(bool multipipeline) : multipipeline{multipipeline} {

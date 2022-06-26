@@ -1,7 +1,8 @@
 #include "pipeline_graphics.hpp"
 
-#include "fusion/utils/time.hpp"
 #include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/render_stage.hpp"
+#include "fusion/utils/time.hpp"
 #include "fusion/utils/file.hpp"
 
 using namespace fe;

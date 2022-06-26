@@ -1,8 +1,11 @@
 #pragma once
 
-#include "fusion/graphics/pipelines/pipeline.hpp"
+#include "fusion/graphics/pipelines/shader.hpp"
 
 namespace fe {
+    class CommandBuffer;
+    class Pipeline;
+
     /**
      * @brief Class that handles a pipeline push constant.
      */

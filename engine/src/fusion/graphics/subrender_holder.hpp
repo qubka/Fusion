@@ -1,10 +1,9 @@
 #pragma once
 
-#include "subrender.hpp"
-
 #include "fusion/graphics/pipelines/pipeline.hpp"
 
 namespace fe {
+    class Subrender;
     /**
      * @brief Class that contains and manages subrenders registered to a render manager.
      */
