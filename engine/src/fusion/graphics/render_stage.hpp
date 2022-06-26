@@ -46,8 +46,8 @@ namespace fe {
     public:
         explicit RenderStage(std::vector<Attachment> images = {}, std::vector<SubpassType> subpasses = {}, const Viewport& viewport = {});
 
-        void update();
-        void rebuild(const Swapchain& swapchain);
+        void update(size_t id);
+        void rebuild(size_t id, const Swapchain& swapchain);
 
         std::optional<Attachment> getAttachment(const std::string& name) const;
         std::optional<Attachment> getAttachment(uint32_t binding) const;

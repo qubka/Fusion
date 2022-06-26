@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef PLATFORM_WINDOWs
+#if PLATFORM_WINDOWs
 #include <windows.h>
 #elif PLATFORM_LINUX
 #include <unistd.h>
@@ -20,7 +20,7 @@ namespace fe {
 
     private:
         uint32_t processId;
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
         int numOfProcessors; // numbre of processors
         ULARGE_INTEGER creationTime; // process creation time
         ULARGE_INTEGER prevSystemTime; // previously measured system time

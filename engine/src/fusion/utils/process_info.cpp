@@ -1,6 +1,6 @@
 #include "process_info.hpp"
 
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
 #include "psapi.h"
 #pragma comment(lib, "psapi.lib")
 #include "tlhelp32.h"
@@ -13,7 +13,7 @@
 using namespace fe;
 
 ProcessInfo::ProcessInfo(uint32_t processId) : processId{processId} {
-#ifdef _WIN32
+#if PLATFORM_WINDOWs
     // get number of processors
 	SYSTEM_INFO lSysInfo;
 	GetSystemInfo(&lSysInfo);
@@ -97,7 +97,7 @@ uint32_t ProcessInfo::getProcessId() {
 uint64_t ProcessInfo::getProcessUptime() {
     uint64_t lUptimeInSec = -1;
 
-#ifdef _WIN32
+#if PLATFORM_WINDOWs
     FILETIME lCurrTime;
 	GetSystemTimeAsFileTime(&lCurrTime);
 
@@ -123,7 +123,7 @@ uint64_t ProcessInfo::getProcessUptime() {
 
 double ProcessInfo::getProcessCpuUsage() {
     double lCPUUsage = -1;
-#ifdef _WIN32
+#if PLATFORM_WINDOWs
     HANDLE lProcessHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, mProcessId);
 	if (lProcessHandle != NULL) {
 		// get current system time
@@ -208,7 +208,7 @@ double ProcessInfo::getProcessCpuUsage() {
 double ProcessInfo::getProcessMemoryUsed() {
     double lMemUsed = -1;
 
-#ifdef _WIN32
+#if PLATFORM_WINDOWs
     HANDLE lProcessHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, mProcessId);
 	if (lProcessHandle != NULL) {
 		PROCESS_MEMORY_COUNTERS lPMC;
@@ -254,7 +254,7 @@ double ProcessInfo::getProcessMemoryUsed() {
 uint64_t ProcessInfo::getProcessThreadCount() {
     uint64_t lThreadCnt = -1;
 
-#ifdef _WIN32
+#if PLATFORM_WINDOWs
     // get a process list snapshot
 	HANDLE lSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, 0);
 	if (lSnapshot != NULL) {

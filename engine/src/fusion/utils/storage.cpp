@@ -84,9 +84,9 @@ public:
 private:
     size_t size_{ 0 };
     uint8_t* mapped_{ nullptr };
-#if PLATFORM_ANDROID
+#ifdef PLATFORM_ANDROID
     AAsset* asset_{ nullptr };
-#elif (WIN32)
+#elif PLATFORM_WINDOWS
     HANDLE file_{ INVALID_HANDLE_VALUE };
     HANDLE mapFile_{ INVALID_HANDLE_VALUE };
 #else
@@ -96,14 +96,14 @@ private:
 
 FileStorage::FileStorage(const std::filesystem::path& filename) {
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
-#if PLATFORM_ANDROID
+#ifdef PLATFORM_ANDROID
     // Load shader from compressed asset
     asset_ = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
     assert(asset_);
     _size = AAsset_getLength(asset_);
     assert(_size > 0);
     mapped_ = reinterpret_cast<uint8_t*>(AAsset_getBuffer(asset_));
-#elif (WIN32)
+#elif PPLATFORM_WINDOWS
     file_ = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     if (file_ == INVALID_HANDLE_VALUE) {
         throw std::runtime_error("Failed to open file");
@@ -122,9 +122,9 @@ FileStorage::FileStorage(const std::filesystem::path& filename) {
 }
 
 FileStorage::~FileStorage() {
-#if PLATFORM_ANDROID
+#ifdef PLATFORM_ANDROID
     AAsset_close(asset_);
-#elif (WIN32)
+#elif PLATFORM_WINDOWS
     UnmapViewOfFile(mapped_);
     CloseHandle(mapFile_);
     CloseHandle(file_);

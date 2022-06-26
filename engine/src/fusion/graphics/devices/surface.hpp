@@ -18,17 +18,19 @@ namespace fe {
         operator const VkSurfaceKHR&() const { return surface; }
 
         const VkSurfaceKHR& getSurface() const { return surface; }
+        const Window& getWindow() const { return window; }
+
         const VkSurfaceCapabilitiesKHR& getCapabilities() const { return capabilities; }
-        const VkSurfaceFormatKHR& getFormat() const { return format; }
+        const std::vector<VkSurfaceFormatKHR>& getFormat() const { return formats; }
+        const std::vector<VkPresentModeKHR>& getPresentModes() const { return presentModes; }
 
     private:
         const Instance& instance;
-        const PhysicalDevice& physicalDevice;
-        const LogicalDevice& logicalDevice;
         const Window& window;
 
         VkSurfaceKHR surface{ VK_NULL_HANDLE };
-        VkSurfaceCapabilitiesKHR capabilities{};
-        VkSurfaceFormatKHR format{};
+        VkSurfaceCapabilitiesKHR capabilities =  {};
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
     };
 }
