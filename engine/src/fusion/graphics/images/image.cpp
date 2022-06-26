@@ -389,14 +389,14 @@ void Image::CopyBufferToImage(const VkBuffer& buffer, const VkImage& image, cons
 bool Image::CopyImage(const VkImage& srcImage, VkImage& dstImage, VkDeviceMemory& dstImageMemory, VkFormat srcFormat, const VkExtent3D& extent,
 	VkImageLayout srcImageLayout, uint32_t mipLevel, uint32_t arrayLayer) {
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
-	auto surface = Graphics::Get()->getSurface(0);
+	auto swapchain = Graphics::Get()->getSwapchain(0); /// TODO:: WTF
 
 	// Checks blit swapchain support.
 	auto supportsBlit = true;
 	VkFormatProperties formatProperties;
 
 	// Check if the device supports blitting from optimal images (the swapchain images are in optimal format).
-	vkGetPhysicalDeviceFormatProperties(physicalDevice, surface->getFormat().format, &formatProperties);
+	vkGetPhysicalDeviceFormatProperties(physicalDevice, swapchain->getSurfaceFormat().format, &formatProperties);
 
 	if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT)) {
 		LOG_WARNING << "Device does not support blitting from optimal tiled images, using copy instead of blit!";
