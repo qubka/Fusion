@@ -1,7 +1,5 @@
 #pragma once
 
-#include "fusion/graphics/camera.hpp"
-
 namespace fe {
     class SceneCamera {
     public:
