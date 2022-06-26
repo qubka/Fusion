@@ -1,44 +1,27 @@
 #pragma once
 
-#include "fusion/utils/math.hpp"
+#include "fusion/graphics/pipelines/shader.hpp"
+
+#include <imgui/imgui.h>
 
 namespace fe {
-    struct VertexImgui {
-        glm::vec2 position;
-        glm::vec2 uv;
-        glm::vec4 color;
-
+    class ImGuis {;
+    public:
         static Shader::VertexInput GetVertexInput(uint32_t baseBinding = 0) {
             std::vector<VkVertexInputBindingDescription> bindingDescriptions = {
-                    {baseBinding, sizeof(VertexImgui), VK_VERTEX_INPUT_RATE_VERTEX}
+                    {baseBinding, sizeof(ImDrawVert), VK_VERTEX_INPUT_RATE_VERTEX}
             };
             std::vector<VkVertexInputAttributeDescription> attributeDescriptions = {
-                    {0, baseBinding, VK_FORMAT_R32G32_SFLOAT, offsetof(VertexImgui, position)},
-                    {1, baseBinding, VK_FORMAT_R32G32_SFLOAT, offsetof(VertexImgui, uv)},
-                    {2, baseBinding, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(VertexImgui, color)}
+                    {0, baseBinding, VK_FORMAT_R32G32_SFLOAT, offsetof(ImDrawVert, pos)},
+                    {1, baseBinding, VK_FORMAT_R32G32_SFLOAT, offsetof(ImDrawVert, uv)},
+                    {2, baseBinding, VK_FORMAT_R8G8B8A8_UNORM, offsetof(ImDrawVert, col)}
             };
             return {bindingDescriptions, attributeDescriptions};
         }
 
-        bool operator==(const VertexImgui& rhs) const {
-            return position == rhs.position && uv == rhs.uv && color == rhs.color;
-        }
-
-        bool operator!=(const VertexImgui& rhs) const {
-            return !operator==(rhs);
-        }
-    };
-}
-
-namespace std {
-    template<>
-    struct hash<fe::VertexImgui> {
-        size_t operator()(const fe::VertexImgui& vertex) const noexcept {
-            size_t seed = 0;
-            fe::Math::HashCombine(seed, vertex.position);
-            fe::Math::HashCombine(seed, vertex.uv);
-            fe::Math::HashCombine(seed, vertex.color);
-            return seed;
-        }
+        static void SetStyleColors();
+        static void UpdateKeyModifiers(int mods);
+        static int TranslateUntranslatedKey(int key, int scancode);
+        static ImGuiKey KeyToImGuiKey(int key);
     };
 }
