@@ -1,9 +1,9 @@
 #pragma once
 
 #include "fusion/graphics/subrender.hpp"
-#include "fusion/graphics/images/image2d.hpp"
+
 #include "fusion/graphics/pipelines/pipeline_graphics.hpp"
-#include "fusion/graphics/buffers/buffer.hpp"
+#include "fusion/graphics/buffers/push_handler.hpp"
 #include "fusion/graphics/descriptors/descriptors_handler.hpp"
 
 #include "fusion/input/mouse_buttons.hpp"
@@ -11,6 +11,9 @@
 
 namespace fe {
     class Window;
+    class Buffer;
+    class Image2d;
+
     class ImGuiSubrender final : public Subrender {
     public:
         ImGuiSubrender(const Pipeline::Stage& pipelineStage);

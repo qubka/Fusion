@@ -3,7 +3,7 @@
 #include "panels/scene_hierarchy_panel.hpp"
 #include "panels/content_browser_panel.hpp"
 
-#include "fusion/core/layer.hpp"
+//#include "fusion/core/layer.hpp"
 //#include "fusion/input/base_input.hpp"
 #include "fusion/scene/scene.hpp"
 #include "fusion/scene/scene_serializer.hpp"
@@ -11,16 +11,16 @@
 #include "fusion/graphics/renderer.hpp"
 
 namespace fe {
-    class EditorLayer : public Layer {
+    class EditorLayer/* : public Layer*/ {
     public:
         EditorLayer();
-        ~EditorLayer() override;
+        ~EditorLayer();
 
-        void onAttach() override;
-        void onDetach() override;
-        void onUpdate(float dt) override;
-        void onRender(Renderer& renderer) override;
-        void onImGui() override;
+        void onAttach();
+        void onDetach();
+        void onUpdate(float dt);
+        void onRender(Renderer& renderer);
+        void onImGui();
 
     private:
         void newScene();

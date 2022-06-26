@@ -1,7 +1,7 @@
 #include "window.hpp"
 
 #include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/devices/device_manager.hpp"
+#include "fusion/devices/devices.hpp"
 #include "fusion/devices/cursor.hpp"
 
 using namespace glfw;

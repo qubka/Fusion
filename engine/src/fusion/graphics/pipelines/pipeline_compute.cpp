@@ -1,6 +1,7 @@
 #include "pipeline_compute.hpp"
 
 #include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/utils/file.hpp"
 
 using namespace fe;

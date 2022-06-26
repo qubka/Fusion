@@ -1,10 +1,13 @@
 #include "imgui_subrender.hpp"
 #include "imgui.hpp"
 
-#include "fusion/devices/device_manager.hpp"
+#include "fusion/devices/devices.hpp"
 #include "fusion/utils/file.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/images/image2d.hpp"
+#include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/graphics/buffers/buffer.hpp"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
@@ -180,7 +183,7 @@ void ImGuiSubrender::updateBuffers() {
         return;
 
     // Update buffers only if vertex or index count has been changed compared to current buffer size.
-    Graphics::Get()->getC;
+    //Graphics::Get()->getC;
 
     // Vertex buffer.
     if (!vertexBuffer || (vertexCount != drawData->TotalVtxCount)) {

@@ -16,7 +16,7 @@ using namespace fe;
 
 // TODO: Fix editorScene -> activeScene
 
-EditorLayer::EditorLayer() : Layer{"EditorLayer"} {
+EditorLayer::EditorLayer()/* : Layer{"EditorLayer"}*/ {
 }
 
 EditorLayer::~EditorLayer() {

@@ -1,18 +1,24 @@
 #include "graphics.hpp"
 #include "subrender.hpp"
 
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/devices/window.hpp"
 #include "fusion/utils/enumerate.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
+#include "fusion/devices/devices.hpp"
+#include "fusion/devices/window.hpp"
+#include "fusion/graphics/renderpass/fence.hpp"
+#include "fusion/graphics/renderpass/semaphore.hpp"
+#include "fusion/graphics/renderpass/swapchain.hpp"
+#include "fusion/graphics/renderpass/framebuffers.hpp"
+#include "fusion/graphics/renderpass/renderpass.hpp"
+#include "fusion/graphics/images/image_depth.hpp"
+#include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/graphics/commands/command_pool.hpp"
+#include "fusion/graphics/render_stage.hpp"
+#include "fusion/graphics/renderer.hpp"
 
 #include <glslang/Public/ShaderLang.h>
 
 using namespace fe;
-
-Graphics* Graphics::Instance{ nullptr };
-
-#define MAX_FRAMES_IN_FLIGHT 2
 
 Graphics::Graphics()
     : elapsedPurge(5s)
@@ -20,8 +26,6 @@ Graphics::Graphics()
     , physicalDevice{instance}
     , logicalDevice{instance, physicalDevice}
 {
-    Instance = this;
-
     for (auto& w : Devices::Get()->getWindows()) {
         onWindowCreate(w.get(), true);
     }
@@ -46,23 +50,10 @@ Graphics::~Graphics() {
 
     vkDestroyPipelineCache(logicalDevice, pipelineCache, nullptr);
 
-    for (const auto& perSurfaceBuffer : perSurfaceBuffers) {
-        for (const auto& fence : perSurfaceBuffer->flightFences) {
-            vkDestroyFence(logicalDevice, fence, nullptr);
-        }
-        for (const auto& semaphore : perSurfaceBuffer->renderCompletes) {
-            vkDestroySemaphore(logicalDevice, semaphore, nullptr);
-        }
-        for (const auto& semaphore : perSurfaceBuffer->presentCompletes) {
-            vkDestroySemaphore(logicalDevice, semaphore, nullptr);
-        }
-        perSurfaceBuffer->commandBuffers.clear();
-    }
-
+    perSurfaceBuffers.clear();
     commandPools.clear();
 
     renderer = nullptr;
-    Instance = nullptr;
 }
 
 void Graphics::update() {
@@ -71,11 +62,11 @@ void Graphics::update() {
 
     if (!renderer->started) {
         resetRenderStages();
-        renderer->onStart();
+        renderer->start();
         renderer->started = true;
     }
 
-    renderer->onUpdate();
+    renderer->update();
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
@@ -108,10 +99,10 @@ void Graphics::update() {
                 stage.second = subpass.binding;
 
                 // Renders subpass subrender pipelines.
-                renderer->subrenderHolder.renderStage(stage, *commandBuffer);
+                renderer->subrenderHolder.renderStage(stage, commandBuffer);
 
                 if (subpass.binding != renderStage->getSubpasses().back().binding)
-                    vkCmdNextSubpass(*commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
+                    vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
             }
 
             if (!endRenderpass(id, *renderStage))
@@ -179,7 +170,7 @@ const RenderStage* Graphics::getRenderStage(uint32_t index) const {
     return nullptr;
 }
 
-const Descriptor* Graphics::getAttachment(const std::string &name) const {
+const Descriptor* Graphics::getAttachment(const std::string& name) const {
     if (auto it = attachments.find(name); it != attachments.end())
         return it->second;
     return nullptr;
@@ -202,10 +193,6 @@ void Graphics::resetRenderStages() {
     recreateSwapchain(VK_EVENT_RESET);
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
-        auto& perSurfaceBuffer = perSurfaceBuffers[id];
-        if (perSurfaceBuffer->flightFences.size() != MAX_FRAMES_IN_FLIGHT)
-            recreateCommandBuffers(id);
-
         for (const auto& renderStage : renderer->renderStages)
             renderStage->rebuild(id, *swapchain);
     }
@@ -230,53 +217,7 @@ void Graphics::recreateSwapchain(VkResult reason) {
             LOG_DEBUG << "Creating swapchain (" << size.x << ", " << size.y << ")";
         }
         swapchain = std::make_unique<Swapchain>(logicalDevice, *surface, vku::uvec2_cast(size), window.isVSync(), swapchain.get());
-
-        auto& perSurfaceBuffer = perSurfaceBuffers[id];
-        perSurfaceBuffer = std::make_unique<PerSurfaceBuffers>();
-        recreateCommandBuffers(id);
-    }
-}
-
-void Graphics::recreateCommandBuffers(size_t id) {
-    auto& swapchain = swapchains[id];
-    auto& perSurfaceBuffer = perSurfaceBuffers[id];
-
-    for (const auto& fence : perSurfaceBuffer->flightFences) {
-        vkDestroyFence(logicalDevice, fence, nullptr);
-    }
-    for (const auto& semaphore : perSurfaceBuffer->renderCompletes) {
-        vkDestroySemaphore(logicalDevice, semaphore, nullptr);
-    }
-    for (const auto& semaphore : perSurfaceBuffer->presentCompletes) {
-        vkDestroySemaphore(logicalDevice, semaphore, nullptr);
-    }
-    perSurfaceBuffer->imagesInFlight.clear();
-    perSurfaceBuffer->commandBuffers.clear();
-
-    perSurfaceBuffer->commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-    perSurfaceBuffer->presentCompletes.resize(MAX_FRAMES_IN_FLIGHT);
-    perSurfaceBuffer->renderCompletes.resize(MAX_FRAMES_IN_FLIGHT);
-    perSurfaceBuffer->flightFences.resize(MAX_FRAMES_IN_FLIGHT);
-    perSurfaceBuffer->imagesInFlight.resize(swapchain->getImageCount(), VK_NULL_HANDLE);
-
-    VkSemaphoreCreateInfo semaphoreCreateInfo = {};
-    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-    VkFenceCreateInfo fenceCreateInfo = {};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-    for (auto& commandBuffer : perSurfaceBuffer->commandBuffers) {
-        commandBuffer = std::make_unique<CommandBuffer>(false);
-    }
-    for (auto& semaphore : perSurfaceBuffer->presentCompletes) {
-        CheckVk(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &semaphore));
-    }
-    for (auto& semaphore : perSurfaceBuffer->renderCompletes) {
-        CheckVk(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &semaphore));
-    }
-    for (auto& fence : perSurfaceBuffer->flightFences) {
-        CheckVk(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &fence));
+        perSurfaceBuffers[id] = std::make_unique<PerSurfaceBuffers>(swapchain->getImageCount());
     }
 }
 
@@ -317,16 +258,16 @@ bool Graphics::startRenderpass(size_t id, RenderStage& renderStage) {
     auto& currentFrame = perSurfaceBuffer->currentFrame;
     auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
 
-    if (!commandBuffer->isRunning())
-        commandBuffer->begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+    if (!commandBuffer.isRunning())
+        commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
     auto& renderArea = renderStage.getRenderArea();
 
     VkViewport viewport = vku::viewport(renderArea.extent);
-    vkCmdSetViewport(*commandBuffer, 0, 1, &viewport);
+    vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 
     VkRect2D scissor = vku::rect2D(renderArea.extent, renderArea.offset);
-    vkCmdSetScissor(*commandBuffer, 0, 1, &scissor);
+    vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
     auto clearValues = renderStage.getClearValues();
 
@@ -337,7 +278,7 @@ bool Graphics::startRenderpass(size_t id, RenderStage& renderStage) {
     renderPassBeginInfo.renderArea = scissor; // same as render area
     renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassBeginInfo.pClearValues = clearValues.data();
-    vkCmdBeginRenderPass(*commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     return true;
 }
@@ -349,23 +290,16 @@ bool Graphics::endRenderpass(size_t id, RenderStage& renderStage) {
     auto& currentFrame = perSurfaceBuffer->currentFrame;
     auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
 
-    vkCmdEndRenderPass(*commandBuffer);
+    vkCmdEndRenderPass(commandBuffer);
 
     if (!renderStage.hasSwapchain())
         return false;
 
-    commandBuffer->end();
+    commandBuffer.end();
 
     auto imageIndex = swapchain->getActiveImageIndex();
 
-    VkFence curr = perSurfaceBuffer->flightFences[currentFrame];
-    VkFence prev = perSurfaceBuffer->imagesInFlight[imageIndex];
-    if (prev != VK_NULL_HANDLE) {
-        Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &prev, VK_TRUE, UINT64_MAX));
-    }
-    prev = curr;
-
-    commandBuffer->submit(perSurfaceBuffer->presentCompletes[currentFrame], perSurfaceBuffer->renderCompletes[currentFrame], curr);
+    commandBuffer.submit(perSurfaceBuffer->presentCompletes[currentFrame], perSurfaceBuffer->renderCompletes[currentFrame], perSurfaceBuffer->flightFences[currentFrame]);
 
     auto presentResult = swapchain->queuePresent(presentQueue, perSurfaceBuffer->renderCompletes[currentFrame]);
 
@@ -461,4 +395,11 @@ void Graphics::CheckVk(VkResult result) {
     if (result >= 0) return;
     auto failure = StringifyResultVk(result);
     throw std::runtime_error("Vulkan error: " + failure);
+}
+
+Graphics::PerSurfaceBuffers::PerSurfaceBuffers(size_t imageCount) {
+    commandBuffers.resize(imageCount);
+    presentCompletes.resize(imageCount);
+    renderCompletes.resize(imageCount);
+    flightFences.resize(imageCount);
 }

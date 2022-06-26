@@ -1,12 +1,12 @@
 #pragma once
 
-#include "fusion/devices/device_manager.hpp"
+#include "fusion/devices/devices.hpp"
 
 namespace glfw {
-    class DeviceManager : public fe::Devices {
+    class Devices : public fe::Devices {
     public:
-        DeviceManager();
-        ~DeviceManager() override;
+        Devices();
+        ~Devices() override;
 
         void update() override;
         void waitEvents() override;

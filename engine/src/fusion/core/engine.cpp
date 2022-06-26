@@ -1,7 +1,6 @@
 #include "engine.hpp"
-#include "app.hpp"
 
-#include "fusion/devices/device_manager.hpp"
+#include "fusion/devices/devices.hpp"
 
 using namespace fe;
 
@@ -18,13 +17,13 @@ Engine::Engine(const CommandLineArgs& args) : version{FUSION_VERSION_MAJOR, FUSI
 
     commandLineParser.parse(args);
 
+    devices = Devices::Init();
+    devices->getWindow(0)->OnClose().connect<&Engine::requestClose>(this);
+
     for (auto [type, module] : Module::Registry()) {
         modules.emplace(type, module.create());
         moduleStages[module.stage].emplace_back(type);
     }
-
-    //devices = Devices::Create();
-    //devices->getWindow(0)->OnClose().connect<&Engine::requestClose>(this);
 
     running = true;
 }

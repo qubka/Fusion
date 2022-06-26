@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vku.hpp"
+#include "fusion/graphics/vku.hpp"
 
 #include "images/image_depth.hpp"
 #include "renderpass/framebuffers.hpp"
@@ -8,6 +8,12 @@
 #include "renderpass/swapchain.hpp"
 
 namespace fe {
+    /*class ImageDepth;
+    class Descriptor;
+    class Renderpass;
+    class Framebuffers;
+    class Swapchain;*/
+
     struct Attachment {
         enum class Type { Image, Depth, Swapchain };
         uint32_t binding{ 0 };
@@ -45,6 +51,7 @@ namespace fe {
         friend class Graphics;
     public:
         explicit RenderStage(std::vector<Attachment> images = {}, std::vector<SubpassType> subpasses = {}, const Viewport& viewport = {});
+        ~RenderStage() = default;;
 
         void update(size_t id);
         void rebuild(size_t id, const Swapchain& swapchain);

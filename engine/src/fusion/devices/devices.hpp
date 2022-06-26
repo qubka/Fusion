@@ -20,7 +20,7 @@ namespace fe {
         virtual ~Devices();
         NONCOPYABLE(Devices);
 
-        static std::unique_ptr<Devices> Create();
+        static std::unique_ptr<Devices> Init();
 
         static Devices* Get() { return Instance; }
 

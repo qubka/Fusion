@@ -1,11 +1,11 @@
-#include "device_manager.hpp"
+#include "devices.hpp"
 #include "monitor.hpp"
 #include "window.hpp"
 #include "joystick.hpp"
 
 using namespace glfw;
 
-DeviceManager::DeviceManager() : fe::Devices{} {
+Devices::Devices() : fe::Devices{} {
     // Set the error error callback.
     glfwSetErrorCallback(ErrorCallback);
 
@@ -43,12 +43,12 @@ DeviceManager::DeviceManager() : fe::Devices{} {
     createWindow<glfw::Window>(glm::uvec2{1280, 720});
 }
 
-DeviceManager::~DeviceManager() {
+Devices::~Devices() {
     // Terminate GLFW.
     glfwTerminate();
 }
 
-void DeviceManager::update() {
+void Devices::update() {
     // Polls for window events.
     glfwPollEvents();
 
@@ -61,12 +61,12 @@ void DeviceManager::update() {
     }
 }
 
-void DeviceManager::waitEvents() {
+void Devices::waitEvents() {
     // Wait for GLFW events.
     glfwWaitEvents();
 }
 
-std::vector<const char*> DeviceManager::getRequiredInstanceExtensions() const {
+std::vector<const char*> Devices::getRequiredInstanceExtensions() const {
     std::vector<const char*> result;
     uint32_t count = 0;
     const char** names = glfwGetRequiredInstanceExtensions(&count);
@@ -78,19 +78,19 @@ std::vector<const char*> DeviceManager::getRequiredInstanceExtensions() const {
     return result;
 }
 
-fe::ScanCode DeviceManager::getScanCode(fe::KeyCode key) const{
+fe::ScanCode Devices::getScanCode(fe::KeyCode key) const{
     return glfwGetKeyScancode(key);
 }
 
-std::string DeviceManager::getKeyName(fe::KeyCode key, fe::ScanCode scancode) const {
+std::string Devices::getKeyName(fe::KeyCode key, fe::ScanCode scancode) const {
     return glfwGetKeyName(key, scancode);
 }
 
-bool DeviceManager::isRawMouseMotionSupported() const {
+bool Devices::isRawMouseMotionSupported() const {
     return glfwRawMouseMotionSupported() == GLFW_TRUE;
 }
 
-void DeviceManager::updateGamepadMappings(const std::string& mappings) {
+void Devices::updateGamepadMappings(const std::string& mappings) {
     glfwUpdateGamepadMappings(mappings.c_str());
 }
 
@@ -98,12 +98,12 @@ void DeviceManager::updateGamepadMappings(const std::string& mappings) {
 
 namespace glfw {
 
-    void DeviceManager::ErrorCallback(int error, const char* description) {
+    void Devices::ErrorCallback(int error, const char* description) {
         CheckGlfw(error);
     }
 
-    void DeviceManager::MonitorCallback(GLFWmonitor* monitor, int action) {
-        auto manager = reinterpret_cast<glfw::DeviceManager*>(DeviceManager::Get());
+    void Devices::MonitorCallback(GLFWmonitor* monitor, int action) {
+        auto manager = reinterpret_cast<glfw::Devices*>(Devices::Get());
         auto& monitors = manager->monitors;
 
         LOG_VERBOSE << "MonitorEvent: name: [" << glfwGetMonitorName(monitor) << "] - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
@@ -123,8 +123,8 @@ namespace glfw {
     }
 
     #if GLFW_VERSION_MINOR >= 2
-    void DeviceManager::JoystickCallback(int jid, int action) {
-        auto manager = reinterpret_cast<glfw::DeviceManager*>(DeviceManager::Get());
+    void Devices::JoystickCallback(int jid, int action) {
+        auto manager = reinterpret_cast<glfw::Devices*>(Devices::Get());
         auto& joysticks = manager->joysticks;
 
         LOG_VERBOSE << "JoystickEvent: id: [" << jid << "] | name: [" << glfwGetJoystickName(jid) << "] - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
@@ -144,7 +144,7 @@ namespace glfw {
     }
     #endif
 
-    std::string DeviceManager::StringifyResultGlfw(int result) {
+    std::string Devices::StringifyResultGlfw(int result) {
         switch (result) {
             case GLFW_TRUE:
                 return "Success";
@@ -173,7 +173,7 @@ namespace glfw {
         }
     }
 
-    void DeviceManager::CheckGlfw(int result) {
+    void Devices::CheckGlfw(int result) {
         if (result) return;
         auto failure = StringifyResultGlfw(result);
         LOG_ERROR << "GLFW error: " << failure << ", " << result;

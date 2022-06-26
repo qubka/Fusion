@@ -49,7 +49,7 @@ namespace fe {
             template<typename ... Args>
             static bool Register(typename Base::Stage stage, Requires<Args...>&& requires = {}) {
                 ModuleFactory::Registry()[typeid(T)] = { stage, []() {
-                    moduleInstance = T::Create();
+                    moduleInstance = new T();
                     return std::unique_ptr<Base>(moduleInstance);
                 }, requires.Get() };
                 return true;
@@ -69,7 +69,7 @@ namespace fe {
          */
         enum class Stage { Never, Always, Pre, Normal, Post, Render };
 
-        //using StageIndex = std::pair<Stage, std::type_index>;
+        using StageIndex = std::pair<Stage, std::type_index>;
 
         virtual ~Module() = default;
         NONCOPYABLE(Module);

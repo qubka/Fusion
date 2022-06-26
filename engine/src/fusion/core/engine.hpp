@@ -3,13 +3,13 @@
 #include "version.hpp"
 #include "command_line.hpp"
 #include "module.hpp"
+#include "app.hpp"
 
 #include "fusion/utils/time.hpp"
 
 int main(int argc, char** argv);
 
 namespace fe {
-    class App;
     class Devices;
     class Engine {
     protected:

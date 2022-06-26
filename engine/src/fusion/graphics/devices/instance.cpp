@@ -1,7 +1,7 @@
 #include "instance.hpp"
 
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/devices/device_manager.hpp"
+#include "fusion/devices/devices.hpp"
 #include "fusion/core/engine.hpp"
 
 using namespace fe;
