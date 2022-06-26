@@ -1,4 +1,7 @@
 #include "engine.hpp"
+#include "app.hpp"
+
+#include "fusion/devices/device_manager.hpp"
 
 using namespace fe;
 
@@ -15,8 +18,13 @@ Engine::Engine(const CommandLineArgs& args) : version{FUSION_VERSION_MAJOR, FUSI
 
     commandLineParser.parse(args);
 
-    devices = Devices::Create();
-    devices->getWindow(0)->OnClose().connect<&Engine::requestClose>(this);
+    for (auto [type, module] : Module::Registry()) {
+        modules.emplace(type, module.create());
+        moduleStages[module.stage].emplace_back(type);
+    }
+
+    //devices = Devices::Create();
+    //devices->getWindow(0)->OnClose().connect<&Engine::requestClose>(this);
 
     running = true;
 }
@@ -36,12 +44,14 @@ int32_t Engine::run() {
 
             if (application) {
                 if (!application->started) {
-                    application->onStart();
+                    application->start();
                     application->started = true;
                 }
 
-                application->onUpdate(deltaTime.time);
+                application->update(deltaTime.time);
             }
+
+
         } catch (std::exception& e) {
             LOG_FATAL << e.what();
             return EXIT_FAILURE;

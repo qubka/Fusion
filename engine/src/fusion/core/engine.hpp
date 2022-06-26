@@ -2,14 +2,15 @@
 
 #include "version.hpp"
 #include "command_line.hpp"
-#include "app.hpp"
+#include "module.hpp"
 
 #include "fusion/utils/time.hpp"
-#include "fusion/devices/device_manager.hpp"
 
 int main(int argc, char** argv);
 
 namespace fe {
+    class App;
+    class Devices;
     class Engine {
     protected:
         /**
@@ -104,13 +105,18 @@ namespace fe {
             }
         } fps;*/
 
+
+
         static Engine* Instance;
 
         CommandLineParser commandLineParser;
         Version version;
 
-        std::unique_ptr<Devices> devices;
         std::unique_ptr<App> application;
+        std::unique_ptr<Devices> devices;
+
+        std::unordered_map<std::type_index, std::unique_ptr<Module>> modules;
+        std::map<Module::Stage, std::vector<std::type_index>> moduleStages;
 
         uint64_t frameNumber{ 0 };
         bool running{ false };
