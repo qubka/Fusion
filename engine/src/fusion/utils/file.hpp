@@ -35,6 +35,6 @@ namespace fe {
         static std::string ExtensionIcon(const std::filesystem::path& filename);
 
     private:
-        static std::map<std::string, std::string> Extensions;
+        static std::unordered_map<std::string, std::string> Extensions;
     };
 }

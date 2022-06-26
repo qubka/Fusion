@@ -18,11 +18,11 @@ namespace fe {
         }
         ~MainRenderer() override = default;
 
-        void onStart() override {
+        void start() override {
             addSubrender<ImGuiSubrender>({ 0, 0});
         }
 
-        void onUpdate() override {
+        void update() override {
         }
 
     private:

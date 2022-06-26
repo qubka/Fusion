@@ -1,13 +1,9 @@
 #pragma once
 
 #include "version.hpp"
-#include "layer_stack.hpp"
-
-#include "fusion/graphics/graphics.hpp"
 
 namespace fe {
     class Time;
-
     class App {
         friend class Engine;
     public:
@@ -18,12 +14,12 @@ namespace fe {
         /**
          * Run when switching to this app from another.
          */
-        virtual void onStart() = 0;
+        virtual void start() = 0;
 
         /**
          * Every frame as long as the app has work to do.
          */
-        virtual void onUpdate(const Time& dt) = 0;
+        virtual void update(const Time& dt) = 0;
 
         /**
          * Gets the application's name.
@@ -49,32 +45,9 @@ namespace fe {
          */
         void setVersion(const Version& ver) { version = ver; }
 
-        /**
-         * Gets the current graphics context.
-         * @return The graphics context.
-         */
-        Graphics* getGraphics() { return graphics.get(); }
-
-        /**
-         * Sets the current graphics context to the application.
-         * @param graphics The new graphics context.
-         */
-        void setGraphics(std::unique_ptr<Graphics>&& graphics) { this->graphics = std::move(graphics); }
-
-        void pushLayer(Layer* layer) { layers.pushFront(layer); }
-
-        void pushOverlay(Layer* layer) { layers.pushBack(layer); }
-
     protected:
         std::string name;
         Version version;
         bool started{ false };
-
-        std::unique_ptr<Graphics> graphics;
-
-        LayerStack layers;
-
-        //KeyInput keyInput{/*all keys*/};
-        //MouseInput mouseInput{/*all buttons*/};
     };
 }

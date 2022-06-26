@@ -41,7 +41,7 @@ std::string File::ExtensionIcon(const std::filesystem::path& filename) {
     return key != Extensions.end() ? key->second.c_str() : ICON_FA_FILE;
 }
 
-std::map<std::string, std::string> File::Extensions = {
+std::unordered_map<std::string, std::string> File::Extensions = {
     {".gif", ICON_FA_FILE_IMAGE_O},
     {".jpeg", ICON_FA_FILE_IMAGE_O},
     {".jpg", ICON_FA_FILE_IMAGE_O},

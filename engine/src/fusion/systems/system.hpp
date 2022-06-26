@@ -12,27 +12,27 @@ namespace fe {
         /**
          * @brief Called when the system is created.
          */
-        virtual void onCreate() {};
+        virtual void create() {};
 
         /**
          * @brief Before the first OnUpdate and whenever the system resumes running.
          */
-        virtual void onStartRunning() {};
+        virtual void startRunning() {};
 
         /**
          * @brief Every frame as long as the system has work to do (see ShouldRunSystem()) and the system is Enabled.
          */
-        virtual void onUpdate() {};
+        virtual void update() {};
 
         /**
          * @brief Whenever the system stops updating because it finds no entities matching its queries. Also called before OnDestroy.
          */
-        virtual void onStopRunning() {};
+        virtual void stopRunning() {};
 
         /**
          * @brief When the system is destroyed
          */
-        virtual void onDestroy() {};
+        virtual void destroy() {};
 
     protected:
         entt::registry& registry;

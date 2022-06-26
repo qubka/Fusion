@@ -11,12 +11,12 @@ EditorApp::~EditorApp() {
 
 }
 
-void EditorApp::onStart() {
+void EditorApp::start() {
     auto graphics = std::make_unique<Graphics>();
     graphics->setRenderer(std::make_unique<MainRenderer>());
     setGraphics(std::move(graphics));
 }
 
-void EditorApp::onUpdate(const Time& dt) {
+void EditorApp::update(const Time& dt) {
     graphics->update();
 }

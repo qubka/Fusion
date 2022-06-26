@@ -8,8 +8,8 @@ namespace fe {
         EditorApp(const std::string& name, const Version& version);
         ~EditorApp() override;
 
-        void onStart() override;
-        void onUpdate(const Time& dt) override;
+        void start() override;
+        void update(const Time& dt) override;
 
     private:
 

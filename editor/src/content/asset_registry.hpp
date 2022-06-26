@@ -9,10 +9,8 @@ namespace fe {
         void clear();
 
     private:
-
         void registerAllAssets(const std::filesystem::path& filename);
         void registerAsset(const std::filesystem::path& filename);
-
 
         std::unordered_map<std::wstring, AssetInfo> assets;
     };

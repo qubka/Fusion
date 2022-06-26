@@ -31,16 +31,25 @@ Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlag
     VkMemoryRequirements memoryRequirements;
     vkGetBufferMemoryRequirements(logicalDevice, buffer, &memoryRequirements);
 
+    // Create the memory backing up the buffer handle
     VkMemoryAllocateInfo memoryAllocateInfo = {};
     memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memoryAllocateInfo.allocationSize = memoryRequirements.size;
+    // Find a memory type index that fits the properties of the buffer
     memoryAllocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, properties);
+    // If the buffer has VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT set we also need to enable the appropriate flag during allocation
+    if (usage & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) {
+        VkMemoryAllocateFlagsInfoKHR allocFlagsInfo = {};
+        allocFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO_KHR;
+        allocFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
+        memoryAllocateInfo.pNext = &allocFlagsInfo;
+    }
     Graphics::CheckVk(vkAllocateMemory(logicalDevice, &memoryAllocateInfo, nullptr, &memory));
 
     // If a pointer to the buffer data has been passed, map the buffer and copy over the data.
     if (data) {
         map(size);
-        copy(mapped);
+        copy(data);
 
         // If host coherency hasn't been requested, do a manual flush to make writes visible.
         if ((properties & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == 0) {

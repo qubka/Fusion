@@ -5,6 +5,8 @@
 #include "joystick.hpp"
 
 #include "fusion/input/key_codes.hpp"
+#include "fusion/core/module_factory.hpp"
+#include "fusion/core/module.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -17,7 +19,7 @@ namespace fe {
     class Devices {
     public:
         Devices();
-        virtual ~Devices();
+        ~Devices();
         NONCOPYABLE(Devices);
 
         static std::unique_ptr<Devices> Create();
@@ -118,9 +120,9 @@ namespace fe {
     protected:
         static Devices* Instance;
 
-        std::vector<std::unique_ptr<Window>> windows;
-        std::vector<std::unique_ptr<Monitor>> monitors;
-        std::vector<std::unique_ptr<Joystick>> joysticks;
+        std::vector<std::unique_ptr<Window>> windows{};
+        std::vector<std::unique_ptr<Monitor>> monitors{};
+        std::vector<std::unique_ptr<Joystick>> joysticks{};
 
         entt::sigh<void(Window*, bool)> onWindowCreate{};
         entt::sigh<void(Monitor*, bool)> onMonitorConnect{};

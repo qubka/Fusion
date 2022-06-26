@@ -63,7 +63,8 @@ void CommandBuffer::submitIdle() {
 
 	VkFence fence;
 	Graphics::CheckVk(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &fence));
-	Graphics::CheckVk(vkResetFences(logicalDevice, 1, &fence));
+
+	//Graphics::CheckVk(vkResetFences(logicalDevice, 1, &fence));
 	Graphics::CheckVk(vkQueueSubmit(queueSelected, 1, &submitInfo, fence));
 	Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
 

@@ -158,7 +158,7 @@ namespace fe {
             int32_t getSize() const { return size; }
             VkShaderStageFlags getStageFlags() const { return stageFlags; }
             Type getType() const { return type; }
-            const std::map<std::string, Uniform>& getUniforms() const { return uniforms; }
+            const std::unordered_map<std::string, Uniform>& getUniforms() const { return uniforms; }
 
             std::optional<Uniform> getUniform(const std::string& name) const {
                 if (auto it = uniforms.find(name); it != uniforms.end())
@@ -179,7 +179,7 @@ namespace fe {
             int32_t size;
             VkShaderStageFlags stageFlags;
             Type type;
-            std::map<std::string, Uniform> uniforms;
+            std::unordered_map<std::string, Uniform> uniforms;
         };
 
         class Attribute {
