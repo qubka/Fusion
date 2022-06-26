@@ -4,7 +4,7 @@
 
 using namespace fe;
 
-Engine* Engine::Instance{ nullptr };
+Engine* Engine::Instance = nullptr;
 
 Engine::Engine(const CommandLineArgs& args) : version{FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
     Instance = this;

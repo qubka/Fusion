@@ -10,7 +10,7 @@
 
 using namespace fe;
 
-Devices* Devices::Instance{ nullptr };
+Devices* Devices::Instance = nullptr;
 
 Devices::Devices() {
     Instance = this;

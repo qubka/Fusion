@@ -38,7 +38,7 @@ namespace fe {
              * Gets the engines instance.
              * @return The current module instance.
              */
-            static T* Get() { return moduleInstance; }
+            static T* Get() { return Instance; }
 
         protected:
             /**
@@ -49,13 +49,13 @@ namespace fe {
             template<typename ... Args>
             static bool Register(typename Base::Stage stage, Requires<Args...>&& requires = {}) {
                 ModuleFactory::Registry()[typeid(T)] = { stage, []() {
-                    moduleInstance = new T();
-                    return std::unique_ptr<Base>(moduleInstance);
+                    Instance = new T();
+                    return std::unique_ptr<Base>(Instance);
                 }, requires.Get() };
                 return true;
             }
 
-            inline static T* moduleInstance = nullptr;
+            inline static T* Instance = nullptr;
         };
     };
 

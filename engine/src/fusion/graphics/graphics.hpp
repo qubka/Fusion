@@ -3,28 +3,37 @@
 #include "fusion/devices/window.hpp"
 #include "fusion/utils/elapsed_time.hpp"
 
+#include "fusion/graphics/devices/instance.hpp"
+#include "fusion/graphics/devices/logical_device.hpp"
+#include "fusion/graphics/devices/physical_device.hpp"
+#include "fusion/graphics/devices/surface.hpp"
+
+#include "fusion/graphics/vku.hpp"
 #include "renderer.hpp"
-#include "commands/command_buffer.hpp"
-#include "commands/command_pool.hpp"
-#include "devices/instance.hpp"
-#include "devices/logical_device.hpp"
-#include "devices/physical_device.hpp"
-#include "devices/surface.hpp"
-#include "vku.hpp"
+#include "fusion/core/module.hpp"
+
+#define MAX_FRAMES_IN_FLIGHT 2
 
 namespace fe {
+    class Renderer;
+    class RenderStage;
+    class CommandBuffer;
+    class CommandPool;
+    class Semaphore;
+    class Fence;
+    class Descriptor;
+    class Swapchain;
+
     /**
      * @brief Module that manages the Vulkan instance, Surface, Window and the renderpass structure.
      */
-    class Graphics {
+    class Graphics : public Module::Registrar<Graphics> {
+        inline static const bool Registered = Register(Stage::Render/*, Requires<Window>()*/);
     public:
         Graphics();
-        ~Graphics();
-        NONCOPYABLE(Graphics);
+        ~Graphics() override;
 
-        void update();
-
-        static Graphics* Get() { return Instance; }
+        void update() override;
 
         static std::string StringifyResultVk(VkResult result);
         static void CheckVk(VkResult result);
@@ -50,7 +59,6 @@ namespace fe {
         void setRenderer(std::unique_ptr<Renderer>&& renderer) { this->renderer = std::move(renderer); }
 
         const RenderStage* getRenderStage(uint32_t index) const;
-
         const Descriptor* getAttachment(const std::string& name) const;
 
         const PhysicalDevice& getPhysicalDevice() const { return physicalDevice; }
@@ -59,15 +67,11 @@ namespace fe {
 
         const Surface* getSurface(size_t id) const { return surfaces[id].get(); }
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
-        //void setFramebufferResized(size_t id) { perSurfaceBuffers[id]->framebufferResized = true; }
 
     private:
-        static Graphics* Instance;
-
         void createPipelineCache();
         void resetRenderStages();
         void recreateSwapchain(VkResult reason);
-        void recreateCommandBuffers(size_t id);
         void recreatePass(size_t id, RenderStage& renderStage);
         void recreateAttachmentsMap();
         bool startRenderpass(size_t id, RenderStage& renderStage);
@@ -90,12 +94,12 @@ namespace fe {
         ElapsedTime elapsedPurge;
 
         struct PerSurfaceBuffers {
+            explicit PerSurfaceBuffers(size_t imageCount);
             size_t currentFrame{ 0 };
-            std::vector<VkSemaphore> presentCompletes;
-            std::vector<VkSemaphore> renderCompletes;
-            std::vector<VkFence> flightFences;
-            std::vector<VkFence> imagesInFlight;
-            std::vector<std::unique_ptr<CommandBuffer>> commandBuffers;
+            std::vector<CommandBuffer> commandBuffers;
+            std::vector<Semaphore> presentCompletes;
+            std::vector<Semaphore> renderCompletes;
+            std::vector<Fence> flightFences;
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;
     };

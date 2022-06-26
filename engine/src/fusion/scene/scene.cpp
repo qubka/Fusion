@@ -11,12 +11,12 @@
 using namespace fe;
 using namespace physx;
 
-PxDefaultAllocator Scene::DefaultAllocatorCallback{};
-PxDefaultErrorCallback Scene::DefaultErrorCallback{};
-PxFoundation* Scene::Foundation{ nullptr };
-PxDefaultCpuDispatcher* Scene::Dispatcher{ nullptr };
-PxPhysics* Scene::Physics{ nullptr };
-PxPvd* Scene::Pvd{ nullptr };
+PxDefaultAllocator Scene::DefaultAllocatorCallback = {};
+PxDefaultErrorCallback Scene::DefaultErrorCallback = {};
+PxFoundation* Scene::Foundation = nullptr;
+PxDefaultCpuDispatcher* Scene::Dispatcher = nullptr;
+PxPhysics* Scene::Physics = nullptr;
+PxPvd* Scene::Pvd = nullptr;
 
 Scene::Scene() : PxSimulationEventCallback{} {
     init();

@@ -140,7 +140,6 @@ list(APPEND ALL_SYSTEM_LIBS freetype)
 ##find_package(glslang 11.6.0 QUIET)
 if(NOT glslang_FOUND)
     set(GLSLANG_LIB_NAME "glslang")
-    set(_ACID_ALL_SYSTEM_LIBS false)
 
     # On MSVC shared mode must be disabled with glslang currently
     set(BUILD_SHARED_LIBS_SAVED "${BUILD_SHARED_LIBS}")
