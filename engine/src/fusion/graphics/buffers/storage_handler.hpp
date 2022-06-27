@@ -28,7 +28,7 @@ namespace fe {
                 bound = true;
             }
 
-            // If the buffer is already changed we can skip a memory comparison and just copy.
+            // If the buffer is already changed we can skip a memory comparison and just copy
             if (handlerStatus == Buffer::Status::Changed || storageBuffer->compare(data, size) != 0) {
                 storageBuffer->copy(data, size);
                 handlerStatus = Buffer::Status::Changed;
@@ -45,7 +45,7 @@ namespace fe {
                 bound = true;
             }
 
-            // If the buffer is already changed we can skip a memory comparison and just copy.
+            // If the buffer is already changed we can skip a memory comparison and just copy
             if (handlerStatus == Buffer::Status::Changed || storageBuffer->compare(&object, size, offset) != 0) {
                 storageBuffer->copy(&object, size, offset);
                 handlerStatus = Buffer::Status::Changed;

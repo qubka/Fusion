@@ -50,7 +50,7 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Subrender*>>>
         T* add(const Pipeline::Stage& stage, std::unique_ptr<T>&& subrender) {
-            // Remove previous Subrender, if it exists.
+            // Remove previous Subrender, if it exists
             //remove<T>();
 
             const auto& typeId = typeid(T);
@@ -71,10 +71,10 @@ namespace fe {
         void remove() {
             const auto& typeId = typeid(T);
 
-            // Remove the stage value for this Subrender.
+            // Remove the stage value for this Subrender
             removeSubrenderStage(typeId);
 
-            // Then, remove the Subrender.
+            // Then, remove the Subrender
             subrenders.erase(typeId);
         }
 

@@ -2,11 +2,14 @@
 
 namespace fe {
     template<typename Base>
+    /**
+     * https://accu.org/journals/overload/6/27/bellingham_597/
+     */
     class ModuleFactory {
     public:
         struct TCreateValue {
-            typename Base::Stage stage;
             std::function<std::unique_ptr<Base>()> create;
+            typename Base::Stage stage;
             std::vector<std::type_index> requires;
         };
         using TRegistryMap = std::unordered_map<std::type_index, TCreateValue>;
@@ -48,10 +51,10 @@ namespace fe {
              */
             template<typename ... Args>
             static bool Register(typename Base::Stage stage, Requires<Args...>&& requires = {}) {
-                ModuleFactory::Registry()[typeid(T)] = { stage, []() {
+                ModuleFactory::Registry()[typeid(T)] = { []() {
                     Instance = new T();
                     return std::unique_ptr<Base>(Instance);
-                }, requires.Get() };
+                }, stage, requires.Get() };
                 return true;
             }
 

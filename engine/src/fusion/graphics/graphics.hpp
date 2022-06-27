@@ -8,8 +8,8 @@
 #include "fusion/graphics/devices/physical_device.hpp"
 #include "fusion/graphics/devices/surface.hpp"
 
+#include "fusion/graphics/renderer.hpp"
 #include "fusion/graphics/vku.hpp"
-#include "renderer.hpp"
 #include "fusion/core/module.hpp"
 
 #define MAX_FRAMES_IN_FLIGHT 2
@@ -25,7 +25,7 @@ namespace fe {
     class Swapchain;
 
     /**
-     * @brief Module that manages the Vulkan instance, Surface, Window and the renderpass structure.
+     * @brief Module that manages the Vulkan's graphics context.
      */
     class Graphics : public Module::Registrar<Graphics> {
         inline static const bool Registered = Register(Stage::Render/*, Requires<Window>()*/);
@@ -90,7 +90,7 @@ namespace fe {
         std::vector<std::unique_ptr<Swapchain>> swapchains;
 
         std::map<std::thread::id, std::shared_ptr<CommandPool>> commandPools;
-        /// Timer used to remove unused command pools.
+        /// Timer used to remove unused command pools
         ElapsedTime elapsedPurge;
 
         struct PerSurfaceBuffers {

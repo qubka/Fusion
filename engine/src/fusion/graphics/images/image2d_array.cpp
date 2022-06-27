@@ -12,7 +12,7 @@ Image2dArray::Image2dArray(const glm::uvec2& extent, uint32_t arrayLayers, VkFor
     , anisotropic{anisotropic}
     , mipmap{mipmap}
 {
-	if (this->extent.width == 0 || this->extent.height == 0) {
+	if (extent.width == 0 || extent.height == 0) {
 		return;
 	}
 

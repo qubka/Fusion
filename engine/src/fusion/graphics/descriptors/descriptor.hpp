@@ -26,15 +26,15 @@ namespace fe {
 
     class WriteDescriptorSet {
     public:
-        WriteDescriptorSet(const VkWriteDescriptorSet& writeDescriptorSet, const VkDescriptorImageInfo& imageInfo) :
-            writeDescriptorSet{writeDescriptorSet},
-            imageInfo{std::make_unique<VkDescriptorImageInfo>(imageInfo)} {
+        WriteDescriptorSet(const VkWriteDescriptorSet& writeDescriptorSet, const VkDescriptorImageInfo& imageInfo)
+            : writeDescriptorSet{writeDescriptorSet}
+            , imageInfo{std::make_unique<VkDescriptorImageInfo>(imageInfo)} {
             this->writeDescriptorSet.pImageInfo = this->imageInfo.get();
         }
 
-        WriteDescriptorSet(const VkWriteDescriptorSet& writeDescriptorSet, const VkDescriptorBufferInfo& bufferInfo) :
-            writeDescriptorSet{writeDescriptorSet},
-            bufferInfo{std::make_unique<VkDescriptorBufferInfo>(bufferInfo)} {
+        WriteDescriptorSet(const VkWriteDescriptorSet& writeDescriptorSet, const VkDescriptorBufferInfo& bufferInfo)
+            : writeDescriptorSet{writeDescriptorSet}
+            , bufferInfo{std::make_unique<VkDescriptorBufferInfo>(bufferInfo)} {
             this->writeDescriptorSet.pBufferInfo = this->bufferInfo.get();
         }
 

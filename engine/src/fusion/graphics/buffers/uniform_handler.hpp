@@ -23,7 +23,7 @@ namespace fe {
                 bound = true;
             }
 
-            // If the buffer is already changed we can skip a memory comparison and just copy.
+            // If the buffer is already changed we can skip a memory comparison and just copy
             if (handlerStatus == Buffer::Status::Changed || uniformBuffer->compare(&object, size) != 0) {
                 uniformBuffer->copy(&object, size);
                 handlerStatus = Buffer::Status::Changed;

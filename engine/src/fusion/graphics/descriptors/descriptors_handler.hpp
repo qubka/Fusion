@@ -22,11 +22,11 @@ namespace fe {
             if (!shader)
                 return;
 
-            // Finds the local value given to the descriptor name.
+            // Finds the local value given to the descriptor name
             auto it = descriptors.find(descriptorName);
 
             if (it != descriptors.end()) {
-                // If the descriptor and size have not changed then the write is not modified.
+                // If the descriptor and size have not changed then the write is not modified
                 if (it->second.descriptor == descriptor && it->second.offsetSize == offsetSize) {
                     return;
                 }
@@ -34,12 +34,12 @@ namespace fe {
                 descriptors.erase(it);
             }
 
-            // Only non-null descriptors can be mapped.
+            // Only non-null descriptors can be mapped
             if (!descriptor) {
                 return;
             }
 
-            // When adding the descriptor find the location in the shader.
+            // When adding the descriptor find the location in the shader
             auto location = shader->getDescriptorLocation(descriptorName);
 
             if (!location) {
@@ -63,7 +63,7 @@ namespace fe {
                 return;
             }
 
-            // Adds the new descriptor value.
+            // Adds the new descriptor value
             auto writeDescriptor = descriptor->getWriteDescriptor(*location, *descriptorType, offsetSize);
             descriptors.emplace(descriptorName, DescriptorValue{descriptor, std::move(writeDescriptor), offsetSize, *location});
             changed = true;

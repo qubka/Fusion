@@ -31,6 +31,7 @@ PipelineGraphics::PipelineGraphics(Stage stage, std::vector<std::filesystem::pat
 #endif
 
 	std::sort(this->vertexInputs.begin(), this->vertexInputs.end());
+
 	createShaderProgram();
 	createDescriptorLayout();
 	createDescriptorPool();

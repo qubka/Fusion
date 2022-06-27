@@ -98,7 +98,7 @@ void Graphics::update() {
             for (const auto& subpass : renderStage->getSubpasses()) {
                 stage.second = subpass.binding;
 
-                // Renders subpass subrender pipelines.
+                // Renders subpass subrender pipelines
                 renderer->subrenderHolder.renderStage(stage, commandBuffer);
 
                 if (subpass.binding != renderStage->getSubpasses().back().binding)
@@ -112,7 +112,7 @@ void Graphics::update() {
         }
     }
 
-    // Purges unused command pools.
+    // Purges unused command pools
     if (elapsedPurge.getElapsed() != 0) {
         for (auto it = commandPools.begin(); it != commandPools.end();) {
             if ((*it).second.use_count() <= 1) {
@@ -136,7 +136,7 @@ void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t i
     VkDeviceMemory dstImageMemory;
     //auto supportsBlit = Image::CopyImage(swapchains[id]->getActiveImage(), dstImage, dstImageMemory, surfaces[id]->getFormat().format, {size.x, size.y, 1}, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
 
-    // Get layout of the image (including row pitch).
+    // Get layout of the image (including row pitch)
     VkImageSubresource imageSubresource = {};
     imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageSubresource.mipLevel = 0;
@@ -152,11 +152,11 @@ void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t i
     memcpy(bitmap.getData<void>(), data, static_cast<size_t>(dstSubresourceLayout.size));
     vkUnmapMemory(logicalDevice, dstImageMemory);
 
-    // Frees temp image and memory.
+    // Frees temp image and memory
     vkFreeMemory(logicalDevice, dstImageMemory, nullptr);
     vkDestroyImage(logicalDevice, dstImage, nullptr);
 
-    // Writes the screenshot bitmap to the file.
+    // Writes the screenshot bitmap to the file
     bitmap.write(filename);
 
 #if FUSION_DEBUG
