@@ -144,6 +144,7 @@ namespace fe {
         //VkBufferUsageFlags getUsageFlags() const { return usageFlags; }
         //VkMemoryPropertyFlags getMemoryPropertyFlags() const { return memoryPropertyFlags; }
 
+        operator bool() const { return buffer != VK_NULL_HANDLE; }
         operator const VkBuffer&() const { return buffer; }
 
         static uint32_t FindMemoryType(uint32_t typeFilter, const VkMemoryPropertyFlags& requiredProperties);

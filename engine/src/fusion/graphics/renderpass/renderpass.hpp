@@ -38,6 +38,7 @@ namespace fe {
         Renderpass(const LogicalDevice& logicalDevice, const RenderStage& renderStage, VkFormat depthFormat, VkFormat surfaceFormat, VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT);
         ~Renderpass();
 
+        operator bool() const { return renderpass != VK_NULL_HANDLE; }
         operator const VkRenderPass&() const { return renderpass; }
         const VkRenderPass& getRenderpass() const { return renderpass; }
 

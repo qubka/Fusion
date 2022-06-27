@@ -15,6 +15,7 @@ namespace fe {
         ~Surface();
         NONCOPYABLE(Surface);
 
+        operator bool() const { return surface != VK_NULL_HANDLE; }
         operator const VkSurfaceKHR&() const { return surface; }
 
         struct SupportDetails {

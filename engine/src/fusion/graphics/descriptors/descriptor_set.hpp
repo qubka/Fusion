@@ -14,12 +14,16 @@ namespace fe {
 
         void bindDescriptor(const CommandBuffer& commandBuffer) const;
 
+        operator bool() const { return descriptorSet != VK_NULL_HANDLE; }
+        operator const VkDescriptorSet&() const { return descriptorSet; }
+
         const VkDescriptorSet& getDescriptorSet() const { return descriptorSet; }
 
     private:
         VkPipelineLayout pipelineLayout;
         VkPipelineBindPoint pipelineBindPoint;
         VkDescriptorPool descriptorPool;
+
         VkDescriptorSet descriptorSet{ VK_NULL_HANDLE };
     };
 }

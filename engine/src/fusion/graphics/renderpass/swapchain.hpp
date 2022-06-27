@@ -30,6 +30,7 @@ namespace fe {
 
         bool isSameExtent(const VkExtent2D& extent2D) { return extent.width == extent2D.width && extent.height == extent2D.height; }
 
+        operator bool() const { return swapchain != VK_NULL_HANDLE; }
         operator const VkSwapchainKHR&() const { return swapchain; }
 
         const VkExtent2D& getExtent() const { return extent; }

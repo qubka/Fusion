@@ -11,7 +11,7 @@ using namespace fe;
 
 Framebuffers::Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& swapchain, const RenderStage& renderStage, const Renderpass& renderPass, const ImageDepth& depthStencil,
 	const glm::uvec2& extent, VkSampleCountFlagBits samples) :
-	logicalDevice(logicalDevice) {
+	logicalDevice{logicalDevice} {
 	for (const auto& attachment : renderStage.getAttachments()) {
         switch (attachment.type) {
             case Attachment::Type::Image:

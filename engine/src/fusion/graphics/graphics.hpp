@@ -7,12 +7,13 @@
 #include "fusion/graphics/devices/logical_device.hpp"
 #include "fusion/graphics/devices/physical_device.hpp"
 #include "fusion/graphics/devices/surface.hpp"
+#include "fusion/graphics/pipelines/pipeline_cache.hpp"
 
 #include "fusion/graphics/renderer.hpp"
 #include "fusion/graphics/vku.hpp"
 #include "fusion/core/module.hpp"
 
-#define MAX_FRAMES_IN_FLIGHT 2
+//#define MAX_FRAMES_IN_FLIGHT 2
 
 namespace fe {
     class Renderer;
@@ -78,10 +79,10 @@ namespace fe {
 
         void onWindowCreate(Window* window, bool create);
 
-        fe::Instance instance;
+        Instance instance;
         PhysicalDevice physicalDevice;
         LogicalDevice logicalDevice;
-        VkPipelineCache pipelineCache{ VK_NULL_HANDLE };
+        PipelineCache pipelineCache;
         std::vector<std::unique_ptr<Surface>> surfaces;
 
         std::unique_ptr<Renderer> renderer;

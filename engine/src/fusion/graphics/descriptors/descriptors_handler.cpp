@@ -60,7 +60,7 @@ bool DescriptorsHandler::update(const Pipeline& pipeline) {
 			writeDescriptorSet.dstSet = VK_NULL_HANDLE;
 
 			if (!pushDescriptors)
-				writeDescriptorSet.dstSet = descriptorSet->getDescriptorSet();
+				writeDescriptorSet.dstSet = *descriptorSet;
 
 			writeDescriptorSets.push_back(writeDescriptorSet);
 		}

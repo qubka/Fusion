@@ -31,6 +31,7 @@ namespace fe {
         static void FvkCmdPushDescriptorSetKHR(VkDevice device, VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint, VkPipelineLayout layout, uint32_t set, uint32_t descriptorWriteCount, const VkWriteDescriptorSet* pDescriptorWrites);
         static uint32_t FindMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties* deviceMemoryProperties, const VkMemoryRequirements* memoryRequirements, VkMemoryPropertyFlags requiredProperties);
 
+        operator bool() const { return instance != VK_NULL_HANDLE; }
         operator const VkInstance&() const { return instance; }
 
         bool getEnableValidationLayers() const { return enableValidationLayers; }

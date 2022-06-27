@@ -44,10 +44,11 @@ namespace fe {
         void submit(const VkSemaphore& waitSemaphore = VK_NULL_HANDLE, const VkSemaphore& signalSemaphore = VK_NULL_HANDLE, VkFence fence = VK_NULL_HANDLE,
                     VkPipelineStageFlags submitPipelineStages = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
 
+        operator bool() const { return commandBuffer != VK_NULL_HANDLE; }
+        operator const VkCommandBuffer&() const { return commandBuffer; }
+
         const VkCommandBuffer& getCommandBuffer() const { return commandBuffer; }
         bool isRunning() const { return running; }
-
-        operator const VkCommandBuffer&() const { return commandBuffer; }
 
     private:
         VkQueue getQueue() const;

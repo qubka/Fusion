@@ -14,6 +14,7 @@ namespace fe {
         ~PhysicalDevice() = default;
         NONCOPYABLE(PhysicalDevice);
 
+        operator bool() const { return physicalDevice != VK_NULL_HANDLE; }
         operator const VkPhysicalDevice&() const { return physicalDevice; }
 
         const VkPhysicalDevice& getPhysicalDevice() const { return physicalDevice; }

@@ -13,6 +13,7 @@ namespace fe {
         ~LogicalDevice();
         NONCOPYABLE(LogicalDevice);
 
+        operator bool() const { return logicalDevice != VK_NULL_HANDLE; }
         operator const VkDevice&() const { return logicalDevice; }
 
         const VkDevice& getLogicalDevice() const { return logicalDevice; }

@@ -25,13 +25,12 @@ Graphics::Graphics()
     , instance{}
     , physicalDevice{instance}
     , logicalDevice{instance, physicalDevice}
+    , pipelineCache{logicalDevice}
 {
     for (auto& window : Devices::Get()->getWindows()) {
         onWindowCreate(window.get(), true);
     }
     Devices::Get()->OnWindowCreate().connect<&Graphics::onWindowCreate>(this);
-
-    createPipelineCache();
 
     if (!glslang::InitializeProcess())
         throw std::runtime_error("Failed to initialize glslang process");
@@ -47,8 +46,6 @@ Graphics::~Graphics() {
     CheckVk(vkQueueWaitIdle(graphicsQueue));
 
     glslang::FinalizeProcess();
-
-    vkDestroyPipelineCache(logicalDevice, pipelineCache, nullptr);
 
     perSurfaceBuffers.clear();
     commandPools.clear();
@@ -183,12 +180,6 @@ const std::shared_ptr<CommandPool>& Graphics::getCommandPool(const std::thread::
     return commandPools.emplace(threadId, std::make_shared<CommandPool>(threadId)).first->second;
 }
 
-void Graphics::createPipelineCache() {
-    VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
-    pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-    CheckVk(vkCreatePipelineCache(logicalDevice, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
-}
-
 void Graphics::resetRenderStages() {
     recreateSwapchain(VK_EVENT_RESET);
 
@@ -297,13 +288,11 @@ bool Graphics::endRenderpass(size_t id, RenderStage& renderStage) {
 
     commandBuffer.end();
 
-    auto imageIndex = swapchain->getActiveImageIndex();
-
     commandBuffer.submit(perSurfaceBuffer->presentCompletes[currentFrame], perSurfaceBuffer->renderCompletes[currentFrame], perSurfaceBuffer->flightFences[currentFrame]);
 
     auto presentResult = swapchain->queuePresent(presentQueue, perSurfaceBuffer->renderCompletes[currentFrame]);
 
-    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    currentFrame = (currentFrame + 1) % swapchain->getImageCount();
 
 #ifndef PLATFORM_ANDROID
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR) {

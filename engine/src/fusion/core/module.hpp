@@ -42,7 +42,7 @@ namespace fe {
              * Gets the engines instance.
              * @return The current module instance.
              */
-            static T* Get() { return Instance; }
+            static T* Get() { return ModuleInstance; }
 
             /**
              * Creates a new module singleton instance and registers into the module registry map.
@@ -52,13 +52,13 @@ namespace fe {
             template<typename ... Args>
             static bool Register(typename Base::Stage stage, Requires<Args...>&& requires = {}) {
                 ModuleFactory::Registry()[typeid(T)] = { []() {
-                    Instance = new T();
-                    return std::unique_ptr<Base>(Instance);
+                    ModuleInstance = new T();
+                    return std::unique_ptr<Base>(ModuleInstance);
                 }, stage, requires.Get() };
                 return true;
             }
 
-            inline static T* Instance = nullptr;
+            inline static T* ModuleInstance = nullptr;
         };
     };
 
