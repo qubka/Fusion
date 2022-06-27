@@ -100,12 +100,15 @@ Swapchain::~Swapchain() {
 
 VkResult Swapchain::acquireNextImage(const VkSemaphore& presentCompleteSemaphore, VkFence fence) {
 	if (fence != VK_NULL_HANDLE)
-		Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, 1000000000));
+		Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
 
-	auto acquireResult = vkAcquireNextImageKHR(logicalDevice, swapchain, 1000000000, presentCompleteSemaphore, VK_NULL_HANDLE, &activeImageIndex);
+	auto acquireResult = vkAcquireNextImageKHR(logicalDevice, swapchain, UINT64_MAX, presentCompleteSemaphore, VK_NULL_HANDLE, &activeImageIndex);
 
 	if (acquireResult != VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR && acquireResult != VK_ERROR_OUT_OF_DATE_KHR)
 		throw std::runtime_error("Failed to acquire swapchain image");
+
+    //Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fenceImage, VK_TRUE, UINT64_MAX));
+    //Graphics::CheckVk(vkResetFences(logicalDevice, 1, &fenceImage));
 
 	return acquireResult;
 }
