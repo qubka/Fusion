@@ -218,7 +218,7 @@ void Instance::createDebugMessenger() {
 	auto debugReportResult = FvkCreateDebugReportCallbackEXT(instance, &debugReportCallbackCreateInfo, nullptr, &debugReportCallback);
 	if (debugReportResult == VK_ERROR_EXTENSION_NOT_PRESENT) {
 		enableValidationLayers = false;
-		Log::Error("Extension vkCreateDebugReportCallbackEXT not present!\n");
+		LOG_ERROR << "Extension vkCreateDebugReportCallbackEXT not present!";
 	} else {
 		Graphics::CheckVk(debugReportResult);
 	}
