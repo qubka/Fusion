@@ -35,7 +35,7 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     };
     LOG_DEBUG << "Android UI scale "<< scale;
 #endif
-    // Sets flags.
+    // Sets flags
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -44,11 +44,11 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-    // Setup Dear ImGui style.
+    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     ImGuis::SetStyleColors();
 
-    // Dimensions.
+    // Dimensions
     window = Devices::Get()->getWindow(0);
     auto& size = window->getSize();
     io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
@@ -64,7 +64,7 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
 #if PLATFORM_ANDROID
     scale = static_cast<float>(android::screenDensity) / static_cast<float>(ACONFIGURATION_DENSITY_MEDIUM);
 #endif
-    // Read fonts from memory.
+    // Read fonts from memory
     File::Read("fonts/PT Sans.ttf", [&](size_t size, const void* data) {
         io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(data), size, 16.0f * scale, nullptr, io.Fonts->GetGlyphRangesCyrillic());
     });
@@ -72,10 +72,10 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
         io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(data), size, 16.0f * scale, &config, iconsRanges);
     });
 
-    // Generate font.
+    // Generate font
     io.Fonts->Build();
 
-    // Create font texture.
+    // Create font texture
     uint8_t* fontBuffer;
     int texWidth, texHeight;
     io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
@@ -118,24 +118,24 @@ void ImGuiSubrender::render(const CommandBuffer& commandBuffer) {
 }
 
 void ImGuiSubrender::drawFrame(const CommandBuffer& commandBuffer) {
-    // Update vertex and index buffer containing the imGui elements when required.
+    // Update vertex and index buffer containing the imGui elements when required
     ImDrawData* drawData = ImGui::GetDrawData();
     if (!drawData || drawData->CmdListsCount == 0)
         return;
 
-    // Update push constants.
+    // Update push constants
     ImGuiIO& io = ImGui::GetIO();
     pushObject.push("scale", glm::vec2{ 2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y });
     pushObject.push("translate", glm::vec2{ -1.0f });
 
-    // Updates descriptors.
+    // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
     descriptorSet.push("fontSampler", font.get());
 
     if (!descriptorSet.update(pipeline))
         return;
 
-    // Draws the objects.
+    // Draws the objects
     pipeline.bindPipeline(commandBuffer);
     descriptorSet.bindDescriptor(commandBuffer, pipeline);
     pushObject.bindPush(commandBuffer, pipeline);
@@ -157,7 +157,7 @@ void ImGuiSubrender::drawFrame(const CommandBuffer& commandBuffer) {
                     glm::ivec2{std::max(static_cast<int>((cmd.ClipRect.x)), 0), std::max(static_cast<int>((cmd.ClipRect.y)), 0)} // offset
             );
             vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-            // Bind DescriptorSet with font or user texture.
+            // Bind DescriptorSet with font or user texture
             //VkDescriptorSet descriptor[1] = { static_cast<VkDescriptorSet>(pcmd.TextureId) };
             //vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, descriptor, 0, nullptr);
             vkCmdDrawIndexed(commandBuffer, cmd.ElemCount, 1, indexOffset, vertexOffset, 0);
@@ -169,37 +169,37 @@ void ImGuiSubrender::drawFrame(const CommandBuffer& commandBuffer) {
 }
 
 void ImGuiSubrender::updateBuffers() {
-    // Update vertex and index buffer containing the imGui elements when required.
+    // Update vertex and index buffer containing the imGui elements when required
     ImDrawData* drawData = ImGui::GetDrawData();
     if (!drawData)
         return;
 
-    // Note: Alignment is done inside buffer creation.
+    // Note: Alignment is done inside buffer creation
     VkDeviceSize vertexBufferSize = drawData->TotalVtxCount * sizeof(ImDrawVert);
     VkDeviceSize indexBufferSize = drawData->TotalIdxCount * sizeof(ImDrawIdx);
 
-    // Update buffers only if vertex or index count has been changed compared to current buffer size.
+    // Update buffers only if vertex or index count has been changed compared to current buffer size
     if (vertexBufferSize == 0 || indexBufferSize == 0)
         return;
 
-    // Update buffers only if vertex or index count has been changed compared to current buffer size.
+    // Update buffers only if vertex or index count has been changed compared to current buffer size
     //Graphics::Get()->getC;
 
-    // Vertex buffer.
+    // Vertex buffer
     if (!vertexBuffer || (vertexCount != drawData->TotalVtxCount)) {
         vertexBuffer = std::make_unique<Buffer>(vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         vertexBuffer->map();
         vertexCount = drawData->TotalVtxCount;
     }
 
-    // Index buffer.
+    // Index buffer
     if (!indexBuffer || (indexCount != drawData->TotalIdxCount)) {
         indexBuffer = std::make_unique<Buffer>(indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         indexBuffer->map();
         indexCount = drawData->TotalIdxCount;
     }
 
-    // Upload data.
+    // Upload data
     auto vtxDst = reinterpret_cast<ImDrawVert*>(vertexBuffer->getMappedMemory());
     auto idxDst = reinterpret_cast<ImDrawIdx*>(indexBuffer->getMappedMemory());
 
@@ -211,7 +211,7 @@ void ImGuiSubrender::updateBuffers() {
         idxDst += cmdList->IdxBuffer.Size;
     }
 
-    // Flush to make writes visible to GPU.
+    // Flush to make writes visible to GPU
     vertexBuffer->flush();
     indexBuffer->flush();
 }
