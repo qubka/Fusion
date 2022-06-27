@@ -73,7 +73,7 @@ void Graphics::update(const Time& dt) {
 
 #ifndef PLATFORM_ANDROID
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapchain(result);
+            recreateSwapchain();
             return;
         }
 #endif
@@ -102,8 +102,9 @@ void Graphics::update(const Time& dt) {
                     vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
             }
 
-            if (!endRenderpass(id, *renderStage))
-                return;
+            if (!endRenderpass(id, *renderStage)) {
+                //return;
+            }
 
             stage.first++;
         }
@@ -181,7 +182,7 @@ const std::shared_ptr<CommandPool>& Graphics::getCommandPool(const std::thread::
 }
 
 void Graphics::resetRenderStages() {
-    recreateSwapchain(VK_EVENT_RESET);
+    recreateSwapchain();
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
         for (const auto& renderStage : renderer->renderStages)
@@ -191,10 +192,10 @@ void Graphics::resetRenderStages() {
     recreateAttachmentsMap();
 }
 
-void Graphics::recreateSwapchain(VkResult reason) {
+void Graphics::recreateSwapchain() {
     vkDeviceWaitIdle(logicalDevice);
 
-    LOG_DEBUG << "Reason of recreating: " << StringifyResultVk(reason);
+    //LOG_DEBUG << "Reason of recreating: " << StringifyResultVk(reason);
 
     swapchains.resize(surfaces.size());
     perSurfaceBuffers.resize(surfaces.size());
@@ -218,14 +219,8 @@ void Graphics::recreatePass(size_t idx, RenderStage& renderStage) {
     CheckVk(vkQueueWaitIdle(graphicsQueue));
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
-        const auto& extent = vku::uvec2_cast(surfaces[id]->getWindow().getSize());
-        while (extent.width == 0 || extent.height == 0) {
-            Devices::Get()->waitEvents();
-            LOG_DEBUG << "Wait to get extent. Current is unvalid " << "(" << extent.width << ", " << extent.height << ")";
-        }
-
-        if (renderStage.hasSwapchain() && !swapchain->isSameExtent(extent)) {
-            recreateSwapchain(VK_ERROR_INCOMPATIBLE_DISPLAY_KHR);
+        if (renderStage.hasSwapchain() && (perSurfaceBuffers[id]->framebufferResized || !swapchain->isSameExtent(vku::uvec2_cast(surfaces[id]->getWindow().getSize())))) {
+            recreateSwapchain();
         }
         renderStage.rebuild(id, *swapchain);
     }
@@ -251,7 +246,7 @@ bool Graphics::startRenderpass(size_t id, RenderStage& renderStage) {
     auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
 
     if (!commandBuffer.isRunning())
-        commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+        commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT); //VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
 
     auto& renderArea = renderStage.getRenderArea();
 
@@ -291,17 +286,18 @@ bool Graphics::endRenderpass(size_t id, RenderStage& renderStage) {
 
     commandBuffer.submit(perSurfaceBuffer->presentCompletes[currentFrame], perSurfaceBuffer->renderCompletes[currentFrame], perSurfaceBuffer->flightFences[currentFrame]);
 
-    auto presentResult = swapchain->queuePresent(presentQueue, perSurfaceBuffer->renderCompletes[currentFrame]);
+    auto result = swapchain->queuePresent(presentQueue, perSurfaceBuffer->renderCompletes[currentFrame]);
 
     currentFrame = (currentFrame + 1) % swapchain->getImageCount();
 
 #ifndef PLATFORM_ANDROID
-    if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR) {
-        recreateSwapchain(presentResult);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        //recreateSwapchain();
+        perSurfaceBuffer->framebufferResized = true;
         return false;
-    } else if (presentResult != VK_SUCCESS) {
+    } else if (result != VK_SUCCESS) {
         LOG_ERROR << "Failed to present swap chain image!";
-        CheckVk(presentResult);
+        CheckVk(result);
         return false;
     }
 #else

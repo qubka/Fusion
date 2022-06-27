@@ -69,9 +69,8 @@ namespace fe {
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
 
     private:
-        void createPipelineCache();
         void resetRenderStages();
-        void recreateSwapchain(VkResult reason);
+        void recreateSwapchain();
         void recreatePass(size_t id, RenderStage& renderStage);
         void recreateAttachmentsMap();
         bool startRenderpass(size_t id, RenderStage& renderStage);
@@ -100,6 +99,7 @@ namespace fe {
             std::vector<Semaphore> presentCompletes;
             std::vector<Semaphore> renderCompletes;
             std::vector<Fence> flightFences;
+            bool framebufferResized{ false };
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;
     };
