@@ -11,6 +11,7 @@
 #include <entt/signal/sigh.hpp>
 
 namespace fe {
+    class Time;
     /**
      * @brief Module used for managing some devices.
      */
@@ -25,7 +26,7 @@ namespace fe {
         static Devices* Get() { return Instance; }
 
         /**
-         * Processes all connected devices.
+         * Run every frame to processes connected devices.
          */
         virtual void update() = 0;
 

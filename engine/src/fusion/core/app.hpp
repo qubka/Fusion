@@ -17,7 +17,8 @@ namespace fe {
         virtual void start() = 0;
 
         /**
-         * Every frame as long as the app has work to do.
+         * Run every frame as long as the app has work to do.
+         * @param dt The current delta time.
          */
         virtual void update(const Time& dt) = 0;
 

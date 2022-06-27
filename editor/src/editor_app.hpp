@@ -12,6 +12,5 @@ namespace fe {
         void update(const Time& dt) override;
 
     private:
-
     };
 }

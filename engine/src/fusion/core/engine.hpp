@@ -6,12 +6,13 @@
 #include "app.hpp"
 
 #include "fusion/utils/time.hpp"
+#include "fusion/utils/elapsed_time.hpp"
 
 int main(int argc, char** argv);
 
 namespace fe {
     class Devices;
-    class Engine {
+    class Engine final {
     protected:
         /**
          * Carries out the setup for basic engine components and the engine. Call {@link Engine#Run} after creating a instance.
@@ -22,7 +23,7 @@ namespace fe {
         NONCOPYABLE(Engine);
 
         /**
-         * The update function for the updater.
+         * The run function for the engine.
          * @return {@code EXIT_SUCCESS} or {@code EXIT_FAILURE}
          */
         int32_t run();
@@ -76,6 +77,18 @@ namespace fe {
         void requestClose() { running = false; }
 
     private:
+        static Engine* Instance;
+
+        /**
+         * The initialization function for the engine.
+         */
+        void init();
+
+        /**
+         * The update engine modules for the required stage.
+         */
+        void updateStage(Module::Stage stage);
+
         struct DeltaTime {
             Time currentTime;
             Time lastTime;
@@ -87,27 +100,6 @@ namespace fe {
                 lastTime = currentTime;
             }
         } deltaTime;
-
-        /*struct ChangePerSecond {
-            uint32_t value{ 0 };
-            uint32_t tempValue{ 0 };
-            Time valueTime;
-
-            void update(const Time &time) {
-                tempValue++;
-
-                if (std::floor(time.asSeconds()) > std::floor(valueTime.asSeconds())) {
-                    value = tempValue;
-                    tempValue = 0;
-                }
-
-                valueTime = time;
-            }
-        } fps;*/
-
-
-
-        static Engine* Instance;
 
         CommandLineParser commandLineParser;
         Version version;
@@ -124,3 +116,23 @@ namespace fe {
         friend int ::main(int argc, char** argv);
     };
 }
+
+/*struct ChangePerSecond {
+    uint32_t value{ 0 };
+    uint32_t tempValue{ 0 };
+    Time valueTime;
+
+    bool update(const Time& time) {
+        tempValue++;
+
+        if (std::floor(time.asSeconds()) > std::floor(valueTime.asSeconds())) {
+            value = tempValue;
+            tempValue = 0;
+            return true;
+        }
+
+        valueTime = time;
+        return false;
+    }
+};*/
+

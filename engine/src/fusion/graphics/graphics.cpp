@@ -21,13 +21,13 @@
 using namespace fe;
 
 Graphics::Graphics()
-    : elapsedPurge(5s)
+    : elapsedPurge{5s}
     , instance{}
     , physicalDevice{instance}
     , logicalDevice{instance, physicalDevice}
 {
-    for (auto& w : Devices::Get()->getWindows()) {
-        onWindowCreate(w.get(), true);
+    for (auto& window : Devices::Get()->getWindows()) {
+        onWindowCreate(window.get(), true);
     }
     Devices::Get()->OnWindowCreate().connect<&Graphics::onWindowCreate>(this);
 
@@ -56,7 +56,7 @@ Graphics::~Graphics() {
     renderer = nullptr;
 }
 
-void Graphics::update() {
+void Graphics::update(const Time& dt) {
     if (!renderer || Devices::Get()->getWindow(0)->isIconified())
         return;
 

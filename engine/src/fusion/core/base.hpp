@@ -20,10 +20,10 @@
 #define FUSION_API
 #endif
 
-#define NONCOPYABLE(x)  x(const x&) = delete; \
-                        x(x&&) = delete; \
-                        x& operator=(const x&) = delete; \
-                        x& operator=(x&&) = delete;      \
+#define NONCOPYABLE(x) x(const x&) = delete; \
+                       x(x&&) = delete; \
+                       x& operator=(const x&) = delete; \
+                       x& operator=(x&&) = delete;
 
 
 // Here we create a number of defines to make it easy to choose between

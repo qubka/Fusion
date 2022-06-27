@@ -2,6 +2,8 @@
 #include "editor_layer.hpp"
 #include "main_renderer.hpp"
 
+#include "fusion/graphics/graphics.hpp"
+
 using namespace fe;
 
 EditorApp::EditorApp(const std::string& name, const Version& version) : App{name, version} {
@@ -12,11 +14,8 @@ EditorApp::~EditorApp() {
 }
 
 void EditorApp::start() {
-    //auto graphics = std::make_unique<Graphics>();
-    //graphics->setRenderer(std::make_unique<MainRenderer>());
-    //setGraphics(std::move(graphics));
+    Graphics::Get()->setRenderer(std::make_unique<MainRenderer>());
 }
 
 void EditorApp::update(const Time& dt) {
-    //graphics->update();
 }

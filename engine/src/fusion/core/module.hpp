@@ -1,6 +1,7 @@
 #pragma once
 
 namespace fe {
+    class Time;
     template<typename Base>
     /**
      * https://accu.org/journals/overload/6/27/bellingham_597/
@@ -43,7 +44,6 @@ namespace fe {
              */
             static T* Get() { return Instance; }
 
-        protected:
             /**
              * Creates a new module singleton instance and registers into the module registry map.
              * @tparam Args Modules that will be initialized before this module.
@@ -70,16 +70,18 @@ namespace fe {
         /**
          * @brief Represents the stage where the module will be updated in the engine.
          */
-        enum class Stage { Never, Always, Pre, Normal, Post, Render };
+        enum class Stage { Never, Pre, Normal, Post, Render };
 
         using StageIndex = std::pair<Stage, std::type_index>;
 
+        //Module() = default;
         virtual ~Module() = default;
-        NONCOPYABLE(Module);
+        //NONCOPYABLE(Module);
 
         /**
          * The update function for the module.
+         * @param dt The current delta time.
          */
-        virtual void update() = 0;
+        virtual void update(const Time& dt) = 0;
     };
 }

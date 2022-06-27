@@ -12,8 +12,8 @@ Image2dArray::Image2dArray(const glm::uvec2& extent, uint32_t arrayLayers, VkFor
     , anisotropic{anisotropic}
     , mipmap{mipmap}
 {
-	if (extent.width == 0 || extent.height == 0) {
-		return;
+	if (extent.x == 0 || extent.y == 0) {
+        return;
 	}
 
 	//mipLevels = mipmap ? GetMipLevels(extent) : 1;

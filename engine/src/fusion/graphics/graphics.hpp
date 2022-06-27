@@ -28,12 +28,11 @@ namespace fe {
      * @brief Module that manages the Vulkan's graphics context.
      */
     class Graphics : public Module::Registrar<Graphics> {
-        inline static const bool Registered = Register(Stage::Render/*, Requires<Window>()*/);
     public:
         Graphics();
         ~Graphics() override;
 
-        void update() override;
+        void update(const Time& dt) override;
 
         static std::string StringifyResultVk(VkResult result);
         static void CheckVk(VkResult result);
