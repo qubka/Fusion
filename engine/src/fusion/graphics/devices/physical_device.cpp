@@ -10,14 +10,13 @@ static const std::vector<VkSampleCountFlagBits> STAGE_FLAG_BITS = {
     VK_SAMPLE_COUNT_4_BIT, VK_SAMPLE_COUNT_2_BIT
 };
 
-PhysicalDevice::PhysicalDevice(const Instance& instance) : instance{instance} {
+PhysicalDevice::PhysicalDevice(const Instance& instance, DevicePickerFunction picker) : instance{instance} {
     uint32_t physicalDeviceCount;
     vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, nullptr);
     std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
     vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, physicalDevices.data());
 
-    // TODO: Allow user to configure graphics preference.
-    physicalDevice = ChoosePhysicalDevice(physicalDevices);
+    physicalDevice = picker(physicalDevices);
     if (!physicalDevice)
         throw std::runtime_error("Vulkan runtime error, failed to find a suitable GPU");
 

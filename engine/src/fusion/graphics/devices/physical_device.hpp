@@ -5,10 +5,12 @@
 namespace fe {
     class Instance;
 
+    using DevicePickerFunction = std::function<VkPhysicalDevice(const std::vector<VkPhysicalDevice>&)>;
+
     class PhysicalDevice {
         friend class Graphics;
     public:
-        explicit PhysicalDevice(const Instance& instance);
+        explicit PhysicalDevice(const Instance& instance, DevicePickerFunction picker = [](const std::vector<VkPhysicalDevice>& devices) -> VkPhysicalDevice { return ChoosePhysicalDevice(devices); });
         ~PhysicalDevice() = default;
         NONCOPYABLE(PhysicalDevice);
 
