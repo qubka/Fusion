@@ -94,8 +94,8 @@ namespace fe {
         ElapsedTime elapsedPurge;
 
         struct PerSurfaceBuffers {
-            explicit PerSurfaceBuffers(size_t imageCount);
-            size_t currentFrame{ 0 };
+            explicit PerSurfaceBuffers(size_t currentFrame, size_t imageCount);
+            size_t currentFrame;
             std::vector<CommandBuffer> commandBuffers;
             std::vector<Semaphore> presentCompletes;
             std::vector<Semaphore> renderCompletes;

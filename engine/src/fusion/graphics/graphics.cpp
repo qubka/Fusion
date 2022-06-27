@@ -208,7 +208,8 @@ void Graphics::recreateSwapchain(VkResult reason) {
             LOG_DEBUG << "Creating swapchain (" << size.x << ", " << size.y << ")";
         }
         swapchain = std::make_unique<Swapchain>(logicalDevice, *surface, vku::uvec2_cast(size), window.isVSync(), swapchain.get());
-        perSurfaceBuffers[id] = std::make_unique<PerSurfaceBuffers>(swapchain->getImageCount());
+        auto& perSurfaceBuffer = perSurfaceBuffers[id];
+        perSurfaceBuffer = std::make_unique<PerSurfaceBuffers>(perSurfaceBuffer ? perSurfaceBuffer->currentFrame : 0, swapchain->getImageCount());
     }
 }
 
@@ -386,7 +387,7 @@ void Graphics::CheckVk(VkResult result) {
     throw std::runtime_error("Vulkan error: " + failure);
 }
 
-Graphics::PerSurfaceBuffers::PerSurfaceBuffers(size_t imageCount) {
+Graphics::PerSurfaceBuffers::PerSurfaceBuffers(size_t currentFrame, size_t imageCount) : currentFrame{currentFrame} {
     commandBuffers.resize(imageCount);
     presentCompletes.resize(imageCount);
     renderCompletes.resize(imageCount);
