@@ -5,8 +5,9 @@
 using namespace fe;
 
 CommandPool::CommandPool(const std::thread::id &threadId) : threadId{threadId} {
+    const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-	auto graphicsFamily = logicalDevice.getGraphicsFamily();
+	auto graphicsFamily = physicalDevice.getGraphicsFamily();
 
 	VkCommandPoolCreateInfo commandPoolCreateInfo = {};
 	commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;

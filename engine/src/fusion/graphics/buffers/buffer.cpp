@@ -5,16 +5,13 @@
 
 using namespace fe;
 
-Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, const void* data)
-    : size{size}
-    //, usageFlags{usage}
-    //, memoryPropertyFlags{properties}
-{
+Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, const void* data) : size{size} {
+    const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-    auto graphicsFamily = logicalDevice.getGraphicsFamily();
-    auto presentFamily = logicalDevice.getPresentFamily();
-    auto computeFamily = logicalDevice.getComputeFamily();
+    auto graphicsFamily = physicalDevice.getGraphicsFamily();
+    auto presentFamily = physicalDevice.getPresentFamily();
+    auto computeFamily = physicalDevice.getComputeFamily();
 
     std::array queueFamily = {graphicsFamily, presentFamily, computeFamily};
 

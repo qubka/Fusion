@@ -10,8 +10,7 @@ Image2dArray::Image2dArray(const glm::uvec2& extent, uint32_t arrayLayers, VkFor
                            VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap)
     : Image{filter, addressMode, VK_SAMPLE_COUNT_1_BIT, layout, usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, format, 1, arrayLayers, {extent.x, extent.y, 1}}
     , anisotropic{anisotropic}
-    , mipmap{mipmap}
-{
+    , mipmap{mipmap} {
 	if (extent.x == 0 || extent.y == 0) {
         return;
 	}
@@ -28,8 +27,7 @@ Image2dArray::Image2dArray(std::unique_ptr<Bitmap>&& bitmap, uint32_t arrayLayer
                            VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap)
     : Image{filter, addressMode, VK_SAMPLE_COUNT_1_BIT, layout, usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, format, 1, arrayLayers, bitmap->getExtent()}
     , anisotropic{anisotropic}
-    , mipmap{mipmap}
-{
+    , mipmap{mipmap} {
 	if (extent.width == 0 || extent.height == 0) {
 		return;
 	}

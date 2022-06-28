@@ -11,8 +11,7 @@ PipelineCompute::PipelineCompute(std::filesystem::path shaderStage, std::vector<
     , shaderStage{std::move(shaderStage)}
     , defines{std::move(defines)}
     , pushDescriptors{pushDescriptors}
-    , pipelineBindPoint{VK_PIPELINE_BIND_POINT_COMPUTE}
-{
+    , pipelineBindPoint{VK_PIPELINE_BIND_POINT_COMPUTE} {
 #if FUSION_DEBUG
 	auto debugStart = Time::Now();
 #endif

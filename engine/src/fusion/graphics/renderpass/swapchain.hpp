@@ -9,7 +9,7 @@ namespace fe {
 
     class Swapchain {
     public:
-        Swapchain(const LogicalDevice& logicalDevice, const Surface& surface, const VkExtent2D& size, bool isVSync, const Swapchain* oldSwapchain = nullptr);
+        Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Surface& surface, const VkExtent2D& size, bool isVSync, const Swapchain* oldSwapchain = nullptr);
         ~Swapchain();
 
         /**

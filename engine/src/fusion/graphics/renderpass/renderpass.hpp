@@ -12,8 +12,7 @@ namespace fe {
         class SubpassDescription {
         public:
             SubpassDescription(VkPipelineBindPoint bindPoint, std::vector<VkAttachmentReference> colorAttachments, const std::optional<uint32_t>& depthAttachment)
-                : colorAttachments{std::move(colorAttachments)}
-            {
+                : colorAttachments{std::move(colorAttachments)} {
                 subpassDescription.pipelineBindPoint = bindPoint;
                 subpassDescription.colorAttachmentCount = static_cast<uint32_t>(this->colorAttachments.size());
                 subpassDescription.pColorAttachments = this->colorAttachments.data();

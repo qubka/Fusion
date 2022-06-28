@@ -17,8 +17,8 @@ using namespace fe;
 
 ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     : Subrender{pipelineStage}
-    , pipeline{pipelineStage, {"shaders/imgui/imgui.vert", "shaders/imgui/imgui.frag"}, {ImGuis::GetVertexInput()}}
-{
+    , pipeline{pipelineStage, {"shaders/imgui/imgui.vert", "shaders/imgui/imgui.frag"}, {ImGuis::GetVertexInput()}} {
+
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
     float scale = 1.0f;
@@ -115,6 +115,7 @@ void ImGuiSubrender::render(const CommandBuffer& commandBuffer) {
 
     drawFrame(commandBuffer);
 
+    // TODO: Temp
     static uint32_t imageCount = Graphics::Get()->getSwapchain(0)->getImageCount() * 2;
     while (removePool.size() > imageCount) {
         removePool.pop();

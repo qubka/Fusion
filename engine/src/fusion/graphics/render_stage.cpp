@@ -15,8 +15,7 @@ RenderStage::RenderStage(std::vector<Attachment> images, std::vector<SubpassType
     , subpasses{std::move(subpasses)}
     , viewport{viewport}
     , subpassAttachmentCount(this->subpasses.size())
-    , subpassMultisampled(this->subpasses.size())
-{
+    , subpassMultisampled(this->subpasses.size()) {
 	for (const auto& image : attachments) {
 		VkClearValue clearValue = {};
 

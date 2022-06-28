@@ -1,113 +1,30 @@
 #include "logical_device.hpp"
 
-#include "fusion/graphics/graphics.hpp"
-
 #include "instance.hpp"
 #include "physical_device.hpp"
+
+#include "fusion/graphics/graphics.hpp"
 
 using namespace fe;
 
 const std::vector<const char *> LogicalDevice::DeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME }; // VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME
 
-LogicalDevice::LogicalDevice(const Instance &instance, const PhysicalDevice &physicalDevice) :
-	instance(instance),
-	physicalDevice(physicalDevice) {
-	createQueueIndices();
-	createLogicalDevice();
-}
+LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& physicalDevice)
+    : instance{instance}
+    , physicalDevice{physicalDevice} {
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    const float queuePriority = 0.0f;
 
-LogicalDevice::~LogicalDevice() {
-	Graphics::CheckVk(vkDeviceWaitIdle(logicalDevice));
+    for (uint32_t queueFamily : physicalDevice.getUniqueFamilies()) {
+        VkDeviceQueueCreateInfo queueCreateInfo = {};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
 
-	vkDestroyDevice(logicalDevice, nullptr);
-}
-
-void LogicalDevice::createQueueIndices() {
-	uint32_t deviceQueueFamilyPropertyCount;
-	vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &deviceQueueFamilyPropertyCount, nullptr);
-	std::vector<VkQueueFamilyProperties> deviceQueueFamilyProperties(deviceQueueFamilyPropertyCount);
-	vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &deviceQueueFamilyPropertyCount, deviceQueueFamilyProperties.data());
-
-	for (uint32_t i = 0; i < deviceQueueFamilyPropertyCount; i++) {
-        VkQueueFlags flags = deviceQueueFamilyProperties[i].queueFlags;
-		// Check for graphics support.
-		if (flags & VK_QUEUE_GRAPHICS_BIT) {
-			graphicsFamily = i;
-			supportedQueues |= VK_QUEUE_GRAPHICS_BIT;
-		}
-
-		// Check for presentation support.
-		//VkBool32 presentSupport;
-		//vkGetPhysicalDeviceSurfaceSupportKHR(*physicalDevice, i, *surface, &presentSupport);
-
-		if (deviceQueueFamilyProperties[i].queueCount > 0 /*&& presentSupport*/) {
-			presentFamily = i;
-		}
-
-		// Check for compute support.
-		if (flags & VK_QUEUE_COMPUTE_BIT) {
-			computeFamily = i;
-			supportedQueues |= VK_QUEUE_COMPUTE_BIT;
-		}
-
-		// Check for transfer support.
-		if (flags & VK_QUEUE_TRANSFER_BIT) {
-			transferFamily = i;
-			supportedQueues |= VK_QUEUE_TRANSFER_BIT;
-		}
-
-        // Stop if found all required indices
-		if (graphicsFamily != VK_QUEUE_FAMILY_IGNORED &&
-            presentFamily != VK_QUEUE_FAMILY_IGNORED &&
-            computeFamily != VK_QUEUE_FAMILY_IGNORED &&
-            transferFamily != VK_QUEUE_FAMILY_IGNORED) {
-			break;
-		}
-	}
-}
-
-void LogicalDevice::createLogicalDevice() {
-	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	const float defaultQueuePriority = 0.0;
-
-	if (supportedQueues & VK_QUEUE_GRAPHICS_BIT) {
-		VkDeviceQueueCreateInfo graphicsQueueCreateInfo = {};
-		graphicsQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		graphicsQueueCreateInfo.queueFamilyIndex = graphicsFamily;
-		graphicsQueueCreateInfo.queueCount = 1;
-		graphicsQueueCreateInfo.pQueuePriorities = &defaultQueuePriority;
-		queueCreateInfos.push_back(graphicsQueueCreateInfo);
-	} else {
-        throw std::runtime_error("Failed to find queue family supporting VK_QUEUE_GRAPHICS_BIT");
-	}
-
-    // Dedicated compute queue
-	if (supportedQueues & VK_QUEUE_COMPUTE_BIT && computeFamily != graphicsFamily) {
-		VkDeviceQueueCreateInfo computeQueueCreateInfo = {};
-		computeQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		computeQueueCreateInfo.queueFamilyIndex = computeFamily;
-		computeQueueCreateInfo.queueCount = 1;
-		computeQueueCreateInfo.pQueuePriorities = &defaultQueuePriority;
-		queueCreateInfos.push_back(computeQueueCreateInfo);
-	} else {
-        // Else we use the same queue.
-		computeFamily = graphicsFamily;
-	}
-
-    // Dedicated transfer queue.
-	if (supportedQueues & VK_QUEUE_TRANSFER_BIT && transferFamily != graphicsFamily && transferFamily != computeFamily) {
-		VkDeviceQueueCreateInfo transferQueueCreateInfo = {};
-		transferQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		transferQueueCreateInfo.queueFamilyIndex = transferFamily;
-		transferQueueCreateInfo.queueCount = 1;
-		transferQueueCreateInfo.pQueuePriorities = &defaultQueuePriority;
-		queueCreateInfos.push_back(transferQueueCreateInfo);
-	} else {
-        // Else we use the same queue.
-		transferFamily = graphicsFamily;
-	}
-
-    // TODO: Rework that to allow user to change enable features
+    /// TODO: Rework that to allow user to change enable features
     {
         auto physicalDeviceFeatures = physicalDevice.getFeatures();
 
@@ -167,30 +84,38 @@ void LogicalDevice::createLogicalDevice() {
 
         if (physicalDeviceFeatures.tessellationShader)
             enabledFeatures.tessellationShader = VK_TRUE;
-        else LOG_WARNING << "Selected GPU does not support tessellation shaders!";
+        else
+            LOG_WARNING << "Selected GPU does not support tessellation shaders!";
 
         if (physicalDeviceFeatures.multiViewport)
             enabledFeatures.multiViewport = VK_TRUE;
-        else LOG_WARNING << "Selected GPU does not support multi viewports!";
+        else
+            LOG_WARNING << "Selected GPU does not support multi viewports!";
     }
 
-	VkDeviceCreateInfo deviceCreateInfo = {};
-	deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-	if (instance.getEnableValidationLayers()) {
-		deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(Instance::ValidationLayers.size());
-		deviceCreateInfo.ppEnabledLayerNames = Instance::ValidationLayers.data();
-	}
-	deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(DeviceExtensions.size());
-	deviceCreateInfo.ppEnabledExtensionNames = DeviceExtensions.data();
-	deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
-	Graphics::CheckVk(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice));
+    VkDeviceCreateInfo deviceCreateInfo = {};
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+    if (instance.getEnableValidationLayers()) {
+        deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(Instance::ValidationLayers.size());
+        deviceCreateInfo.ppEnabledLayerNames = Instance::ValidationLayers.data();
+    }
+    deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(DeviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = DeviceExtensions.data();
+    deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+    Graphics::CheckVk(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice));
 
-	volkLoadDevice(logicalDevice);
+    volkLoadDevice(logicalDevice);
 
-	vkGetDeviceQueue(logicalDevice, graphicsFamily, 0, &graphicsQueue);
-	vkGetDeviceQueue(logicalDevice, presentFamily, 0, &presentQueue);
-	vkGetDeviceQueue(logicalDevice, computeFamily, 0, &computeQueue);
-	vkGetDeviceQueue(logicalDevice, transferFamily, 0, &transferQueue);
+    vkGetDeviceQueue(logicalDevice, physicalDevice.getGraphicsFamily(), 0, &graphicsQueue);
+    vkGetDeviceQueue(logicalDevice, physicalDevice.getPresentFamily(), 0, &presentQueue);
+    vkGetDeviceQueue(logicalDevice, physicalDevice.getComputeFamily(), 0, &computeQueue);
+    vkGetDeviceQueue(logicalDevice, physicalDevice.getTransferFamily(), 0, &transferQueue);
+}
+
+LogicalDevice::~LogicalDevice() {
+	Graphics::CheckVk(vkDeviceWaitIdle(logicalDevice));
+
+	vkDestroyDevice(logicalDevice, nullptr);
 }

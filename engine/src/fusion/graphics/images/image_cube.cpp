@@ -12,8 +12,7 @@ ImageCube::ImageCube(const glm::uvec2& extent, VkFormat format, VkImageLayout la
     : Image{filter, addressMode, samples, layout, usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, format, 1, 6, {extent.x, extent.y, 1}}
     , anisotropic(anisotropic)
     , mipmap{mipmap}
-    , components{4}
-{
+    , components{4} {
 	ImageCube::load();
 }
 
@@ -22,8 +21,7 @@ ImageCube::ImageCube(std::unique_ptr<Bitmap>&& bitmap, VkFormat format, VkImageL
     : Image{filter, addressMode, samples, layout, usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, format, 1, 6, bitmap->getExtent()}
     , anisotropic{anisotropic}
     , mipmap{mipmap}
-    , components{static_cast<uint32_t>(bitmap->getChannels())}
-{
+    , components{static_cast<uint32_t>(bitmap->getChannels())} {
 	ImageCube::load(std::move(bitmap));
 }
 

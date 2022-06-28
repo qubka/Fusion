@@ -1,7 +1,5 @@
 #pragma once
 
-#include "queue_family_indicies.hpp"
-
 #include <volk.h>
 
 namespace fe {
@@ -24,12 +22,18 @@ namespace fe {
         const VkPhysicalDeviceFeatures& getFeatures() const { return features; }
         const VkPhysicalDeviceMemoryProperties& getMemoryProperties() const { return memoryProperties; }
         const VkSampleCountFlagBits& getMsaaSamples() const { return msaaSamples; }
-        const QueueFamilyIndices& getQueueFamilyIndices() const { return queueFamilyIndices; };
+        uint32_t getGraphicsFamily() const { return graphicsFamily; }
+        uint32_t getPresentFamily() const { return presentFamily; }
+        uint32_t getComputeFamily() const { return computeFamily; }
+        uint32_t getTransferFamily() const { return transferFamily; }
+        VkQueueFlags getSupportedQueues() const { return supportedQueues; }
+        const std::set<uint32_t>& getUniqueFamilies() const { return uniqueFamilies; };
 
     private:
         static VkPhysicalDevice ChoosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices);
         static uint32_t ScorePhysicalDevice(const VkPhysicalDevice& device);
         VkSampleCountFlagBits getMaxUsableSampleCount() const;
+        void findQueueFamilyIndices();
 
         static void LogVulkanDevice(const VkPhysicalDeviceProperties& physicalDeviceProperties, const std::vector<VkExtensionProperties>& extensionProperties);
 
@@ -40,7 +44,11 @@ namespace fe {
         VkPhysicalDeviceFeatures features{};
         VkPhysicalDeviceMemoryProperties memoryProperties{};
         VkSampleCountFlagBits msaaSamples{ VK_SAMPLE_COUNT_1_BIT };
-
-        QueueFamilyIndices queueFamilyIndices;
+        VkQueueFlags supportedQueues{};
+        uint32_t graphicsFamily{ VK_QUEUE_FAMILY_IGNORED };
+        uint32_t presentFamily{ VK_QUEUE_FAMILY_IGNORED };
+        uint32_t computeFamily{ VK_QUEUE_FAMILY_IGNORED };
+        uint32_t transferFamily{ VK_QUEUE_FAMILY_IGNORED };
+        std::set<uint32_t> uniqueFamilies;
     };
 }

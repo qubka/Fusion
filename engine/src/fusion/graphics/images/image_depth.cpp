@@ -8,8 +8,7 @@ static const std::vector<VkFormat> TRY_FORMATS = {
 
 ImageDepth::ImageDepth(const glm::uvec2& extent, VkSampleCountFlagBits samples)
     : Image{VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, samples, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-            FindSupportedFormat(TRY_FORMATS, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT), 1, 1, {extent.x, extent.y, 1}}
-{
+            FindSupportedFormat(TRY_FORMATS, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT), 1, 1, {extent.x, extent.y, 1}} {
 	if (format == VK_FORMAT_UNDEFINED)
 		throw std::runtime_error("No depth stencil format could be selected");
 

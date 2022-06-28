@@ -11,8 +11,7 @@ Image2d::Image2d(std::filesystem::path filename, VkFilter filter, VkSamplerAddre
     : Image{filter, addressMode, VK_SAMPLE_COUNT_1_BIT, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_FORMAT_R8G8B8A8_UNORM, 1, 1, {0, 0, 1}}
     , filename{std::move(filename)}
     , anisotropic{anisotropic}
-    , mipmap{mipmap}
-{
+    , mipmap{mipmap} {
 	if (load) {
 		Image2d::load();
 	}
@@ -23,8 +22,7 @@ Image2d::Image2d(const glm::uvec2& extent, VkFormat format, VkImageLayout layout
     : Image{filter, addressMode, samples, layout, usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, format, 1, 1, {extent.x, extent.y, 1}}
     , anisotropic{anisotropic}
     , mipmap{mipmap}
-    , components{4}
-{
+    , components{4} {
     Image2d::load();
 }
 
@@ -33,8 +31,7 @@ Image2d::Image2d(std::unique_ptr<Bitmap>&& bitmap, VkFormat format, VkImageLayou
     : Image{filter, addressMode, samples, layout, usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, format, 1, 1, bitmap->getExtent()}
     , anisotropic{anisotropic}
     , mipmap{mipmap}
-    , components{static_cast<uint32_t>(bitmap->getChannels())}
-{
+    , components{static_cast<uint32_t>(bitmap->getChannels())} {
     Image2d::load(std::move(bitmap));
 }
 
