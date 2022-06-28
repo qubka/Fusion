@@ -1,5 +1,7 @@
 #pragma once
 
+#include "swapchain_support_details.hpp"
+
 #include <volk.h>
 
 namespace fe {
@@ -18,13 +20,7 @@ namespace fe {
         operator bool() const { return surface != VK_NULL_HANDLE; }
         operator const VkSurfaceKHR&() const { return surface; }
 
-        struct SupportDetails {
-            VkSurfaceCapabilitiesKHR capabilities;
-            std::vector<VkSurfaceFormatKHR> formats;
-            std::vector<VkPresentModeKHR> presentModes;
-        };
-        SupportDetails getSupportDetails() const;
-
+        const SwapchainSupportDetails& getSwapchainSupportDetails();
         const VkSurfaceKHR& getSurface() const { return surface; }
         const Window& getWindow() const { return window; }
 
@@ -34,5 +30,6 @@ namespace fe {
         const Window& window;
 
         VkSurfaceKHR surface{ VK_NULL_HANDLE };
+        SwapchainSupportDetails supportDetails;
     };
 }

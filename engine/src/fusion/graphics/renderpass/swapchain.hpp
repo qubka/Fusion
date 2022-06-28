@@ -9,7 +9,7 @@ namespace fe {
 
     class Swapchain {
     public:
-        Swapchain(const LogicalDevice& logicalDevice, const Surface& surface, const VkExtent2D& size, bool vsync, const Swapchain* oldSwapchain = nullptr);
+        Swapchain(const LogicalDevice& logicalDevice, const Surface& surface, const VkExtent2D& size, bool isVSync, const Swapchain* oldSwapchain = nullptr);
         ~Swapchain();
 
         /**
@@ -55,9 +55,5 @@ namespace fe {
         uint32_t activeImageIndex{ 0 };
         VkSurfaceFormatKHR surfaceFormat;
         VkPresentModeKHR presentMode;
-
-        static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-        static VkPresentModeKHR ChooseSwapPresentMode(bool vsync, const std::vector<VkPresentModeKHR>& availablePresentModes);
-        static VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, const VkExtent2D& size);
     };
 }

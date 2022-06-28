@@ -1,5 +1,7 @@
 #pragma once
 
+#include "queue_family_indicies.hpp"
+
 #include <volk.h>
 
 namespace fe {
@@ -10,7 +12,7 @@ namespace fe {
     class PhysicalDevice {
         friend class Graphics;
     public:
-        explicit PhysicalDevice(const Instance& instance, DevicePickerFunction picker = [](const std::vector<VkPhysicalDevice>& devices) -> VkPhysicalDevice { return ChoosePhysicalDevice(devices); });
+        explicit PhysicalDevice(const Instance& instance, const DevicePickerFunction& picker = [](const std::vector<VkPhysicalDevice>& devices) -> VkPhysicalDevice { return ChoosePhysicalDevice(devices); });
         ~PhysicalDevice() = default;
         NONCOPYABLE(PhysicalDevice);
 
@@ -22,6 +24,7 @@ namespace fe {
         const VkPhysicalDeviceFeatures& getFeatures() const { return features; }
         const VkPhysicalDeviceMemoryProperties& getMemoryProperties() const { return memoryProperties; }
         const VkSampleCountFlagBits& getMsaaSamples() const { return msaaSamples; }
+        const QueueFamilyIndices& getQueueFamilyIndices() const { return queueFamilyIndices; };
 
     private:
         static VkPhysicalDevice ChoosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices);
@@ -37,5 +40,7 @@ namespace fe {
         VkPhysicalDeviceFeatures features{};
         VkPhysicalDeviceMemoryProperties memoryProperties{};
         VkSampleCountFlagBits msaaSamples{ VK_SAMPLE_COUNT_1_BIT };
+
+        QueueFamilyIndices queueFamilyIndices;
     };
 }

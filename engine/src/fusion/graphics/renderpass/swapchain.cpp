@@ -9,43 +9,44 @@ static const std::vector<VkCompositeAlphaFlagBitsKHR> COMPOSITE_ALPHA_FLAGS = {
     VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR,
 };
 
-Swapchain::Swapchain(const LogicalDevice& logicalDevice, const Surface& surface, const VkExtent2D& size, bool vsync, const Swapchain* oldSwapchain)
+Swapchain::Swapchain(const LogicalDevice& logicalDevice, const Surface& surface, const VkExtent2D& size, bool isVSync, const Swapchain* oldSwapchain)
     : logicalDevice{logicalDevice}
 {
-	auto support = surface.getSupportDetails();
+	auto support = surface.getSwapchainSupportDetails();
 	auto graphicsFamily = logicalDevice.getGraphicsFamily();
 	auto presentFamily = logicalDevice.getPresentFamily();
+    auto capabilities = support.getCapabilities();
 
-    extent = ChooseSwapExtent(support.capabilities, size);
-    surfaceFormat = ChooseSwapSurfaceFormat(support.formats);
-    presentMode = ChooseSwapPresentMode(vsync, support.presentModes);
+    extent = support.getOptimalSwapChainExtent(size);
+    surfaceFormat =  support.getOptimalSwapSurfaceFormat();
+    presentMode = support.getOptimalSwapPresentMode(isVSync);
 
-    uint32_t desiredImageCount = support.capabilities.minImageCount + 1;
-    if (support.capabilities.maxImageCount > 0 &&
-        desiredImageCount > support.capabilities.maxImageCount) {
-        desiredImageCount = support.capabilities.maxImageCount;
+    uint32_t desiredImageCount = capabilities.minImageCount + 1;
+    if (capabilities.maxImageCount > 0 &&
+        desiredImageCount > capabilities.maxImageCount) {
+        desiredImageCount = capabilities.maxImageCount;
     }
 
     VkSurfaceTransformFlagsKHR preTransform;
-	if (support.capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
+	if (capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
 		// We prefer a non-rotated transform.
 		preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
 	} else {
-		preTransform = support.capabilities.currentTransform;
+		preTransform = capabilities.currentTransform;
 	}
 
     VkCompositeAlphaFlagBitsKHR compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	for (const auto& compositeAlphaFlag : COMPOSITE_ALPHA_FLAGS) {
-		if (support.capabilities.supportedCompositeAlpha & compositeAlphaFlag) {
+		if (capabilities.supportedCompositeAlpha & compositeAlphaFlag) {
 			compositeAlpha = compositeAlphaFlag;
 			break;
 		}
 	}
 
     VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    if (support.capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
+    if (capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
         usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-    if (support.capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+    if (capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT)
         usage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
 	VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
@@ -117,56 +118,4 @@ VkResult Swapchain::queuePresent(const VkQueue& presentQueue, const VkSemaphore&
 	presentInfo.waitSemaphoreCount = waitSemaphore ? 1 : 0;
 	presentInfo.pWaitSemaphores = &waitSemaphore;
 	return vkQueuePresentKHR(presentQueue, &presentInfo);
-}
-
-VkSurfaceFormatKHR Swapchain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
-    // If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
-    // there is no preferred format, so we assume VK_FORMAT_B8G8R8A8_UNORM
-    if (availableFormats.size() == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED) {
-        return { VK_FORMAT_B8G8R8A8_UNORM, availableFormats[0].colorSpace };
-    }
-
-    // iterate over the list of available surface format and
-    // check for the presence of VK_FORMAT_B8G8R8A8_UNORM
-    for (const auto& availableFormat : availableFormats) {
-        if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM) {
-            return availableFormat;
-        }
-    }
-
-    // in case VK_FORMAT_B8G8R8A8_UNORM is not available
-    // select the first available color format
-    return availableFormats[0];
-}
-
-VkPresentModeKHR Swapchain::ChooseSwapPresentMode(bool vsync, const std::vector<VkPresentModeKHR>& physicalPresentModes) {
-    // Prefer mailbox mode if present, it's the lowest latency non-tearing present mode
-    VkPresentModeKHR bestMode = VK_PRESENT_MODE_FIFO_KHR;
-
-    if (!vsync) {
-        for (const auto& presentMode : physicalPresentModes) {
-            if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-                bestMode = presentMode;
-                break;
-            }
-            if (presentMode != VK_PRESENT_MODE_MAILBOX_KHR && presentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
-                bestMode = presentMode;
-            }
-        }
-    }
-
-    return bestMode;
-}
-
-VkExtent2D Swapchain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, const VkExtent2D& size) {
-    if (capabilities.currentExtent.width == UINT32_MAX || capabilities.currentExtent.height == UINT32_MAX) {
-        return {
-                std::max(capabilities.minImageExtent.width,
-                         std::min(capabilities.maxImageExtent.width, size.width)),
-                std::max(capabilities.minImageExtent.height,
-                         std::min(capabilities.maxImageExtent.height, size.height))
-        };
-    } else {
-        return capabilities.currentExtent;
-    }
 }

@@ -90,7 +90,8 @@ void Graphics::update(const Time& dt) {
             if (!startRenderpass(id, *renderStage))
                 return;
 
-            auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
+            auto imageIndex = swapchain->getActiveImageIndex();
+            auto& commandBuffer = perSurfaceBuffer->commandBuffers[imageIndex];
 
             for (const auto& subpass : renderStage->getSubpasses()) {
                 stage.second = subpass.binding;
@@ -102,22 +103,20 @@ void Graphics::update(const Time& dt) {
                     vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
             }
 
-            if (!endRenderpass(id, *renderStage)) {
-                //return;
-            }
+            if (!endRenderpass(id, *renderStage))
+                return;
 
             stage.first++;
         }
     }
 
-    // Purges unused command pools
+    // Resets unused command pools
     if (elapsedPurge.getElapsed() != 0) {
         for (auto it = commandPools.begin(); it != commandPools.end();) {
             if ((*it).second.use_count() <= 1) {
                 it = commandPools.erase(it);
                 continue;
             }
-
             ++it;
         }
     }
@@ -199,6 +198,7 @@ void Graphics::recreateSwapchain() {
 
     swapchains.resize(surfaces.size());
     perSurfaceBuffers.resize(surfaces.size());
+
     for (const auto& [id, surface] : enumerate(surfaces)) {
         auto& window = surface->getWindow();
         auto& size = window.getSize();
@@ -219,7 +219,8 @@ void Graphics::recreatePass(size_t idx, RenderStage& renderStage) {
     CheckVk(vkQueueWaitIdle(graphicsQueue));
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
-        if (renderStage.hasSwapchain() && (perSurfaceBuffers[id]->framebufferResized || !swapchain->isSameExtent(vku::uvec2_cast(surfaces[id]->getWindow().getSize())))) {
+        auto& perSurfaceBuffer = perSurfaceBuffers[id];
+        if (renderStage.hasSwapchain() && (perSurfaceBuffer->framebufferResized || !swapchain->isSameExtent(vku::uvec2_cast(surfaces[id]->getWindow().getSize())))) {
             recreateSwapchain();
         }
         renderStage.rebuild(id, *swapchain);
@@ -243,7 +244,7 @@ bool Graphics::startRenderpass(size_t id, RenderStage& renderStage) {
     auto& swapchain = swapchains[id];
     auto& perSurfaceBuffer = perSurfaceBuffers[id];
     auto& currentFrame = perSurfaceBuffer->currentFrame;
-    auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
+    auto& commandBuffer = perSurfaceBuffer->commandBuffers[swapchain->getActiveImageIndex()];
 
     if (!commandBuffer.isRunning())
         commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT); //VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
@@ -275,12 +276,14 @@ bool Graphics::endRenderpass(size_t id, RenderStage& renderStage) {
     auto& swapchain = swapchains[id];
     auto& perSurfaceBuffer = perSurfaceBuffers[id];
     auto& currentFrame = perSurfaceBuffer->currentFrame;
-    auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
+    auto& commandBuffer = perSurfaceBuffer->commandBuffers[swapchain->getActiveImageIndex()];
 
     vkCmdEndRenderPass(commandBuffer);
 
-    if (!renderStage.hasSwapchain())
+    if (!renderStage.hasSwapchain()) {
+        LOG_DEBUG << "endRenderpass ABORTION!";
         return false;
+    }
 
     commandBuffer.end();
 

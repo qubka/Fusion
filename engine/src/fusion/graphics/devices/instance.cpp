@@ -107,7 +107,8 @@ bool Instance::checkValidationLayerSupport() const {
 	uint32_t instanceLayerPropertyCount;
 	vkEnumerateInstanceLayerProperties(&instanceLayerPropertyCount, nullptr);
 	std::vector<VkLayerProperties> instanceLayerProperties(instanceLayerPropertyCount);
-	vkEnumerateInstanceLayerProperties(&instanceLayerPropertyCount, instanceLayerProperties.data());
+    if (instanceLayerPropertyCount > 0)
+	    vkEnumerateInstanceLayerProperties(&instanceLayerPropertyCount, instanceLayerProperties.data());
 
 #if FUSION_DEBUG
     LogVulkanLayers(instanceLayerProperties);

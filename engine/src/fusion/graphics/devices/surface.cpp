@@ -12,35 +12,28 @@ Surface::Surface(const Instance& instance, const PhysicalDevice& physicalDevice,
     , physicalDevice{physicalDevice}
     , window{window}
 {
-    // Creates the surface.
+    // Creates the surface
     Graphics::CheckVk(window.createSurface(instance, nullptr, &surface));
 
-    // Check for presentation support.
+    // Check for presentation support
     VkBool32 presentSupport;
     vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, logicalDevice.getPresentFamily(), surface, &presentSupport);
 
     if (!presentSupport)
         throw std::runtime_error("Present queue family does not have presentation support");
+
+    // Update the swapchain support details for that surface
+    supportDetails.extract(physicalDevice, surface);
 }
 
 Surface::~Surface() {
     vkDestroySurfaceKHR(instance, surface, nullptr);
 }
 
-Surface::SupportDetails Surface::getSupportDetails() const {
-    SupportDetails details;
-
-    Graphics::CheckVk(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &details.capabilities));
-
-    uint32_t surfaceFormatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &surfaceFormatCount, nullptr);
-    details.formats.resize(surfaceFormatCount);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &surfaceFormatCount, details.formats.data());
-
-    uint32_t physicalPresentModeCount;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &physicalPresentModeCount, nullptr);
-    details.presentModes.resize(physicalPresentModeCount);
-    vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &physicalPresentModeCount, details.presentModes.data());
-
-    return details;
+const SwapchainSupportDetails& Surface::getSwapchainSupportDetails() {
+#if PLATFORM_LINUX
+    // Doe to virtual surface consider re-extract information again
+    supportDetails.extract(physicalDevice, surface);
+#endif
+    return supportDetails;
 }

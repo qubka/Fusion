@@ -46,6 +46,8 @@ namespace fe {
         int32_t vertexCount{ 0 };
         int32_t indexCount{ 0 };
 
+        std::queue<std::unique_ptr<Buffer>> removePool;
+
         Window* window{ nullptr };
         Window* currentWindow{ nullptr };
         glm::vec2 lastValidMousePos{ -FLT_MAX };

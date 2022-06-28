@@ -111,10 +111,14 @@ void ImGuiSubrender::render(const CommandBuffer& commandBuffer) {
 
     ImGui::Render();
 
-    // Update vertex and index buffer containing the ImGui elements
     updateBuffers();
 
     drawFrame(commandBuffer);
+
+    static uint32_t imageCount = Graphics::Get()->getSwapchain(0)->getImageCount() * 2;
+    while (removePool.size() > imageCount) {
+        removePool.pop();
+    }
 }
 
 void ImGuiSubrender::drawFrame(const CommandBuffer& commandBuffer) {
@@ -187,6 +191,9 @@ void ImGuiSubrender::updateBuffers() {
 
     // Vertex buffer
     if (!vertexBuffer || (vertexCount != drawData->TotalVtxCount)) {
+        if (vertexBuffer) {
+            removePool.push(std::move(vertexBuffer));
+        }
         vertexBuffer = std::make_unique<Buffer>(vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         vertexBuffer->map();
         vertexCount = drawData->TotalVtxCount;
@@ -194,6 +201,9 @@ void ImGuiSubrender::updateBuffers() {
 
     // Index buffer
     if (!indexBuffer || (indexCount != drawData->TotalIdxCount)) {
+        if (indexBuffer) {
+            removePool.push(std::move(indexBuffer));
+        }
         indexBuffer = std::make_unique<Buffer>(indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         indexBuffer->map();
         indexCount = drawData->TotalIdxCount;

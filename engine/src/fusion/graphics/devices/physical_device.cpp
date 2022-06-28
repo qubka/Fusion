@@ -10,11 +10,12 @@ static const std::vector<VkSampleCountFlagBits> STAGE_FLAG_BITS = {
     VK_SAMPLE_COUNT_4_BIT, VK_SAMPLE_COUNT_2_BIT
 };
 
-PhysicalDevice::PhysicalDevice(const Instance& instance, DevicePickerFunction picker) : instance{instance} {
+PhysicalDevice::PhysicalDevice(const Instance& instance, const DevicePickerFunction& picker) : instance{instance} {
     uint32_t physicalDeviceCount;
     vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, nullptr);
     std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
-    vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, physicalDevices.data());
+    if (physicalDeviceCount > 0)
+        vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, physicalDevices.data());
 
     physicalDevice = picker(physicalDevices);
     if (!physicalDevice)
@@ -24,6 +25,8 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, DevicePickerFunction pi
     vkGetPhysicalDeviceFeatures(physicalDevice, &features);
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
     msaaSamples = getMaxUsableSampleCount();
+
+    queueFamilyIndices.extract(physicalDevice);
 
     LOG_DEBUG << "Selected Physical Device: " << properties.deviceID << " " << std::quoted(properties.deviceName);
 }
@@ -51,7 +54,8 @@ uint32_t PhysicalDevice::ScorePhysicalDevice(const VkPhysicalDevice& device) {
     uint32_t extensionPropertyCount;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionPropertyCount, nullptr);
     std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
-    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionPropertyCount, extensionProperties.data());
+    if (extensionPropertyCount > 0)
+        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionPropertyCount, extensionProperties.data());
 
     // Iterates through all extensions requested.
     for (const char* currentExtension : LogicalDevice::DeviceExtensions) {

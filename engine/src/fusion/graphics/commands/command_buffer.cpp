@@ -25,6 +25,7 @@ CommandBuffer::CommandBuffer(bool begin, VkQueueFlagBits queueType, VkCommandBuf
 CommandBuffer::~CommandBuffer() {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
+    //vkResetCommandBuffer(commandBuffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
 	vkFreeCommandBuffers(logicalDevice, commandPool->getCommandPool(), 1, &commandBuffer);
 }
 
@@ -88,16 +89,22 @@ void CommandBuffer::submit(const VkSemaphore& waitSemaphore, const VkSemaphore& 
 		submitInfo.pWaitDstStageMask = &submitPipelineStages;
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = &waitSemaphore;
-	}
+	} else {
+        LOG_DEBUG << "No wait semaphore!";
+    }
 
 	if (signalSemaphore != VK_NULL_HANDLE) {
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = &signalSemaphore;
-	}
+	} else {
+        LOG_DEBUG << "No signal semaphore!";
+    }
 
 	if (fence != VK_NULL_HANDLE) {
         //Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
         Graphics::CheckVk(vkResetFences(logicalDevice, 1, &fence));
+    } else {
+        LOG_DEBUG << "No flight fence!";
     }
 
 	Graphics::CheckVk(vkQueueSubmit(queueSelected, 1, &submitInfo, fence));
