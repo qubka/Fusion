@@ -12,7 +12,7 @@ static const std::vector<VkCompositeAlphaFlagBitsKHR> COMPOSITE_ALPHA_FLAGS = {
 Swapchain::Swapchain(const LogicalDevice& logicalDevice, const Surface& surface, const VkExtent2D& size, bool isVSync, const Swapchain* oldSwapchain)
     : logicalDevice{logicalDevice}
 {
-	auto support = surface.getSwapchainSupportDetails();
+	const auto& support = surface.getSwapchainSupportDetails();
 	auto graphicsFamily = logicalDevice.getGraphicsFamily();
 	auto presentFamily = logicalDevice.getPresentFamily();
     auto capabilities = support.getCapabilities();

@@ -25,6 +25,7 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, const DevicePickerFunct
     vkGetPhysicalDeviceFeatures(physicalDevice, &features);
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
     msaaSamples = getMaxUsableSampleCount();
+
     queueFamilyIndices = QueueFamilyIndices{physicalDevice};
 
     LOG_DEBUG << "Selected Physical Device: " << properties.deviceID << " " << std::quoted(properties.deviceName);
