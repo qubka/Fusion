@@ -34,7 +34,21 @@ void Instance::FvkDestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtil
 	if (func) return func(instance, messenger, pAllocator);
 }
 #else
-const std::vector<const char *> Instance::ValidationLayers = { "VK_LAYER_LUNARG_standard_validation" };
+#if PLATFORM_ANDROID
+const std::vector<const char *> Instance::ValidationLayers = {
+        "VK_LAYER_GOOGLE_threading",
+        "VK_LAYER_LUNARG_parameter_validation",
+        "VK_LAYER_LUNARG_object_tracker",
+        "VK_LAYER_LUNARG_core_validation",
+        "VK_LAYER_LUNARG_swapchain",
+        "VK_LAYER_GOOGLE_unique_objects"
+};
+#else
+const std::vector<const char *> Instance::ValidationLayers = {
+        "VK_LAYER_LUNARG_assistant_layer",
+        "VK_LAYER_LUNARG_standard_validation"
+};
+#endif
 
 VKAPI_ATTR VkBool32 VKAPI_CALL CallbackDebug(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode,
 	const char* pLayerPrefix, const char* pMessage, void* pUserData) {
@@ -73,8 +87,7 @@ void Instance::FvkCmdPushDescriptorSetKHR(VkDevice device, VkCommandBuffer comma
 	if (func) func(commandBuffer, pipelineBindPoint, layout, set, descriptorWriteCount, pDescriptorWrites);
 }
 
-uint32_t Instance::FindMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties* deviceMemoryProperties, const VkMemoryRequirements* memoryRequirements,
-                                       VkMemoryPropertyFlags requiredProperties) {
+uint32_t Instance::FindMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties* deviceMemoryProperties, const VkMemoryRequirements* memoryRequirements, VkMemoryPropertyFlags requiredProperties) {
 	for (uint32_t i = 0; i < deviceMemoryProperties->memoryTypeCount; ++i) {
 		if (memoryRequirements->memoryTypeBits & (1 << i)) {
 			if ((deviceMemoryProperties->memoryTypes[i].propertyFlags & requiredProperties) == requiredProperties) {
