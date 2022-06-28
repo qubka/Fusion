@@ -5,7 +5,8 @@
 namespace fe {
     class SwapchainSupportDetails {
     public:
-        void extract(const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface);
+        SwapchainSupportDetails(const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface);
+        ~SwapchainSupportDetails() = default;
 
         bool isSwapChainAdequate() const;
         VkSurfaceFormatKHR getOptimalSwapSurfaceFormat() const;

@@ -4,7 +4,7 @@
 
 using namespace fe;
 
-void SwapchainSupportDetails::init(const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) {
+SwapchainSupportDetails::SwapchainSupportDetails(const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) {
     Graphics::CheckVk(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities));
 
     uint32_t surfaceFormatCount;
@@ -30,7 +30,7 @@ VkSurfaceFormatKHR SwapchainSupportDetails::getOptimalSwapSurfaceFormat() const 
     // iterate over the list of available surface format and
     // check for the presence of VK_FORMAT_B8G8R8A8_UNORM
     for (const auto& availableFormat : formats) {
-        if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM/* && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR*/) {
             return availableFormat;
         }
     }
