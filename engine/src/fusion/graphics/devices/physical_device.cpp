@@ -25,8 +25,7 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, const DevicePickerFunct
     vkGetPhysicalDeviceFeatures(physicalDevice, &features);
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
     msaaSamples = getMaxUsableSampleCount();
-
-    queueFamilyIndices.extract(physicalDevice);
+    queueFamilyIndices = QueueFamilyIndices{physicalDevice};
 
     LOG_DEBUG << "Selected Physical Device: " << properties.deviceID << " " << std::quoted(properties.deviceName);
 }
@@ -50,18 +49,18 @@ VkPhysicalDevice PhysicalDevice::ChoosePhysicalDevice(const std::vector<VkPhysic
 uint32_t PhysicalDevice::ScorePhysicalDevice(const VkPhysicalDevice& device) {
     uint32_t score = 0;
 
-    // Checks if the requested extensions are supported.
+    // Checks if the requested extensions are supported
     uint32_t extensionPropertyCount;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionPropertyCount, nullptr);
     std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
     if (extensionPropertyCount > 0)
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionPropertyCount, extensionProperties.data());
 
-    // Iterates through all extensions requested.
+    // Iterates through all extensions requested
     for (const char* currentExtension : LogicalDevice::DeviceExtensions) {
         bool extensionFound = false;
 
-        // Checks if the extension is in the available extensions.
+        // Checks if the extension is in the available extensions
         for (const auto& extension : extensionProperties) {
             if (strcmp(currentExtension, extension.extensionName) == 0) {
                 extensionFound = true;
@@ -69,12 +68,12 @@ uint32_t PhysicalDevice::ScorePhysicalDevice(const VkPhysicalDevice& device) {
             }
         }
 
-        // Returns a score of 0 if this device is missing a required extension.
+        // Returns a score of 0 if this device is missing a required extension
         if (!extensionFound)
             return 0;
     }
 
-    // Obtain the device features and properties of the current device being rateds.
+    // Obtain the device features and properties of the current device being rateds
     VkPhysicalDeviceProperties physicalDeviceProperties;
     VkPhysicalDeviceFeatures physicalDeviceFeatures;
     vkGetPhysicalDeviceProperties(device, &physicalDeviceProperties);
@@ -84,11 +83,11 @@ uint32_t PhysicalDevice::ScorePhysicalDevice(const VkPhysicalDevice& device) {
     LogVulkanDevice(physicalDeviceProperties, extensionProperties);
 #endif
 
-    // Adds a large score boost for discrete GPUs (dedicated graphics cards).
+    // Adds a large score boost for discrete GPUs (dedicated graphics cards)
     if (physicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
         score += 1000;
 
-    // Gives a higher score to devices with a higher maximum texture size.
+    // Gives a higher score to devices with a higher maximum texture size
     score += physicalDeviceProperties.limits.maxImageDimension2D;
     return score;
 }
