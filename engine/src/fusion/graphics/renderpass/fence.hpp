@@ -5,7 +5,7 @@
 namespace fe {
     class Fence {
     public:
-        Fence();
+        Fence(bool signaled = false);
         Fence(VkFence fence);
         ~Fence();
 

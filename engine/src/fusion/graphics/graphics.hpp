@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fusion/devices/window.hpp"
-#include "fusion/utils/elapsed_time.hpp"
 
 #include "fusion/graphics/devices/instance.hpp"
 #include "fusion/graphics/devices/logical_device.hpp"
@@ -13,15 +12,16 @@
 #include "fusion/graphics/vku.hpp"
 #include "fusion/core/module.hpp"
 
-//#define MAX_FRAMES_IN_FLIGHT 2
+#define MAX_FRAMES_IN_FLIGHT 2
 
 namespace fe {
     class Renderer;
     class RenderStage;
     class CommandBuffer;
     class CommandPool;
-    class Semaphore;
-    class Fence;
+    class SyncObject;
+    //class Semaphore;
+    //class Fence;
     class Descriptor;
     class Swapchain;
 
@@ -44,8 +44,6 @@ namespace fe {
          */
         void captureScreenshot(const std::filesystem::path& filename, size_t id = 0) const;
 
-        const std::shared_ptr<CommandPool>& getCommandPool(const std::thread::id& threadId = std::this_thread::get_id());
-
         /**
          * Gets the current renderer.
          * @return The renderer.
@@ -65,41 +63,37 @@ namespace fe {
         const LogicalDevice& getLogicalDevice() const { return logicalDevice; }
         const VkPipelineCache& getPipelineCache() const { return pipelineCache; }
 
+        const CommandPool* getCommandPool();
         const Surface* getSurface(size_t id) const { return surfaces[id].get(); }
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
 
     private:
         void resetRenderStages();
-        void recreateSwapchain();
-        void recreatePass(size_t id, RenderStage& renderStage);
+        void recreateSwapchain(size_t id);
         void recreateAttachmentsMap();
+
         bool startRenderpass(size_t id, RenderStage& renderStage);
         bool endRenderpass(size_t id, RenderStage& renderStage);
 
         void onWindowCreate(Window* window, bool create);
 
-        Instance instance;
-        PhysicalDevice physicalDevice;
-        LogicalDevice logicalDevice;
-        PipelineCache pipelineCache;
-        std::vector<std::unique_ptr<Surface>> surfaces;
+        Instance instance{};
+        PhysicalDevice physicalDevice{ instance };
+        LogicalDevice logicalDevice{ instance, physicalDevice };
+        PipelineCache pipelineCache{ logicalDevice };
 
-        std::unique_ptr<Renderer> renderer;
         std::map<std::string, const Descriptor*> attachments;
+
+        std::unique_ptr<CommandPool> commandPool;
+        std::unique_ptr<Renderer> renderer;
+
+        std::vector<std::unique_ptr<Surface>> surfaces;
         std::vector<std::unique_ptr<Swapchain>> swapchains;
 
-        std::map<std::thread::id, std::shared_ptr<CommandPool>> commandPools;
-        /// Timer used to remove unused command pools
-        ElapsedTime elapsedPurge;
-
         struct PerSurfaceBuffers {
-            explicit PerSurfaceBuffers(size_t currentFrame, size_t imageCount);
-            size_t currentFrame;
+            size_t currentFrame{ 0 };
             std::vector<CommandBuffer> commandBuffers;
-            std::vector<Semaphore> presentCompletes;
-            std::vector<Semaphore> renderCompletes;
-            std::vector<Fence> flightFences;
-            bool framebufferResized{ false };
+            std::vector<SyncObject> syncObjects;
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;
     };

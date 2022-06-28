@@ -6,10 +6,9 @@
 using namespace fe;
 
 CommandBuffer::CommandBuffer(bool begin, VkQueueFlagBits queueType, VkCommandBufferLevel bufferLevel)
-    : commandPool{Graphics::Get()->getCommandPool()}
+    : logicalDevice{Graphics::Get()->getLogicalDevice()}
     , queueType{queueType} {
-	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-
+    auto commandPool = Graphics::Get()->getCommandPool();
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	commandBufferAllocateInfo.commandPool = *commandPool;
@@ -22,10 +21,8 @@ CommandBuffer::CommandBuffer(bool begin, VkQueueFlagBits queueType, VkCommandBuf
 }
 
 CommandBuffer::~CommandBuffer() {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-
-    //vkResetCommandBuffer(commandBuffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
-	vkFreeCommandBuffers(logicalDevice, commandPool->getCommandPool(), 1, &commandBuffer);
+    auto commandPool = Graphics::Get()->getCommandPool();
+	vkFreeCommandBuffers(logicalDevice, *commandPool, 1, &commandBuffer);
 }
 
 void CommandBuffer::begin(VkCommandBufferUsageFlags usage) {
@@ -48,7 +45,6 @@ void CommandBuffer::end() {
 }
 
 void CommandBuffer::submitIdle() {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 	auto queueSelected = getQueue();
 
 	if (running)
@@ -73,7 +69,6 @@ void CommandBuffer::submitIdle() {
 }
 
 void CommandBuffer::submit(const VkSemaphore& waitSemaphore, const VkSemaphore& signalSemaphore, VkFence fence, VkPipelineStageFlags submitPipelineStages) {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 	auto queueSelected = getQueue();
 
 	if (running)
@@ -110,8 +105,6 @@ void CommandBuffer::submit(const VkSemaphore& waitSemaphore, const VkSemaphore& 
 }
 
 VkQueue CommandBuffer::getQueue() const {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-
 	switch (queueType) {
         case VK_QUEUE_GRAPHICS_BIT:
             return logicalDevice.getGraphicsQueue();

@@ -3,6 +3,7 @@
 #include <volk.h>
 
 namespace fe {
+    class LogicalDevice;
     /**
     * @brief Encapsulates access to a Vulkan buffer backed up by device memory
     * @note To be filled by an external source like the VulkanDevice
@@ -163,6 +164,8 @@ namespace fe {
         static VkDeviceSize GetAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment);
 
     protected:
+        const LogicalDevice& logicalDevice;
+
         void* mapped{ nullptr };
         VkBuffer buffer;
         VkDeviceMemory memory{ VK_NULL_HANDLE };

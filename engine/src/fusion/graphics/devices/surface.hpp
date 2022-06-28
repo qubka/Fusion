@@ -20,7 +20,7 @@ namespace fe {
 
         const VkSurfaceKHR& getSurface() const { return surface; }
         const Window& getWindow() const { return window; }
-        const VkSurfaceCapabilitiesKHR& getCapabilities() const { return capabilities; }
+        const VkSurfaceCapabilitiesKHR& getCapabilities();
         VkSurfaceFormatKHR getFormat() const { return format; }
         VkPresentModeKHR getPresentMode() const { return presentMode; }
         VkExtent2D getExtent() const;
@@ -28,6 +28,8 @@ namespace fe {
     private:
         VkSurfaceFormatKHR getOptimalSurfaceFormat() const;
         VkPresentModeKHR getOptimalPresentMode() const;
+
+        void onFramebufferResize();
 
         const Instance& instance;
         const PhysicalDevice& physicalDevice;

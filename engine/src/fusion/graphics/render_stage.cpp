@@ -2,6 +2,7 @@
 #include "graphics.hpp"
 
 #include "fusion/devices/devices.hpp"
+#include "fusion/utils/time.hpp"
 #include "fusion/graphics/images/image_depth.hpp"
 #include "fusion/graphics/images/image2d.hpp"
 #include "fusion/graphics/renderpass/framebuffers.hpp"

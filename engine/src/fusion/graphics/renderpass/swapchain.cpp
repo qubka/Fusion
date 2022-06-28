@@ -9,7 +9,7 @@ static const std::vector<VkCompositeAlphaFlagBitsKHR> COMPOSITE_ALPHA_FLAGS = {
     VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR,
 };
 
-Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Surface& surface, const Swapchain* oldSwapchain) : logicalDevice{logicalDevice} {
+Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, Surface& surface, const Swapchain* oldSwapchain) : logicalDevice{logicalDevice} {
     const auto& capabilities = surface.getCapabilities();
     auto graphicsFamily = physicalDevice.getGraphicsFamily();
     auto presentFamily = physicalDevice.getPresentFamily();
@@ -55,7 +55,6 @@ Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& 
 	swapchainCreateInfo.imageExtent = extent;
 	swapchainCreateInfo.imageArrayLayers = 1;
 	swapchainCreateInfo.imageUsage = usage;
-
 	if (graphicsFamily != presentFamily) {
 		std::array<uint32_t, 2> queueFamily = { graphicsFamily, presentFamily };
 		swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
@@ -66,7 +65,6 @@ Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& 
         swapchainCreateInfo.queueFamilyIndexCount = 0;
         swapchainCreateInfo.pQueueFamilyIndices = nullptr;
     }
-
     swapchainCreateInfo.preTransform = static_cast<VkSurfaceTransformFlagBitsKHR>(preTransform);
     swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     swapchainCreateInfo.compositeAlpha = compositeAlpha;
@@ -77,13 +75,16 @@ Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& 
     Graphics::CheckVk(vkCreateSwapchainKHR(logicalDevice, &swapchainCreateInfo, nullptr, &swapchain));
 
 	Graphics::CheckVk(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, nullptr));
+    if (imageCount < 0)
+        throw std::runtime_error("Failed to create swap chain images");
+
 	images.resize(imageCount);
 	imageViews.resize(imageCount);
+
 	Graphics::CheckVk(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, images.data()));
 
 	for (uint32_t i = 0; i < imageCount; i++) {
-		Image::CreateImageView(images[i], imageViews[i], VK_IMAGE_VIEW_TYPE_2D, surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT,
-			1, 0, 1, 0);
+		Image::CreateImageView(images[i], imageViews[i], VK_IMAGE_VIEW_TYPE_2D, surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, 1, 0, 1, 0);
 	}
 
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;

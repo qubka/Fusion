@@ -4,6 +4,7 @@
 
 namespace fe {
     class CommandPool;
+    class LogicalDevice;
     /**
      * @brief Class that represents a command buffer.
      */
@@ -53,7 +54,7 @@ namespace fe {
     private:
         VkQueue getQueue() const;
 
-        std::shared_ptr<CommandPool> commandPool;
+        const LogicalDevice& logicalDevice;
 
         VkQueueFlagBits queueType;
         VkCommandBuffer commandBuffer{ VK_NULL_HANDLE };

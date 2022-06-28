@@ -32,6 +32,11 @@ Surface::~Surface() {
     vkDestroySurfaceKHR(instance, surface, nullptr);
 }
 
+const VkSurfaceCapabilitiesKHR& Surface::getCapabilities() {
+    Graphics::CheckVk(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities));
+    return capabilities;
+}
+
 VkExtent2D Surface::getExtent() const {
     if (capabilities.currentExtent.width == UINT32_MAX || capabilities.currentExtent.height == UINT32_MAX) {
         // Deadlock to wait until we get some valid data

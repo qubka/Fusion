@@ -15,7 +15,12 @@ namespace fe {
         void setImageInFlight(const VkFence& fence) { imageInFlight = fence; }
         void setImageInUse() { imageInFlight = inFlightFence; }
 
+        void reset();
+
     private:
+        void init(const VkDevice& logicalDevice);
+        void destroy(const VkDevice& logicalDevice);
+
         VkSemaphore imageAvailableSemaphore{ VK_NULL_HANDLE };
         VkSemaphore renderFinishedSemaphore{ VK_NULL_HANDLE };
         VkFence inFlightFence{ VK_NULL_HANDLE };

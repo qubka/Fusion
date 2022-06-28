@@ -3,6 +3,7 @@
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/utils/file.hpp"
+#include "fusion/utils/time.hpp"
 
 using namespace fe;
 

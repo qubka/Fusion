@@ -5,9 +5,10 @@
 
 using namespace fe;
 
-Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, const void* data) : size{size} {
+Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, const void* data)
+    : logicalDevice{Graphics::Get()->getLogicalDevice()}
+    , size{size} {
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
     auto graphicsFamily = physicalDevice.getGraphicsFamily();
     auto presentFamily = physicalDevice.getPresentFamily();
@@ -62,14 +63,12 @@ Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlag
 }
 
 Buffer::~Buffer() {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
     unmap();
     vkDestroyBuffer(logicalDevice, buffer, nullptr);
     vkFreeMemory(logicalDevice, memory, nullptr);
 }
 
 VkResult Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
     VkMappedMemoryRange mappedRange = {};
     mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
     mappedRange.memory = memory;
@@ -79,7 +78,6 @@ VkResult Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
 }
 
 VkResult Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
     VkMappedMemoryRange mappedRange = {};
     mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
     mappedRange.memory = memory;
@@ -90,13 +88,11 @@ VkResult Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
 
 VkResult Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
     assert(buffer && memory && "Called map on buffer before create");
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
     return vkMapMemory(logicalDevice, memory, offset, size, 0, &mapped);
 }
 
 void Buffer::unmap() {
     if (mapped) {
-        const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
         vkUnmapMemory(logicalDevice, memory);
         mapped = nullptr;
     }

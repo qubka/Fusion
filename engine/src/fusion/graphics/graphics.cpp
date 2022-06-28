@@ -2,11 +2,11 @@
 #include "subrender.hpp"
 
 #include "fusion/utils/enumerate.hpp"
+#include "fusion/utils/time.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/devices/devices.hpp"
 #include "fusion/devices/window.hpp"
-#include "fusion/graphics/renderpass/fence.hpp"
-#include "fusion/graphics/renderpass/semaphore.hpp"
+#include "fusion/graphics/renderpass/sync_object.hpp"
 #include "fusion/graphics/renderpass/swapchain.hpp"
 #include "fusion/graphics/renderpass/framebuffers.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
@@ -20,12 +20,7 @@
 
 using namespace fe;
 
-Graphics::Graphics()
-    : elapsedPurge{5s}
-    , instance{}
-    , physicalDevice{instance}
-    , logicalDevice{instance, physicalDevice}
-    , pipelineCache{logicalDevice} {
+Graphics::Graphics() {
     for (auto& window : Devices::Get()->getWindows()) {
         onWindowCreate(window.get(), true);
     }
@@ -47,8 +42,8 @@ Graphics::~Graphics() {
     glslang::FinalizeProcess();
 
     perSurfaceBuffers.clear();
-    commandPools.clear();
 
+    commandPool = nullptr;
     renderer = nullptr;
 }
 
@@ -67,12 +62,13 @@ void Graphics::update(const Time& dt) {
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
         auto& currentFrame = perSurfaceBuffer->currentFrame;
+        auto& syncObject = perSurfaceBuffer->syncObjects[currentFrame];
 
-        auto result = swapchain->acquireNextImage(perSurfaceBuffer->presentCompletes[currentFrame], perSurfaceBuffer->flightFences[currentFrame]);
+        auto result = swapchain->acquireNextImage(syncObject.getImageAvailableSemaphore(), syncObject.getInFlightFence());
 
 #ifndef PLATFORM_ANDROID
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapchain();
+            recreateSwapchain(id);
             return;
         }
 #endif
@@ -86,11 +82,9 @@ void Graphics::update(const Time& dt) {
         for (auto& renderStage : renderer->renderStages) {
             renderStage->update(id);
 
-            if (!startRenderpass(id, *renderStage))
-                return;
+            startRenderpass(id, *renderStage);
 
-            auto imageIndex = swapchain->getActiveImageIndex();
-            auto& commandBuffer = perSurfaceBuffer->commandBuffers[imageIndex];
+            auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
 
             for (const auto& subpass : renderStage->getSubpasses()) {
                 stage.second = subpass.binding;
@@ -103,21 +97,12 @@ void Graphics::update(const Time& dt) {
             }
 
             if (!endRenderpass(id, *renderStage))
-                return;
+                break;
 
             stage.first++;
         }
-    }
 
-    // Resets unused command pools
-    if (elapsedPurge.getElapsed() != 0) {
-        for (auto it = commandPools.begin(); it != commandPools.end();) {
-            if ((*it).second.use_count() <= 1) {
-                it = commandPools.erase(it);
-                continue;
-            }
-            ++it;
-        }
+        currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 }
 
@@ -172,58 +157,47 @@ const Descriptor* Graphics::getAttachment(const std::string& name) const {
     return nullptr;
 }
 
-const std::shared_ptr<CommandPool>& Graphics::getCommandPool(const std::thread::id &threadId) {
-    if (auto it = commandPools.find(threadId); it != commandPools.end())
-        return it->second;
-    // TODO: Cleanup and fix crashes
-    return commandPools.emplace(threadId, std::make_shared<CommandPool>(threadId)).first->second;
-}
-
 void Graphics::resetRenderStages() {
-    recreateSwapchain();
-
-    for (const auto& [id, swapchain] : enumerate(swapchains)) {
+    for (const auto& [id, surface] : enumerate(surfaces)) {
+        auto& swapchain = swapchains.emplace_back(std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, nullptr));
+        auto& perSurfaceBuffer = perSurfaceBuffers.emplace_back(std::make_unique<PerSurfaceBuffers>());
+        perSurfaceBuffer->commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+        perSurfaceBuffer->syncObjects.resize(MAX_FRAMES_IN_FLIGHT);
         for (const auto& renderStage : renderer->renderStages)
             renderStage->rebuild(id, *swapchain);
     }
-
     recreateAttachmentsMap();
 }
 
-void Graphics::recreateSwapchain() {
-    vkDeviceWaitIdle(logicalDevice);
+void Graphics::recreateSwapchain(size_t id) {
+    CheckVk(vkDeviceWaitIdle(logicalDevice));
 
-    //LOG_DEBUG << "Reason of recreating: " << StringifyResultVk(reason);
+    auto& swapchain = swapchains[id];
+    auto& surface = surfaces[id];
+    auto& perSurfaceBuffer = perSurfaceBuffers[id];
 
-    swapchains.resize(surfaces.size());
-    perSurfaceBuffers.resize(surfaces.size());
-
-    for (const auto& [id, surface] : enumerate(surfaces)) {
-        auto& window = surface->getWindow();
-        auto& size = window.getSize();
-        auto& swapchain = swapchains[id];
-        if (swapchain) {
-            LOG_DEBUG << "Recreating swapchain old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")";
-        } else {
-            LOG_DEBUG << "Creating swapchain (" << size.x << ", " << size.y << ")";
-        }
-        swapchain = std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, swapchain.get());
-        auto& perSurfaceBuffer = perSurfaceBuffers[id];
-        perSurfaceBuffer = std::make_unique<PerSurfaceBuffers>(perSurfaceBuffer ? perSurfaceBuffer->currentFrame : 0, swapchain->getImageCount());
+#if FUSION_DEBUG
+    auto& window = surface->getWindow();
+    auto& size = window.getSize();
+    if (swapchain) {
+        LOG_DEBUG << "Recreating swapchain[" << id << "] old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")";
+    } else {
+        LOG_DEBUG << "Creating swapchain[" << id << "] (" << size.x << ", " << size.y << ")";
     }
-}
+#endif
 
-void Graphics::recreatePass(size_t idx, RenderStage& renderStage) {
+    swapchain = std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, swapchain.get());
+    // Reset sync objects
+    for (auto& sync : perSurfaceBuffer->syncObjects) {
+        sync.reset();
+    }
+
     auto graphicsQueue = logicalDevice.getGraphicsQueue();
     CheckVk(vkQueueWaitIdle(graphicsQueue));
 
-    for (const auto& [id, swapchain] : enumerate(swapchains)) {
-        auto& perSurfaceBuffer = perSurfaceBuffers[id];
-        if (renderStage.hasSwapchain() && (perSurfaceBuffer->framebufferResized || !swapchain->isSameExtent(vku::uvec2_cast(surfaces[id]->getWindow().getSize())))) {
-            recreateSwapchain();
-        }
-        renderStage.rebuild(id, *swapchain);
-    }
+    for (const auto& renderStage : renderer->renderStages)
+        renderStage->rebuild(id, *swapchain);
+
     recreateAttachmentsMap();
 }
 
@@ -236,14 +210,14 @@ void Graphics::recreateAttachmentsMap() {
 
 bool Graphics::startRenderpass(size_t id, RenderStage& renderStage) {
     if (renderStage.isOutOfDate()) {
-        recreatePass(id, renderStage);
+        recreateSwapchain(id);
         return false;
     }
 
     auto& swapchain = swapchains[id];
     auto& perSurfaceBuffer = perSurfaceBuffers[id];
     auto& currentFrame = perSurfaceBuffer->currentFrame;
-    auto& commandBuffer = perSurfaceBuffer->commandBuffers[swapchain->getActiveImageIndex()];
+    auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
 
     if (!commandBuffer.isRunning())
         commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT); //VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
@@ -271,31 +245,35 @@ bool Graphics::startRenderpass(size_t id, RenderStage& renderStage) {
 }
 
 bool Graphics::endRenderpass(size_t id, RenderStage& renderStage) {
-    auto presentQueue = logicalDevice.getPresentQueue();
     auto& swapchain = swapchains[id];
     auto& perSurfaceBuffer = perSurfaceBuffers[id];
     auto& currentFrame = perSurfaceBuffer->currentFrame;
-    auto& commandBuffer = perSurfaceBuffer->commandBuffers[swapchain->getActiveImageIndex()];
+    auto& commandBuffer = perSurfaceBuffer->commandBuffers[currentFrame];
+    auto& syncObject = perSurfaceBuffer->syncObjects[currentFrame];
 
     vkCmdEndRenderPass(commandBuffer);
 
     if (!renderStage.hasSwapchain()) {
-        LOG_DEBUG << "endRenderpass ABORTION!";
-        return false;
+        throw std::runtime_error("Render stage is not have swapchain");
     }
 
     commandBuffer.end();
 
-    commandBuffer.submit(perSurfaceBuffer->presentCompletes[currentFrame], perSurfaceBuffer->renderCompletes[currentFrame], perSurfaceBuffer->flightFences[currentFrame]);
+    // Check if a previous frame is using this image (i.e. there is its fence to wait on)
+    if (syncObject.getImageInFlightFence() != VK_NULL_HANDLE) {
+        vkWaitForFences(logicalDevice, 1, &syncObject.getImageInFlightFence(), VK_TRUE, UINT64_MAX);
+    }
+    // Mark the image as now being in use by this frame
+    syncObject.setImageInUse();
 
-    auto result = swapchain->queuePresent(presentQueue, perSurfaceBuffer->renderCompletes[currentFrame]);
+    commandBuffer.submit(syncObject.getImageAvailableSemaphore(), syncObject.getRenderFinishedSemaphore(), syncObject.getInFlightFence());
 
-    currentFrame = (currentFrame + 1) % swapchain->getImageCount();
+    auto presentQueue = logicalDevice.getPresentQueue();
+    auto result = swapchain->queuePresent(presentQueue, syncObject.getRenderFinishedSemaphore());
 
 #ifndef PLATFORM_ANDROID
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-        //recreateSwapchain();
-        perSurfaceBuffer->framebufferResized = true;
+        recreateSwapchain(id);
         return false;
     } else if (result != VK_SUCCESS) {
         LOG_ERROR << "Failed to present swap chain image!";
@@ -316,7 +294,15 @@ bool Graphics::endRenderpass(size_t id, RenderStage& renderStage) {
 void Graphics::onWindowCreate(Window* window, bool create) {
     if (!window) return;
     if (create) {
-        surfaces.push_back(std::make_unique<Surface>(instance, physicalDevice, logicalDevice, *window));
+        auto& surface = surfaces.emplace_back(std::make_unique<Surface>(instance, physicalDevice, logicalDevice, *window));
+
+        /*auto& swapchain = swapchains.emplace_back(std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, nullptr));
+        auto& perSurfaceBuffer = perSurfaceBuffers.emplace_back();
+        perSurfaceBuffer->commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+        perSurfaceBuffer->syncObjects.resize(MAX_FRAMES_IN_FLIGHT);
+        for (const auto& renderStage : renderer->renderStages)
+            renderStage->rebuild(surfaces.size() - 1, *swapchain);
+        recreateAttachmentsMap();*/
     } else {
         /*surfaces.erase(std::remove_if(surfaces.begin(), surfaces.end(), [window](const auto& s) {
             return window == &s->window;
@@ -385,9 +371,7 @@ void Graphics::CheckVk(VkResult result) {
     throw std::runtime_error("Vulkan error: " + failure);
 }
 
-Graphics::PerSurfaceBuffers::PerSurfaceBuffers(size_t currentFrame, size_t imageCount) : currentFrame{currentFrame} {
-    commandBuffers.resize(imageCount);
-    presentCompletes.resize(imageCount);
-    renderCompletes.resize(imageCount);
-    flightFences.resize(imageCount);
+const CommandPool* Graphics::getCommandPool() {
+    if (!commandPool) commandPool = std::make_unique<CommandPool>();
+    return commandPool.get();
 }
