@@ -21,7 +21,7 @@ namespace fe {
         const VkPhysicalDeviceProperties& getProperties() const { return properties; }
         const VkPhysicalDeviceFeatures& getFeatures() const { return features; }
         const VkPhysicalDeviceMemoryProperties& getMemoryProperties() const { return memoryProperties; }
-        const VkSampleCountFlagBits& getMsaaSamples() const { return msaaSamples; }
+        VkSampleCountFlagBits getMsaaSamples() const { return msaaSamples; }
         uint32_t getGraphicsFamily() const { return graphicsFamily; }
         uint32_t getPresentFamily() const { return presentFamily; }
         uint32_t getComputeFamily() const { return computeFamily; }

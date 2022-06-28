@@ -116,7 +116,7 @@ Instance::~Instance() {
 	vkDestroyInstance(instance, nullptr);
 }
 
-bool Instance::checkValidationLayerSupport() const {
+bool Instance::CheckValidationLayerSupport() {
 	uint32_t instanceLayerPropertyCount;
 	vkEnumerateInstanceLayerProperties(&instanceLayerPropertyCount, nullptr);
 	std::vector<VkLayerProperties> instanceLayerProperties(instanceLayerPropertyCount);
@@ -152,7 +152,7 @@ std::vector<const char*> Instance::getExtensions() const {
 
 	if (enableValidationLayers)
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-	//extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+
 	return extensions;
 }
 
@@ -171,7 +171,7 @@ void Instance::createInstance() {
 	applicationInfo.engineVersion = static_cast<uint32_t>(engineVersion);
 	applicationInfo.apiVersion = volkGetInstanceVersion() >= VK_API_VERSION_1_1 ? VK_API_VERSION_1_1 : VK_MAKE_VERSION(1, 0, 57);
 
-	if (enableValidationLayers && !checkValidationLayerSupport()) {
+	if (enableValidationLayers && !CheckValidationLayerSupport()) {
 		LOG_ERROR << "Validation layers requested, but not available!";
 		enableValidationLayers = false;
 	}

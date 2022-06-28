@@ -1,7 +1,5 @@
 #pragma once
 
-#include "swapchain_support_details.hpp"
-
 #include <volk.h>
 
 namespace fe {
@@ -22,13 +20,22 @@ namespace fe {
 
         const VkSurfaceKHR& getSurface() const { return surface; }
         const Window& getWindow() const { return window; }
-        SwapchainSupportDetails getSwapchainSupportDetails() const;
+        const VkSurfaceCapabilitiesKHR& getCapabilities() const { return capabilities; }
+        VkSurfaceFormatKHR getFormat() const { return format; }
+        VkPresentModeKHR getPresentMode() const { return presentMode; }
+        VkExtent2D getExtent() const;
 
     private:
+        VkSurfaceFormatKHR getOptimalSurfaceFormat() const;
+        VkPresentModeKHR getOptimalPresentMode() const;
+
         const Instance& instance;
         const PhysicalDevice& physicalDevice;
         const Window& window;
 
         VkSurfaceKHR surface{ VK_NULL_HANDLE };
+        VkSurfaceCapabilitiesKHR capabilities = {};
+        VkSurfaceFormatKHR format = {};
+        VkPresentModeKHR presentMode{ VK_PRESENT_MODE_FIFO_KHR };
     };
 }

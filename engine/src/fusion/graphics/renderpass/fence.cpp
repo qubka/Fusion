@@ -14,7 +14,6 @@ Fence::Fence() {
 }
 
 Fence::Fence(VkFence fence) : fence{fence} {
-
 }
 
 Fence::~Fence() {

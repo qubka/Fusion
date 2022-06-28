@@ -13,7 +13,6 @@ Semaphore::Semaphore() {
 }
 
 Semaphore::Semaphore(VkSemaphore semaphore) : semaphore{semaphore} {
-
 }
 
 Semaphore::~Semaphore() {

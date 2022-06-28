@@ -41,11 +41,11 @@ namespace fe {
         static const std::vector<const char*> ValidationLayers;
 
     private:
-        bool checkValidationLayerSupport() const;
         std::vector<const char*> getExtensions() const;
         void createInstance();
         void createDebugMessenger();
 
+        static bool CheckValidationLayerSupport();
         static void LogVulkanLayers(const std::vector<VkLayerProperties>& layerProperties);
 
         bool enableValidationLayers{ false };

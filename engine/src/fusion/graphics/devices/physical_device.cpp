@@ -16,10 +16,12 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, const DevicePickerFunct
     std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
     if (physicalDeviceCount > 0)
         vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, physicalDevices.data());
+    else
+        throw std::runtime_error("Failed to find any physical GPU");
 
     physicalDevice = picker(physicalDevices);
     if (!physicalDevice)
-        throw std::runtime_error("Vulkan runtime error, failed to find a suitable GPU");
+        throw std::runtime_error("Filed to find a suitable GPU");
 
     vkGetPhysicalDeviceProperties(physicalDevice, &properties);
     vkGetPhysicalDeviceFeatures(physicalDevice, &features);

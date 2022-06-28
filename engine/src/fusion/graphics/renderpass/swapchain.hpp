@@ -9,8 +9,9 @@ namespace fe {
 
     class Swapchain {
     public:
-        Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Surface& surface, const VkExtent2D& size, bool isVSync, const Swapchain* oldSwapchain = nullptr);
+        Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Surface& surface, const Swapchain* oldSwapchain = nullptr);
         ~Swapchain();
+        NONCOPYABLE(Swapchain);
 
         /**
          * Acquires the next image in the swapchain into the internal acquired image. The function will always waitEvents until the next image has been acquired by setting timeout to UINT64_MAX.
@@ -42,7 +43,6 @@ namespace fe {
         uint32_t getActiveImageIndex() const { return activeImageIndex; }
         VkSurfaceFormatKHR getSurfaceFormat() const { return surfaceFormat; }
         VkPresentModeKHR getPresentMode() const { return presentMode; }
-
     private:
         const LogicalDevice& logicalDevice;
 
@@ -53,7 +53,7 @@ namespace fe {
         VkPresentInfoKHR presentInfo = {};
         VkSwapchainKHR swapchain{ VK_NULL_HANDLE };
         uint32_t activeImageIndex{ 0 };
-        VkSurfaceFormatKHR surfaceFormat;
+        VkSurfaceFormatKHR surfaceFormat = {};
         VkPresentModeKHR presentMode;
     };
 }

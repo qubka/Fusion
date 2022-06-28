@@ -9,16 +9,14 @@ static const std::vector<VkCompositeAlphaFlagBitsKHR> COMPOSITE_ALPHA_FLAGS = {
     VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR,
 };
 
-Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Surface& surface, const VkExtent2D& size, bool isVSync, const Swapchain* oldSwapchain)
-    : logicalDevice{logicalDevice} {
-	const auto& support = surface.getSwapchainSupportDetails();
-	auto graphicsFamily = physicalDevice.getGraphicsFamily();
-	auto presentFamily = physicalDevice.getPresentFamily();
-    auto capabilities = support.getCapabilities();
+Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Surface& surface, const Swapchain* oldSwapchain) : logicalDevice{logicalDevice} {
+    const auto& capabilities = surface.getCapabilities();
+    auto graphicsFamily = physicalDevice.getGraphicsFamily();
+    auto presentFamily = physicalDevice.getPresentFamily();
 
-    extent = support.getOptimalSwapChainExtent(size);
-    surfaceFormat =  support.getOptimalSwapSurfaceFormat();
-    presentMode = support.getOptimalSwapPresentMode(isVSync);
+    extent = surface.getExtent();
+    surfaceFormat = surface.getFormat();
+    presentMode = surface.getPresentMode();
 
     uint32_t desiredImageCount = capabilities.minImageCount + 1;
     if (capabilities.maxImageCount > 0 &&
@@ -57,22 +55,26 @@ Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& 
 	swapchainCreateInfo.imageExtent = extent;
 	swapchainCreateInfo.imageArrayLayers = 1;
 	swapchainCreateInfo.imageUsage = usage;
-	swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	swapchainCreateInfo.preTransform = static_cast<VkSurfaceTransformFlagBitsKHR>(preTransform);
-	swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	swapchainCreateInfo.compositeAlpha = compositeAlpha;
-	swapchainCreateInfo.presentMode = presentMode;
-	swapchainCreateInfo.clipped = VK_TRUE;
-	swapchainCreateInfo.oldSwapchain = oldSwapchain ? oldSwapchain->swapchain : VK_NULL_HANDLE;
 
 	if (graphicsFamily != presentFamily) {
 		std::array<uint32_t, 2> queueFamily = { graphicsFamily, presentFamily };
 		swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 		swapchainCreateInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamily.size());
 		swapchainCreateInfo.pQueueFamilyIndices = queueFamily.data();
-	}
+	} else {
+        swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        swapchainCreateInfo.queueFamilyIndexCount = 0;
+        swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+    }
 
-	Graphics::CheckVk(vkCreateSwapchainKHR(logicalDevice, &swapchainCreateInfo, nullptr, &swapchain));
+    swapchainCreateInfo.preTransform = static_cast<VkSurfaceTransformFlagBitsKHR>(preTransform);
+    swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    swapchainCreateInfo.compositeAlpha = compositeAlpha;
+    swapchainCreateInfo.presentMode = presentMode;
+    swapchainCreateInfo.clipped = VK_TRUE;
+    swapchainCreateInfo.oldSwapchain = oldSwapchain ? oldSwapchain->swapchain : VK_NULL_HANDLE;
+
+    Graphics::CheckVk(vkCreateSwapchainKHR(logicalDevice, &swapchainCreateInfo, nullptr, &swapchain));
 
 	Graphics::CheckVk(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, nullptr));
 	images.resize(imageCount);
@@ -102,15 +104,7 @@ VkResult Swapchain::acquireNextImage(const VkSemaphore& presentCompleteSemaphore
 	if (fence != VK_NULL_HANDLE)
 		Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
 
-	auto acquireResult = vkAcquireNextImageKHR(logicalDevice, swapchain, UINT64_MAX, presentCompleteSemaphore, VK_NULL_HANDLE, &activeImageIndex);
-
-	if (acquireResult != VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR && acquireResult != VK_ERROR_OUT_OF_DATE_KHR)
-		throw std::runtime_error("Failed to acquire swapchain image");
-
-    //Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fenceImage, VK_TRUE, UINT64_MAX));
-    //Graphics::CheckVk(vkResetFences(logicalDevice, 1, &fenceImage));
-
-	return acquireResult;
+	return vkAcquireNextImageKHR(logicalDevice, swapchain, UINT64_MAX, presentCompleteSemaphore, VK_NULL_HANDLE, &activeImageIndex);
 }
 
 VkResult Swapchain::queuePresent(const VkQueue& presentQueue, const VkSemaphore& waitSemaphore) {

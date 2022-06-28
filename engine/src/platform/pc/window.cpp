@@ -281,6 +281,9 @@ namespace glfw {
     }
 
     void Window::SizeCallback(GLFWwindow* handle, int width, int height) {
+        if (width <= 0 || height <= 0)
+            return;
+
         auto& window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle));
 
         glm::uvec2 size {width, height};
@@ -289,11 +292,10 @@ namespace glfw {
 
         if (window.fullscreen) {
             window.fullscreenSize = size;
-            window.onSizeChange.publish(size);
         } else {
             window.size = size;
-            window.onSizeChange.publish(size);
         }
+        window.onSizeChange.publish(size);
     }
 
     void Window::CloseCallback(GLFWwindow* handle) {
@@ -339,11 +341,10 @@ namespace glfw {
 
         if (window.fullscreen) {
             window.fullscreenSize = size;
-            window.onFramebufferResize.publish(size);
         } else {
             window.size = size;
-            window.onFramebufferResize.publish(size);
         }
+        window.onFramebufferResize.publish(size);
     }
 
     void Window::CursorPosCallback(GLFWwindow* handle, double posX, double posY) {

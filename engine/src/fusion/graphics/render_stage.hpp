@@ -51,7 +51,8 @@ namespace fe {
         friend class Graphics;
     public:
         explicit RenderStage(std::vector<Attachment> images = {}, std::vector<SubpassType> subpasses = {}, const Viewport& viewport = {});
-        ~RenderStage() = default;;
+        ~RenderStage() = default;
+        NONCOPYABLE(RenderStage);
 
         void update(size_t id);
         void rebuild(size_t id, const Swapchain& swapchain);

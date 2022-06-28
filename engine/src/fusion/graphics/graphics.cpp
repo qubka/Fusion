@@ -25,8 +25,7 @@ Graphics::Graphics()
     , instance{}
     , physicalDevice{instance}
     , logicalDevice{instance, physicalDevice}
-    , pipelineCache{logicalDevice}
-{
+    , pipelineCache{logicalDevice} {
     for (auto& window : Devices::Get()->getWindows()) {
         onWindowCreate(window.get(), true);
     }
@@ -208,7 +207,7 @@ void Graphics::recreateSwapchain() {
         } else {
             LOG_DEBUG << "Creating swapchain (" << size.x << ", " << size.y << ")";
         }
-        swapchain = std::make_unique<Swapchain>(logicalDevice, *surface, vku::uvec2_cast(size), window.isVSync(), swapchain.get());
+        swapchain = std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, swapchain.get());
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
         perSurfaceBuffer = std::make_unique<PerSurfaceBuffers>(perSurfaceBuffer ? perSurfaceBuffer->currentFrame : 0, swapchain->getImageCount());
     }

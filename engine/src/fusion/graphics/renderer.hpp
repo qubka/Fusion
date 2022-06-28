@@ -16,6 +16,7 @@ namespace fe {
          */
         Renderer() = default;
         virtual ~Renderer() = default;
+        NONCOPYABLE(Renderer);
 
         /**
          * Run when switching to this scene from another, use this method to create {@link Subrender}'s.
