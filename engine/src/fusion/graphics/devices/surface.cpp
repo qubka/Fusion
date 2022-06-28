@@ -21,19 +21,12 @@ Surface::Surface(const Instance& instance, const PhysicalDevice& physicalDevice,
 
     if (!presentSupport)
         throw std::runtime_error("Present queue family does not have presentation support");
-
-    // Update the swapchain support details for that surface
-    supportDetails.extract(physicalDevice, surface);
 }
 
 Surface::~Surface() {
     vkDestroySurfaceKHR(instance, surface, nullptr);
 }
 
-const SwapchainSupportDetails& Surface::getSwapchainSupportDetails() {
-#if PLATFORM_LINUX
-    // Doe to virtual surface consider re-extract information again
-    supportDetails.extract(physicalDevice, surface);
-#endif
-    return supportDetails;
+SwapchainSupportDetails Surface::getSwapchainSupportDetails() const {
+    return { physicalDevice, surface };
 }

@@ -20,9 +20,9 @@ namespace fe {
         operator bool() const { return surface != VK_NULL_HANDLE; }
         operator const VkSurfaceKHR&() const { return surface; }
 
-        const SwapchainSupportDetails& getSwapchainSupportDetails();
         const VkSurfaceKHR& getSurface() const { return surface; }
         const Window& getWindow() const { return window; }
+        SwapchainSupportDetails getSwapchainSupportDetails() const;
 
     private:
         const Instance& instance;
@@ -30,6 +30,5 @@ namespace fe {
         const Window& window;
 
         VkSurfaceKHR surface{ VK_NULL_HANDLE };
-        SwapchainSupportDetails supportDetails;
     };
 }
