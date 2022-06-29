@@ -9,7 +9,7 @@ Semaphore::Semaphore() {
     semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-    VK_RESULT(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &semaphore));
+    VK_CHECK(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &semaphore));
 }
 
 Semaphore::Semaphore(VkSemaphore semaphore) : semaphore{semaphore} {

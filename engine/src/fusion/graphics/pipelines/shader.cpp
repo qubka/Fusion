@@ -289,6 +289,10 @@ VkShaderModule Shader::createShaderModule(const std::filesystem::path& moduleNam
 
 	stages.push_back(moduleName);
 
+    if (!String::Contains(moduleCode, "GL_ARB_separate_shader_objects") || !String::Contains(moduleCode, "GL_ARB_shading_language_420pack")) {
+        LOG_DEBUG << "Shader " << std::quoted(moduleName.string()) << "not have GL extentions";
+    }
+
 	// Starts converting GLSL to SPIR-V.
 	auto language = getEshLanguage(moduleFlag);
 	glslang::TProgram program;
@@ -372,7 +376,7 @@ VkShaderModule Shader::createShaderModule(const std::filesystem::path& moduleNam
 	shaderModuleCreateInfo.pCode = spirv.data();
 
 	VkShaderModule shaderModule;
-	VK_RESULT(vkCreateShaderModule(logicalDevice, &shaderModuleCreateInfo, nullptr, &shaderModule));
+	VK_CHECK(vkCreateShaderModule(logicalDevice, &shaderModuleCreateInfo, nullptr, &shaderModule));
 	return shaderModule;
 }
 

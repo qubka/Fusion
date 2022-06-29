@@ -95,10 +95,8 @@ namespace fe {
 
         struct PerSurfaceBuffers {
             size_t currentFrame{ 0 };
-            std::array<std::pair<CommandBuffer, SyncObject>, MAX_FRAMES_IN_FLIGHT> buffers {
-                std::make_pair(CommandBuffer{}, SyncObject{}),
-                std::make_pair(CommandBuffer{}, SyncObject{})
-            };
+            std::vector<CommandBuffer> commandBuffers;
+            std::vector<SyncObject> syncObjects;
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;
     };

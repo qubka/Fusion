@@ -24,7 +24,7 @@ Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlag
     bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     bufferCreateInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamily.size());
     bufferCreateInfo.pQueueFamilyIndices = queueFamily.data();
-    Graphics::CheckVk(vkCreateBuffer(logicalDevice, &bufferCreateInfo, nullptr, &buffer));
+    VK_CHECK(vkCreateBuffer(logicalDevice, &bufferCreateInfo, nullptr, &buffer));
 
     // Create the memory backing up the buffer handle.
     VkMemoryRequirements memoryRequirements;
@@ -43,7 +43,7 @@ Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlag
         allocFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
         memoryAllocateInfo.pNext = &allocFlagsInfo;
     }
-    Graphics::CheckVk(vkAllocateMemory(logicalDevice, &memoryAllocateInfo, nullptr, &memory));
+    VK_CHECK(vkAllocateMemory(logicalDevice, &memoryAllocateInfo, nullptr, &memory));
 
     // If a pointer to the buffer data has been passed, map the buffer and copy over the data.
     if (data) {
@@ -59,7 +59,7 @@ Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlag
     }
     
     // Attach the memory to the buffer object.
-    Graphics::CheckVk(vkBindBufferMemory(logicalDevice, buffer, memory, 0));
+    VK_CHECK(vkBindBufferMemory(logicalDevice, buffer, memory, 0));
 }
 
 Buffer::~Buffer() {
@@ -68,27 +68,27 @@ Buffer::~Buffer() {
     vkFreeMemory(logicalDevice, memory, nullptr);
 }
 
-VkResult Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
+void Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
     VkMappedMemoryRange mappedRange = {};
     mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
     mappedRange.memory = memory;
     mappedRange.offset = offset;
     mappedRange.size = size;
-    return vkFlushMappedMemoryRanges(logicalDevice, 1, &mappedRange);
+    VK_CHECK(vkFlushMappedMemoryRanges(logicalDevice, 1, &mappedRange));
 }
 
-VkResult Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
+void Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
     VkMappedMemoryRange mappedRange = {};
     mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
     mappedRange.memory = memory;
     mappedRange.offset = offset;
     mappedRange.size = size;
-    return vkInvalidateMappedMemoryRanges(logicalDevice, 1, &mappedRange);
+    VK_CHECK(vkInvalidateMappedMemoryRanges(logicalDevice, 1, &mappedRange));
 }
 
-VkResult Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
+void Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
     assert(buffer && memory && "Called map on buffer before create");
-    return vkMapMemory(logicalDevice, memory, offset, size, 0, &mapped);
+    VK_CHECK(vkMapMemory(logicalDevice, memory, offset, size, 0, &mapped));
 }
 
 void Buffer::unmap() {
@@ -126,16 +126,16 @@ VkDescriptorBufferInfo Buffer::descriptorInfo(VkDeviceSize size, VkDeviceSize of
     writeToBuffer(data, instanceSize, index * alignmentSize);
 }
 
-VkResult Buffer::flushIndex(int index) {
-    return flush(alignmentSize, index * alignmentSize);
+void Buffer::flushIndex(int index) {
+    flush(alignmentSize, index * alignmentSize);
 }
 
 VkDescriptorBufferInfo Buffer::descriptorInfoForIndex(int index) {
     return descriptorInfo(alignmentSize, index * alignmentSize);
 }
 
-VkResult Buffer::invalidateIndex(int index) {
-    return invalidate(alignmentSize, index * alignmentSize);
+void Buffer::invalidateIndex(int index) {
+    invalidate(alignmentSize, index * alignmentSize);
 }*/
 
 VkDeviceSize Buffer::GetAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {

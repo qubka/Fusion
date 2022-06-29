@@ -16,13 +16,13 @@ DescriptorSet::DescriptorSet(const Pipeline& pipeline)
 	descriptorSetAllocateInfo.descriptorPool = descriptorPool;
 	descriptorSetAllocateInfo.descriptorSetCount = 1;
 	descriptorSetAllocateInfo.pSetLayouts = &pipeline.getDescriptorSetLayout();
-	Graphics::CheckVk(vkAllocateDescriptorSets(logicalDevice, &descriptorSetAllocateInfo, &descriptorSet));
+	VK_CHECK(vkAllocateDescriptorSets(logicalDevice, &descriptorSetAllocateInfo, &descriptorSet));
 }
 
 DescriptorSet::~DescriptorSet() {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	Graphics::CheckVk(vkFreeDescriptorSets(logicalDevice, descriptorPool, 1, &descriptorSet));
+	VK_CHECK(vkFreeDescriptorSets(logicalDevice, descriptorPool, 1, &descriptorSet));
 }
 
 void DescriptorSet::update(const std::vector<VkWriteDescriptorSet>& descriptorWrites) {

@@ -15,13 +15,13 @@ void StorageBuffer::update(const void* newData) {
 WriteDescriptorSet StorageBuffer::getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const {
 	VkDescriptorBufferInfo bufferInfo = {};
 	bufferInfo.buffer = buffer;
-	bufferInfo.offset = 0;
-	bufferInfo.range = size;
-
 	if (offsetSize) {
 		bufferInfo.offset = offsetSize->getOffset();
 		bufferInfo.range = offsetSize->getSize();
-	}
+	} else {
+        bufferInfo.offset = 0;
+        bufferInfo.range = size;
+    }
 
 	VkWriteDescriptorSet descriptorWrite = {};
 	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

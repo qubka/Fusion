@@ -24,14 +24,14 @@ namespace fe {
             }
 
             // If the buffer is already changed we can skip a memory comparison and just copy
-            if (handlerStatus == Buffer::Status::Changed || uniformBuffer->compare(&object, size) != 0) {
-                uniformBuffer->copy(&object, size);
+            if (handlerStatus == Buffer::Status::Changed || uniformBuffer->compare(&object, size, offset) != 0) {
+                uniformBuffer->copy(&object, size, offset);
                 handlerStatus = Buffer::Status::Changed;
             }
         }
 
         template<typename T>
-        void push(const std::string &uniformName, const T& object, size_t size = 0) {
+        void push(const std::string& uniformName, const T& object, size_t size = 0) {
             if (!uniformBlock || !uniformBuffer)
                 return;
 

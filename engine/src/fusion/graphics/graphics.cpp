@@ -35,7 +35,7 @@ Graphics::~Graphics() {
 
     Devices::Get()->OnWindowCreate().disconnect<&Graphics::onWindowCreate>(this);
 
-    CheckVk(vkQueueWaitIdle(graphicsQueue));
+    VK_CHECK(vkQueueWaitIdle(graphicsQueue));
 
     glslang::FinalizeProcess();
 
@@ -59,13 +59,14 @@ void Graphics::update(const Time& dt) {
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
+        auto& currentFrame = perSurfaceBuffer->currentFrame;
 
         FrameInfo info {
             id,
-            perSurfaceBuffer->currentFrame,
+            currentFrame,
             *swapchain,
-            perSurfaceBuffer->commandBuffers[perSurfaceBuffer->currentFrame],
-            perSurfaceBuffer->syncObjects[perSurfaceBuffer->currentFrame]
+            perSurfaceBuffer->commandBuffers[currentFrame],
+            perSurfaceBuffer->syncObjects[currentFrame]
         };
 
         if (!beginFrame(info))
@@ -105,7 +106,6 @@ bool Graphics::beginFrame(FrameInfo& info) {
 
 #ifndef PLATFORM_ANDROID
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        LOG_ERROR << "VK_ERROR_OUT_OF_DATE_KHR";
         recreateSwapchain(info.id);
         return false;
     }
@@ -171,10 +171,9 @@ void Graphics::endFrame(FrameInfo& info) {
 #ifndef PLATFORM_ANDROID
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
         recreateSwapchain(info.id);
-        LOG_ERROR << "VK_SUBOPTIMAL_KHR & VK_ERROR_OUT_OF_DATE_KHR";
     } else if (result != VK_SUCCESS) {
         LOG_ERROR << "Failed to present swap chain image!";
-        VK_RESULT(result);
+        VK_CHECK(result);
     }
 #else
     if (presentResult != VK_SUCCESS) {
@@ -240,7 +239,9 @@ const Descriptor* Graphics::getAttachment(const std::string& name) const {
 void Graphics::resetRenderStages() {
     for (const auto& [id, surface] : enumerate(surfaces)) {
         auto& swapchain = swapchains.emplace_back(std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, nullptr));
-        perSurfaceBuffers.push_back(std::make_unique<PerSurfaceBuffers>());
+        auto& perSurfaceBuffer = perSurfaceBuffers.emplace_back(std::make_unique<PerSurfaceBuffers>());
+        perSurfaceBuffer->commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+        perSurfaceBuffer->syncObjects.resize(MAX_FRAMES_IN_FLIGHT);
         for (const auto& renderStage : renderer->renderStages)
             renderStage->rebuild(id, *swapchain);
     }
@@ -248,7 +249,7 @@ void Graphics::resetRenderStages() {
 }
 
 void Graphics::recreateSwapchain(size_t id) {
-    CheckVk(vkDeviceWaitIdle(logicalDevice));
+    VK_CHECK(vkDeviceWaitIdle(logicalDevice));
 
     auto& swapchain = swapchains[id];
     auto& surface = surfaces[id];
@@ -268,7 +269,7 @@ void Graphics::recreateSwapchain(size_t id) {
 
     auto graphicsQueue = logicalDevice.getGraphicsQueue();
 
-    CheckVk(vkQueueWaitIdle(graphicsQueue));
+    VK_CHECK(vkQueueWaitIdle(graphicsQueue));
 
     for (const auto& renderStage : renderer->renderStages)
         renderStage->rebuild(id, *swapchain);

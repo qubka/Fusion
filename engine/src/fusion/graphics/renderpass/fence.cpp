@@ -11,7 +11,7 @@ Fence::Fence(bool signaled) {
         fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-    VK_RESULT(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &fence));
+    VK_CHECK(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &fence));
 }
 
 Fence::Fence(VkFence fence) : fence{fence} {

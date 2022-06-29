@@ -22,9 +22,9 @@ void SyncObject::init(const VkDevice& logicalDevice) {
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    VK_RESULT(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &imageAvailableSemaphore));
-    VK_RESULT(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &renderFinishedSemaphore));
-    VK_RESULT(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &inFlightFence));
+    VK_CHECK(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &imageAvailableSemaphore));
+    VK_CHECK(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &renderFinishedSemaphore));
+    VK_CHECK(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &inFlightFence));
 }
 
 void SyncObject::destroy(const VkDevice& logicalDevice) {

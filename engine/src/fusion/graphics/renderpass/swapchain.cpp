@@ -1,5 +1,9 @@
 #include "swapchain.hpp"
 
+#include "fusion/graphics/devices/physical_device.hpp"
+#include "fusion/graphics/devices/logical_device.hpp"
+#include "fusion/graphics/devices/surface.hpp"
+#include "fusion/graphics/images/image.hpp"
 #include "fusion/graphics/vku.hpp"
 
 using namespace fe;
@@ -74,16 +78,16 @@ Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& 
         swapchainCreateInfo.oldSwapchain = oldSwapchain->swapchain;
         activeImageIndex = oldSwapchain->activeImageIndex;
     }
-    VK_RESULT(vkCreateSwapchainKHR(logicalDevice, &swapchainCreateInfo, nullptr, &swapchain));
+    VK_CHECK(vkCreateSwapchainKHR(logicalDevice, &swapchainCreateInfo, nullptr, &swapchain));
 
-	VK_RESULT(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, nullptr));
+	VK_CHECK(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, nullptr));
     if (imageCount < 0)
         throw std::runtime_error("Failed to create swap chain images");
 
 	images.resize(imageCount);
 	imageViews.resize(imageCount);
 
-	VK_RESULT(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, images.data()));
+	VK_CHECK(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, images.data()));
 
 	for (uint32_t i = 0; i < imageCount; i++) {
 		Image::CreateImageView(images[i], imageViews[i], VK_IMAGE_VIEW_TYPE_2D, surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, 1, 0, 1, 0);
@@ -100,7 +104,7 @@ Swapchain::~Swapchain() {
 
 VkResult Swapchain::acquireNextImage(const VkSemaphore& presentCompleteSemaphore, VkFence fence) {
 	if (fence != VK_NULL_HANDLE)
-		VK_RESULT(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
+		VK_CHECK(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
 
 	return vkAcquireNextImageKHR(logicalDevice, swapchain, UINT64_MAX, presentCompleteSemaphore, VK_NULL_HANDLE, &activeImageIndex);
 }

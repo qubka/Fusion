@@ -13,7 +13,7 @@ Surface::Surface(const Instance& instance, const PhysicalDevice& physicalDevice,
     , physicalDevice{physicalDevice}
     , window{window} {
     // Creates the surface
-    Graphics::CheckVk(window.createSurface(instance, nullptr, &surface));
+    VK_CHECK(window.createSurface(instance, nullptr, &surface));
 
     // Check for presentation support
     VkBool32 presentSupport;
@@ -22,7 +22,7 @@ Surface::Surface(const Instance& instance, const PhysicalDevice& physicalDevice,
     if (!presentSupport)
         throw std::runtime_error("Present queue family does not have presentation support");
 
-    Graphics::CheckVk(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities));
+    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities));
 
     format = getOptimalSurfaceFormat();
     presentMode = getOptimalPresentMode();
@@ -33,7 +33,7 @@ Surface::~Surface() {
 }
 
 const VkSurfaceCapabilitiesKHR& Surface::getCapabilities() {
-    Graphics::CheckVk(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities));
+    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities));
     return capabilities;
 }
 

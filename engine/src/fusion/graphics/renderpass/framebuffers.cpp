@@ -55,7 +55,7 @@ Framebuffers::Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& 
 		framebufferCreateInfo.width = extent.x;
 		framebufferCreateInfo.height = extent.y;
 		framebufferCreateInfo.layers = 1;
-		VK_RESULT(vkCreateFramebuffer(logicalDevice, &framebufferCreateInfo, nullptr, &framebuffers[i]));
+		VK_CHECK(vkCreateFramebuffer(logicalDevice, &framebufferCreateInfo, nullptr, &framebuffers[i]));
 	}
 }
 

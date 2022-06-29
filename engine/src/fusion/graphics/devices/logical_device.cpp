@@ -104,7 +104,7 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
     deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(DeviceExtensions.size());
     deviceCreateInfo.ppEnabledExtensionNames = DeviceExtensions.data();
     deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
-    VK_RESULT(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice));
+    VK_CHECK(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice));
 
     volkLoadDevice(logicalDevice);
 
@@ -115,7 +115,7 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
 }
 
 LogicalDevice::~LogicalDevice() {
-	VK_RESULT(vkDeviceWaitIdle(logicalDevice));
+	VK_CHECK(vkDeviceWaitIdle(logicalDevice));
 
 	vkDestroyDevice(logicalDevice, nullptr);
 }

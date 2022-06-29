@@ -57,7 +57,7 @@ void RenderStage::update(size_t id, const Swapchain& swapchain) {
 	if (viewport.size)
 		renderArea.extent = viewport.scale * glm::vec2{*viewport.size};
 	else
-		renderArea.extent = viewport.scale * glm::vec2{ extent2D_cast(swapchain.getExtent()) };
+		renderArea.extent = viewport.scale * glm::vec2{ vku::extent2D_cast(swapchain.getExtent()) };
 
 	renderArea.extent += renderArea.offset;
 

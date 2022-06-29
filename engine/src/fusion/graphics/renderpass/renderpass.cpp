@@ -114,7 +114,7 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 	renderPassCreateInfo.pSubpasses = subpassDescriptions.data();
 	renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
 	renderPassCreateInfo.pDependencies = dependencies.data();
-	VK_RESULT(vkCreateRenderPass(logicalDevice, &renderPassCreateInfo, nullptr, &renderpass));
+	VK_CHECK(vkCreateRenderPass(logicalDevice, &renderPassCreateInfo, nullptr, &renderpass));
 }
 
 Renderpass::~Renderpass() {

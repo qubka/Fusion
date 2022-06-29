@@ -27,9 +27,8 @@ namespace fe {
          * @param size (Optional) Size of the memory range to map. Pass VK_WHOLE_SIZE to map the complete
          * buffer range.
          * @param offset (Optional) Byte offset from beginning.
-         * @return True on success, false otherwise.
          */
-        bool map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+        void map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
         /**
          * Unmap a mapped memory range.
@@ -65,10 +64,8 @@ namespace fe {
          *
          * @param size (Optional) Size of the memory range to flush. Pass VK_WHOLE_SIZE to flush the complete buffer range.
          * @param offset (Optional) Byte offset from beginning.
-         *
-         * @return True on success, false otherwise.
          */
-        bool flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+        void flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
         /**
          * Invalidate a memory range of the buffer to make it visible to the host.
@@ -77,19 +74,15 @@ namespace fe {
          *
          * @param size (Optional) Size of the memory range to invalidate. Pass VK_WHOLE_SIZE to invalidate the complete buffer range.
          * @param offset (Optional) Byte offset from beginning.
-         *
-         * @return True on success, false otherwise.
          */
-        bool invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+        void invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
         /**
          * Attach the allocated memory block to the buffer.
          *
          * @param offset (Optional) Byte offset (from the beginning) for the memory region to bind.
-         *
-         * @return VkResult of the bindBufferMemory call.
          */
-        //VkResult bind(VkDeviceSize offset = 0);
+        //void bind(VkDeviceSize offset = 0);
 
         /**
          * Create a buffer info descriptor.
@@ -116,7 +109,7 @@ namespace fe {
          * @param index Used in offset calculation.
          *
          */
-        //VkResult flushIndex(int index);
+        //void flushIndex(int index);
 
         /**
          * Create a buffer info descriptor.
@@ -133,10 +126,8 @@ namespace fe {
          * @note Only required for non-coherent memory.
          *
          * @param index Specifies the region to invalidate: index * alignmentSize.
-         *
-         * @return VkResult of the invalidate call.
          */
-        //VkResult invalidateIndex(int index);
+        //void invalidateIndex(int index);
 
         const VkBuffer& getBuffer() const { return buffer; }
         VkDeviceSize getSize() const { return size; }
