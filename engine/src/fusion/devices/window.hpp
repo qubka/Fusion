@@ -20,9 +20,10 @@ namespace fe {
         NONCOPYABLE(Window);
 
         /**
-         * Processes as object.
+         * Run every frame as long as the window has work to do.
+         * @param dt The current delta time.
          */
-        virtual void update() = 0;
+        virtual void update(float dt) = 0;
 
         /**
          * Gets weather the window is borderless or not.

@@ -10,6 +10,8 @@ namespace glfw {
         explicit Monitor(GLFWmonitor* monitor);
         ~Monitor() override = default;
 
+        void update(float dt) override {}
+
         bool isPrimary() const override{ return monitor == glfwGetPrimaryMonitor(); }
 
         glm::uvec4 getWorkarea() const;

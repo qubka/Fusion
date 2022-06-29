@@ -9,7 +9,7 @@ namespace fe {
         ~EditorApp() override;
 
         void start() override;
-        void update(const Time& dt) override;
+        void update(float dt) override;
 
     private:
     };

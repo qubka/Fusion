@@ -20,7 +20,6 @@ namespace glfw {
          */
         explicit Cursor(fe::CursorStandard standard);
 
-
         ~Cursor() override;
 
         void* getNativeCursor() const override { return cursor; }

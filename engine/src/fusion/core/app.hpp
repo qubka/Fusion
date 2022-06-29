@@ -3,7 +3,6 @@
 #include "version.hpp"
 
 namespace fe {
-    class Time;
     class App {
         friend class Engine;
     public:
@@ -20,7 +19,7 @@ namespace fe {
          * Run every frame as long as the app has work to do.
          * @param dt The current delta time.
          */
-        virtual void update(const Time& dt) = 0;
+        virtual void update(float dt) = 0;
 
         /**
          * Gets the application's name.

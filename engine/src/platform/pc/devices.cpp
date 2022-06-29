@@ -6,14 +6,14 @@
 using namespace glfw;
 
 Devices::Devices() : fe::Devices{} {
-    // Set the error error callback.
+    // Set the error error callback
     glfwSetErrorCallback(ErrorCallback);
 
-    // Initialize the GLFW library.
+    // Initialize the GLFW library
     if (glfwInit() == GLFW_FALSE)
         throw std::runtime_error("GLFW failed to initialize");
 
-    // Checks Vulkan support on GLFW.
+    // Checks Vulkan support on GLFW
     if (glfwVulkanSupported() == GLFW_FALSE)
         throw std::runtime_error("GLFW failed to find Vulkan support");
 
@@ -25,16 +25,16 @@ Devices::Devices() : fe::Devices{} {
     glfwSetJoystickCallback(JoystickCallback);
 #endif
 
-    // The window will stay hidden until after creation.
+    // The window will stay hidden until after creation
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    // Disable context creation.
+    // Disable context creation
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    // Fixes 16 bit stencil bits in macOS.
+    // Fixes 16 bit stencil bits in macOS
     glfwWindowHint(GLFW_STENCIL_BITS, 8);
     // No stereo view!
     glfwWindowHint(GLFW_STEREO, GLFW_FALSE);
 
-    // Get connected monitors.
+    // Get connected monitors
     int count;
     auto glfwMonitors = glfwGetMonitors(&count);
     for (int i = 0; i < count; i++)
@@ -44,25 +44,29 @@ Devices::Devices() : fe::Devices{} {
 }
 
 Devices::~Devices() {
-    // Terminate GLFW.
+    // Terminate GLFW
     glfwTerminate();
 }
 
-void Devices::update() {
-    // Polls for window events.
+void Devices::update(float dt) {
+    // Polls for window events
     glfwPollEvents();
 
-    for (auto& w : windows) {
-        w->update();
+    for (auto& window : windows) {
+        window->update(dt);
     }
 
-    for (auto& j : joysticks) {
-        j->update();
+    for (auto& monitor : monitors) {
+        monitor->update(dt);
+    }
+
+    for (auto& joystick : joysticks) {
+        joystick->update(dt);
     }
 }
 
 void Devices::waitEvents() {
-    // Wait for GLFW events.
+    // Wait for GLFW events
     glfwWaitEvents();
 }
 

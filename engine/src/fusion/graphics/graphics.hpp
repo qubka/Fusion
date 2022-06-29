@@ -30,7 +30,7 @@ namespace fe {
         Graphics();
         ~Graphics() override;
 
-        void update(const Time& dt) override;
+        void update(float dt) override;
 
         /**
          * Takes a screenshot of the current image of the display and saves it into a image file.

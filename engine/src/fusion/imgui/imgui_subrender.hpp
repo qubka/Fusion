@@ -19,7 +19,7 @@ namespace fe {
         ImGuiSubrender(const Pipeline::Stage& pipelineStage);
         ~ImGuiSubrender() override;
 
-        void render(const CommandBuffer& commandBuffer) override;
+        void render(const CommandBuffer& commandBuffer, float dt) override;
 
     private:
         void drawFrame(const CommandBuffer& commandBuffer);
@@ -51,5 +51,12 @@ namespace fe {
         Window* window{ nullptr };
         Window* currentWindow{ nullptr };
         glm::vec2 lastValidMousePos{ -FLT_MAX };
+
+        static Shader::VertexInput GetVertexInput(uint32_t baseBinding = 0);
+
+        static void SetStyleColors();
+        static void UpdateKeyModifiers(int mods);
+        static int TranslateUntranslatedKey(int key, int scancode);
+        static int KeyToImGuiKey(int key);
     };
 }

@@ -22,9 +22,10 @@ namespace fe {
         NONCOPYABLE(Joystick);
 
         /**
-         * Processes as object.
+         * Run every frame as long as the joystick has work to do.
+         * @param dt The current delta time.
          */
-        virtual void update() = 0;
+        virtual void update(float dt) = 0;
 
         /**
          * Gets the port of the joystick.

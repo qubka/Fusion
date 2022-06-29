@@ -9,7 +9,8 @@ namespace fe {
     public:
         PerspectiveCamera(float fov, float aspect, float near, float far);
 
-        virtual void update(float dt) { updateView(); }
+        void start() override {}
+        void update(float dt) override { updateView(); }
 
         void setPerspective(float fov, float aspect, float near, float far);
 

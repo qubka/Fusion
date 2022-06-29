@@ -10,7 +10,7 @@ namespace glfw {
         explicit Joystick(uint8_t port);
         ~Joystick() override = default;
 
-        void update() override;
+        void update(float dt) override;
 
         uint8_t getPort() const override { return port; }
         bool isConnected() const override { return connected; }

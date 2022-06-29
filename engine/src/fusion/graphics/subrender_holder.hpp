@@ -92,8 +92,9 @@ namespace fe {
          * Iterates through all Subrenders.
          * @param stage The Subrender stage.
          * @param commandBuffer The command buffer to record render command into.
+         * @param dt The current delta time.
          */
-        void renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer);
+        void renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer, float dt);
 
         /// List of all Subrenders.
         std::unordered_map<std::type_index, std::unique_ptr<Subrender>> subrenders;

@@ -60,6 +60,12 @@ namespace fe {
         void setApp(std::unique_ptr<App>&& app) { application = std::move(app); }
 
         /**
+         * Gets the delta (seconds) between updates.
+         * @return The delta between updates.
+         */
+        const Time& getDeltaTime() const { return deltaTime.time; }
+
+        /**
          * Gets if the engine is running.
          * @return If the engine is running.
          */

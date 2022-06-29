@@ -11,7 +11,6 @@
 #include <entt/signal/sigh.hpp>
 
 namespace fe {
-    class Time;
     /**
      * @brief Module used for managing some devices.
      */
@@ -26,9 +25,10 @@ namespace fe {
         static Devices* Get() { return Instance; }
 
         /**
-         * Run every frame to processes connected devices.
+         * Run every frame as long as the manager has work to do.
+         * @param dt The current delta time.
          */
-        virtual void update() = 0;
+        virtual void update(float dt) = 0;
 
         /**
          * Waits until events are queued and processes them.

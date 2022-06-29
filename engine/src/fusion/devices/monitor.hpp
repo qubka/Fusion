@@ -40,6 +40,12 @@ namespace fe {
         NONCOPYABLE(Monitor);
 
         /**
+         * Run every frame as long as the monitor has work to do.
+         * @param dt The current delta time.
+         */
+        virtual void update(float dt) = 0;
+
+        /**
          * Validate that monitor is primary.
          * @return True if primary, false otherwise.
          */

@@ -2,6 +2,7 @@
 
 #include "fusion/graphics/renderer.hpp"
 #include "fusion/imgui/imgui_subrender.hpp"
+#include "fusion/grid/grid_renderer.hpp"
 
 namespace fe {
     class MainRenderer : public Renderer {
@@ -19,10 +20,11 @@ namespace fe {
         ~MainRenderer() override = default;
 
         void start() override {
-            addSubrender<ImGuiSubrender>({ 0, 0});
+            //addSubrender<ImGuiSubrender>({0, 0});
+            addSubrender<GridRenderer>({0, 0});
         }
 
-        void update() override {
+        void update(float dt) override {
         }
 
     private:

@@ -1,7 +1,6 @@
 #pragma once
 
 namespace fe {
-    class Time;
     template<typename Base>
     /**
      * https://accu.org/journals/overload/6/27/bellingham_597/
@@ -82,6 +81,6 @@ namespace fe {
          * The update function for the module.
          * @param dt The current delta time.
          */
-        virtual void update(const Time& dt) = 0;
+        virtual void update(float dt) = 0;
     };
 }

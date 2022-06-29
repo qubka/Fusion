@@ -45,7 +45,7 @@ Graphics::~Graphics() {
     renderer = nullptr;
 }
 
-void Graphics::update(const Time& dt) {
+void Graphics::update(float dt) {
     if (!renderer || Devices::Get()->getWindow(0)->isIconified())
         return;
 
@@ -55,7 +55,7 @@ void Graphics::update(const Time& dt) {
         renderer->started = true;
     }
 
-    renderer->update();
+    renderer->update(dt);
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
@@ -84,7 +84,7 @@ void Graphics::update(const Time& dt) {
                 stage.second = subpass.binding;
 
                 // Renders subpass subrender pipelines
-                renderer->subrenderHolder.renderStage(stage, info.commandBuffer);
+                renderer->subrenderHolder.renderStage(stage, info.commandBuffer, dt);
 
                 if (subpass.binding != renderStage->getSubpasses().back().binding)
                     vkCmdNextSubpass(info.commandBuffer, VK_SUBPASS_CONTENTS_INLINE);

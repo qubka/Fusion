@@ -11,7 +11,7 @@ namespace glfw {
         Window(const fe::VideoMode& videoMode, const glm::uvec2& size = {1280, 720}, std::string title = "Fusion");
         ~Window() override;
 
-        void update() override;
+        void update(float dt) override;
 
         bool isBorderless() const override { return borderless; }
         void setBorderless(bool flag) override;

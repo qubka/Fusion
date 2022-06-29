@@ -61,15 +61,16 @@ int32_t Engine::run() {
         while (running) {
             // Updates the delta time
             deltaTime.update();
+            float dt = deltaTime.time.asSeconds();
 
             // Main application and devices processing
-            devices->update();
+            devices->update(dt);
             if (application) {
                 if (!application->started) {
                     application->start();
                     application->started = true;
                 }
-                application->update(deltaTime.time);
+                application->update(dt);
             }
 
             // Pre-Update
@@ -78,7 +79,6 @@ int32_t Engine::run() {
             updateStage(Module::Stage::Normal);
             // Post-Update
             updateStage(Module::Stage::Post);
-
             // Render-Update
             updateStage(Module::Stage::Render);
 
@@ -93,6 +93,7 @@ int32_t Engine::run() {
 }
 
 void Engine::updateStage(Module::Stage stage) {
+    float dt = deltaTime.time.asSeconds();
     for (const auto& moduleId : moduleStages[stage])
-        modules[moduleId]->update(deltaTime.time);
+        modules[moduleId]->update(dt);
 }

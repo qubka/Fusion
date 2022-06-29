@@ -7,7 +7,8 @@ namespace fe {
     public:
         OrthographicCamera(float left, float right, float bottom, float top);
 
-        virtual void update(float dt) { updateView(); }
+        void start() override {}
+        void update(float dt) override { updateView(); }
 
         void setOrthographic(float left, float right, float bottom, float top);
 

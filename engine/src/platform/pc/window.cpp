@@ -74,15 +74,13 @@ Window::~Window() {
     glfwDestroyWindow(window);
 }
 
-void Window::update() {
-    //auto delta = Engine::Get()->getDelta().asSeconds();
-auto delta = 0.015f;
+void Window::update(float dt) {
     // Updates the position delta.
-    mousePositionDelta = delta * (mouseLastPosition - mousePosition);
+    mousePositionDelta = dt * (mouseLastPosition - mousePosition);
     mouseLastPosition = mousePosition;
 
     // Updates the scroll delta.
-    mouseScrollDelta = delta * (mouseLastScroll - mouseScroll);
+    mouseScrollDelta = dt * (mouseLastScroll - mouseScroll);
     mouseLastScroll = mouseScroll;
 }
 

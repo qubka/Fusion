@@ -15,15 +15,17 @@ namespace fe {
         ~GridRenderer();
 
     private:
-        void render(const CommandBuffer& commandBuffer) override;
+        void render(const CommandBuffer& commandBuffer, float dt) override;
 
         PipelineGraphics pipeline;
         DescriptorsHandler descriptorSet;
-        UniformHandler uniformObject;
-        //PushHandler pushObject;
+        //UniformHandler uniformObject;
+        PushHandler pushObject;
 
         EditorCamera camera{};
 
         std::unique_ptr<Buffer> vertexBuffer;
+
+        static Shader::VertexInput GetVertexInput(uint32_t baseBinding = 0);
     };
 }
