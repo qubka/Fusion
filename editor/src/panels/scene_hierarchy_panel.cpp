@@ -50,7 +50,7 @@ void SceneHierarchyPanel::drawEntities() {
 
     entt::entity removeEntity = entt::null;
     std::function<void(entt::entity entity)> function = [&](const auto entity) {
-        ImGui::PushID(("Entity" + std::to_string(static_cast<int>(entity))).c_str());
+        ImGui::PushID(("Entity" + std::to_string(static_cast<int32_t>(entity))).c_str());
 
         auto& tag = *context->registry.get<TagComponent>(entity);
         bool children = parentSystem.has_children(entity);

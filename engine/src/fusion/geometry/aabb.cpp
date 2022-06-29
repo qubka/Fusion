@@ -166,7 +166,7 @@ float AABB::getDistanceToNearestEdge(const glm::vec3& point) const {
     };
 
     float minDistance = glm::distance2(point, edges[0]);
-    for (int i = 1; i < edges.size(); ++i) {
+    for (size_t i = 1; i < edges.size(); ++i) {
         float dist = glm::distance2(point, edges[i]);
         if (dist < minDistance)
             minDistance = dist;

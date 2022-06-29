@@ -161,7 +161,7 @@ void Instance::createInstance() {
 	const auto& appVersion = Engine::Get()->getApp()->getVersion();
 	const auto& appName = Engine::Get()->getApp()->getName();
 
-	Graphics::CheckVk(volkInitialize());
+	VK_RESULT(volkInitialize());
 	
 	VkApplicationInfo applicationInfo = {};
 	applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -202,7 +202,7 @@ void Instance::createInstance() {
 		instanceCreateInfo.ppEnabledLayerNames = ValidationLayers.data();
 	}
 
-	Graphics::CheckVk(vkCreateInstance(&instanceCreateInfo, nullptr, &instance));
+	VK_RESULT(vkCreateInstance(&instanceCreateInfo, nullptr, &instance));
 
 #if VOLK_HEADER_VERSION >= 131
 	volkLoadInstanceOnly(instance);
@@ -221,7 +221,7 @@ void Instance::createDebugMessenger() {
 	debugUtilsMessengerCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 	debugUtilsMessengerCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 	debugUtilsMessengerCreateInfo.pfnUserCallback = &CallbackDebug;
-	Graphics::CheckVk(FvkCreateDebugUtilsMessengerEXT(instance, &debugUtilsMessengerCreateInfo, nullptr, &debugMessenger));
+	VK_RESULT(FvkCreateDebugUtilsMessengerEXT(instance, &debugUtilsMessengerCreateInfo, nullptr, &debugMessenger));
 #else
 	VkDebugReportCallbackCreateInfoEXT debugReportCallbackCreateInfo = {};
 	debugReportCallbackCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
@@ -234,7 +234,7 @@ void Instance::createDebugMessenger() {
 		enableValidationLayers = false;
 		LOG_ERROR << "Extension vkCreateDebugReportCallbackEXT not present!";
 	} else {
-		Graphics::CheckVk(debugReportResult);
+		VK_RESULT(debugReportResult);
 	}
 #endif
 }

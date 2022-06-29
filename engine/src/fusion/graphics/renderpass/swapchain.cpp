@@ -1,6 +1,6 @@
 #include "swapchain.hpp"
 
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/vku.hpp"
 
 using namespace fe;
 
@@ -70,27 +70,24 @@ Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& 
     swapchainCreateInfo.compositeAlpha = compositeAlpha;
     swapchainCreateInfo.presentMode = presentMode;
     swapchainCreateInfo.clipped = VK_TRUE;
-    swapchainCreateInfo.oldSwapchain = oldSwapchain ? oldSwapchain->swapchain : VK_NULL_HANDLE;
+    if (oldSwapchain) {
+        swapchainCreateInfo.oldSwapchain = oldSwapchain->swapchain;
+        activeImageIndex = oldSwapchain->activeImageIndex;
+    }
+    VK_RESULT(vkCreateSwapchainKHR(logicalDevice, &swapchainCreateInfo, nullptr, &swapchain));
 
-    Graphics::CheckVk(vkCreateSwapchainKHR(logicalDevice, &swapchainCreateInfo, nullptr, &swapchain));
-
-	Graphics::CheckVk(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, nullptr));
+	VK_RESULT(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, nullptr));
     if (imageCount < 0)
         throw std::runtime_error("Failed to create swap chain images");
 
 	images.resize(imageCount);
 	imageViews.resize(imageCount);
 
-	Graphics::CheckVk(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, images.data()));
+	VK_RESULT(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, images.data()));
 
 	for (uint32_t i = 0; i < imageCount; i++) {
 		Image::CreateImageView(images[i], imageViews[i], VK_IMAGE_VIEW_TYPE_2D, surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, 1, 0, 1, 0);
 	}
-
-    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.swapchainCount = 1;
-    presentInfo.pSwapchains = &swapchain;
-    presentInfo.pImageIndices = &activeImageIndex;
 }
 
 Swapchain::~Swapchain() {
@@ -103,12 +100,17 @@ Swapchain::~Swapchain() {
 
 VkResult Swapchain::acquireNextImage(const VkSemaphore& presentCompleteSemaphore, VkFence fence) {
 	if (fence != VK_NULL_HANDLE)
-		Graphics::CheckVk(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
+		VK_RESULT(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
 
 	return vkAcquireNextImageKHR(logicalDevice, swapchain, UINT64_MAX, presentCompleteSemaphore, VK_NULL_HANDLE, &activeImageIndex);
 }
 
 VkResult Swapchain::queuePresent(const VkQueue& presentQueue, const VkSemaphore& waitSemaphore) {
+    VkPresentInfoKHR presentInfo = {};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = &swapchain;
+    presentInfo.pImageIndices = &activeImageIndex;
 	presentInfo.waitSemaphoreCount = waitSemaphore ? 1 : 0;
 	presentInfo.pWaitSemaphores = &waitSemaphore;
 	return vkQueuePresentKHR(presentQueue, &presentInfo);

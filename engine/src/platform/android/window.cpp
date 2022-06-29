@@ -24,7 +24,7 @@ Window::Window()
 
 void Window::pollEvents() {
     focused = true;
-    int ident, events;
+    int32_t ident, events;
     struct android_poll_source* source;
     while (!destroy && (ident = ALooper_pollAll(focused ? 0 : -1, NULL, &events, (void**)&source)) >= 0) {
         if (source != NULL) {

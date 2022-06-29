@@ -137,7 +137,7 @@ void Image::CreateImage(VkImage& image, VkDeviceMemory& memory, const VkExtent3D
 	imageCreateInfo.usage = usage;
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	Graphics::CheckVk(vkCreateImage(logicalDevice, &imageCreateInfo, nullptr, &image));
+	VK_RESULT(vkCreateImage(logicalDevice, &imageCreateInfo, nullptr, &image));
 
 	VkMemoryRequirements memoryRequirements;
 	vkGetImageMemoryRequirements(logicalDevice, image, &memoryRequirements);
@@ -146,9 +146,9 @@ void Image::CreateImage(VkImage& image, VkDeviceMemory& memory, const VkExtent3D
 	memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	memoryAllocateInfo.allocationSize = memoryRequirements.size;
 	memoryAllocateInfo.memoryTypeIndex = Buffer::FindMemoryType(memoryRequirements.memoryTypeBits, properties);
-	Graphics::CheckVk(vkAllocateMemory(logicalDevice, &memoryAllocateInfo, nullptr, &memory));
+	VK_RESULT(vkAllocateMemory(logicalDevice, &memoryAllocateInfo, nullptr, &memory));
 
-	Graphics::CheckVk(vkBindImageMemory(logicalDevice, image, memory, 0));
+	VK_RESULT(vkBindImageMemory(logicalDevice, image, memory, 0));
 }
 
 void Image::CreateImageSampler(VkSampler& sampler, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, uint32_t mipLevels) {
@@ -172,7 +172,7 @@ void Image::CreateImageSampler(VkSampler& sampler, VkFilter filter, VkSamplerAdd
 	samplerCreateInfo.maxLod = static_cast<float>(mipLevels);
 	samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 	samplerCreateInfo.unnormalizedCoordinates = VK_FALSE;
-	Graphics::CheckVk(vkCreateSampler(logicalDevice, &samplerCreateInfo, nullptr, &sampler));
+	VK_RESULT(vkCreateSampler(logicalDevice, &samplerCreateInfo, nullptr, &sampler));
 }
 
 void Image::CreateImageView(const VkImage& image, VkImageView& imageView, VkImageViewType type, VkFormat format, VkImageAspectFlags imageAspect,
@@ -190,7 +190,7 @@ void Image::CreateImageView(const VkImage& image, VkImageView& imageView, VkImag
 	imageViewCreateInfo.subresourceRange.levelCount = mipLevels;
 	imageViewCreateInfo.subresourceRange.baseArrayLayer = baseArrayLayer;
 	imageViewCreateInfo.subresourceRange.layerCount = layerCount;
-	Graphics::CheckVk(vkCreateImageView(logicalDevice, &imageViewCreateInfo, nullptr, &imageView));
+	VK_RESULT(vkCreateImageView(logicalDevice, &imageViewCreateInfo, nullptr, &imageView));
 }
 
 void Image::CreateMipmaps(const VkImage& image, const VkExtent3D& extent, VkFormat format, VkImageLayout dstImageLayout, uint32_t mipLevels,

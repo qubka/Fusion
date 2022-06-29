@@ -92,7 +92,7 @@ void InputMapper::dispatch() const {
 /**
  * Add a callback to the dispatch table
  */
-void InputMapper::addCallback(InputCallback callback, int priority) {
+void InputMapper::addCallback(InputCallback callback, int32_t priority) {
     callbackTable.insert(std::make_pair(priority, callback));
 }
 

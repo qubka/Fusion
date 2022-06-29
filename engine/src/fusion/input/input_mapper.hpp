@@ -50,7 +50,7 @@ namespace fe {
 
         // Input callback registration interface
     public:
-        void addCallback(InputCallback callback, int priority);
+        void addCallback(InputCallback callback, int32_t priority);
 
         // Context management interface
     public:
@@ -68,7 +68,7 @@ namespace fe {
         std::map<std::wstring, std::unique_ptr<InputContext>> inputContexts;
         std::list<InputContext*> activeContexts; // just used to monitor active contexts
 
-        std::multimap<int, InputCallback> callbackTable;
+        std::multimap<int32_t, InputCallback> callbackTable;
 
         MappedInput currentMappedInput;
     };

@@ -243,7 +243,7 @@ namespace YAML {
     {
         static Node encode(const glm::mat4& rhs) {
             Node node;
-            for (int i = 0; i < 4; i++) {
+            for (size_t i = 0; i < 4; i++) {
                 auto& col = rhs[i];
                 node.push_back(col.x);
                 node.push_back(col.y);
@@ -258,7 +258,7 @@ namespace YAML {
             if (!node.IsSequence() || node.size() != 16)
                 return false;
 
-            for (int i = 0, j = 0; i < 4; i++, j+=4) {
+            for (size_t i = 0, j = 0; i < 4; i++, j+=4) {
                 rhs[i] = {
                     node[j+0].as<float>(),
                     node[j+1].as<float>(),
@@ -274,13 +274,13 @@ namespace YAML {
     struct convert<entt::entity>
     {
         static Node encode(const entt::entity& rhs) {
-            return Node(static_cast<int>(rhs));
+            return Node(static_cast<int32_t>(rhs));
         }
 
         static bool decode(const Node& node, entt::entity& rhs) {
             if (node.IsNull())
                 return false;
-            rhs = static_cast<entt::entity>(node.as<int>());
+            rhs = static_cast<entt::entity>(node.as<int32_t>());
             return true;
         }
     };
@@ -310,7 +310,7 @@ namespace YAML {
     }
 
     Emitter& operator<<(YAML::Emitter& out, entt::entity entity) {
-        out << static_cast<int>(entity);
+        out << static_cast<int32_t>(entity);
         return out;
     }
 
@@ -516,7 +516,7 @@ bool SceneSerializer::deserialize(const std::filesystem::path& filename) {
                 scene->registry.emplace<TagComponent>(deserializedEntity, name);
             }
 
-            LOG_DEBUG << "Deserialized entity with ID = " << static_cast<int>(uuid) << ", name = " << name;
+            LOG_DEBUG << "Deserialized entity with ID = " << static_cast<int32_t>(uuid) << ", name = " << name;
 
             if (const auto& component = entity["TransformComponent"]) {
                 scene->registry.emplace<TransformComponent>(deserializedEntity,

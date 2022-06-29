@@ -50,7 +50,6 @@ namespace fe {
         std::vector<VkImage> images;
         std::vector<VkImageView> imageViews;
         uint32_t imageCount{ 0 };
-        VkPresentInfoKHR presentInfo = {};
         VkSwapchainKHR swapchain{ VK_NULL_HANDLE };
         uint32_t activeImageIndex{ 0 };
         VkSurfaceFormatKHR surfaceFormat = {};

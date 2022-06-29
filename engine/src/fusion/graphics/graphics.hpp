@@ -7,7 +7,8 @@
 #include "fusion/graphics/devices/physical_device.hpp"
 #include "fusion/graphics/devices/surface.hpp"
 #include "fusion/graphics/pipelines/pipeline_cache.hpp"
-
+#include "fusion/graphics/renderpass/sync_object.hpp"
+#include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/renderer.hpp"
 #include "fusion/graphics/vku.hpp"
 #include "fusion/core/module.hpp"
@@ -17,11 +18,7 @@
 namespace fe {
     class Renderer;
     class RenderStage;
-    class CommandBuffer;
     class CommandPool;
-    class SyncObject;
-    //class Semaphore;
-    //class Fence;
     class Descriptor;
     class Swapchain;
 
@@ -34,9 +31,6 @@ namespace fe {
         ~Graphics() override;
 
         void update(const Time& dt) override;
-
-        static std::string StringifyResultVk(VkResult result);
-        static void CheckVk(VkResult result);
 
         /**
          * Takes a screenshot of the current image of the display and saves it into a image file.
@@ -68,12 +62,21 @@ namespace fe {
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
 
     private:
+        struct FrameInfo {
+            size_t id;
+            size_t& currentFrame;
+            Swapchain& swapchain;
+            CommandBuffer& commandBuffer;
+            SyncObject& syncObject;
+        };
+        bool beginFrame(FrameInfo& info);
+        bool beginRenderpass(FrameInfo& info, RenderStage& renderStage);
+        void endRenderpass(FrameInfo& info);
+        void endFrame(FrameInfo& info);
+
         void resetRenderStages();
         void recreateSwapchain(size_t id);
         void recreateAttachmentsMap();
-
-        bool startRenderpass(size_t id, RenderStage& renderStage);
-        bool endRenderpass(size_t id, RenderStage& renderStage);
 
         void onWindowCreate(Window* window, bool create);
 
@@ -92,8 +95,10 @@ namespace fe {
 
         struct PerSurfaceBuffers {
             size_t currentFrame{ 0 };
-            std::vector<CommandBuffer> commandBuffers;
-            std::vector<SyncObject> syncObjects;
+            std::array<std::pair<CommandBuffer, SyncObject>, MAX_FRAMES_IN_FLIGHT> buffers {
+                std::make_pair(CommandBuffer{}, SyncObject{}),
+                std::make_pair(CommandBuffer{}, SyncObject{})
+            };
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;
     };

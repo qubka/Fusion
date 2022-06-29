@@ -5,7 +5,6 @@
 namespace fe {
     class Instance;
     class PhysicalDevice;
-    class QueueFamilyIndices;
 
     class LogicalDevice {
         friend class Graphics;

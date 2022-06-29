@@ -337,8 +337,8 @@ VkShaderModule Shader::createShaderModule(const std::filesystem::path& moduleNam
 	program.buildReflection();
 	//program.dumpReflection();
 
-	for (uint32_t dim = 0; dim < 3; ++dim) {
-		if (auto localSize = program.getLocalSize(dim); localSize > 1)
+	for (int32_t dim = 0; dim < 3; ++dim) {
+		if (uint32_t localSize = program.getLocalSize(dim); localSize > 1)
 			localSizes[dim] = localSize;
 	}
 
@@ -372,7 +372,7 @@ VkShaderModule Shader::createShaderModule(const std::filesystem::path& moduleNam
 	shaderModuleCreateInfo.pCode = spirv.data();
 
 	VkShaderModule shaderModule;
-	Graphics::CheckVk(vkCreateShaderModule(logicalDevice, &shaderModuleCreateInfo, nullptr, &shaderModule));
+	VK_RESULT(vkCreateShaderModule(logicalDevice, &shaderModuleCreateInfo, nullptr, &shaderModule));
 	return shaderModule;
 }
 

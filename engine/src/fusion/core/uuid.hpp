@@ -8,7 +8,7 @@ namespace fe::uuid {
 
     std::string generate_uuid_v4() {
         std::stringstream ss;
-        int i;
+        uint8_t i;
         ss << std::hex;
         for (i = 0; i < 8; i++) {
             ss << dis(gen);

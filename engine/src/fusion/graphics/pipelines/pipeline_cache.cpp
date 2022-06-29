@@ -7,7 +7,7 @@ using namespace fe;
 PipelineCache::PipelineCache(const LogicalDevice& logicalDevice) : logicalDevice{logicalDevice} {
     VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
     pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-    Graphics::CheckVk(vkCreatePipelineCache(logicalDevice, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
+    VK_RESULT(vkCreatePipelineCache(logicalDevice, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
 }
 
 PipelineCache::~PipelineCache() {

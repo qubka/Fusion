@@ -54,7 +54,7 @@ namespace fe {
         ~RenderStage() = default;
         NONCOPYABLE(RenderStage);
 
-        void update(size_t id);
+        void update(size_t id, const Swapchain& swapchain);
         void rebuild(size_t id, const Swapchain& swapchain);
 
         std::optional<Attachment> getAttachment(const std::string& name) const;

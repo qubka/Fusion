@@ -49,7 +49,7 @@ RenderStage::RenderStage(std::vector<Attachment> images, std::vector<SubpassType
 	}
 }
 
-void RenderStage::update(size_t id) {
+void RenderStage::update(size_t id, const Swapchain& swapchain) {
 	auto lastRenderArea = renderArea;
 
 	renderArea.offset = viewport.offset;
@@ -57,7 +57,7 @@ void RenderStage::update(size_t id) {
 	if (viewport.size)
 		renderArea.extent = viewport.scale * glm::vec2{*viewport.size};
 	else
-		renderArea.extent = viewport.scale * glm::vec2{ Devices::Get()->getWindow(id)->getSize()};
+		renderArea.extent = viewport.scale * glm::vec2{ extent2D_cast(swapchain.getExtent()) };
 
 	renderArea.extent += renderArea.offset;
 
@@ -69,7 +69,7 @@ void RenderStage::rebuild(size_t id, const Swapchain& swapchain) {
 	auto debugStart = Time::Now();
 #endif
 
-	update(id);
+	update(id, swapchain);
 
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
 	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();

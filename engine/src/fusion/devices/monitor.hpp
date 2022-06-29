@@ -6,17 +6,17 @@ namespace fe {
      */
     struct VideoMode {
         /// The width, in screen coordinates, of the video mode.
-        int width;
+        int32_t width;
         /// The height, in screen coordinates, of the video mode.
-        int height;
+        int32_t height;
         /// The bit depth of the red channel of the video mode.
-        int redBits;
+        int32_t redBits;
         /// The bit depth of the green channel of the video mode.
-        int greenBits;
+        int32_t greenBits;
         /// The bit depth of the blue channel of the video mode.
-        int blueBits;
+        int32_t blueBits;
         /// The refresh rate, in Hz, of the video mode.
-        int refreshRate;
+        int32_t refreshRate;
     };
 
     /**

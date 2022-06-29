@@ -4,7 +4,7 @@
 using namespace fe;
 
 CommandLineArgs::CommandLineArgs(int count, char** args) {
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         std::string argument{ args[i] };
         if (auto pos = argument.find('='); pos != std::string::npos) {
             arguments.emplace(argument.substr(0, pos), argument.substr(pos + 1));
