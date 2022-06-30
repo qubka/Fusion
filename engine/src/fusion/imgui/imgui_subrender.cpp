@@ -135,7 +135,7 @@ void ImGuiSubrender::drawFrame(const CommandBuffer& commandBuffer) {
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
-    //descriptorSet.push("fontSampler", font.get());
+    descriptorSet.push("fontSampler", font.get());
 
     if (!descriptorSet.update(pipeline))
         return;
