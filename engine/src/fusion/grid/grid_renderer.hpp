@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fusion/graphics/editor_camera.hpp"
+#include "fusion/graphics/camera/editor_camera.hpp"
 
 #include "fusion/graphics/subrender.hpp"
 #include "fusion/graphics/pipelines/pipeline_graphics.hpp"

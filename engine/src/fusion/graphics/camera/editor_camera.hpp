@@ -6,9 +6,8 @@ namespace fe {
     class EditorCamera : public PerspectiveCamera {
     public:
         EditorCamera();
-        EditorCamera(float fov, float aspect, float near, float far);
 
-        void update(float dt) override;
+        void update(float dt);
 
         float getPitch() const { return pitch; }
         float getYaw() const { return yaw; }
@@ -16,11 +15,6 @@ namespace fe {
         void setDistance(float value) { distance = value; }
         float getSpeed() const { return speed; }
         void setSpeed(float value) { speed = value; }
-
-        void setViewport(const glm::vec2& size) {
-            viewport = size;
-            setAspect(size.x / size.y);
-        }
 
         void mousePan(const glm::vec2& delta);
         void mouseRotate(const glm::vec2& delta);

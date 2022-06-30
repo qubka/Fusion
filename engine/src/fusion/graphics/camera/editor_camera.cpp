@@ -3,10 +3,7 @@
 
 using namespace fe;
 
-EditorCamera::EditorCamera() : PerspectiveCamera{45.0f, 1.778f, 0.1f, 1000.0f} {
-}
-
-EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : PerspectiveCamera{fov, aspect, near, far} {
+EditorCamera::EditorCamera() : PerspectiveCamera{} {
 }
 
 void EditorCamera::update(float dt) {
@@ -26,21 +23,19 @@ void EditorCamera::update(float dt) {
             }
         }
 
-        setRotation(glm::vec3{pitch, yaw, 0});
-        setPosition(calculatePosition());
+        setOrientation(glm::vec3{pitch, yaw, 0});
+        setEyePoint(focalPoint - viewDirection * distance);
     }
-
-    PerspectiveCamera::update(dt);
 }
 
 void EditorCamera::mousePan(const glm::vec2& delta) {
     glm::vec2 pans{ panSpeed() };
-    focalPoint += right * delta.x * pans.x * distance;
-    focalPoint += up * delta.y * pans.y * distance;
+    focalPoint += rightVector * delta.x * pans.x * distance;
+    focalPoint += upVector * delta.y * pans.y * distance;
 }
 
 void EditorCamera::mouseRotate(const glm::vec2& delta) {
-    float yawSign = up.y > 0 ? -1.0f : 1.0f;
+    float yawSign = upVector.y > 0 ? -1.0f : 1.0f;
     yaw -= yawSign * delta.x;
     pitch += delta.y;
 }
@@ -48,7 +43,7 @@ void EditorCamera::mouseRotate(const glm::vec2& delta) {
 void EditorCamera::mouseZoom(float delta) {
     distance -= delta * zoomSpeed();
     if (distance < 1.0f) {
-        focalPoint += forward;
+        focalPoint += viewDirection;
         distance = 1.0f;
     }
 }
@@ -69,8 +64,4 @@ float EditorCamera::zoomSpeed() const {
     float speed = dist * dist;
     speed = std::min(speed, 100.0f); // max speed = 100
     return speed;
-}
-
-glm::vec3 EditorCamera::calculatePosition() const {
-    return (focalPoint - forward * distance);
 }

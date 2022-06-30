@@ -90,7 +90,7 @@ void StereoCamera::calcViewMatrix() const {
 
     // calculate left matrix
     glm::vec3 eye {eyePoint - (orientation * vec3::right) * (0.5f * eyeSeparation)};
-    glm::vec3 d {-dot(eye, rightVector), -dot(eye, upVector), -dot(eye, -viewDirection)};
+    glm::vec3 d {-dot(eye, rightVector), -dot(eye, upVector), -dot(eye, viewDirection)};
 
     viewMatrixLeft[3][0] = d.x;
     viewMatrixLeft[3][1] = d.y;
@@ -98,7 +98,7 @@ void StereoCamera::calcViewMatrix() const {
 
     // calculate right matrix
     eye = eyePoint + (orientation * vec3::right) * (0.5f * eyeSeparation);
-    d = {-dot(eye, rightVector), -dot(eye, upVector), -dot(eye, -viewDirection)};
+    d = {-dot(eye, rightVector), -dot(eye, upVector), -dot(eye, viewDirection)};
 
     viewMatrixRight[3][0] = d.x;
     viewMatrixRight[3][1] = d.y;
@@ -157,8 +157,8 @@ void StereoCamera::getShiftedClipCoordinates(float clipDist, float ratio, glm::v
     const float left = frustumLeft + shift;
     const float right = frustumRight + shift;
 
-    topLeft = shiftedEyePoint + clipDist * viewDirection + ratio * (frustumTop * upVector + left * rightVector);
-    topRight = shiftedEyePoint + clipDist * viewDirection + ratio * (frustumTop * upVector + right * rightVector);
-    bottomLeft = shiftedEyePoint + clipDist * viewDirection + ratio * (frustumBottom * upVector + left * rightVector);
-    bottomRight = shiftedEyePoint + clipDist * viewDirection + ratio * (frustumBottom * upVector + right * rightVector);
+    topLeft = shiftedEyePoint - clipDist * viewDirection + ratio * (frustumTop * upVector + left * rightVector);
+    topRight = shiftedEyePoint - clipDist * viewDirection + ratio * (frustumTop * upVector + right * rightVector);
+    bottomLeft = shiftedEyePoint - clipDist * viewDirection + ratio * (frustumBottom * upVector + left * rightVector);
+    bottomRight = shiftedEyePoint - clipDist * viewDirection + ratio * (frustumBottom * upVector + right * rightVector);
 }

@@ -19,9 +19,9 @@ namespace fe {
         uint32_t binding{ 0 };
         std::string name;
         Type type{ Type:: Image };
+        bool multisampled{ false };
         VkFormat format{ VK_FORMAT_R8G8B8A8_UNORM };
         glm::vec4 clearColour{ 0.0f, 0.0f, 0.0f, 1.0f };
-        bool multisampled{ false };
     };
 
     struct SubpassType {
@@ -66,7 +66,7 @@ namespace fe {
         const std::vector<Attachment>& getAttachments() const { return attachments; }
         const std::vector<SubpassType>& getSubpasses() const { return subpasses; }
 
-        const Viewport& getViewport() { return viewport; }
+        Viewport& getViewport() { return viewport; }
         void setViewport(const Viewport& viewport) { this->viewport = viewport; }
 
         /**
@@ -100,7 +100,7 @@ namespace fe {
         std::unique_ptr<ImageDepth> depthStencil;
         std::unique_ptr<Framebuffers> framebuffers;
 
-        std::map<std::string, const Descriptor*> descriptors;
+        std::unordered_map<std::string, const Descriptor*> descriptors;
 
         std::vector<VkClearValue> clearValues;
         std::vector<uint32_t> subpassAttachmentCount;

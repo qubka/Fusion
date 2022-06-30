@@ -59,7 +59,7 @@ void Camera::setViewDirection(glm::vec3 direction) {
         return;
 
     viewDirection = direction;
-    orientation = glm::rotation(viewDirection, vec3::back);
+    orientation = glm::rotation(viewDirection, vec3::forward);
     dirtyViewCaches();
 }
 
@@ -69,7 +69,7 @@ void Camera::setOrientation(glm::quat rotation) {
         return;
 
     orientation = rotation;
-    viewDirection = orientation * vec3::back;
+    viewDirection = orientation * vec3::forward;
     dirtyViewCaches();
 }
 
@@ -79,7 +79,7 @@ void Camera::setWorldUp(glm::vec3 up) {
         return;
 
     worldUp = up;
-    orientation = glm::toQuat(glm::alignZAxisWithTarget(-viewDirection, worldUp));
+    orientation = glm::toQuat(glm::alignZAxisWithTarget(viewDirection, worldUp));
     dirtyViewCaches();
 }
 
@@ -96,7 +96,7 @@ void Camera::lookAt(glm::vec3 target) {
         return;
 
     viewDirection = direction;
-    orientation = glm::toQuat(alignZAxisWithTarget(-viewDirection, worldUp));
+    orientation = glm::toQuat(alignZAxisWithTarget(viewDirection, worldUp));
     pivotDistance = glm::length(target);
 
     dirtyViewCaches();
@@ -111,7 +111,7 @@ void Camera::lookAt(const glm::vec3& point, glm::vec3 target) {
 
     eyePoint = point;
     viewDirection = direction;
-    orientation = glm::quat(glm::toQuat(alignZAxisWithTarget(-viewDirection, worldUp)));
+    orientation = glm::quat(glm::toQuat(alignZAxisWithTarget(viewDirection, worldUp)));
     pivotDistance = glm::length(target);
 
     dirtyViewCaches();
@@ -128,7 +128,7 @@ void Camera::lookAt(const glm::vec3& point, glm::vec3 target, glm::vec3 up) {
     eyePoint = point;
     worldUp = up;
     viewDirection = direction;
-    orientation = glm::toQuat(alignZAxisWithTarget(-viewDirection, worldUp));
+    orientation = glm::toQuat(alignZAxisWithTarget(viewDirection, worldUp));
     pivotDistance = glm::length(target);
 
     dirtyViewCaches();
@@ -263,6 +263,7 @@ void Camera::calcMatrices() const {
 }
 
 void Camera::calcViewMatrix() const {
+    //forwardVector = orientation * vec3::forward; // should be same as viewDirection
     rightVector = orientation * vec3::right;
     upVector = orientation * vec3::up;
 
@@ -283,8 +284,8 @@ void Camera::calcInverseView() const {
 void Camera::getClipCoordinates(float clipDist, float ratio, glm::vec3& topLeft, glm::vec3& topRight, glm::vec3& bottomLeft, glm::vec3& bottomRight) const {
     calcMatrices();
 
-    topLeft = eyePoint + clipDist * viewDirection + ratio * (frustumTop * upVector) + ratio * (frustumLeft * rightVector);
-    topRight = eyePoint + clipDist * viewDirection + ratio * (frustumTop * upVector) + ratio * (frustumRight * rightVector);
-    bottomLeft = eyePoint + clipDist * viewDirection + ratio * (frustumBottom * upVector) + ratio * (frustumLeft * rightVector);
-    bottomRight = eyePoint + clipDist * viewDirection + ratio * (frustumBottom * upVector) + ratio * (frustumRight * rightVector);
+    topLeft = eyePoint - clipDist * viewDirection + ratio * (frustumTop * upVector) + ratio * (frustumLeft * rightVector);
+    topRight = eyePoint - clipDist * viewDirection + ratio * (frustumTop * upVector) + ratio * (frustumRight * rightVector);
+    bottomLeft = eyePoint - clipDist * viewDirection + ratio * (frustumBottom * upVector) + ratio * (frustumLeft * rightVector);
+    bottomRight = eyePoint - clipDist * viewDirection + ratio * (frustumBottom * upVector) + ratio * (frustumRight * rightVector);
 }

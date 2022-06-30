@@ -23,7 +23,7 @@ EditorLayer::~EditorLayer() {
 }
 
 void EditorLayer::onAttach() {
-    editorCamera = EditorCamera{30, 1.778f, 0.1f, 1000};
+    editorCamera = EditorCamera{/*30, 1.778f, 0.1f, 1000*/};
     activeScene = std::make_shared<Scene>();
 
     /*auto commandLineArgs = Application::Instance().getCommandLineArgs();
@@ -278,8 +278,8 @@ void EditorLayer::onImGui() {
 
         // Camera
         // Runtime camera from entity
-        const glm::mat4& cameraView = editorCamera.getView();
-        const glm::mat4& cameraProjection = editorCamera.getProjection();
+        const glm::mat4& cameraView = editorCamera.getViewMatrix();
+        const glm::mat4& cameraProjection = editorCamera.getProjectionMatrix();
 
         // Entity transform
         auto& transform = activeScene->registry.get<TransformComponent>(selectedEntity);
@@ -397,7 +397,7 @@ void EditorLayer::saveSceneAs() {
 }
 
 void EditorLayer::onViewportResize() {
-    editorCamera.setViewport(viewportSize);
+    editorCamera.setAspectRatio(viewportSize.x / viewportSize.y);
     activeScene->onViewportResize(viewportSize);
     viewportOrtho = glm::ortho(0.0f, viewportSize.x, 0.0f, viewportSize.y);
 }

@@ -5,7 +5,7 @@
 //#include "fusion/graphics/systems/grid_renderer.hpp"
 //#include "fusion/graphics/systems/sky_renderer.hpp"
 
-#include "fusion/graphics/editor_camera.hpp"
+#include "fusion/graphics/camera/editor_camera.hpp"
 //#include "fusion/input/input.hpp"
 
 using namespace fe;

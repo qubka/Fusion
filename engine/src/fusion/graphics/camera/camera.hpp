@@ -57,7 +57,7 @@ namespace fe {
         void setPivotDistance(float distance) { pivotDistance = distance; }
 
         //! Primarily for user interaction, such as with CameraUi. Returns the world-space point relative to which tumbling and dollying occur.
-        glm::vec3 getPivotPoint() const { return eyePoint + viewDirection * pivotDistance; }
+        glm::vec3 getPivotPoint() const { return eyePoint - viewDirection * pivotDistance; }
 
         //! Returns the aspect ratio of the image plane - its width divided by its height
         float getAspectRatio() const { return aspectRatio; }
@@ -139,7 +139,7 @@ namespace fe {
         bool isProjectionCachesDirty() { return projectionCached || inverseProjectionCached; }
 
         glm::vec3 eyePoint{ vec3::zero };
-        glm::vec3 viewDirection{ vec3::back };
+        glm::vec3 viewDirection{ vec3::forward };
         glm::quat orientation{ quat::identity };
         glm::vec3 worldUp{ vec3::up };
 
@@ -149,6 +149,7 @@ namespace fe {
         float farClip{ 1000.f };
         float pivotDistance{ 1.0f };
 
+        //mutable glm::vec3 forwardVector;
         mutable glm::vec3 rightVector;
         mutable glm::vec3 upVector;
 

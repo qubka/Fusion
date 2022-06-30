@@ -53,7 +53,7 @@ Ray PerspectiveCamera::calcRay(const glm::vec2& uv, float imagePlaneAspectRatio)
     float t = (uv.t - 0.5f + 0.5f * lensShift.y);
     float viewDistance = imagePlaneAspectRatio / fabsf(frustumRight - frustumLeft) * nearClip;
 
-    return { eyePoint, glm::normalize(rightVector * s + upVector * t + (viewDirection * viewDistance)) };
+    return { eyePoint, glm::normalize(rightVector * s + upVector * t - (viewDirection * viewDistance)) };
 }
 
 void PerspectiveCamera::calcProjection() const {
@@ -92,7 +92,7 @@ PerspectiveCamera PerspectiveCamera::calcFraming(const Sphere& worldSpaceSphere)
     PerspectiveCamera result = *this;
     float xDistance = worldSpaceSphere.getRadius() / sinf(glm::radians(getFovHorizontal() * 0.5f));
     float yDistance = worldSpaceSphere.getRadius() / sinf(glm::radians(getFov() * 0.5f));
-    result.setEyePoint(worldSpaceSphere.getCenter() - result.viewDirection * std::max(xDistance, yDistance));
+    result.setEyePoint(worldSpaceSphere.getCenter() + result.viewDirection * std::max(xDistance, yDistance));
     result.pivotDistance = glm::distance(result.eyePoint, worldSpaceSphere.getCenter());
     return result;
 }

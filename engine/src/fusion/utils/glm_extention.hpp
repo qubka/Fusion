@@ -1,5 +1,30 @@
 #pragma once
 
+namespace vec3 {
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 right{1.0f, 0.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 left{-1.0f, 0.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 up{0.0f, 1.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 down{0.0f, -1.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 forward {0.0f, 0.0f, 1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 back{0.0f ,0.0f, -1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 zero{0.0f, 0.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 one{1.0f, 1.0f, 1.0f};
+}
+
+namespace vec2 {
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 right{1.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 left{-1.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 up{0.0f, 1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 down{0.0f, -1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 zero{0.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 one{1.0f, 1.0f};
+}
+
+namespace quat {
+    GLM_INLINE GLM_CONSTEXPR glm::quat identity{1.0f, 0.0f, 0.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::quat y_1800{0.0f, 0.0f, 1.0f, 0.0f};
+}
+
 namespace glm {
     template<typename T, qualifier Q>
     GLM_FUNC_DECL bool decompose(mat<4, 4, T, Q> const& modelMatrix, vec<3, T, Q>& translation, vec<3, T, Q>& rotation, vec<3, T, Q>& scale) {
@@ -106,8 +131,8 @@ namespace glm {
         return output;
     }
 
-    /*template<typename T, qualifier Q>
-    GLM_FUNC_DECL mat<4, 4, T, Q> alignZAxisWithTarget(vec<3, T, Q> const& targetDir, vec<3, T, Q> const& upDir) {
+    template<typename T, qualifier Q>
+    GLM_FUNC_DECL mat<4, 4, T, Q> alignZAxisWithTarget(vec<3, T, Q> targetDir, vec<3, T, Q> upDir) {
         // Ensure that the target direction is non-zero.
         if (length2(targetDir) == 0)
             targetDir = vec<3, T, Q>{ 0, 0, 1 };
@@ -144,35 +169,10 @@ namespace glm {
             0,         0,         0,		 1
         };
         return output;
-    }*/
+    }
 
     template<typename T, qualifier Q>
     GLM_FUNC_QUALIFIER GLM_CONSTEXPR T cross(const vec<2, T, Q>& x, const vec<2, T, Q>& y)  {
         return x.x * y.y - x.y * y.x;
     }
-}
-
-namespace vec3 {
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 right{1.0f, 0.0f, 0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 left{-1.0f, 0.0f, 0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 up{0.0f, 1.0f, 0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 down{0.0f, -1.0f, 0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 forward {0.0f, 0.0f, 1.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 back{0.0f ,0.0f, -1.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 zero{0.0f, 0.0f, 0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec3 one{1.0f, 1.0f, 1.0f};
-}
-
-namespace vec2 {
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 right{1.0f, 0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 left{-1.0f, 0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 up{0.0f, 1.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 down{0.0f, -1.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 zero{0.0f, 0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::vec2 one{1.0f, 1.0f};
-}
-
-namespace quat {
-    GLM_INLINE GLM_CONSTEXPR glm::quat identity{1.0f, 0.0f, 0.0f, 0.0f};
-    GLM_INLINE GLM_CONSTEXPR glm::quat y_1800{0.0f, 0.0f, 1.0f, 0.0f};
 }

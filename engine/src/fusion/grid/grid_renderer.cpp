@@ -32,14 +32,16 @@ GridRenderer::~GridRenderer() {
 
 void GridRenderer::render(const CommandBuffer& commandBuffer, float dt) {
     camera.update(dt);
-    camera.setViewport(Devices::Get()->getWindow(0)->getSize());
+
+    auto& size = Devices::Get()->getWindow(0)->getSize();
+    camera.setAspectRatio(size.x / size.y);
 
     // Updates uniform
     //auto camera = Scenes::Get()->getScene()->getCamera();
     //uniformObject.push("projection", camera.getProjection());
     //uniformObject.push("view", camera.getView());
-    pushObject.push("projection", camera.getProjection());
-    pushObject.push("view", camera.getView());
+    pushObject.push("projection", camera.getProjectionMatrix());
+    pushObject.push("view", camera.getViewMatrix());
 
     // Updates descriptors
     //descriptorSet.push("UniformObject", uniformObject);
