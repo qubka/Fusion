@@ -50,11 +50,7 @@ PipelineGraphics::PipelineGraphics(Stage stage, std::vector<std::filesystem::pat
 	}
 
 #if FUSION_DEBUG
-    std::string shaders;
-    for (auto& s : this->shaderStages) {
-        shaders += s.string() + " ";
-    }
-	LOG_DEBUG << "Pipeline Graphics: " << shaders << " loaded in " << (Time::Now() - debugStart).asMilliseconds<float>() << "ms";
+	LOG_DEBUG << "Pipeline Graphics: " << shader.getName() << " loaded in " << (Time::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 
