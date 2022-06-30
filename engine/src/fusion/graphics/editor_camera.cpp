@@ -1,4 +1,5 @@
 #include "editor_camera.hpp"
+#include "fusion/devices/devices.hpp"
 
 using namespace fe;
 
@@ -9,17 +10,19 @@ EditorCamera::EditorCamera(float fov, float aspect, float near, float far) : Per
 }
 
 void EditorCamera::update(float dt) {
-    /*if (Input::GetKey(Key::LeftAlt)) {
-        if (Input::GetMouseButton(Mouse::ButtonMiddle))
-            mousePan(Input::MouseDelta() * dt);
-        else if (Input::GetMouseButton(Mouse::ButtonLeft))
-            mouseRotate(Input::MouseDelta() * dt);
-        else if (Input::GetMouseButton(Mouse::ButtonRight))
-            mouseZoom(Input::MouseDelta().y * dt);
+    auto window = Devices::Get()->getWindow(0);
+
+    if (window->getKey(Key::LeftAlt)) {
+        if (window->getMouseButton(Mouse::ButtonMiddle))
+            mousePan(window->getMousePositionDelta());
+        else if (window->getMouseButton(Mouse::ButtonLeft))
+            mouseRotate(window->getMousePositionDelta());
+        else if (window->getMouseButton(Mouse::ButtonRight))
+            mouseZoom(window->getMousePositionDelta().y);
         else {
-            float scroll = Input::MouseScroll().y;
+            float scroll = window->getMouseScrollDelta().y;
             if (scroll != 0.0f) {
-                mouseZoom(scroll * 0.1f);
+                mouseZoom(scroll);
             }
         }
 
@@ -27,7 +30,7 @@ void EditorCamera::update(float dt) {
         setPosition(calculatePosition());
     }
 
-    PerspectiveCamera::update(dt);*/
+    PerspectiveCamera::update(dt);
 }
 
 void EditorCamera::mousePan(const glm::vec2& delta) {
@@ -38,7 +41,7 @@ void EditorCamera::mousePan(const glm::vec2& delta) {
 
 void EditorCamera::mouseRotate(const glm::vec2& delta) {
     float yawSign = up.y > 0 ? -1.0f : 1.0f;
-    yaw += yawSign * delta.x;
+    yaw -= yawSign * delta.x;
     pitch += delta.y;
 }
 

@@ -295,7 +295,7 @@ void EditorLayer::onImGui() {
         // Bounding
         auto bounds = gizmoType == ImGuizmo::BOUNDS;
         glm::vec3 boundsSnap{ 0.1f };  // Snap to 0.1m for bound change
-        static glm::mat2x3 boundsValues = { glm::vec3{-1.0f}, glm::vec3{1.0f} };
+        static glm::mat2x3 boundsValues = { -vec3::one, vec3::one };
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                              static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::WORLD, glm::value_ptr(transform.model),

@@ -10,8 +10,8 @@ GridRenderer::GridRenderer(const Pipeline::Stage& pipelineStage)
     , pipeline{pipelineStage, {"shaders/grid/grid.vert", "shaders/grid/grid.frag"}, {GetVertexInput()}} {
 
     std::array<glm::vec2, 6> vertices{{
-        {1, 1}, {-1, -1}, {-1, 1},
-        {-1, -1}, {1, 1}, {1, -1}
+        {-1, 1}, {-1, -1}, {1, 1},
+        {1, -1}, {1, 1}, {-1, -1}
     }};
 
     Buffer vertexStaging(sizeof(glm::vec2) * vertices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());

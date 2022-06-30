@@ -131,6 +131,69 @@ glm::vec3 Sphere::closestPoint(const Ray& ray) const {
     return center + glm::normalize(onRay - center) * radius;
 }
 
+void Sphere::calcProjection(float focalLength, glm::vec2* outCenter, glm::vec2* outAxisA, glm::vec2* outAxisB) const {
+    glm::vec3 o {-center.x, center.y, center.z};
+
+    float r2 = radius * radius;
+    float z2 = o.z * o.z;
+    float l2 = glm::dot(o, o);
+
+    if (outCenter)
+        *outCenter = focalLength * o.z * glm::vec2{o} / (z2 - r2);
+    if (std::fabs(z2 - l2) > 0.00001f) {
+        if (outAxisA)
+            *outAxisA = focalLength * sqrtf(-r2 * (r2 - l2) / ((l2 - z2) * (r2 - z2) * (r2 - z2))) * glm::vec2{o.x, o.y};
+        if (outAxisB)
+            *outAxisB = focalLength * sqrtf(std::fabs(-r2 * (r2 - l2) / ((l2 - z2) * (r2 - z2) * (r2 - l2)))) * glm::vec2{-o.y, o.x};
+    } else { // approximate with circle
+        float rad = focalLength * radius / sqrtf(z2 - r2);
+        if (outAxisA)
+            *outAxisA = {rad, 0};
+        if (outAxisB)
+            *outAxisB = {0, rad};
+    }
+}
+
+void Sphere::calcProjection(float focalLength, const glm::vec2& screenSize, glm::vec2* outCenter, glm::vec2* outAxisA, glm::vec2* outAxisB) const {
+    if (screenSize.x == 0.0f || screenSize.y == 0.0f)
+        return;
+
+    auto toScreenPixels = [=](glm::vec2 result, const glm::vec2& windowSize) {
+        result.x *= 1 / (windowSize.x / windowSize.y);
+        result += glm::vec2{0.5f};
+        result *= windowSize;
+        return result;
+    };
+
+    glm::vec2 centerO, axisA, axisB;
+    calcProjection(focalLength, &centerO, &axisA, &axisB);
+
+    if (outCenter)
+        *outCenter = toScreenPixels(centerO, screenSize);
+
+    if (outAxisA)
+        *outAxisA = toScreenPixels(centerO + axisA * 0.5f, screenSize) -
+                    toScreenPixels(centerO - axisA * 0.5f, screenSize);
+    if (outAxisB)
+        *outAxisB = toScreenPixels(centerO + axisB * 0.5f, screenSize) -
+                    toScreenPixels(centerO - axisB * 0.5f, screenSize);
+}
+
+float Sphere::calcProjectedArea(float focalLength, const glm::vec2& screenSize) const {
+    if (screenSize.x == 0.0f || screenSize.y == 0.0f)
+        return 0.0f;
+
+    glm::vec3 o {center};
+
+    float r2 = radius * radius;
+    float z2 = o.z * o.z;
+    float l2 = glm::dot(o, o);
+
+    float area = static_cast<float>(-M_PI) * focalLength * focalLength * r2 * std::sqrt(std::fabs((l2 - r2) / (r2 - z2))) / (r2 - z2);
+    float aspectRatio = screenSize.x / screenSize.y;
+    return area * screenSize.x * screenSize.y * 0.25f / aspectRatio;
+}
+
 void Sphere::transform(const glm::mat4& transform) {
     center = transform * glm::vec4{center, 1}; // vec4 -> vec3
     radius = glm::length(transform * glm::vec4{radius, 0, 0, 0});

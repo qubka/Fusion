@@ -32,7 +32,7 @@ Surface::~Surface() {
     vkDestroySurfaceKHR(instance, surface, nullptr);
 }
 
-const VkSurfaceCapabilitiesKHR& Surface::getCapabilities() {
+const VkSurfaceCapabilitiesKHR& Surface::getCapabilities() const {
     VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities));
     return capabilities;
 }

@@ -355,15 +355,17 @@ namespace glfw {
         window.mousePosition = pos;
         window.onMouseMotion.publish(pos);
 
-        glm::uvec2 size {window.getSize()};
-        if (size.x > 0 && size.y > 0) {
-            glm::vec2 norm{ 2.0f * pos / glm::vec2{size - 1U}};
-
-            LOG_VERBOSE << "MouseMotionNormEvent: " << glm::to_string(norm);
-
-            window.mousePositionNorm = norm;
-            window.onMouseMotionNorm.publish(norm);
+        const auto& size = window.getSize();
+        if (size.x <= 1 || size.y <= 1) {
+            return;
         }
+
+        glm::vec2 norm{ 2.0f * pos / glm::vec2{size - 1U}};
+
+        LOG_VERBOSE << "MouseMotionNormEvent: " << glm::to_string(norm);
+
+        window.mousePositionNorm = norm;
+        window.onMouseMotionNorm.publish(norm);
     }
 
     void Window::ScrollCallback(GLFWwindow* handle, double offsetX, double offsetY) {

@@ -16,7 +16,8 @@ using namespace fe;
 
 ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     : Subrender{pipelineStage}
-    , pipeline{pipelineStage, {"shaders/imgui/imgui.vert", "shaders/imgui/imgui.frag"}, {GetVertexInput()}} {
+    , pipeline{pipelineStage, {"shaders/imgui/imgui.vert", "shaders/imgui/imgui.frag"}, {GetVertexInput()}, {}
+    , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None } {
 
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
@@ -64,15 +65,15 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     scale = static_cast<float>(android::screenDensity) / static_cast<float>(ACONFIGURATION_DENSITY_MEDIUM);
 #endif
     // Read fonts from memory
-    File::Read("fonts/PT Sans.ttf", [&](size_t size, const void* data) {
-        io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(data), size, 16.0f * scale/*, nullptr, io.Fonts->GetGlyphRangesCyrillic()*/);
+    /*File::Read("fonts/PT Sans.ttf", [&](size_t size, const void* data) {
+        io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(data), size, 16.0f * scale, nullptr, io.Fonts->GetGlyphRangesCyrillic());
     });
     File::Read("fonts/fontawesome-webfont.ttf", [&](size_t size, const void* data) {
         io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(data), size, 16.0f * scale, &config, iconsRanges);
-    });
+    });*/
 
     // Generate font
-    io.Fonts->Build();
+    //io.Fonts->Build();
 
     // Create font texture
     uint8_t* fontBuffer;
@@ -134,7 +135,7 @@ void ImGuiSubrender::drawFrame(const CommandBuffer& commandBuffer) {
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
-    descriptorSet.push("fontSampler", font.get());
+    //descriptorSet.push("fontSampler", font.get());
 
     if (!descriptorSet.update(pipeline))
         return;

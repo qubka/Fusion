@@ -3,9 +3,6 @@
 #include "perspective_camera.hpp"
 
 namespace fe {
-    class KeyInput;
-    class MouseInput;
-
     class EditorCamera : public PerspectiveCamera {
     public:
         EditorCamera();

@@ -106,6 +106,46 @@ namespace glm {
         return output;
     }
 
+    /*template<typename T, qualifier Q>
+    GLM_FUNC_DECL mat<4, 4, T, Q> alignZAxisWithTarget(vec<3, T, Q> const& targetDir, vec<3, T, Q> const& upDir) {
+        // Ensure that the target direction is non-zero.
+        if (length2(targetDir) == 0)
+            targetDir = vec<3, T, Q>{ 0, 0, 1 };
+
+        // Ensure that the up direction is non-zero.
+        if (length2(upDir) == 0)
+            upDir = vec<3, T, Q>{ 0, 1, 0 };
+
+        // Check for degeneracies.  If the upDir and targetDir are parallel
+        // or opposite, then compute a new, arbitrary up direction that is
+        // not parallel or opposite to the targetDir.
+        if (length2(cross(upDir, targetDir)) == 0) {
+            upDir = cross(targetDir, vec<3, T, Q>{ 1, 0, 0 });
+            if (length2(upDir) == 0)
+                upDir = cross(targetDir, vec<3, T, Q>{ 0, 0, 1 });
+        }
+
+        // Compute the x-, y-, and z-axis vectors of the new coordinate system.
+        vec<3, T, Q> targetPerpDir{ cross(upDir, targetDir) };
+        vec<3, T, Q> targetUpDir{ cross(targetDir, targetPerpDir) };
+
+        // Rotate the x-axis into targetPerpDir (row 0),
+        // rotate the y-axis into targetUpDir   (row 1),
+        // rotate the z-axis into targetDir     (row 2).
+        vec<3, T, Q> row[3];
+        row[0] = normalize(targetPerpDir);
+        row[1] = normalize(targetUpDir);
+        row[2] = normalize(targetDir);
+
+        mat<4, 4, T, Q> output {
+            row[0].x,  row[0].y,  row[0].z,  0,
+            row[1].x,  row[1].y,  row[1].z,  0,
+            row[2].x,  row[2].y,  row[2].z,  0,
+            0,         0,         0,		 1
+        };
+        return output;
+    }*/
+
     template<typename T, qualifier Q>
     GLM_FUNC_QUALIFIER GLM_CONSTEXPR T cross(const vec<2, T, Q>& x, const vec<2, T, Q>& y)  {
         return x.x * y.y - x.y * y.x;
@@ -120,6 +160,7 @@ namespace vec3 {
     GLM_INLINE GLM_CONSTEXPR glm::vec3 forward {0.0f, 0.0f, 1.0f};
     GLM_INLINE GLM_CONSTEXPR glm::vec3 back{0.0f ,0.0f, -1.0f};
     GLM_INLINE GLM_CONSTEXPR glm::vec3 zero{0.0f, 0.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 one{1.0f, 1.0f, 1.0f};
 }
 
 namespace vec2 {
@@ -128,6 +169,7 @@ namespace vec2 {
     GLM_INLINE GLM_CONSTEXPR glm::vec2 up{0.0f, 1.0f};
     GLM_INLINE GLM_CONSTEXPR glm::vec2 down{0.0f, -1.0f};
     GLM_INLINE GLM_CONSTEXPR glm::vec2 zero{0.0f, 0.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 one{1.0f, 1.0f};
 }
 
 namespace quat {
