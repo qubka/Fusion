@@ -8,7 +8,7 @@ namespace glfw {
         Devices();
         ~Devices() override;
 
-        void update(float dt) override;
+        void update() override;
         void waitEvents() override;
 
         fe::ScanCode getScanCode(fe::KeyCode key) const override;

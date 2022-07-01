@@ -2,7 +2,7 @@
 #include "subrender.hpp"
 
 #include "fusion/utils/enumerate.hpp"
-#include "fusion/utils/time.hpp"
+#include "fusion/utils/date_time.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/devices/devices.hpp"
 #include "fusion/devices/window.hpp"
@@ -45,7 +45,7 @@ Graphics::~Graphics() {
     renderer = nullptr;
 }
 
-void Graphics::update(float dt) {
+void Graphics::update() {
     if (!renderer || Devices::Get()->getWindow(0)->isIconified())
         return;
 
@@ -55,7 +55,7 @@ void Graphics::update(float dt) {
         renderer->started = true;
     }
 
-    renderer->update(dt);
+    renderer->update();
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
@@ -84,7 +84,7 @@ void Graphics::update(float dt) {
                 stage.second = subpass.binding;
 
                 // Renders subpass subrender pipelines
-                renderer->subrenderHolder.renderStage(stage, info.commandBuffer, dt);
+                renderer->subrenderHolder.renderStage(stage, info.commandBuffer);
 
                 if (subpass.binding != renderStage->getSubpasses().back().binding)
                     vkCmdNextSubpass(info.commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
@@ -189,7 +189,7 @@ void Graphics::endFrame(FrameInfo& info) {
 
 void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t id) const {
 #if FUSION_DEBUG
-    auto debugStart = Time::Now();
+    auto debugStart = DateTime::Now();
 #endif
 
     const auto& size = Devices::Get()->getWindow(id)->getSize();
@@ -222,7 +222,7 @@ void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t i
     bitmap.write(filename);
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Screenshot " << filename << " created in " << (Time::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Screenshot " << filename << " created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 

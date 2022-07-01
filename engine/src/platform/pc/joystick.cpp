@@ -13,7 +13,7 @@ Joystick::Joystick(uint8_t port)
     glfwSetJoystickUserPointer(port, this);
 }
 
-void Joystick::update(float dt) {
+void Joystick::update() {
     if (!connected)
         return;
 

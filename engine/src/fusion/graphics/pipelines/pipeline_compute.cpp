@@ -3,7 +3,7 @@
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/utils/file.hpp"
-#include "fusion/utils/time.hpp"
+#include "fusion/utils/date_time.hpp"
 
 using namespace fe;
 
@@ -14,7 +14,7 @@ PipelineCompute::PipelineCompute(std::filesystem::path shaderStage, std::vector<
     , pushDescriptors{pushDescriptors}
     , pipelineBindPoint{VK_PIPELINE_BIND_POINT_COMPUTE} {
 #if FUSION_DEBUG
-	auto debugStart = Time::Now();
+	auto debugStart = DateTime::Now();
 #endif
 
 	createShaderProgram();
@@ -24,7 +24,7 @@ PipelineCompute::PipelineCompute(std::filesystem::path shaderStage, std::vector<
 	createPipelineCompute();
 
 #if FUSION_DEBUG
-	LOG_DEBUG << "Pipeline Compute " << shader.getName() << " created in " << (Time::Now() - debugStart).asMilliseconds<float>() << "ms";
+	LOG_DEBUG << "Pipeline Compute " << shader.getName() << " created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 

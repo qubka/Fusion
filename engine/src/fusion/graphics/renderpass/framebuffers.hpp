@@ -17,11 +17,10 @@ namespace fe {
         ~Framebuffers();
         NONCOPYABLE(Framebuffers);
 
-        Image2d* getAttachment(uint32_t index) const { return imageAttachments[index].get(); }
+        const Image2d* getAttachment(uint32_t index) const { return imageAttachments[index].get(); }
 
-        const VkFramebuffer& operator[](uint32_t index) const {
-            return index < framebuffers.size() ? framebuffers[index] : framebuffers[0];
-        }
+        const VkFramebuffer& getFramebuffer(uint32_t index) const { return framebuffers[index < framebuffers.size() ? index : 0]; }
+        const VkFramebuffer& operator[](uint32_t index) const { return framebuffers[index < framebuffers.size() ? index : 0]; }
 
         const std::vector<std::unique_ptr<Image2d>>& getImageAttachments() const { return imageAttachments; }
         const std::vector<VkFramebuffer>& getFramebuffers() const { return framebuffers; }

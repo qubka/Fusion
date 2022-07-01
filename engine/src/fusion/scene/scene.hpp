@@ -20,8 +20,8 @@ namespace fe {
         void onRuntimeStart();
         void onRuntimeStop();
 
-        void onUpdateRuntime(float dt);
-        void onUpdateEditor(float dt);
+        void onUpdateRuntime();
+        void onUpdateEditor();
 
         void onRenderRuntime();
         void onRenderEditor(const EditorCamera& camera);

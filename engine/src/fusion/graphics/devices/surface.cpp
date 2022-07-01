@@ -45,7 +45,6 @@ VkExtent2D Surface::getExtent() const {
             size = window.getSize();
             Devices::Get()->waitEvents();
         }
-
         return {
                 std::max(capabilities.minImageExtent.width,
                          std::min(capabilities.maxImageExtent.width, size.x)),

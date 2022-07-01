@@ -15,7 +15,7 @@ namespace fe {
         ~GridRenderer();
 
     private:
-        void render(const CommandBuffer& commandBuffer, float dt) override;
+        void render(const CommandBuffer& commandBuffer) override;
 
         PipelineGraphics pipeline;
         DescriptorsHandler descriptorSet;

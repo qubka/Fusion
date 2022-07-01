@@ -35,7 +35,7 @@ namespace fe {
 
         VkSurfaceKHR surface{ VK_NULL_HANDLE };
         VkSurfaceFormatKHR format = {};
-        mutable VkSurfaceCapabilitiesKHR capabilities = {};
         VkPresentModeKHR presentMode{ VK_PRESENT_MODE_FIFO_KHR };
+        mutable VkSurfaceCapabilitiesKHR capabilities = {};
     };
 }

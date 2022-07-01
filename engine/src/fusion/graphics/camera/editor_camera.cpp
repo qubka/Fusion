@@ -6,7 +6,7 @@ using namespace fe;
 EditorCamera::EditorCamera() : PerspectiveCamera{} {
 }
 
-void EditorCamera::update(float dt) {
+void EditorCamera::update() {
     auto window = Devices::Get()->getWindow(0);
 
     if (window->getKey(Key::LeftAlt)) {

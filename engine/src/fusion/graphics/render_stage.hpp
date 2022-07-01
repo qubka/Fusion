@@ -8,12 +8,6 @@
 #include "renderpass/swapchain.hpp"
 
 namespace fe {
-    /*class ImageDepth;
-    class Descriptor;
-    class Renderpass;
-    class Framebuffers;
-    class Swapchain;*/
-
     struct Attachment {
         enum class Type { Image, Depth, Swapchain };
         uint32_t binding{ 0 };
@@ -100,7 +94,7 @@ namespace fe {
         std::unique_ptr<ImageDepth> depthStencil;
         std::unique_ptr<Framebuffers> framebuffers;
 
-        std::unordered_map<std::string, const Descriptor*> descriptors;
+        std::map<std::string, const Descriptor*> descriptors;
 
         std::vector<VkClearValue> clearValues;
         std::vector<uint32_t> subpassAttachmentCount;

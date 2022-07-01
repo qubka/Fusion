@@ -7,7 +7,9 @@ using namespace fe;
 
 Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, const void* data)
     : logicalDevice{Graphics::Get()->getLogicalDevice()}
-    , size{size} {
+    , size{size}
+    , usageFlags{usage}
+    , memoryPropertyFlags{properties} {
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
 
     auto graphicsFamily = physicalDevice.getGraphicsFamily();
@@ -16,7 +18,7 @@ Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlag
 
     std::array queueFamily = {graphicsFamily, presentFamily, computeFamily};
 
-    // Create the buffer handle.
+    // Create the buffer handle
     VkBufferCreateInfo bufferCreateInfo = {};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferCreateInfo.size = size;
@@ -26,7 +28,7 @@ Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlag
     bufferCreateInfo.pQueueFamilyIndices = queueFamily.data();
     VK_CHECK(vkCreateBuffer(logicalDevice, &bufferCreateInfo, nullptr, &buffer));
 
-    // Create the memory backing up the buffer handle.
+    // Create the memory backing up the buffer handle
     VkMemoryRequirements memoryRequirements;
     vkGetBufferMemoryRequirements(logicalDevice, buffer, &memoryRequirements);
 
@@ -45,21 +47,21 @@ Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlag
     }
     VK_CHECK(vkAllocateMemory(logicalDevice, &memoryAllocateInfo, nullptr, &memory));
 
-    // If a pointer to the buffer data has been passed, map the buffer and copy over the data.
+    // If a pointer to the buffer data has been passed, map the buffer and copy over the data
     if (data) {
         map(size);
         copy(data);
 
-        // If host coherency hasn't been requested, do a manual flush to make writes visible.
+        // If host coherency hasn't been requested, do a manual flush to make writes visible
         if ((properties & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == 0) {
             flush(size);
         }
 
         unmap();
     }
-    
-    // Attach the memory to the buffer object.
-    VK_CHECK(vkBindBufferMemory(logicalDevice, buffer, memory, 0));
+
+    // Attach the memory to the buffer object
+    bind();
 }
 
 Buffer::~Buffer() {
@@ -116,6 +118,10 @@ int Buffer::compare(const void* data, VkDeviceSize size, VkDeviceSize offset) {
     } else {
         return memcmp(reinterpret_cast<int8_t*>(mapped) + offset, data, size);
     }
+}
+
+void Buffer::bind(VkDeviceSize offset) {
+    VK_CHECK(vkBindBufferMemory(logicalDevice, buffer, memory, offset));
 }
 
 VkDescriptorBufferInfo Buffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {

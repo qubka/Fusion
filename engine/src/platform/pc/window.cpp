@@ -74,7 +74,7 @@ Window::~Window() {
     glfwDestroyWindow(window);
 }
 
-void Window::update(float dt) {
+void Window::update() {
     // Updates the position delta.
     mousePositionDelta = dt * (mouseLastPosition - mousePosition);
     mouseLastPosition = mousePosition;

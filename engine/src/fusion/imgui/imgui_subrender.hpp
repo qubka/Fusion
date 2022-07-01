@@ -19,7 +19,7 @@ namespace fe {
         ImGuiSubrender(const Pipeline::Stage& pipelineStage);
         ~ImGuiSubrender() override;
 
-        void render(const CommandBuffer& commandBuffer, float dt) override;
+        void render(const CommandBuffer& commandBuffer) override;
 
     private:
         void drawFrame(const CommandBuffer& commandBuffer);

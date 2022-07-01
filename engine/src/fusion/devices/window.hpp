@@ -21,9 +21,8 @@ namespace fe {
 
         /**
          * Run every frame as long as the window has work to do.
-         * @param dt The current delta time.
          */
-        virtual void update(float dt) = 0;
+        virtual void update() = 0;
 
         /**
          * Gets weather the window is borderless or not.

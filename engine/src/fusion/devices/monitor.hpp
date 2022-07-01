@@ -41,9 +41,8 @@ namespace fe {
 
         /**
          * Run every frame as long as the monitor has work to do.
-         * @param dt The current delta time.
          */
-        virtual void update(float dt) = 0;
+        virtual void update() = 0;
 
         /**
          * Validate that monitor is primary.

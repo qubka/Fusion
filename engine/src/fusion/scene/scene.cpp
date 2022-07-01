@@ -166,7 +166,7 @@ void Scene::onRuntimeStop() {
     active = false;
 }
 
-void Scene::onUpdateRuntime(float dt) {
+void Scene::onUpdateRuntime() {
     // Physics
     {
         scene->simulate(dt);
@@ -186,7 +186,7 @@ void Scene::onUpdateRuntime(float dt) {
     }
 }
 
-void Scene::onUpdateEditor(float dt) {
+void Scene::onUpdateEditor() {
 
 }
 

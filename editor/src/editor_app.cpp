@@ -17,5 +17,5 @@ void EditorApp::start() {
     Graphics::Get()->setRenderer(std::make_unique<MainRenderer>());
 }
 
-void EditorApp::update(float dt) {
+void EditorApp::update() {
 }

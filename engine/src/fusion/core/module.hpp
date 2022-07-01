@@ -79,8 +79,7 @@ namespace fe {
 
         /**
          * The update function for the module.
-         * @param dt The current delta time.
          */
-        virtual void update(float dt) = 0;
+        virtual void update() = 0;
     };
 }

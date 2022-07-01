@@ -2,7 +2,7 @@
 
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/render_stage.hpp"
-#include "fusion/utils/time.hpp"
+#include "fusion/utils/date_time.hpp"
 #include "fusion/utils/file.hpp"
 
 using namespace fe;
@@ -27,7 +27,7 @@ PipelineGraphics::PipelineGraphics(Stage stage, std::vector<std::filesystem::pat
     , pipelineBindPoint{VK_PIPELINE_BIND_POINT_GRAPHICS} {
 
 #if FUSION_DEBUG
-	auto debugStart = Time::Now();
+	auto debugStart = DateTime::Now();
 #endif
 
 	std::sort(this->vertexInputs.begin(), this->vertexInputs.end());
@@ -50,7 +50,7 @@ PipelineGraphics::PipelineGraphics(Stage stage, std::vector<std::filesystem::pat
 	}
 
 #if FUSION_DEBUG
-	LOG_DEBUG << "Pipeline Graphics: " << shader.getName() << " loaded in " << (Time::Now() - debugStart).asMilliseconds<float>() << "ms";
+	LOG_DEBUG << "Pipeline Graphics: " << shader.getName() << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 

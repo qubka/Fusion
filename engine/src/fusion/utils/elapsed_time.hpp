@@ -1,22 +1,22 @@
 #pragma once
 
-#include "time.hpp"
+#include "date_time.hpp"
 
 namespace fe {
     class ElapsedTime {
     public:
-        explicit ElapsedTime(const Time& interval = -1s);
+        explicit ElapsedTime(const DateTime& interval = -1s);
 
         uint32_t getElapsed();
 
-        const Time& getStartTime() const { return startTime; }
-        void setStartTime(const Time& time) { startTime = time; }
+        const DateTime& getStartTime() const { return startTime; }
+        void setStartTime(const DateTime& time) { startTime = time; }
 
-        const Time& getInterval() const { return interval; }
-        void setInterval(const Time& time) { interval = time; }
+        const DateTime& getInterval() const { return interval; }
+        void setInterval(const DateTime& time) { interval = time; }
 
     private:
-        Time startTime;
-        Time interval;
+        DateTime startTime;
+        DateTime interval;
     };
 }

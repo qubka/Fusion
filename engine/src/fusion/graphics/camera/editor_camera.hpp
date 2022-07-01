@@ -7,7 +7,7 @@ namespace fe {
     public:
         EditorCamera();
 
-        void update(float dt);
+        void update();
 
         float getPitch() const { return pitch; }
         float getYaw() const { return yaw; }

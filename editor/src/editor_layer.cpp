@@ -40,7 +40,7 @@ void EditorLayer::onDetach() {
 
 }
 
-void EditorLayer::onUpdate(float dt) {
+void EditorLayer::onUpdate() {
     switch (sceneState) {
         case Edit: {
             if (viewportFocused)

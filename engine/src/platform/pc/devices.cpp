@@ -48,7 +48,7 @@ Devices::~Devices() {
     glfwTerminate();
 }
 
-void Devices::update(float dt) {
+void Devices::update() {
     // Polls for window events
     glfwPollEvents();
 

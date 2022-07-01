@@ -5,9 +5,6 @@
 #include "module.hpp"
 #include "app.hpp"
 
-#include "fusion/utils/time.hpp"
-#include "fusion/utils/elapsed_time.hpp"
-
 int main(int argc, char** argv);
 
 namespace fe {
@@ -60,22 +57,10 @@ namespace fe {
         void setApp(std::unique_ptr<App>&& app) { application = std::move(app); }
 
         /**
-         * Gets the delta (seconds) between updates.
-         * @return The delta between updates.
-         */
-        const Time& getDeltaTime() const { return deltaTime.time; }
-
-        /**
          * Gets if the engine is running.
          * @return If the engine is running.
          */
         bool isRunning() const { return running; }
-
-        /**
-         * This value starts at 0 and increases by 1 on each run phase.
-         * @return The total number of frames since the start of the game.
-         */
-        uint64_t frameCount() const { return frameNumber; }
 
         /**
          * Requests the engine to stop the game-loop.
@@ -95,18 +80,6 @@ namespace fe {
          */
         void updateStage(Module::Stage stage);
 
-        struct DeltaTime {
-            Time currentTime;
-            Time lastTime;
-            Time time;
-
-            void update() {
-                currentTime = Time::Now();
-                time = currentTime - lastTime;
-                lastTime = currentTime;
-            }
-        } deltaTime;
-
         CommandLineParser commandLineParser;
         Version version;
 
@@ -116,29 +89,8 @@ namespace fe {
         std::unordered_map<std::type_index, std::unique_ptr<Module>> modules;
         std::map<Module::Stage, std::vector<std::type_index>> moduleStages;
 
-        uint64_t frameNumber{ 0 };
         bool running{ false };
 
         friend int ::main(int argc, char** argv);
     };
 }
-
-/*struct ChangePerSecond {
-    uint32_t value{ 0 };
-    uint32_t tempValue{ 0 };
-    Time valueTime;
-
-    bool update(const Time& time) {
-        tempValue++;
-
-        if (std::floor(time.asSeconds()) > std::floor(valueTime.asSeconds())) {
-            value = tempValue;
-            tempValue = 0;
-            return true;
-        }
-
-        valueTime = time;
-        return false;
-    }
-};*/
-

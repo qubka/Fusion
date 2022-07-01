@@ -1,7 +1,7 @@
 #include "bitmap.hpp"
 
 #include "fusion/utils/string.hpp"
-#include "fusion/utils/time.hpp"
+#include "fusion/utils/date_time.hpp"
 
 using namespace fe;
 
@@ -25,7 +25,7 @@ Bitmap::Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, Bitmap
 
 void Bitmap::load(const std::filesystem::path& filename) {
 #if FUSION_DEBUG
-    auto debugStart = Time::Now();
+    auto debugStart = DateTime::Now();
 #endif
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
 
@@ -39,13 +39,13 @@ void Bitmap::load(const std::filesystem::path& filename) {
     }
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Bitmap " << filename << " loaded in " << (Time::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Bitmap " << filename << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 
 void Bitmap::write(const std::filesystem::path& filename) const {
 #if FUSION_DEBUG
-    auto debugStart = Time::Now();
+    auto debugStart = DateTime::Now();
 #endif
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
 
@@ -61,7 +61,7 @@ void Bitmap::write(const std::filesystem::path& filename) const {
     }
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Bitmap " << filename << " written in " << (Time::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Bitmap " << filename << " written in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 

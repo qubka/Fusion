@@ -30,8 +30,8 @@ GridRenderer::~GridRenderer() {
 
 }
 
-void GridRenderer::render(const CommandBuffer& commandBuffer, float dt) {
-    camera.update(dt);
+void GridRenderer::render(const CommandBuffer& commandBuffer) {
+    camera.update();
 
     auto& size = Devices::Get()->getWindow(0)->getSize();
     camera.setAspectRatio(size.x / size.y);

@@ -19,9 +19,8 @@ namespace fe {
         /**
          * Runs the render pipeline in the current renderpass.
          * @param commandBuffer The command buffer to record render command into.
-         * @param dt The current delta time.
          */
-        virtual void render(const CommandBuffer& commandBuffer, float dt) = 0;
+        virtual void render(const CommandBuffer& commandBuffer) = 0;
 
         const Pipeline::Stage& getStage() const { return stage; }
 

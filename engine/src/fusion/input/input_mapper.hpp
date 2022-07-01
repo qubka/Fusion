@@ -66,7 +66,7 @@ namespace fe {
         // Internal tracking
     private:
         std::unordered_map<std::wstring, std::unique_ptr<InputContext>> inputContexts;
-        std::list<InputContext*> activeContexts; // just used to monitor active contexts
+        std::list<const InputContext*> activeContexts; // just used to monitor active contexts
 
         std::multimap<int32_t, InputCallback> callbackTable;
 

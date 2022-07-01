@@ -18,7 +18,7 @@ namespace fe {
 
         void onAttach();
         void onDetach();
-        void onUpdate(float dt);
+        void onUpdate();
         void onRender(Renderer& renderer);
         void onImGui();
 

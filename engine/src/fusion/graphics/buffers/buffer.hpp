@@ -82,7 +82,7 @@ namespace fe {
          *
          * @param offset (Optional) Byte offset (from the beginning) for the memory region to bind.
          */
-        //void bind(VkDeviceSize offset = 0);
+        void bind(VkDeviceSize offset = 0);
 
         /**
          * Create a buffer info descriptor.
@@ -133,8 +133,8 @@ namespace fe {
         VkDeviceSize getSize() const { return size; }
         const VkDeviceMemory& getBufferMemory() const { return memory; }
         void* getMappedMemory() const { return mapped; }
-        //VkBufferUsageFlags getUsageFlags() const { return usageFlags; }
-        //VkMemoryPropertyFlags getMemoryPropertyFlags() const { return memoryPropertyFlags; }
+        VkBufferUsageFlags getUsageFlags() const { return usageFlags; }
+        VkMemoryPropertyFlags getMemoryPropertyFlags() const { return memoryPropertyFlags; }
 
         operator bool() const { return buffer != VK_NULL_HANDLE; }
         operator const VkBuffer&() const { return buffer; }
@@ -163,8 +163,8 @@ namespace fe {
         VkDeviceSize size;
 
         /** @brief Usage flags to be filled by external source at buffer creation (to query at some later point) */
-        //VkBufferUsageFlags usageFlags;
+        VkBufferUsageFlags usageFlags;
         /** @brief Memory property flags to be filled by external source at buffer creation (to query at some later point) */
-        //VkMemoryPropertyFlags memoryPropertyFlags;
+        VkMemoryPropertyFlags memoryPropertyFlags;
     };
 }

@@ -24,7 +24,7 @@ namespace fe {
             addSubrender<ImGuiSubrender>({0, 0});
         }
 
-        void update(float dt) override {
+        void update() override {
         }
 
     private:

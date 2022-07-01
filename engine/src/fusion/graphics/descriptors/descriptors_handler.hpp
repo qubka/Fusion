@@ -48,7 +48,6 @@ namespace fe {
                     LOG_ERROR << "Could not find descriptor in shader " << shader->getName() << " of name " << std::quoted(descriptorName);
                 }
     #endif
-
                 return;
             }
 
@@ -79,7 +78,7 @@ namespace fe {
             }
 
             auto location = shader->getDescriptorLocation(descriptorName);
-            //auto descriptorType = shader->GetDescriptorType(*location);
+            //auto descriptorType = shader->getDescriptorType(*location);
 
             descriptors.emplace(descriptorName, DescriptorValue{descriptor, std::move(writeDescriptorSet), std::nullopt, *location});
             changed = true;
@@ -96,20 +95,18 @@ namespace fe {
         const DescriptorSet* getDescriptorSet() const { return descriptorSet.get(); }
 
     private:
-        class DescriptorValue {
-        public:
+        struct DescriptorValue {
             const Descriptor* descriptor;
             WriteDescriptorSet writeDescriptor;
             std::optional<OffsetSize> offsetSize;
             uint32_t location;
         };
 
-        const Shader* shader;
-        bool pushDescriptors = false;
+        const Shader* shader{ nullptr };
         std::unique_ptr<DescriptorSet> descriptorSet;
-
         std::map<std::string, DescriptorValue> descriptors;
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
-        bool changed = false;
+        bool pushDescriptors{ false };
+        bool changed{ false };
     };
 }

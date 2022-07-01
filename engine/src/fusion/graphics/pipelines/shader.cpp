@@ -287,6 +287,9 @@ TBuiltInResource getResources() {
 VkShaderModule Shader::createShaderModule(const std::filesystem::path& moduleName, const std::string& moduleCode, const std::string& preamble, VkShaderStageFlags moduleFlag) {
 	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
+    if (name.empty())
+        name = moduleName.filename().string();
+
 	stages.push_back(moduleName);
 
     if (!String::Contains(moduleCode, "GL_ARB_separate_shader_objects") || !String::Contains(moduleCode, "GL_ARB_shading_language_420pack")) {

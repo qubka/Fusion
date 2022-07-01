@@ -17,8 +17,8 @@ using namespace fe;
 ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     : Subrender{pipelineStage}
     , pipeline{pipelineStage, {"shaders/imgui/imgui.vert", "shaders/imgui/imgui.frag"}, {GetVertexInput()}, {}
-    , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None } {
-
+    , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None }
+    , descriptorSet{pipeline} {
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
     float scale = 1.0f;
@@ -95,7 +95,7 @@ ImGuiSubrender::~ImGuiSubrender() {
 }
 
 /** Update the command buffers to reflect UI changes */
-void ImGuiSubrender::render(const CommandBuffer& commandBuffer, float dt) {
+void ImGuiSubrender::render(const CommandBuffer& commandBuffer) {
     ImGuiIO& io = ImGui::GetIO();
     io.DeltaTime = dt;
 

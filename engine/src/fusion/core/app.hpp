@@ -17,9 +17,8 @@ namespace fe {
 
         /**
          * Run every frame as long as the app has work to do.
-         * @param dt The current delta time.
          */
-        virtual void update(float dt) = 0;
+        virtual void update() = 0;
 
         /**
          * Gets the application's name.

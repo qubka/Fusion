@@ -2,7 +2,7 @@
 #include "graphics.hpp"
 
 #include "fusion/devices/devices.hpp"
-#include "fusion/utils/time.hpp"
+#include "fusion/utils/date_time.hpp"
 #include "fusion/graphics/images/image_depth.hpp"
 #include "fusion/graphics/images/image2d.hpp"
 #include "fusion/graphics/renderpass/framebuffers.hpp"
@@ -66,7 +66,7 @@ void RenderStage::update(size_t id, const Swapchain& swapchain) {
 
 void RenderStage::rebuild(size_t id, const Swapchain& swapchain) {
 #if FUSION_DEBUG
-	auto debugStart = Time::Now();
+	auto debugStart = DateTime::Now();
 #endif
 
 	update(id, swapchain);
@@ -96,7 +96,7 @@ void RenderStage::rebuild(size_t id, const Swapchain& swapchain) {
 	}
 
 #if FUSION_DEBUG
-	LOG_DEBUG << "Render Stage created in " << (Time::Now() - debugStart).asMilliseconds<float>() << "ms";
+	LOG_DEBUG << "Render Stage created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 
@@ -125,5 +125,5 @@ const Descriptor* RenderStage::getDescriptor(const std::string& name) const {
 }
 
 const VkFramebuffer& RenderStage::getActiveFramebuffer(uint32_t activeSwapchainImage) const {
-	return (*framebuffers)[activeSwapchainImage];
+	return framebuffers->getFramebuffer(activeSwapchainImage);
 }

@@ -25,9 +25,8 @@ namespace fe {
 
         /**
          * Run when updating the renderer manager.
-         * @param dt The current delta time.
          */
-        virtual void update(float dt) = 0;
+        virtual void update() = 0;
 
         /**
          * Checks whether a Subrender exists or not.
