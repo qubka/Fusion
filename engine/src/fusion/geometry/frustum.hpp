@@ -47,9 +47,9 @@ namespace fe {
         bool intersects(const AABB& box) const;
 
         //! Returns a const reference to the Plane associated with /a index section of the Frustum.
-        Plane& operator[](size_t i) { return planes[i]; }
+        Plane& operator[](size_t index) { return planes[index]; }
         //! Returns a const reference to the Plane associated with /a index section of the Frustum.
-        const Plane& operator[](size_t i) const { return planes[i]; }
+        const Plane& operator[](size_t index) const { return planes[index]; }
         //! Returns a const reference to the Plane associated with /a section of the Frustum.
         Plane& operator[](FrustumSection section) { return planes[section]; }
         //! Returns a const reference to the Plane associated with /a section of the Frustum.
