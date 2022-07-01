@@ -159,7 +159,7 @@ glm::vec2 Camera::worldToScreen(const glm::vec3& worldCoord, const glm::vec2& sc
     ndc.x /= ndc.w;
     ndc.y /= ndc.w;
     ndc.z /= ndc.w;
-    return {(ndc.x + 1.0f) / 2.0f * screenSize.x, (1.0f - (ndc.y + 1.0f) / 2.0f) * screenSize.y};
+    return { (ndc.x + 1.0f) / 2.0f * screenSize.x, (1.0f - (ndc.y + 1.0f) / 2.0f) * screenSize.y };
 }
 
 glm::vec2 Camera::eyeToScreen(const glm::vec3& eyeCoord, const glm::vec2& screenSize) const {
@@ -170,7 +170,7 @@ glm::vec2 Camera::eyeToScreen(const glm::vec3& eyeCoord, const glm::vec2& screen
     ndc.x /= ndc.w;
     ndc.y /= ndc.w;
     ndc.z /= ndc.w;
-    return {(ndc.x + 1.0f) / 2.0f * screenSize.x, (1.0f - (ndc.y + 1.0f) / 2.0f) * screenSize.y};
+    return { (ndc.x + 1.0f) / 2.0f * screenSize.x, (1.0f - (ndc.y + 1.0f) / 2.0f) * screenSize.y };
 }
 
 float Camera::worldToEyeDepth(const glm::vec3& worldCoord) const {
@@ -184,7 +184,7 @@ float Camera::worldToEyeDepth(const glm::vec3& worldCoord) const {
 glm::vec3 Camera::worldToNdc(const glm::vec3& worldCoord) const {
     glm::vec4 eye{ getViewMatrix() * glm::vec4{worldCoord, 1} };
     glm::vec4 unproj{ getProjectionMatrix() * eye };
-    return {unproj.x / unproj.w, unproj.y / unproj.w, unproj.z / unproj.w};
+    return { unproj.x / unproj.w, unproj.y / unproj.w, unproj.z / unproj.w };
 }
 
 /// @link https://discourse.libcinder.org/t/screen-to-world-coordinates/1014/2
@@ -192,7 +192,7 @@ glm::vec3 Camera::screenToWorld(const glm::vec2& screenCoord, const glm::vec2& s
     if (screenSize.x == 0.0f || screenSize.y == 0.0f)
         return eyePoint;
 
-    glm::vec4 viewport{0, 0, screenSize.x, screenSize.y};
+    glm::vec4 viewport{ 0, 0, screenSize.x, screenSize.y };
     return glm::unProject(glm::vec3{screenCoord, 0}, getViewMatrix(), getProjectionMatrix(), viewport);
 }
 
@@ -201,12 +201,12 @@ Ray Camera::screenPointToRay(const glm::vec2& screenCoord, const glm::vec2& scre
     if (screenSize.x <= 1.0f || screenSize.y <= 1.0f)
         return { eyePoint, viewDirection };
 
-    glm::vec2 mouseNorm{ 2.0f * screenCoord / (screenSize - 1.0f)};
+    glm::vec2 mouseNorm{ 2.0f * screenCoord / (screenSize - 1.0f) };
 
 #ifdef GLM_FORCE_DEPTH_ZERO_TO_ONE
-    glm::vec4 screenPos{mouseNorm.x, -mouseNorm.y, 0, 1};
+    glm::vec4 screenPos{ mouseNorm.x, -mouseNorm.y, 0, 1 };
 #else
-    glm::vec4 screenPos{mouseNorm.x, -mouseNorm.y, -1, 1};
+    glm::vec4 screenPos{ mouseNorm.x, -mouseNorm.y, -1, 1 };
 #endif
 
     glm::vec4 eyeRay{ getInverseProjectionMatrix() * screenPos };

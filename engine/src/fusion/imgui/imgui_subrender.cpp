@@ -1,5 +1,6 @@
 #include "imgui_subrender.hpp"
 
+#include "fusion/core/time.hpp"
 #include "fusion/devices/devices.hpp"
 #include "fusion/utils/file.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
@@ -97,7 +98,7 @@ ImGuiSubrender::~ImGuiSubrender() {
 /** Update the command buffers to reflect UI changes */
 void ImGuiSubrender::render(const CommandBuffer& commandBuffer) {
     ImGuiIO& io = ImGui::GetIO();
-    io.DeltaTime = dt;
+    io.DeltaTime = Time::DeltaTime();
 
     auto& size = Devices::Get()->getWindow(0)->getSize();
     io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};

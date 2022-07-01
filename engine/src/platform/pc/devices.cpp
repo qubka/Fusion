@@ -53,15 +53,15 @@ void Devices::update() {
     glfwPollEvents();
 
     for (auto& window : windows) {
-        window->update(dt);
+        window->update();
     }
 
     for (auto& monitor : monitors) {
-        monitor->update(dt);
+        monitor->update();
     }
 
     for (auto& joystick : joysticks) {
-        joystick->update(dt);
+        joystick->update();
     }
 }
 

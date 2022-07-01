@@ -1,5 +1,6 @@
 #include "window.hpp"
 
+#include "fusion/core/time.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/devices/devices.hpp"
 #include "fusion/devices/cursor.hpp"
@@ -75,6 +76,8 @@ Window::~Window() {
 }
 
 void Window::update() {
+    float dt = fe::Time::DeltaTime();
+
     // Updates the position delta.
     mousePositionDelta = dt * (mouseLastPosition - mousePosition);
     mouseLastPosition = mousePosition;

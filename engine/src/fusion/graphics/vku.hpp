@@ -59,7 +59,7 @@ namespace vku {
     static inline const glm::uvec2& extent2D_cast(const VkExtent2D& v) { return *reinterpret_cast<const glm::uvec2*>(&v); }
     static inline const glm::uvec3& extent3D_cast(const VkExtent3D& v) { return *reinterpret_cast<const glm::uvec3*>(&v); }
 
-    inline std::string to_string(VkResult result) {
+    inline std::string StringifyResultVk(VkResult result) {
         switch (result) {
             case VK_SUCCESS:
                 return "Success";
@@ -114,20 +114,19 @@ namespace vku {
         }
     }
 
-    inline bool check_vk_errors(const std::string& filename, uint32_t line, VkResult result) {
+    inline void CheckVk(const std::string& filename, uint32_t line, VkResult result) {
         if (result != VK_SUCCESS) {
-            LOG_ERROR << "Vulkan error (" << filename << ": " << line << ") - " << to_string(result);
-            throw std::runtime_error("Vulkan error: " + vku::to_string(result));
-            return false;
+            auto failure = StringifyResultVk(result);
+            LOG_ERROR << "Vulkan error (" << filename << ": " << line << ") - " << failure;
+            throw std::runtime_error("Vulkan error: " + failure);
         }
-        return true;
     }
 }
 
 #ifdef FUSION_DEBUG
-#define VK_CHECK(func) { auto RESULT__ = func; if (RESULT__ != VK_SUCCESS) vku::check_vk_errors(__FILE__, __LINE__, RESULT__); }
+#define VK_CHECK(func) { auto RESULT__ = func; if (RESULT__ != VK_SUCCESS) vku::CheckVk(__FILE__, __LINE__, RESULT__); }
 #else
-#define VK_RESULT(func) func
+#define VK_CHECK(func) func
 #endif
 
 /*template<typename Error, typename Function, typename... Args>

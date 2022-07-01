@@ -5,6 +5,7 @@
 //#include "fusion/graphics/systems/grid_renderer.hpp"
 //#include "fusion/graphics/systems/sky_renderer.hpp"
 
+#include "fusion/core/time.hpp"
 #include "fusion/graphics/camera/editor_camera.hpp"
 //#include "fusion/input/input.hpp"
 
@@ -169,7 +170,7 @@ void Scene::onRuntimeStop() {
 void Scene::onUpdateRuntime() {
     // Physics
     {
-        scene->simulate(dt);
+        scene->simulate(Time::DeltaTime());
         scene->fetchResults(true);
 
         // Retrieve transform from PhysX

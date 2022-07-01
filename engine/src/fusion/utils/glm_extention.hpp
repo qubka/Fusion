@@ -27,34 +27,29 @@ namespace quat {
 
 namespace glm {
     template<typename T, qualifier Q>
-    GLM_FUNC_DECL bool decompose(mat<4, 4, T, Q> const& modelMatrix, vec<3, T, Q>& translation, vec<3, T, Q>& rotation, vec<3, T, Q>& scale) {
-        mat<4, 4, T, Q> localMatrix{ modelMatrix };
-
+    GLM_FUNC_DECL bool decompose(mat<4, 4, T, Q> modelMatrix, vec<3, T, Q>& translation, vec<3, T, Q>& rotation, vec<3, T, Q>& scale) {
         // Normalize the matrix.
-        if (epsilonEqual(localMatrix[3][3], static_cast<T>(0), epsilon<T>()))
+        if (epsilonEqual(modelMatrix[3][3], static_cast<T>(0), epsilon<T>()))
             return false;
 
         // First, isolate perspective.  This is the messiest.
-        if (
-                epsilonNotEqual(localMatrix[0][3], static_cast<T>(0), epsilon<T>()) ||
-                epsilonNotEqual(localMatrix[1][3], static_cast<T>(0), epsilon<T>()) ||
-                epsilonNotEqual(localMatrix[2][3], static_cast<T>(0), epsilon<T>()))
-        {
+        if (epsilonNotEqual(modelMatrix[0][3], static_cast<T>(0), epsilon<T>()) ||
+            epsilonNotEqual(modelMatrix[1][3], static_cast<T>(0), epsilon<T>()) ||
+            epsilonNotEqual(modelMatrix[2][3], static_cast<T>(0), epsilon<T>())) {
             // Clear the perspective partition
-            localMatrix[0][3] = localMatrix[1][3] = localMatrix[2][3] = static_cast<T>(0);
-            localMatrix[3][3] = static_cast<T>(1);
+            modelMatrix[0][3] = modelMatrix[1][3] = modelMatrix[2][3] = static_cast<T>(0);
+            modelMatrix[3][3] = static_cast<T>(1);
         }
 
         // Next take care of translation (easy).
-        translation = vec<3, T, Q>{ localMatrix[3] };
-        localMatrix[3] = vec<4, T, Q>{ 0, 0, 0, localMatrix[3].w };
+        translation = vec<3, T, Q>{ modelMatrix[3] };
+        modelMatrix[3] = vec<4, T, Q>{ 0, 0, 0, modelMatrix[3].w };
 
-        vec<3, T, Q> Row[3], Pdum3;
-
+        vec<3, T, Q> Row[3];
         // Now get scale and shear.
         for (length_t i = 0; i < 3; ++i)
             for (length_t j = 0; j < 3; ++j)
-                Row[i][j] = localMatrix[i][j];
+                Row[i][j] = modelMatrix[i][j];
 
         // Compute X scale factor and normalize first row.
         scale.x = length(Row[0]);
@@ -67,18 +62,6 @@ namespace glm {
         // At this point, the matrix (in rows[]) is orthonormal.
         // Check for a coordinate system flip.  If the determinant
         // is -1, then negate the matrix and the scaling factors.
-#if 0
-        Pdum3 = cross(Row[1], Row[2]); // v3Cross(row[1], row[2], Pdum3);
-		if (dot(Row[0], Pdum3) < 0)
-		{
-			for (length_t i = 0; i < 3; i++)
-            {
-				scale[i] *= static_cast<T>(-1);
-				Row[i] *= static_cast<T>(-1);
-			}
-		}
-#endif
-
         rotation.y = asin(-Row[0][2]);
         if (cos(rotation.y) != 0) {
             rotation.x = atan2f(Row[1][2], Row[2][2]);
@@ -117,7 +100,7 @@ namespace glm {
 
         currentVelocity = (currentVelocity - omega * temp) * exp;
 
-        vec<3, T, Q> output = dest + (change + temp) * exp;
+        vec<3, T, Q> output { dest + (change + temp) * exp };
 
         // Prevent overshooting
         vec<3, T, Q> origMinusCurrent {target - current};
@@ -172,7 +155,7 @@ namespace glm {
     }
 
     template<typename T, qualifier Q>
-    GLM_FUNC_QUALIFIER GLM_CONSTEXPR T cross(const vec<2, T, Q>& x, const vec<2, T, Q>& y)  {
+    GLM_FUNC_QUALIFIER GLM_CONSTEXPR T cross(vec<2, T, Q> const& x, vec<2, T, Q> const& y)  {
         return x.x * y.y - x.y * y.x;
     }
 }
