@@ -1,5 +1,6 @@
 #include "engine.hpp"
 #include "module.hpp"
+#include "time.hpp"
 
 #include "fusion/devices/devices.hpp"
 #include "fusion/graphics/graphics.hpp"
@@ -17,7 +18,7 @@ Engine::Engine(const CommandLineArgs& args) : version{FUSION_VERSION_MAJOR, FUSI
     LOG_INFO << "Git: [" << GIT_COMMIT_HASH << "]:(" << GIT_TAG << ") - " << GIT_COMMIT_SUBJECT << " on " << GIT_BRANCH << " at " << GIT_COMMIT_DATE;
     LOG_INFO << "Compiled on: " << FUSION_COMPILED_SYSTEM << " from: " << FUSION_COMPILED_GENERATOR << " with: " << FUSION_COMPILED_COMPILER;
 
-    commandLineParser.parse(args);
+    //commandLineParser.parse(args);
 
     devices = Devices::Init();
     devices->getWindow(0)->OnClose().connect<&Engine::requestClose>(this);
@@ -29,6 +30,7 @@ Engine::~Engine() {
 }
 
 void Engine::init() {
+    Time::Register(Module::Stage::Pre);
     Graphics::Register(Module::Stage::Render);
 
     // Use the table to sort the modules for each stage depending on the number of mentions
@@ -59,8 +61,8 @@ int32_t Engine::run() {
         init();
         running = true;
         while (running) {
-            // Updates the delta time
-            deltaTime.update();
+            // Pre-Update
+            updateStage(Module::Stage::Pre);
 
             // Main application and devices processing
             devices->update();
@@ -72,17 +74,12 @@ int32_t Engine::run() {
                 application->update();
             }
 
-            // Pre-Update
-            updateStage(Module::Stage::Pre);
-            // Update.
+            // Update
             updateStage(Module::Stage::Normal);
             // Post-Update
             updateStage(Module::Stage::Post);
             // Render-Update
             updateStage(Module::Stage::Render);
-
-            // Increment frame index
-            frameNumber++;
         }
     } catch (std::exception& e) {
         LOG_FATAL << e.what();

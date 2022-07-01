@@ -293,7 +293,7 @@ VkShaderModule Shader::createShaderModule(const std::filesystem::path& moduleNam
 	stages.push_back(moduleName);
 
     if (!String::Contains(moduleCode, "GL_ARB_separate_shader_objects") || !String::Contains(moduleCode, "GL_ARB_shading_language_420pack")) {
-        LOG_DEBUG << "Shader " << std::quoted(moduleName.string()) << "not have GL extentions";
+        LOG_DEBUG << "Shader " << std::quoted(name) << "not have GL extentions";
     }
 
 	// Starts converting GLSL to SPIR-V.

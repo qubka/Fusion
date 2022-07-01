@@ -44,13 +44,13 @@ void EditorLayer::onUpdate() {
     switch (sceneState) {
         case Edit: {
             if (viewportFocused)
-                editorCamera.update(dt);
-            activeScene->onUpdateEditor(dt);
+                editorCamera.update();
+            activeScene->onUpdateEditor();
             break;
         }
 
         case Play: {
-            activeScene->onUpdateRuntime(dt);
+            activeScene->onUpdateRuntime();
             break;
         }
     }

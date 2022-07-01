@@ -34,7 +34,6 @@ namespace fe {
                 framesPerSecond = frameNumber;
                 frameNumber = 0;
                 frameTime = currentTime;
-                std::cout << framesPerSecond << std::endl;
             }
         }
 
