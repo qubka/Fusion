@@ -22,10 +22,10 @@ void Joystick::update() {
     axes.resize(axeCount);
 
     for (int i = 0; i < axeCount; i++) {
-        float ptr = axesPtr[i];
-        if (axes[i] != ptr) {
-            axes[i] = ptr;
-            onAxis.publish(fe::JoyAxisData{ static_cast<fe::JoystickButton>(i), ptr });
+        float value = axesPtr[i];
+        if (axes[i] != value) {
+            axes[i] = value;
+            onAxis.publish(i, value);
         }
     }
 
@@ -34,12 +34,12 @@ void Joystick::update() {
     buttons.resize(buttonCount);
 
     for (int i = 0; i < buttonCount; i++) {
-        fe::ActionCode ptr = buttonsPtr[i];
-        if (ptr != fe::Action::Release && buttons[i] != fe::Action::Release) {
-            buttons[i] = fe::Action::Repeat;
-        } else if (buttons[i] != ptr) {
-            buttons[i] = ptr;
-            onButton.publish(fe::JoyButtonData{ static_cast<fe::JoystickButton>(i), ptr });
+        auto value = static_cast<fe::InputAction>(buttonsPtr[i]);
+        if (value != fe::InputAction::Release && buttons[i] != fe::InputAction::Release) {
+            buttons[i] = fe::InputAction::Repeat;
+        } else if (buttons[i] != value) {
+            buttons[i] = value;
+            onButton.publish(i, value);
         }
     }
 
@@ -48,10 +48,10 @@ void Joystick::update() {
     hats.resize(hatCount);
 
     for (int i = 0; i < hatCount; i++) {
-        fe::JoystickHat ptr = hatsPtr[i];
-        if (hats[i] != ptr) {
-            hats[i] = ptr;
-            onHat.publish(fe::JoyHatData{ static_cast<fe::JoystickHat>(i), ptr });
+        auto value = bitmask::bitmask<fe::JoystickHat>(static_cast<fe::JoystickHat>(hatsPtr[i]));
+        if (hats[i] != value) {
+            hats[i] = value;
+            onHat.publish(i, value);
         }
     }
 }

@@ -57,27 +57,33 @@ InputContext::InputContext(const std::filesystem::path& filename) {
  * Attempt to map a raw button to an action
  */
 bool InputContext::mapButtonToAction(RawInputButton button, Action& out) const {
-    if (auto it = actionMap.find(button); it != actionMap.end())
-        return it->second;
-    return true;
+    if (auto it = actionMap.find(button); it != actionMap.end()) {
+        out = it->second;
+        return true;
+    }
+    return false;
 }
 
 /**
  * Attempt to map a raw button to a state
  */
 bool InputContext::mapButtonToState(RawInputButton button, State& out) const {
-    if (auto it = stateMap.find(button); it != stateMap.end())
-        return it->second;
-    return true;
+    if (auto it = stateMap.find(button); it != stateMap.end()) {
+        out = it->second;
+        return true;
+    }
+    return false;
 }
 
 /**
  * Attempt to map a raw axis to a range
  */
 bool InputContext::mapAxisToRange(RawInputAxis axis, Range& out) const {
-    if (auto it = rangeMap.find(axis); it != rangeMap.end())
-        return it->second;
-    return true;
+    if (auto it = rangeMap.find(axis); it != rangeMap.end()) {
+        out = it->second;
+        return true;
+    }
+    return false;
 }
 
 /**

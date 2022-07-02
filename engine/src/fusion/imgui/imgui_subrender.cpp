@@ -17,8 +17,8 @@ using namespace fe;
 
 ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     : Subrender{pipelineStage}
-    , pipeline{pipelineStage, {"shaders/imgui/imgui.vert", "shaders/imgui/imgui.frag"}, {GetVertexInput()}, {}
-    , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None }
+    , pipeline{pipelineStage, {"shaders/imgui/imgui.vert", "shaders/imgui/imgui.frag"}, {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}}, {}
+    , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None}
     , descriptorSet{pipeline} {
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
@@ -66,15 +66,17 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     scale = static_cast<float>(android::screenDensity) / static_cast<float>(ACONFIGURATION_DENSITY_MEDIUM);
 #endif
     // Read fonts from memory
-    /*File::Read("fonts/PT Sans.ttf", [&](size_t size, const void* data) {
-        io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(data), size, 16.0f * scale, nullptr, io.Fonts->GetGlyphRangesCyrillic());
-    });
-    File::Read("fonts/fontawesome-webfont.ttf", [&](size_t size, const void* data) {
-        io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(data), size, 16.0f * scale, &config, iconsRanges);
-    });*/
+
+    // Text font
+    std::vector<uint8_t> textFont { File::ReadAllBytes("fonts/PT Sans.ttf") };
+    io.Fonts->AddFontFromMemoryTTF(textFont.data(), static_cast<int>(textFont.size()), 16.0f * scale, nullptr, io.Fonts->GetGlyphRangesCyrillic());
+
+    // Icon font
+    std::vector<uint8_t> iconFont { File::ReadAllBytes("fonts/fontawesome-webfont.ttf") };
+    io.Fonts->AddFontFromMemoryTTF(iconFont.data(), static_cast<int>(iconFont.size()), 16.0f * scale, &config, iconsRanges);
 
     // Generate font
-    //io.Fonts->Build();
+    io.Fonts->Build();
 
     // Create font texture
     uint8_t* fontBuffer;
@@ -115,12 +117,6 @@ void ImGuiSubrender::render(const CommandBuffer& commandBuffer) {
     updateBuffers();
 
     drawFrame(commandBuffer);
-
-    // TODO: Temp
-    static uint32_t imageCount = Graphics::Get()->getSwapchain(0)->getImageCount() * 2;
-    while (removePool.size() > imageCount) {
-        removePool.pop();
-    }
 }
 
 void ImGuiSubrender::drawFrame(const CommandBuffer& commandBuffer) {
@@ -167,7 +163,6 @@ void ImGuiSubrender::drawFrame(const CommandBuffer& commandBuffer) {
             //VkDescriptorSet descriptor[1] = { static_cast<VkDescriptorSet>(pcmd.TextureId) };
             //vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, descriptor, 0, nullptr);
             vkCmdDrawIndexed(commandBuffer, cmd.ElemCount, 1, indexOffset, vertexOffset, 0);
-
             indexOffset += static_cast<int32_t>(cmd.ElemCount);
         }
         vertexOffset += cmdLists->VtxBuffer.Size;
@@ -187,9 +182,6 @@ void ImGuiSubrender::updateBuffers() {
     // Update buffers only if vertex or index count has been changed compared to current buffer size
     if (vertexBufferSize == 0 || indexBufferSize == 0)
         return;
-
-    // Update buffers only if vertex or index count has been changed compared to current buffer size
-    //Graphics::Get()->getC;
 
     // Vertex buffer
     if (!vertexBuffer || (vertexCount != drawData->TotalVtxCount)) {
@@ -226,12 +218,18 @@ void ImGuiSubrender::updateBuffers() {
     // Flush to make writes visible to GPU
     vertexBuffer->flush();
     indexBuffer->flush();
+
+    // Remove unused buffers from pool
+    //static uint32_t imageCount = Graphics::Get()->getSwapchain(0)->getImageCount() * 2;
+    while (removePool.size() > MAX_FRAMES_IN_FLIGHT * 2) {
+        removePool.pop();
+    }
 }
 
-void ImGuiSubrender::onMouseButtonEvent(MouseData data) {
-    if (data.button >= 0 && data.button < ImGuiMouseButton_COUNT) {
+void ImGuiSubrender::onMouseButtonEvent(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods) {
+    if (button >= MouseButton::Button0 && button < MouseButton::Button5) {
         ImGuiIO& io = ImGui::GetIO();
-        io.AddMouseButtonEvent(data.button, data.action == Action::Press);
+        io.AddMouseButtonEvent(static_cast<int>(button), action == InputAction::Press);
     }
 }
 
@@ -260,18 +258,19 @@ void ImGuiSubrender::onMouseEnterEvent(bool entered) {
     }
 }
 
-void ImGuiSubrender::onKeyEvent(KeyData data) {
-    if (data.action >= Action::Repeat)
+void ImGuiSubrender::onKeyEvent(Key key, InputAction action, Key scan, bitmask::bitmask<InputMod> mods) {
+    if (action >= InputAction::Repeat)
         return;
 
     //UpdateKeyModifiers(data.mods);
 
-    int keycode = TranslateUntranslatedKey(data.key, data.scancode);
+    int scancode = static_cast<int>(scan);
+    int keycode = TranslateUntranslatedKey(static_cast<int>(key), scancode);
 
     ImGuiIO& io = ImGui::GetIO();
-    ImGuiKey key = KeyToImGuiKey(keycode);
-    io.AddKeyEvent(key, data.action == Action::Press);
-    io.SetKeyEventNativeData(key, keycode, data.scancode); // To support legacy indexing (<1.87 user code)
+    ImGuiKey imKey = KeyToImGuiKey(keycode);
+    io.AddKeyEvent(imKey, action == InputAction::Press);
+    io.SetKeyEventNativeData(imKey, keycode, scancode); // To support legacy indexing (<1.87 user code)
 }
 
 void ImGuiSubrender::onCharInputEvent(uint32_t chr) {
@@ -304,18 +303,6 @@ void ImGuiSubrender::setupEvents(bool connect) {
         window->OnCharInput().disconnect<&ImGuiSubrender::onCharInputEvent>(this);
         window->OnFocus().disconnect<&ImGuiSubrender::onFocusEvent>(this);
     }
-}
-
-Shader::VertexInput ImGuiSubrender::GetVertexInput(uint32_t baseBinding)  {
-    std::vector<VkVertexInputBindingDescription> bindingDescriptions = {
-            {baseBinding, sizeof(ImDrawVert), VK_VERTEX_INPUT_RATE_VERTEX}
-    };
-    std::vector<VkVertexInputAttributeDescription> attributeDescriptions = {
-            {0, baseBinding, VK_FORMAT_R32G32_SFLOAT, offsetof(ImDrawVert, pos)},
-            {1, baseBinding, VK_FORMAT_R32G32_SFLOAT, offsetof(ImDrawVert, uv)},
-            {2, baseBinding, VK_FORMAT_R8G8B8A8_UNORM, offsetof(ImDrawVert, col)}
-    };
-    return {bindingDescriptions, attributeDescriptions};
 }
 
 //_______________________________________________________________

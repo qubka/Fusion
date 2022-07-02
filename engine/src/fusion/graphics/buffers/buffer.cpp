@@ -174,3 +174,32 @@ void Buffer::InsertBufferMemoryBarrier(const CommandBuffer& commandBuffer, const
     bufferMemoryBarrier.size = size;
     vkCmdPipelineBarrier(commandBuffer, srcStageMask, dstStageMask, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 }
+
+std::unique_ptr<Buffer> Buffer::StageToDeviceBuffer(VkBufferUsageFlags usage, VkDeviceSize size, const void* data) {
+    Buffer stagingBuffer{size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, data};
+    auto deviceBuffer = std::make_unique<Buffer>(size, usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    CommandBuffer commandBuffer;
+
+    VkBufferCopy copyRegion = {};
+    copyRegion.size = stagingBuffer.getSize();
+    vkCmdCopyBuffer(commandBuffer, stagingBuffer, *deviceBuffer, 1, &copyRegion);
+
+    commandBuffer.submitIdle();
+
+    return deviceBuffer;
+}
+
+std::unique_ptr<Buffer> Buffer::DeviceToStageBuffer(const Buffer& deviceBuffer) {
+    auto stagingBuffer = std::make_unique<Buffer>(deviceBuffer, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+    CommandBuffer commandBuffer;
+
+    VkBufferCopy copyRegion = {};
+    copyRegion.size = stagingBuffer->getSize();
+    vkCmdCopyBuffer(commandBuffer, *stagingBuffer, deviceBuffer, 1, &copyRegion);
+
+    commandBuffer.submitIdle();
+
+    return stagingBuffer;
+}

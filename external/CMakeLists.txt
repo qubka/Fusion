@@ -91,6 +91,20 @@ endif()
 list(APPEND ALL_SYSTEM_LIBS entt)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
+# bitmask
+#╒◖═════════════════════════════════════════════════════════════════════◗╕
+#find_package(bitmask 1.1.2 QUIET)
+if(NOT bitmask_FOUND)
+    set(BITMASK_LIB_NAME "bitmask")
+    set(BITMASK_INC_PATH ${BITMASK_LIB_NAME}/include)
+
+    add_library(${BITMASK_LIB_NAME} INTERFACE)
+
+    target_include_directories(${BITMASK_LIB_NAME} INTERFACE ${BITMASK_INC_PATH})
+endif()
+list(APPEND ALL_SYSTEM_LIBS bitmask)
+#╘◖═════════════════════════════════════════════════════════════════════◗╛
+
 # magic_enum
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 #find_package(magic_enum 0.7.3 QUIET)

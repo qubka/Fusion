@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fusion/input/joystick_states.hpp"
+#include "fusion/input/codes.hpp"
 
 #include <entt/signal/sigh.hpp>
 
@@ -10,7 +10,7 @@ namespace fe {
      */
     struct GamepadState {
         /// The states of each [gamepad button](@ref gamepad_buttons), `Action::Press` or `Action::Release`.
-        ActionCode buttons[15];
+        InputAction buttons[15];
         /// The states of each [gamepad axis](@ref gamepad_axes), in the range -1.0 to 1.0 inclusive.
         float axes[6];
     };
@@ -73,21 +73,21 @@ namespace fe {
          * @param axis The axis id to get the value from.
          * @return The value of the joystick's axis.
          */
-        virtual float getAxis(JoystickAxis axis) const = 0;
+        virtual float getAxis(uint8_t axis) const = 0;
 
         /**
          * Gets the whether a button on a joystick is pressed.
          * @param button The button id to get the value from.
          * @return Whether a button on a joystick is pressed.
          */
-        virtual ActionCode getButton(JoystickButton button) = 0;
+        virtual InputAction getButton(uint8_t button) = 0;
 
         /**
          * Gets the value of a joysticks hat.
          * @param hat The hat id to get the value from.
          * @return The value of the joystick's hat.
          */
-        virtual int getHat(JoystickHat hat) const = 0;
+        virtual bitmask::bitmask<JoystickHat> getHat(uint8_t hat) const = 0;
 
         /**
          * This function retrieves the state of the specified joystick remapped to an Xbox-like gamepad.
@@ -121,8 +121,8 @@ namespace fe {
         auto OnHat() { return entt::sink{onHat}; }
 
     protected:
-        entt::sigh<void(JoyButtonData)> onButton;
-        entt::sigh<void(JoyAxisData)> onAxis;
-        entt::sigh<void(JoyHatData)> onHat;
+        entt::sigh<void(uint8_t, InputAction)> onButton;
+        entt::sigh<void(uint8_t, float)> onAxis;
+        entt::sigh<void(uint8_t, bitmask::bitmask<JoystickHat>)> onHat;
     };
 }

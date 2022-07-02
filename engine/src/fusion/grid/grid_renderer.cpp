@@ -14,16 +14,7 @@ GridRenderer::GridRenderer(const Pipeline::Stage& pipelineStage)
         {1, -1}, {1, 1}, {-1, -1}
     }};
 
-    Buffer vertexStaging{sizeof(glm::vec2) * vertices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data()};
-    vertexBuffer = std::make_unique<Buffer>(vertexStaging.getSize(), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    CommandBuffer commandBuffer;
-
-    VkBufferCopy copyRegion = {};
-    copyRegion.size = vertexStaging.getSize();
-    vkCmdCopyBuffer(commandBuffer, vertexStaging, *vertexBuffer, 1, &copyRegion);
-
-    commandBuffer.submitIdle();
+    vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(glm::vec2) * vertices.size(), vertices.data());
 }
 
 GridRenderer::~GridRenderer() {

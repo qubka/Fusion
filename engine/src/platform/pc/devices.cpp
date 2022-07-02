@@ -82,12 +82,12 @@ std::vector<const char*> Devices::getRequiredInstanceExtensions() const {
     return result;
 }
 
-fe::ScanCode Devices::getScanCode(fe::KeyCode key) const{
-    return glfwGetKeyScancode(key);
+fe::Key Devices::getScanCode(fe::Key key) const{
+    return static_cast<fe::Key>(glfwGetKeyScancode(static_cast<int>(key)));
 }
 
-std::string Devices::getKeyName(fe::KeyCode key, fe::ScanCode scancode) const {
-    return glfwGetKeyName(key, scancode);
+std::string Devices::getKeyName(fe::Key key, fe::Key scancode) const {
+    return glfwGetKeyName(static_cast<int>(key), static_cast<int>(scancode));
 }
 
 bool Devices::isRawMouseMotionSupported() const {

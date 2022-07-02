@@ -4,7 +4,7 @@
 #include "window.hpp"
 #include "joystick.hpp"
 
-#include "fusion/input/key_codes.hpp"
+#include "fusion/input/codes.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -39,7 +39,7 @@ namespace fe {
          * @param key Any named key.
          * @return The platform-specific scancode for the key, or 255 if an error occurred.
          */
-        virtual ScanCode getScanCode(KeyCode key) const = 0;
+        virtual Key getScanCode(Key key) const = 0;
 
         /**
          * This function returns the name of the specified printable key, encoded as UTF-8.
@@ -47,7 +47,7 @@ namespace fe {
          * @param scancode The scancode of the key to query.
          * @return The UTF-8 encoded, layout-specific name of the key, or NULL.
          */
-        virtual std::string getKeyName(KeyCode key, ScanCode scancode) const = 0;
+        virtual std::string getKeyName(Key key, Key scan) const = 0;
 
         /**
          * Returns the Vulkan instance extensions list required by that type of window.

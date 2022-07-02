@@ -61,8 +61,8 @@ namespace glfw {
         void setCursor(const fe::Cursor* cursor) override;
         void setIcons(const std::vector<std::filesystem::path>& filenames) override;
 
-        fe::ActionCode getKey(fe::KeyCode key) const override;
-        fe::ActionCode getMouseButton(fe::MouseButton button) const override;
+        fe::InputAction getKey(fe::Key key) const override;
+        fe::InputAction getMouseButton(fe::MouseButton button) const override;
 
         const glm::vec2& getMousePosition() const override { return mousePosition; }
         const glm::vec2& getMousePositionDelta() const override { return mousePositionDelta; }

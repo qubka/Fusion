@@ -6,8 +6,7 @@
 #include "fusion/graphics/buffers/push_handler.hpp"
 #include "fusion/graphics/descriptors/descriptors_handler.hpp"
 
-#include "fusion/input/mouse_buttons.hpp"
-#include "fusion/input/key_codes.hpp"
+#include "fusion/input/codes.hpp"
 
 namespace fe {
     class Window;
@@ -26,11 +25,11 @@ namespace fe {
         void updateBuffers();
         void setupEvents(bool connect);
 
-        void onMouseButtonEvent(MouseData data);
+        void onMouseButtonEvent(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods);
         void onMouseMotionEvent(const glm::vec2& pos);
         void onMouseScrollEvent(const glm::vec2& offset);
         void onMouseEnterEvent(bool entered);
-        void onKeyEvent(KeyData data);
+        void onKeyEvent(Key key, InputAction action, Key scan, bitmask::bitmask<InputMod> mods);
         void onCharInputEvent(uint32_t chr);
         void onFocusEvent(bool focuses);
 

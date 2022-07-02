@@ -85,15 +85,15 @@ void InputMapper::setRawAxisValue(RawInputAxis axis, double value) {
  */
 void InputMapper::dispatch() const {
     MappedInput input = currentMappedInput;
-    for (auto it : callbackTable)
-        (*it.second)(input);
+    for (const auto& [priority, callback] : callbackTable)
+        callback(input);
 }
 
 /**
  * Add a callback to the dispatch table
  */
-void InputMapper::addCallback(InputCallback callback, int32_t priority) {
-    callbackTable.insert(std::make_pair(priority, callback));
+void InputMapper::addCallback(InputCallback&& callback, int32_t priority) {
+    callbackTable.insert(std::make_pair(priority, std::move(callback)));
 }
 
 /**

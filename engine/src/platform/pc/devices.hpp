@@ -11,8 +11,8 @@ namespace glfw {
         void update() override;
         void waitEvents() override;
 
-        fe::ScanCode getScanCode(fe::KeyCode key) const override;
-        std::string getKeyName(fe::KeyCode key, fe::ScanCode scancode) const override;
+        fe::Key getScanCode(fe::Key key) const override;
+        std::string getKeyName(fe::Key key, fe::Key scancode) const override;
 
         std::vector<const char*> getRequiredInstanceExtensions() const override;
         bool isRawMouseMotionSupported() const override;

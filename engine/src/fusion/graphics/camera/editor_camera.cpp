@@ -9,12 +9,12 @@ EditorCamera::EditorCamera() : PerspectiveCamera{} {
 void EditorCamera::update() {
     auto window = Devices::Get()->getWindow(0);
 
-    if (window->getKey(Key::LeftAlt)) {
-        if (window->getMouseButton(Mouse::ButtonMiddle))
+    if (!!window->getKey(Key::LeftAlt)) {
+        if (!!window->getMouseButton(MouseButton::ButtonMiddle))
             mousePan(window->getMousePositionDelta());
-        else if (window->getMouseButton(Mouse::ButtonLeft))
+        else if (!!window->getMouseButton(MouseButton::ButtonLeft))
             mouseRotate(window->getMousePositionDelta());
-        else if (window->getMouseButton(Mouse::ButtonRight))
+        else if (!!window->getMouseButton(MouseButton::ButtonRight))
             mouseZoom(window->getMousePositionDelta().y);
         else {
             float scroll = window->getMouseScrollDelta().y;

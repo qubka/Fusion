@@ -1,8 +1,6 @@
 #pragma once
 
-#include "fusion/input/mouse_buttons.hpp"
-#include "fusion/input/key_codes.hpp"
-#include "fusion/input/action_codes.hpp"
+#include "fusion/input/codes.hpp"
 
 #include <volk.h>
 #include <entt/signal/sigh.hpp>
@@ -223,14 +221,14 @@ namespace fe {
          * @param key The key to get the state of.
          * @return The keys state.
          */
-        virtual ActionCode getKey(KeyCode key) const = 0;
+        virtual InputAction getKey(Key key) const = 0;
 
         /**
          * Gets the current state of a mouse button.
          * @param mouseButton The mouse button to get the state of.
          * @return The mouse buttons state.
          */
-        virtual ActionCode getMouseButton(MouseButton button) const = 0;
+        virtual InputAction getMouseButton(MouseButton button) const = 0;
 
         /**
          * Gets the mouses position.
@@ -485,17 +483,17 @@ namespace fe {
         entt::sigh<void(bool)> onFocus{};
         entt::sigh<void(bool)> onIconify{};
         entt::sigh<void(bool)> onFullscreen{};
-        entt::sigh<void(MouseData)> onMouseButton{};
+        entt::sigh<void(MouseButton, InputAction, bitmask::bitmask<InputMod>)> onMouseButton{};
         entt::sigh<void(MouseButton)> onMousePress{};
         entt::sigh<void(MouseButton)> onMouseRelease{};
         entt::sigh<void(const glm::vec2 &)> onMouseMotion{};
         entt::sigh<void(const glm::vec2 &)> onMouseMotionNorm{};
         entt::sigh<void(bool)> onMouseEnter{};
         entt::sigh<void(const glm::vec2 &)> onMouseScroll{};
-        entt::sigh<void(KeyData)> onKey{};
-        entt::sigh<void(KeyCode)> onKeyPress{};
-        entt::sigh<void(KeyCode)> onKeyRelease{};
-        entt::sigh<void(KeyCode)> onKeyHold{};
+        entt::sigh<void(Key, InputAction, Key, bitmask::bitmask<InputMod>)> onKey{};
+        entt::sigh<void(Key)> onKeyPress{};
+        entt::sigh<void(Key)> onKeyRelease{};
+        entt::sigh<void(Key)> onKeyHold{};
         entt::sigh<void(uint32_t)> onCharInput{};
         entt::sigh<void(const std::vector<std::filesystem::path> &)> onFileDrop{};
         entt::sigh<void(const glm::vec2 &)> onContentScale{};

@@ -210,12 +210,12 @@ void Window::setIcons(const std::vector<std::filesystem::path>& filenames) {
     glfwSetWindowIcon(window, static_cast<int>(icons.size()), icons.data());
 }
 
-fe::ActionCode Window::getKey(fe::KeyCode key) const {
-    return glfwGetKey(window, key);
+fe::InputAction Window::getKey(fe::Key key) const {
+    return static_cast<fe::InputAction>(glfwGetKey(window, static_cast<int>(key)));
 }
 
-fe::ActionCode Window::getMouseButton(fe::MouseButton button) const {
-    return glfwGetMouseButton(window, button);
+fe::InputAction Window::getMouseButton(fe::MouseButton button) const {
+    return static_cast<fe::InputAction>(glfwGetMouseButton(window, static_cast<int>(button)));
 }
 
 void Window::setMousePosition(const glm::vec2& pos) {
@@ -387,14 +387,14 @@ namespace glfw {
 
         LOG_VERBOSE << "MouseButtonEvent: " << glm::to_string(glm::ivec3{button, action, mods});
 
-        window.onMouseButton.publish(fe::MouseData{ static_cast<fe::MouseButton>(button), static_cast<fe::ActionCode>(action), static_cast<fe::ModCode>(mods) });
+        window.onMouseButton.publish(static_cast<fe::MouseButton>(button), static_cast<fe::InputAction>(action), bitmask::bitmask<fe::InputMod>(static_cast<fe::InputMod>(mods)));
 
         switch (action) {
             case GLFW_PRESS:
-                window.onMousePress.publish(button);
+                window.onMousePress.publish(static_cast<fe::MouseButton>(button));
                 break;
             case GLFW_RELEASE:
-                window.onMouseRelease.publish(button);
+                window.onMouseRelease.publish(static_cast<fe::MouseButton>(button));
                 break;
         }
     }
@@ -404,17 +404,17 @@ namespace glfw {
 
         LOG_VERBOSE << "KeyEvent: " << glm::to_string(glm::ivec4{key, scancode, action, mods});
 
-        window.onKey.publish(fe::KeyData{static_cast<fe::KeyCode>(key), static_cast<fe::ActionCode>(action), static_cast<fe::ScanCode>(scancode), static_cast<fe::ModCode>(mods)});
+        window.onKey.publish(static_cast<fe::Key>(key), static_cast<fe::InputAction>(action), static_cast<fe::Key>(scancode), bitmask::bitmask<fe::InputMod>(static_cast<fe::InputMod>(mods)));
 
         switch (action) {
             case GLFW_PRESS:
-                window.onKeyPress.publish(key);
+                window.onKeyPress.publish(static_cast<fe::Key>(key));
                 break;
             case GLFW_RELEASE:
-                window.onKeyRelease.publish(key);
+                window.onKeyRelease.publish(static_cast<fe::Key>(key));
                 break;
             case GLFW_REPEAT:
-                window.onKeyHold.publish(key);
+                window.onKeyHold.publish(static_cast<fe::Key>(key));
                 break;
         }
     }

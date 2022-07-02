@@ -30,7 +30,7 @@ namespace fe {
     };
 
     // Handy type shortcuts
-    typedef void (*InputCallback)(MappedInput& inputs);
+    using InputCallback = std::function<void(MappedInput& inputs)>;
 
     class InputMapper {
         // Construction and destruction
@@ -50,7 +50,7 @@ namespace fe {
 
         // Input callback registration interface
     public:
-        void addCallback(InputCallback callback, int32_t priority);
+        void addCallback(InputCallback&& callback, int32_t priority);
 
         // Context management interface
     public:
@@ -68,7 +68,7 @@ namespace fe {
         std::unordered_map<std::wstring, std::unique_ptr<InputContext>> inputContexts;
         std::list<const InputContext*> activeContexts; // just used to monitor active contexts
 
-        std::multimap<int32_t, InputCallback> callbackTable;
+        std::multimap<int32_t, const InputCallback> callbackTable;
 
         MappedInput currentMappedInput;
     };

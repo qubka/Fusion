@@ -22,9 +22,9 @@ namespace glfw {
         size_t getAxisCount() const override { return connected ? axes.size() : 0; }
         size_t getHatCount() const override { return connected ? hats.size() : 0; }
 
-        fe::ActionCode getButton(fe::JoystickButton button) override { return connected && button < buttons.size() ? buttons[button] : 0; }
-        float getAxis(fe::JoystickAxis axis) const override { return connected && axis < axes.size() ? axes[axis] : 0.0f; }
-        int getHat(fe::JoystickHat hat) const override { return connected && hat < hats.size() ? hats[hat] : 0; }
+        fe::InputAction getButton(uint8_t button) override { return connected && button < buttons.size() ? buttons[button] : fe::InputAction::Release; }
+        float getAxis(uint8_t axis) const override { return connected && axis < axes.size() ? axes[axis] : 0.0f; }
+        bitmask::bitmask<fe::JoystickHat> getHat(uint8_t hat) const override { return connected && hat < hats.size() ? hats[hat] : bitmask::bitmask<fe::JoystickHat>(); }
 
         const fe::GamepadState& getGamepadState() const override;
 
@@ -33,9 +33,9 @@ namespace glfw {
     private:
         uint8_t port;
         std::string name;
-        std::vector<uint8_t> buttons;
+        std::vector<fe::InputAction> buttons;
         std::vector<float> axes;
-        std::vector<fe::JoystickHat> hats;
+        std::vector<bitmask::bitmask<fe::JoystickHat>> hats;
         bool connected{ true };
     };
 }
