@@ -100,48 +100,57 @@ void Graphics::update() {
 }
 
 bool Graphics::beginFrame(FrameInfo& info) {
-    auto result = info.swapchain.acquireNextImage(info.syncObject.getImageAvailableSemaphore(), info.syncObject.getInFlightFence());
+    auto& [id, frame, swapchain, commandBuffer, syncObject] = info;
+
+    auto result = swapchain.acquireNextImage(syncObject.getImageAvailableSemaphore(), syncObject.getInFlightFence());
 
 #ifndef PLATFORM_ANDROID
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        recreateSwapchain(info.id);
+        recreateSwapchain(id);
         return false;
     }
-#endif
+
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw std::runtime_error("Failed to acquire swap chain image!");
     }
+#else
+    if (result != VK_SUCCESS) {
+        throw std::runtime_error("Failed to acquire swap chain image!");
+    }
+#endif
 
-    if (!info.commandBuffer.isRunning())
-        info.commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    if (!commandBuffer.isRunning())
+        commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
     return true;
 }
 
 bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
+    auto& [id, frame, swapchain, commandBuffer, syncObject] = info;
+
     if (renderStage.isOutOfDate()) {
-        LOG_ERROR << "Render stage is out of date!";
+        LOG_WARNING << "Render stage is out of date!";
         return false;
     }
 
     auto& renderArea = renderStage.getRenderArea();
 
     VkViewport viewport = vku::viewport(renderArea.extent);
-    vkCmdSetViewport(info.commandBuffer, 0, 1, &viewport);
+    vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 
     VkRect2D scissor = vku::rect2D(renderArea.extent, renderArea.offset);
-    vkCmdSetScissor(info.commandBuffer, 0, 1, &scissor);
+    vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
     auto clearValues = renderStage.getClearValues();
 
     VkRenderPassBeginInfo renderPassBeginInfo = {};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassBeginInfo.renderPass = *renderStage.getRenderpass();
-    renderPassBeginInfo.framebuffer = renderStage.getActiveFramebuffer(info.swapchain.getActiveImageIndex());
+    renderPassBeginInfo.framebuffer = renderStage.getActiveFramebuffer(swapchain.getActiveImageIndex());
     renderPassBeginInfo.renderArea = scissor; // same as render area
     renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassBeginInfo.pClearValues = clearValues.data();
-    vkCmdBeginRenderPass(info.commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     return true;
 }
@@ -151,35 +160,37 @@ void Graphics::endRenderpass(FrameInfo& info) {
 }
 
 void Graphics::endFrame(FrameInfo& info) {
-    info.commandBuffer.end();
+    auto& [id, frame, swapchain, commandBuffer, syncObject] = info;
+
+    commandBuffer.end();
 
     // Check if a previous frame is using this image (i.e. there is its fence to wait on)
-    if (info.syncObject.getImageInFlightFence() != VK_NULL_HANDLE) {
-        vkWaitForFences(logicalDevice, 1, &info.syncObject.getImageInFlightFence(), VK_TRUE, UINT64_MAX);
+    if (syncObject.getImageInFlightFence() != VK_NULL_HANDLE) {
+        vkWaitForFences(logicalDevice, 1, &syncObject.getImageInFlightFence(), VK_TRUE, UINT64_MAX);
     }
     // Mark the image as now being in use by this frame
-    info.syncObject.setImageInUse();
+    syncObject.setImageInUse();
 
-    info.commandBuffer.submit(info.syncObject.getImageAvailableSemaphore(), info.syncObject.getRenderFinishedSemaphore(), info.syncObject.getInFlightFence());
+    commandBuffer.submit(syncObject.getImageAvailableSemaphore(), syncObject.getRenderFinishedSemaphore(), syncObject.getInFlightFence());
 
     auto presentQueue = logicalDevice.getPresentQueue();
-    auto result = info.swapchain.queuePresent(presentQueue, info.syncObject.getRenderFinishedSemaphore());
+    auto result = swapchain.queuePresent(presentQueue, syncObject.getRenderFinishedSemaphore());
 
 #ifndef PLATFORM_ANDROID
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-        recreateSwapchain(info.id);
+        recreateSwapchain(id);
     } else if (result != VK_SUCCESS) {
-        LOG_ERROR << "Failed to present swap chain image!";
+        LOG_WARNING << "Failed to present swap chain image!";
         VK_CHECK(result);
     }
 #else
-    if (presentResult != VK_SUCCESS) {
-        LOG_ERROR << "Failed to present swap chain image!";
-        CheckVk(presentResult);
+    if (result != VK_SUCCESS) {
+        LOG_WARNING << "Failed to present swap chain image!";
+        VK_CHECK(result);
     }
 #endif
 
-    info.currentFrame = (info.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    frame = (frame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t id) const {

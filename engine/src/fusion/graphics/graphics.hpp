@@ -63,12 +63,13 @@ namespace fe {
 
     private:
         struct FrameInfo {
-            size_t id;
+            const size_t& id;
             size_t& currentFrame;
             Swapchain& swapchain;
             CommandBuffer& commandBuffer;
             SyncObject& syncObject;
         };
+
         bool beginFrame(FrameInfo& info);
         bool beginRenderpass(FrameInfo& info, RenderStage& renderStage);
         void endRenderpass(FrameInfo& info);

@@ -20,7 +20,7 @@ RangeConverter::RangeConverter(std::wifstream& file) {
     auto numconversions = attemptRead<unsigned>(file);
     for (unsigned i = 0; i < numconversions; ++i) {
         auto range = static_cast<Range>(attemptRead<unsigned>(file));
-        Converter converter;
+        Converter converter = {};
         converter.minimumInput = attemptRead<double>(file);
         converter.maximumInput = attemptRead<double>(file);
         converter.minimumOutput = attemptRead<double>(file);
