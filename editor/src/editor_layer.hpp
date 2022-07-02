@@ -7,7 +7,7 @@
 //#include "fusion/input/base_input.hpp"
 #include "fusion/scene/scene.hpp"
 #include "fusion/scene/scene_serializer.hpp"
-#include "fusion/graphics/camera/editor_camera.hpp"
+#include "fusion/graphics/cameras/editor_camera.hpp"
 #include "fusion/graphics/renderer.hpp"
 
 namespace fe {

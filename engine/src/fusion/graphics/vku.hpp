@@ -133,6 +133,7 @@ namespace vku {
         uint8_t blockHeight;
         uint8_t bytesPerBlock;
     };
+
     /// Get the details of vulkan texture formats.
     inline BlockParams getBlockParams(VkFormat format) {
         switch (format) {
@@ -426,20 +427,7 @@ namespace vku {
 }
 
 #ifdef FUSION_DEBUG
-#define VK_CHECK(func) { auto RESULT__ = func; if (RESULT__ != VK_SUCCESS) vku::CheckVk(__FILE__, __LINE__, RESULT__); }
+#define VK_CHECK(func) { auto result = func; if (result != VK_SUCCESS) vku::CheckVk(__FILE__, __LINE__, result); }
 #else
 #define VK_CHECK(func) func
 #endif
-
-/*template<typename Error, typename Function, typename... Args>
-auto vkCallImpl(const char* filename, const uint32_t line, Error&& error, Function&& function, Args&&...args)
--> typename std::enable_if_t<std::is_same_v<VkResult, decltype(function(args...))>, bool> {
-    auto result = function(std::forward<Args>(args)...);
-#ifdef FUSION_DEBUG
-    return error(filename, line, result);
-#else
-    return true;
-#endif
-}
-
-#define vkCall(function, ...) vkCallImpl(__FILE__, __LINE__, vku::check_vk_errors, function, __VA_ARGS__)*/

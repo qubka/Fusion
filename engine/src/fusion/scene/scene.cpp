@@ -6,7 +6,7 @@
 //#include "fusion/graphics/systems/sky_renderer.hpp"
 
 #include "fusion/core/time.hpp"
-#include "fusion/graphics/camera/editor_camera.hpp"
+#include "fusion/graphics/cameras/editor_camera.hpp"
 //#include "fusion/input/input.hpp"
 
 using namespace fe;

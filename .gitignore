@@ -21,11 +21,6 @@ bld/
 [Oo]bj/
 cmake-build-debug/
 
-# Don't ignore 3d models in obj format
-!assets/models/*.obj
-!assets/models/lowpoly/*.obj
-!assets/models/voyager/*.obj
-
 # User-specific files
 *.suo
 *.user
