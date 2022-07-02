@@ -60,7 +60,7 @@ VkDescriptorSetLayoutBinding Image::GetDescriptorSetLayout(uint32_t binding, VkD
 std::unique_ptr<Bitmap> Image::getBitmap(uint32_t mipLevel, uint32_t arrayLayer) const {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	glm::uvec2 size{ uint32_t(extent.width >> mipLevel), uint32_t(extent.height >> mipLevel) };
+    auto size = glm::uvec2{extent.width, extent.height} >> mipLevel;
 	
 	VkImage dstImage;
 	VkDeviceMemory dstImageMemory;
@@ -205,7 +205,7 @@ void Image::CreateMipmaps(const VkImage& image, const VkExtent3D& extent, VkForm
 	assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT);
 	assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
 
-	CommandBuffer commandBuffer{true};
+	CommandBuffer commandBuffer;
 
 	for (uint32_t i = 1; i < mipLevels; i++) {
 		VkImageMemoryBarrier barrier0 = {};
@@ -275,7 +275,7 @@ void Image::CreateMipmaps(const VkImage& image, const VkExtent3D& extent, VkForm
 
 void Image::TransitionImageLayout(const VkImage& image, VkFormat format, VkImageLayout srcImageLayout, VkImageLayout dstImageLayout,
 	VkImageAspectFlags imageAspect, uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer) {
-	CommandBuffer commandBuffer{true};
+	CommandBuffer commandBuffer;
 
 	VkImageMemoryBarrier imageMemoryBarrier = {};
 	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -369,7 +369,7 @@ void Image::InsertImageMemoryBarrier(const CommandBuffer& commandBuffer, const V
 }
 
 void Image::CopyBufferToImage(const VkBuffer& buffer, const VkImage& image, const VkExtent3D& extent, uint32_t layerCount, uint32_t baseArrayLayer) {
-	CommandBuffer commandBuffer{true};
+	CommandBuffer commandBuffer;
 
 	VkBufferImageCopy region = {};
 	region.bufferOffset = 0;
@@ -415,7 +415,7 @@ bool Image::CopyImage(const VkImage& srcImage, VkImage& dstImage, VkDeviceMemory
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 1, 1, VK_IMAGE_TYPE_2D);
 
 	// Do the actual blit from the swapchain image to our host visible destination image.
-	CommandBuffer commandBuffer{true};
+	CommandBuffer commandBuffer;
 
 	// Transition destination image to transfer destination layout.
 	InsertImageMemoryBarrier(commandBuffer, dstImage, 0, VK_ACCESS_TRANSFER_WRITE_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,

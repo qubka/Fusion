@@ -23,6 +23,13 @@ namespace fe {
         virtual ~Buffer();
 
         /**
+         * Attach the allocated memory block to the buffer.
+         *
+         * @param offset (Optional) Byte offset (from the beginning) for the memory region to bind.
+         */
+        void bind(VkDeviceSize offset = 0);
+
+        /**
          * Map a memory range of this buffer. If successful, mapped points to the specified buffer range.
          * @param size (Optional) Size of the memory range to map. Pass VK_WHOLE_SIZE to map the complete
          * buffer range.
@@ -40,22 +47,33 @@ namespace fe {
          * Copies the specified data to the mapped buffer. Default value writes whole buffer range.
          *
          * @param data Pointer to the data to copy range.
-         * @param size (Optional) Size of the data to copy. Pass VK_WHOLE_SIZE to flush the complete buffer.
+         * @param size (Optional) Size of the data to copy. Pass VK_WHOLE_SIZE to copy the complete buffer.
          * @param offset (Optional) Byte offset from beginning of mapped region.
          *
          */
         void copy(const void* data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
         /**
-         * Compare the specified data in the mapped buffer. Default value compaares whole buffer range.
+         * Compares the specified data in the mapped buffer. Default value compares whole buffer range.
          *
          * @param data Pointer to the data to copy range.
-         * @param size (Optional) Size of the data to copy. Pass VK_WHOLE_SIZE to flush the complete buffer.
+         * @param size (Optional) Size of the data to compare. Pass VK_WHOLE_SIZE to compare the complete buffer.
          * @param offset (Optional) Byte offset from beginning of mapped region.
          *
          * @return Returns an integral value indicating the relationship between the content of the memory blocks.
          */
         int compare(const void* data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+
+        /**
+         * Extracts the specified data from the mapped buffer. Default value extract whole buffer range.
+         *
+         * @param data Pointer to the data to copy range.
+         * @param size (Optional) Size of the data to extract. Pass VK_WHOLE_SIZE to exract the complete buffer.
+         * @param offset (Optional) Byte offset from beginning of mapped region.
+         *
+         * @return Returns an integral value indicating the relationship between the content of the memory blocks.
+         */
+        void extract(void* data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
         /**
          * Flush a memory range of the buffer to make it visible to the device.
@@ -78,13 +96,6 @@ namespace fe {
         void invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
         /**
-         * Attach the allocated memory block to the buffer.
-         *
-         * @param offset (Optional) Byte offset (from the beginning) for the memory region to bind.
-         */
-        void bind(VkDeviceSize offset = 0);
-
-        /**
          * Create a buffer info descriptor.
          *
          * @param size (Optional) Size of the memory range of the descriptor.
@@ -93,41 +104,6 @@ namespace fe {
          * @return VkDescriptorBufferInfo of specified offset and range.
          */
         VkDescriptorBufferInfo descriptorInfo(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
-
-        /**
-         * Copies "instanceSize" bytes of data to the mapped buffer at an offset of index * alignmentSize.
-         *
-         * @param data Pointer to the data to copy.
-         * @param index Used in offset calculation.
-         *
-         */
-        //void writeToIndex(const void* data, int index);
-
-        /**
-         *  Flush the memory range at index * alignmentSize of the buffer to make it visible to the device.
-         *
-         * @param index Used in offset calculation.
-         *
-         */
-        //void flushIndex(int index);
-
-        /**
-         * Create a buffer info descriptor.
-         *
-         * @param index Specifies the region given by index * alignmentSize.
-         *
-         * @return VkDescriptorBufferInfo for instance at index.
-         */
-        //VkDescriptorBufferInfo descriptorInfoForIndex(int index);
-
-        /**
-         * Invalidate a memory range of the buffer to make it visible to the host.
-         *
-         * @note Only required for non-coherent memory.
-         *
-         * @param index Specifies the region to invalidate: index * alignmentSize.
-         */
-        //void invalidateIndex(int index);
 
         const VkBuffer& getBuffer() const { return buffer; }
         VkDeviceSize getSize() const { return size; }

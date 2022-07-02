@@ -52,8 +52,6 @@ namespace fe {
         Window* currentWindow{ nullptr };
         glm::vec2 lastValidMousePos{ -FLT_MAX };
 
-        static Shader::VertexInput GetVertexInput(uint32_t baseBinding = 0);
-
         static void SetStyleColors();
         static void UpdateKeyModifiers(int mods);
         static int TranslateUntranslatedKey(int key, int scancode);

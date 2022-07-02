@@ -9,6 +9,7 @@ namespace vec3 {
     GLM_INLINE GLM_CONSTEXPR glm::vec3 back{0.0f ,0.0f, -1.0f};
     GLM_INLINE GLM_CONSTEXPR glm::vec3 zero{0.0f, 0.0f, 0.0f};
     GLM_INLINE GLM_CONSTEXPR glm::vec3 one{1.0f, 1.0f, 1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec3 infinity{FLT_MAX, FLT_MAX, FLT_MAX};
 }
 
 namespace vec2 {
@@ -18,6 +19,7 @@ namespace vec2 {
     GLM_INLINE GLM_CONSTEXPR glm::vec2 down{0.0f, -1.0f};
     GLM_INLINE GLM_CONSTEXPR glm::vec2 zero{0.0f, 0.0f};
     GLM_INLINE GLM_CONSTEXPR glm::vec2 one{1.0f, 1.0f};
+    GLM_INLINE GLM_CONSTEXPR glm::vec2 infinity{FLT_MAX, FLT_MAX};
 }
 
 namespace quat {

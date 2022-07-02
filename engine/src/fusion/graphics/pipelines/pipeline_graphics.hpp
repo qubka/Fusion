@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "pipeline.hpp"
+#include "vertex.hpp"
 
 namespace fe {
     class ImageDepth;
@@ -37,7 +38,7 @@ namespace fe {
          * @param frontFace The direction to render faces.
          * @param pushDescriptors If no actual descriptor sets are allocated but instead pushed.
          */
-        PipelineGraphics(Stage stage, std::vector<std::filesystem::path> shaderStages, std::vector<Shader::VertexInput> vertexInputs, std::vector<Shader::Define> defines = {},
+        PipelineGraphics(Stage stage, std::vector<std::filesystem::path> shaderStages, std::vector<Vertex::Input> vertexInputs, std::vector<Shader::Define> defines = {},
             Mode mode = Mode::Polygon, Depth depth = Depth::ReadWrite, VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL,
             VkCullModeFlags cullMode = VK_CULL_MODE_BACK_BIT, VkFrontFace frontFace = VK_FRONT_FACE_CLOCKWISE, bool pushDescriptors = false);
         ~PipelineGraphics();
@@ -66,7 +67,7 @@ namespace fe {
 
         const Stage& getStage() const { return stage; }
         const std::vector<std::filesystem::path>& getShaderStages() const { return shaderStages; }
-        const std::vector<Shader::VertexInput>& getVertexInputs() const { return vertexInputs; }
+        const std::vector<Vertex::Input>& getVertexInputs() const { return vertexInputs; }
         const std::vector<Shader::Define>& getDefines() const { return defines; }
         Mode getMode() const { return mode; }
         Depth getDepth() const { return depth; }
@@ -94,7 +95,7 @@ namespace fe {
 
         Stage stage;
         std::vector<std::filesystem::path> shaderStages;
-        std::vector<Shader::VertexInput> vertexInputs;
+        std::vector<Vertex::Input> vertexInputs;
         std::vector<Shader::Define> defines;
         Mode mode;
         Depth depth;

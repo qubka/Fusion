@@ -7,17 +7,17 @@ using namespace fe;
 
 GridRenderer::GridRenderer(const Pipeline::Stage& pipelineStage)
     : Subrender{pipelineStage}
-    , pipeline{pipelineStage, {"shaders/grid/grid.vert", "shaders/grid/grid.frag"}, {GetVertexInput()}} {
+    , pipeline{pipelineStage, {"shaders/grid/grid.vert", "shaders/grid/grid.frag"}, {{{Vertex::Component::Position2}}}} {
 
     std::array<glm::vec2, 6> vertices{{
         {-1, 1}, {-1, -1}, {1, 1},
         {1, -1}, {1, 1}, {-1, -1}
     }};
 
-    Buffer vertexStaging(sizeof(glm::vec2) * vertices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
+    Buffer vertexStaging{sizeof(glm::vec2) * vertices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data()};
     vertexBuffer = std::make_unique<Buffer>(vertexStaging.getSize(), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    CommandBuffer commandBuffer{true};
+    CommandBuffer commandBuffer;
 
     VkBufferCopy copyRegion = {};
     copyRegion.size = vertexStaging.getSize();
@@ -27,24 +27,20 @@ GridRenderer::GridRenderer(const Pipeline::Stage& pipelineStage)
 }
 
 GridRenderer::~GridRenderer() {
-
 }
 
 void GridRenderer::render(const CommandBuffer& commandBuffer) {
     camera.update();
 
     auto& size = Devices::Get()->getWindow(0)->getSize();
-    camera.setAspectRatio(size.x / size.y);
+    camera.setAspectRatio(static_cast<float>(size.x) / static_cast<float>(size.y));
 
     // Updates uniform
     //auto camera = Scenes::Get()->getScene()->getCamera();
-    //uniformObject.push("projection", camera.getProjection());
-    //uniformObject.push("view", camera.getView());
     pushObject.push("projection", camera.getProjectionMatrix());
     pushObject.push("view", camera.getViewMatrix());
 
     // Updates descriptors
-    //descriptorSet.push("UniformObject", uniformObject);
     descriptorSet.push("PushObject", pushObject);
 
     if (!descriptorSet.update(pipeline))
@@ -55,18 +51,8 @@ void GridRenderer::render(const CommandBuffer& commandBuffer) {
     descriptorSet.bindDescriptor(commandBuffer, pipeline);
     pushObject.bindPush(commandBuffer, pipeline);
 
-    VkBuffer veryexBuffers[1] = { *vertexBuffer };
+    VkBuffer vertexBuffers[1] = { *vertexBuffer };
     VkDeviceSize offsets[1] = { 0 };
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &(vertexBuffer->getBuffer()), offsets);
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
     vkCmdDraw(commandBuffer, 6, 1, 0, 0);
-}
-
-Shader::VertexInput GridRenderer::GetVertexInput(uint32_t baseBinding) {
-    std::vector<VkVertexInputBindingDescription> bindingDescriptions = {
-            {baseBinding, sizeof(glm::vec2), VK_VERTEX_INPUT_RATE_VERTEX}
-    };
-    std::vector<VkVertexInputAttributeDescription> attributeDescriptions = {
-            {0, baseBinding, VK_FORMAT_R32G32_SFLOAT, 0},
-    };
-    return {bindingDescriptions, attributeDescriptions};
 }

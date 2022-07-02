@@ -33,12 +33,6 @@ namespace fe {
         void update() override;
 
         /**
-         * Takes a screenshot of the current image of the display and saves it into a image file.
-         * @param filename The file to save the screenshot as.
-         */
-        void captureScreenshot(const std::filesystem::path& filename, size_t id = 0) const;
-
-        /**
          * Gets the current renderer.
          * @return The renderer.
          */
@@ -60,6 +54,12 @@ namespace fe {
         const CommandPool* getCommandPool();
         const Surface* getSurface(size_t id) const { return surfaces[id].get(); }
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
+
+        /**
+         * Takes a screenshot of the current image of the display and saves it into a image file.
+         * @param filename The file to save the screenshot as.
+         */
+        void captureScreenshot(const std::filesystem::path& filename, size_t id = 0) const;
 
     private:
         struct FrameInfo {

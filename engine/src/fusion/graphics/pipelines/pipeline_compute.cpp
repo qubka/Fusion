@@ -24,7 +24,7 @@ PipelineCompute::PipelineCompute(std::filesystem::path shaderStage, std::vector<
 	createPipelineCompute();
 
 #if FUSION_DEBUG
-	LOG_DEBUG << "Pipeline Compute " << shader.getName() << " created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+	LOG_DEBUG << "Pipeline Compute " << std::quoted(shader.getName()) << " created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 

@@ -25,7 +25,5 @@ namespace fe {
         EditorCamera camera{};
 
         std::unique_ptr<Buffer> vertexBuffer;
-
-        static Shader::VertexInput GetVertexInput(uint32_t baseBinding = 0);
     };
 }

@@ -62,7 +62,7 @@ Image2dArray::Image2dArray(std::unique_ptr<Bitmap>&& bitmap, uint32_t arrayLayer
 		region.bufferOffset = 3 * extent.width * extent.height * layer;
 		bufferCopyRegions.push_back(region);
 	}
-	CommandBuffer commandBuffer{true};
+	CommandBuffer commandBuffer;
 	vkCmdCopyBufferToImage(commandBuffer, bufferStaging, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, bufferCopyRegions.size(), bufferCopyRegions.data());
 	commandBuffer.submitIdle();
 	

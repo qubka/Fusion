@@ -45,7 +45,7 @@ namespace fe {
             if (!location) {
     #if FUSION_DEBUG
                 if (shader->reportedNotFound(descriptorName, true)) {
-                    LOG_ERROR << "Could not find descriptor in shader " << shader->getName() << " of name " << std::quoted(descriptorName);
+                    LOG_ERROR << "Could not find descriptor in shader " << std::quoted(shader->getName()) << " of name " << std::quoted(descriptorName);
                 }
     #endif
                 return;
@@ -56,7 +56,7 @@ namespace fe {
             if (!descriptorType) {
     #if FUSION_DEBUG
                 if (shader->reportedNotFound(descriptorName, true)) {
-                    LOG_ERROR << "Could not find descriptor in shader " << shader->getName() << " of name " << std::quoted(descriptorName) << " at location " << *location;
+                    LOG_ERROR << "Could not find descriptor in shader " << std::quoted(shader->getName()) << " of name " << std::quoted(descriptorName) << " at location " << *location;
                 }
     #endif
                 return;

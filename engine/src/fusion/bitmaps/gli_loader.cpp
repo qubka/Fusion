@@ -7,14 +7,14 @@
 using namespace fe;
 
 void GliLoader::Load(Bitmap& bitmap, const std::filesystem::path& filename) {
-    gli::texture texture;
+    std::unique_ptr<gli::texture> texture;
     File::Read(filename, [&texture](size_t size, const void* data) {
-        texture = gli::load(reinterpret_cast<const char*>(data), size);
+        texture = std::make_unique<gli::texture>(gli::load(reinterpret_cast<const char*>(data), size));
     });
 
-    bitmap.data = std::unique_ptr<uint8_t[]>(texture.data<uint8_t>());
-    bitmap.size = texture.extent();
-    bitmap.channels = static_cast<BitmapChannels>(block_size(texture.format()));
+    bitmap.data = std::unique_ptr<uint8_t[]>(texture->data<uint8_t>());
+    bitmap.size = texture->extent();
+    bitmap.channels = static_cast<BitmapChannels>(block_size(texture->format()));
     bitmap.hdr = false;
 
     if (bitmap.isEmpty()) {

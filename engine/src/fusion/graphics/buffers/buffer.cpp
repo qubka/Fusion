@@ -70,26 +70,13 @@ Buffer::~Buffer() {
     vkFreeMemory(logicalDevice, memory, nullptr);
 }
 
-void Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = memory;
-    mappedRange.offset = offset;
-    mappedRange.size = size;
-    VK_CHECK(vkFlushMappedMemoryRanges(logicalDevice, 1, &mappedRange));
-}
-
-void Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = memory;
-    mappedRange.offset = offset;
-    mappedRange.size = size;
-    VK_CHECK(vkInvalidateMappedMemoryRanges(logicalDevice, 1, &mappedRange));
+void Buffer::bind(VkDeviceSize offset) {
+    VK_CHECK(vkBindBufferMemory(logicalDevice, buffer, memory, offset));
 }
 
 void Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
     assert(buffer && memory && "Called map on buffer before create");
+
     VK_CHECK(vkMapMemory(logicalDevice, memory, offset, size, 0, &mapped));
 }
 
@@ -120,29 +107,37 @@ int Buffer::compare(const void* data, VkDeviceSize size, VkDeviceSize offset) {
     }
 }
 
-void Buffer::bind(VkDeviceSize offset) {
-    VK_CHECK(vkBindBufferMemory(logicalDevice, buffer, memory, offset));
+void Buffer::extract(void* data, VkDeviceSize size, VkDeviceSize offset) {
+    assert(mapped && "Cannot extract from unmapped buffer");
+
+    if (size == VK_WHOLE_SIZE) {
+        memcpy(data, mapped, this->size);
+    } else {
+        memcpy(data, reinterpret_cast<int8_t*>(mapped) + offset, size);
+    }
+}
+
+void Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
+    VkMappedMemoryRange mappedRange = {};
+    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    mappedRange.memory = memory;
+    mappedRange.offset = offset;
+    mappedRange.size = size;
+    VK_CHECK(vkFlushMappedMemoryRanges(logicalDevice, 1, &mappedRange));
+}
+
+void Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
+    VkMappedMemoryRange mappedRange = {};
+    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    mappedRange.memory = memory;
+    mappedRange.offset = offset;
+    mappedRange.size = size;
+    VK_CHECK(vkInvalidateMappedMemoryRanges(logicalDevice, 1, &mappedRange));
 }
 
 VkDescriptorBufferInfo Buffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {
     return VkDescriptorBufferInfo{ buffer, offset, size, };
 }
-
-/*void Buffer::writeToIndex(const void* data, int index) {
-    writeToBuffer(data, instanceSize, index * alignmentSize);
-}
-
-void Buffer::flushIndex(int index) {
-    flush(alignmentSize, index * alignmentSize);
-}
-
-VkDescriptorBufferInfo Buffer::descriptorInfoForIndex(int index) {
-    return descriptorInfo(alignmentSize, index * alignmentSize);
-}
-
-void Buffer::invalidateIndex(int index) {
-    invalidate(alignmentSize, index * alignmentSize);
-}*/
 
 VkDeviceSize Buffer::GetAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
     if (minOffsetAlignment > 0) {

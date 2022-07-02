@@ -100,8 +100,6 @@ void Graphics::update() {
 }
 
 bool Graphics::beginFrame(FrameInfo& info) {
-    //LOG_WARNING << "BEGIN";
-
     auto result = info.swapchain.acquireNextImage(info.syncObject.getImageAvailableSemaphore(), info.syncObject.getInFlightFence());
 
 #ifndef PLATFORM_ANDROID
@@ -114,9 +112,8 @@ bool Graphics::beginFrame(FrameInfo& info) {
         throw std::runtime_error("Failed to acquire swap chain image!");
     }
 
-    assert(!info.commandBuffer.isRunning());
-
-    info.commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    if (!info.commandBuffer.isRunning())
+        info.commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
     return true;
 }
@@ -183,8 +180,6 @@ void Graphics::endFrame(FrameInfo& info) {
 #endif
 
     info.currentFrame = (info.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-
-    //LOG_WARNING << "END";
 }
 
 void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t id) const {
