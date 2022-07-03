@@ -81,7 +81,7 @@ namespace fe {
         template<typename Func>
         void each(Func&& func) {
             for (auto& [typeId, system] : systems) {
-                func(typeId, system.get());
+                func(system.get());
             }
         }
 

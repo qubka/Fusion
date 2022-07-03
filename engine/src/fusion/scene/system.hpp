@@ -1,26 +1,39 @@
 #pragma once
 
+#include <entt/entity/registry.hpp>
+
 namespace fe {
     class System {
     public:
-        System() = default;
+        System(entt::registry& registry) : registry{registry} {}
         virtual ~System() = default;
         NONCOPYABLE(System);
 
         /**
-         * @brief Before the first OnUpdate and whenever the system resumes running.
+         * @brief Called when the system is created.
          */
-        virtual void start() = 0;
+        virtual void create() {};
 
         /**
-         * @brief Every frame as long as the system has work to do (see ShouldRunSystem()) and the system is Enabled.
+         * @brief Whenever the system starts updating because scene in the active state.
          */
-        virtual void update() = 0;
+        virtual void start() {};
+
+        /**
+         * @brief Every frame as long as the system has work to do and the system is Enabled.
+         */
+        virtual void update() {};
+
+        /**
+        * @brief Whenever the system stops updating because scene not in the active state.
+        */
+        virtual void stop() {};
 
         bool isEnabled() const { return enabled; }
         void setEnabled(bool enable) { this->enabled = enable; }
 
     protected:
         bool enabled{ true };
+        entt::registry& registry;
     };
 }

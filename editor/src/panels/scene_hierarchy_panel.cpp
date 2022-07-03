@@ -478,17 +478,17 @@ bool SceneHierarchyPanel::drawEnumControl(const std::string& label, Enum& value,
     }, columnWidth);
 }
 
-template<typename Component>
-void SceneHierarchyPanel::drawComponent(const std::string& label, entt::entity entity, std::function<void(Component&)>&& function) {
+template<typename T>
+void SceneHierarchyPanel::drawComponent(const std::string& label, entt::entity entity, std::function<void(T&)>&& function) {
     const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap |
                                      ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth |
                                      ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding;
-    if (auto component = context->registry.try_get<Component>(entity)) {
+    if (auto component = context->registry.try_get<T>(entity)) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
         float lineHeight = ImGui::GetContentRegionAvail().x - ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y;
         ImGui::Separator();
 
-        bool opened = ImGui::TreeNodeEx((void*)typeid(Component).hash_code(), flags, "%s", label.c_str());
+        bool opened = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, "%s", label.c_str());
         ImGui::PopStyleVar();
 
         ImGui::SameLine(lineHeight);
@@ -526,10 +526,10 @@ void SceneHierarchyPanel::drawComponent(const std::string& label, entt::entity e
             case MoveDown:
                 break;
             case Reset:
-                context->registry.replace<Component>(entity);
+                context->registry.replace<T>(entity);
                 break;
             case Remove:
-                context->registry.erase<Component>(entity);
+                context->registry.erase<T>(entity);
                 break;
             case Copy:
                 break;
@@ -558,7 +558,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         drawComponentMenuItem<TransformComponent>(ICON_FA_YELP + " Transform"s, entity);
         drawComponentMenuItem<CameraComponent>(ICON_FA_CAMERA + " Camera"s, entity);
         drawComponentMenuItem<MeshComponent>(ICON_FA_CODEPEN + " Mesh"s, entity);
-        drawComponentMenuItem<RigidbodyComponent>(ICON_FA_CUBE + " Rigidbody"s, entity);
+        drawComponentMenuItem<RigidBodyComponent>(ICON_FA_CUBE + " Rigidbody"s, entity);
         drawComponentMenuItem<PhysicsMaterialComponent>(ICON_FA_TENCENT_WEIBO + " Physics Material"s, entity);
         drawComponentMenuItem<BoxColliderComponent>(ICON_FA_SQUARE_O + " Box Collider"s, entity);
         drawComponentMenuItem<SphereColliderComponent>(ICON_FA_CIRCLE_O + " Sphere Collider"s, entity);
@@ -665,10 +665,10 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
             context->registry.patch<MeshComponent>(entity);
     });
 
-    drawComponent<RigidbodyComponent>(ICON_FA_CUBE + "  Rigidbody"s, entity, [&](RigidbodyComponent& component)
+    drawComponent<RigidBodyComponent>(ICON_FA_CUBE + "  Rigidbody"s, entity, [&](RigidBodyComponent& component)
     {
-        drawEnumControl<RigidbodyComponent::BodyType>("Type", component.type);
-        if (component.type == RigidbodyComponent::BodyType::Dynamic) {
+        drawEnumControl<RigidBodyComponent::BodyType>("Type", component.type);
+        if (component.type == RigidBodyComponent::BodyType::Dynamic) {
             drawValueControl("Mass", [&component] { return ImGui::DragFloat("", &component.mass, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
             drawValueControl("Linear Drag", [&component] { return ImGui::DragFloat("", &component.linearDrag, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
             drawValueControl("Angular Drag", [&component] { return ImGui::DragFloat("", &component.angularDrag, 0.1f, 0.0f, FLT_MAX, "%.2f"); });
@@ -717,11 +717,11 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
     });*/
 }
 
-template<typename Component>
+template<typename T>
 void SceneHierarchyPanel::drawComponentMenuItem(const std::string& label, entt::entity entity) {
-    if (!context->registry.all_of<Component>(entity)) {
+    if (!context->registry.all_of<T>(entity)) {
         if (ImGui::MenuItem(label.c_str())) {
-            context->registry.emplace<Component>(entity);
+            context->registry.emplace<T>(entity);
             ImGui::CloseCurrentPopup();
         }
     }

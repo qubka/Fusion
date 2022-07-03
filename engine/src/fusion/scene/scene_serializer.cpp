@@ -323,11 +323,7 @@ namespace YAML {
 
 using namespace fe;
 
-SceneSerializer::SceneSerializer(const std::shared_ptr<Scene>& scene) : scene{scene} {
-
-}
-
-void SceneSerializer::serialize(const std::filesystem::path& filename) {
+/*void SceneSerializer::serialize(const Scene& scene, const std::filesystem::path& filename) {
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
 
     YAML::Emitter out;
@@ -399,16 +395,13 @@ void SceneSerializer::serialize(const std::filesystem::path& filename) {
 
             out << YAML::Key << "path" << YAML::Value << component->path;
             //out << YAML::Key << "layout" << YAML::Value << component->layout;
-            out << YAML::Key << "scale" << YAML::Value << component->scale;
-            out << YAML::Key << "center" << YAML::Value << component->center;
-            out << YAML::Key << "uvscale" << YAML::Value << component->uvscale;
 
             out << YAML::EndMap; // MeshComponent
         }
 
-        if (auto component = scene->registry.try_get<RigidbodyComponent>(entity)) {
-            out << YAML::Key << "RigidbodyComponent";
-            out << YAML::BeginMap; // RigidbodyComponent
+        if (auto component = scene->registry.try_get<RigidBodyComponent>(entity)) {
+            out << YAML::Key << "RigidBodyComponent";
+            out << YAML::BeginMap; // RigidBodyComponent
 
             out << YAML::Key << "type" << YAML::Value << me::enum_index(component->type).value_or(0);
             out << YAML::Key << "mass" << YAML::Value << component->mass;
@@ -419,7 +412,7 @@ void SceneSerializer::serialize(const std::filesystem::path& filename) {
             out << YAML::Key << "freezePosition" << YAML::Value << component->freezePosition;
             out << YAML::Key << "freezeRotation" << YAML::Value << component->freezeRotation;
 
-            out << YAML::EndMap; // RigidbodyComponent
+            out << YAML::EndMap; // RigidBodyComponent
         }
 
         if (auto component = scene->registry.try_get<BoxColliderComponent>(entity)) {
@@ -470,11 +463,11 @@ void SceneSerializer::serialize(const std::filesystem::path& filename) {
             out << YAML::Key << "MaterialComponent";
             out << YAML::BeginMap; // MaterialComponent
 
-            /*out << YAML::Key << "ambient" << YAML::Value << component->ambient;
+            out << YAML::Key << "ambient" << YAML::Value << component->ambient;
             out << YAML::Key << "diffuse" << YAML::Value << component->diffuse;
             out << YAML::Key << "emission" << YAML::Value << component->emission;
             out << YAML::Key << "specular" << YAML::Value << component->specular;
-            out << YAML::Key << "shininess" << YAML::Value << component->shininess;*/
+            out << YAML::Key << "shininess" << YAML::Value << component->shininess;
 
             out << YAML::EndMap; // MaterialComponent
         }
@@ -485,11 +478,11 @@ void SceneSerializer::serialize(const std::filesystem::path& filename) {
     out << YAML::EndSeq;
     out << YAML::EndMap;
 
-    std::ofstream fout(filename);
+    std::ofstream fout{filename};
     fout << out.c_str();
 }
 
-bool SceneSerializer::deserialize(const std::filesystem::path& filename) {
+bool SceneSerializer::deserialize(const Scene& scene, const std::filesystem::path& filename) {
     assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
 
     YAML::Node data;
@@ -554,16 +547,13 @@ bool SceneSerializer::deserialize(const std::filesystem::path& filename) {
 
             if (const auto& meshComponent = entity["MeshComponent"]) {
                 scene->registry.emplace<MeshComponent>(deserializedEntity,
-                                                       meshComponent["path"].as<std::string>(),
-                                                       //meshComponent["layout"].as<std::vector<int>>(),
-                                                       meshComponent["scale"].as<glm::vec3>(),
-                                                       meshComponent["center"].as<glm::vec3>(),
-                                                       meshComponent["uvscale"].as<glm::vec2>());
+                                                       meshComponent["path"].as<std::string>());
+                                                       //meshComponent["layout"].as<std::vector<int>>());
             }
 
-            if (const auto& component = entity["RigidbodyComponent"]) {
-                scene->registry.emplace<RigidbodyComponent>(deserializedEntity,
-                                                            me::enum_value<RigidbodyComponent::BodyType>(component["type"].as<size_t>()),
+            if (const auto& component = entity["RigidBodyComponent"]) {
+                scene->registry.emplace<RigidBodyComponent>(deserializedEntity,
+                                                            me::enum_value<RigidBodyComponent::BodyType>(component["type"].as<size_t>()),
                                                             component["mass"].as<float>(),
                                                             component["linearDrag"].as<float>(),
                                                             component["angularDrag"].as<float>(),
@@ -602,15 +592,16 @@ bool SceneSerializer::deserialize(const std::filesystem::path& filename) {
             }
 
             if (const auto& component = entity["MaterialComponent"]) {
-                /*scene->registry.emplace<MaterialComponent>(deserializedEntity,
+                scene->registry.emplace<MaterialComponent>(deserializedEntity,
                                                            component["ambient"].as<glm::vec4>(),
                                                            component["diffuse"].as<glm::vec4>(),
                                                            component["emission"].as<glm::vec4>(),
                                                            component["specular"].as<glm::vec3>(),
-                                                           component["shininess"].as<float>());*/
+                                                           component["shininess"].as<float>());
             }
         }
     }
 
     return true;
 }
+*/

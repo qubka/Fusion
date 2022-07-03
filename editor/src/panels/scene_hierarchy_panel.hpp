@@ -18,9 +18,9 @@ namespace fe {
     private:
         void drawEntities();
         void drawComponents(entt::entity entity);
-        template<typename Component>
-        void drawComponent(const std::string& label, entt::entity entity, std::function<void(Component&)>&& function);
-        template<typename Component>
+        template<typename T>
+        void drawComponent(const std::string& label, entt::entity entity, std::function<void(T&)>&& function);
+        template<typename T>
         void drawComponentMenuItem(const std::string& label, entt::entity entity);
 
         bool drawFileBrowser(const std::string& label, std::string& value, const std::vector<std::string>& formats, float columnWidth = 150.0f);
