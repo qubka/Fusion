@@ -73,7 +73,7 @@ namespace fe {
 
         using StageIndex = std::pair<Stage, std::type_index>;
 
-        //Module() = default;
+        Module() = default;
         ~Module() override = default;
         NONCOPYABLE(Module);
 

@@ -11,7 +11,7 @@ namespace fe {
     public:
         SystemHolder() = default;
         ~SystemHolder() = default;
-        //NONCOPYABLE(SystemHolder);
+        NONCOPYABLE(SystemHolder);
 
         /**
          * Checks whether a System exists or not.
@@ -46,7 +46,7 @@ namespace fe {
          * @param system The System.
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
-        void add(std::shared_ptr<T>&& system) {
+        void add(std::unique_ptr<T>&& system) {
             // Remove previous System, if it exists
             remove<T>();
 
@@ -86,6 +86,6 @@ namespace fe {
         }
 
     private:
-        std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
+        std::unordered_map<std::type_index, std::unique_ptr<System>> systems;
     };
 }
