@@ -45,7 +45,7 @@ public:
 
 	void releaseInclude(IncludeResult* result) override {
 		if (result) {
-			delete[] static_cast<char *>(result->userData);
+			delete[] static_cast<char*>(result->userData);
 			delete result;
 		}
 	}

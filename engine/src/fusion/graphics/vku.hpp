@@ -129,9 +129,9 @@ namespace vku {
 
     /// Description of blocks for compressed formats.
     struct BlockParams {
-        uint8_t blockWidth;
-        uint8_t blockHeight;
-        uint8_t bytesPerBlock;
+        uint8_t width;
+        uint8_t height;
+        uint8_t bytes;
     };
 
     /// Get the details of vulkan texture formats.

@@ -1,9 +1,10 @@
 #pragma once
 
+#include "subrender.hpp"
+
 #include "fusion/graphics/pipelines/pipeline.hpp"
 
 namespace fe {
-    class Subrender;
     /**
      * @brief Class that contains and manages subrenders registered to a render manager.
      */
@@ -19,7 +20,7 @@ namespace fe {
          * @tparam T The Subrender type.
          * @return If the Subrender exists.
          */
-        template<typename T, typename = std::enable_if_t<std::is_convertible_v<T , Subrender*>>>
+        template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Subrender*>>>
         bool has() const {
             const auto it = subrenders.find(typeid(T));
             return it != subrenders.end() && it->second;
@@ -34,7 +35,7 @@ namespace fe {
         T* get() const {
             const auto& typeId = typeid(T);
 
-            if (auto it = subrenders.find(typeId);  it != subrenders.end() && it->second)
+            if (auto it = subrenders.find(typeId); it != subrenders.end() && it->second)
                 return static_cast<T*>(it->second.get());
 
             //throw std::runtime_error("Subrender Holder does not have requested Subrender");
@@ -51,7 +52,7 @@ namespace fe {
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Subrender*>>>
         T* add(const Pipeline::Stage& stage, std::unique_ptr<T>&& subrender) {
             // Remove previous Subrender, if it exists
-            //remove<T>();
+            remove<T>();
 
             const auto& typeId = typeid(T);
 
@@ -67,7 +68,7 @@ namespace fe {
          * Removes a Subrender.
          * @tparam T The Subrender type.
          */
-        template<typename T, typename = std::enable_if_t<std::is_convertible_v<T *, Subrender *>>>
+        template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Subrender*>>>
         void remove() {
             const auto& typeId = typeid(T);
 
