@@ -24,11 +24,10 @@ namespace fe {
 
         template<typename ... Args>
         class Requires {
-            static constexpr size_t value = sizeof...(Args);
         public:
             std::vector<std::type_index> get() const {
                 std::vector<std::type_index> requires;
-                requires.reserve(value);
+                requires.reserve(sizeof...(Args));
                 (requires.emplace_back(typeid(Args)), ...);
                 return requires;
             }
@@ -41,7 +40,7 @@ namespace fe {
              * Gets the engines instance.
              * @return The current module instance.
              */
-            static T* Get() { return ModuleInstance; }
+            static T* Get() { return Instance; }
 
             /**
              * Creates a new module singleton instance and registers into the module registry map.
@@ -51,13 +50,14 @@ namespace fe {
             template<typename ... Args>
             static bool Register(typename Base::Stage stage, Requires<Args...>&& requires = {}) {
                 ModuleFactory::Registry()[typeid(T)] = { []() {
-                    ModuleInstance = new T();
-                    return std::unique_ptr<Base>(ModuleInstance);
+                    Instance = new T();
+                    return std::unique_ptr<Base>(Instance);
                 }, stage, requires.get() };
                 return true;
             }
 
-            inline static T* ModuleInstance = nullptr;
+        protected:
+            inline static T* Instance = nullptr;
         };
     };
 
@@ -74,8 +74,8 @@ namespace fe {
         using StageIndex = std::pair<Stage, std::type_index>;
 
         //Module() = default;
-        virtual ~Module() = default;
-        //NONCOPYABLE(Module);
+        ~Module() override = default;
+        NONCOPYABLE(Module);
 
         /**
          * The update function for the module.
