@@ -67,7 +67,7 @@ namespace fe {
          */
         template<typename T, typename... Args>
         void addSystem(Args&&...args) {
-            systems.add<T>(std::make_unique<T>(registry, std::forward<Args>(args)...));
+            systems.add<T>(std::make_shared<T>(registry, std::forward<Args>(args)...));
         }
 
         /**
@@ -133,7 +133,7 @@ namespace fe {
         template<typename T>
         void clone(const entt::registry& src) {
             auto view = src.view<const T>();
-            for (auto [entity, component] : view.each()) {
+            for (const auto& [entity, component] : view.each()) {
                 registry.emplace_or_replace<T>(entity, component);
             }
         }
