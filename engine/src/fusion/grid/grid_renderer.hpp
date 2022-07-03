@@ -1,7 +1,5 @@
 #pragma once
 
-#include "fusion/graphics/cameras/editor_camera.hpp"
-
 #include "fusion/graphics/subrender.hpp"
 #include "fusion/graphics/pipelines/pipeline_graphics.hpp"
 #include "fusion/graphics/buffers/uniform_handler.hpp"
@@ -21,8 +19,6 @@ namespace fe {
         DescriptorsHandler descriptorSet;
         //UniformHandler uniformObject;
         PushHandler pushObject;
-
-        EditorCamera camera{};
 
         std::unique_ptr<Buffer> vertexBuffer;
     };

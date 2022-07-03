@@ -16,6 +16,7 @@ namespace fe {
         explicit Bitmap(const glm::uvec2& size, BitmapChannels channels = BitmapChannels::RgbAlpha, bool hdr = false);
         Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, BitmapChannels channels = BitmapChannels::RgbAlpha, bool hdr = false);
         ~Bitmap() override = default;
+        NONCOPYABLE(Bitmap);
 
         void load(const std::filesystem::path& filename);
         void write(const std::filesystem::path& filename) const;

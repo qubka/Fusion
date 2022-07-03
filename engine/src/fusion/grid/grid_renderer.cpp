@@ -1,7 +1,10 @@
 #include "grid_renderer.hpp"
 
 #include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/graphics/cameras/camera.hpp"
 #include "fusion/devices/devices.hpp"
+#include "fusion/scene/scene.hpp"
+#include "fusion/scene/scenes.hpp"
 
 using namespace fe;
 
@@ -21,15 +24,10 @@ GridRenderer::~GridRenderer() {
 }
 
 void GridRenderer::render(const CommandBuffer& commandBuffer) {
-    camera.update();
-
-    auto& size = Devices::Get()->getWindow(0)->getSize();
-    camera.setAspectRatio(static_cast<float>(size.x) / static_cast<float>(size.y));
-
     // Updates uniform
-    //auto camera = Scenes::Get()->getScene()->getCamera();
-    pushObject.push("projection", camera.getProjectionMatrix());
-    pushObject.push("view", camera.getViewMatrix());
+    auto camera = Scenes::Get()->getScene()->getCamera();
+    pushObject.push("projection", camera->getProjectionMatrix());
+    pushObject.push("view", camera->getViewMatrix());
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
