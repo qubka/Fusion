@@ -1,8 +1,5 @@
 #include "graphics.hpp"
-#include "subrender.hpp"
 
-#include "fusion/utils/enumerate.hpp"
-#include "fusion/utils/date_time.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/devices/devices.hpp"
 #include "fusion/devices/window.hpp"
@@ -13,6 +10,9 @@
 #include "fusion/graphics/images/image_depth.hpp"
 #include "fusion/graphics/render_stage.hpp"
 #include "fusion/graphics/renderer.hpp"
+#include "fusion/graphics/subrender.hpp"
+#include "fusion/utils/enumerate.hpp"
+#include "fusion/utils/date_time.hpp"
 
 #include <glslang/Public/ShaderLang.h>
 
@@ -180,8 +180,7 @@ void Graphics::endFrame(FrameInfo& info) {
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
         recreateSwapchain(id);
     } else if (result != VK_SUCCESS) {
-        LOG_WARNING << "Failed to present swap chain image!";
-        VK_CHECK(result);
+        throw std::runtime_error("Failed to present swap chain image!");
     }
 #else
     if (result != VK_SUCCESS) {

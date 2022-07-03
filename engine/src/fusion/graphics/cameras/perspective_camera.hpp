@@ -12,6 +12,8 @@ namespace fe {
         //! Constructs screen-aligned camera
         PerspectiveCamera(const glm::vec2& size, float fov, float near, float far);
 
+        void update() override {};
+
         //! Configures the camera's projection according to the provided parameters.
         void setPerspective(float verticalFovDegrees, float aspect, float near, float far);
 

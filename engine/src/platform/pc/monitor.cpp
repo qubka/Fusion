@@ -16,7 +16,7 @@ Monitor::Monitor(GLFWmonitor* monitor)
     modes.reserve(videoModeCount);
 
     for (int i = 0; i < videoModeCount; i++)
-        modes.push_back(*reinterpret_cast<const fe::VideoMode *>(&videoModes[i]));
+        modes.push_back(*reinterpret_cast<const fe::VideoMode*>(&videoModes[i]));
 }
 
 glm::uvec4 Monitor::getWorkarea() const {
@@ -57,7 +57,7 @@ glm::uvec2 Monitor::getPosition() const {
 
 const fe::VideoMode& Monitor::getVideoMode() const {
     auto videoMode = glfwGetVideoMode(monitor);
-    return *reinterpret_cast<const fe::VideoMode *>(videoMode);
+    return *reinterpret_cast<const fe::VideoMode*>(videoMode);
 }
 
 const fe::GammaRamp& Monitor::getGammaRamp() const {

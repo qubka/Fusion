@@ -7,7 +7,7 @@ bool Mesh::render(const CommandBuffer& commandBuffer, uint32_t instances) {
         VkBuffer vertexBuffers[1] = { *vertexBuffer };
         VkDeviceSize offsets[1] = { 0 };
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-        vkCmdBindIndexBuffer(commandBuffer, *indexBuffer, 0, getIndexType());
+        vkCmdBindIndexBuffer(commandBuffer, *indexBuffer, 0, indexType);
         vkCmdDrawIndexed(commandBuffer, indexCount, instances, 0, 0, 0);
     } else if (vertexBuffer && !indexBuffer) {
         VkBuffer vertexBuffers[1] = { *vertexBuffer };

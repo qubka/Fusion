@@ -1,7 +1,7 @@
 #pragma once
 
+#include "fusion/core/module.hpp"
 #include "fusion/devices/window.hpp"
-
 #include "fusion/graphics/devices/instance.hpp"
 #include "fusion/graphics/devices/logical_device.hpp"
 #include "fusion/graphics/devices/physical_device.hpp"
@@ -11,7 +11,6 @@
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/renderer.hpp"
 #include "fusion/graphics/vku.hpp"
-#include "fusion/core/module.hpp"
 
 #define MAX_FRAMES_IN_FLIGHT 2
 

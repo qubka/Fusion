@@ -1,11 +1,10 @@
 #pragma once
 
+#include "fusion/graphics/images/image_depth.hpp"
+#include "fusion/graphics/renderpass/framebuffers.hpp"
+#include "fusion/graphics/renderpass/renderpass.hpp"
+#include "fusion/graphics/renderpass/swapchain.hpp"
 #include "fusion/graphics/vku.hpp"
-
-#include "images/image_depth.hpp"
-#include "renderpass/framebuffers.hpp"
-#include "renderpass/renderpass.hpp"
-#include "renderpass/swapchain.hpp"
 
 namespace fe {
     struct Attachment {

@@ -10,7 +10,7 @@ namespace fe {
     public:
         Mesh() = default;
         template<typename T>
-        explicit Mesh(const std::vector<T>& vertices, const std::vector<uint32_t>& indices = {}) {
+        explicit Mesh(const std::vector<T>& vertices, const std::vector<uint32_t>& indices = {}, VkIndexType indexType = VK_INDEX_TYPE_UINT32) : indexType{indexType} {
             setVertices(vertices);
             setIndices(indices);
 
@@ -29,13 +29,13 @@ namespace fe {
         const Buffer* getIndexBuffer() const { return indexBuffer.get(); }
         uint32_t getVertexCount() const { return vertexCount; }
         uint32_t getIndexCount() const { return indexCount; }
-        static VkIndexType getIndexType() { return VK_INDEX_TYPE_UINT32; }
         const glm::vec3& getMinExtents() const { return minExtents; }
         const glm::vec3& getMaxExtents() const { return maxExtents; }
         float getWidth() const { return maxExtents.x - minExtents.x; }
         float getHeight() const { return maxExtents.y - minExtents.y; }
         float getDepth() const { return maxExtents.z - minExtents.z; }
         float getRadius() const { return radius; }
+        VkIndexType getIndexType() const { return indexType; }
 
         std::vector<uint32_t> getIndices();
         void setIndices(const std::vector<uint32_t>& indices);
@@ -68,6 +68,7 @@ namespace fe {
         std::unique_ptr<Buffer> indexBuffer;
         uint32_t vertexCount{ 0 };
         uint32_t indexCount{ 0 };
+        VkIndexType indexType{ VK_INDEX_TYPE_UINT32 };
         glm::vec3 minExtents{ FLT_MAX };
         glm::vec3 maxExtents{ -FLT_MAX };
         float radius{ 0.0f };

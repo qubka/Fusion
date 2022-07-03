@@ -35,7 +35,7 @@ void Instance::FvkDestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtil
 }
 #else
 #if PLATFORM_ANDROID
-const std::vector<const char *> Instance::ValidationLayers = {
+const std::vector<const char*> Instance::ValidationLayers = {
         "VK_LAYER_GOOGLE_threading",
         "VK_LAYER_LUNARG_parameter_validation",
         "VK_LAYER_LUNARG_object_tracker",
@@ -44,7 +44,7 @@ const std::vector<const char *> Instance::ValidationLayers = {
         "VK_LAYER_GOOGLE_unique_objects"
 };
 #else
-const std::vector<const char *> Instance::ValidationLayers = {
+const std::vector<const char*> Instance::ValidationLayers = {
         "VK_LAYER_LUNARG_assistant_layer",
         "VK_LAYER_LUNARG_standard_validation"
 };
