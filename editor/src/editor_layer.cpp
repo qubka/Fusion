@@ -202,7 +202,6 @@ void EditorLayer::onImGui() {
 
     ImGui::Begin((ICON_FA_NEWSPAPER_O + "  Stats"s).c_str());
 
-    //std::string name = "None";
     //if (hoveredEntity)
     //    name = hoveredEntity.GetComponent<TagComponent>();
     //ImGui::Text("Hovered Entity: %s", name.c_str());
