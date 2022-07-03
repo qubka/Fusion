@@ -23,7 +23,7 @@ namespace fe {
         virtual void start() = 0;
 
         /**
-         * Run when updating the renderer manager.
+         * Run when updating the renderer module.
          */
         virtual void update() = 0;
 

@@ -8,6 +8,8 @@ namespace fe {
     enum class BitmapChannels { Default = 0, Grey = 1, GreyAlpha, Rgb, RgbAlpha };
 
     class Bitmap : public BitmapFactory<Bitmap> {
+        friend class StbLoader;
+        friend class GliLoader;
     public:
         Bitmap() = default;
         explicit Bitmap(const std::filesystem::path& filename);
@@ -47,8 +49,5 @@ namespace fe {
 
     private:
         static size_t CalculateLength(const glm::uvec2& size, BitmapChannels channels = BitmapChannels::RgbAlpha, bool hdr = false);
-
-        friend class StbLoader;
-        friend class GliLoader;
     };
 }

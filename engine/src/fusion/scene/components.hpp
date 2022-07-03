@@ -23,14 +23,14 @@ namespace fe {
         entt::entity parent{ entt::null }; // the entity identifier of the parent, if any.
     };
 
-    struct TransformComponent { // http://graphics.cs.cmu.edu/courses/15-466-f17/notes/hierarchy.html
+    struct TransformComponent {
         glm::vec3 position{ 0.0f };
         glm::quat rotation{ quat::identity };
         glm::vec3 scale{ 1.0f };
 
         glm::mat4 model{ 1.0f };
 
-        glm::mat4 transform() const {
+        glm::mat4 getTransform() const {
             return glm::mat4{ //translate
                 { 1.0f, 0.0f, 0.0f, 0.0f },
                 { 0.0f, 1.0f, 0.0f, 0.0f },
@@ -71,16 +71,29 @@ namespace fe {
 
     struct MeshComponent {
         std::string path;
-        glm::vec3 scale{ 1.0f };
-        glm::vec3 center{ 0.0f };
-        glm::vec2 uvscale{ 1.0f };
+        //bool castShadows{ false };
 
         // Storage for runtime
         void* runtimeModel{ nullptr };
     };
     struct DirtyMeshComponent {};
 
-    struct RigidbodyComponent {
+    struct PointLightComponent {
+        glm::vec3 color{ 1.0f };
+        float intensity{ 1.0f };
+        float radius{ 2.0f };
+    };
+
+    struct DirectionalLightComponent {
+        glm::vec3 color{ 1.0f };
+        float intensity{ 1.0f };
+    };
+
+    struct ScriptComponent {
+        std::string name;
+    };
+
+    /*struct RigidBodyComponent {
         enum class BodyType { Static = 0, Dynamic = 1 };
         BodyType type{ BodyType::Static };
         //Layer layer;
@@ -99,6 +112,7 @@ namespace fe {
     struct BoxColliderComponent {
         glm::vec3 extent{ 1.0f };
         bool trigger{ false };
+        //bool showColliderBounds{ true };
 
         // Storage for runtime
         void* runtimeShape{ nullptr };
@@ -107,6 +121,7 @@ namespace fe {
     struct SphereColliderComponent {
         float radius{ 0.0f };
         bool trigger{ false };
+        //bool showColliderBounds{ true };
 
         // Storage for runtime
         void* runtimeShape{ nullptr };
@@ -116,15 +131,21 @@ namespace fe {
         float radius{ 0.0f };
         float height{ 0.0f };
         bool trigger{ false };
+        //bool showColliderBounds{ true };
 
         // Storage for runtime
         void* runtimeShape{ nullptr };
     };
 
-    /*struct MeshColliderComponent {
+    struct MeshColliderComponent {
+        bool convex{ false };
+        bool trigger{ false };
+        bool overrideMesh{ false };
+        //bool showColliderBounds{ false };
+
         // Storage for runtime
         void* runtimeShape{ nullptr };
-    };*/
+    };
 
     struct PhysicsMaterialComponent {
         enum class CombineMode { Average = 0, Minimum, Multiply, Maximum };
@@ -140,10 +161,37 @@ namespace fe {
     };
 
     struct MaterialComponent {
-        glm::vec4 ambient;
-        glm::vec4 diffuse;
-        glm::vec4 emission;
-        glm::vec3 specular;
-        float shininess;
+        glm::vec4 ambient{ 1.0f };
+        glm::vec4 diffuse{ 1.0f };
+        glm::vec4 emission{ 1.0f };
+        glm::vec3 specular{ 1.0f };
+        float shininess{ 0.5f };
+    };*/
+
+    /*template<typename... T>
+    struct ComponentGroup {
+        template<typename F, typename ...Args>
+        static void each(F func, Args&& ... args) {
+            (T(func(std::forward<Args>(args)...), ...));
+        }
     };
+
+    using AllComponents =
+            ComponentGroup<
+                    TagComponent,
+                    RelationshipComponent,
+                    TransformComponent,
+                    CameraComponent,
+                    MeshComponent,
+                    PointLightComponent,
+                    DirectionalLightComponent,
+                    ScriptComponent,
+                    RigidBodyComponent,
+                    BoxColliderComponent,
+                    SphereColliderComponent,
+                    CapsuleColliderComponent,
+                    MeshColliderComponent,
+                    PhysicsMaterialComponent,
+                    MaterialComponent
+            >;*/
 }

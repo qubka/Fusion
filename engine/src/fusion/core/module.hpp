@@ -26,7 +26,7 @@ namespace fe {
         class Requires {
             static constexpr size_t value = sizeof...(Args);
         public:
-            std::vector<std::type_index> Get() const {
+            std::vector<std::type_index> get() const {
                 std::vector<std::type_index> requires;
                 requires.reserve(value);
                 (requires.emplace_back(typeid(Args)), ...);
@@ -53,7 +53,7 @@ namespace fe {
                 ModuleFactory::Registry()[typeid(T)] = { []() {
                     ModuleInstance = new T();
                     return std::unique_ptr<Base>(ModuleInstance);
-                }, stage, requires.Get() };
+                }, stage, requires.get() };
                 return true;
             }
 
