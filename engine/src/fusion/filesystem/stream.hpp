@@ -7,10 +7,10 @@ namespace fe {
         Read, Write, Append
     };
 
-    class BaseFStream {
+    class BaseFileStream {
     public:
-        explicit BaseFStream(PHYSFS_File *file);
-        virtual ~BaseFStream();
+        explicit BaseFileStream(PHYSFS_File *file);
+        virtual ~BaseFileStream();
 
         size_t length();
 
@@ -18,21 +18,15 @@ namespace fe {
         PHYSFS_File* file;
     };
 
-    class IFStream : public BaseFStream, public std::istream {
+    class IFileStream final : public BaseFileStream, public std::istream {
     public:
-        explicit IFStream(const std::filesystem::path& filename);
-        ~IFStream() override;
+        explicit IFileStream(const std::filesystem::path& filename);
+        ~IFileStream() override;
     };
 
-    class OFStream : public BaseFStream, public std::ostream {
+    class OFileStream final : public BaseFileStream, public std::ostream {
     public:
-        explicit OFStream(const std::filesystem::path& filename, FileMode writeMode = FileMode::Write);
-        ~OFStream() override;
-    };
-
-    class FStream : public BaseFStream, public std::iostream {
-    public:
-        explicit FStream(const std::filesystem::path& filename, FileMode openMode = FileMode::Read);
-        ~FStream() override;
+        explicit OFileStream(const std::filesystem::path& filename, FileMode writeMode = FileMode::Write);
+        ~OFileStream() override;
     };
 }

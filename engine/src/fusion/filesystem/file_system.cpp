@@ -1,6 +1,8 @@
 #include "file_system.hpp"
-#include "fusion/utils/string.hpp"
+
+#include "fusion/core/engine.hpp"
 #include "fusion/filesystem/stream.hpp"
+#include "fusion/utils/string.hpp"
 
 #include <physfs.h>
 #include <IconsFontAwesome4.h>
@@ -8,8 +10,6 @@
 using namespace fe;
 
 bool FileSystem::Exists(const std::filesystem::path& path) {
-    if (PHYSFS_isInit() == 0) return false;
-
     auto pathStr = path.string();
     std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
     return PHYSFS_exists(pathStr.c_str()) != 0;
@@ -21,7 +21,7 @@ void FileSystem::Read(const std::filesystem::path& filename, const FileSystem::S
 }
 
 std::vector<uint8_t> FileSystem::ReadBytes(const std::filesystem::path& filename) {
-    IFStream file{filename};
+    /*IFileStream file{filename};
     file >> std::noskipws;
 
     auto fileSize = file.tellg();
@@ -30,9 +30,31 @@ std::vector<uint8_t> FileSystem::ReadBytes(const std::filesystem::path& filename
     std::vector<uint8_t> bytes;
     bytes.reserve(fileSize);
 
+    file.insert(bytes.begin(), std::istream_iterator<uint8_t>(infile), std::istream_iterator<uint8_t>());
+
     std::copy(std::istream_iterator<uint8_t>(file), std::istream_iterator<uint8_t>(), back_inserter(bytes));
 
-    return bytes;
+    file.close();
+
+    return bytes;*/
+
+    auto pathStr = filename.string();
+    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+    auto fsFile = PHYSFS_openRead(pathStr.c_str());
+
+    if (!fsFile) {
+        LOG_ERROR << "Failed to open file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+    }
+
+    auto size = PHYSFS_fileLength(fsFile);
+    std::vector<uint8_t> data(size);
+    PHYSFS_readBytes(fsFile, data.data(), static_cast<PHYSFS_uint64>(size));
+
+    if (PHYSFS_close(fsFile) == 0) {
+        LOG_ERROR << "Failed to close file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+    }
+
+    return data;
 }
 
 std::string FileSystem::ReadText(const std::filesystem::path& filename) {
@@ -63,12 +85,12 @@ std::string FileSystem::ReadText(const std::filesystem::path& filename) {
     return { data.begin(), data.end() };
 }
 
-std::vector<std::string> FileSystem::GetFiles(const std::filesystem::path& path, bool recursive) {
+std::vector<std::filesystem::path> FileSystem::GetFiles(const std::filesystem::path& path, bool recursive) {
     auto pathStr = path.string();
     std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
     auto rc = PHYSFS_enumerateFiles(pathStr.c_str());
 
-    std::vector<std::string> files;
+    std::vector<std::filesystem::path> files;
 
     for (auto i = rc; *i; i++) {
         if (IsDirectory(*i)) {
@@ -85,8 +107,117 @@ std::vector<std::string> FileSystem::GetFiles(const std::filesystem::path& path,
     return files;
 }
 
+std::vector<std::filesystem::path> FileSystem::GetFilesWithFilter(const std::filesystem::path& path, bool recursive, const std::string& filter, const std::vector<std::string>& formats) {
+    auto pathStr = path.string();
+    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+    auto rc = PHYSFS_enumerateFiles(pathStr.c_str());
+
+    std::vector<std::filesystem::path> files;
+
+    for (auto i = rc; *i; i++) {
+        if (IsDirectory(*i)) {
+            if (recursive) {
+                auto filesInFound = GetFilesWithFilter(*i, recursive, filter, formats);
+                files.insert(files.end(), filesInFound.begin(), filesInFound.end());
+            }
+        } else {
+            std::filesystem::path filename{*i};
+
+            if (!filter.empty() && String::FindInsensitive(filename.string(), filter) == std::string::npos)
+                continue;
+
+            if (!formats.empty() && std::find(formats.begin(), formats.end(), GetExtension(filename)) == formats.end())
+                continue;
+
+            files.push_back(filename);
+        }
+    }
+
+    PHYSFS_freeList(rc);
+    return files;
+}
+
+bool FileSystem::HasDirectories(const std::filesystem::path& path) {
+    if (IsDirectory(path)) {
+        auto pathStr = path.string();
+        auto rc = PHYSFS_enumerateFiles(pathStr.c_str());
+
+        for (auto i = rc; *i; i++) {
+            if (IsDirectory(*i))
+                return true;
+        }
+    }
+    return false;
+}
+
+bool FileSystem::IsDirectory(const std::filesystem::path& path) {
+    auto pathStr = path.string();
+    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+
+    PHYSFS_Stat stat;
+    if (!PHYSFS_stat(pathStr.c_str(), &stat)) {
+        return false;
+    } else {
+        if (stat.filetype == PHYSFS_FILETYPE_SYMLINK) {
+            // PHYSFS_stat() doesn't follow symlinks, so we do it manually
+            const char* realdir = PHYSFS_getRealDir(pathStr.c_str());
+            if (realdir == nullptr) {
+                return false;
+            } else {
+                const std::filesystem::path realfname = std::filesystem::path{realdir} / path;
+                return IsDirectory(realfname);
+            }
+        } else {
+            return stat.filetype == PHYSFS_FILETYPE_DIRECTORY;
+        }
+    }
+}
+
+FileStats FileSystem::GetStats(const std::filesystem::path& path) {
+    auto pathStr = path.string();
+    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+
+    PHYSFS_Stat stat;
+    PHYSFS_stat(pathStr.c_str(), &stat);
+
+    return {
+        static_cast<size_t>(stat.filesize),
+        DateTime::Seconds(stat.modtime),
+        DateTime::Seconds(stat.createtime),
+        DateTime::Seconds(stat.accesstime),
+        static_cast<FileType>(stat.filetype),
+        static_cast<bool>(stat.readonly)
+    };
+}
+
+bitmask::bitmask<FileAttributes> FileSystem::GetAttributes(const std::filesystem::path& path) {
+    bitmask::bitmask<FileAttributes> attributes;
+
+    auto pathStr = path.string();
+    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+    PHYSFS_Stat stat;
+    PHYSFS_stat(pathStr.c_str(), &stat);
+
+    switch (stat.filetype) {
+        case PHYSFS_FILETYPE_REGULAR:
+            attributes |= FileAttributes::Regular;
+            break;
+        case PHYSFS_FILETYPE_DIRECTORY:
+            attributes |= FileAttributes::Directory;
+            break;
+        case PHYSFS_FILETYPE_SYMLINK:
+            attributes |= FileAttributes::Symlink;
+            break;
+    }
+
+    if (stat.readonly)
+        attributes |= FileAttributes::ReadOnly;
+
+    return attributes;
+}
+
 std::string FileSystem::GetExtension(const std::filesystem::path& filename) {
-    return Exists(filename) ? String::Lowercase(filename.extension().string()) : "";
+    return String::Lowercase(filename.extension().string());
 }
 
 std::string FileSystem::GetIcon(const std::filesystem::path& filename) {
@@ -199,7 +330,9 @@ std::unordered_map<std::string, std::string> FileSystem::Extensions = {
 };
 
 FileSystem::FileSystem() {
-    PHYSFS_init(std::filesystem::current_path().c_str());
+    const auto& args = Engine::Get()->getCommandLineArgs();
+    PHYSFS_init(args[0].first.c_str());
+    PHYSFS_mount(std::filesystem::current_path().c_str(), nullptr, 1);
 }
 
 FileSystem::~FileSystem() {

@@ -68,11 +68,11 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     // Read fonts from memory
 
     // Text font
-    std::vector<uint8_t> textFont { FileSystem::ReadBytes("fonts/PT Sans.ttf") };
+    std::vector<uint8_t> textFont = FileSystem::ReadBytes("fonts/PT Sans.ttf");
     io.Fonts->AddFontFromMemoryTTF(textFont.data(), static_cast<int>(textFont.size()), 16.0f * scale, nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
     // Icon font
-    std::vector<uint8_t> iconFont { FileSystem::ReadBytes("fonts/fontawesome-webfont.ttf") };
+    std::vector<uint8_t> iconFont = FileSystem::ReadBytes("fonts/fontawesome-webfont.ttf");
     io.Fonts->AddFontFromMemoryTTF(iconFont.data(), static_cast<int>(iconFont.size()), 16.0f * scale, &config, iconsRanges);
 
     // Generate font

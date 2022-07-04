@@ -15,6 +15,17 @@ CommandLineArgs::CommandLineArgs(int count, char** args) {
     }
 }
 
+std::pair<std::string, std::string> CommandLineArgs::operator[](size_t index) const {
+    size_t i = 0;
+    for (const auto& argument : arguments) {
+        if (i == index) {
+            return std::make_pair(argument.first, argument.second);
+        }
+        i++;
+    }
+    return std::make_pair("", "");
+}
+
 CommandLineParser::CommandLineParser() {
     add("help", { "--help" }, false, "Show help");
     add("validation", {"-v", "--validation"}, false, "Enable validation layers");

@@ -3,9 +3,12 @@
 namespace fe {
     class ContentBrowserPanel {
     public:
-        ContentBrowserPanel() { selectDirectory(std::filesystem::current_path()); }
+        ContentBrowserPanel() = default;
         ~ContentBrowserPanel() = default;
 
+        void start() {
+            selectDirectory(std::filesystem::current_path());
+        }
         void onImGui();
 
         const std::filesystem::path& getCurrentFile() const { return currentFile; }

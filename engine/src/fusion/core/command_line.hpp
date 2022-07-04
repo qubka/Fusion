@@ -7,6 +7,8 @@ namespace fe {
         CommandLineArgs() = default;
         CommandLineArgs(int count, char** args);
 
+        std::pair<std::string, std::string> operator[](size_t index) const;
+
         //! Returns an iterator over the elements in this deque in proper sequence.
         std::map<std::string, std::string>::iterator begin() { return arguments.begin(); }
         std::map<std::string, std::string>::iterator end() { return arguments.end(); }

@@ -213,28 +213,6 @@ endif()
 list(APPEND ALL_SYSTEM_LIBS cereal)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
-# physfs
-#╒◖═════════════════════════════════════════════════════════════════════◗╕
-find_package(PhysFS 3.0.2 QUIET)
-if(NOT PhysFS_FOUND)
-    set(PHYSFS_LIB_NAME "physfs")
-
-    if(BUILD_SHARED_LIBS)
-        set(PHYSFS_BUILD_STATIC OFF CACHE INTERNAL "Build static library.")
-    else()
-        set(PHYSFS_BUILD_SHARED OFF CACHE INTERNAL "Build shared library.")
-    endif()
-    set(PHYSFS_BUILD_TEST OFF CACHE INTERNAL "Build stdio test program.")
-    set(PHYSFS_BUILD_DOCS OFF CACHE INTERNAL "Build doxygen based documentation.")
-    set(PHYSFS_TARGETNAME_DIST "physfs-dist" CACHE INTERNAL STRING)
-    set(PHYSFS_TARGETNAME_UNINSTALL "physfs-uninstall" CACHE INTERNAL STRING)
-
-    add_subdirectory(${PHYSFS_LIB_NAME})
-
-endif()
-list(APPEND ALL_SYSTEM_LIBS physfs-static)
-#╘◖═════════════════════════════════════════════════════════════════════◗╛
-
 # physx
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 set(PHYSX_LIBRARIES
@@ -308,6 +286,27 @@ if(NOT PhysX_FOUND)
     endif()
 
 endif()
+#╘◖═════════════════════════════════════════════════════════════════════◗╛
+
+# physfs
+#╒◖═════════════════════════════════════════════════════════════════════◗╕
+find_package(PhysFS 3.0.2 QUIET)
+if(NOT PhysFS_FOUND)
+    set(PHYSFS_LIB_NAME "physfs")
+
+    if(BUILD_SHARED_LIBS)
+        set(PHYSFS_BUILD_STATIC OFF CACHE INTERNAL "Build static library.")
+    else()
+        set(PHYSFS_BUILD_SHARED OFF CACHE INTERNAL "Build shared library.")
+    endif()
+    set(PHYSFS_BUILD_TEST OFF CACHE INTERNAL "Build stdio test program.")
+    set(PHYSFS_BUILD_DOCS OFF CACHE INTERNAL "Build doxygen based documentation.")
+    set(PHYSFS_TARGETNAME_DIST "physfs-dist" CACHE INTERNAL STRING)
+    set(PHYSFS_TARGETNAME_UNINSTALL "physfs-uninstall" CACHE INTERNAL STRING)
+
+    add_subdirectory(${PHYSFS_LIB_NAME})
+endif()
+list(APPEND ALL_SYSTEM_LIBS physfs-static)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # portfiledialog

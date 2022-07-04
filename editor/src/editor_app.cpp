@@ -38,6 +38,7 @@ void EditorApp::start() {
         serializer.deserialize(sceneFilePath);
     }*/
 
+    contentBrowserPanel.start();
     sceneHierarchyPanel.setContext(activeScene);
 }
 
@@ -98,7 +99,7 @@ void EditorApp::update() {
 void EditorApp::onImGui() {
     // Note: Switch this to true to enable dockspace
     static bool opt_fullscreen_persistant = true;
-    static ImGuiDockNodeFlags dockspace_flags = 0;//ImGuiDockNodeFlags_PassthruCentralNode;
+    static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
 
     // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
     // because it would be confusing to have two docking targets within each others.

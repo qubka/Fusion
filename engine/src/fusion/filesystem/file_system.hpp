@@ -1,8 +1,34 @@
 #pragma once
 
 #include "fusion/core/module.hpp"
+#include "fusion/utils/date_time.hpp"
 
 namespace fe {
+    enum class FileType {
+        Regular, /**< a normal file */
+        Directory, /**< a directory */
+        Symlink, /**< a symlink */
+        Other /**< something completely different like a device */
+    };
+
+    struct FileStats {
+        size_t filesize; /**< size in bytes, -1 for non-files and unknown */
+        DateTime modtime;  /**< last modification time */
+        DateTime createtime; /**< like modtime, but for file creation time */
+        DateTime accesstime; /**< like modtime, but for file access time */
+        FileType filetype; /**< File? Directory? Symlink? */
+        bool readonly; /**< non-zero if read only, zero if writable. */
+    };
+
+    enum class FileAttributes : uint8_t {
+        ReadOnly = 1,
+        Regular = 2,
+        Directory = 4,
+        Symlink = 8,
+        // TODO: Expand
+    };
+    BITMASK_DEFINE_MAX_ELEMENT(FileAttributes, Symlink);
+
     class FileSystem : public Module::Registrar<FileSystem> {
         using SimpleHandler = std::function<void(const uint8_t*, size_t)>;
     public:
@@ -39,29 +65,50 @@ namespace fe {
          */
         static std::string ReadText(const std::filesystem::path& filename);
 
+        static bool WriteFile(const std::filesystem::path& filename, uint8_t* buffer, size_t size);
+
+        static bool WriteTextFile(const std::filesystem::path& filename, const std::string& text);
+
         /**
          * Finds all the files in a path.
          * @param path The path to search.
          * @param recursive If paths will be recursively searched.
          * @return The files found.
          */
-        static std::vector<std::string> GetFiles(const std::filesystem::path& path, bool recursive = true);
+        static std::vector<std::filesystem::path> GetFiles(const std::filesystem::path& path, bool recursive = true);
 
         /**
-         * Gets the next line from a stream.
-         * @param is The input stream.
-         * @param t The next string.
-         * @return The input stream.
+         * Finds all the files in a path.
+         * @param path The path to search.
+         * @param recursive If paths will be recursively searched.
+         * @param filter File name pattern.
+         * @param formats File formats to search.
+         * @return The files found.
          */
-        static std::istream& SafeGetLine(std::istream& is, std::string& t);
+        static std::vector<std::filesystem::path> GetFilesWithFilter(const std::filesystem::path& path, bool recursive = true, const std::string& filter = "", const std::vector<std::string>& formats = {});
 
-        static bool WriteFile(const std::filesystem::path& filename, uint8_t* buffer, size_t size);
+        /**
+         * Gets the FileStats of the file on the path.
+         * @param path The path to the file.
+         * @return The FileStats of the file on the path.
+         */
+        static FileStats GetStats(const std::filesystem::path& path);
 
-        static bool WriteTextFile(const std::filesystem::path& filename, const std::string& text);
+        /**
+         * Gets the FileAttributes of the file on the path.
+         * @param path The path to the file.
+         * @return The FileAttributes of the file on the path.
+         */
+        static bitmask::bitmask<FileAttributes> GetAttributes(const std::filesystem::path& path);
+
+        /**
+         *
+         * @param path The file to look for.
+         * @return
+         */
+        static bool HasDirectories(const std::filesystem::path& path);
 
         static bool IsDirectory(const std::filesystem::path& path);
-
-        static bool HasDirectories(const std::filesystem::path& path);
 
         /**
          *

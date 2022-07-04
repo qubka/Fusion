@@ -15,7 +15,7 @@ namespace fe {
          * Carries out the setup for basic engine components and the engine. Call {@link Engine#Run} after creating a instance.
          * @param args The arguments passed to main.
          */
-        Engine(const CommandLineArgs& args);
+        Engine(CommandLineArgs args);
         ~Engine();
         NONCOPYABLE(Engine);
 
@@ -33,7 +33,13 @@ namespace fe {
         static Engine* Get() { return Instance; }
 
         /**
-         * Gets the command argument passed to main.
+         * Gets the command arguments passed to main.
+         * @return The command arguments passed tp main.
+         */
+        const CommandLineArgs& getCommandLineArgs() const { return commandLineArgs; };
+
+        /**
+         * Gets the already parsed command argument which was passed to main.
          * @return The command parser with parsed data from main.
          */
         const CommandLineParser& getCommandLineParser() const { return commandLineParser; };
@@ -80,6 +86,7 @@ namespace fe {
          */
         void updateStage(Module::Stage stage);
 
+        CommandLineArgs commandLineArgs;
         CommandLineParser commandLineParser;
         Version version;
 

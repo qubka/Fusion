@@ -209,7 +209,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         std::strncpy(buffer, fileFilter.c_str(), sizeof(buffer));
         if (ImGui::InputTextWithHint("##filefilter", "Search File", buffer, sizeof(buffer))) {
             fileFilter = std::string{buffer};
-            cachedFiles = FileSystem::GetFiles(std::filesystem::current_path(), true, fileFilter, formats);
+            cachedFiles = FileSystem::GetFilesWithFilter(std::filesystem::current_path(), true, fileFilter, formats);
         }
 
         ImGui::Separator();
@@ -259,7 +259,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         if (ImGui::Button("...", buttonSize)) {
             fileFilter = "";
             currentFile = "";
-            cachedFiles = Directory::GetFilesRecursive(std::filesystem::current_path(), fileFilter, formats);
+            cachedFiles = FileSystem::GetFilesWithFilter(std::filesystem::current_path(), true, fileFilter, formats);
             ImGui::OpenPopup("FileExplorer");
         }
     } else {
@@ -296,7 +296,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     if (ImGui::Button(ICON_FA_SEARCH)) {
         fileFilter = "";
         currentFile = "";
-        cachedFiles = FileSystem::GetFiles(std::filesystem::current_path(), true, fileFilter, formats);
+        cachedFiles = FileSystem::GetFilesWithFilter(std::filesystem::current_path(), true, fileFilter, formats);
         ImGui::OpenPopup("FileExplorer");
     }
 

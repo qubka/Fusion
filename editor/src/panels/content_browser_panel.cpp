@@ -71,7 +71,7 @@ void ContentBrowserPanel::drawContentBrowser() {
     std::strncpy(buffer, filter.c_str(), sizeof(buffer));
     if (ImGui::InputTextWithHint("##filesfilter", "Search Files", buffer, sizeof(buffer))) {
         filter = std::string{buffer};
-        filteredFiles = FileSystem::GetFiles(std::filesystem::current_path(), true, filter);
+        filteredFiles = FileSystem::GetFilesWithFilter(std::filesystem::current_path(), true, filter);
     }
 
     ImGui::Separator();
