@@ -3,7 +3,6 @@
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/cameras/camera.hpp"
 #include "fusion/devices/devices.hpp"
-#include "fusion/scene/scene.hpp"
 #include "fusion/scene/scenes.hpp"
 
 using namespace fe;

@@ -4,6 +4,8 @@
 
 #include "fusion/devices/devices.hpp"
 #include "fusion/graphics/graphics.hpp"
+#include "fusion/filesystem/file_system.hpp"
+#include "fusion/scene/scenes.hpp"
 
 using namespace fe;
 
@@ -31,6 +33,8 @@ Engine::~Engine() {
 
 void Engine::init() {
     Time::Register(Module::Stage::Pre);
+    Scenes::Register(Module::Stage::Normal);
+    FileSystem::Register(Module::Stage::Post);
     Graphics::Register(Module::Stage::Render);
 
     // Use the table to sort the modules for each stage depending on the number of mentions

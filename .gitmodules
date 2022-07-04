@@ -70,3 +70,9 @@
 [submodule "external/bitmask"]
 	path = external/bitmask
 	url = https://github.com/oliora/bitmask
+[submodule "external/cereal"]
+	path = external/cereal
+	url = https://github.com/USCiLab/cereal
+[submodule "external/physfs"]
+	path = external/physfs
+	url = https://github.com/icculus/physfs

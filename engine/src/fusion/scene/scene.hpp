@@ -13,8 +13,7 @@ namespace fe {
          * Creates a new scene.
          * @param camera The scenes camera.
          */
-        explicit Scene(std::unique_ptr<Camera>&& camera);
-        Scene(const Scene& scene);
+        explicit Scene(std::shared_ptr<Camera> camera);
         ~Scene() = default;
 
         /**
@@ -27,16 +26,15 @@ namespace fe {
          */
         virtual void update();
 
+        /**
+         * Run when the scene is start the runtime.
+         */
         void runtimeStart();
+
+        /**
+         * Run when the scene is stop the runtime.
+         */
         void runtimeStop();
-
-
-        void updateRuntime();
-        void updateEditor();
-
-       // void OnViewportResize(const glm::vec2& size);
-
-
 
         /**
          * Checks whether a System exists or not.
@@ -93,25 +91,19 @@ namespace fe {
          * Gets the current camera object.
          * @return The current camera.
          */
-        Camera* getCamera() const { return camera; }
+        Camera* getCamera() const { return camera.get(); }
 
         /**
          * Sets the current camera to a new camera.
          * @param camera The new camera.
          */
-        void setCamera(Camera* camera) { this->camera = camera; }
+        void setCamera(std::shared_ptr<Camera> camera) { this->camera = std::move(camera); }
 
         /**
-         * Gets if the scene is for runtime.
-         * @return If the scene is runtime.
+         * Gets if the scene is in runtime.
+         * @return If the scene is in runtime.
          */
-        bool isRuntimeScene() { return runtimeScene; }
-
-        /**
-         * Gets if the scene is active.
-         * @return If the scene is active.
-         */
-        bool isActive() { return active; }
+        bool isRuntime() { return runtime; }
 
         entt::entity createEntity(std::string name = "");
 
@@ -119,12 +111,21 @@ namespace fe {
 
         entt::entity duplicateEntity(entt::entity entity);
 
+        //void serialise(std::filesystem::path filename, bool binary = false);
+        //void deserialise(std::filesystem::path filename, bool binary = false);
+
         /**
          * Gets the scene entity registry.
          * @return Entity registry.
          */
         const entt::registry& getRegistry() const { return registry; }
         entt::registry& getRegistry() { return registry; }
+
+        /**
+         * Sets the scene entity registry.
+         * @param camera The new entity registry.
+         */
+        void setRegistry(entt::registry&& registry) { this->registry = std::move(registry) ; }
 
         template<typename T>
         auto getAllEntitiesWith() { return registry.view<T>(); }
@@ -144,11 +145,11 @@ namespace fe {
                 registry.emplace_or_replace<T>(dst, *component);
         }
 
+        //std::string name;
         SystemHolder systems;
         entt::registry registry;
-        Camera* camera;
+        std::shared_ptr<Camera> camera;
         bool started{ false };
-        bool active{ false };
-        bool runtimeScene{ false };
+        bool runtime{ false };
     };
 }

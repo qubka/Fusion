@@ -3,8 +3,7 @@
 
 #include "fusion/scene/components.hpp"
 #include "fusion/systems/parent_system.hpp"
-#include "fusion/utils/directory.hpp"
-#include "fusion/utils/file.hpp"
+#include "fusion/filesystem/file_system.hpp"
 #include "fusion/utils/string.hpp"
 
 #include <portable-file-dialogs/portable-file-dialogs.h>
@@ -27,7 +26,7 @@ void SceneHierarchyPanel::onImGui() {
     ImGui::End();
 
     ImGui::Begin((ICON_FA_INFO_CIRCLE + "  Inspector"s).c_str());
-    if (context->registry.valid(selectionContext)) {
+    if (context->getRegistry().valid(selectionContext)) {
         drawComponents(selectionContext);
     }
     ImGui::End();
@@ -46,13 +45,13 @@ void SceneHierarchyPanel::drawEntities() {
     ImGui::Separator();
     ImGui::BeginChild("EntityList");
 
-    ParentSystem parentSystem{ context->registry };
+    ParentSystem parentSystem{ context->getRegistry() };
 
     entt::entity removeEntity = entt::null;
     std::function<void(entt::entity entity)> function = [&](const auto entity) {
         ImGui::PushID(("Entity" + std::to_string(static_cast<int32_t>(entity))).c_str());
 
-        auto& tag = *context->registry.get<TagComponent>(entity);
+        auto& tag = *context->getRegistry().get<TagComponent>(entity);
         bool children = parentSystem.has_children(entity);
 
         ImGuiTreeNodeFlags flags = ((selectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) |
@@ -60,7 +59,7 @@ void SceneHierarchyPanel::drawEntities() {
 
         if (entity != renameContext) {
             flags |= ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
-        } else if (context->registry.valid(renameContext)) {
+        } else if (context->getRegistry().valid(renameContext)) {
             flags |= ImGuiTreeNodeFlags_FramePadding;
 
             float lineHeight = ImGui::GetFontSize() / 2.0f;
@@ -81,7 +80,7 @@ void SceneHierarchyPanel::drawEntities() {
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
-                ParentSystem{ context->registry }.assign_child(entity, *reinterpret_cast<entt::entity*>(payload->Data));
+                ParentSystem{ context->getRegistry() }.assign_child(entity, *reinterpret_cast<entt::entity*>(payload->Data));
             }
             ImGui::EndDragDropTarget();
         }
@@ -139,14 +138,14 @@ void SceneHierarchyPanel::drawEntities() {
         }
     };
 
-    context->registry.each([&](auto entity) {
+    context->getRegistry().each([&](auto entity) {
         if (parentSystem.get_parent(entity) == entt::null) {
             function(entity);
         }
     });
 
     if (removeEntity != entt::null) {
-        //context->registry.destroy_parent(removeEntity);
+        //context->getRegistry().destroy_parent(removeEntity);
         if (selectionContext == removeEntity)
             selectionContext = entt::null;
         if (renameContext == removeEntity)
@@ -162,11 +161,11 @@ void SceneHierarchyPanel::drawEntities() {
     // Right-click on blank space
     if (ImGui::BeginPopupContextWindow("HierarchyOptions", 1, false)) {
         if (ImGui::MenuItem("Create Empty Entity")) {
-            auto entity = context->registry.create();
+            auto entity = context->getRegistry().create();
 
             std::string name{ "Empty Entity" };
             size_t idx = 0;
-            auto view = context->registry.view<const TagComponent>();
+            auto view = context->getRegistry().view<const TagComponent>();
             for (auto [e, tag] : view.each()) {
                 if (String::Contains(*tag, name)) {
                     idx++;
@@ -175,8 +174,8 @@ void SceneHierarchyPanel::drawEntities() {
             if (idx > 0)
                 name += " (" + std::to_string(idx) + ")";
 
-            context->registry.emplace<TagComponent>(entity, name);
-            context->registry.emplace<TransformComponent>(entity);
+            context->getRegistry().emplace<TagComponent>(entity, name);
+            context->getRegistry().emplace<TransformComponent>(entity);
 
             selectionContext = entity;
             renameContext = entity;
@@ -210,14 +209,14 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         std::strncpy(buffer, fileFilter.c_str(), sizeof(buffer));
         if (ImGui::InputTextWithHint("##filefilter", "Search File", buffer, sizeof(buffer))) {
             fileFilter = std::string{buffer};
-            cachedFiles = Directory::GetFilesRecursive(std::filesystem::current_path(), fileFilter, formats);
+            cachedFiles = FileSystem::GetFiles(std::filesystem::current_path(), true, fileFilter, formats);
         }
 
         ImGui::Separator();
         ImGui::BeginChild("FileBrowser", { 300.0f, 500.0f });
 
         for (const auto& file : cachedFiles) {
-            std::string title{ File::ExtensionIcon(file) + " " + file.filename().string() };
+            std::string title{ FileSystem::GetIcon(file) + " " + file.filename().string() };
             if (ImGui::Selectable(title.c_str(), currentFile == file, ImGuiSelectableFlags_AllowDoubleClick)) {
                 currentFile = file;
                 if (ImGui::IsMouseDoubleClicked(0)) {
@@ -232,7 +231,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         ImGui::Separator();
 
         if (!currentFile.empty()) {
-            std::string title{ File::ExtensionIcon(currentFile) + " " + currentFile.string() };
+            std::string title{ FileSystem::GetIcon(currentFile) + " " + currentFile.string() };
             ImGui::TextUnformatted(title.c_str());
         }
 
@@ -265,7 +264,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
         }
     } else {
         std::filesystem::path file{ value };
-        std::string title{ File::ExtensionIcon(file) + " " + file.filename().string() };
+        std::string title{ FileSystem::GetIcon(file) + " " + file.filename().string() };
         if (ImGui::Button(title.c_str(), buttonSize)) {
             contentBrowserPanel.selectFile(file);
         }
@@ -297,7 +296,7 @@ bool SceneHierarchyPanel::drawFileBrowser(const std::string& label, std::string&
     if (ImGui::Button(ICON_FA_SEARCH)) {
         fileFilter = "";
         currentFile = "";
-        cachedFiles = Directory::GetFilesRecursive(std::filesystem::current_path(), fileFilter, formats);
+        cachedFiles = FileSystem::GetFiles(std::filesystem::current_path(), true, fileFilter, formats);
         ImGui::OpenPopup("FileExplorer");
     }
 
@@ -455,11 +454,11 @@ bool SceneHierarchyPanel::drawValueControl(const std::string& label, std::functi
     return modify;
 }
 
-template<typename Enum>
-bool SceneHierarchyPanel::drawEnumControl(const std::string& label, Enum& value, float columnWidth) {
+template<typename E>
+bool SceneHierarchyPanel::drawEnumControl(const std::string& label, E& value, float columnWidth) {
     return drawValueControl(label, [&value]() {
         bool modify = false;
-        constexpr auto entries = me::enum_entries<Enum>();
+        constexpr auto entries = me::enum_entries<E>();
         if (ImGui::BeginCombo("", entries[me::enum_index(value).value_or(0)].second.data())) {
             for (const auto& [type, name] : entries) {
                 bool isSelected = value == type;
@@ -483,7 +482,7 @@ void SceneHierarchyPanel::drawComponent(const std::string& label, entt::entity e
     const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap |
                                      ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth |
                                      ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding;
-    if (auto component = context->registry.try_get<T>(entity)) {
+    if (auto component = context->getRegistry().try_get<T>(entity)) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
         float lineHeight = ImGui::GetContentRegionAvail().x - ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y;
         ImGui::Separator();
@@ -526,10 +525,10 @@ void SceneHierarchyPanel::drawComponent(const std::string& label, entt::entity e
             case MoveDown:
                 break;
             case Reset:
-                context->registry.replace<T>(entity);
+                context->getRegistry().replace<T>(entity);
                 break;
             case Remove:
-                context->registry.erase<T>(entity);
+                context->getRegistry().erase<T>(entity);
                 break;
             case Copy:
                 break;
@@ -540,7 +539,7 @@ void SceneHierarchyPanel::drawComponent(const std::string& label, entt::entity e
 }
 
 void SceneHierarchyPanel::drawComponents(entt::entity entity) {
-    auto& tag = *context->registry.get<TagComponent>(entity);
+    auto& tag = *context->getRegistry().get<TagComponent>(entity);
     char buffer[256];
     memset(buffer, 0, sizeof(buffer));
     std::strncpy(buffer, tag.c_str(), sizeof(buffer));
@@ -558,12 +557,12 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         drawComponentMenuItem<TransformComponent>(ICON_FA_YELP + " Transform"s, entity);
         drawComponentMenuItem<CameraComponent>(ICON_FA_CAMERA + " Camera"s, entity);
         drawComponentMenuItem<MeshComponent>(ICON_FA_CODEPEN + " Mesh"s, entity);
-        drawComponentMenuItem<RigidBodyComponent>(ICON_FA_CUBE + " Rigidbody"s, entity);
+        /*drawComponentMenuItem<RigidBodyComponent>(ICON_FA_CUBE + " Rigidbody"s, entity);
         drawComponentMenuItem<PhysicsMaterialComponent>(ICON_FA_TENCENT_WEIBO + " Physics Material"s, entity);
         drawComponentMenuItem<BoxColliderComponent>(ICON_FA_SQUARE_O + " Box Collider"s, entity);
         drawComponentMenuItem<SphereColliderComponent>(ICON_FA_CIRCLE_O + " Sphere Collider"s, entity);
         drawComponentMenuItem<CapsuleColliderComponent>(ICON_FA_TOGGLE_OFF + " Capsule Collider"s, entity);
-        drawComponentMenuItem<MaterialComponent>(ICON_FA_DELICIOUS + " Material"s, entity);
+        drawComponentMenuItem<MaterialComponent>(ICON_FA_DELICIOUS + " Material"s, entity);*/
         ImGui::EndPopup();
     }
 
@@ -579,7 +578,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
         notify += drawVec3Control("Scale", component.scale, 0.01f, FLT_MAX, 1.0f, 0.01f);
 
         if (notify)
-            context->registry.patch<TransformComponent>(entity);
+            context->getRegistry().patch<TransformComponent>(entity);
     });
 
     drawComponent<CameraComponent>(ICON_FA_CAMERA + "  Camera"s, entity, [&](CameraComponent& component)
@@ -658,14 +657,14 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
     {
         uint8_t notify = 0;
         notify += drawFileBrowser("File Path", component.path, { ".fbx", ".obj", ".dae", ".gltf", ".3ds" });
-        notify += drawVec3Control("Scale", component.scale, 0.01f, FLT_MAX, 1.0f, 0.01f);
+        /*notify += drawVec3Control("Scale", component.scale, 0.01f, FLT_MAX, 1.0f, 0.01f);
         notify += drawVec3Control("Center", component.center);
-        notify += drawVec2Control("UV Scale", component.uvscale, 0.01f, FLT_MAX, 1.0f, 0.01f);
+        notify += drawVec2Control("UV Scale", component.uvscale, 0.01f, FLT_MAX, 1.0f, 0.01f);*/
         if (notify)
-            context->registry.patch<MeshComponent>(entity);
+            context->getRegistry().patch<MeshComponent>(entity);
     });
 
-    drawComponent<RigidBodyComponent>(ICON_FA_CUBE + "  Rigidbody"s, entity, [&](RigidBodyComponent& component)
+    /*drawComponent<RigidBodyComponent>(ICON_FA_CUBE + "  Rigidbody"s, entity, [&](RigidBodyComponent& component)
     {
         drawEnumControl<RigidBodyComponent::BodyType>("Type", component.type);
         if (component.type == RigidBodyComponent::BodyType::Dynamic) {
@@ -708,7 +707,7 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
     drawComponent<MaterialComponent>(ICON_FA_DELICIOUS + "  Material"s, entity, [&](MaterialComponent& component)
     {
 
-    });
+    });*/
 
     /*drawComponent<BoundsComponent>(fs::ICON_FA_BOUNDS + "  Bounds"s, entity, [&](BoundsComponent& component)
     {
@@ -719,9 +718,9 @@ void SceneHierarchyPanel::drawComponents(entt::entity entity) {
 
 template<typename T>
 void SceneHierarchyPanel::drawComponentMenuItem(const std::string& label, entt::entity entity) {
-    if (!context->registry.all_of<T>(entity)) {
+    if (!context->getRegistry().all_of<T>(entity)) {
         if (ImGui::MenuItem(label.c_str())) {
-            context->registry.emplace<T>(entity);
+            context->getRegistry().emplace<T>(entity);
             ImGui::CloseCurrentPopup();
         }
     }

@@ -1,7 +1,7 @@
 #include "stb_loader.hpp"
 
 #include "fusion/utils/string.hpp"
-#include "fusion/utils/file.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
@@ -17,15 +17,15 @@ void StbLoader::Load(Bitmap& bitmap, const std::filesystem::path& filename) {
     int desired_channels = STBI_rgb_alpha;
     bool hdr = false;
 
-    auto fileExt = String::Uppercase(filename.extension().string());
+    auto fileExt = FileSystem::GetExtension(filename);
     if (fileExt == ".hdr") {
-        File::Read(filename, [&](size_t size, const void* data) {
-            pixels = std::unique_ptr<uint8_t[]>(reinterpret_cast<uint8_t*>(stbi_loadf_from_memory(reinterpret_cast<const uint8_t*>(data), static_cast<int>(size), &width, &height, &channels, desired_channels)));
+        FileSystem::Read(filename, [&](const uint8_t* data, size_t size) {
+            pixels = std::unique_ptr<uint8_t[]>(reinterpret_cast<uint8_t*>(stbi_loadf_from_memory(data, static_cast<int>(size), &width, &height, &channels, desired_channels)));
         });
         hdr = true;
     } else {
-        File::Read(filename, [&](size_t size, const void* data) {
-            pixels = std::unique_ptr<uint8_t[]>(stbi_load_from_memory(reinterpret_cast<const uint8_t*>(data), static_cast<int>(size), &width, &height, &channels, desired_channels));
+        FileSystem::Read(filename, [&](const uint8_t* data, size_t size) {
+            pixels = std::unique_ptr<uint8_t[]>(stbi_load_from_memory(data, static_cast<int>(size), &width, &height, &channels, desired_channels));
         });
     }
 
@@ -45,7 +45,7 @@ void StbLoader::Load(Bitmap& bitmap, const std::filesystem::path& filename) {
 }
 
 void StbLoader::Write(const Bitmap& bitmap, const std::filesystem::path& filename) {
-    auto fileExt = String::Uppercase(filename.extension().string());
+    auto fileExt = FileSystem::GetExtension(filename);
     if (fileExt == ".jpg" || fileExt == ".jpeg") {
         stbi_write_jpg(filename.c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<uint8_t>(), 8);
     } else if (fileExt == ".bmp") {

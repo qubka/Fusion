@@ -1,47 +1,100 @@
-#include "file.hpp"
-#include "storage.hpp"
-#include "string.hpp"
+#include "file_system.hpp"
+#include "fusion/utils/string.hpp"
+#include "fusion/filesystem/stream.hpp"
 
+#include <physfs.h>
 #include <IconsFontAwesome4.h>
 
 using namespace fe;
 
-void File::Read(const std::filesystem::path& filename, const File::SimpleHandler& handler) {
-    auto storage = Storage::ReadFile(filename);
-    handler(storage->size(), storage->data());
+bool FileSystem::Exists(const std::filesystem::path& path) {
+    if (PHYSFS_isInit() == 0) return false;
+
+    auto pathStr = path.string();
+    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+    return PHYSFS_exists(pathStr.c_str()) != 0;
 }
 
-std::vector<uint8_t> File::ReadAllBytes(const std::filesystem::path& filename) {
-    std::vector<uint8_t> result;
-    Read(filename, [&](size_t size, const void* data) {
-        result.resize(size);
-        memcpy(result.data(), data, size);
-    });
-    return result;
+void FileSystem::Read(const std::filesystem::path& filename, const FileSystem::SimpleHandler& handler) {
+    auto bytes = ReadBytes(filename);
+    handler(bytes.data(), bytes.size());
 }
 
-std::string File::ReadAllText(const std::filesystem::path& filename) {
-    //return {reinterpret_cast<const char*>(ReadAllBytes(filename).data())};
-    std::string content;
-    std::ifstream infile{filename, std::ios::in};
-    if (!infile.is_open()) {
-        throw std::runtime_error("File " + filename.string() + " not found");
+std::vector<uint8_t> FileSystem::ReadBytes(const std::filesystem::path& filename) {
+    IFStream file{filename};
+    file >> std::noskipws;
+
+    auto fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    std::vector<uint8_t> bytes;
+    bytes.reserve(fileSize);
+
+    std::copy(std::istream_iterator<uint8_t>(file), std::istream_iterator<uint8_t>(), back_inserter(bytes));
+
+    return bytes;
+}
+
+std::string FileSystem::ReadText(const std::filesystem::path& filename) {
+    auto pathStr = filename.string();
+    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+    auto fsFile = PHYSFS_openRead(pathStr.c_str());
+
+    if (!fsFile) {
+        if (!std::filesystem::exists(filename) || !std::filesystem::is_regular_file(filename)) {
+            LOG_ERROR << "Failed to open file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+            return "";
+        }
+
+        std::ifstream is{filename};
+        std::stringstream buffer;
+        buffer << is.rdbuf();
+        return buffer.str();
     }
-    std::string line;
-    while (!infile.eof()) {
-        getline(infile, line);
-        content.append(line + "\n");
+
+    auto size = PHYSFS_fileLength(fsFile);
+    std::vector<uint8_t> data(size);
+    PHYSFS_readBytes(fsFile, data.data(), static_cast<PHYSFS_uint64>(size));
+
+    if (PHYSFS_close(fsFile) == 0) {
+        LOG_ERROR << "Failed to close file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
-    infile.close();
-    return content;
+
+    return { data.begin(), data.end() };
 }
 
-std::string File::ExtensionIcon(const std::filesystem::path& filename) {
-    auto key = Extensions.find(String::Lowercase(filename.extension().string()));
+std::vector<std::string> FileSystem::GetFiles(const std::filesystem::path& path, bool recursive) {
+    auto pathStr = path.string();
+    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+    auto rc = PHYSFS_enumerateFiles(pathStr.c_str());
+
+    std::vector<std::string> files;
+
+    for (auto i = rc; *i; i++) {
+        if (IsDirectory(*i)) {
+            if (recursive) {
+                auto filesInFound = GetFiles(*i, recursive);
+                files.insert(files.end(), filesInFound.begin(), filesInFound.end());
+            }
+        } else {
+            files.emplace_back(*i);
+        }
+    }
+
+    PHYSFS_freeList(rc);
+    return files;
+}
+
+std::string FileSystem::GetExtension(const std::filesystem::path& filename) {
+    return Exists(filename) ? String::Lowercase(filename.extension().string()) : "";
+}
+
+std::string FileSystem::GetIcon(const std::filesystem::path& filename) {
+    auto key = Extensions.find(GetExtension(filename));
     return key != Extensions.end() ? key->second.c_str() : ICON_FA_FILE;
 }
 
-std::unordered_map<std::string, std::string> File::Extensions = {
+std::unordered_map<std::string, std::string> FileSystem::Extensions = {
     {".gif", ICON_FA_FILE_IMAGE_O},
     {".jpeg", ICON_FA_FILE_IMAGE_O},
     {".jpg", ICON_FA_FILE_IMAGE_O},
@@ -144,3 +197,15 @@ std::unordered_map<std::string, std::string> File::Extensions = {
 
     {".db", ICON_FA_DATABASE},
 };
+
+FileSystem::FileSystem() {
+    PHYSFS_init(std::filesystem::current_path().c_str());
+}
+
+FileSystem::~FileSystem() {
+    PHYSFS_deinit();
+}
+
+void FileSystem::update() {
+
+}

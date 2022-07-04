@@ -12,15 +12,15 @@ namespace fe {
         ~Time() override = default;
 
         //! The time at the beginning of this frame (Read Only).
-        static DateTime CurrentTime() { return Instance->lastTime; }
+        static DateTime CurrentTime() { return ModuleInstance->lastTime; }
         //! The interval in seconds from the last frame to the current one.
-        static float DeltaTime() { return Instance->deltaTime; }
+        static float DeltaTime() { return ModuleInstance->deltaTime; }
         //! The total number of frames since the start of the game.
-        static uint64_t FrameCount() { return Instance->frameCount; }
+        static uint64_t FrameCount() { return ModuleInstance->frameCount; }
         //! Incremented once per frame before the scene is being rendered. Reset on the each second
-        static uint32_t FrameNumber() { return Instance->frameNumber; }
+        static uint32_t FrameNumber() { return ModuleInstance->frameNumber; }
         //! The number of frames per second
-        static uint32_t FramesPerSecond() { return Instance->framesPerSecond; }
+        static uint32_t FramesPerSecond() { return ModuleInstance->framesPerSecond; }
 
         void update() override {
             auto currentTime = DateTime::Now();

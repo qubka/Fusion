@@ -8,6 +8,8 @@
 
 #include "fusion/input/codes.hpp"
 
+#include <entt/signal/sigh.hpp>
+
 namespace fe {
     class Window;
     class Buffer;
@@ -19,6 +21,12 @@ namespace fe {
         ~ImGuiSubrender() override;
 
         void render(const CommandBuffer& commandBuffer) override;
+
+        /**
+         * Event when the imgui elements shoud be drawn.
+         * @return A sink is used to connect listeners to signals and to disconnect them.
+         */
+        auto OnImGui() { return entt::sink{onImGui}; }
 
     private:
         void drawFrame(const CommandBuffer& commandBuffer);
@@ -38,6 +46,8 @@ namespace fe {
 
         DescriptorsHandler descriptorSet;
         PushHandler pushObject;
+
+        entt::sigh<void()> onImGui;
 
         std::unique_ptr<Image2d> font;
         std::unique_ptr<Buffer> vertexBuffer;

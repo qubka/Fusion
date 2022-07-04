@@ -1,5 +1,4 @@
 #include "scenes.hpp"
-#include "scene.hpp"
 
 using namespace fe;
 

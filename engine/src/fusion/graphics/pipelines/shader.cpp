@@ -10,7 +10,7 @@
 #include "fusion/graphics/images/image2d.hpp"
 #include "fusion/graphics/images/image_cube.hpp"
 #include "fusion/utils/string.hpp"
-#include "fusion/utils/file.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 using namespace fe;
 
@@ -18,7 +18,7 @@ class ShaderIncluder : public glslang::TShader::Includer {
 public:
 	IncludeResult* includeLocal(const char* headerName, const char* includerName, size_t inclusionDepth) override {
 		auto directory = std::filesystem::path(includerName).parent_path();
-		auto fileLoaded = File::ReadAllText(directory / headerName);
+		auto fileLoaded = FileSystem::ReadText(directory / headerName);
 		if (fileLoaded.empty()) {
             LOG_ERROR << "Shader Include could not be loaded: " << std::quoted(headerName);
 			return nullptr;
@@ -31,7 +31,7 @@ public:
 	}
 
 	IncludeResult* includeSystem(const char* headerName, const char* includerName, size_t inclusionDepth) override {
-		auto fileLoaded = File::ReadAllText(headerName);
+		auto fileLoaded = FileSystem::ReadText(headerName);
 		if (fileLoaded.empty()) {
             LOG_ERROR << "Shader Include could not be loaded: " << std::quoted(headerName);
 			return nullptr;
@@ -149,9 +149,7 @@ std::optional<VkDescriptorType> Shader::getDescriptorType(uint32_t location) con
 }
 
 VkShaderStageFlagBits Shader::GetShaderStage(const std::filesystem::path& filename) {
-    assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
-
-	auto fileExt = String::Lowercase(filename.extension().string());
+	auto fileExt = FileSystem::GetExtension(filename);
 	if (fileExt == ".comp")
 		return VK_SHADER_STAGE_COMPUTE_BIT;
 	if (fileExt == ".vert")

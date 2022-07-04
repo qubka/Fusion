@@ -1,6 +1,6 @@
 #include "gli_loader.hpp"
 
-#include "fusion/utils/file.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 #include <gli/gli/gli.hpp>
 
@@ -8,7 +8,7 @@ using namespace fe;
 
 void GliLoader::Load(Bitmap& bitmap, const std::filesystem::path& filename) {
     std::unique_ptr<gli::texture> texture;
-    File::Read(filename, [&texture](size_t size, const void* data) {
+    FileSystem::Read(filename, [&texture](const uint8_t* data, size_t size) {
         texture = std::make_unique<gli::texture>(gli::load(reinterpret_cast<const char*>(data), size));
     });
 

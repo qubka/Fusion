@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cereal/cereal.hpp>
+
 namespace fe {
     class SceneCamera {
     public:
@@ -30,6 +32,19 @@ namespace fe {
 
         ProjectionType getProjectionType() const { return projectionType; }
         void setProjectionType(ProjectionType type) { projectionType = type; recalculateProjection(); }
+
+        template <typename Archive>
+        void serialize(Archive& archive) const {
+            archive(cereal::make_nvp("Projection Type", projectionType),
+                    cereal::make_nvp("Projection Matrix", projectionMatrix),
+                    cereal::make_nvp("Perspective FOV", perspectiveFOV),
+                    cereal::make_nvp("Perspective Near", perspectiveNear),
+                    cereal::make_nvp("Perspective Far", perspectiveFar),
+                    cereal::make_nvp("Orthographic Size", orthographicSize),
+                    cereal::make_nvp("Orthographic Near", orthographicNear),
+                    cereal::make_nvp("Orthographic Far", orthographicFar),
+                    cereal::make_nvp("Aspect Ratio", aspectRatio));
+        }
 
     private:
         void recalculateProjection();

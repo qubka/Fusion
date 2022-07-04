@@ -1,5 +1,6 @@
 #include "bitmap.hpp"
 
+#include "fusion/filesystem/file_system.hpp"
 #include "fusion/utils/string.hpp"
 #include "fusion/utils/date_time.hpp"
 
@@ -27,9 +28,7 @@ void Bitmap::load(const std::filesystem::path& filename) {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
-    assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
-
-    auto fileExt = String::Lowercase(filename.extension().string());
+    auto fileExt = FileSystem::GetExtension(filename);
     if (auto it = Registry().find(fileExt); it != Registry().end()) {
         it->second.first(*this, filename);
         this->filename = filename;
@@ -47,12 +46,10 @@ void Bitmap::write(const std::filesystem::path& filename) const {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
-    assert(std::filesystem::exists(filename) && std::filesystem::is_regular_file(filename));
-
     if (auto parent = filename.parent_path(); !parent.empty())
         std::filesystem::create_directories(parent);
 
-    auto fileExt = String::Lowercase(filename.extension().string());
+    auto fileExt = FileSystem::GetExtension(filename);
     if (auto it = Registry().find(fileExt); it != Registry().end()) {
         it->second.second(*this, filename);
     } else {

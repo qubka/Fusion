@@ -2,7 +2,7 @@
 
 #include "fusion/core/time.hpp"
 #include "fusion/devices/devices.hpp"
-#include "fusion/utils/file.hpp"
+#include "fusion/filesystem/file_system.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/images/image2d.hpp"
@@ -18,7 +18,7 @@ using namespace fe;
 ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     : Subrender{pipelineStage}
     , pipeline{pipelineStage, {"shaders/imgui/imgui.vert", "shaders/imgui/imgui.frag"}, {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}}, {}
-    , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None}
+    , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE}
     , descriptorSet{pipeline} {
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
@@ -68,11 +68,11 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     // Read fonts from memory
 
     // Text font
-    std::vector<uint8_t> textFont { File::ReadAllBytes("fonts/PT Sans.ttf") };
+    std::vector<uint8_t> textFont { FileSystem::ReadBytes("fonts/PT Sans.ttf") };
     io.Fonts->AddFontFromMemoryTTF(textFont.data(), static_cast<int>(textFont.size()), 16.0f * scale, nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
     // Icon font
-    std::vector<uint8_t> iconFont { File::ReadAllBytes("fonts/fontawesome-webfont.ttf") };
+    std::vector<uint8_t> iconFont { FileSystem::ReadBytes("fonts/fontawesome-webfont.ttf") };
     io.Fonts->AddFontFromMemoryTTF(iconFont.data(), static_cast<int>(iconFont.size()), 16.0f * scale, &config, iconsRanges);
 
     // Generate font
@@ -85,7 +85,7 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     auto bitmap = std::make_unique<Bitmap>(glm::uvec2{texWidth, texHeight});
     memcpy(bitmap->getData<void>(), fontBuffer, bitmap->getLength());
     font = std::make_unique<Image2d>(std::move(bitmap));
-    //io.Fonts->SetTexID((ImTextureID)(&*font));
+    io.Fonts->SetTexID((ImTextureID)(&*font));
 
     setupEvents(true);
 }
@@ -108,9 +108,7 @@ void ImGuiSubrender::render(const CommandBuffer& commandBuffer) {
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
 
-    {
-        ImGui::ShowDemoWindow();
-    }
+    onImGui.publish();
 
     ImGui::Render();
 

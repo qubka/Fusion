@@ -5,6 +5,26 @@
 #include "fusion/utils/glm_extention.hpp"
 
 #include <entt/entt.hpp>
+#include <cereal/cereal.hpp>
+
+#define ALL_COMPONENTS  TagComponent, \
+                        RelationshipComponent, \
+                        TransformComponent, \
+                        CameraComponent, \
+                        MeshComponent
+
+/*
+                        PointLightComponent, \
+                        DirectionalLightComponent, \
+                        ScriptComponent, \
+                        RigidBodyComponent, \
+                        BoxColliderComponent, \
+                        SphereColliderComponent, \
+                        CapsuleColliderComponent, \
+                        MeshColliderComponent, \
+                        PhysicsMaterialComponent, \
+                        MaterialComponent \
+*/
 
 namespace fe {
     struct TagComponent {
@@ -13,6 +33,11 @@ namespace fe {
         std::string& operator*() { return tag; }
         const std::string& operator*() const { return tag; }
         operator std::string() const { return tag; }
+
+        template <typename Archive>
+        void serialize(Archive& archive) const {
+            archive(cereal::make_nvp("Tag", tag));
+        }
     };
 
     struct RelationshipComponent {
@@ -21,6 +46,15 @@ namespace fe {
         entt::entity prev{ entt::null }; // the previous sibling in the list of children for the parent.
         entt::entity next{ entt::null }; // the next sibling in the list of children for the parent.
         entt::entity parent{ entt::null }; // the entity identifier of the parent, if any.
+
+        template <typename Archive>
+        void serialize(Archive& archive) const {
+            archive(cereal::make_nvp("children", children),
+                    cereal::make_nvp("first", first),
+                    cereal::make_nvp("prev", prev),
+                    cereal::make_nvp("next", next),
+                    cereal::make_nvp("parent", parent));
+        }
     };
 
     struct TransformComponent {
@@ -55,6 +89,20 @@ namespace fe {
         glm::vec3 inverseTransformDirection(const glm::vec3& direction) const { return glm::rotate(glm::inverse(rotation), direction); }
         glm::vec3 inverseTransformVector(const glm::vec3& vector) const { return glm::rotate(glm::inverse(rotation), vector / scale); }
         glm::vec3 inverseTransformPoint(const glm::vec3& point) const { return glm::rotate(glm::inverse(rotation), (point - position) / scale); }
+
+        template <typename Archive>
+        void save(Archive& archive) const {
+            archive(cereal::make_nvp("Position", position));
+            archive(cereal::make_nvp("Rotation", rotation));
+            archive(cereal::make_nvp("Scale", scale));
+        }
+
+        template <typename Archive>
+        void load(Archive& archive) {
+            archive(cereal::make_nvp("Position", position));
+            archive(cereal::make_nvp("Rotation", rotation));
+            archive(cereal::make_nvp("Scale", scale));
+        }
     };
     struct DirtyTransformComponent {};
 
@@ -67,6 +115,13 @@ namespace fe {
         SceneCamera camera;
         bool primary{ true };
         bool fixedAspectRatio{ false };
+
+        template <typename Archive>
+        void serialize(Archive& archive) const {
+            archive(cereal::make_nvp("Camera", camera),
+                    cereal::make_nvp("Primary", primary),
+                    cereal::make_nvp("FixedAspectRatio", fixedAspectRatio));
+        }
     };
 
     struct MeshComponent {
@@ -75,10 +130,15 @@ namespace fe {
 
         // Storage for runtime
         void* runtimeModel{ nullptr };
+
+        template <typename Archive>
+        void serialize(Archive& archive) const {
+            archive(cereal::make_nvp("Path", path));
+        }
     };
     struct DirtyMeshComponent {};
 
-    struct PointLightComponent {
+    /*struct PointLightComponent {
         glm::vec3 color{ 1.0f };
         float intensity{ 1.0f };
         float radius{ 2.0f };
@@ -91,7 +151,7 @@ namespace fe {
 
     struct ScriptComponent {
         std::string name;
-    };
+    };*/
 
     /*struct RigidBodyComponent {
         enum class BodyType { Static = 0, Dynamic = 1 };
@@ -167,31 +227,4 @@ namespace fe {
         glm::vec3 specular{ 1.0f };
         float shininess{ 0.5f };
     };*/
-
-    /*template<typename... T>
-    struct ComponentGroup {
-        template<typename F, typename ...Args>
-        static void each(F func, Args&& ... args) {
-            (T(func(std::forward<Args>(args)...), ...));
-        }
-    };
-
-    using AllComponents =
-            ComponentGroup<
-                    TagComponent,
-                    RelationshipComponent,
-                    TransformComponent,
-                    CameraComponent,
-                    MeshComponent,
-                    PointLightComponent,
-                    DirectionalLightComponent,
-                    ScriptComponent,
-                    RigidBodyComponent,
-                    BoxColliderComponent,
-                    SphereColliderComponent,
-                    CapsuleColliderComponent,
-                    MeshColliderComponent,
-                    PhysicsMaterialComponent,
-                    MaterialComponent
-            >;*/
 }

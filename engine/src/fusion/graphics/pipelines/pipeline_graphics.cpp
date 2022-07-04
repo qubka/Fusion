@@ -3,7 +3,7 @@
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/render_stage.hpp"
 #include "fusion/utils/date_time.hpp"
-#include "fusion/utils/file.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 using namespace fe;
 
@@ -84,7 +84,7 @@ void PipelineGraphics::createShaderProgram() {
 		defineBlock << "#define " << defineName << " " << defineValue << '\n';
 
 	for (const auto& shaderStage : shaderStages) {
-		auto fileLoaded = File::ReadAllText(shaderStage);
+		auto fileLoaded = FileSystem::ReadText(shaderStage);
 		if (fileLoaded.empty())
 			throw std::runtime_error("Could not create pipeline, missing shader stage");
 
