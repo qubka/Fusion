@@ -35,36 +35,36 @@ Scene::Scene(std::shared_ptr<Camera> camera) : camera{std::move(camera)} {
     clone<MaterialComponent>(other.registry);
 }*/
 
-void Scene::start() {
+void Scene::onStart() {
     systems.each([&](auto system) {
         if (system->isEnabled())
-            system->create();
+            system->onCreate();
     });
 }
 
-void Scene::update() {
+void Scene::onUpdate() {
     if (!runtime)
         return;
 
     systems.each([&](auto system) {
         if (system->isEnabled())
-            system->update();
+            system->onUpdate();
     });
 }
 
-void Scene::runtimeStart() {
+void Scene::onRuntimeStart() {
     runtime = true;
 
     systems.each([&](auto system) {
         if (system->isEnabled())
-            system->start();
+            system->onStart();
     });
 }
 
-void Scene::runtimeStop() {
+void Scene::onRuntimeStop() {
     systems.each([&](auto system) {
         if (system->isEnabled())
-            system->stop();
+            system->onStop();
     });
 
     runtime = false;

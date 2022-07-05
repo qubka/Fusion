@@ -1,13 +1,14 @@
 #include "imgui_subrender.hpp"
+#include "imgui_utilities.hpp"
 
+#include "fusion/core/engine.hpp"
 #include "fusion/core/time.hpp"
 #include "fusion/devices/devices.hpp"
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/images/image2d.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/graphics/buffers/buffer.hpp"
+#include "fusion/input/codes.hpp"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
@@ -22,20 +23,31 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     , descriptorSet{pipeline} {
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
-    float scale = 1.0f;
+    LOG_INFO << "ImGui Version: " << IMGUI_VERSION;
+#ifdef IMGUI_USER_CONFIG
+    LOG_INFO << "ImConfig File: " << std::quoted(IMGUI_USER_CONFIG);
+#endif
+
+    fontSize = 14.0f;
+
 #if PLATFORM_ANDROID
     // Screen density
     if (android::screenDensity >= ACONFIGURATION_DENSITY_XXXHIGH) {
-        scale = 4.5f;
+        fontScale = 4.5f;
     } else if (android::screenDensity >= ACONFIGURATION_DENSITY_XXHIGH) {
-        scale = 3.5f;
+        fontScale = 3.5f;
     } else if (android::screenDensity >= ACONFIGURATION_DENSITY_XHIGH) {
-        scale = 2.5f;
+        fontScale = 2.5f;
     } else if (android::screenDensity >= ACONFIGURATION_DENSITY_HIGH) {
-        scale = 2.0f;
+        fontScale = 2.0f;
     };
-    LOG_DEBUG << "Android UI scale "<< scale;
+    LOG_DEBUG << "Android UI scale "<< fontScale;
+#elif PLATFORM_IOS
+    fontScale = 2.0f;
+#else
+    fontScale = 1.0f;
 #endif
+
     // Sets flags
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
@@ -44,50 +56,24 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+#ifdef PLATFORM_ANDROID
+    io.ConfigFlags |= ImGuiConfigFlags_IsTouchScreen;
+#endif
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
 
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    SetStyleColors();
-
-    // Dimensions
     window = Devices::Get()->getWindow(0);
     auto& size = window->getSize();
     io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
-    io.FontGlobalScale = scale;
 
-    // Add character ranges and merge into the previous font.
-    // The ranges array is not copied by the AddFont* functions and is used lazily.
-    // so ensure it is available at the time of building or calling GetTexDataAsRGBA32().
-    static const ImWchar iconsRanges[] = { 0xf000, 0xf3ff, 0 }; // Will not be copied by AddFont* so keep in scope.
-    ImFontConfig config;
-    config.MergeMode = true;
-
-#if PLATFORM_ANDROID
-    scale = static_cast<float>(android::screenDensity) / static_cast<float>(ACONFIGURATION_DENSITY_MEDIUM);
-#endif
-    // Read fonts from memory
-
-    // Text font
-    std::vector<uint8_t> textFont = FileSystem::ReadBytes("fonts/PT Sans.ttf");
-    io.Fonts->AddFontFromMemoryTTF(textFont.data(), static_cast<int>(textFont.size()), 16.0f * scale, nullptr, io.Fonts->GetGlyphRangesCyrillic());
-
-    // Icon font
-    std::vector<uint8_t> iconFont = FileSystem::ReadBytes("fonts/fontawesome-webfont.ttf");
-    io.Fonts->AddFontFromMemoryTTF(iconFont.data(), static_cast<int>(iconFont.size()), 16.0f * scale, &config, iconsRanges);
-
-    // Generate font
-    io.Fonts->Build();
-
-    // Create font texture
-    uint8_t* fontBuffer;
-    int texWidth, texHeight;
-    io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
-    auto bitmap = std::make_unique<Bitmap>(glm::uvec2{texWidth, texHeight});
-    memcpy(bitmap->getData<void>(), fontBuffer, bitmap->getLength());
-    font = std::make_unique<Image2d>(std::move(bitmap));
-    io.Fonts->SetTexID((ImTextureID)(&*font));
+    setupKeyCodes();
+    setupStyle();
 
     setupEvents(true);
+
+    io.ClipboardUserData = window;
+    io.SetClipboardTextFn = SetClipboardText;
+    io.GetClipboardTextFn = GetClipboardText;
 }
 
 ImGuiSubrender::~ImGuiSubrender() {
@@ -97,27 +83,19 @@ ImGuiSubrender::~ImGuiSubrender() {
     setupEvents(false);
 }
 
-/** Update the command buffers to reflect UI changes */
-void ImGuiSubrender::render(const CommandBuffer& commandBuffer) {
+void ImGuiSubrender::onUpdate() {
     ImGuiIO& io = ImGui::GetIO();
     io.DeltaTime = Time::DeltaTime();
-
-    auto& size = Devices::Get()->getWindow(0)->getSize();
-    io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
 
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
 
-    onImGui.publish();
+    Engine::Get()->getApp()->onImGui();
 
     ImGui::Render();
-
-    updateBuffers();
-
-    drawFrame(commandBuffer);
 }
 
-void ImGuiSubrender::drawFrame(const CommandBuffer& commandBuffer) {
+void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer) {
     // Update vertex and index buffer containing the imGui elements when required
     ImDrawData* drawData = ImGui::GetDrawData();
     if (!drawData || drawData->CmdListsCount == 0)
@@ -130,98 +108,17 @@ void ImGuiSubrender::drawFrame(const CommandBuffer& commandBuffer) {
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
-    descriptorSet.push("fontSampler", font.get());
+    descriptorSet.push("fontSampler", canvasObject.getFont());
 
     if (!descriptorSet.update(pipeline))
         return;
 
-    // Draws the objects
+    // Draws the canvas
     pipeline.bindPipeline(commandBuffer);
     descriptorSet.bindDescriptor(commandBuffer, pipeline);
     pushObject.bindPush(commandBuffer, pipeline);
 
-    VkBuffer vertexBuffers[1] = { *vertexBuffer };
-    VkDeviceSize offsets[1] = { 0 };
-
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffer, *indexBuffer, 0, sizeof(ImDrawIdx) == 2 ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32);
-
-    int32_t vertexOffset = 0;
-    int32_t indexOffset = 0;
-
-    for (int i = 0; i < drawData->CmdListsCount; i++) {
-        const ImDrawList* cmdLists = drawData->CmdLists[i];
-        for (const auto& cmd : cmdLists->CmdBuffer) {
-            VkRect2D scissor = vku::rect2D(
-                    glm::uvec2{cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y}, // extent
-                    glm::ivec2{std::max(static_cast<int>((cmd.ClipRect.x)), 0), std::max(static_cast<int>((cmd.ClipRect.y)), 0)} // offset
-            );
-            vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-            // Bind DescriptorSet with font or user texture
-            //VkDescriptorSet descriptor[1] = { static_cast<VkDescriptorSet>(pcmd.TextureId) };
-            //vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, descriptor, 0, nullptr);
-            vkCmdDrawIndexed(commandBuffer, cmd.ElemCount, 1, indexOffset, vertexOffset, 0);
-            indexOffset += static_cast<int32_t>(cmd.ElemCount);
-        }
-        vertexOffset += cmdLists->VtxBuffer.Size;
-    }
-}
-
-void ImGuiSubrender::updateBuffers() {
-    // Update vertex and index buffer containing the imGui elements when required
-    ImDrawData* drawData = ImGui::GetDrawData();
-    if (!drawData)
-        return;
-
-    // Note: Alignment is done inside buffer creation
-    VkDeviceSize vertexBufferSize = drawData->TotalVtxCount * sizeof(ImDrawVert);
-    VkDeviceSize indexBufferSize = drawData->TotalIdxCount * sizeof(ImDrawIdx);
-
-    // Update buffers only if vertex or index count has been changed compared to current buffer size
-    if (vertexBufferSize == 0 || indexBufferSize == 0)
-        return;
-
-    // Vertex buffer
-    if (!vertexBuffer || (vertexCount != drawData->TotalVtxCount)) {
-        if (vertexBuffer) {
-            removePool.push(std::move(vertexBuffer));
-        }
-        vertexBuffer = std::make_unique<Buffer>(vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-        vertexBuffer->map();
-        vertexCount = drawData->TotalVtxCount;
-    }
-
-    // Index buffer
-    if (!indexBuffer || (indexCount != drawData->TotalIdxCount)) {
-        if (indexBuffer) {
-            removePool.push(std::move(indexBuffer));
-        }
-        indexBuffer = std::make_unique<Buffer>(indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-        indexBuffer->map();
-        indexCount = drawData->TotalIdxCount;
-    }
-
-    // Upload data
-    auto vtxDst = reinterpret_cast<ImDrawVert*>(vertexBuffer->getMappedMemory());
-    auto idxDst = reinterpret_cast<ImDrawIdx*>(indexBuffer->getMappedMemory());
-
-    for (int i = 0; i < drawData->CmdListsCount; i++) {
-        const ImDrawList* cmdList = drawData->CmdLists[i];
-        memcpy(vtxDst, cmdList->VtxBuffer.Data, cmdList->VtxBuffer.Size * sizeof(ImDrawVert));
-        memcpy(idxDst, cmdList->IdxBuffer.Data, cmdList->IdxBuffer.Size * sizeof(ImDrawIdx));
-        vtxDst += cmdList->VtxBuffer.Size;
-        idxDst += cmdList->IdxBuffer.Size;
-    }
-
-    // Flush to make writes visible to GPU
-    vertexBuffer->flush();
-    indexBuffer->flush();
-
-    // Remove unused buffers from pool
-    //static uint32_t imageCount = Graphics::Get()->getSwapchain(0)->getImageCount() * 2;
-    while (removePool.size() > MAX_FRAMES_IN_FLIGHT * 2) {
-        removePool.pop();
-    }
+    canvasObject.cmdRender(commandBuffer);
 }
 
 void ImGuiSubrender::onMouseButtonEvent(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods) {
@@ -232,8 +129,10 @@ void ImGuiSubrender::onMouseButtonEvent(MouseButton button, InputAction action, 
 }
 
 void ImGuiSubrender::onMouseMotionEvent(const glm::vec2& pos) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.AddMousePosEvent(pos.x, pos.y);
+    if (!window->isCursorHidden()) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMousePosEvent(pos.x, pos.y);
+    }
 }
 
 void ImGuiSubrender::onMouseScrollEvent(const glm::vec2& offset) {
@@ -260,25 +159,31 @@ void ImGuiSubrender::onKeyEvent(Key key, InputAction action, Key scan, bitmask::
     if (action >= InputAction::Repeat)
         return;
 
-    //UpdateKeyModifiers(data.mods);
-
-    int scancode = static_cast<int>(scan);
-    int keycode = TranslateUntranslatedKey(static_cast<int>(key), scancode);
-
     ImGuiIO& io = ImGui::GetIO();
-    ImGuiKey imKey = KeyToImGuiKey(keycode);
-    io.AddKeyEvent(imKey, action == InputAction::Press);
-    io.SetKeyEventNativeData(imKey, keycode, scancode); // To support legacy indexing (<1.87 user code)
+
+    io.KeyCtrl = (mods & InputMod::Control) ? true : false;
+    io.KeyShift = (mods & InputMod::Shift) ? true : false;
+    io.KeyAlt = (mods & InputMod::Alt) ? true : false;
+    io.KeySuper = (mods & InputMod::Super) ? true : false;
+
+    io.AddKeyEvent(KeyToImGuiKey(key), action == InputAction::Press);
 }
 
 void ImGuiSubrender::onCharInputEvent(uint32_t chr) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.AddInputCharacter(chr);
+    if (chr > 0 && chr < 0x10000) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddInputCharacter(chr);
+    }
 }
 
 void ImGuiSubrender::onFocusEvent(bool focuses) {
     ImGuiIO& io = ImGui::GetIO();
     io.AddFocusEvent(focuses);
+}
+
+void ImGuiSubrender::onSizeChange(const glm::uvec2& size) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
 }
 
 void ImGuiSubrender::setupEvents(bool connect) {
@@ -291,6 +196,7 @@ void ImGuiSubrender::setupEvents(bool connect) {
         window->OnKey().connect<&ImGuiSubrender::onKeyEvent>(this);
         window->OnCharInput().connect<&ImGuiSubrender::onCharInputEvent>(this);
         window->OnFocus().connect<&ImGuiSubrender::onFocusEvent>(this);
+        window->OnResize().connect<&ImGuiSubrender::onSizeChange>(this);
     } else {
         // Remove the window events callbacks.
         window->OnMouseButton().disconnect<&ImGuiSubrender::onMouseButtonEvent>(this);
@@ -300,179 +206,244 @@ void ImGuiSubrender::setupEvents(bool connect) {
         window->OnKey().disconnect<&ImGuiSubrender::onKeyEvent>(this);
         window->OnCharInput().disconnect<&ImGuiSubrender::onCharInputEvent>(this);
         window->OnFocus().disconnect<&ImGuiSubrender::onFocusEvent>(this);
+        window->OnResize().disconnect<&ImGuiSubrender::onSizeChange>(this);
     }
 }
 
-//_______________________________________________________________
-
-void ImGuiSubrender::SetStyleColors() {
-    auto& colors = ImGui::GetStyle().Colors;
-    colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 1.0f };
-
-    colors[ImGuiCol_Header] = { 0.2f, 0.205f, 0.21f, 1.0f };
-    colors[ImGuiCol_HeaderHovered] = { 0.3f, 0.305f, 0.31f, 1.0f };
-    colors[ImGuiCol_HeaderActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-
-    colors[ImGuiCol_Button] = { 0.2f, 0.205f, 0.21f, 1.0f };
-    colors[ImGuiCol_ButtonHovered] = { 0.3f, 0.305f, 0.31f, 1.0f };
-    colors[ImGuiCol_ButtonActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-
-    colors[ImGuiCol_FrameBg] = { 0.2f, 0.205f, 0.21f, 1.0f };
-    colors[ImGuiCol_FrameBgHovered] = { 0.3f, 0.305f, 0.31f, 1.0f };
-    colors[ImGuiCol_FrameBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-
-    colors[ImGuiCol_Tab] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-    colors[ImGuiCol_TabHovered] = { 0.38f, 0.3805f, 0.381f, 1.0f };
-    colors[ImGuiCol_TabActive] = { 0.28f, 0.2805f, 0.281f, 1.0f };
-    colors[ImGuiCol_TabUnfocused] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-    colors[ImGuiCol_TabUnfocusedActive] = { 0.2f, 0.205f, 0.21f, 1.0f };
-
-    colors[ImGuiCol_TitleBg] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-    colors[ImGuiCol_TitleBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
-    colors[ImGuiCol_TitleBgCollapsed] = { 0.15f, 0.1505f, 0.151f, 1.0 };
-}
-
-void ImGuiSubrender::UpdateKeyModifiers(int mods) {
+void ImGuiSubrender::setupKeyCodes() {
     ImGuiIO& io = ImGui::GetIO();
-    io.AddKeyEvent(ImGuiKey_ModCtrl, (mods & GLFW_MOD_CONTROL) != 0);
-    io.AddKeyEvent(ImGuiKey_ModShift, (mods & GLFW_MOD_SHIFT) != 0);
-    io.AddKeyEvent(ImGuiKey_ModAlt, (mods & GLFW_MOD_ALT) != 0);
-    io.AddKeyEvent(ImGuiKey_ModSuper, (mods & GLFW_MOD_SUPER) != 0);
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+    /*io.KeyMap[ImGuiKey_Tab] = static_cast<int>(Key::Tab);
+    io.KeyMap[ImGuiKey_LeftArrow] = static_cast<int>(Key::Left);
+    io.KeyMap[ImGuiKey_RightArrow] = static_cast<int>(Key::Right);
+    io.KeyMap[ImGuiKey_UpArrow] = static_cast<int>(Key::Up);
+    io.KeyMap[ImGuiKey_DownArrow] = static_cast<int>(Key::Down);
+    io.KeyMap[ImGuiKey_PageUp] = static_cast<int>(Key::PageUp);
+    io.KeyMap[ImGuiKey_PageDown] = static_cast<int>(Key::PageDown);
+    io.KeyMap[ImGuiKey_Home] = static_cast<int>(Key::Home);
+    io.KeyMap[ImGuiKey_End] = static_cast<int>(Key::End);
+    io.KeyMap[ImGuiKey_Insert] = static_cast<int>(Key::Insert);
+    io.KeyMap[ImGuiKey_Delete] = static_cast<int>(Key::Delete);
+    io.KeyMap[ImGuiKey_Backspace] = static_cast<int>(Key::Backspace);
+    io.KeyMap[ImGuiKey_Space] = static_cast<int>(Key::Space);
+    io.KeyMap[ImGuiKey_Enter] = static_cast<int>(Key::Enter);
+    io.KeyMap[ImGuiKey_Escape] = static_cast<int>(Key::Escape);
+    io.KeyMap[ImGuiKey_A] = static_cast<int>(Key::A);
+    io.KeyMap[ImGuiKey_C] = static_cast<int>(Key::C);
+    io.KeyMap[ImGuiKey_V] = static_cast<int>(Key::V);
+    io.KeyMap[ImGuiKey_X] = static_cast<int>(Key::X);
+    io.KeyMap[ImGuiKey_Y] = static_cast<int>(Key::Y);
+    io.KeyMap[ImGuiKey_Z] = static_cast<int>(Key::Z);*/
+    io.KeyRepeatDelay = 0.400f;
+    io.KeyRepeatRate = 0.05f;
 }
 
-int ImGuiSubrender::TranslateUntranslatedKey(int key, int scancode) {
-#if GLFW_HAS_GET_KEY_NAME && !defined(__EMSCRIPTEN__)
-    // GLFW 3.1+ attempts to "untranslate" keys, which goes the opposite of what every other framework does, making using lettered shortcuts difficult.
-    // (It had reasons to do so: namely GLFW is/was more likely to be used for WASD-type game controls rather than lettered shortcuts, but IHMO the 3.1 change could have been done differently)
-    // See https://github.com/glfw/glfw/issues/1502 for details.
-    // Adding a workaround to undo this (so our keys are translated->untranslated->translated, likely a lossy process).
-    // This won't cover edge cases but this is at least going to cover common cases.
-    if (key >= GLFW_KEY_KP_0 && key <= GLFW_KEY_KP_EQUAL)
-        return key;
-    const char* key_name = glfwGetKeyName(key, scancode);
-    if (key_name && key_name[0] != 0 && key_name[1] == 0)
-    {
-        const char char_names[] = "`-=[]\\,;\'./";
-        const int char_keys[] = { GLFW_KEY_GRAVE_ACCENT, GLFW_KEY_MINUS, GLFW_KEY_EQUAL, GLFW_KEY_LEFT_BRACKET, GLFW_KEY_RIGHT_BRACKET, GLFW_KEY_BACKSLASH, GLFW_KEY_COMMA, GLFW_KEY_SEMICOLON, GLFW_KEY_APOSTROPHE, GLFW_KEY_PERIOD, GLFW_KEY_SLASH, 0 };
-        IM_ASSERT(IM_ARRAYSIZE(char_names) == IM_ARRAYSIZE(char_keys));
-        if (key_name[0] >= '0' && key_name[0] <= '9')               { key = GLFW_KEY_0 + (key_name[0] - '0'); }
-        else if (key_name[0] >= 'A' && key_name[0] <= 'Z')          { key = GLFW_KEY_A + (key_name[0] - 'A'); }
-        else if (const char* p = strchr(char_names, key_name[0]))   { key = char_keys[p - char_names]; }
+void ImGuiSubrender::setupStyle() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    ImGui::StyleColorsDark();
+
+    io.FontGlobalScale = fontScale;
+
+    ImFontConfig config;
+    config.MergeMode = false;
+    config.PixelSnapH = true;
+    config.OversampleH = config.OversampleV = 1;
+    config.GlyphMinAdvanceX = 4.0f;
+    config.SizePixels = 12.0f;
+
+    static const ImWchar iconsRanges[] = { 0xf000, 0xf3ff, 0 };
+
+    std::vector<uint8_t> textFont = FileSystem::ReadBytes("fonts/PT Sans.ttf");
+    io.Fonts->AddFontFromMemoryTTF(textFont.data(), static_cast<int>(textFont.size()), fontSize * fontScale, nullptr, io.Fonts->GetGlyphRangesCyrillic());
+
+    std::vector<uint8_t> iconFont = FileSystem::ReadBytes("fonts/fontawesome-webfont.ttf");
+    io.Fonts->AddFontFromMemoryTTF(iconFont.data(), static_cast<int>(iconFont.size()), fontSize * fontScale, &config, iconsRanges);
+
+    io.Fonts->TexGlyphPadding = 1;
+    for (int n = 0; n < io.Fonts->ConfigData.Size; n++) {
+        io.Fonts->ConfigData[n].RasterizerMultiply = 1.0f;
     }
-    // if (action == GLFW_PRESS) printf("key %d scancode %d name '%s'\n", key, scancode, key_name);
-#else
-    IM_UNUSED(scancode);
+
+    io.Fonts->Build();
+
+    uint8_t* fontBuffer;
+    int texWidth, texHeight;
+    io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
+    auto bitmap = std::make_unique<Bitmap>(glm::uvec2{texWidth, texHeight});
+    memcpy(bitmap->getData<void>(), fontBuffer, bitmap->getLength());
+    canvasObject.setFont(std::make_unique<Image2d>(std::move(bitmap)));
+    //io.Fonts->SetTexID((ImTextureID)(&*font));
+
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    style.WindowPadding = ImVec2{ 5, 5 };
+    style.FramePadding = ImVec2{ 4, 4 };
+    style.ItemSpacing = ImVec2{ 6, 2 };
+    style.ItemInnerSpacing = ImVec2{ 2, 2 };
+    style.IndentSpacing = 6.0f;
+    style.TouchExtraPadding = ImVec2{ 4, 4 };
+
+    style.ScrollbarSize = 10;
+
+    style.WindowBorderSize = 0;
+    style.ChildBorderSize = 1;
+    style.PopupBorderSize = 3;
+    style.FrameBorderSize = 0.0f;
+
+    const int roundingAmount = 2;
+    style.PopupRounding = roundingAmount;
+    style.WindowRounding = roundingAmount;
+    style.ChildRounding = 0;
+    style.FrameRounding = roundingAmount;
+    style.ScrollbarRounding = roundingAmount;
+    style.GrabRounding = roundingAmount;
+    style.WindowMinSize = ImVec2{ 200.0f, 200.0f };
+
+#ifdef IMGUI_HAS_DOCK
+    style.TabBorderSize = 1.0f;
+    style.TabRounding = roundingAmount; // + 4;
+
+    if(ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        style.WindowRounding = roundingAmount;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
 #endif
-    return key;
+
+    ImGuiUtilities::SetTheme(ImGuiUtilities::Theme::Dark);
 }
 
-int ImGuiSubrender::KeyToImGuiKey(int key) {
+const char* ImGuiSubrender::GetClipboardText(void* userData) {
+    return reinterpret_cast<Window*>(userData)->getClipboard();
+}
+
+void ImGuiSubrender::SetClipboardText(void* userData, const char* text) {
+    reinterpret_cast<Window*>(userData)->setClipboard(text);
+}
+
+int ImGuiSubrender::KeyToImGuiKey(Key key) {
     switch (key) {
-        case GLFW_KEY_TAB: return ImGuiKey_Tab;
-        case GLFW_KEY_LEFT: return ImGuiKey_LeftArrow;
-        case GLFW_KEY_RIGHT: return ImGuiKey_RightArrow;
-        case GLFW_KEY_UP: return ImGuiKey_UpArrow;
-        case GLFW_KEY_DOWN: return ImGuiKey_DownArrow;
-        case GLFW_KEY_PAGE_UP: return ImGuiKey_PageUp;
-        case GLFW_KEY_PAGE_DOWN: return ImGuiKey_PageDown;
-        case GLFW_KEY_HOME: return ImGuiKey_Home;
-        case GLFW_KEY_END: return ImGuiKey_End;
-        case GLFW_KEY_INSERT: return ImGuiKey_Insert;
-        case GLFW_KEY_DELETE: return ImGuiKey_Delete;
-        case GLFW_KEY_BACKSPACE: return ImGuiKey_Backspace;
-        case GLFW_KEY_SPACE: return ImGuiKey_Space;
-        case GLFW_KEY_ENTER: return ImGuiKey_Enter;
-        case GLFW_KEY_ESCAPE: return ImGuiKey_Escape;
-        case GLFW_KEY_APOSTROPHE: return ImGuiKey_Apostrophe;
-        case GLFW_KEY_COMMA: return ImGuiKey_Comma;
-        case GLFW_KEY_MINUS: return ImGuiKey_Minus;
-        case GLFW_KEY_PERIOD: return ImGuiKey_Period;
-        case GLFW_KEY_SLASH: return ImGuiKey_Slash;
-        case GLFW_KEY_SEMICOLON: return ImGuiKey_Semicolon;
-        case GLFW_KEY_EQUAL: return ImGuiKey_Equal;
-        case GLFW_KEY_LEFT_BRACKET: return ImGuiKey_LeftBracket;
-        case GLFW_KEY_BACKSLASH: return ImGuiKey_Backslash;
-        case GLFW_KEY_RIGHT_BRACKET: return ImGuiKey_RightBracket;
-        case GLFW_KEY_GRAVE_ACCENT: return ImGuiKey_GraveAccent;
-        case GLFW_KEY_CAPS_LOCK: return ImGuiKey_CapsLock;
-        case GLFW_KEY_SCROLL_LOCK: return ImGuiKey_ScrollLock;
-        case GLFW_KEY_NUM_LOCK: return ImGuiKey_NumLock;
-        case GLFW_KEY_PRINT_SCREEN: return ImGuiKey_PrintScreen;
-        case GLFW_KEY_PAUSE: return ImGuiKey_Pause;
-        case GLFW_KEY_KP_0: return ImGuiKey_Keypad0;
-        case GLFW_KEY_KP_1: return ImGuiKey_Keypad1;
-        case GLFW_KEY_KP_2: return ImGuiKey_Keypad2;
-        case GLFW_KEY_KP_3: return ImGuiKey_Keypad3;
-        case GLFW_KEY_KP_4: return ImGuiKey_Keypad4;
-        case GLFW_KEY_KP_5: return ImGuiKey_Keypad5;
-        case GLFW_KEY_KP_6: return ImGuiKey_Keypad6;
-        case GLFW_KEY_KP_7: return ImGuiKey_Keypad7;
-        case GLFW_KEY_KP_8: return ImGuiKey_Keypad8;
-        case GLFW_KEY_KP_9: return ImGuiKey_Keypad9;
-        case GLFW_KEY_KP_DECIMAL: return ImGuiKey_KeypadDecimal;
-        case GLFW_KEY_KP_DIVIDE: return ImGuiKey_KeypadDivide;
-        case GLFW_KEY_KP_MULTIPLY: return ImGuiKey_KeypadMultiply;
-        case GLFW_KEY_KP_SUBTRACT: return ImGuiKey_KeypadSubtract;
-        case GLFW_KEY_KP_ADD: return ImGuiKey_KeypadAdd;
-        case GLFW_KEY_KP_ENTER: return ImGuiKey_KeypadEnter;
-        case GLFW_KEY_KP_EQUAL: return ImGuiKey_KeypadEqual;
-        case GLFW_KEY_LEFT_SHIFT: return ImGuiKey_LeftShift;
-        case GLFW_KEY_LEFT_CONTROL: return ImGuiKey_LeftCtrl;
-        case GLFW_KEY_LEFT_ALT: return ImGuiKey_LeftAlt;
-        case GLFW_KEY_LEFT_SUPER: return ImGuiKey_LeftSuper;
-        case GLFW_KEY_RIGHT_SHIFT: return ImGuiKey_RightShift;
-        case GLFW_KEY_RIGHT_CONTROL: return ImGuiKey_RightCtrl;
-        case GLFW_KEY_RIGHT_ALT: return ImGuiKey_RightAlt;
-        case GLFW_KEY_RIGHT_SUPER: return ImGuiKey_RightSuper;
-        case GLFW_KEY_MENU: return ImGuiKey_Menu;
-        case GLFW_KEY_0: return ImGuiKey_0;
-        case GLFW_KEY_1: return ImGuiKey_1;
-        case GLFW_KEY_2: return ImGuiKey_2;
-        case GLFW_KEY_3: return ImGuiKey_3;
-        case GLFW_KEY_4: return ImGuiKey_4;
-        case GLFW_KEY_5: return ImGuiKey_5;
-        case GLFW_KEY_6: return ImGuiKey_6;
-        case GLFW_KEY_7: return ImGuiKey_7;
-        case GLFW_KEY_8: return ImGuiKey_8;
-        case GLFW_KEY_9: return ImGuiKey_9;
-        case GLFW_KEY_A: return ImGuiKey_A;
-        case GLFW_KEY_B: return ImGuiKey_B;
-        case GLFW_KEY_C: return ImGuiKey_C;
-        case GLFW_KEY_D: return ImGuiKey_D;
-        case GLFW_KEY_E: return ImGuiKey_E;
-        case GLFW_KEY_F: return ImGuiKey_F;
-        case GLFW_KEY_G: return ImGuiKey_G;
-        case GLFW_KEY_H: return ImGuiKey_H;
-        case GLFW_KEY_I: return ImGuiKey_I;
-        case GLFW_KEY_J: return ImGuiKey_J;
-        case GLFW_KEY_K: return ImGuiKey_K;
-        case GLFW_KEY_L: return ImGuiKey_L;
-        case GLFW_KEY_M: return ImGuiKey_M;
-        case GLFW_KEY_N: return ImGuiKey_N;
-        case GLFW_KEY_O: return ImGuiKey_O;
-        case GLFW_KEY_P: return ImGuiKey_P;
-        case GLFW_KEY_Q: return ImGuiKey_Q;
-        case GLFW_KEY_R: return ImGuiKey_R;
-        case GLFW_KEY_S: return ImGuiKey_S;
-        case GLFW_KEY_T: return ImGuiKey_T;
-        case GLFW_KEY_U: return ImGuiKey_U;
-        case GLFW_KEY_V: return ImGuiKey_V;
-        case GLFW_KEY_W: return ImGuiKey_W;
-        case GLFW_KEY_X: return ImGuiKey_X;
-        case GLFW_KEY_Y: return ImGuiKey_Y;
-        case GLFW_KEY_Z: return ImGuiKey_Z;
-        case GLFW_KEY_F1: return ImGuiKey_F1;
-        case GLFW_KEY_F2: return ImGuiKey_F2;
-        case GLFW_KEY_F3: return ImGuiKey_F3;
-        case GLFW_KEY_F4: return ImGuiKey_F4;
-        case GLFW_KEY_F5: return ImGuiKey_F5;
-        case GLFW_KEY_F6: return ImGuiKey_F6;
-        case GLFW_KEY_F7: return ImGuiKey_F7;
-        case GLFW_KEY_F8: return ImGuiKey_F8;
-        case GLFW_KEY_F9: return ImGuiKey_F9;
-        case GLFW_KEY_F10: return ImGuiKey_F10;
-        case GLFW_KEY_F11: return ImGuiKey_F11;
-        case GLFW_KEY_F12: return ImGuiKey_F12;
-        default: return ImGuiKey_None;
+        case Key::Space: return ImGuiKey_Space;
+        case Key::Apostrophe: return ImGuiKey_Apostrophe;
+        case Key::Comma: return ImGuiKey_Comma;
+        case Key::Minus: return ImGuiKey_Minus;
+        case Key::Period: return ImGuiKey_Period;
+        case Key::Slash: return ImGuiKey_Slash;
+        case Key::D0: return ImGuiKey_0;
+        case Key::D1: return ImGuiKey_1;
+        case Key::D2: return ImGuiKey_2;
+        case Key::D3: return ImGuiKey_3;
+        case Key::D4: return ImGuiKey_4;
+        case Key::D5: return ImGuiKey_5;
+        case Key::D6: return ImGuiKey_6;
+        case Key::D7: return ImGuiKey_7;
+        case Key::D8: return ImGuiKey_8;
+        case Key::D9: return ImGuiKey_9;
+        case Key::Semicolon: return ImGuiKey_Semicolon;
+        case Key::Equal: return ImGuiKey_Equal;
+        case Key::A: return ImGuiKey_A;
+        case Key::B: return ImGuiKey_B;
+        case Key::C: return ImGuiKey_C;
+        case Key::D: return ImGuiKey_D;
+        case Key::E: return ImGuiKey_E;
+        case Key::F: return ImGuiKey_F;
+        case Key::G: return ImGuiKey_G;
+        case Key::H: return ImGuiKey_H;
+        case Key::I: return ImGuiKey_I;
+        case Key::J: return ImGuiKey_J;
+        case Key::K: return ImGuiKey_K;
+        case Key::L: return ImGuiKey_L;
+        case Key::M: return ImGuiKey_M;
+        case Key::N: return ImGuiKey_N;
+        case Key::O: return ImGuiKey_O;
+        case Key::P: return ImGuiKey_P;
+        case Key::Q: return ImGuiKey_Q;
+        case Key::R: return ImGuiKey_R;
+        case Key::S: return ImGuiKey_S;
+        case Key::T: return ImGuiKey_T;
+        case Key::U: return ImGuiKey_U;
+        case Key::V: return ImGuiKey_V;
+        case Key::W: return ImGuiKey_W;
+        case Key::X: return ImGuiKey_X;
+        case Key::Y: return ImGuiKey_Y;
+        case Key::Z: return ImGuiKey_Z;
+        case Key::LeftBracket: return ImGuiKey_LeftBracket;
+        case Key::Backslash: return ImGuiKey_Backslash;
+        case Key::RightBracket: return ImGuiKey_RightBracket;
+        case Key::GraveAccent: return ImGuiKey_GraveAccent;
+        //case Key::World1: return ImGuiKey_World1;
+        //case Key::World2: return ImGuiKey_World2;
+        case Key::Escape: return ImGuiKey_Escape;
+        case Key::Enter: return ImGuiKey_Enter;
+        case Key::Tab: return ImGuiKey_Tab;
+        case Key::Backspace: return ImGuiKey_Backspace;
+        case Key::Insert: return ImGuiKey_Insert;
+        case Key::Delete: return ImGuiKey_Delete;
+        case Key::Right: return ImGuiKey_RightArrow;
+        case Key::Left: return ImGuiKey_LeftArrow;
+        case Key::Down: return ImGuiKey_DownArrow;
+        case Key::Up: return ImGuiKey_UpArrow;
+        case Key::PageUp: return ImGuiKey_PageUp;
+        case Key::PageDown: return ImGuiKey_PageDown;
+        case Key::Home: return ImGuiKey_Home;
+        case Key::End: return ImGuiKey_End;
+        case Key::CapsLock: return ImGuiKey_CapsLock;
+        case Key::ScrollLock: return ImGuiKey_ScrollLock;
+        case Key::NumLock: return ImGuiKey_NumLock;
+        case Key::PrintScreen: return ImGuiKey_PrintScreen;
+        case Key::Pause: return ImGuiKey_Pause;
+        case Key::F1: return ImGuiKey_F1;
+        case Key::F2: return ImGuiKey_F2;
+        case Key::F3: return ImGuiKey_F3;
+        case Key::F4: return ImGuiKey_F4;
+        case Key::F5: return ImGuiKey_F5;
+        case Key::F6: return ImGuiKey_F6;
+        case Key::F7: return ImGuiKey_F7;
+        case Key::F8: return ImGuiKey_F8;
+        case Key::F9: return ImGuiKey_F9;
+        case Key::F10: return ImGuiKey_F10;
+        case Key::F11: return ImGuiKey_F11;
+        case Key::F12: return ImGuiKey_F12;
+        /*case Key::F13: return ImGuiKey_F13;
+        case Key::F14: return ImGuiKey_F14;
+        case Key::F15: return ImGuiKey_F15;
+        case Key::F16: return ImGuiKey_F16;
+        case Key::F17: return ImGuiKey_F17;
+        case Key::F18: return ImGuiKey_F18;
+        case Key::F19: return ImGuiKey_F19;
+        case Key::F20: return ImGuiKey_F20;
+        case Key::F21: return ImGuiKey_F21;
+        case Key::F22: return ImGuiKey_F22;
+        case Key::F23: return ImGuiKey_F23;
+        case Key::F24: return ImGuiKey_F24;
+        case Key::F25: return ImGuiKey_F25;*/
+        case Key::KP0: return ImGuiKey_Keypad0;
+        case Key::KP1: return ImGuiKey_Keypad1;
+        case Key::KP2: return ImGuiKey_Keypad2;
+        case Key::KP3: return ImGuiKey_Keypad3;
+        case Key::KP4: return ImGuiKey_Keypad4;
+        case Key::KP5: return ImGuiKey_Keypad5;
+        case Key::KP6: return ImGuiKey_Keypad6;
+        case Key::KP7: return ImGuiKey_Keypad7;
+        case Key::KP8: return ImGuiKey_Keypad8;
+        case Key::KP9: return ImGuiKey_Keypad9;
+        case Key::KPDecimal: return ImGuiKey_KeypadDecimal;
+        case Key::KPDivide: return ImGuiKey_KeypadDivide;
+        case Key::KPMultiply: return ImGuiKey_KeypadMultiply;
+        case Key::KPSubtract: return ImGuiKey_KeypadSubtract;
+        case Key::KPAdd: return ImGuiKey_KeypadAdd;
+        case Key::KPEnter: return ImGuiKey_KeypadEnter;
+        case Key::KPEqual: return ImGuiKey_KeypadEqual;
+        case Key::LeftShift: return ImGuiKey_LeftShift;
+        case Key::LeftControl: return ImGuiKey_LeftCtrl;
+        case Key::LeftAlt: return ImGuiKey_LeftAlt;
+        case Key::LeftSuper: return ImGuiKey_LeftSuper;
+        case Key::RightShift: return ImGuiKey_RightShift;
+        case Key::RightControl: return ImGuiKey_RightCtrl;
+        case Key::RightAlt: return ImGuiKey_RightAlt;
+        case Key::RightSuper: return ImGuiKey_RightSuper;
+        case Key::Menu: return ImGuiKey_Menu;
     }
+    return ImGuiKey_None;
 }

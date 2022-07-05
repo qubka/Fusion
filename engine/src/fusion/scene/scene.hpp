@@ -19,22 +19,22 @@ namespace fe {
         /**
          * Run when switching to this scene from another.
          */
-        virtual void start();
+        virtual void onStart();
 
         /**
          * Run when updating the scene.
          */
-        virtual void update();
+        virtual void onUpdate();
 
         /**
          * Run when the scene is start the runtime.
          */
-        void runtimeStart();
+        void onRuntimeStart();
 
         /**
          * Run when the scene is stop the runtime.
          */
-        void runtimeStop();
+        void onRuntimeStop();
 
         /**
          * Checks whether a System exists or not.
