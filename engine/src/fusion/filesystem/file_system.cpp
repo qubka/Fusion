@@ -10,9 +10,7 @@
 using namespace fe;
 
 bool FileSystem::Exists(const std::filesystem::path& path) {
-    auto pathStr = path.string();
-    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
-    return PHYSFS_exists(pathStr.c_str()) != 0;
+    return PHYSFS_exists(path.c_str()) != 0;
 }
 
 void FileSystem::Read(const std::filesystem::path& filename, const FileSystem::SimpleHandler& handler) {
@@ -21,29 +19,29 @@ void FileSystem::Read(const std::filesystem::path& filename, const FileSystem::S
 }
 
 std::vector<uint8_t> FileSystem::ReadBytes(const std::filesystem::path& filename) {
-    /*IFileStream file{filename};
-    file >> std::noskipws;
-
-    auto fileSize = file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    std::vector<uint8_t> bytes;
-    bytes.reserve(fileSize);
-
-    file.insert(bytes.begin(), std::istream_iterator<uint8_t>(infile), std::istream_iterator<uint8_t>());
-
-    std::copy(std::istream_iterator<uint8_t>(file), std::istream_iterator<uint8_t>(), back_inserter(bytes));
-
-    file.close();
-
-    return bytes;*/
-
-    auto pathStr = filename.string();
-    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
-    auto fsFile = PHYSFS_openRead(pathStr.c_str());
+    auto fsFile = PHYSFS_openRead(filename.c_str());
 
     if (!fsFile) {
-        LOG_ERROR << "Failed to open file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        if (!std::filesystem::exists(filename) || !std::filesystem::is_regular_file(filename)) {
+            LOG_ERROR << "Failed to open file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+            return {};
+        }
+
+        std::ifstream is{filename, std::ios::binary};
+        is.unsetf(std::ios::skipws);
+
+        std::streampos filesize;
+
+        is.seekg(0, std::ios::end);
+        filesize = is.tellg();
+        is.seekg(0, std::ios::beg);
+
+        std::vector<uint8_t> filedata;
+        filedata.reserve(filesize);
+
+        filedata.insert(filedata.begin(), std::istream_iterator<uint8_t>(is), std::istream_iterator<uint8_t>());
+
+        return filedata;
     }
 
     auto size = PHYSFS_fileLength(fsFile);
@@ -58,9 +56,7 @@ std::vector<uint8_t> FileSystem::ReadBytes(const std::filesystem::path& filename
 }
 
 std::string FileSystem::ReadText(const std::filesystem::path& filename) {
-    auto pathStr = filename.string();
-    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
-    auto fsFile = PHYSFS_openRead(pathStr.c_str());
+    auto fsFile = PHYSFS_openRead(filename.c_str());
 
     if (!fsFile) {
         if (!std::filesystem::exists(filename) || !std::filesystem::is_regular_file(filename)) {
@@ -85,10 +81,37 @@ std::string FileSystem::ReadText(const std::filesystem::path& filename) {
     return { data.begin(), data.end() };
 }
 
+bool FileSystem::WriteFile(const std::filesystem::path& filename, uint8_t* buffer, size_t size) {
+    auto fsFile = PHYSFS_openWrite(filename.c_str());
+
+    if (!fsFile) {
+        if (!std::filesystem::exists(filename) || !std::filesystem::is_regular_file(filename)) {
+            LOG_ERROR << "Failed to open file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+            return false;
+        }
+
+        std::ofstream os{filename, std::ios::binary};
+        os.write(reinterpret_cast<const char*>(buffer), size);
+        return true;
+    }
+
+    bool ret = false;
+
+    auto written = PHYSFS_writeBytes(fsFile, reinterpret_cast<const void*>(buffer), size);
+    if(written != size)
+        LOG_ERROR << "Failed to write in file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+    else
+        ret = written;
+
+    if (PHYSFS_close(fsFile) == 0) {
+        LOG_ERROR << "Failed to close file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+    }
+
+    return ret;
+}
+
 std::vector<std::filesystem::path> FileSystem::GetFiles(const std::filesystem::path& path, bool recursive) {
-    auto pathStr = path.string();
-    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
-    auto rc = PHYSFS_enumerateFiles(pathStr.c_str());
+    auto rc = PHYSFS_enumerateFiles(path.c_str());
 
     std::vector<std::filesystem::path> files;
 
@@ -108,9 +131,7 @@ std::vector<std::filesystem::path> FileSystem::GetFiles(const std::filesystem::p
 }
 
 std::vector<std::filesystem::path> FileSystem::GetFilesWithFilter(const std::filesystem::path& path, bool recursive, const std::string& filter, const std::vector<std::string>& formats) {
-    auto pathStr = path.string();
-    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
-    auto rc = PHYSFS_enumerateFiles(pathStr.c_str());
+    auto rc = PHYSFS_enumerateFiles(path.c_str());
 
     std::vector<std::filesystem::path> files;
 
@@ -121,15 +142,13 @@ std::vector<std::filesystem::path> FileSystem::GetFilesWithFilter(const std::fil
                 files.insert(files.end(), filesInFound.begin(), filesInFound.end());
             }
         } else {
-            std::filesystem::path filename{*i};
-
-            if (!filter.empty() && String::FindInsensitive(filename.string(), filter) == std::string::npos)
+            if (!filter.empty() && String::FindInsensitive(*i, filter) == std::string::npos)
                 continue;
 
-            if (!formats.empty() && std::find(formats.begin(), formats.end(), GetExtension(filename)) == formats.end())
+            if (!formats.empty() && std::find(formats.begin(), formats.end(), GetExtension(*i)) == formats.end())
                 continue;
 
-            files.push_back(filename);
+            files.emplace_back(*i);
         }
     }
 
@@ -138,34 +157,35 @@ std::vector<std::filesystem::path> FileSystem::GetFilesWithFilter(const std::fil
 }
 
 bool FileSystem::HasDirectories(const std::filesystem::path& path) {
+    bool ret = false;
     if (IsDirectory(path)) {
-        auto pathStr = path.string();
-        auto rc = PHYSFS_enumerateFiles(pathStr.c_str());
+        auto rc = PHYSFS_enumerateFiles(path.c_str());
 
         for (auto i = rc; *i; i++) {
-            if (IsDirectory(*i))
-                return true;
+            if (IsDirectory(*i)) {
+                ret = true;
+                break;
+            }
         }
+
+        PHYSFS_freeList(rc);
     }
-    return false;
+    return ret;
 }
 
 bool FileSystem::IsDirectory(const std::filesystem::path& path) {
-    auto pathStr = path.string();
-    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
-
     PHYSFS_Stat stat;
-    if (!PHYSFS_stat(pathStr.c_str(), &stat)) {
+    if (!PHYSFS_stat(path.c_str(), &stat)) {
         return false;
     } else {
         if (stat.filetype == PHYSFS_FILETYPE_SYMLINK) {
             // PHYSFS_stat() doesn't follow symlinks, so we do it manually
-            const char* realdir = PHYSFS_getRealDir(pathStr.c_str());
+            const char* realdir = PHYSFS_getRealDir(path.c_str());
             if (realdir == nullptr) {
                 return false;
             } else {
-                const std::filesystem::path realfname = std::filesystem::path{realdir} / path;
-                return IsDirectory(realfname);
+                const std::filesystem::path realfile = std::filesystem::path{realdir} / path;
+                return IsDirectory(realfile);
             }
         } else {
             return stat.filetype == PHYSFS_FILETYPE_DIRECTORY;
@@ -174,11 +194,8 @@ bool FileSystem::IsDirectory(const std::filesystem::path& path) {
 }
 
 FileStats FileSystem::GetStats(const std::filesystem::path& path) {
-    auto pathStr = path.string();
-    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
-
-    PHYSFS_Stat stat;
-    PHYSFS_stat(pathStr.c_str(), &stat);
+    PHYSFS_Stat stat = {};
+    PHYSFS_stat(path.c_str(), &stat);
 
     return {
         static_cast<size_t>(stat.filesize),
@@ -193,10 +210,8 @@ FileStats FileSystem::GetStats(const std::filesystem::path& path) {
 bitmask::bitmask<FileAttributes> FileSystem::GetAttributes(const std::filesystem::path& path) {
     bitmask::bitmask<FileAttributes> attributes;
 
-    auto pathStr = path.string();
-    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
-    PHYSFS_Stat stat;
-    PHYSFS_stat(pathStr.c_str(), &stat);
+    PHYSFS_Stat stat = {};
+    PHYSFS_stat(path.c_str(), &stat);
 
     switch (stat.filetype) {
         case PHYSFS_FILETYPE_REGULAR:
@@ -216,12 +231,12 @@ bitmask::bitmask<FileAttributes> FileSystem::GetAttributes(const std::filesystem
     return attributes;
 }
 
-std::string FileSystem::GetExtension(const std::filesystem::path& filename) {
-    return String::Lowercase(filename.extension().string());
+std::string FileSystem::GetExtension(const std::filesystem::path& path) {
+    return String::Lowercase(path.extension().string());
 }
 
-std::string FileSystem::GetIcon(const std::filesystem::path& filename) {
-    auto key = Extensions.find(GetExtension(filename));
+std::string FileSystem::GetIcon(const std::filesystem::path& path) {
+    auto key = Extensions.find(GetExtension(path));
     return key != Extensions.end() ? key->second.c_str() : ICON_FA_FILE;
 }
 
@@ -339,6 +354,6 @@ FileSystem::~FileSystem() {
     PHYSFS_deinit();
 }
 
-void FileSystem::update() {
+void FileSystem::onUpdate() {
 
 }

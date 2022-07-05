@@ -20,12 +20,12 @@ namespace fe {
         /**
          * Run when switching to this scene from another, use this method to create {@link Subrender}'s.
          */
-        virtual void start() = 0;
+        virtual void onStart() = 0;
 
         /**
          * Run when updating the renderer module.
          */
-        virtual void update() = 0;
+        virtual void onUpdate() = 0;
 
         /**
          * Checks whether a Subrender exists or not.

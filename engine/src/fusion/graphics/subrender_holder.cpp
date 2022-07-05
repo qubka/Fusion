@@ -6,6 +6,14 @@ void SubrenderHolder::clear() {
 	stages.clear();
 }
 
+void SubrenderHolder::updateAll() {
+    for (auto& [typeId, subrender] : subrenders) {
+        if (subrender->isEnabled()) {
+            subrender->onUpdate();
+        }
+    }
+}
+
 void SubrenderHolder::removeSubrenderStage(const std::type_index& id) {
 	for (auto it = stages.begin(); it != stages.end();) {
 		if (it->second == id) {

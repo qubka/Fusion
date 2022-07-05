@@ -29,7 +29,7 @@ namespace fe {
         Graphics();
         ~Graphics() override;
 
-        void update() override;
+        void onUpdate() override;
 
         /**
          * Gets the current renderer.

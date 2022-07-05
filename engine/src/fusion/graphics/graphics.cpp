@@ -45,17 +45,18 @@ Graphics::~Graphics() {
     renderer = nullptr;
 }
 
-void Graphics::update() {
+void Graphics::onUpdate() {
     if (!renderer || Devices::Get()->getWindow(0)->isIconified())
         return;
 
     if (!renderer->started) {
         resetRenderStages();
-        renderer->start();
+        renderer->onStart();
         renderer->started = true;
     }
 
-    renderer->update();
+    renderer->onUpdate();
+    renderer->subrenderHolder.updateAll();
 
     for (const auto& [id, swapchain] : enumerate(swapchains)) {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];

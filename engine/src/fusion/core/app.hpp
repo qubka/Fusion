@@ -21,6 +21,11 @@ namespace fe {
         virtual void onUpdate() = 0;
 
         /**
+         * Run when ImGui should be drawn.
+         */
+        virtual void onImGui() = 0;
+
+        /**
          * Gets the application's name.
          * @return The application's name.
          */

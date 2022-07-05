@@ -23,7 +23,7 @@ namespace fe {
         }
         ~Mesh() = default;
 
-        bool onRender(const CommandBuffer& commandBuffer, uint32_t instances = 1);
+        bool cmdRender(const CommandBuffer& commandBuffer, uint32_t instances = 1);
 
         const Buffer* getVertexBuffer() const { return vertexBuffer.get(); }
         const Buffer* getIndexBuffer() const { return indexBuffer.get(); }

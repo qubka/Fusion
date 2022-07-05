@@ -22,7 +22,7 @@ GridRenderer::GridRenderer(const Pipeline::Stage& pipelineStage)
 GridRenderer::~GridRenderer() {
 }
 
-void GridRenderer::render(const CommandBuffer& commandBuffer) {
+void GridRenderer::onRender(const CommandBuffer& commandBuffer) {
     // Updates uniform
     auto camera = Scenes::Get()->getScene()->getCamera();
     pushObject.push("projection", camera->getProjectionMatrix());

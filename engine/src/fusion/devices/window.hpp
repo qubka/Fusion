@@ -178,13 +178,13 @@ namespace fe {
          * Gets the contents of the clipboard as a string.
          * @return If the clipboard contents.
          */
-        virtual std::string getClipboard() const = 0;
+        virtual const char* getClipboard() const = 0;
 
         /**
          * Sets the clipboard to the specified string.
          * @param string The string to set as the clipboard.
          */
-        virtual void setClipboard(const std::string& string) = 0;
+        virtual void setClipboard(const char* string) = 0;
 
         /**
          * Gets if the window is selected.
@@ -215,12 +215,6 @@ namespace fe {
          * @param filenames The new icon files.
          */
         virtual void setIcons(const std::vector<std::filesystem::path>& filenames) = 0;
-
-        /**
-         * Gets the window specific dpi value.
-         * @return The dpi scale.
-         */
-        virtual float getDPIScale() const = 0;
 
         /**
          * Gets the current state of a key.

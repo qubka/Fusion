@@ -5,10 +5,10 @@
 
 namespace fe {
     enum class FileType {
-        Regular, /**< a normal file */
-        Directory, /**< a directory */
-        Symlink, /**< a symlink */
-        Other /**< something completely different like a device */
+        Regular,      /**< a normal file */
+        Directory,    /**< a directory */
+        Symlink,      /**< a symlink */
+        Other         /**< something completely different like a device */
     };
 
     struct FileStats {
@@ -35,7 +35,7 @@ namespace fe {
         FileSystem();
         ~FileSystem() override;
 
-        void update() override;
+        void onUpdate() override;
 
         /**
          * Gets if the path is found in one of the search paths.
@@ -65,9 +65,14 @@ namespace fe {
          */
         static std::string ReadText(const std::filesystem::path& filename);
 
+        /**
+         * Opens a file, write all data into the file, and then closes the file.
+         * @param filename The path to write.
+         * @param buffer The buffer data.
+         * @param size The size of the buffer.
+         * @return True on the success, false otherwise.
+         */
         static bool WriteFile(const std::filesystem::path& filename, uint8_t* buffer, size_t size);
-
-        static bool WriteTextFile(const std::filesystem::path& filename, const std::string& text);
 
         /**
          * Finds all the files in a path.
@@ -102,27 +107,32 @@ namespace fe {
         static bitmask::bitmask<FileAttributes> GetAttributes(const std::filesystem::path& path);
 
         /**
-         *
-         * @param path The file to look for.
-         * @return
+         * Checks that file is a directory and has other directories inside.
+         * @param path The path to the file.
+         * @returnTrue if path is a directory and has directories inside.
          */
         static bool HasDirectories(const std::filesystem::path& path);
 
+        /**
+         * Checks that file is a directory.
+         * @param path The path to the file.
+         * @return True if path has a directory.
+         */
         static bool IsDirectory(const std::filesystem::path& path);
 
         /**
-         *
-         * @param filename
-         * @return
+         * Gets the file extention in the lowercase format.
+         * @param path The path to the file.
+         * @return The string extension.
          */
-        static std::string GetExtension(const std::filesystem::path& filename);
+        static std::string GetExtension(const std::filesystem::path& path);
 
         /**
-         *
-         * @param filename
-         * @return
+         * Gets the icon string for the specific file format.
+         * @param path The path to the file.
+         * @return The string with font awesome icon.
          */
-        static std::string GetIcon(const std::filesystem::path& filename);
+        static std::string GetIcon(const std::filesystem::path& path);
 
     private:
         static std::unordered_map<std::string, std::string> Extensions;

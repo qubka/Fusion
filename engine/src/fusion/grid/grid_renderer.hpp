@@ -9,11 +9,12 @@
 namespace fe {
     class GridRenderer final : public Subrender {
     public:
-        GridRenderer(const Pipeline::Stage& pipelineStage);
+        explicit GridRenderer(const Pipeline::Stage& pipelineStage);
         ~GridRenderer();
 
     private:
-        void render(const CommandBuffer& commandBuffer) override;
+        void onUpdate() override {};
+        void onRender(const CommandBuffer& commandBuffer) override;
 
         PipelineGraphics pipeline;
         DescriptorsHandler descriptorSet;

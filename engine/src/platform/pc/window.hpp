@@ -50,8 +50,8 @@ namespace glfw {
         const std::string& getTitle() const override { return title; }
         void setTitle(const std::string& str) override;
 
-        std::string getClipboard() const override { return glfwGetClipboardString(window); }
-        void setClipboard(const std::string& string) override { glfwSetClipboardString(window, string.c_str()); }
+        const char* getClipboard() const override { return glfwGetClipboardString(window); }
+        void setClipboard(const char* string) override { glfwSetClipboardString(window, string); }
 
         bool isSelected() const override { return selected; }
 
@@ -60,8 +60,6 @@ namespace glfw {
 
         void setCursor(const fe::Cursor* cursor) override;
         void setIcons(const std::vector<std::filesystem::path>& filenames) override;
-
-        float getDPIScale() const override { return 1.0f; }
 
         fe::InputAction getKey(fe::Key key) const override;
         fe::InputAction getMouseButton(fe::MouseButton button) const override;

@@ -87,14 +87,19 @@ namespace fe {
     private:
         using StageIndex = std::pair<Pipeline::Stage, size_t>;
 
-        void removeSubrenderStage(const std::type_index& id);
+        /**
+         * Iterates through all Subrenders for updating stages.
+         */
+        void updateAll();
 
         /**
-         * Iterates through all Subrenders.
+         * Iterates through all Subrenders for rendering.
          * @param stage The Subrender stage.
          * @param commandBuffer The command buffer to record render command into.
          */
         void renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer);
+
+        void removeSubrenderStage(const std::type_index& id);
 
         /// List of all Subrenders.
         std::unordered_map<std::type_index, std::unique_ptr<Subrender>> subrenders;

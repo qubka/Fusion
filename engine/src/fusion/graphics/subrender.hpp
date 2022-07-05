@@ -17,6 +17,11 @@ namespace fe {
         NONCOPYABLE(Subrender);
 
         /**
+         * Called after main renderer update.
+         */
+        virtual void onUpdate() = 0;
+
+        /**
          * Runs the render pipeline in the current renderpass.
          * @param commandBuffer The command buffer to record render command into.
          */

@@ -17,7 +17,7 @@ namespace fe {
         explicit PipelineCompute(std::filesystem::path shaderStage, std::vector<Shader::Define> defines = {}, bool pushDescriptors = false);
         ~PipelineCompute();
 
-        void onRender(const CommandBuffer& commandBuffer, const glm::uvec2& extent) const;
+        void cmdRender(const CommandBuffer& commandBuffer, const glm::uvec2& extent) const;
 
         const std::filesystem::path& getShaderStage() const { return shaderStage; }
         const std::vector<Shader::Define>& getDefines() const { return defines; }
