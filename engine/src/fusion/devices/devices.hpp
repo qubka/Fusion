@@ -27,7 +27,7 @@ namespace fe {
         /**
          * Run every frame as long as the manager has work to do.
          */
-        virtual void update() = 0;
+        virtual void onUpdate() = 0;
 
         /**
          * Waits until events are queued and processes them.

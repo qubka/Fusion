@@ -48,20 +48,20 @@ Devices::~Devices() {
     glfwTerminate();
 }
 
-void Devices::update() {
+void Devices::onUpdate() {
     // Polls for window events
     glfwPollEvents();
 
     for (auto& window : windows) {
-        window->update();
+        window->onUpdate();
     }
 
     for (auto& monitor : monitors) {
-        monitor->update();
+        monitor->onUpdate();
     }
 
     for (auto& joystick : joysticks) {
-        joystick->update();
+        joystick->onUpdate();
     }
 }
 

@@ -69,13 +69,13 @@ int32_t Engine::run() {
             updateStage(Module::Stage::Pre);
 
             // Main application and devices processing
-            devices->update();
+            devices->onUpdate();
             if (application) {
                 if (!application->started) {
-                    application->start();
+                    application->onStart();
                     application->started = true;
                 }
-                application->update();
+                application->onUpdate();
             }
 
             // Update
@@ -94,5 +94,5 @@ int32_t Engine::run() {
 
 void Engine::updateStage(Module::Stage stage) {
     for (const auto& moduleId : moduleStages[stage])
-        modules[moduleId]->update();
+        modules[moduleId]->onUpdate();
 }
