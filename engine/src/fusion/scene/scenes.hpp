@@ -12,7 +12,7 @@ namespace fe {
         Scenes() = default;
         ~Scenes() override = default;
 
-        void update() override;
+        void onUpdate() override;
 
         /**
          * Gets the current scene.

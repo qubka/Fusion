@@ -1,6 +1,6 @@
 #include "fusion/core/engine.hpp"
 
-#include "editor_app.hpp"
+#include "editor.hpp"
 
 int main(int args, char** argv) {
     using namespace fe;
@@ -9,7 +9,7 @@ int main(int args, char** argv) {
     Engine engine{CommandLineArgs{args, argv}};
 
     // Sets the application to the engine
-    engine.setApp(std::make_unique<EditorApp>("Editor Application", Version{1, 1, 1}));
+    engine.setApp(std::make_unique<Editor>("Editor Application", Version{1, 1, 1}));
 
     // Runs the game loop
     auto exitCode = engine.run();

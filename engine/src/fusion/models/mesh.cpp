@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-bool Mesh::render(const CommandBuffer& commandBuffer, uint32_t instances) {
+bool Mesh::onRender(const CommandBuffer& commandBuffer, uint32_t instances) {
     if (vertexBuffer && indexBuffer) {
         VkBuffer vertexBuffers[1] = { *vertexBuffer };
         VkDeviceSize offsets[1] = { 0 };

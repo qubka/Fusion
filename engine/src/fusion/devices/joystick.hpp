@@ -24,7 +24,7 @@ namespace fe {
         /**
          * Run every frame as long as the joystick has work to do.
          */
-        virtual void update() = 0;
+        virtual void onUpdate() = 0;
 
         /**
          * Gets the port of the joystick.

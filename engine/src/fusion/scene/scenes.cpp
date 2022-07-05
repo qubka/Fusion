@@ -2,14 +2,14 @@
 
 using namespace fe;
 
-void Scenes::update() {
+void Scenes::onUpdate() {
     if (!scene)
         return;
 
     if (!scene->started) {
-        scene->start();
+        scene->onStart();
         scene->started = true;
     }
 
-    scene->update();
+    scene->onUpdate();
 }

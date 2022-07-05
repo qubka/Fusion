@@ -80,6 +80,6 @@ namespace fe {
         /**
          * The update function for the module.
          */
-        virtual void update() = 0;
+        virtual void onUpdate() = 0;
     };
 }

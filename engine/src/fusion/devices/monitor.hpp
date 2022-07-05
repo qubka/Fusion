@@ -42,7 +42,7 @@ namespace fe {
         /**
          * Run every frame as long as the monitor has work to do.
          */
-        virtual void update() = 0;
+        virtual void onUpdate() = 0;
 
         /**
          * Validate that monitor is primary.

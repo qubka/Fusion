@@ -29,4 +29,10 @@ namespace fe {
         explicit OFileStream(const std::filesystem::path& filename, FileMode writeMode = FileMode::Write);
         ~OFileStream() override;
     };
+
+    class FileStream final : public BaseFileStream, public std::iostream {
+    public:
+        explicit FileStream(const std::filesystem::path& filename, FileMode openMode = FileMode::Read);
+        ~FileStream() override;
+    };
 }

@@ -265,6 +265,9 @@ if(NOT PhysX_FOUND)
     # Call into PhysX's CMake scripts
     add_subdirectory(${PHYSX_ROOT_DIR}/compiler/public/)
 
+    # Reset back to value before MSVC fix
+    set(BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS_SAVED}")
+
     # Add physx libraries to target
     #target_link_libraries(target_name PUBLIC ${PHYSX_LIBRARIES})
     #### Windows only: Copy the Physx dll files to the simulation executable####
@@ -306,7 +309,7 @@ if(NOT PhysFS_FOUND)
 
     add_subdirectory(${PHYSFS_LIB_NAME})
 endif()
-list(APPEND ALL_SYSTEM_LIBS physfs-static)
+list(APPEND ALL_SYSTEM_LIBS physfs-static )
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # portfiledialog

@@ -75,7 +75,7 @@ Window::~Window() {
     glfwDestroyWindow(window);
 }
 
-void Window::update() {
+void Window::onUpdate() {
     float dt = fe::Time::DeltaTime();
 
     // Updates the position delta.
@@ -296,7 +296,7 @@ namespace glfw {
         } else {
             window.size = size;
         }
-        window.onSizeChange.publish(size);
+        window.onResize.publish(size);
     }
 
     void Window::CloseCallback(GLFWwindow* handle) {

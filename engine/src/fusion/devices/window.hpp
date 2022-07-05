@@ -20,7 +20,7 @@ namespace fe {
         /**
          * Run every frame as long as the window has work to do.
          */
-        virtual void update() = 0;
+        virtual void onUpdate() = 0;
 
         /**
          * Gets weather the window is borderless or not.
@@ -217,6 +217,12 @@ namespace fe {
         virtual void setIcons(const std::vector<std::filesystem::path>& filenames) = 0;
 
         /**
+         * Gets the window specific dpi value.
+         * @return The dpi scale.
+         */
+        virtual float getDPIScale() const = 0;
+
+        /**
          * Gets the current state of a key.
          * @param key The key to get the state of.
          * @return The keys state.
@@ -295,22 +301,22 @@ namespace fe {
 
     public:
         /**
-         * Event when the window is moved.
-         * @return A sink is used to connect listeners to signals and to disconnect them.
-         */
-        auto OnPositionChange() { return entt::sink{onPositionChange}; }
-        
-        /**
          * Event when the window is resized.
          * @return A sink is used to connect listeners to signals and to disconnect them.
          */
-        auto OnSizeChange() { return entt::sink{onSizeChange}; }
+        auto OnResize() { return entt::sink{onResize}; }
 
         /**
          * Event when the window framebuffer is resized.
          * @return A sink is used to connect listeners to signals and to disconnect them.
          */
         auto OnFramebufferResize() { return entt::sink{onFramebufferResize}; }
+
+        /**
+         * Event when the window is moved.
+         * @return A sink is used to connect listeners to signals and to disconnect them.
+         */
+        auto OnPositionChange() { return entt::sink{onPositionChange}; }
 
         /**
          * Event when the windows title changed.
@@ -469,9 +475,9 @@ namespace fe {
         auto OnMaximize() { return entt::sink{onMaximize}; }
 
     protected:
-        entt::sigh<void(const glm::uvec2 &)> onPositionChange{};
-        entt::sigh<void(const glm::uvec2 &)> onSizeChange{};
+        entt::sigh<void(const glm::uvec2 &)> onResize{};
         entt::sigh<void(const glm::uvec2 &)> onFramebufferResize{};
+        entt::sigh<void(const glm::uvec2 &)> onPositionChange{};
         entt::sigh<void(const std::string &)> onTitleChange{};
         entt::sigh<void()> onStart{};
         entt::sigh<void()> onClose{};

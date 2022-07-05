@@ -19,12 +19,12 @@ namespace fe {
         }
         ~MainRenderer() override = default;
 
-        void start() override {
+        void onStart() override {
             addSubrender<GridRenderer>({0, 0});
             addSubrender<ImGuiSubrender>({0, 0});
         }
 
-        void update() override {
+        void onUpdate() override {
         }
 
     private:

@@ -11,7 +11,7 @@ namespace fe {
     public:
         virtual ~Camera() = default;
 
-        virtual void update() = 0;
+        virtual void onUpdate() = 0;
 
         //! Returns the position in world-space from which the Camera is viewing
         glm::vec3 getEyePoint() const { return eyePoint; }

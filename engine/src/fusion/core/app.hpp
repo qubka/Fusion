@@ -13,12 +13,12 @@ namespace fe {
         /**
          * Run when switching to this app from another.
          */
-        virtual void start() = 0;
+        virtual void onStart() = 0;
 
         /**
          * Run every frame as long as the app has work to do.
          */
-        virtual void update() = 0;
+        virtual void onUpdate() = 0;
 
         /**
          * Gets the application's name.

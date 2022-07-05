@@ -42,6 +42,8 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLM_FORCE_DEPTH_ZERO_TO_ONE)
 target_compile_definitions(${PROJECT_NAME} PUBLIC FUSION_DEBUG)
 target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
+target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_USER_CONFIG="fusion/imgui/imconfig.hpp")
+
 target_compile_definitions(${PROJECT_NAME} PUBLIC
         FUSION_VERSION_MAJOR=${FUSION_VERSION_MAJOR}
         FUSION_VERSION_MINOR=${FUSION_VERSION_MINOR}

@@ -10,7 +10,7 @@ namespace glfw {
         explicit Monitor(GLFWmonitor* monitor);
         ~Monitor() override = default;
 
-        void update() override {}
+        void onUpdate() override {}
 
         bool isPrimary() const override{ return monitor == glfwGetPrimaryMonitor(); }
 

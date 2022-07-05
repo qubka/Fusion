@@ -11,7 +11,7 @@ namespace glfw {
         Window(const fe::VideoMode& videoMode, const glm::uvec2& size = {1280, 720}, std::string title = "Fusion");
         ~Window() override;
 
-        void update() override;
+        void onUpdate() override;
 
         bool isBorderless() const override { return borderless; }
         void setBorderless(bool flag) override;
@@ -60,6 +60,8 @@ namespace glfw {
 
         void setCursor(const fe::Cursor* cursor) override;
         void setIcons(const std::vector<std::filesystem::path>& filenames) override;
+
+        float getDPIScale() const override { return 1.0f; }
 
         fe::InputAction getKey(fe::Key key) const override;
         fe::InputAction getMouseButton(fe::MouseButton button) const override;

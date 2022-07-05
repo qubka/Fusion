@@ -22,7 +22,7 @@ namespace fe {
         //! The number of frames per second
         static uint32_t FramesPerSecond() { return ModuleInstance->framesPerSecond; }
 
-        void update() override {
+        void onUpdate() override {
             auto currentTime = DateTime::Now();
             deltaTime = (currentTime - lastTime).asSeconds();
             lastTime = currentTime;

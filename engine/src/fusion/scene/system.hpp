@@ -12,22 +12,22 @@ namespace fe {
         /**
          * @brief Called when the system is created.
          */
-        virtual void create() {};
+        virtual void onCreate() {};
 
         /**
          * @brief Whenever the system starts updating because scene in the active state.
          */
-        virtual void start() {};
+        virtual void onStart() {};
 
         /**
          * @brief Every frame as long as the system has work to do and the system is Enabled.
          */
-        virtual void update() {};
+        virtual void onUpdate() {};
 
         /**
         * @brief Whenever the system stops updating because scene not in the active state.
         */
-        virtual void stop() {};
+        virtual void onStop() {};
 
         bool isEnabled() const { return enabled; }
         void setEnabled(bool enable) { this->enabled = enable; }

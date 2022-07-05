@@ -24,7 +24,7 @@ void SubrenderHolder::renderStage(const Pipeline::Stage& stage, const CommandBuf
 
 		if (auto& subrender = subrenders[typeId]) {
 			if (subrender->isEnabled()) {
-				subrender->render(commandBuffer);
+				subrender->onRender(commandBuffer);
 			}
 		}
 	}

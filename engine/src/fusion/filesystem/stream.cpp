@@ -1,25 +1,112 @@
 #include "stream.hpp"
-#include "stream_buf.hpp"
 
 #include <physfs.h>
+
+namespace fe {
+    using std::streambuf;
+    using std::ios_base;
+
+    class FBuffer : public streambuf {
+    public:
+        explicit FBuffer(PHYSFS_File *file, size_t bufferSize = 2048) : file{file}, buffer(bufferSize) {
+            auto end = buffer.data() + buffer.size();
+            setg(end, end, end);
+            setp(buffer.data(), end);
+        }
+
+        ~FBuffer() {
+            sync();
+        }
+
+        NONCOPYABLE(FBuffer);
+
+    private:
+        int_type underflow() override {
+            if (PHYSFS_eof(file)) {
+                return traits_type::eof();
+            }
+
+            auto bytesRead = PHYSFS_readBytes(file, buffer.data(), static_cast<PHYSFS_uint32>(buffer.size()));
+            if (bytesRead < 1)
+                return traits_type::eof();
+
+            setg(buffer.data(), buffer.data(), buffer.data() + static_cast<size_t>(bytesRead));
+            return static_cast<int_type>(*gptr());
+        }
+
+        pos_type seekoff(off_type pos, ios_base::seekdir dir, ios_base::openmode mode) override {
+            switch (dir) {
+                case std::ios_base::beg:
+                    PHYSFS_seek(file, pos);
+                    break;
+                case std::ios_base::cur:
+                    // Subtract characters currently in buffer from seek position.
+                    PHYSFS_seek(file, (PHYSFS_tell(file) + pos) - (egptr() - gptr()));
+                    break;
+                case std::ios_base::end:
+                    PHYSFS_seek(file, PHYSFS_fileLength(file) + pos);
+                    break;
+            }
+
+            if (mode & std::ios_base::in)
+                setg(egptr(), egptr(), egptr());
+            if (mode & std::ios_base::out)
+                setp(buffer.data(), buffer.data());
+
+            return PHYSFS_tell(file);
+        }
+
+        pos_type seekpos(pos_type pos, std::ios_base::openmode mode) override {
+            PHYSFS_seek(file, pos);
+
+            if (mode & std::ios_base::in)
+                setg(egptr(), egptr(), egptr());
+            if (mode & std::ios_base::out)
+                setp(buffer.data(), buffer.data());
+
+            return PHYSFS_tell(file);
+        }
+
+        int_type overflow(int_type c = traits_type::eof()) override {
+            if (pptr() == pbase() && c == traits_type::eof())
+                return 0; // no-op
+
+            if (PHYSFS_writeBytes(file, pbase(), static_cast<PHYSFS_uint32>(pptr() - pbase())) < 1)
+                return traits_type::eof();
+
+            if (c != traits_type::eof()) {
+                if (PHYSFS_writeBytes(file, &c, 1) < 1)
+                    return traits_type::eof();
+            }
+
+            return 0;
+        }
+
+        int sync() override {
+            return overflow();
+        }
+
+        std::vector<char> buffer;
+
+    protected:
+        PHYSFS_File* file;
+    };
+}
 
 using namespace fe;
 
 PHYSFS_File* OpenWithMode(const std::filesystem::path& filename, FileMode openMode) {
     PHYSFS_File* file = nullptr;
 
-    auto pathStr = filename.string();
-    std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
-
     switch (openMode) {
         case FileMode::Write:
-            file = PHYSFS_openWrite(pathStr.c_str());
+            file = PHYSFS_openWrite(filename.c_str());
             break;
         case FileMode::Append:
-            file = PHYSFS_openAppend(pathStr.c_str());
+            file = PHYSFS_openAppend(filename.c_str());
             break;
         case FileMode::Read:
-            file = PHYSFS_openRead(pathStr.c_str());
+            file = PHYSFS_openRead(filename.c_str());
     }
 
     if (file == nullptr)
@@ -44,7 +131,7 @@ size_t BaseFileStream::length() {
 
 IFileStream::IFileStream(const std::filesystem::path& filename)
     : BaseFileStream{OpenWithMode(filename, FileMode::Read)}
-    , std::istream{new IFileStreambuf{file}} {
+    , std::istream{new FBuffer{file}} {
 }
 
 IFileStream::~IFileStream() {
@@ -53,9 +140,18 @@ IFileStream::~IFileStream() {
 
 OFileStream::OFileStream(const std::filesystem::path& filename, FileMode writeMode)
     : BaseFileStream{OpenWithMode(filename, writeMode)}
-    , std::ostream{new OFileStreambuf{file}} {
+    , std::ostream{new FBuffer{file}} {
 }
 
 OFileStream::~OFileStream() {
+    delete rdbuf();
+}
+
+FileStream::FileStream(const std::filesystem::path &filename, FileMode openMode)
+    : BaseFileStream{OpenWithMode(filename, openMode)}
+    , std::iostream{new FBuffer{file}} {
+}
+
+FileStream::~FileStream() {
     delete rdbuf();
 }
