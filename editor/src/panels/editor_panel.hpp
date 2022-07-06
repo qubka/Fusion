@@ -1,18 +1,23 @@
 #pragma once
 
+#include "fusion/imgui/material_design_icons.hpp"
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+
 namespace fe {
     class Editor;
     class Scene;
 
     class EditorPanel {
     public:
-        EditorPanel() = default;
+        EditorPanel(std::string name, std::string simpleName) : name{std::move(name)}, simpleName{std::move(simpleName)} {};
         virtual ~EditorPanel() = default;
 
         const std::string& getName() const { return name; }
         const std::string& getSimpleName() const { return simpleName; }
 
-        virtual void OnImGui() = 0;
+        virtual void onImGui() = 0;
 
         virtual void onNewScene(Scene* scene) {
         }

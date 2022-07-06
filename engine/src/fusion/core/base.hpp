@@ -26,6 +26,8 @@
                        x& operator=(x&&) = delete;
 
 
+/// https://github.com/steinwurf/platform
+
 // Here we create a number of defines to make it easy to choose between
 // different compilers, operatings systems and CPU architectures.
 // Some information about the defines used can be found here:

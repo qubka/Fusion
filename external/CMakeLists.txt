@@ -360,11 +360,13 @@ endif()
 list(APPEND ALL_SYSTEM_LIBS assimp)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
-# imgui, imguizmo & iconfontcppheaders
+# imgui and plugins
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 set(IMGUI_LIB_NAME "imgui")
 set(IMGUIZMO_LIB_NAME "imguizmo")
-set(ICON_HEADERS_LIB_NAME "iconfontcppheaders")
+set(IMGUI_FILEBROWSER_LIB_NAME "imgui-filebrowser")
+set(IMGUIAL_LIB_NAME "imguial")
+#set(ICON_HEADERS_LIB_NAME "iconfontcppheaders")
 
 set(IMGUI_SOURCES
         "${IMGUI_LIB_NAME}/imgui.cpp"
@@ -393,6 +395,8 @@ set(IMGUI_HEADERS
         "${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.h"
         #"${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.h"
         "${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.h"
+
+        "${IMGUI_FILEBROWSER_LIB_NAME}/imfilebrowser.h"
 
         "${IMGUIZMO_LIB_NAME}/GraphEditor.h"
         "${IMGUIZMO_LIB_NAME}/ImCurveEdit.h"
@@ -423,7 +427,8 @@ target_include_directories(${IMGUI_LIB_NAME}
         "${IMGUIZMO_INC_PATH}"
         "${GLFW_INC_PATH}"
         "${GLAD_INC_PATH}"
-        "${ICON_HEADERS_LIB_NAME}"
+        "${IMGUIAL_LIB_NAME}/fonts/"
+        #"${ICON_HEADERS_LIB_NAME}"
         )
 
 list(APPEND ALL_SYSTEM_LIBS imgui)

@@ -1,11 +1,10 @@
 #include "file_system.hpp"
 
 #include "fusion/core/engine.hpp"
-#include "fusion/filesystem/stream.hpp"
 #include "fusion/utils/string.hpp"
+#include "fusion/imgui/material_design_icons.hpp"
 
 #include <physfs.h>
-#include <IconsFontAwesome4.h>
 
 using namespace fe;
 
@@ -235,7 +234,7 @@ std::string FileSystem::GetExtension(const std::filesystem::path& path) {
     return String::Lowercase(path.extension().string());
 }
 
-std::string FileSystem::GetIcon(const std::filesystem::path& path) {
+/*std::string FileSystem::GetIcon(const std::filesystem::path& path) {
     auto key = Extensions.find(GetExtension(path));
     return key != Extensions.end() ? key->second.c_str() : ICON_FA_FILE;
 }
@@ -342,9 +341,10 @@ std::unordered_map<std::string, std::string> FileSystem::Extensions = {
     {".csv", ICON_FA_FILE_CODE_O},
 
     {".db", ICON_FA_DATABASE},
-};
+};*/
 
 FileSystem::FileSystem() {
+    // TODO: Make
     const auto& args = Engine::Get()->getCommandLineArgs();
     PHYSFS_init(args[0].first.c_str());
     PHYSFS_mount(std::filesystem::current_path().c_str(), nullptr, 1);

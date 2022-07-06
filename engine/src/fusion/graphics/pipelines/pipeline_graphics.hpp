@@ -123,7 +123,7 @@ namespace fe {
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
         VkPipelineRasterizationStateCreateInfo rasterizationState = {};
         std::array<VkPipelineColorBlendAttachmentState, 1> blendAttachmentStates = {};
-        VkPipelineColorBlendStateCreateInfo colourBlendState = {};
+        VkPipelineColorBlendStateCreateInfo colorBlendState = {};
         VkPipelineDepthStencilStateCreateInfo depthStencilState = {};
         VkPipelineViewportStateCreateInfo viewportState = {};
         VkPipelineMultisampleStateCreateInfo multisampleState = {};

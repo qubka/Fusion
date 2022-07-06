@@ -14,7 +14,7 @@ namespace fe {
         Type type{ Type:: Image };
         bool multisampled{ false };
         VkFormat format{ VK_FORMAT_R8G8B8A8_UNORM };
-        glm::vec4 clearColour{ 0.0f, 0.0f, 0.0f, 1.0f };
+        glm::vec4 clearColor{ 0.0f, 0.0f, 0.0f, 1.0f };
     };
 
     struct SubpassType {

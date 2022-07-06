@@ -76,3 +76,9 @@
 [submodule "external/physfs"]
 	path = external/physfs
 	url = https://github.com/icculus/physfs
+[submodule "external/imgui-filebrowser"]
+	path = external/imgui-filebrowser
+	url = https://github.com/AirGuanZ/imgui-filebrowser
+[submodule "external/imguial"]
+	path = external/imguial
+	url = https://github.com/leiradel/ImGuiAl

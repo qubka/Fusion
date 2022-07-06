@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imgui_object.hpp"
+#include "fusion/imgui/imgui_object.hpp"
 
 #include "fusion/graphics/subrender.hpp"
 #include "fusion/graphics/pipelines/pipeline_graphics.hpp"
@@ -22,6 +22,7 @@ namespace fe {
         void setupEvents(bool connect);
         void setupKeyCodes();
         void setupStyle();
+        void addIconFont();
 
         void onMouseButtonEvent(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods);
         void onMouseMotionEvent(const glm::vec2& pos);

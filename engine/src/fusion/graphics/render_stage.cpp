@@ -22,7 +22,7 @@ RenderStage::RenderStage(std::vector<Attachment> images, std::vector<SubpassType
 
 		switch (image.type) {
             case Attachment::Type::Image:
-                clearValue.color = vku::clearColor(image.clearColour);
+                clearValue.color = vku::clearColor(image.clearColor);
 
                 for (const auto& subpass : this->subpasses) {
                     if (const auto& subpassBindings = subpass.attachmentBindings;
@@ -40,7 +40,7 @@ RenderStage::RenderStage(std::vector<Attachment> images, std::vector<SubpassType
                 depthAttachment = image;
                 break;
             case Attachment::Type::Swapchain:
-                clearValue.color = vku::clearColor(image.clearColour);
+                clearValue.color = vku::clearColor(image.clearColor);
                 swapchainAttachment = image;
                 break;
         }

@@ -30,7 +30,7 @@ namespace fe {
          * @param milliseconds Number of milliseconds.
          * @return Time value constructed from the amount of milliseconds.
          */
-        template<typename T = int32_t>
+        template<typename T = double>
         constexpr static DateTime Milliseconds(const T& milliseconds) { return {std::chrono::duration<T, std::micro>(milliseconds)}; }
 
         /**
@@ -39,7 +39,7 @@ namespace fe {
          * @param microseconds Number of microseconds.
          * @return Time value constructed from the amount of microseconds.
          */
-        template<typename T = int64_t>
+        template<typename T = uint64_t>
         constexpr static DateTime Microseconds(const T& microseconds) { return {std::chrono::duration<T, std::micro>(microseconds)}; }
 
         /**
@@ -55,7 +55,7 @@ namespace fe {
          * @tparam T The type of value to be casted to.
          * @return Time in milliseconds.
          */
-        template<typename T = int32_t>
+        template<typename T = double>
         constexpr auto asMilliseconds() const { return static_cast<T>(value.count()) / static_cast<T>(1000); }
 
         /**
@@ -63,7 +63,7 @@ namespace fe {
          * @tparam T The type of value to be casted to.
          * @return Time in microseconds.
          */
-        template<typename T = int64_t>
+        template<typename T = uint64_t>
         constexpr auto asMicroseconds() const { return static_cast<T>(value.count()); }
 
         /**

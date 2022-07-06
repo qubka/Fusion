@@ -177,15 +177,15 @@ void PipelineGraphics::createAttributes() {
 	blendAttachmentStates[0].alphaBlendOp = VK_BLEND_OP_MAX;
 	blendAttachmentStates[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
-	colourBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-	colourBlendState.logicOpEnable = VK_FALSE;
-	colourBlendState.logicOp = VK_LOGIC_OP_COPY;
-	colourBlendState.attachmentCount = static_cast<uint32_t>(blendAttachmentStates.size());
-	colourBlendState.pAttachments = blendAttachmentStates.data();
-	colourBlendState.blendConstants[0] = 0.0f;
-	colourBlendState.blendConstants[1] = 0.0f;
-	colourBlendState.blendConstants[2] = 0.0f;
-	colourBlendState.blendConstants[3] = 0.0f;
+	colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	colorBlendState.logicOpEnable = VK_FALSE;
+	colorBlendState.logicOp = VK_LOGIC_OP_COPY;
+	colorBlendState.attachmentCount = static_cast<uint32_t>(blendAttachmentStates.size());
+	colorBlendState.pAttachments = blendAttachmentStates.data();
+	colorBlendState.blendConstants[0] = 0.0f;
+	colorBlendState.blendConstants[1] = 0.0f;
+	colorBlendState.blendConstants[2] = 0.0f;
+	colorBlendState.blendConstants[3] = 0.0f;
 
 	depthStencilState.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 	depthStencilState.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
@@ -283,7 +283,7 @@ void PipelineGraphics::createPipeline() {
 	pipelineCreateInfo.pRasterizationState = &rasterizationState;
 	pipelineCreateInfo.pMultisampleState = &multisampleState;
 	pipelineCreateInfo.pDepthStencilState = &depthStencilState;
-	pipelineCreateInfo.pColorBlendState = &colourBlendState;
+	pipelineCreateInfo.pColorBlendState = &colorBlendState;
 	pipelineCreateInfo.pDynamicState = &dynamicState;
 
 	pipelineCreateInfo.layout = pipelineLayout;
@@ -318,8 +318,8 @@ void PipelineGraphics::createPipelineMrt() {
 		blendAttachmentStates.push_back(blendAttachmentState);
 	}
 
-	colourBlendState.attachmentCount = static_cast<uint32_t>(blendAttachmentStates.size());
-	colourBlendState.pAttachments = blendAttachmentStates.data();
+	colorBlendState.attachmentCount = static_cast<uint32_t>(blendAttachmentStates.size());
+	colorBlendState.pAttachments = blendAttachmentStates.data();
 
 	createPipeline();
 }

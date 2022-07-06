@@ -100,6 +100,18 @@ namespace fe {
         void setCamera(std::shared_ptr<Camera> camera) { this->camera = std::move(camera); }
 
         /**
+         * Gets the name of the scene.
+         * @return The scene name.
+         */
+        const std::string& getName() const { return name; }
+
+        /**
+         * Sets the name to the scene.
+         * @param name The scene name.
+         */
+        void setName(const std::string& name) { this->name = name; }
+
+        /**
          * Gets if the scene is in runtime.
          * @return If the scene is in runtime.
          */
@@ -145,7 +157,7 @@ namespace fe {
                 registry.emplace_or_replace<T>(dst, *component);
         }
 
-        //std::string name;
+        std::string name;
         SystemHolder systems;
         entt::registry registry;
         std::shared_ptr<Camera> camera;

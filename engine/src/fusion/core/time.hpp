@@ -6,15 +6,13 @@
 namespace fe {
     class Time : public Module::Registrar<Time> {
     public:
-        Time() {
-            lastTime = frameTime = DateTime::Now();
-        }
+        Time() { lastTime = frameTime = DateTime::Now(); }
         ~Time() override = default;
 
         //! The time at the beginning of this frame (Read Only).
         static DateTime CurrentTime() { return ModuleInstance->lastTime; }
         //! The interval in seconds from the last frame to the current one.
-        static float DeltaTime() { return ModuleInstance->deltaTime; }
+        static DateTime DeltaTime() { return ModuleInstance->deltaTime; }
         //! The total number of frames since the start of the game.
         static uint64_t FrameCount() { return ModuleInstance->frameCount; }
         //! Incremented once per frame before the scene is being rendered. Reset on the each second
@@ -24,7 +22,7 @@ namespace fe {
 
         void onUpdate() override {
             auto currentTime = DateTime::Now();
-            deltaTime = (currentTime - lastTime).asSeconds();
+            deltaTime = (currentTime - lastTime);
             lastTime = currentTime;
 
             frameCount++;
@@ -38,7 +36,7 @@ namespace fe {
         }
 
     private:
-        float deltaTime{ 0.0015f };
+        DateTime deltaTime;
         DateTime lastTime;
         DateTime frameTime;
         uint64_t frameCount{ 0 };

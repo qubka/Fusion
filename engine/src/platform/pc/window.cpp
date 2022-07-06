@@ -76,7 +76,7 @@ Window::~Window() {
 }
 
 void Window::onUpdate() {
-    float dt = fe::Time::DeltaTime();
+    float dt = fe::Time::DeltaTime().asSeconds();
 
     // Updates the position delta.
     mousePositionDelta = dt * (mouseLastPosition - mousePosition);

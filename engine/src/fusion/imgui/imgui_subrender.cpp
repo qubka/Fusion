@@ -1,18 +1,22 @@
 #include "imgui_subrender.hpp"
-#include "imgui_utilities.hpp"
+#include "imgui_utils.hpp"
 
 #include "fusion/core/engine.hpp"
 #include "fusion/core/time.hpp"
 #include "fusion/devices/devices.hpp"
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
+#include "fusion/input/codes.hpp"
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/input/codes.hpp"
+#include "fusion/imgui/material_design_icons.hpp"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
-#include <GLFW/glfw3.h>
+
+#include <imguial/fonts/MaterialDesign.inl>
+#include <imguial/fonts/RobotoRegular.inl>
+#include <imguial/fonts/RobotoBold.inl>
 
 using namespace fe;
 
@@ -85,7 +89,7 @@ ImGuiSubrender::~ImGuiSubrender() {
 
 void ImGuiSubrender::onUpdate() {
     ImGuiIO& io = ImGui::GetIO();
-    io.DeltaTime = Time::DeltaTime();
+    io.DeltaTime = Time::DeltaTime().asSeconds();
 
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
@@ -253,20 +257,21 @@ void ImGuiSubrender::setupStyle() {
     config.GlyphMinAdvanceX = 4.0f;
     config.SizePixels = 12.0f;
 
-    static const ImWchar iconsRanges[] = { 0xf000, 0xf3ff, 0 };
+    static const ImWchar ranges[] = { 0x0020, 0x00FF, 0x0400, 0x044F, 0, };
+    //std::vector<uint8_t> textFont = FileSystem::ReadBytes("fonts/PT Sans.ttf");
 
-    std::vector<uint8_t> textFont = FileSystem::ReadBytes("fonts/PT Sans.ttf");
-    io.Fonts->AddFontFromMemoryTTF(textFont.data(), static_cast<int>(textFont.size()), fontSize * fontScale, nullptr, io.Fonts->GetGlyphRangesCyrillic());
+    io.Fonts->AddFontFromMemoryCompressedTTF(RobotoRegular_compressed_data, RobotoRegular_compressed_size, fontSize, &config, ranges);
+    addIconFont();
+    io.Fonts->Build();
 
-    std::vector<uint8_t> iconFont = FileSystem::ReadBytes("fonts/fontawesome-webfont.ttf");
-    io.Fonts->AddFontFromMemoryTTF(iconFont.data(), static_cast<int>(iconFont.size()), fontSize * fontScale, &config, iconsRanges);
+    /*io.Fonts->AddFontFromMemoryCompressedTTF(RobotoBold_compressed_data, RobotoBold_compressed_size, fontSize + 2.0f, &config, ranges);
+    addIconFont();
+    io.Fonts->Build();*/
 
     io.Fonts->TexGlyphPadding = 1;
     for (int n = 0; n < io.Fonts->ConfigData.Size; n++) {
         io.Fonts->ConfigData[n].RasterizerMultiply = 1.0f;
     }
-
-    io.Fonts->Build();
 
     uint8_t* fontBuffer;
     int texWidth, texHeight;
@@ -311,7 +316,22 @@ void ImGuiSubrender::setupStyle() {
     }
 #endif
 
-    ImGuiUtilities::SetTheme(ImGuiUtilities::Theme::Dark);
+    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Dark);
+}
+
+void ImGuiSubrender::addIconFont() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    static const ImWchar ranges[] = { ICON_MIN_MDI, ICON_MAX_MDI, 0 };
+    ImFontConfig config;
+    config.MergeMode = true;
+    config.PixelSnapH = true;
+    config.GlyphOffset.y = 1.0f;
+    config.OversampleH = config.OversampleV = 1;
+    config.GlyphMinAdvanceX = 4.0f;
+    config.SizePixels = 12.0f;
+
+    io.Fonts->AddFontFromMemoryCompressedTTF(MaterialDesign_compressed_data, MaterialDesign_compressed_size, fontSize, &config, ranges);
 }
 
 const char* ImGuiSubrender::GetClipboardText(void* userData) {
@@ -444,6 +464,6 @@ int ImGuiSubrender::KeyToImGuiKey(Key key) {
         case Key::RightAlt: return ImGuiKey_RightAlt;
         case Key::RightSuper: return ImGuiKey_RightSuper;
         case Key::Menu: return ImGuiKey_Menu;
+        default: return ImGuiKey_None;
     }
-    return ImGuiKey_None;
 }
