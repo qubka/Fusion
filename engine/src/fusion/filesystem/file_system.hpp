@@ -132,7 +132,7 @@ namespace fe {
          * @param path The path to the file.
          * @return The string with font awesome icon.
          */
-        //static std::string GetIcon(const std::filesystem::path& path);
+        static std::string GetIcon(const std::filesystem::path& path);
 
     private:
         static std::unordered_map<std::string, std::string> Extensions;

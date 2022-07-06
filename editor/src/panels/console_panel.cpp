@@ -108,7 +108,7 @@ void ConsolePanel::renderHeader() {
     float levelButtonWidths = (levelButtonWidth + style.ItemSpacing.x) * 6;
 
     {
-        //ImGuiUtilities::ScopedFont boldFont(io.Fonts->Fonts[1]);
+        ImGuiUtils::ScopedFont boldFont(io.Fonts->Fonts[1]);
         ImGuiUtils::ScopedStyle frameBorder(ImGuiStyleVar_FrameBorderSize, 0.0f);
         ImGuiUtils::ScopedColor frameColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
         Filter.Draw("###ConsoleFilter", ImGui::GetContentRegionAvail().x - (levelButtonWidths));
@@ -141,7 +141,7 @@ void ConsolePanel::renderHeader() {
 
     if (!Filter.IsActive()) {
         ImGui::SameLine();
-        //ImGuiUtilities::ScopedFont boldFont{io.Fonts->Fonts[1]};
+        ImGuiUtils::ScopedFont boldFont{io.Fonts->Fonts[1]};
         ImGui::SetCursorPosX(ImGui::GetFontSize() * 4.0f);
         ImGuiUtils::ScopedStyle padding{ ImGuiStyleVar_FramePadding, ImVec2{ 0.0f, style.FramePadding.y}};
         ImGui::TextUnformatted("Search...");
@@ -151,7 +151,7 @@ void ConsolePanel::renderHeader() {
 void ConsolePanel::renderMessages() {
     ImGui::BeginChild("ScrollRegion", ImVec2{0, 0}, false, ImGuiWindowFlags_HorizontalScrollbar);
     {
-        // ImGuiUtilities::AlternatingRowsBackground();
+        // ImGuiUtils::AlternatingRowsBackground();
 
         auto messageStart = MessageBuffer.begin() + MessageBufferBegin;
         if (*messageStart) {// If contains old message here

@@ -434,7 +434,7 @@ bool PropertyDropdown(const std::string& name, E& value, const bitmask::bitmask<
     return updated;
 }
 
-bool PropertyDropdown(const std::string& name, std::string* options, int32_t optionCount, int32_t* selected, const Flags& flags = PropertyFlag::None) {
+bool PropertyDropdown(const std::string& name, std::string* options, int32_t optionCount, int32_t* selected) {
     bool updated = false;
 
     ImGui::TextUnformatted(name.c_str());
@@ -443,23 +443,19 @@ bool PropertyDropdown(const std::string& name, std::string* options, int32_t opt
 
     const char* current = options[*selected].c_str();
 
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::TextUnformatted(current);
-    } else {
-        std::string id = "##" + name;
-        if (ImGui::BeginCombo(id.c_str(), current)) {
-            for (int i = 0; i < optionCount; i++) {
-                const bool is_selected = (current == options[i]);
-                if (ImGui::Selectable(options[i].c_str(), is_selected)) {
-                    current = options[i].c_str();
-                    *selected = i;
-                    updated = true;
-                }
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();
+    std::string id = "##" + name;
+    if (ImGui::BeginCombo(id.c_str(), current)) {
+        for (int i = 0; i < optionCount; i++) {
+            const bool is_selected = (current == options[i]);
+            if (ImGui::Selectable(options[i].c_str(), is_selected)) {
+                current = options[i].c_str();
+                *selected = i;
+                updated = true;
             }
-            ImGui::EndCombo();
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
         }
+        ImGui::EndCombo();
     }
 
     DrawItemActivityOutline(2.5f);

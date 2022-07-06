@@ -3,6 +3,7 @@
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/images/image2d.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/graphics/descriptors/descriptors_handler.hpp"
 #include "fusion/graphics/vku.hpp"
 
 #include <volk.h>
@@ -10,7 +11,7 @@
 
 using namespace fe;
 
-void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer) {
+void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, DescriptorsHandler& descriptorSet) {
     ImDrawData* drawData = ImGui::GetDrawData();
 
     // Note: Alignment is done inside buffer creation
@@ -80,10 +81,16 @@ void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer) {
                     glm::ivec2{std::max(static_cast<int>((cmd.ClipRect.x)), 0), std::max(static_cast<int>((cmd.ClipRect.y)), 0)} // offset
             );
             vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-            // Bind DescriptorSet with font or user texture
-            //VkDescriptorSet descriptor[1] = { static_cast<VkDescriptorSet>(pcmd.TextureId) };
-            //vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, descriptor, 0, nullptr);
+
+            descriptorSet.push("fontSampler", reinterpret_cast<Image2d*>(cmd.TextureId));
+
+            if (!descriptorSet.update(pipeline))
+                continue;
+
+            descriptorSet.bindDescriptor(commandBuffer, pipeline);
+
             vkCmdDrawIndexed(commandBuffer, cmd.ElemCount, 1, indexOffset, vertexOffset, 0);
+
             indexOffset += static_cast<int32_t>(cmd.ElemCount);
         }
         vertexOffset += cmdLists->VtxBuffer.Size;

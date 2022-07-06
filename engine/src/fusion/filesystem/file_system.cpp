@@ -234,15 +234,17 @@ std::string FileSystem::GetExtension(const std::filesystem::path& path) {
     return String::Lowercase(path.extension().string());
 }
 
-/*std::string FileSystem::GetIcon(const std::filesystem::path& path) {
+std::string FileSystem::GetIcon(const std::filesystem::path& path) {
     auto key = Extensions.find(GetExtension(path));
     return key != Extensions.end() ? key->second.c_str() : ICON_FA_FILE;
 }
 
 std::unordered_map<std::string, std::string> FileSystem::Extensions = {
-    {".gif", ICON_FA_FILE_IMAGE_O},
-    {".jpeg", ICON_FA_FILE_IMAGE_O},
+    {".gif", ICON_MDI_GIF},
+
+    {".jpeg", ICON_MDI_FILE_,
     {".jpg", ICON_FA_FILE_IMAGE_O},
+
     {".png", ICON_FA_FILE_IMAGE_O},
     {".ktx", ICON_FA_FILE_IMAGE_O},
 
@@ -341,7 +343,7 @@ std::unordered_map<std::string, std::string> FileSystem::Extensions = {
     {".csv", ICON_FA_FILE_CODE_O},
 
     {".db", ICON_FA_DATABASE},
-};*/
+};
 
 FileSystem::FileSystem() {
     // TODO: Make

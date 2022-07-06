@@ -33,6 +33,7 @@ bin_debug
 
 # External data
 external/
+!external/binary_fonts
 !external/CMakeLists.txt
 
 # CMake

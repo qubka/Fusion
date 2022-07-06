@@ -5,8 +5,9 @@
 #include "fusion/core/time.hpp"
 #include "fusion/devices/devices.hpp"
 #include "fusion/filesystem/file_system.hpp"
-#include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/input/codes.hpp"
+#include "fusion/bitmaps/bitmap.hpp"
+#include "fusion/graphics/images/image2d.hpp"
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/imgui/material_design_icons.hpp"
@@ -112,17 +113,12 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer) {
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
-    descriptorSet.push("fontSampler", canvasObject.getFont());
-
-    if (!descriptorSet.update(pipeline))
-        return;
 
     // Draws the canvas
     pipeline.bindPipeline(commandBuffer);
-    descriptorSet.bindDescriptor(commandBuffer, pipeline);
     pushObject.bindPush(commandBuffer, pipeline);
 
-    canvasObject.cmdRender(commandBuffer);
+    canvasObject.cmdRender(commandBuffer, pipeline, descriptorSet);
 }
 
 void ImGuiSubrender::onMouseButtonEvent(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods) {
@@ -262,24 +258,16 @@ void ImGuiSubrender::setupStyle() {
 
     io.Fonts->AddFontFromMemoryCompressedTTF(RobotoRegular_compressed_data, RobotoRegular_compressed_size, fontSize, &config, ranges);
     addIconFont();
-    io.Fonts->Build();
+    rebuildFont();
 
-    /*io.Fonts->AddFontFromMemoryCompressedTTF(RobotoBold_compressed_data, RobotoBold_compressed_size, fontSize + 2.0f, &config, ranges);
+    io.Fonts->AddFontFromMemoryCompressedTTF(RobotoBold_compressed_data, RobotoBold_compressed_size, fontSize + 2.0f, &config, ranges);
     addIconFont();
-    io.Fonts->Build();*/
+    rebuildFont();
 
     io.Fonts->TexGlyphPadding = 1;
     for (int n = 0; n < io.Fonts->ConfigData.Size; n++) {
         io.Fonts->ConfigData[n].RasterizerMultiply = 1.0f;
     }
-
-    uint8_t* fontBuffer;
-    int texWidth, texHeight;
-    io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
-    auto bitmap = std::make_unique<Bitmap>(glm::uvec2{texWidth, texHeight});
-    memcpy(bitmap->getData<void>(), fontBuffer, bitmap->getLength());
-    canvasObject.setFont(std::make_unique<Image2d>(std::move(bitmap)));
-    //io.Fonts->SetTexID((ImTextureID)(&*font));
 
     ImGuiStyle& style = ImGui::GetStyle();
 
@@ -332,6 +320,21 @@ void ImGuiSubrender::addIconFont() {
     config.SizePixels = 12.0f;
 
     io.Fonts->AddFontFromMemoryCompressedTTF(MaterialDesign_compressed_data, MaterialDesign_compressed_size, fontSize, &config, ranges);
+}
+
+void ImGuiSubrender::rebuildFont() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    io.Fonts->Build();
+
+    uint8_t* fontBuffer;
+    int texWidth, texHeight;
+    io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
+    auto bitmap = std::make_unique<Bitmap>(glm::uvec2{texWidth, texHeight});
+    memcpy(bitmap->getData<void>(), fontBuffer, bitmap->getLength());
+    auto& font = fontImages.emplace_back(std::make_unique<Image2d>(std::move(bitmap)));
+
+    io.Fonts->SetTexID((ImTextureID)(font.get()));
 }
 
 const char* ImGuiSubrender::GetClipboardText(void* userData) {

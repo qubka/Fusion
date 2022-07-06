@@ -10,6 +10,7 @@
 
 namespace fe {
     class Window;
+    class Image2d;
     class ImGuiSubrender final : public Subrender {
     public:
         explicit ImGuiSubrender(const Pipeline::Stage& pipelineStage);
@@ -23,6 +24,7 @@ namespace fe {
         void setupKeyCodes();
         void setupStyle();
         void addIconFont();
+        void rebuildFont();
 
         void onMouseButtonEvent(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods);
         void onMouseMotionEvent(const glm::vec2& pos);
@@ -44,6 +46,8 @@ namespace fe {
         PushHandler pushObject;
 
         ImGuiObject canvasObject;
+
+        std::vector<std::unique_ptr<Image2d>> fontImages;
 
         float fontSize;
         float fontScale;

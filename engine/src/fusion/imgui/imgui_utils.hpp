@@ -56,7 +56,7 @@ namespace ImGuiUtils {
 
     template<typename E>
     bool PropertyDropdown(const std::string& name, E& value, const Flags& flags = PropertyFlag::None);
-    bool PropertyDropdown(const std::string& name, std::string* options, int32_t optionCount, int32_t* selected, const Flags& flags = PropertyFlag::None);
+    bool PropertyDropdown(const std::string& name, std::string* options, int32_t optionCount, int32_t* selected);
 
     void Tooltip(const std::string& text);
     void Tooltip(const char* text);
