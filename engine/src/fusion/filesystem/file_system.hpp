@@ -80,17 +80,7 @@ namespace fe {
          * @param recursive If paths will be recursively searched.
          * @return The files found.
          */
-        static std::vector<std::filesystem::path> GetFiles(const std::filesystem::path& path, bool recursive = true);
-
-        /**
-         * Finds all the files in a path.
-         * @param path The path to search.
-         * @param recursive If paths will be recursively searched.
-         * @param filter File name pattern.
-         * @param formats File formats to search.
-         * @return The files found.
-         */
-        static std::vector<std::filesystem::path> GetFilesWithFilter(const std::filesystem::path& path, bool recursive = true, const std::string& filter = "", const std::vector<std::string>& formats = {});
+        static std::vector<std::filesystem::path> GetFiles(const std::filesystem::path& path, bool recursive = false);
 
         /**
          * Gets the FileStats of the file on the path.
@@ -111,7 +101,7 @@ namespace fe {
          * @param path The path to the file.
          * @returnTrue if path is a directory and has directories inside.
          */
-        static bool HasDirectories(const std::filesystem::path& path);
+        static bool ContainsDirectories(const std::filesystem::path& path);
 
         /**
          * Checks that file is a directory.
@@ -132,7 +122,7 @@ namespace fe {
          * @param path The path to the file.
          * @return The string with font awesome icon.
          */
-        static std::string GetIcon(const std::filesystem::path& path);
+        static const char* GetIcon(const std::filesystem::path& path);
 
     private:
         static std::unordered_map<std::string, std::string> Extensions;
