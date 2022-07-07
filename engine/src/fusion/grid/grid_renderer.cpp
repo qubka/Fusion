@@ -2,8 +2,8 @@
 
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/cameras/camera.hpp"
-#include "fusion/devices/devices.hpp"
-#include "fusion/scene/scenes.hpp"
+#include "fusion/devices/device_manager.hpp"
+#include "fusion/scene/scene_manager.hpp"
 
 using namespace fe;
 
@@ -24,7 +24,7 @@ GridRenderer::~GridRenderer() {
 
 void GridRenderer::onRender(const CommandBuffer& commandBuffer) {
     // Updates uniform
-    auto camera = Scenes::Get()->getScene()->getCamera();
+    auto camera = SceneManager::Get()->getCurrentScene()->getCamera();
     pushObject.push("projection", camera->getProjectionMatrix());
     pushObject.push("view", camera->getViewMatrix());
 

@@ -293,7 +293,7 @@ endif()
 
 # physfs
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-find_package(PhysFS 3.0.2 QUIET)
+#find_package(PhysFS 3.0.2 QUIET)
 if(NOT PhysFS_FOUND)
     set(PHYSFS_LIB_NAME "physfs")
 
@@ -309,7 +309,7 @@ if(NOT PhysFS_FOUND)
 
     add_subdirectory(${PHYSFS_LIB_NAME})
 endif()
-list(APPEND ALL_SYSTEM_LIBS physfs-static )
+#list(APPEND ALL_SYSTEM_LIBS physfs-static )
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # portfiledialog

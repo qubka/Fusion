@@ -53,10 +53,13 @@ namespace ImGuiUtils {
 
     bool PropertyControl(const std::string& name, glm::vec2& value, float min = 0.0f, float max = 0.0f, float reset = 0.0f, float speed = 0.1f);
     bool PropertyControl(const std::string& name, glm::vec3& value, float min = 0.0f, float max = 0.0f, float reset = 0.0f, float speed = 0.1f);
+    bool PropertyControl(const std::string& name, glm::quat& value, float min = 0.0f, float max = 0.0f, float reset = 0.0f, float speed = 0.1f);
 
     template<typename E>
     bool PropertyDropdown(const std::string& name, E& value, const Flags& flags = PropertyFlag::None);
     bool PropertyDropdown(const std::string& name, std::string* options, int32_t optionCount, int32_t* selected);
+
+    bool PropertyFile(const std::string& name, const std::filesystem::path& path, std::filesystem::path& value, std::vector<std::filesystem::path>& files, std::filesystem::path& selected, ImGuiTextFilter& filter);
 
     void Tooltip(const std::string& text);
     void Tooltip(const char* text);
@@ -83,37 +86,6 @@ namespace ImGuiUtils {
     bool InputText(std::string& currentText);
 
     void AlternatingRowsBackground(float lineHeight = -1.0f);
-
-    class ScopedStyle {
-    public:
-        template<typename T>
-        ScopedStyle(ImGuiStyleVar styleVar, T value) { ImGui::PushStyleVar(styleVar, value); }
-        ~ScopedStyle() { ImGui::PopStyleVar(); }
-        NONCOPYABLE(ScopedStyle);
-    };
-
-    class ScopedColor {
-    public:
-        template<typename T>
-        ScopedColor(ImGuiCol colorId, T color) { ImGui::PushStyleColor(colorId, color); }
-        ~ScopedColor() { ImGui::PopStyleColor(); }
-        NONCOPYABLE(ScopedColor);
-    };
-
-    class ScopedFont {
-    public:
-        ScopedFont(ImFont* font) { ImGui::PushFont(font); }
-        ~ScopedFont() { ImGui::PopFont(); }
-        NONCOPYABLE(ScopedFont);
-    };
-
-    class ScopedID {
-    public:
-        template<typename T>
-        ScopedID(T id) { ImGui::PushID(id); }
-        ~ScopedID() { ImGui::PopID(); }
-        NONCOPYABLE(ScopedID);
-    };
 };
 
 static inline ImVec2 operator*(const ImVec2& lhs, const float rhs) {

@@ -1,6 +1,6 @@
 #include "stream.hpp"
 
-#include <physfs.h>
+/*#include <physfs.h>
 
 namespace fe {
     using std::streambuf;
@@ -154,4 +154,4 @@ FileStream::FileStream(const std::filesystem::path &filename, FileMode openMode)
 
 FileStream::~FileStream() {
     delete rdbuf();
-}
+}*/

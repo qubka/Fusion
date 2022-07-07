@@ -56,7 +56,7 @@ namespace fe {
          * @param stage The stage to get values from, if not provided the pipelines stage will be used.
          * @return The image that is found.
          */
-        const Image2d* getImage(uint32_t index, const std::optional<uint32_t>& stage = std::nullopt) const;
+        const Image2d* getImage(size_t index, const std::optional<uint32_t>& stage = std::nullopt) const;
 
         /**
          * Gets the render stage viewport.

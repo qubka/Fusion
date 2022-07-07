@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 struct PHYSFS_File;
 
 namespace fe {
@@ -35,4 +35,4 @@ namespace fe {
         explicit FileStream(const std::filesystem::path& filename, FileMode openMode = FileMode::Read);
         ~FileStream() override;
     };
-}
+}*/

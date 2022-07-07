@@ -1,7 +1,7 @@
 #include "graphics.hpp"
 
 #include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/devices/devices.hpp"
+#include "fusion/devices/device_manager.hpp"
 #include "fusion/devices/window.hpp"
 #include "fusion/graphics/renderpass/swapchain.hpp"
 #include "fusion/graphics/renderpass/framebuffers.hpp"
@@ -19,10 +19,10 @@
 using namespace fe;
 
 Graphics::Graphics() {
-    for (auto& window : Devices::Get()->getWindows()) {
+    for (auto& window : DeviceManager::Get()->getWindows()) {
         onWindowCreate(window.get(), true);
     }
-    Devices::Get()->OnWindowCreate().connect<&Graphics::onWindowCreate>(this);
+    DeviceManager::Get()->OnWindowCreate().connect<&Graphics::onWindowCreate>(this);
 
     if (!glslang::InitializeProcess())
         throw std::runtime_error("Failed to initialize glslang process");
@@ -33,7 +33,7 @@ Graphics::~Graphics() {
 
     swapchains.clear();
 
-    Devices::Get()->OnWindowCreate().disconnect<&Graphics::onWindowCreate>(this);
+    DeviceManager::Get()->OnWindowCreate().disconnect<&Graphics::onWindowCreate>(this);
 
     VK_CHECK(vkQueueWaitIdle(graphicsQueue));
 
@@ -46,7 +46,7 @@ Graphics::~Graphics() {
 }
 
 void Graphics::onUpdate() {
-    if (!renderer || Devices::Get()->getWindow(0)->isIconified())
+    if (!renderer || DeviceManager::Get()->getWindow(0)->isIconified())
         return;
 
     if (!renderer->started) {
@@ -198,7 +198,7 @@ void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t i
     auto debugStart = DateTime::Now();
 #endif
 
-    const auto& size = Devices::Get()->getWindow(id)->getSize();
+    const auto& size = DeviceManager::Get()->getWindow(id)->getSize();
 
     VkImage dstImage;
     VkDeviceMemory dstImageMemory;
@@ -232,7 +232,7 @@ void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t i
 #endif
 }
 
-const RenderStage* Graphics::getRenderStage(uint32_t index) const {
+const RenderStage* Graphics::getRenderStage(size_t index) const {
     return renderer ? renderer->getRenderStage(index) : nullptr;
 }
 

@@ -4,7 +4,7 @@
 #include "fusion/graphics/devices/instance.hpp"
 #include "fusion/graphics/devices/logical_device.hpp"
 #include "fusion/graphics/devices/physical_device.hpp"
-#include "fusion/devices/devices.hpp"
+#include "fusion/devices/device_manager.hpp"
 
 using namespace fe;
 
@@ -43,7 +43,7 @@ VkExtent2D Surface::getExtent() const {
         auto size = window.getSize();
         while (size.x == 0 || size.y == 0) {
             size = window.getSize();
-            Devices::Get()->waitEvents();
+            DeviceManager::Get()->waitEvents();
         }
         return {
                 std::max(capabilities.minImageExtent.width,

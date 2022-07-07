@@ -1,14 +1,66 @@
 #include "file_system.hpp"
+#include "storage.hpp"
 
 #include "fusion/core/engine.hpp"
 #include "fusion/utils/string.hpp"
 #include "fusion/imgui/material_design_icons.hpp"
 
-#include <physfs.h>
+//#include <physfs.h>
 
 using namespace fe;
 
-bool FileSystem::Exists(const std::filesystem::path& path) {
+void FileSystem::Read(const std::filesystem::path& filename, const FileSystem::SimpleHandler& handler) {
+    auto storage = Storage::readFile(filename);
+    handler(storage->getData(), storage->getSize());
+}
+
+std::vector<uint8_t> FileSystem::ReadBytes(const std::filesystem::path& filename) {
+    std::vector<uint8_t> result;
+    Read(filename, [&](const uint8_t* data, size_t size) {
+        result.resize(size);
+        memcpy(result.data(), data, size);
+    });
+    return result;
+}
+
+std::string FileSystem::ReadText(const std::filesystem::path& filename) {
+    std::string content;
+    std::ifstream is{filename, std::ios::in};
+
+    if (!is.is_open()) {
+        throw std::runtime_error("File " + filename.string() + " not found");
+    }
+
+    std::string line;
+    while (!is.eof()) {
+        getline(is, line);
+        content.append(line + "\n");
+    }
+
+    return content;
+}
+
+std::vector<std::filesystem::path> FileSystem::GetFiles(const std::filesystem::path& path, bool recursive) {
+    std::vector<std::filesystem::path> files;
+
+    if (recursive) {
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(path)) {
+            files.emplace_back(entry.path().c_str());
+        }
+        std::sort(files.begin(), files.end(), [](const std::filesystem::path& a, const std::filesystem::path& b) {
+            return is_directory(a) && !is_directory(b);
+        });
+
+    } else {
+        for (const auto& entry : std::filesystem::directory_iterator(path)) {
+            files.emplace_back(entry.path().c_str());
+        }
+    }
+
+    return files;
+}
+
+/*bool FileSystem::Exists(const std::filesystem::path& path) {
     return PHYSFS_exists(path.c_str()) != 0;
 }
 
@@ -200,7 +252,7 @@ bitmask::bitmask<FileAttributes> FileSystem::GetAttributes(const std::filesystem
         attributes |= FileAttributes::ReadOnly;
 
     return attributes;
-}
+}*/
 
 std::string FileSystem::GetExtension(const std::filesystem::path& path) {
     return String::Lowercase(path.extension().string());
@@ -317,13 +369,13 @@ std::unordered_map<std::string, std::string> FileSystem::Extensions = {
 
 FileSystem::FileSystem() {
     // TODO: Make
-    const auto& args = Engine::Get()->getCommandLineArgs();
-    PHYSFS_init(args[0].first.c_str());
+    //const auto& args = Engine::Get()->getCommandLineArgs();
+    //PHYSFS_init(args[0].first.c_str());
     //PHYSFS_mount("/", nullptr, 1);
 }
 
 FileSystem::~FileSystem() {
-    PHYSFS_deinit();
+   // PHYSFS_deinit();
 }
 
 void FileSystem::onUpdate() {

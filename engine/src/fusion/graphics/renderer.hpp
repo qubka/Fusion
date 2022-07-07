@@ -75,7 +75,7 @@ namespace fe {
             subrenderHolder.clear();
         }
 
-        RenderStage* getRenderStage(uint32_t index) const {
+        RenderStage* getRenderStage(size_t index) const {
             if (renderStages.empty() || renderStages.size() < index)
                 return nullptr;
             return renderStages[index].get();

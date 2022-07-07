@@ -3,7 +3,7 @@
 
 #include "fusion/core/engine.hpp"
 #include "fusion/core/time.hpp"
-#include "fusion/devices/devices.hpp"
+#include "fusion/devices/device_manager.hpp"
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/input/codes.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
@@ -15,9 +15,9 @@
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
 
-#include <imguial/fonts/MaterialDesign.inl>
-#include <imguial/fonts/RobotoRegular.inl>
-#include <imguial/fonts/RobotoBold.inl>
+#include <binary_fonts/MaterialDesignIcons.inl>
+#include <binary_fonts/RobotoRegular.inl>
+#include <binary_fonts/RobotoBold.inl>
 
 using namespace fe;
 
@@ -67,7 +67,7 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
-    window = Devices::Get()->getWindow(0);
+    window = DeviceManager::Get()->getWindow(0);
     auto& size = window->getSize();
     io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
 
@@ -319,13 +319,13 @@ void ImGuiSubrender::addIconFont() {
     config.GlyphMinAdvanceX = 4.0f;
     config.SizePixels = 12.0f;
 
-    io.Fonts->AddFontFromMemoryCompressedTTF(MaterialDesign_compressed_data, MaterialDesign_compressed_size, fontSize, &config, ranges);
+    io.Fonts->AddFontFromMemoryCompressedTTF(MaterialDesignIcons_compressed_data, MaterialDesignIcons_compressed_size, fontSize, &config, ranges);
 }
 
 void ImGuiSubrender::rebuildFont() {
     ImGuiIO& io = ImGui::GetIO();
 
-    io.Fonts->Build();
+    //io.Fonts->Build();
 
     uint8_t* fontBuffer;
     int texWidth, texHeight;
