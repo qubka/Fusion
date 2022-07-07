@@ -29,10 +29,10 @@ namespace fe {
         }
 
         bool isEnabled() const { return enabled; }
-        void setEnabled(bool enable) { this->enabled = enable; }
+        void setEnabled(bool flag) { enabled = flag; }
 
         Editor* getEditor() { return editor; }
-        void setEditor(Editor* editor) { this->editor = editor; }
+        void setEditor(Editor* ptr) { editor = ptr; }
 
     protected:
         std::string name;
