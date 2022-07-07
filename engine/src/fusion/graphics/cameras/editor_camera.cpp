@@ -1,5 +1,5 @@
 #include "editor_camera.hpp"
-#include "fusion/devices/devices.hpp"
+#include "fusion/devices/device_manager.hpp"
 
 using namespace fe;
 
@@ -7,7 +7,7 @@ EditorCamera::EditorCamera() : PerspectiveCamera{} {
 }
 
 void EditorCamera::onUpdate() {
-    auto window = Devices::Get()->getWindow(0);
+    auto window = DeviceManager::Get()->getWindow(0);
 
     if (!!window->getKey(Key::LeftAlt)) {
         if (!!window->getMouseButton(MouseButton::ButtonMiddle))
