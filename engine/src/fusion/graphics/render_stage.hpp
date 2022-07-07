@@ -60,7 +60,7 @@ namespace fe {
         const std::vector<SubpassType>& getSubpasses() const { return subpasses; }
 
         Viewport& getViewport() { return viewport; }
-        void setViewport(const Viewport& viewport) { this->viewport = viewport; }
+        void setViewport(const Viewport& port) { viewport = port; }
 
         /**
          * Gets the render stage viewport.

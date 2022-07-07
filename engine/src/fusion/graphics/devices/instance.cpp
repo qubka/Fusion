@@ -1,7 +1,7 @@
 #include "instance.hpp"
 
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/devices/devices.hpp"
+#include "fusion/devices/device_manager.hpp"
 #include "fusion/core/engine.hpp"
 
 using namespace fe;
@@ -148,7 +148,7 @@ bool Instance::CheckValidationLayerSupport() {
 
 std::vector<const char*> Instance::getExtensions() const {
 	// Sets up the extensions.
-	auto extensions = Devices::Get()->getRequiredInstanceExtensions();
+	auto extensions = DeviceManager::Get()->getRequiredInstanceExtensions();
 
 	if (enableValidationLayers)
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);

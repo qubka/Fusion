@@ -2,7 +2,7 @@
 
 #include "fusion/core/engine.hpp"
 #include "fusion/core/time.hpp"
-#include "fusion/scene/scenes.hpp"
+#include "fusion/scene/scene_manager.hpp"
 
 using namespace fe;
 
@@ -36,7 +36,7 @@ void ApplicationInfoPanel::onImGui() {
             ImGui::Text("FPS : %5.2i", Time::FramesPerSecond());
             ImGui::Text("Frame Time : %5.2f ms", Time::DeltaTime().asMilliseconds());
             ImGui::NewLine();
-            ImGui::Text("Scene : %s", Scenes::Get()->getScene()->getName().c_str());
+            ImGui::Text("Scene : %s", SceneManager::Get()->getCurrentScene()->getName().c_str());
             ImGui::TreePop();
         };
     }

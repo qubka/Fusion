@@ -48,6 +48,7 @@
 #endif
 #endif
 #elif defined(__APPLE__)
+#define PLATFORM_APPLE 1
 // Detect iOS before MacOSX (__MACH__ is also defined for iOS)
 #if defined(IPHONE)
 #define PLATFORM_IOS 1

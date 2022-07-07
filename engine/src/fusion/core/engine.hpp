@@ -3,12 +3,12 @@
 #include "version.hpp"
 #include "command_line.hpp"
 #include "module.hpp"
-#include "app.hpp"
+#include "application.hpp"
 
 int main(int argc, char** argv);
 
 namespace fe {
-    class Devices;
+    class DeviceManager;
     class Engine final {
     protected:
         /**
@@ -54,13 +54,13 @@ namespace fe {
          * Gets the current application.
          * @return The renderer manager.
          */
-        App* getApp() const { return application.get(); }
+        Application* getApp() const { return application.get(); }
 
         /**
          * Sets the current application to the engine.
          * @param app The new application.
          */
-        void setApp(std::unique_ptr<App>&& app) { application = std::move(app); }
+        void setApp(std::unique_ptr<Application>&& app) { application = std::move(app); }
 
         /**
          * Gets if the engine is running.
@@ -94,10 +94,11 @@ namespace fe {
 
         CommandLineArgs commandLineArgs;
         CommandLineParser commandLineParser;
+
         Version version;
 
-        std::unique_ptr<App> application;
-        std::unique_ptr<Devices> devices;
+        std::unique_ptr<Application> application;
+        std::unique_ptr<DeviceManager> devices;
 
         std::unordered_map<std::type_index, std::unique_ptr<Module>> modules;
         std::map<Module::Stage, std::vector<std::type_index>> moduleStages;

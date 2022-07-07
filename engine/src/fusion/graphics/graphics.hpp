@@ -41,7 +41,7 @@ namespace fe {
          * Sets the current renderer to a new renderer.
          * @param renderer The new renderer.
          */
-        void setRenderer(std::unique_ptr<Renderer>&& renderer) { this->renderer = std::move(renderer); }
+        void setRenderer(std::unique_ptr<Renderer>&& ptr) { renderer = std::move(ptr); }
 
         const RenderStage* getRenderStage(size_t index) const;
         const Descriptor* getAttachment(const std::string& name) const;

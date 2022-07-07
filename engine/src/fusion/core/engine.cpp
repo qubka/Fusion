@@ -1,17 +1,19 @@
 #include "engine.hpp"
+
+#include <utility>
 #include "module.hpp"
 #include "time.hpp"
 
-#include "fusion/devices/devices.hpp"
+#include "fusion/devices/device_manager.hpp"
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/filesystem/file_system.hpp"
-#include "fusion/scene/scenes.hpp"
+//#include "fusion/filesystem/file_system.hpp"
+#include "fusion/scene/scene_manager.hpp"
 
 using namespace fe;
 
 Engine* Engine::Instance = nullptr;
 
-Engine::Engine(CommandLineArgs args) : commandLineArgs{args}, version{FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
+Engine::Engine(CommandLineArgs args) : commandLineArgs{std::move(args)}, version{FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
     Instance = this;
 
     Log::Init();
@@ -20,9 +22,9 @@ Engine::Engine(CommandLineArgs args) : commandLineArgs{args}, version{FUSION_VER
     LOG_INFO << "Git: [" << GIT_COMMIT_HASH << "]:(" << GIT_TAG << ") - " << GIT_COMMIT_SUBJECT << " on " << GIT_BRANCH << " at " << GIT_COMMIT_DATE;
     LOG_INFO << "Compiled on: " << FUSION_COMPILED_SYSTEM << " from: " << FUSION_COMPILED_GENERATOR << " with: " << FUSION_COMPILED_COMPILER;
 
-    //commandLineParser.parse(args);
+    commandLineParser.parse(commandLineArgs);
 
-    devices = Devices::Init();
+    devices = DeviceManager::Init();
     devices->getWindow(0)->OnClose().connect<&Engine::requestClose>(this);
 }
 
@@ -33,8 +35,8 @@ Engine::~Engine() {
 
 void Engine::init() {
     Time::Register(Module::Stage::Pre);
-    Scenes::Register(Module::Stage::Normal);
-    FileSystem::Register(Module::Stage::Post);
+    SceneManager::Register(Module::Stage::Normal);
+    //FileSystem::Register(Module::Stage::Post);
     Graphics::Register(Module::Stage::Render);
 
     // Use the table to sort the modules for each stage depending on the number of mentions
