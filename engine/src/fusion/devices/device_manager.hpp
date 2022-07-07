@@ -14,15 +14,15 @@ namespace fe {
     /**
      * @brief Module used for managing some devices.
      */
-    class Devices {
+    class DeviceManager {
     public:
-        Devices();
-        virtual ~Devices();
-        NONCOPYABLE(Devices);
+        DeviceManager();
+        virtual ~DeviceManager();
+        NONCOPYABLE(DeviceManager);
 
-        static std::unique_ptr<Devices> Init();
+        static std::unique_ptr<DeviceManager> Init();
 
-        static Devices* Get() { return Instance; }
+        static DeviceManager* Get() { return Instance; }
 
         /**
          * Run every frame as long as the manager has work to do.
@@ -116,7 +116,7 @@ namespace fe {
         auto OnJoystickConnect() { return entt::sink{onJoystickConnect}; }
 
     protected:
-        static Devices* Instance;
+        static DeviceManager* Instance;
 
         std::vector<std::unique_ptr<Window>> windows{};
         std::vector<std::unique_ptr<Monitor>> monitors{};
