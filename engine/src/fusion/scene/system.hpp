@@ -30,7 +30,7 @@ namespace fe {
         virtual void onStop() {};
 
         bool isEnabled() const { return enabled; }
-        void setEnabled(bool enable) { this->enabled = enable; }
+        void setEnabled(bool flag) { enabled = flag; }
 
     protected:
         bool enabled{ true };

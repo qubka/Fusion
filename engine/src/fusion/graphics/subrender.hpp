@@ -30,7 +30,7 @@ namespace fe {
         const Pipeline::Stage& getStage() const { return stage; }
 
         bool isEnabled() const { return enabled; }
-        void setEnabled(bool enable) { this->enabled = enable; }
+        void setEnabled(bool flag) { enabled = flag; }
 
     private:
         bool enabled{ true };
