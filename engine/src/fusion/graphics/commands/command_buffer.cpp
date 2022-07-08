@@ -40,7 +40,7 @@ void CommandBuffer::end() {
 	if (!running)
         return;
 
-	VK_CHECK(vkEndCommandBuffer(commandBuffer));
+    VK_CHECK(vkEndCommandBuffer(commandBuffer));
 	running = false;
 }
 

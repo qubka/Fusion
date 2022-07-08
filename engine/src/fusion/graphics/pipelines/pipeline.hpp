@@ -4,6 +4,7 @@
 
 namespace fe {
     class CommandBuffer;
+
     /**
      * @brief Class that is used to represent a pipeline.
      */
@@ -17,7 +18,7 @@ namespace fe {
         Pipeline() = default;
         virtual ~Pipeline() = default;
 
-        void bindPipeline(const CommandBuffer& commandBuffer) const;
+        virtual void bindPipeline(const CommandBuffer& commandBuffer) const;
 
         virtual const Shader& getShader() const = 0;
         virtual bool isPushDescriptors() const = 0;

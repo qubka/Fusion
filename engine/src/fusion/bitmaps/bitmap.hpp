@@ -2,7 +2,7 @@
 
 #include "bitmap_factory.hpp"
 
-#include <volk.h>
+#include <volk/volk.h>
 
 namespace fe {
     enum class BitmapChannels { Default = 0, Grey = 1, GreyAlpha, Rgb, RgbAlpha };

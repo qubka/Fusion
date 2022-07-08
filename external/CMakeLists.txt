@@ -19,12 +19,22 @@ add_subdirectory(${VULKAN_LIB_NAME})
 list(APPEND ALL_SYSTEM_LIBS volk)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
+# tracy
+#╒◖═════════════════════════════════════════════════════════════════════◗╕
+#find_package(tracy 0.8.2 QUIET)
+if(NOT tracy_FOUND)
+    set(TRACY_LIB_NAME "tracy")
+
+    add_subdirectory(${TRACY_LIB_NAME})
+endif()
+list(APPEND ALL_SYSTEM_LIBS TracyClient)
+#╘◖═════════════════════════════════════════════════════════════════════◗╛
+
 # glfw
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 #find_package(glfw3 3.3.6 QUIET)
 if(NOT glfw_FOUND)
     set(GLFW_LIB_NAME "glfw")
-    set(GLFW_INC_PATH ${GLFW_LIB_NAME}/include)
 
     foreach(_glfw3_option "GLFW_BUILD_TESTS" "GLFW_BUILD_EXAMPLES" "GLFW_BUILD_DOCS" "GLFW_INSTALL")
         set(${_glfw3_option} OFF CACHE INTERNAL "")
