@@ -7,10 +7,9 @@
 
 using namespace fe;
 
-const std::vector<VkDynamicState> DYNAMIC_STATES = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_LINE_WIDTH};
-
 PipelineGraphics::PipelineGraphics(Stage stage, std::vector<std::filesystem::path> shaderStages, std::vector<Vertex::Input> vertexInputs, std::vector<Shader::Define> defines,
-	Mode mode, Depth depth, VkPrimitiveTopology topology, VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace, bool pushDescriptors)
+	Mode mode, Depth depth, VkPrimitiveTopology topology, VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace, Blend blend, bool depthBiasEnabled,
+    float depthBiasConstantFactor, float depthBiasSlopeFactor, float depthBiasClamp, float lineWidth, bool transparencyEnabled, bool pushDescriptors)
     : shader{}
     , stage{std::move(stage)}
     , shaderStages{std::move(shaderStages)}
@@ -22,8 +21,14 @@ PipelineGraphics::PipelineGraphics(Stage stage, std::vector<std::filesystem::pat
     , polygonMode{polygonMode}
     , cullMode{cullMode}
     , frontFace{frontFace}
+    , blend{blend}
+    , depthBiasEnabled{depthBiasEnabled}
+    , depthBiasConstantFactor{depthBiasConstantFactor}
+    , depthBiasSlopeFactor{depthBiasSlopeFactor}
+    , depthBiasClamp{depthBiasClamp}
+    , lineWidth{lineWidth}
+    , transparencyEnabled{transparencyEnabled}
     , pushDescriptors{pushDescriptors}
-    , dynamicStates{DYNAMIC_STATES}
     , pipelineBindPoint{VK_PIPELINE_BIND_POINT_GRAPHICS} {
 
 #if FUSION_DEBUG
@@ -162,20 +167,44 @@ void PipelineGraphics::createAttributes() {
 	rasterizationState.polygonMode = polygonMode;
 	rasterizationState.cullMode = cullMode;
 	rasterizationState.frontFace = frontFace;
-	rasterizationState.depthBiasEnable = VK_FALSE;
-	//rasterizationState.depthBiasConstantFactor = 0.0f;
-	//rasterizationState.depthBiasClamp = 0.0f;
-	//rasterizationState.depthBiasSlopeFactor = 0.0f;
-	rasterizationState.lineWidth = 1.0f;
+	rasterizationState.depthBiasEnable = depthBiasEnabled ? VK_TRUE : VK_FALSE;
+	rasterizationState.depthBiasConstantFactor = depthBiasConstantFactor;
+	rasterizationState.depthBiasClamp = depthBiasClamp;
+	rasterizationState.depthBiasSlopeFactor = depthBiasSlopeFactor;
+	rasterizationState.lineWidth = lineWidth;
 
-	blendAttachmentStates[0].blendEnable = VK_TRUE;
-	blendAttachmentStates[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-	blendAttachmentStates[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-	blendAttachmentStates[0].colorBlendOp = VK_BLEND_OP_ADD;
-	blendAttachmentStates[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-	blendAttachmentStates[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_DST_ALPHA;
-	blendAttachmentStates[0].alphaBlendOp = VK_BLEND_OP_MAX;
-	blendAttachmentStates[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    for (auto& blendAttachmentState : blendAttachmentStates) {
+        blendAttachmentState = VkPipelineColorBlendAttachmentState();
+        blendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+        blendAttachmentState.alphaBlendOp = VK_BLEND_OP_MAX;
+        blendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD;
+
+        if (transparencyEnabled) {
+            blendAttachmentState.blendEnable = VK_TRUE;
+            blendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+            blendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_DST_ALPHA;
+
+            if (blend == Blend::SrcAlphaOneMinusSrcAlpha) {
+                blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+                blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+            } else if (blend == Blend::ZeroSrcColor) {
+                blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+                blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_SRC_COLOR;
+            } else if (blend == Blend::OneZero) {
+                blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+                blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+            } else {
+                blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+                blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+            }
+        } else {
+            blendAttachmentState.blendEnable = VK_FALSE;
+            blendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+            blendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+            blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+            blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+        }
+    }
 
 	colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlendState.logicOpEnable = VK_FALSE;
@@ -223,7 +252,20 @@ void PipelineGraphics::createAttributes() {
 	multisampleState.rasterizationSamples = multisampled ? physicalDevice.getMsaaSamples() : VK_SAMPLE_COUNT_1_BIT;
 	multisampleState.sampleShadingEnable = VK_FALSE;
 
-	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    dynamicStates.reserve(4);
+
+    dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
+    dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
+
+    if (topology == VK_PRIMITIVE_TOPOLOGY_LINE_LIST || topology == VK_PRIMITIVE_TOPOLOGY_LINE_STRIP || topology == VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY || topology == VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY) {
+        dynamicStates.push_back(VK_DYNAMIC_STATE_LINE_WIDTH);
+    }
+
+    if (depthBiasEnabled) {
+        dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_BIAS);
+    }
+
+    dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 	dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
 	dynamicState.pDynamicStates = dynamicStates.data();
 
@@ -322,4 +364,14 @@ void PipelineGraphics::createPipelineMrt() {
 	colorBlendState.pAttachments = blendAttachmentStates.data();
 
 	createPipeline();
+}
+
+void PipelineGraphics::bindPipeline(const CommandBuffer& commandBuffer) const {
+    Pipeline::bindPipeline(commandBuffer);
+
+#if PLATFORM_APPLE
+    // Bug in moltenVK. Needs to happen after pipeline bound for now.
+    if(depthBiasEnabled)
+        vkCmdSetDepthBias(commandBuffer, depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor);
+#endif
 }

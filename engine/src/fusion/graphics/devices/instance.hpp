@@ -1,6 +1,6 @@
 #pragma once
 
-#include <volk.h>
+#include <volk/volk.h>
 
 #ifndef VK_API_VERSION_1_1
 #define VK_API_VERSION_1_1 VK_MAKE_VERSION(1, 1, 0)

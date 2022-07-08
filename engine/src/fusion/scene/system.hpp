@@ -33,7 +33,7 @@ namespace fe {
         void setEnabled(bool flag) { enabled = flag; }
 
     protected:
-        bool enabled{ true };
         entt::registry& registry;
+        bool enabled{ true };
     };
 }

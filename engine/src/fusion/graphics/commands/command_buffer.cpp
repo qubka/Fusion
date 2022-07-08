@@ -68,7 +68,7 @@ void CommandBuffer::submitIdle() {
 	vkDestroyFence(logicalDevice, fence, nullptr);
 }
 
-void CommandBuffer::submit(const VkSemaphore& waitSemaphore, const VkSemaphore& signalSemaphore, VkFence fence, VkPipelineStageFlags submitPipelineStages) {
+void CommandBuffer::submit(const VkSemaphore& waitSemaphore, const VkSemaphore& signalSemaphore, const VkFence& fence, VkPipelineStageFlags submitPipelineStages) {
 	auto queueSelected = getQueue();
 
 	if (running)
@@ -83,23 +83,17 @@ void CommandBuffer::submit(const VkSemaphore& waitSemaphore, const VkSemaphore& 
 		submitInfo.pWaitDstStageMask = &submitPipelineStages;
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = &waitSemaphore;
-	}/* else {
-        LOG_DEBUG << "No wait semaphore!";
-    }*/
+	}
 
 	if (signalSemaphore != VK_NULL_HANDLE) {
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = &signalSemaphore;
-	}/* else {
-        LOG_DEBUG << "No signal semaphore!";
-    }*/
+	}
 
 	if (fence != VK_NULL_HANDLE) {
         //VK_RESULT(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
         VK_CHECK(vkResetFences(logicalDevice, 1, &fence));
-    }/* else {
-        LOG_DEBUG << "No flight fence!";
-    }*/
+    }
 
 	VK_CHECK(vkQueueSubmit(queueSelected, 1, &submitInfo, fence));
 }

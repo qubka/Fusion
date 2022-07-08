@@ -1,6 +1,6 @@
 #pragma once
 
-#include <volk.h>
+#include <volk/volk.h>
 
 namespace fe {
     class CommandPool;
@@ -42,7 +42,7 @@ namespace fe {
          * @param fence A optional fence that is signaled once the command buffer has completed.
          * @param submitPipelineStages
          */
-        void submit(const VkSemaphore& waitSemaphore = VK_NULL_HANDLE, const VkSemaphore& signalSemaphore = VK_NULL_HANDLE, VkFence fence = VK_NULL_HANDLE,
+        void submit(const VkSemaphore& waitSemaphore = VK_NULL_HANDLE, const VkSemaphore& signalSemaphore = VK_NULL_HANDLE, const VkFence& fence = VK_NULL_HANDLE,
                     VkPipelineStageFlags submitPipelineStages = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
 
         operator bool() const { return commandBuffer != VK_NULL_HANDLE; }
@@ -51,9 +51,9 @@ namespace fe {
         const VkCommandBuffer& getCommandBuffer() const { return commandBuffer; }
         bool isRunning() const { return running; }
 
-    private:
         VkQueue getQueue() const;
 
+    private:
         const LogicalDevice& logicalDevice;
 
         VkQueueFlagBits queueType;

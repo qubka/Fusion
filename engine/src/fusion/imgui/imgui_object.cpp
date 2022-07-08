@@ -6,7 +6,7 @@
 #include "fusion/graphics/descriptors/descriptors_handler.hpp"
 #include "fusion/graphics/vku.hpp"
 
-#include <volk.h>
+#include <volk/volk.h>
 #include <imgui/imgui.h>
 
 using namespace fe;

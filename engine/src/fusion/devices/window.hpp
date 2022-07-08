@@ -2,7 +2,7 @@
 
 #include "fusion/input/codes.hpp"
 
-#include <volk.h>
+#include <volk/volk.h>
 #include <entt/signal/sigh.hpp>
 
 namespace fe {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <volk.h>
+#include <volk/volk.h>
 
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"

@@ -1,7 +1,5 @@
 #include "console_panel.hpp"
 
-#include "fusion/imgui/imgui_utils.hpp"
-
 using namespace fe;
 using namespace std::string_literals;
 
@@ -14,7 +12,7 @@ std::vector<std::unique_ptr<ConsolePanel::Message>> ConsolePanel::MessageBuffer 
 bool ConsolePanel::AllowScrollingToBottom = true;
 bool ConsolePanel::RequestScrollToBottom = false;
 
-ConsolePanel::ConsolePanel() : EditorPanel{ICON_MDI_VIEW_LIST + " Console###console"s, "Console"} {
+ConsolePanel::ConsolePanel() : EditorPanel{ICON_MDI_VIEW_LIST " Console##console", "Console"} {
 
 }
 
@@ -82,9 +80,10 @@ void ConsolePanel::renderHeader() {
 
     // Button for advanced settings
     {
-        ImGuiUtils::ScopedColor buttonColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f});
         if (ImGui::Button(ICON_MDI_COGS))
             ImGui::OpenPopup("SettingsPopup");
+        ImGui::PopStyleColor();
     }
 
     if (ImGui::BeginPopup("SettingsPopup")) {
@@ -108,17 +107,20 @@ void ConsolePanel::renderHeader() {
     float levelButtonWidths = (levelButtonWidth + style.ItemSpacing.x) * 6;
 
     {
-        ImGuiUtils::ScopedFont boldFont(io.Fonts->Fonts[1]);
-        ImGuiUtils::ScopedStyle frameBorder(ImGuiStyleVar_FrameBorderSize, 0.0f);
-        ImGuiUtils::ScopedColor frameColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+        ImGui::PushFont(io.Fonts->Fonts[1]);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
         Filter.Draw("###ConsoleFilter", ImGui::GetContentRegionAvail().x - (levelButtonWidths));
         ImGuiUtils::DrawItemActivityOutline(2.0f, false);
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor();
+        ImGui::PopFont();
     }
 
     ImGui::SameLine(); // ImGui::GetWindowWidth() - levelButtonWidths);
 
     for (int i = 0; i < 6; i++) {
-        ImGuiUtils::ScopedColor buttonColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f});
         ImGui::SameLine();
         auto level = MessageLevel(std::pow(2, i));
 
@@ -134,17 +136,19 @@ void ConsolePanel::renderHeader() {
         if (ImGui::IsItemHovered()) {
             ImGui::SetTooltip("%s", Message::GetLevelName(level));
         }
-        ImGui::PopStyleColor();
+        ImGui::PopStyleColor(2);
     }
 
     style.ItemSpacing.x = spacing;
 
     if (!Filter.IsActive()) {
         ImGui::SameLine();
-        ImGuiUtils::ScopedFont boldFont{io.Fonts->Fonts[1]};
+        ImGui::PushFont(io.Fonts->Fonts[1]);
         ImGui::SetCursorPosX(ImGui::GetFontSize() * 4.0f);
-        ImGuiUtils::ScopedStyle padding{ ImGuiStyleVar_FramePadding, ImVec2{ 0.0f, style.FramePadding.y}};
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 0.0f, style.FramePadding.y});
         ImGui::TextUnformatted("Search...");
+        ImGui::PopStyleVar();
+        ImGui::PopFont();
     }
 }
 
@@ -197,7 +201,7 @@ ConsolePanel::Message::Message(std::string message, MessageLevel level, std::str
 
 void ConsolePanel::Message::onImGui() {
     if (MessageBufferRenderFilter & level) {
-        ImGuiUtils::ScopedID scopedId{ messageID };
+        ImGui::PushID(messageID);
         ImGui::PushStyleColor(ImGuiCol_Text, GetRenderColor(level));
         ImGui::TextUnformatted(GetLevelIcon(level));
         ImGui::PopStyleColor();
@@ -219,6 +223,8 @@ void ConsolePanel::Message::onImGui() {
             ImGui::SameLine(ImGui::GetContentRegionAvail().x - (count > 99 ? ImGui::GetFontSize() * 1.7f : ImGui::GetFontSize() * 1.5f));
             ImGui::Text("%d", count);
         }
+
+        ImGui::PopID();
     }
 }
 

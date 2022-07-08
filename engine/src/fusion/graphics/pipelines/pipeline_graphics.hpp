@@ -24,6 +24,13 @@ namespace fe {
             ReadWrite = Read | Write
         };
 
+        enum class Blend {
+            None = 0,
+            OneZero,
+            ZeroSrcColor,
+            SrcAlphaOneMinusSrcAlpha,
+        };
+
         /**
          * Creates a new pipeline.
          * @param stage The graphics stage this pipeline will be run on.
@@ -36,11 +43,31 @@ namespace fe {
          * @param polygonMode The polygon draw mode.
          * @param cullMode The vertex cull mode.
          * @param frontFace The direction to render faces.
+         * @param depthBiasEnabled
+         * @param depthBiasConstantFactor
+         * @param depthBiasSlopeFactor
+         * @param lineWidth
+         * @param transparencyEnabled
          * @param pushDescriptors If no actual descriptor sets are allocated but instead pushed.
          */
-        PipelineGraphics(Stage stage, std::vector<std::filesystem::path> shaderStages, std::vector<Vertex::Input> vertexInputs, std::vector<Shader::Define> defines = {},
-            Mode mode = Mode::Polygon, Depth depth = Depth::ReadWrite, VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL,
-            VkCullModeFlags cullMode = VK_CULL_MODE_BACK_BIT, VkFrontFace frontFace = VK_FRONT_FACE_CLOCKWISE, bool pushDescriptors = false);
+        PipelineGraphics(Stage stage,
+                         std::vector<std::filesystem::path> shaderStages,
+                         std::vector<Vertex::Input> vertexInputs,
+                         std::vector<Shader::Define> defines = {},
+                         Mode mode = Mode::Polygon,
+                         Depth depth = Depth::ReadWrite,
+                         VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+                         VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL,
+                         VkCullModeFlags cullMode = VK_CULL_MODE_BACK_BIT,
+                         VkFrontFace frontFace = VK_FRONT_FACE_CLOCKWISE,
+                         Blend blend = Blend::SrcAlphaOneMinusSrcAlpha,
+                         bool depthBiasEnabled = false,
+                         float depthBiasConstantFactor = 0.0f,
+                         float depthBiasSlopeFactor = 0.0f,
+                         float depthBiasClamp = 0.0f,
+                         float lineWidth = 1.0f,
+                         bool transparencyEnabled = true,
+                         bool pushDescriptors = false);
         ~PipelineGraphics();
 
         /**
@@ -64,6 +91,8 @@ namespace fe {
          * @return The the render stage viewport.
          */
         const RenderArea& getRenderArea(const std::optional<uint32_t>& stage = std::nullopt) const;
+
+        void bindPipeline(const CommandBuffer& commandBuffer) const override;
 
         const Stage& getStage() const { return stage; }
         const std::vector<std::filesystem::path>& getShaderStages() const { return shaderStages; }
@@ -99,18 +128,24 @@ namespace fe {
         std::vector<Shader::Define> defines;
         Mode mode;
         Depth depth;
+        Blend blend;
         VkPrimitiveTopology topology;
         VkPolygonMode polygonMode;
         VkCullModeFlags cullMode;
         VkFrontFace frontFace;
+        bool depthBiasEnabled;
+        float depthBiasConstantFactor;
+        float depthBiasSlopeFactor;
+        float depthBiasClamp;
+        float lineWidth;
+        bool transparencyEnabled;
         bool pushDescriptors;
 
         Shader shader;
 
-        std::vector<VkDynamicState> dynamicStates;
-
         std::vector<VkShaderModule> modules;
         std::vector<VkPipelineShaderStageCreateInfo> stages;
+        std::vector<VkDynamicState> dynamicStates;
 
         VkDescriptorSetLayout descriptorSetLayout{ VK_NULL_HANDLE };
         VkDescriptorPool descriptorPool{ VK_NULL_HANDLE };

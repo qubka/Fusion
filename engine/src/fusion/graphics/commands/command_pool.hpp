@@ -1,7 +1,7 @@
 #pragma once
 
-#include <thread>
-#include <volk.h>
+//#include <thread>
+#include <volk/volk.h>
 
 namespace fe {
     /**
@@ -19,6 +19,6 @@ namespace fe {
 
     private:
         VkCommandPool commandPool{ VK_NULL_HANDLE };
-        std::thread::id threadId;
+        //std::thread::id threadId;
     };
 }
