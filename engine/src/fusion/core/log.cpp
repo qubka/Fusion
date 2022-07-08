@@ -1,12 +1,13 @@
+#include "log.hpp"
+
 #include <plog/Initializers/RollingFileInitializer.h>
-#include <plog/Formatters/TxtFormatter.h>
-#include <plog/Appenders/ColorConsoleAppender.h>
 
 using namespace fe;
 
+plog::EventConsoleAppender<plog::TxtFormatter> Log::ConsoleAppender;
+
 void Log::Init() {
 #if FUSION_DEBUG
-    static plog::ColorConsoleAppender<plog::TxtFormatter> ConsoleAppender;
     plog::init(plog::debug, &ConsoleAppender);
 #else
     const char* file = "fusion.log";

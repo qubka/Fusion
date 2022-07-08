@@ -71,7 +71,7 @@ void ContentBrowserPanel::onImGui() {
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_MDI_ARROW_RIGHT)) {
                     if (!isLocked) {
-                        changeDirectory(m_LastNavPath);
+                        //changeDirectory(lastNavPath); // TODO: Implement
                     }
                 }
                 ImGui::SameLine();

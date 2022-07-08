@@ -6,7 +6,7 @@ namespace fe {
     class Application {
         friend class Engine;
     public:
-        Application(std::string name, const Version& version = { 1, 0, 0 }) : name{std::move(name)}, version{version} { }
+        Application(std::string name, Version version = {0, 1, 0, 0}) : name{std::move(name)}, version{version} { }
         virtual ~Application() = default;
         NONCOPYABLE(Application);
 
@@ -41,13 +41,13 @@ namespace fe {
          * Gets the application's version.
          * @return The application's version.
          */
-        const Version& getVersion() const { return version; }
+        Version getVersion() const { return version; }
 
         /**
          * Sets the application's version, for driver support.
          * @param version The application version.
          */
-        void setVersion(const Version& ver) { version = ver; }
+        void setVersion(Version ver) { version = ver; }
 
     protected:
         std::string name;
