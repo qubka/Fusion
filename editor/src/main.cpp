@@ -9,7 +9,7 @@ int main(int args, char** argv) {
     Engine engine{CommandLineArgs{args, argv}};
 
     // Sets the application to the engine
-    engine.setApp(std::make_unique<Editor>("Editor Application", Version{1, 1, 1}));
+    engine.setApp(std::make_unique<Editor>("Editor Application"));
 
     // Runs the game loop
     auto exitCode = engine.run();
