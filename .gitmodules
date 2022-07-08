@@ -82,3 +82,6 @@
 [submodule "external/imguial"]
 	path = external/imguial
 	url = https://github.com/leiradel/ImGuiAl
+[submodule "external/tracy"]
+	path = external/tracy
+	url = https://github.com/wolfpld/tracy

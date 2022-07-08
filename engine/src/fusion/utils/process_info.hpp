@@ -1,8 +1,8 @@
 #pragma once
 
-#if PLATFORM_WINDOWs
+#if FUSION_PLATFORM_WINDOWs
 #include <windows.h>
-#elif PLATFORM_LINUX
+#elif FUSION_PLATFORM_LINUX
 #include <unistd.h>
 #endif
 
@@ -20,13 +20,13 @@ namespace fe {
 
     private:
         uint32_t processId;
-#if PLATFORM_WINDOWS
+#if FUSION_PLATFORM_WINDOWS
         int numOfProcessors; // numbre of processors
         ULARGE_INTEGER creationTime; // process creation time
         ULARGE_INTEGER prevSystemTime; // previously measured system time
         ULARGE_INTEGER prevKernelTime; // amount of time ran in kernel mode
         ULARGE_INTEGER prevUserTime; // amount of time ran in user mode
-#elif PLATFORM_LINUX
+#elif FUSION_PLATFORM_LINUX
         int64_t jiffiesPerSecond;
         uint64_t startTimeSinceBoot;
         uint64_t prevSystemTime;

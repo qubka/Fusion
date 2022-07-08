@@ -4,11 +4,11 @@
 
 using namespace fe;
 
-#if PLATFORM_WINDOWS
+#if FUSION_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
 
-#if PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
 AAssetManager* assetManager = nullptr;
 void setAssetManager(AAssetManager* assetManager) {
     vkx::storage::assetManager = assetManager;
@@ -61,7 +61,7 @@ private:
     std::vector<uint8_t> buffer;
 };
 
-#if PLATFORM_ANDROID || PLATFORM_WINDOWS
+#if FUSION_PLATFORM_ANDROID || FUSION_PLATFORM_WINDOWS
 #define MAPPED_FILES 1
 #else
 #define MAPPED_FILES 0
@@ -84,9 +84,9 @@ public:
 private:
     size_t size{ 0 };
     uint8_t* mapped{ nullptr };
-#if PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
     AAsset* asset{ nullptr };
-#elif PLATFORM_WINDOWS
+#elif FUSION_PLATFORM_WINDOWS
     HANDLE file{ INVALID_HANDLE_VALUE };
     HANDLE mapFile{ INVALID_HANDLE_VALUE };
 #else
@@ -95,14 +95,14 @@ private:
 };
 
 FileStorage::FileStorage(const std::filesystem::path& filename) {
-#if PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
     // Load shader from compressed asset
     asset = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
     assert(asset);
     size = AAsset_getLength(asset);
     assert(size > 0);
     mapped = reinterpret_cast<uint8_t*>(AAsset_getBuffer(asset));
-#elif PLATFORM_WINDOWS
+#elif FUSION_PLATFORM_WINDOWS
     file = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     if (file == INVALID_HANDLE_VALUE) {
         throw std::runtime_error("Failed to open file");
@@ -121,9 +121,9 @@ FileStorage::FileStorage(const std::filesystem::path& filename) {
 }
 
 FileStorage::~FileStorage() {
-#if PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
     AAsset_close(asset);
-#elif PLATFORM_WINDOWS
+#elif FUSION_PLATFORM_WINDOWS
     UnmapViewOfFile(mapped);
     CloseHandle(mapFile);
     CloseHandle(file);

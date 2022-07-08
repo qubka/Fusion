@@ -13,12 +13,12 @@ using namespace fe;
 
 Engine* Engine::Instance = nullptr;
 
-Engine::Engine(CommandLineArgs args) : commandLineArgs{std::move(args)}, version{FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
+Engine::Engine(CommandLineArgs args) : commandLineArgs{std::move(args)}, version{FUSION_VERSION_VARIANT, FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
     Instance = this;
 
     Log::Init();
 
-    LOG_INFO << "Version: " << version.to_string();
+    LOG_INFO << "Version: " << version.string();
     LOG_INFO << "Git: [" << GIT_COMMIT_HASH << "]:(" << GIT_TAG << ") - " << GIT_COMMIT_SUBJECT << " on " << GIT_BRANCH << " at " << GIT_COMMIT_DATE;
     LOG_INFO << "Compiled on: " << FUSION_COMPILED_SYSTEM << " from: " << FUSION_COMPILED_GENERATOR << " with: " << FUSION_COMPILED_COMPILER;
 

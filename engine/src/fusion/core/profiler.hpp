@@ -1,7 +1,7 @@
 #pragma once
 
 #if FUSION_PROFILE
-#ifdef PLATFORM_WINDOWS
+#ifdef FUSION_PLATFORM_WINDOWS
 #define TRACY_CALLSTACK 1
 #endif
 #include <tracy/Tracy.hpp>

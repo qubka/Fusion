@@ -5,12 +5,10 @@
 namespace fe {
     class Instance;
 
-    using DevicePickerFunction = std::function<VkPhysicalDevice(const std::vector<VkPhysicalDevice>&)>;
-
     class PhysicalDevice {
         friend class Graphics;
     public:
-        explicit PhysicalDevice(const Instance& instance, const DevicePickerFunction& picker = [](const std::vector<VkPhysicalDevice>& devices) -> VkPhysicalDevice { return ChoosePhysicalDevice(devices); });
+        explicit PhysicalDevice(const Instance& instance, uint32_t desiredDeviceIndex = UINT32_MAX);
         ~PhysicalDevice() = default;
         NONCOPYABLE(PhysicalDevice);
 
@@ -32,6 +30,7 @@ namespace fe {
     private:
         static VkPhysicalDevice ChoosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices);
         static uint32_t ScorePhysicalDevice(const VkPhysicalDevice& device);
+
         VkSampleCountFlagBits getMaxUsableSampleCount() const;
         void findQueueFamilyIndices();
 

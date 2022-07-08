@@ -13,8 +13,13 @@
 #include "fusion/graphics/subrender.hpp"
 #include "fusion/utils/enumerate.hpp"
 #include "fusion/utils/date_time.hpp"
+#include "fusion/utils/string.hpp"
 
 #include <glslang/Public/ShaderLang.h>
+
+#if FUSION_PROFILE && TRACY_ENABLE
+#include <tracy/TracyVulkan.hpp>
+#endif
 
 using namespace fe;
 
@@ -67,7 +72,10 @@ void Graphics::onUpdate() {
             currentFrame,
             *swapchain,
             perSurfaceBuffer->commandBuffers[currentFrame],
-            perSurfaceBuffer->syncObjects[currentFrame]
+            perSurfaceBuffer->syncObjects[currentFrame],
+#if FUSION_PROFILE && TRACY_ENABLE
+            perSurfaceBuffer->tracyContexts[currentFrame]
+#endif
         };
 
         if (!beginFrame(info))
@@ -81,15 +89,7 @@ void Graphics::onUpdate() {
             if (!beginRenderpass(info, *renderStage))
                 break;
 
-            for (const auto& subpass : renderStage->getSubpasses()) {
-                stage.second = subpass.binding;
-
-                // Renders subpass subrender pipelines
-                renderer->subrenderHolder.renderStage(stage, info.commandBuffer);
-
-                if (subpass.binding != renderStage->getSubpasses().back().binding)
-                    vkCmdNextSubpass(info.commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
-            }
+            nextSubpasses(info, *renderStage, stage);
 
             endRenderpass(info);
 
@@ -101,11 +101,15 @@ void Graphics::onUpdate() {
 }
 
 bool Graphics::beginFrame(FrameInfo& info) {
-    auto& [id, frame, swapchain, commandBuffer, syncObject] = info;
+    UNPACK_FRAME_INFO(info);
 
     auto result = swapchain.acquireNextImage(syncObject.getImageAvailableSemaphore(), syncObject.getInFlightFence());
 
-#ifndef PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
+    if (result != VK_SUCCESS) {
+        throw std::runtime_error("Failed to acquire swap chain image!");
+    }
+#else
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapchain(id);
         return false;
@@ -114,20 +118,19 @@ bool Graphics::beginFrame(FrameInfo& info) {
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw std::runtime_error("Failed to acquire swap chain image!");
     }
-#else
-    if (result != VK_SUCCESS) {
-        throw std::runtime_error("Failed to acquire swap chain image!");
-    }
 #endif
 
     if (!commandBuffer.isRunning())
         commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
+    FUSION_PROFILE_GPU("Begin Frame");
+
     return true;
 }
 
 bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
-    auto& [id, frame, swapchain, commandBuffer, syncObject] = info;
+    UNPACK_FRAME_INFO(info);
+    FUSION_PROFILE_GPU("Begin Renderpass");
 
     if (renderStage.isOutOfDate()) {
         LOG_WARNING << "Render stage is out of date!";
@@ -156,12 +159,34 @@ bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
     return true;
 }
 
+void Graphics::nextSubpasses(FrameInfo& info, RenderStage& renderStage, Pipeline::Stage& stage) {
+    UNPACK_FRAME_INFO(info);
+
+    for (const auto& subpass : renderStage.getSubpasses()) {
+        FUSION_PROFILE_GPU("Begin Subpass");
+
+        stage.second = subpass.binding;
+
+        // Renders subpass subrender pipelines
+        renderer->subrenderHolder.renderStage(stage, commandBuffer);
+
+        if (subpass.binding != renderStage.getSubpasses().back().binding)
+            vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);
+    }
+}
+
 void Graphics::endRenderpass(FrameInfo& info) {
-    vkCmdEndRenderPass(info.commandBuffer);
+    UNPACK_FRAME_INFO(info);
+
+    vkCmdEndRenderPass(commandBuffer);
 }
 
 void Graphics::endFrame(FrameInfo& info) {
-    auto& [id, frame, swapchain, commandBuffer, syncObject] = info;
+    UNPACK_FRAME_INFO(info);
+
+#if FUSION_PROFILE && TRACY_ENABLE
+    TracyVkCollect(tracyContext, commandBuffer);
+#endif
 
     commandBuffer.end();
 
@@ -177,20 +202,17 @@ void Graphics::endFrame(FrameInfo& info) {
     auto presentQueue = logicalDevice.getPresentQueue();
     auto result = swapchain.queuePresent(presentQueue, syncObject.getRenderFinishedSemaphore());
 
-#ifndef PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
+    VK_CHECK_RESULT(result);
+#else
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
         recreateSwapchain(id);
     } else if (result != VK_SUCCESS) {
         throw std::runtime_error("Failed to present swap chain image!");
     }
-#else
-    if (result != VK_SUCCESS) {
-        LOG_WARNING << "Failed to present swap chain image!";
-        VK_CHECK(result);
-    }
 #endif
 
-    frame = (frame + 1) % MAX_FRAMES_IN_FLIGHT;
+    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t id) const {
@@ -245,12 +267,11 @@ const Descriptor* Graphics::getAttachment(const std::string& name) const {
 void Graphics::resetRenderStages() {
     for (const auto& [id, surface] : enumerate(surfaces)) {
         auto& swapchain = swapchains.emplace_back(std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, nullptr));
-        auto& perSurfaceBuffer = perSurfaceBuffers.emplace_back(std::make_unique<PerSurfaceBuffers>());
-        perSurfaceBuffer->commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-        perSurfaceBuffer->syncObjects.resize(MAX_FRAMES_IN_FLIGHT);
+        perSurfaceBuffers.push_back(std::make_unique<PerSurfaceBuffers>());
         for (const auto& renderStage : renderer->renderStages)
             renderStage->rebuild(id, *swapchain);
     }
+
     recreateAttachmentsMap();
 }
 
@@ -274,7 +295,6 @@ void Graphics::recreateSwapchain(size_t id) {
     }
 
     auto graphicsQueue = logicalDevice.getGraphicsQueue();
-
     VK_CHECK(vkQueueWaitIdle(graphicsQueue));
 
     for (const auto& renderStage : renderer->renderStages)
@@ -304,4 +324,30 @@ void Graphics::onWindowCreate(Window* window, bool create) {
 const CommandPool* Graphics::getCommandPool() {
     if (!commandPool) commandPool = std::make_unique<CommandPool>();
     return commandPool.get();
+}
+
+Graphics::PerSurfaceBuffers::PerSurfaceBuffers() {
+    commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+    syncObjects.resize(MAX_FRAMES_IN_FLIGHT);
+#if FUSION_PROFILE && TRACY_ENABLE
+    tracyContexts.resize(MAX_FRAMES_IN_FLIGHT);
+
+    CommandBuffer tracyBuffer{false};
+
+    const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
+    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
+    auto graphicsQueue = logicalDevice.getGraphicsQueue();
+
+    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        tracyContexts[i] = TracyVkContext(physicalDevice, logicalDevice, graphicsQueue, tracyBuffer);
+
+    VK_CHECK(vkQueueWaitIdle(graphicsQueue));
+#endif
+}
+
+Graphics::PerSurfaceBuffers::~PerSurfaceBuffers() {
+#if FUSION_PROFILE && TRACY_ENABLE
+    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        TracyVkDestroy(tracyContexts[i]);
+#endif
 }

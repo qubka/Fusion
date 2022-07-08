@@ -1,6 +1,6 @@
 #pragma once
 
-#include <volk.h>
+#include <volk/volk.h>
 
 namespace fe {
     class Fence {
@@ -14,7 +14,16 @@ namespace fe {
 
         const VkFence& getFence() const { return fence; }
 
+        bool isSignaled() const { return signaled; };
+        void setSignaled(bool flag) { signaled = true; };
+
+        bool wait();
+        void reset();
+        void waitAndReset();
+        bool checkState();
+
     private:
         VkFence fence{ VK_NULL_HANDLE };
+        bool signaled{ false };
     };
 }

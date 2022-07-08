@@ -48,7 +48,7 @@ namespace fe {
          * Gets the engine's version.
          * @return The engine's version.
          */
-        const Version& getVersion() const { return version; }
+        Version getVersion() const { return version; }
 
         /**
          * Gets the current application.

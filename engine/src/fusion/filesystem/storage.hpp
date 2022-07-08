@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-#if PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
     void setAssetManager(AAssetManager* assetManager);
 #endif
     class Storage;

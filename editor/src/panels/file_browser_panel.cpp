@@ -34,6 +34,10 @@ void FileBrowserPanel::open() {
     fileBrowser->Open();
 }
 
+bool FileBrowserPanel::isOpened() {
+    return fileBrowser->IsOpened();
+}
+
 void FileBrowserPanel::setOpenDirectory(bool value) {
     auto flags = fileBrowser->GetFlags();
     if (value) {
@@ -42,4 +46,12 @@ void FileBrowserPanel::setOpenDirectory(bool value) {
         flags &= ~(ImGuiFileBrowserFlags_SelectDirectory);
     }
     fileBrowser->SetFlags(flags);
+}
+
+void FileBrowserPanel::setFileTypeFilters(const std::vector<std::string>& formats) {
+    fileBrowser->SetTypeFilters(formats);
+}
+
+void FileBrowserPanel::clearFileTypeFilters() {
+    fileBrowser->SetTypeFilters({});
 }

@@ -34,7 +34,7 @@ void Instance::FvkDestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtil
 	if (func) return func(instance, messenger, pAllocator);
 }
 #else
-#if PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
 const std::vector<const char*> Instance::ValidationLayers = {
         "VK_LAYER_GOOGLE_threading",
         "VK_LAYER_LUNARG_parameter_validation",
@@ -157,8 +157,8 @@ std::vector<const char*> Instance::getExtensions() const {
 }
 
 void Instance::createInstance() {
-	const auto& engineVersion = Engine::Get()->getVersion();
-	const auto& appVersion = Engine::Get()->getApp()->getVersion();
+	const auto engineVersion = Engine::Get()->getVersion();
+	const auto appVersion = Engine::Get()->getApp()->getVersion();
 	const auto& appName = Engine::Get()->getApp()->getName();
 
 	VK_CHECK(volkInitialize());

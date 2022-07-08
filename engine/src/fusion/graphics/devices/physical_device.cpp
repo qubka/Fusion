@@ -6,11 +6,15 @@
 using namespace fe;
 
 static const std::vector<VkSampleCountFlagBits> STAGE_FLAG_BITS = {
-    VK_SAMPLE_COUNT_64_BIT, VK_SAMPLE_COUNT_32_BIT, VK_SAMPLE_COUNT_16_BIT, VK_SAMPLE_COUNT_8_BIT,
-    VK_SAMPLE_COUNT_4_BIT, VK_SAMPLE_COUNT_2_BIT
+        VK_SAMPLE_COUNT_64_BIT,
+        VK_SAMPLE_COUNT_32_BIT,
+        VK_SAMPLE_COUNT_16_BIT,
+        VK_SAMPLE_COUNT_8_BIT,
+        VK_SAMPLE_COUNT_4_BIT,
+        VK_SAMPLE_COUNT_2_BIT
 };
 
-PhysicalDevice::PhysicalDevice(const Instance& instance, const DevicePickerFunction& picker) : instance{instance} {
+PhysicalDevice::PhysicalDevice(const Instance& instance, uint32_t desiredDeviceIndex) : instance{instance} {
     uint32_t physicalDeviceCount;
     vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, nullptr);
     std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
@@ -19,7 +23,8 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, const DevicePickerFunct
     else
         throw std::runtime_error("Failed to find any physical GPU");
 
-    physicalDevice = picker(physicalDevices);
+    physicalDevice = desiredDeviceIndex < physicalDeviceCount ? physicalDevices[desiredDeviceIndex] : ChoosePhysicalDevice(physicalDevices);
+
     if (!physicalDevice)
         throw std::runtime_error("Filed to find a suitable GPU");
 

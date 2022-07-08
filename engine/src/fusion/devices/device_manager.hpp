@@ -7,7 +7,6 @@
 #include "fusion/input/codes.hpp"
 
 #include <GLFW/glfw3.h>
-
 #include <entt/signal/sigh.hpp>
 
 namespace fe {

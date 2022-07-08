@@ -14,6 +14,10 @@
 
 #define MAX_FRAMES_IN_FLIGHT 2
 
+namespace tracy {
+    class VkCtx;
+}
+
 namespace fe {
     class Renderer;
     class RenderStage;
@@ -67,10 +71,21 @@ namespace fe {
             Swapchain& swapchain;
             CommandBuffer& commandBuffer;
             SyncObject& syncObject;
+#if FUSION_PROFILE && TRACY_ENABLE
+            tracy::VkCtx* tracyContext;
+#endif
         };
 
+#if FUSION_PROFILE && TRACY_ENABLE
+        #define UNPACK_FRAME_INFO(info) auto& [id, currentFrame, swapchain, commandBuffer, syncObject, tracyContext] = info
+        #define FUSION_PROFILE_GPU(name) TracyVkZone(tracyContext, commandBuffer, name)
+#else
+        #define UNPACK_FRAME_INFO(info) auto& [id, currentFrame, swapchain, commandBuffer, syncObject] = info
+        #define FUSION_PROFILE_GPU(name)
+#endif
         bool beginFrame(FrameInfo& info);
         bool beginRenderpass(FrameInfo& info, RenderStage& renderStage);
+        void nextSubpasses(FrameInfo& info, RenderStage& renderStage, Pipeline::Stage& stage);
         void endRenderpass(FrameInfo& info);
         void endFrame(FrameInfo& info);
 
@@ -94,9 +109,14 @@ namespace fe {
         std::vector<std::unique_ptr<Swapchain>> swapchains;
 
         struct PerSurfaceBuffers {
+            PerSurfaceBuffers();
+            ~PerSurfaceBuffers();
             size_t currentFrame{ 0 };
             std::vector<CommandBuffer> commandBuffers;
             std::vector<SyncObject> syncObjects;
+#if FUSION_PROFILE && TRACY_ENABLE
+            std::vector<tracy::VkCtx*> tracyContexts;
+#endif
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;
     };

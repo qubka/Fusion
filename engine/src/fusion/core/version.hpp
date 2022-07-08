@@ -1,10 +1,17 @@
 #pragma once
 
+#define FUSION_MAKE_VERSION(variant, major, minor, patch)  ((((uint32_t)(variant)) << 29) | (((uint32_t)(major)) << 22) | (((uint32_t)(minor)) << 12) | ((uint32_t)(patch)))
+#define FUSION_MAKE_VERSION_VARIANT(version) ((uint32_t)(version) >> 29)
+#define FUSION_MAKE_VERSION_MAJOR(version) (((uint32_t)(version) >> 22) & 0x7FU)
+#define FUSION_MAKE_VERSION_MINOR(version) (((uint32_t)(version) >> 12) & 0x3FFU)
+#define FUSION_MAKE_VERSION_PATCH(version) ((uint32_t)(version) & 0xFFFU)
+
 namespace fe {
     class Version {
     public:
-        Version(uint8_t major = 0, uint8_t minor = 0, uint8_t patch = 0)
-            : major{major}
+        Version(uint8_t variant, uint8_t major, uint8_t minor, uint8_t patch)
+            : variant{variant}
+            , major{major}
             , minor{minor}
             , patch{patch} {
         }
@@ -13,27 +20,34 @@ namespace fe {
         }
 
         Version& operator=(uint32_t version) {
-            major = ((uint32_t)(version) >> 22);
-            minor = (((uint32_t)(version) >> 12) & 0x3FFU);
-            patch = ((uint32_t)(version) & 0xFFFU);
+            variant = FUSION_MAKE_VERSION_VARIANT(version);
+            major = FUSION_MAKE_VERSION_MAJOR(version);
+            minor = FUSION_MAKE_VERSION_MINOR(version);
+            patch = FUSION_MAKE_VERSION_PATCH(version);
             return *this;
         }
 
         operator uint32_t() const {
-            return ((((uint32_t)(major)) << 22) | (((uint32_t)(minor)) << 12) | ((uint32_t)(patch)));
+            return FUSION_MAKE_VERSION(variant, major, minor, patch);
         }
 
-        bool operator >=(const Version& other) const {
-            return (operator uint32_t()) >= (other.operator uint32_t());
-        }
+        bool operator==(const Version& other) const { return (operator uint32_t()) == (other.operator uint32_t()); }
+        bool operator!=(const Version& other) const { return (operator uint32_t()) != (other.operator uint32_t()); }
+        bool operator<=(const Version& other) const { return (operator uint32_t()) <= (other.operator uint32_t()); }
+        bool operator>=(const Version& other) const { return (operator uint32_t()) >= (other.operator uint32_t()); }
+        bool operator>(const Version& other)  const { return (operator uint32_t()) > (other.operator uint32_t()); }
+        bool operator<(const Version& other)  const { return (operator uint32_t()) < (other.operator uint32_t()); }
 
-        std::string to_string() const {
+        std::string string() const {
             std::stringstream buffer;
-            buffer << std::to_string(major) << "." << std::to_string(minor) << "." << std::to_string(patch);
+            buffer << std::to_string(variant) << "." << std::to_string(major) << "." << std::to_string(minor) << "." << std::to_string(patch);
             return buffer.str();
         }
 
     private:
-        uint8_t major, minor, patch;
+        uint8_t variant;
+        uint8_t major;
+        uint8_t minor;
+        uint8_t patch;
     };
 }

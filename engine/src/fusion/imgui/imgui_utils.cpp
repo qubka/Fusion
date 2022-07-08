@@ -595,7 +595,7 @@ bool PropertyFile(const std::string& name, const std::filesystem::path& path, st
     ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{4, 4});
 
-    if (ImGui::BeginPopup("FileExplorer")) {
+    if (ImGui::BeginPopup("File Explorer")) {
         ImGui::TextUnformatted(ICON_MDI_FILE_SEARCH);
         ImGui::SameLine();
 
@@ -659,7 +659,7 @@ bool PropertyFile(const std::string& name, const std::filesystem::path& path, st
             filter.Clear();
             selected = "";
             files = FileSystem::GetFiles("", true);
-            ImGui::OpenPopup("FileExplorer");
+            ImGui::OpenPopup("File Explorer");
         }
     } else {
         std::string title = FileSystem::GetIcon(value) + " "s + value.filename().string();
@@ -688,7 +688,7 @@ bool PropertyFile(const std::string& name, const std::filesystem::path& path, st
         filter.Clear();
         selected = "";
         files = FileSystem::GetFiles("", true);
-        ImGui::OpenPopup("FileExplorer");
+        ImGui::OpenPopup("File Explorer");
     }
 
     ImGui::PopStyleVar();
@@ -959,7 +959,7 @@ void AlternatingRowsBackground(float lineHeight) {
 void SetTheme(Theme theme) {
     static const float max = 255.0f;
 
-    auto& style = ImGui::GetStyle();
+    ImGuiStyle& style = ImGui::GetStyle();
     ImVec4* colors = style.Colors;
     SelectedColor = glm::vec4{ 0.28f, 0.56f, 0.9f, 1.0f };
 

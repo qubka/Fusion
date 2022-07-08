@@ -10,8 +10,8 @@ else()
     set(PLATFORM_FOLDER "pc")
 endif()
 
-file(GLOB_RECURSE SRC_SOURCES "src/fusion/*.cpp" "src/platform/${PLATFORM_FILES}/*.cpp")
-file(GLOB_RECURSE SRC_HEADERS "src/fusion/*.hpp" "src/platform/${PLATFORM_FILES}/*.hpp")
+file(GLOB_RECURSE SRC_SOURCES "src/fusion/*.cpp" "src/platform/${PLATFORM_FOLDER}/*.cpp")
+file(GLOB_RECURSE SRC_HEADERS "src/fusion/*.hpp" "src/platform/${PLATFORM_FOLDER}/*.hpp")
 set(HEADER_FILES "src/pch.hpp")
 
 # create library and exectuable
@@ -25,7 +25,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         )
 
 if(ANDROID)
-    #target_compile_definitions(${PROJECT_NAME} PUBLIC VULKAN_HPP_NO_SMART_HANDLE)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     set(APP_GLUE_DIR ${ANDROID_NDK}/sources/android/native_app_glue)
     include_directories(${APP_GLUE_DIR})
@@ -46,6 +45,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
 target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_USER_CONFIG="fusion/imgui/imconfig.hpp")
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC
+        FUSION_VERSION_VARIANT=${FUSION_VERSION_VARIANT}
         FUSION_VERSION_MAJOR=${FUSION_VERSION_MAJOR}
         FUSION_VERSION_MINOR=${FUSION_VERSION_MINOR}
         FUSION_VERSION_PATCH=${FUSION_VERSION_PATCH}

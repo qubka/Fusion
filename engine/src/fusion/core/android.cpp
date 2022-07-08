@@ -1,6 +1,6 @@
 #include "android.hpp"
 
-#if PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
 #include <android/configuration.h>
 
 int32_t android::screenDensity{ 0 };

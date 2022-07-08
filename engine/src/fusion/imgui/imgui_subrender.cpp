@@ -35,7 +35,7 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
 
     fontSize = 14.0f;
 
-#if PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
     // Screen density
     if (android::screenDensity >= ACONFIGURATION_DENSITY_XXXHIGH) {
         fontScale = 4.5f;
@@ -47,7 +47,7 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
         fontScale = 2.0f;
     };
     LOG_DEBUG << "Android UI scale "<< fontScale;
-#elif PLATFORM_IOS
+#elif FUSION_PLATFORM_IOS
     fontScale = 2.0f;
 #else
     fontScale = 1.0f;
@@ -61,7 +61,7 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
-#ifdef PLATFORM_ANDROID
+#if FUSION_PLATFORM_ANDROID
     io.ConfigFlags |= ImGuiConfigFlags_IsTouchScreen;
 #endif
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
@@ -304,7 +304,7 @@ void ImGuiSubrender::setupStyle() {
     }
 #endif
 
-    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Dark);
+    ImGuiUtils::SetTheme(ImGuiUtils::Theme::ClassicDark);
 }
 
 void ImGuiSubrender::addIconFont() {

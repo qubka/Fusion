@@ -1,10 +1,10 @@
 #include "process_info.hpp"
 
-#if PLATFORM_WINDOWS
+#if FUSION_PLATFORM_WINDOWS
 #include "psapi.h"
 #pragma comment(lib, "psapi.lib")
 #include "tlhelp32.h"
-#elif PLATFORM_LINUX
+#elif FUSION_PLATFORM_LINUX
 #include <sys/sysinfo.h>
 #include <unistd.h>
 #define LINEBUFFLEN 2048
@@ -13,7 +13,7 @@
 using namespace fe;
 
 ProcessInfo::ProcessInfo(uint32_t processId) : processId{processId} {
-#if PLATFORM_WINDOWs
+#if FUSION_PLATFORM_WINDOWS
     // get number of processors
 	SYSTEM_INFO lSysInfo;
 	GetSystemInfo(&lSysInfo);
@@ -40,7 +40,7 @@ ProcessInfo::ProcessInfo(uint32_t processId) : processId{processId} {
 		CloseHandle(lProcessHandle);
 	}
 
-#elif PLATFORM_LINUX
+#elif FUSION_PLATFORM_LINUX
     jiffiesPerSecond = sysconf(_SC_CLK_TCK);
     prevSystemTime = 0;
     prevUserTime = 0;
@@ -97,7 +97,7 @@ uint32_t ProcessInfo::getProcessId() {
 uint64_t ProcessInfo::getProcessUptime() {
     uint64_t lUptimeInSec = -1;
 
-#if PLATFORM_WINDOWs
+#if FUSION_PLATFORM_WINDOWS
     FILETIME lCurrTime;
 	GetSystemTimeAsFileTime(&lCurrTime);
 
@@ -110,7 +110,7 @@ uint64_t ProcessInfo::getProcessUptime() {
 
 	return lUptimeInSec;
 
-#elif PLATFORM_LINUX
+#elif FUSION_PLATFORM_LINUX
     struct sysinfo lSysinfo;
     int lReturn = sysinfo(&lSysinfo);
 
@@ -123,7 +123,7 @@ uint64_t ProcessInfo::getProcessUptime() {
 
 double ProcessInfo::getProcessCpuUsage() {
     double lCPUUsage = -1;
-#if PLATFORM_WINDOWs
+#if FUSION_PLATFORM_WINDOWS
     HANDLE lProcessHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, mProcessId);
 	if (lProcessHandle != NULL) {
 		// get current system time
@@ -155,7 +155,7 @@ double ProcessInfo::getProcessCpuUsage() {
 		CloseHandle(lProcessHandle);
 	}
 
-#elif PLATFORM_LINUX
+#elif FUSION_PLATFORM_LINUX
     uint64_t lCurrSystemTime = 0;
     uint64_t lCurrUserTime = 0;
     uint64_t lCurrKernelTime = 0;
@@ -208,7 +208,7 @@ double ProcessInfo::getProcessCpuUsage() {
 double ProcessInfo::getProcessMemoryUsed() {
     double lMemUsed = -1;
 
-#if PLATFORM_WINDOWs
+#if FUSION_PLATFORM_WINDOWS
     HANDLE lProcessHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, mProcessId);
 	if (lProcessHandle != NULL) {
 		PROCESS_MEMORY_COUNTERS lPMC;
@@ -221,7 +221,7 @@ double ProcessInfo::getProcessMemoryUsed() {
 		CloseHandle(lProcessHandle);
 	}
 
-#elif PLATFORM_LINUX
+#elif FUSION_PLATFORM_LINUX
     char lFileName[256];
     sprintf(lFileName, "/proc/%d/status", processId);
     FILE* lpFile = fopen(lFileName, "r");
@@ -254,7 +254,7 @@ double ProcessInfo::getProcessMemoryUsed() {
 uint64_t ProcessInfo::getProcessThreadCount() {
     uint64_t lThreadCnt = -1;
 
-#if PLATFORM_WINDOWs
+#if FUSION_PLATFORM_WINDOWS
     // get a process list snapshot
 	HANDLE lSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, 0);
 	if (lSnapshot != NULL) {
@@ -275,7 +275,7 @@ uint64_t ProcessInfo::getProcessThreadCount() {
 		CloseHandle(lSnapshot);
 	}
 
-#elif PLATFORM_LINUX
+#elif FUSION_PLATFORM_LINUX
     // get number of threads from file /proc/[pid]/stat
     char lFileName[256];
     sprintf(lFileName, "/proc/%d/stat", processId);
