@@ -15,6 +15,9 @@ namespace fe {
         float axes[6];
     };
 
+    /**
+     * @brief Class used to represent a joystick.
+     */
     class Joystick {
     public:
         Joystick() = default;
