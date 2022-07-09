@@ -20,7 +20,7 @@ target_precompile_headers(${PROJECT_NAME} PUBLIC ${HEADER_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC "src")
 
 # create a
-configure_file(assets <output> COPYONLY)
+#configure_file(assets <output> COPYONLY)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
         git-info

@@ -194,20 +194,6 @@ endif()
 list(APPEND ALL_SYSTEM_LIBS glslang SPIRV)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
-# yaml-cpp
-#╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(Yaml-cpp )
-if(NOT Yaml-cpp_FOUND)
-    set(YAML_LIB_NAME "yaml-cpp")
-
-    set(YAML_CPP_BUILD_CONTRIB OFF CACHE INTERNAL "")
-    set(YAML_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-
-    add_subdirectory(${YAML_LIB_NAME})
-endif()
-#list(APPEND ALL_SYSTEM_LIBS yaml-cpp)
-#╘◖═════════════════════════════════════════════════════════════════════◗╛
-
 # cereal
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 #find_package(cereal)
@@ -342,19 +328,6 @@ if(NOT LZ4_FOUND)
     add_subdirectory(${LZ4_LIB_NAME}/build/cmake/)
 endif()
 list(APPEND ALL_SYSTEM_LIBS lz4)
-#╘◖═════════════════════════════════════════════════════════════════════◗╛
-
-# nlohmann_json
-#╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(nlohmann_json 3.2.0 QUIET)
-if(NOT nlohmann_json_FOUND)
-    set(JSON_LIB_NAME "json")
-
-    set(JSON_BuildTests OFF CACHE INTERNAL "")
-
-    add_subdirectory(${JSON_LIB_NAME})
-endif()
-list(APPEND ALL_SYSTEM_LIBS nlohmann_json)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 #assimp
