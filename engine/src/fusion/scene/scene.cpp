@@ -11,7 +11,7 @@
 
 using namespace fe;
 
-Scene::Scene(std::shared_ptr<Camera> camera) : camera{std::move(camera)} {
+Scene::Scene(std::string name) : name{std::move(name)} {
 
 }
 
@@ -35,7 +35,7 @@ Scene::Scene(std::shared_ptr<Camera> camera) : camera{std::move(camera)} {
     clone<MaterialComponent>(other.registry);
 }*/
 
-void Scene::onStart() {
+void Scene::onCreate() {
     systems.each([&](auto system) {
         if (system->isEnabled())
             system->onCreate();
@@ -52,7 +52,7 @@ void Scene::onUpdate() {
     });
 }
 
-void Scene::onRuntimeStart() {
+void Scene::onStart() {
     runtime = true;
 
     systems.each([&](auto system) {
@@ -61,7 +61,7 @@ void Scene::onRuntimeStart() {
     });
 }
 
-void Scene::onRuntimeStop() {
+void Scene::onStop() {
     systems.each([&](auto system) {
         if (system->isEnabled())
             system->onStop();

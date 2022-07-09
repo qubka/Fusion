@@ -2,6 +2,7 @@
 
 #include "editor.hpp"
 
+#include "fusion/core/engine.hpp"
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/utils/string.hpp"
 #include "fusion/utils/enumerate.hpp"
@@ -10,8 +11,9 @@
 
 using namespace fe;
 
-ContentBrowserPanel::ContentBrowserPanel() : EditorPanel{ICON_MDI_ARCHIVE " Content Browser##content", "ContentBrowser"} {
-    basePath = std::filesystem::current_path(); // TODO: Finish project system
+ContentBrowserPanel::ContentBrowserPanel(Editor* editor) : EditorPanel{ICON_MDI_ARCHIVE " Content Browser##content", "ContentBrowser", editor} {
+    basePath = editor->getProjectSettings().projectRoot / "assets";
+
     auto base = processDirectory(basePath, nullptr);
     baseDirectory = directories[base];
     changeDirectory(baseDirectory);
@@ -161,7 +163,7 @@ void ContentBrowserPanel::onImGui() {
                 if (ImGui::BeginPopupContextWindow()) {
                     {
                         if (ImGui::Selectable("Import New Asset")) {
-                            //editor->openFile();
+                            editor->openFile();
                         }
 
                         if (ImGui::Selectable("Refresh")) {
@@ -403,7 +405,7 @@ void ContentBrowserPanel::onNewProject() {
 }
 
 void ContentBrowserPanel::refresh() {
-    basePath = std::filesystem::current_path(); // TODO: Finish project system
+    basePath = editor->getProjectSettings().projectRoot / "assets";
 
     const auto& currentPath = currentDirectory->path;
 

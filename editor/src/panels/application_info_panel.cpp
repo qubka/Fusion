@@ -6,7 +6,7 @@
 
 using namespace fe;
 
-ApplicationInfoPanel::ApplicationInfoPanel() : EditorPanel{ICON_MDI_INFORMATION_VARIANT " Application Info##appinfo", "AppInfo"} {
+ApplicationInfoPanel::ApplicationInfoPanel(Editor* editor) : EditorPanel{ICON_MDI_INFORMATION_VARIANT " Application Info##appinfo", "AppInfo", editor} {
 
 }
 

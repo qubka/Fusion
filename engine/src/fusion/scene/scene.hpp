@@ -7,19 +7,19 @@
 namespace fe {
     class Camera;
     class Scene {
-        friend class Scenes;
+        friend class SceneManager;
     public:
         /**
          * Creates a new scene.
-         * @param camera The scenes camera.
+         * @param name The scenes name.
          */
-        explicit Scene(std::shared_ptr<Camera> camera);
+        explicit Scene(std::string name);
         ~Scene() = default;
 
         /**
-         * Run when switching to this scene from another.
+         * Called when the scene is created.
          */
-        virtual void onStart();
+        virtual void onCreate();
 
         /**
          * Run when updating the scene.
@@ -27,14 +27,14 @@ namespace fe {
         virtual void onUpdate();
 
         /**
-         * Run when the scene is start the runtime.
+         * Called when scene is being activated, and will begin being rendered/updated.
          */
-        void onRuntimeStart();
+        virtual void onStart();
 
         /**
-         * Run when the scene is stop the runtime.
+         * Called when scene is being swapped and will no longer be rendered/updated
          */
-        void onRuntimeStop();
+        virtual void onStop();
 
         /**
          * Checks whether a System exists or not.
@@ -95,9 +95,9 @@ namespace fe {
 
         /**
          * Sets the current camera to a new camera.
-         * @param camera The new camera.
+         * @param cam The new camera.
          */
-        void setCamera(std::shared_ptr<Camera> camera) { this->camera = std::move(camera); }
+        void setCamera(std::shared_ptr<Camera> cam) { camera = std::move(cam); }
 
         /**
          * Gets the name of the scene.
@@ -107,9 +107,9 @@ namespace fe {
 
         /**
          * Sets the name to the scene.
-         * @param name The scene name.
+         * @param str The scene name.
          */
-        void setName(const std::string& name) { this->name = name; }
+        void setName(const std::string& str) { name = str; }
 
         /**
          * Gets if the scene is in runtime.
@@ -137,7 +137,7 @@ namespace fe {
          * Sets the scene entity registry.
          * @param camera The new entity registry.
          */
-        void setRegistry(entt::registry&& registry) { this->registry = std::move(registry) ; }
+        void setRegistry(entt::registry&& reg) { registry = std::move(reg) ; }
 
         template<typename T>
         auto getAllEntitiesWith() { return registry.view<T>(); }
@@ -161,7 +161,7 @@ namespace fe {
         SystemHolder systems;
         entt::registry registry;
         std::shared_ptr<Camera> camera;
-        bool started{ false };
+        bool created{ false };
         bool runtime{ false };
     };
 }

@@ -12,5 +12,6 @@ int main(int args, char** argv) {
     engine.setApp(std::make_unique<Editor>("Editor Application"));
 
     // Runs the game loop
-    return engine.run();
+    auto result = engine.run();
+    return result;
 }

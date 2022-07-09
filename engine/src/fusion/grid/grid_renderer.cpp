@@ -9,7 +9,7 @@ using namespace fe;
 
 GridRenderer::GridRenderer(const Pipeline::Stage& pipelineStage)
     : Subrender{pipelineStage}
-    , pipeline{pipelineStage, {"shaders/grid/grid.vert", "shaders/grid/grid.frag"}, {{{Vertex::Component::Position2}}}} {
+    , pipeline{pipelineStage, {"engine/assets/shaders/grid/grid.vert", "engine/assets/shaders/grid/grid.frag"}, {{{Vertex::Component::Position2}}}} {
 
     std::array<glm::vec2, 6> vertices{{
         {-1, 1}, {-1, -1}, {1, 1},

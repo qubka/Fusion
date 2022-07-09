@@ -16,8 +16,8 @@ namespace fe {
 
     class ContentBrowserPanel : public EditorPanel {
     public:
-        ContentBrowserPanel();
-        ~ContentBrowserPanel();
+        explicit ContentBrowserPanel(Editor* editor);
+        ~ContentBrowserPanel() override;
 
         void onImGui() override;
         void onNewProject() override;

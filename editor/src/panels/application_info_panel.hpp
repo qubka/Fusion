@@ -5,8 +5,8 @@
 namespace fe {
     class ApplicationInfoPanel : public EditorPanel {
     public:
-        ApplicationInfoPanel();
-        ~ApplicationInfoPanel();
+        explicit ApplicationInfoPanel(Editor* editor);
+        ~ApplicationInfoPanel() override;
 
         void onImGui() override;
 

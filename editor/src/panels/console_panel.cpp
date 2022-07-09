@@ -12,17 +12,17 @@ std::vector<std::unique_ptr<ConsolePanel::Message>> ConsolePanel::MessageBuffer 
 bool ConsolePanel::AllowScrollingToBottom = true;
 bool ConsolePanel::RequestScrollToBottom = false;
 
-ConsolePanel::ConsolePanel() : EditorPanel{ICON_MDI_VIEW_LIST " Console##console", "Console"} {
-
+ConsolePanel::ConsolePanel(Editor* editor) : EditorPanel{ICON_MDI_VIEW_LIST " Console##console", "Console", editor} {
+    Log::GetConsoleAppender().OnMessage().connect<&ConsolePanel::OnMessage>();
 }
 
 ConsolePanel::~ConsolePanel() {
-
+    Log::GetConsoleAppender().OnMessage().connect<&ConsolePanel::OnMessage>();
 }
 
 void ConsolePanel::onImGui() {
     auto flags = ImGuiWindowFlags_NoCollapse;
-    ImGui::SetNextWindowSize(ImVec2{ 640, 480 }, ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2{640, 480}, ImGuiCond_FirstUseEver);
     ImGui::Begin(name.c_str(), &enabled, flags);
     {
         renderHeader();
@@ -30,6 +30,10 @@ void ConsolePanel::onImGui() {
         renderMessages();
     }
     ImGui::End();
+}
+
+void ConsolePanel::OnMessage(const plog::Record& record, const std::string& message) {
+    AddMessage(std::make_unique<Message>(message, me::enum_value<MessageLevel>(record.getSeverity())));
 }
 
 void ConsolePanel::AddMessage(std::unique_ptr<Message>&& message) {
@@ -120,7 +124,7 @@ void ConsolePanel::renderHeader() {
     ImGui::SameLine(); // ImGui::GetWindowWidth() - levelButtonWidths);
 
     for (int i = 0; i < 6; i++) {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
         ImGui::SameLine();
         auto level = MessageLevel(std::pow(2, i));
 
@@ -230,18 +234,18 @@ void ConsolePanel::Message::onImGui() {
 
 const char* ConsolePanel::Message::GetLevelIcon(MessageLevel level) {
     switch (level) {
-        case MessageLevel::Trace:
-            return ICON_MDI_MESSAGE_TEXT;
+        case MessageLevel::Fatal:
+            return ICON_MDI_ALERT_OCTAGRAM;
+        case MessageLevel::Error:
+            return ICON_MDI_CLOSE_OCTAGON;
+        case MessageLevel::Warning:
+            return ICON_MDI_ALERT;
         case MessageLevel::Info:
             return ICON_MDI_INFORMATION;
         case MessageLevel::Debug:
             return ICON_MDI_BUG;
-        case MessageLevel::Warn:
-            return ICON_MDI_ALERT;
-        case MessageLevel::Error:
-            return ICON_MDI_CLOSE_OCTAGON;
-        case MessageLevel::Critical:
-            return ICON_MDI_ALERT_OCTAGRAM;
+        case MessageLevel::Verbose:
+            return ICON_MDI_MESSAGE_TEXT;
         default:
             return "Unknown name";
     }
@@ -249,18 +253,18 @@ const char* ConsolePanel::Message::GetLevelIcon(MessageLevel level) {
 
 const char* ConsolePanel::Message::GetLevelName(MessageLevel level) {
     switch (level) {
-        case MessageLevel::Trace:
-            return ICON_MDI_MESSAGE_TEXT " Trace";
+        case MessageLevel::Fatal:
+            return ICON_MDI_ALERT_OCTAGRAM " Fatal";
+        case MessageLevel::Error:
+            return ICON_MDI_CLOSE_OCTAGON " Error";
+        case MessageLevel::Warning:
+            return ICON_MDI_ALERT " Warning";
         case MessageLevel::Info:
             return ICON_MDI_INFORMATION " Info";
         case MessageLevel::Debug:
             return ICON_MDI_BUG " Debug";
-        case MessageLevel::Warn:
-            return ICON_MDI_ALERT " Warning";
-        case MessageLevel::Error:
-            return ICON_MDI_CLOSE_OCTAGON " Error";
-        case MessageLevel::Critical:
-            return ICON_MDI_ALERT_OCTAGRAM " Critical";
+        case MessageLevel::Verbose:
+            return ICON_MDI_MESSAGE_TEXT " Verbose";
         default:
             return "Unknown name";
     }
@@ -268,18 +272,18 @@ const char* ConsolePanel::Message::GetLevelName(MessageLevel level) {
 
 glm::vec4 ConsolePanel::Message::GetRenderColor(MessageLevel level) {
     switch (level) {
-        case MessageLevel::Trace:
-            return { 0.75f, 0.75f, 0.75f, 1.00f }; // Gray
+        case MessageLevel::Fatal:
+            return { 0.6f, 0.2f, 0.8f, 1.00f }; // Purple
+        case MessageLevel::Error:
+            return { 1.00f, 0.25f, 0.25f, 1.00f }; // Red
+        case MessageLevel::Warning:
+            return { 1.00f, 1.00f, 0.00f, 1.00f }; // Yellow
         case MessageLevel::Info:
             return { 0.40f, 0.70f, 1.00f, 1.00f }; // Blue
         case MessageLevel::Debug:
             return { 0.00f, 0.50f, 0.50f, 1.00f }; // Cyan
-        case MessageLevel::Warn:
-            return { 1.00f, 1.00f, 0.00f, 1.00f }; // Yellow
-        case MessageLevel::Error:
-            return { 1.00f, 0.25f, 0.25f, 1.00f }; // Red
-        case MessageLevel::Critical:
-            return { 0.6f, 0.2f, 0.8f, 1.00f }; // Purple
+        case MessageLevel::Verbose:
+            return { 0.75f, 0.75f, 0.75f, 1.00f }; // Gray
         default:
             return { 1.00f, 1.00f, 1.00f, 1.00f };
     }

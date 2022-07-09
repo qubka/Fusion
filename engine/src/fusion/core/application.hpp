@@ -51,7 +51,7 @@ namespace fe {
 
     protected:
         std::string name;
-        Version version{0, 1, 0, 0};
+        Version version{ 0, 1, 0, 0 };
         bool started{ false };
     };
 }

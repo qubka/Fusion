@@ -1,62 +1,81 @@
 #pragma once
 
-#include "fusion/core/app.hpp"
+#include "fusion/core/default_application.hpp"
 
 #include "panels/editor_panel.hpp"
 #include "panels/file_browser_panel.hpp"
+
+#include <entt/entity/entity.hpp>
 
 namespace fe {
     class Camera;
     class Scene;
 
-    class Editor : public App {
+    struct EditorSettings {
+        bool fullScreenOnPlay{ false };
+        bool fullScreenSceneView{ false };
+        bool showImGuiDemo{ false };
+        ImGuiUtils::Theme theme{ ImGuiUtils::Theme::ClassicDark };
+
+        /*float gridSize{ 10.0f };
+        uint32_t debugDrawFlags{ 0 };
+        uint32_t physics2DDebugFlags{ 0 };
+        uint32_t physics3DDebugFlags{ 0 };
+        bool showGrid{ true };
+        bool showGizmos{ true };
+        bool showViewSelected{ false };
+        bool snapQuizmo{ false };
+        bool showImGuiDemo{ true };
+        bool view2D{ false };
+        bool sleepOutofFocus{ true };
+        bool freeAspect{ true };
+        bool halfRes{ false };
+        float snapAmount{ 1.0f };
+        float imGuizmoScale{ 0.25f };
+        float fixedAspect{ 1.0f };
+        float aspectRatio{ 1.0f };*/
+    };
+
+    enum class EditorState {
+        Paused,
+        Play,
+        Next,
+        Preview
+    };
+
+    class Editor : public DefaultApplication {
     public:
-        Editor(const std::string& name, const Version& version);
+        explicit Editor(std::string name);
         ~Editor() override;
 
         void onStart() override;
         void onUpdate() override;
         void onImGui() override;
 
+        void openFile();
+
+        void fileOpenCallback(const std::filesystem::path& path);
+        void projectOpenCallback(const std::filesystem::path& path);
+        void newProjectOpenCallback(const std::filesystem::path& path);
+        void newProjectLocationCallback(const std::filesystem::path& path);
+
+        const EditorSettings& getSettings() { return editorSettings; }
+        const EditorState& getState() { return editorState; }
+
     private:
+        void beginDockSpace(bool gameFullScreen);
+        void endDockSpace();
         void drawMenuBar();
 
-        void BeginDockSpace(bool gameFullScreen);
-        void EndDockSpace();
+        EditorSettings editorSettings;
+        EditorState editorState{ EditorState::Paused };
 
-        void newScene();
-        void openScene();
-        void openScene(const std::filesystem::path& file);
-        void saveScene();
-        void saveSceneAs();
-
-        void onScenePlay();
-        void onSceneStop();
-        void onViewportResize();
-
-        void UI_Toolbar();
-
-        std::shared_ptr<Scene> activeScene;
-        std::shared_ptr<Camera> editorCamera;
-
-        // Panels
-        //ContentBrowserPanel contentBrowserPanel;
-        //SceneHierarchyPanel sceneHierarchyPanel{ contentBrowserPanel };
-
-        // Gizmo
-        int gizmoType{ -1 };
-        enum SceneState { Edit = 0, Play = 1 };
-        SceneState sceneState{ Edit };
-
-        glm::vec2 viewportSize{ -1.0f };
-        //glm::mat4 viewportOrtho{ 1.0f };
-        bool viewportFocused{ false };
-        bool viewportHovered{ false };
-
-        FileBrowserPanel fileBrowserPanel;
-
-        //EditorSettings settings;
+        FileBrowserPanel fileBrowserPanel{ this };
         std::vector<std::unique_ptr<EditorPanel>> panels;
         std::unordered_map<std::type_index, std::string> componentIconMap;
+
+        entt::entity selectedEntity{ entt::null };
+        entt::entity copiedEntity{ entt::null };
+        bool cutCopyEntity{ false };
     };
 }

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 project(fusion)
 
 include(version.cmake)
-include(git_version.cmake)
+include(git.cmake)
 
 if(ANDROID)
     set(PLATFORM_FOLDER "android")
@@ -18,6 +18,9 @@ set(HEADER_FILES "src/pch.hpp")
 add_library(${PROJECT_NAME} STATIC ${SRC_SOURCES} ${SRC_HEADERS})
 target_precompile_headers(${PROJECT_NAME} PUBLIC ${HEADER_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC "src")
+
+# create a
+configure_file(assets <output> COPYONLY)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
         git-info

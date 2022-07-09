@@ -5,20 +5,20 @@
 namespace fe {
     enum class MessageLevel : uint8_t {
         None = 0,
-        Trace = 1,
-        Debug = 2,
-        Info = 4,
-        Warn = 8,
-        Error = 16,
-        Critical = 32,
+        Fatal = 1,
+        Error = 2,
+        Warning = 4,
+        Info = 8,
+        Debug = 16,
+        Verbose = 32
     };
-    BITMASK_DEFINE_MAX_ELEMENT(MessageLevel, Critical);
+    BITMASK_DEFINE_MAX_ELEMENT(MessageLevel, Verbose);
 
     class ConsolePanel : public EditorPanel {
     public:
         class Message {
         public:
-            explicit Message(std::string message = "", MessageLevel level = MessageLevel::Trace, std::string source = "");
+            explicit Message(std::string message, MessageLevel level, std::string source = "");
 
             void onImGui();
 
@@ -38,7 +38,7 @@ namespace fe {
         };
 
     public:
-        ConsolePanel();
+        explicit ConsolePanel(Editor* editor);
         ~ConsolePanel() override;
 
         void onImGui() override;
@@ -46,6 +46,7 @@ namespace fe {
         static void Flush();
 
         static void AddMessage(std::unique_ptr<Message>&& message);
+        static void OnMessage(const plog::Record& record, const std::string& message);
 
     private:
         void renderHeader();
