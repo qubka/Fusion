@@ -1,60 +1,60 @@
 [submodule "external/lz4"]
 	path = external/lz4
-	url = https://github.com/lz4/lz4.git
+	url = https://github.com/lz4/lz4
 	ignore = all
 [submodule "external/glm"]
 	path = external/glm
-	url = https://github.com/g-truc/glm.git
+	url = https://github.com/g-truc/glm
 	ignore = all
 [submodule "external/glfw"]
 	path = external/glfw
-	url = https://github.com/glfw/glfw.git
+	url = https://github.com/glfw/glfw
 	ignore = all
 [submodule "external/imgui"]
 	path = external/imgui
-	url = https://github.com/ocornut/imgui.git
+	url = https://github.com/ocornut/imgui
 	ignore = all
 	branch = docking
 [submodule "external/entt"]
 	path = external/entt
-	url = https://github.com/skypjack/entt.git
+	url = https://github.com/skypjack/entt
 	ignore = all
 [submodule "external/stb"]
 	path = external/stb
-	url = https://github.com/nothings/stb.git
+	url = https://github.com/nothings/stb
 	ignore = all
 [submodule "external/plog"]
 	path = external/plog
-	url = https://github.com/SergiusTheBest/plog.git
+	url = https://github.com/SergiusTheBest/plog
 	ignore = all
 [submodule "external/imguizmo"]
 	path = external/imguizmo
-	url = https://github.com/CedricGuillemet/ImGuizmo.git
+	url = https://github.com/CedricGuillemet/ImGuizmo
 	ignore = all
 [submodule "external/portable-file-dialogs"]
 	path = external/portable-file-dialogs
-	url = https://github.com/samhocevar/portable-file-dialogs.git
+	url = https://github.com/samhocevar/portable-file-dialogs
 	ignore = all
 [submodule "external/magic_enum"]
 	path = external/magic_enum
-	url = https://github.com/Neargye/magic_enum.git
+	url = https://github.com/Neargye/magic_enum
 	ignore = all
 [submodule "external/gli"]
 	path = external/gli
-	url = https://github.com/g-truc/gli.git
+	url = https://github.com/g-truc/gli
 	ignore = all
 [submodule "external/physx"]
 	path = external/physx
-	url = https://github.com/NVIDIAGameWorks/PhysX.git
+	url = https://github.com/NVIDIAGameWorks/PhysX
 [submodule "external/iconfontcppheaders"]
 	path = external/iconfontcppheaders
-	url = https://github.com/juliettef/IconFontCppHeaders.git
+	url = https://github.com/juliettef/IconFontCppHeaders
 [submodule "external/freetype"]
 	path = external/freetype
-	url = https://github.com/freetype/freetype.git
+	url = https://github.com/freetype/freetype
 [submodule "external/glslang"]
 	path = external/glslang
-	url = https://github.com/KhronosGroup/glslang.git
+	url = https://github.com/KhronosGroup/glslang
 [submodule "external/volk"]
 	path = external/volk
 	url = https://github.com/zeux/volk

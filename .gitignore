@@ -31,6 +31,12 @@ cmake-build-debug/
 !bin/*.dll
 bin_debug
 
+# External data
+external/
+!external/binary_fonts
+!external/imgui-plugins
+!external/CMakeLists.txt
+
 # CMake
 CMakeCache.txt
 CMakeFiles

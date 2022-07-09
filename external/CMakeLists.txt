@@ -347,9 +347,8 @@ list(APPEND ALL_SYSTEM_LIBS assimp)
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 set(IMGUI_LIB_NAME "imgui")
 set(IMGUIZMO_LIB_NAME "imguizmo")
-set(IMGUI_FILEBROWSER_LIB_NAME "imgui-filebrowser")
 set(IMGUIAL_LIB_NAME "imguial")
-#set(ICON_HEADERS_LIB_NAME "iconfontcppheaders")
+set(IMGUI_PLUGINS_NAME "imgui-plugins")
 
 set(IMGUI_SOURCES
         "${IMGUI_LIB_NAME}/imgui.cpp"
@@ -375,11 +374,11 @@ set(IMGUI_HEADERS
         "${IMGUI_LIB_NAME}/imstb_rectpack.h"
         "${IMGUI_LIB_NAME}/imstb_textedit.h"
         "${IMGUI_LIB_NAME}/imstb_truetype.h"
-        "${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.h"
+        #"${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.h"
         #"${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.h"
-        "${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.h"
+        #"${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.h"
 
-        "${IMGUI_FILEBROWSER_LIB_NAME}/imfilebrowser.h"
+        "${IMGUI_PLUGINS_NAME}/imfilebrowser.h"
 
         "${IMGUIZMO_LIB_NAME}/GraphEditor.h"
         "${IMGUIZMO_LIB_NAME}/ImCurveEdit.h"
