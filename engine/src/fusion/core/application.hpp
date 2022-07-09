@@ -6,7 +6,7 @@ namespace fe {
     class Application {
         friend class Engine;
     public:
-        Application(std::string name, Version version = {0, 1, 0, 0}) : name{std::move(name)}, version{version} { }
+        Application(std::string name) : name{std::move(name)} { }
         virtual ~Application() = default;
         NONCOPYABLE(Application);
 
@@ -51,7 +51,7 @@ namespace fe {
 
     protected:
         std::string name;
-        Version version;
+        Version version{0, 1, 0, 0};
         bool started{ false };
     };
 }

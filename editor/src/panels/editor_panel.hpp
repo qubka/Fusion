@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fusion/imgui/material_design_icons.hpp"
+#include "fusion/imgui/imgui_utils.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -19,15 +20,10 @@ namespace fe {
 
         virtual void onImGui() = 0;
 
-        virtual void onNewScene(Scene* scene) {
-        }
+        virtual void onNewScene(Scene* scene) {}
+        virtual void onNewProject() {}
 
-        virtual void onNewProject() {
-        }
-
-        virtual void onRender() {
-        }
-
+        bool& Enabled() { return enabled; }
         bool isEnabled() const { return enabled; }
         void setEnabled(bool flag) { enabled = flag; }
 

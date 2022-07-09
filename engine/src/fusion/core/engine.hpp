@@ -15,7 +15,7 @@ namespace fe {
          * Carries out the setup for basic engine components and the engine. Call {@link Engine#Run} after creating a instance.
          * @param args The arguments passed to main.
          */
-        Engine(CommandLineArgs args);
+        explicit Engine(CommandLineArgs args);
         ~Engine();
         NONCOPYABLE(Engine);
 
@@ -91,6 +91,11 @@ namespace fe {
          * The update engine modules for the required stage.
          */
         void updateStage(Module::Stage stage);
+
+        /**
+         * Sort engine modules on the initialization.
+         */
+         void sortModules();
 
         CommandLineArgs commandLineArgs;
         CommandLineParser commandLineParser;

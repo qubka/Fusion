@@ -5,8 +5,7 @@ using namespace glfw;
 
 Monitor::Monitor(GLFWmonitor* monitor)
     : monitor{monitor}
-    , name{glfwGetMonitorName(monitor)}
-{
+    , name{glfwGetMonitorName(monitor)} {
     glfwSetMonitorUserPointer(monitor, this);
 
     int videoModeCount;

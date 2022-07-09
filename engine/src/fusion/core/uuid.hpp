@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fe{
+namespace fe {
     static std::random_device rd;
     static std::mt19937 gen(rd());
     static std::uniform_int_distribution<> dis(0, 15);

@@ -12,7 +12,7 @@ namespace plog {
     public:
         void write(const Record& record) override{
             ColorConsoleAppender<Formatter>::write(record);
-            onMessage.publish(record, Formatter::format(record));
+            onMessage.publish(record, Formatter::format(record)); // TODO: Create custom formatter
         }
 
         /**
@@ -31,6 +31,9 @@ namespace fe {
     public:
         static void Init();
 
+        static plog::EventConsoleAppender<plog::TxtFormatter>& GetConsoleAppender() { return ConsoleAppender; }
+
+    private:
         static plog::EventConsoleAppender<plog::TxtFormatter> ConsoleAppender;
     };
 }

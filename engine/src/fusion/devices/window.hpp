@@ -6,8 +6,22 @@
 #include <entt/signal/sigh.hpp>
 
 namespace fe {
+    /**
+     * @brief Class used to represent a initial window information.
+     */
+    struct WindowInfo {
+        std::string title{ "Fusion" };
+        glm::uvec2 size{ 1280, 720 };
+        bool isBorderless{ false };
+        bool isResizable{ true };
+        bool isFloating { false };
+        bool isFullscreen{ false };
+        bool isVSync{ false };
+    };
+
     class Monitor;
     class Cursor;
+
     /**
      * @brief Class used to represent a window.
      */

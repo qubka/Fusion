@@ -12,39 +12,37 @@
 
 using namespace fe;
 
-ProcessInfo::ProcessInfo(uint32_t processId) : processId{processId} {
+ProcessInfo::ProcessInfo(unsigned int processId) : mProcessId{processId} {
 #if FUSION_PLATFORM_WINDOWS
     // get number of processors
-	SYSTEM_INFO lSysInfo;
-	GetSystemInfo(&lSysInfo);
-	mNumOfProcessors =  lSysInfo.dwNumberOfProcessors;
+    SYSTEM_INFO lSysInfo;
+    GetSystemInfo(&lSysInfo);
+    mNumOfProcessors = lSysInfo.dwNumberOfProcessors;
 
-	// get system time
-	FILETIME lFileTime;
-	GetSystemTimeAsFileTime(&lFileTime);
-	memcpy(&mPrevSystemTime, &lFileTime, sizeof(FILETIME));
+    // get system time
+    FILETIME lFileTime;
+    GetSystemTimeAsFileTime(&lFileTime);
+    memcpy(&mPrevSystemTime, &lFileTime, sizeof(FILETIME));
 
-	// get amount of time ran in kernel and user mode
-	FILETIME lCreationTime, lExitTime, lKernelTime, lUserTime;
-	HANDLE lProcessHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, mProcessId);
-	if (lProcessHandle != NULL)
-	{
-		BOOL lSuccess = GetProcessTimes(lProcessHandle, &lCreationTime, &lExitTime, &lKernelTime, &lUserTime);
-		if (lSuccess)
-		{
-			memcpy(&mCreationTime, &lCreationTime, sizeof(FILETIME));
-			memcpy(&mPrevKernelTime, &lKernelTime, sizeof(FILETIME));
-			memcpy(&mPrevUserTime, &lUserTime, sizeof(FILETIME));
-		}
+    // get amount of time ran in kernel and user mode
+    FILETIME lCreationTime, lExitTime, lKernelTime, lUserTime;
+    HANDLE lProcessHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, mProcessId);
+    if (lProcessHandle != NULL) {
+        BOOL lSuccess = GetProcessTimes(lProcessHandle, &lCreationTime, &lExitTime, &lKernelTime, &lUserTime);
+        if (lSuccess) {
+            memcpy(&mCreationTime, &lCreationTime, sizeof(FILETIME));
+            memcpy(&mPrevKernelTime, &lKernelTime, sizeof(FILETIME));
+            memcpy(&mPrevUserTime, &lUserTime, sizeof(FILETIME));
+        }
 
-		CloseHandle(lProcessHandle);
-	}
+        CloseHandle(lProcessHandle);
+    }
 
 #elif FUSION_PLATFORM_LINUX
-    jiffiesPerSecond = sysconf(_SC_CLK_TCK);
-    prevSystemTime = 0;
-    prevUserTime = 0;
-    prevKernelTime = 0;
+    mJiffiesPerSecond = sysconf(_SC_CLK_TCK);
+    mPrevSystemTime = 0;
+    mPrevUserTime = 0;
+    mPrevKernelTime = 0;
 
     // calculate total system time from file /proc/stat,
     // the content is like: cpu 7967 550 4155 489328
@@ -52,11 +50,11 @@ ProcessInfo::ProcessInfo(uint32_t processId) : processId{processId} {
     if (lpFile) {
         // skip unnecessary content
         fscanf(lpFile, "cpu");
-        uint64_t lTime;
+        unsigned long long lTime;
         int lValuesToRead = 4;
         for (int i = 0; i < lValuesToRead; i++) {
             fscanf(lpFile, "%llu", &lTime);
-            prevSystemTime += lTime;
+            mPrevSystemTime += lTime;
         }
         fclose(lpFile);
     }
@@ -64,7 +62,7 @@ ProcessInfo::ProcessInfo(uint32_t processId) : processId{processId} {
     // get user mode time, kernel mode time, start time
     // for current process from file /proc/[pid]/stat
     char lFileName[256];
-    sprintf(lFileName, "/proc/%d/stat", processId);
+    sprintf(lFileName, "/proc/%d/stat", mProcessId);
     lpFile = fopen(lFileName, "r");
     if (lpFile) {
         // skip unnecessary content
@@ -72,93 +70,95 @@ ProcessInfo::ProcessInfo(uint32_t processId) : processId{processId} {
         char lTemp[LINEBUFFLEN];
         for (int i = 0; i < lValuesToSkip; i++)
             fscanf(lpFile, "%s", lTemp);
-        fscanf(lpFile, "%llu %llu", &prevUserTime, &prevKernelTime);
+        fscanf(lpFile, "%llu %llu", &mPrevUserTime, &mPrevKernelTime);
 
         // skip unnecessary content
         lValuesToSkip = 6;
         for (int i = 0; i < lValuesToSkip; i++)
             fscanf(lpFile, "%s", lTemp);
-        uint64_t lStartTimeSinceBoot;
+        unsigned long long lStartTimeSinceBoot;
         fscanf(lpFile, "%llu", &lStartTimeSinceBoot);
-        startTimeSinceBoot = lStartTimeSinceBoot / jiffiesPerSecond;
+        mStartTimeSinceBoot = lStartTimeSinceBoot / mJiffiesPerSecond;
 
         fclose(lpFile);
     }
 #endif
 }
 
-ProcessInfo::~ProcessInfo() {
+ProcessInfo::~ProcessInfo() throw() {
 }
 
-uint32_t ProcessInfo::getProcessId() {
-    return processId;
+unsigned int ProcessInfo::getProcessId() {
+    return mProcessId;
 }
 
-uint64_t ProcessInfo::getProcessUptime() {
-    uint64_t lUptimeInSec = -1;
+unsigned long long ProcessInfo::getProcessUptime() {
+    unsigned long long lUptimeInSec = -1;
 
 #if FUSION_PLATFORM_WINDOWS
     FILETIME lCurrTime;
-	GetSystemTimeAsFileTime(&lCurrTime);
+    GetSystemTimeAsFileTime(&lCurrTime);
 
-	ULARGE_INTEGER ulCurrTime;
-	memcpy(&ulCurrTime, &lCurrTime, sizeof(FILETIME));
+    ULARGE_INTEGER ulCurrTime;
+    memcpy(&ulCurrTime, &lCurrTime, sizeof(FILETIME));
 
-	// The FILETIME structure represents the number of 100-nanosecond intervals,
-	// so we need to divide by 10 million to get actual seconds
-	lUptimeInSec = (ulCurrTime.QuadPart - mCreationTime.QuadPart) / 10000000;
+    // The FILETIME structure represents the number of 100-nanosecond intervals,
+    // so we need to divide by 10 million to get actual seconds
+    lUptimeInSec = (ulCurrTime.QuadPart - mCreationTime.QuadPart) / 10000000;
 
-	return lUptimeInSec;
+    return lUptimeInSec;
 
 #elif FUSION_PLATFORM_LINUX
     struct sysinfo lSysinfo;
     int lReturn = sysinfo(&lSysinfo);
 
     if (lReturn == 0)
-        lUptimeInSec = lSysinfo.uptime - startTimeSinceBoot;
+        lUptimeInSec = lSysinfo.uptime - mStartTimeSinceBoot;
 
 #endif
     return lUptimeInSec;
 }
 
-double ProcessInfo::getProcessCpuUsage() {
+double ProcessInfo::getProcessCPUUsage() {
     double lCPUUsage = -1;
+
 #if FUSION_PLATFORM_WINDOWS
     HANDLE lProcessHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, mProcessId);
-	if (lProcessHandle != NULL) {
-		// get current system time
-		FILETIME lFileTime;
-		GetSystemTimeAsFileTime(&lFileTime);
-		ULARGE_INTEGER lCurrSystemTime;
-		memcpy(&lCurrSystemTime, &lFileTime, sizeof(FILETIME));
+    if (lProcessHandle != NULL) {
+        // get current system time
+        FILETIME lFileTime;
+        GetSystemTimeAsFileTime(&lFileTime);
+        ULARGE_INTEGER lCurrSystemTime;
+        memcpy(&lCurrSystemTime, &lFileTime, sizeof(FILETIME));
 
-		// get amount of time ran in kernel and user mode
-		FILETIME lKernelTime, lUserTime;
-		BOOL lSuccess = GetProcessTimes(lProcessHandle, &lFileTime, &lFileTime, &lKernelTime, &lUserTime);
-		if (lSuccess) {
-			ULARGE_INTEGER lCurrKernelTime, lCurrUserTime;
-			memcpy(&lCurrKernelTime, &lKernelTime, sizeof(FILETIME));
-			memcpy(&lCurrUserTime, &lUserTime, sizeof(FILETIME));
+        // get amount of time ran in kernel and user mode
+        FILETIME lKernelTime, lUserTime;
+        BOOL lSuccess = GetProcessTimes(lProcessHandle, &lFileTime, &lFileTime, &lKernelTime, &lUserTime);
+        if (lSuccess) {
+            ULARGE_INTEGER lCurrKernelTime, lCurrUserTime;
+            memcpy(&lCurrKernelTime, &lKernelTime, sizeof(FILETIME));
+            memcpy(&lCurrUserTime, &lUserTime, sizeof(FILETIME));
 
-			// calculate process cpu usage
-			ULONGLONG lTotalProcess = (lCurrKernelTime.QuadPart - mPrevKernelTime.QuadPart) + (lCurrUserTime.QuadPart - mPrevUserTime.QuadPart);
-			ULONGLONG lTotalSystem = lCurrSystemTime.QuadPart - mPrevSystemTime.QuadPart;
-			if (lTotalSystem > 0)
-				lCPUUsage = (lTotalProcess * 100.0) / (lTotalSystem * mNumOfProcessors);
+            // calculate process cpu usage
+            ULONGLONG lTotalProcess = (lCurrKernelTime.QuadPart - mPrevKernelTime.QuadPart) +
+                                      (lCurrUserTime.QuadPart - mPrevUserTime.QuadPart);
+            ULONGLONG lTotalSystem = lCurrSystemTime.QuadPart - mPrevSystemTime.QuadPart;
+            if (lTotalSystem > 0)
+                lCPUUsage = (lTotalProcess * 100.0) / (lTotalSystem * mNumOfProcessors);
 
-			// store current time info
-			mPrevSystemTime = lCurrSystemTime;
-			mPrevKernelTime = lCurrKernelTime;
-			mPrevUserTime = lCurrUserTime;
-		}
+            // store current time info
+            mPrevSystemTime = lCurrSystemTime;
+            mPrevKernelTime = lCurrKernelTime;
+            mPrevUserTime = lCurrUserTime;
+        }
 
-		CloseHandle(lProcessHandle);
-	}
+        CloseHandle(lProcessHandle);
+    }
 
 #elif FUSION_PLATFORM_LINUX
-    uint64_t lCurrSystemTime = 0;
-    uint64_t lCurrUserTime = 0;
-    uint64_t lCurrKernelTime = 0;
+    unsigned long long lCurrSystemTime = 0;
+    unsigned long long lCurrUserTime = 0;
+    unsigned long long lCurrKernelTime = 0;
 
     // calculate total system time from file /proc/stat,
     // the content is like: cpu 7967 550 4155 489328
@@ -166,7 +166,7 @@ double ProcessInfo::getProcessCpuUsage() {
     if (lpFile) {
         // skip unnecessary content
         fscanf(lpFile, "cpu");
-        uint64_t lTime;
+        unsigned long long lTime;
         int lValuesToRead = 4;
         for (int i = 0; i < lValuesToRead; i++) {
             fscanf(lpFile, "%llu", &lTime);
@@ -178,7 +178,7 @@ double ProcessInfo::getProcessCpuUsage() {
     // get user mode and kernel mode time for current
     // process from file /proc/[pid]/stat
     char lFileName[256];
-    sprintf(lFileName, "/proc/%d/stat", processId);
+    sprintf(lFileName, "/proc/%d/stat", mProcessId);
     lpFile = fopen(lFileName, "r");
     if (lpFile) {
         // skip unnecessary content
@@ -191,17 +191,16 @@ double ProcessInfo::getProcessCpuUsage() {
         fclose(lpFile);
     }
 
-    uint64_t lTotalProcess = (lCurrUserTime - prevUserTime) + (lCurrKernelTime - prevKernelTime);
-    uint64_t lTotalSystem = lCurrSystemTime - prevSystemTime;
+    unsigned long long lTotalProcess = (lCurrUserTime - mPrevUserTime) + (lCurrKernelTime - mPrevKernelTime);
+    unsigned long long lTotalSystem = lCurrSystemTime - mPrevSystemTime;
     if (lTotalSystem > 0)
         lCPUUsage = (lTotalProcess * 100.0) / lTotalSystem;
 
-    prevSystemTime = lCurrSystemTime;
-    prevUserTime = lCurrUserTime;
-    prevKernelTime = lCurrKernelTime;
+    mPrevSystemTime = lCurrSystemTime;
+    mPrevUserTime = lCurrUserTime;
+    mPrevKernelTime = lCurrKernelTime;
 
 #endif
-
     return lCPUUsage;
 }
 
@@ -210,20 +209,20 @@ double ProcessInfo::getProcessMemoryUsed() {
 
 #if FUSION_PLATFORM_WINDOWS
     HANDLE lProcessHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, mProcessId);
-	if (lProcessHandle != NULL) {
-		PROCESS_MEMORY_COUNTERS lPMC;
-		BOOL lSuccess = GetProcessMemoryInfo(lProcessHandle, &lPMC, sizeof(lPMC));
-		if (lSuccess) {
-			// size in MB
-			lMemUsed = lPMC.WorkingSetSize / (1024.0 * 1024.0);
-		}
+    if (lProcessHandle != NULL) {
+        PROCESS_MEMORY_COUNTERS lPMC;
+        BOOL lSuccess = GetProcessMemoryInfo(lProcessHandle, &lPMC, sizeof(lPMC));
+        if (lSuccess) {
+            // size in MB
+            lMemUsed = lPMC.WorkingSetSize / (1024.0 * 1024.0);
+        }
 
-		CloseHandle(lProcessHandle);
-	}
+        CloseHandle(lProcessHandle);
+    }
 
 #elif FUSION_PLATFORM_LINUX
     char lFileName[256];
-    sprintf(lFileName, "/proc/%d/status", processId);
+    sprintf(lFileName, "/proc/%d/status", mProcessId);
     FILE* lpFile = fopen(lFileName, "r");
     char lLineBuf[LINEBUFFLEN];
     if (lpFile) {
@@ -251,34 +250,34 @@ double ProcessInfo::getProcessMemoryUsed() {
     return lMemUsed;
 }
 
-uint64_t ProcessInfo::getProcessThreadCount() {
-    uint64_t lThreadCnt = -1;
+unsigned long ProcessInfo::getProcessThreadCount() {
+    unsigned long lThreadCnt = -1;
 
 #if FUSION_PLATFORM_WINDOWS
     // get a process list snapshot
-	HANDLE lSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, 0);
-	if (lSnapshot != NULL) {
-		// initialize the process entry structure
-		PROCESSENTRY32 lEntry;
-		lEntry.dwSize = sizeof(PROCESSENTRY32);
+    HANDLE lSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, 0);
+    if (lSnapshot != NULL) {
+        // initialize the process entry structure
+        PROCESSENTRY32 lEntry;
+        lEntry.dwSize = sizeof(PROCESSENTRY32);
 
-		// get the first process info
-		BOOL lSuccess = Process32First(lSnapshot, &lEntry);
-		while (lSuccess) {
-			if (lEntry.th32ProcessID == mProcessId) {
-				lThreadCnt = lEntry.cntThreads;
-				break;
-			}
-			lSuccess = Process32Next(lSnapshot, &lEntry);
-		}
+        // get the first process info
+        BOOL lSuccess = Process32First(lSnapshot, &lEntry);
+        while (lSuccess) {
+            if (lEntry.th32ProcessID == mProcessId) {
+                lThreadCnt = lEntry.cntThreads;
+                break;
+            }
+            lSuccess = Process32Next(lSnapshot, &lEntry);
+        }
 
-		CloseHandle(lSnapshot);
-	}
+        CloseHandle(lSnapshot);
+    }
 
 #elif FUSION_PLATFORM_LINUX
     // get number of threads from file /proc/[pid]/stat
     char lFileName[256];
-    sprintf(lFileName, "/proc/%d/stat", processId);
+    sprintf(lFileName, "/proc/%d/stat", mProcessId);
     FILE* lpFile = fopen(lFileName, "r");
     if (lpFile) {
         // skip unnecessary content
@@ -289,6 +288,7 @@ uint64_t ProcessInfo::getProcessThreadCount() {
         fscanf(lpFile, "%lu", &lThreadCnt);
         fclose(lpFile);
     }
+
 #endif
     return lThreadCnt;
 }

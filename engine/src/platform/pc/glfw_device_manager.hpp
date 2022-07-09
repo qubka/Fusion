@@ -18,6 +18,8 @@ namespace glfw {
         bool isRawMouseMotionSupported() const override;
         void updateGamepadMappings(const std::string& mappings) override;
 
+        fe::Window* createWindow(const fe::WindowInfo& windowInfo) override;
+
     private:
 #if GLFW_VERSION_MINOR >= 2
         static void JoystickCallback(int jid, int action);

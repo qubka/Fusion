@@ -7,13 +7,15 @@
 
 using namespace glfw;
 
-Window::Window(const fe::VideoMode& videoMode, const glm::uvec2& size, std::string label) : fe::Window{}
-    , size{size}
-    , title{std::move(label)}
-    , resizable{true}
-    , visible{true}
-    , focused{true}
-{
+Window::Window(const fe::VideoMode& videoMode, const fe::WindowInfo& windowInfo) : fe::Window{}
+    , size{windowInfo.size}
+    , title{windowInfo.title}
+    , borderless{windowInfo.isBorderless}
+    , resizable{windowInfo.isResizable}
+    , floating{windowInfo.isFloating}
+    , fullscreen{windowInfo.isFullscreen}
+    , vsync{windowInfo.isVSync} {
+
     LOG_INFO << "Creating window: " << title << " [" << size.x << " " << size.y << "]";
 
     // Create a windowed mode window and its context.

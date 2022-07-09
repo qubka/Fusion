@@ -1,6 +1,6 @@
 #pragma once
 
-#if FUSION_PLATFORM_WINDOWs
+#if FUSION_PLATFORM_WINDOWS
 #include <windows.h>
 #elif FUSION_PLATFORM_LINUX
 #include <unistd.h>
@@ -9,29 +9,29 @@
 namespace fe {
     class ProcessInfo {
     public:
-        ProcessInfo(uint32_t processId);
+        ProcessInfo(unsigned int processId);
         ~ProcessInfo();
-        
-        uint32_t getProcessId();
-        uint64_t getProcessUptime();
-        double getProcessCpuUsage();
+
+        unsigned int getProcessId();
+        unsigned long long getProcessUptime();
+        double getProcessCPUUsage();
         double getProcessMemoryUsed();
-        uint64_t getProcessThreadCount();
+        unsigned long getProcessThreadCount();
 
     private:
-        uint32_t processId;
+        unsigned int mProcessId;
 #if FUSION_PLATFORM_WINDOWS
-        int numOfProcessors; // numbre of processors
-        ULARGE_INTEGER creationTime; // process creation time
-        ULARGE_INTEGER prevSystemTime; // previously measured system time
-        ULARGE_INTEGER prevKernelTime; // amount of time ran in kernel mode
-        ULARGE_INTEGER prevUserTime; // amount of time ran in user mode
+        int mNumOfProcessors; // numbre of processors
+        ULARGE_INTEGER mCreationTime; // process creation time
+        ULARGE_INTEGER mPrevSystemTime; // previously measured system time
+        ULARGE_INTEGER mPrevKernelTime; // amount of time ran in kernel mode
+        ULARGE_INTEGER mPrevUserTime; // amount of time ran in user mode
 #elif FUSION_PLATFORM_LINUX
-        int64_t jiffiesPerSecond;
-        uint64_t startTimeSinceBoot;
-        uint64_t prevSystemTime;
-        uint64_t prevUserTime;
-        uint64_t prevKernelTime;
+        long mJiffiesPerSecond;
+        unsigned long long mStartTimeSinceBoot;
+        unsigned long long mPrevSystemTime;
+        unsigned long long mPrevUserTime;
+        unsigned long long mPrevKernelTime;
 #endif
     };
 }

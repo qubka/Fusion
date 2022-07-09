@@ -39,8 +39,6 @@ DeviceManager::DeviceManager() : fe::DeviceManager{} {
     auto glfwMonitors = glfwGetMonitors(&count);
     for (int i = 0; i < count; i++)
         monitors.push_back(std::make_unique<Monitor>(glfwMonitors[i]));
-
-    createWindow<glfw::Window>(glm::uvec2{1280, 720});
 }
 
 DeviceManager::~DeviceManager() {
@@ -75,6 +73,7 @@ std::vector<const char*> DeviceManager::getRequiredInstanceExtensions() const {
     uint32_t count = 0;
     const char** names = glfwGetRequiredInstanceExtensions(&count);
     if (names && count) {
+        result.reserve(count);
         for (uint32_t i = 0; i < count; ++i) {
             result.push_back(names[i]);
         }
@@ -96,6 +95,12 @@ bool DeviceManager::isRawMouseMotionSupported() const {
 
 void DeviceManager::updateGamepadMappings(const std::string& mappings) {
     glfwUpdateGamepadMappings(mappings.c_str());
+}
+
+fe::Window* DeviceManager::createWindow(const fe::WindowInfo& windowInfo) {
+    auto& it = windows.emplace_back(std::make_unique<glfw::Window>(getPrimaryMonitor()->getVideoMode(), windowInfo));
+    onWindowCreate.publish(it.get(), true);
+    return it.get();
 }
 
 /* Events Callbacks */
@@ -178,7 +183,7 @@ namespace glfw {
     }
 
     void DeviceManager::CheckGlfw(int result) {
-        if (result) return;
+        if (result == GLFW_TRUE) return;
         auto failure = StringifyResultGlfw(result);
         LOG_ERROR << "GLFW error: " << failure << ", " << result;
         throw std::runtime_error("GLFW error: " + failure);

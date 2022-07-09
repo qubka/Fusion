@@ -24,9 +24,9 @@
 using namespace fe;
 
 Graphics::Graphics() {
-    for (auto& window : DeviceManager::Get()->getWindows()) {
+    /*for (auto& window : DeviceManager::Get()->getWindows()) {
         onWindowCreate(window.get(), true);
-    }
+    }*/
     DeviceManager::Get()->OnWindowCreate().connect<&Graphics::onWindowCreate>(this);
 
     if (!glslang::InitializeProcess())

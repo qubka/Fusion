@@ -22,6 +22,9 @@ namespace fe {
         NotAllowed = 10
     };
 
+    /**
+     * @brief Class used to represent a cursor.
+     */
     class Cursor {
     public:
         Cursor() = default;

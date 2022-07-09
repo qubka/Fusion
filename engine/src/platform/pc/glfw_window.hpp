@@ -8,7 +8,7 @@
 namespace glfw {
     class Window : public fe::Window {
     public:
-        Window(const fe::VideoMode& videoMode, const glm::uvec2& size = {1280, 720}, std::string title = "Fusion");
+        Window(const fe::VideoMode& videoMode, const fe::WindowInfo& windowInfo);
         ~Window() override;
 
         void onUpdate() override;
@@ -79,21 +79,22 @@ namespace glfw {
         VkResult createSurface(VkInstance const& instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const override;
 
     private:
+        GLFWwindow* window{ nullptr };
+
         glm::uvec2 size;
         glm::uvec2 fullscreenSize;
         glm::uvec2 position;
         std::string title;
+
         bool borderless{ false };
         bool resizable{ false };
         bool floating{ false };
         bool fullscreen{ false };
-        bool focused{ false };
         bool iconified{ false };
         bool vsync{ false };
-        bool visible{ false };
-        GLFWwindow* window{ nullptr };
-
-        bool selected{ false };
+        bool focused{ true };
+        bool visible{ true };
+        bool selected{ true };
         bool cursorHidden{ false };
 
         glm::vec2 mouseLastPosition;

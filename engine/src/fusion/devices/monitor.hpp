@@ -33,6 +33,9 @@ namespace fe {
         uint32_t size;
     };
 
+    /**
+     * @brief Class used to represent a monitor.
+     */
     class Monitor {
     public:
         Monitor() = default;
