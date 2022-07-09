@@ -42,6 +42,11 @@ DeviceManager::DeviceManager() : fe::DeviceManager{} {
 }
 
 DeviceManager::~DeviceManager() {
+    // Clear attached devices
+    windows.clear();
+    monitors.clear();
+    joysticks.clear();
+
     // Terminate GLFW
     glfwTerminate();
 }

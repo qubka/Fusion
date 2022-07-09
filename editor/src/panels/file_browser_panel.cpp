@@ -4,7 +4,7 @@
 
 using namespace fe;
 
-FileBrowserPanel::FileBrowserPanel() : EditorPanel{"File Browser Window", "FileBrowser"} {
+FileBrowserPanel::FileBrowserPanel(Editor* editor) : EditorPanel{"File Browser Window", "FileBrowser", editor} {
     fileBrowser = new ImGui::FileBrowser(ImGuiFileBrowserFlags_CreateNewDir | ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_NoModal);
     fileBrowser->SetTitle("Test File Browser");
    // fileBrowser->SetTypeFilters({ ".cpp" , ".hpp" });

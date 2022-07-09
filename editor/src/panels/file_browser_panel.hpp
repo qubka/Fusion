@@ -9,7 +9,7 @@ namespace ImGui {
 namespace fe {
     class FileBrowserPanel : public EditorPanel {
     public:
-        FileBrowserPanel();
+        explicit FileBrowserPanel(Editor* editor);
         ~FileBrowserPanel() override;
 
         void onImGui() override;

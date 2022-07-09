@@ -72,7 +72,15 @@ namespace fe {
          * @param size The size of the buffer.
          * @return True on the success, false otherwise.
          */
-        //static bool WriteFile(const std::filesystem::path& filename, uint8_t* buffer, size_t size);
+        static bool WriteBytes(const std::filesystem::path& filename, const uint8_t* buffer, size_t size);
+
+        /**
+         * Opens a file, write all data into the file, and then closes the file.
+         * @param filename The path to write.
+         * @param str The string object.
+         * @return True on the success, false otherwise.
+         */
+        static bool WriteText(const std::filesystem::path& filename, const std::string& str);
 
         /**
          * Finds all the files in a path.

@@ -40,6 +40,19 @@ std::string FileSystem::ReadText(const std::filesystem::path& filename) {
     return content;
 }
 
+
+bool FileSystem::WriteText(const std::filesystem::path& filename, const std::string& str) {
+    std::ofstream os{filename, std::ios::binary};
+    os.write(str.data(), str.size());
+    return true;
+}
+
+bool FileSystem::WriteBytes(const std::filesystem::path& filename, const uint8_t* buffer, size_t size) {
+    std::ofstream os{filename, std::ios::binary};
+    os.write(reinterpret_cast<const char*>(buffer), size);
+    return true;
+}
+
 std::vector<std::filesystem::path> FileSystem::GetFiles(const std::filesystem::path& path, bool recursive) {
     std::vector<std::filesystem::path> files;
 
