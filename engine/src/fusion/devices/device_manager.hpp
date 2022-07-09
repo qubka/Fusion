@@ -66,11 +66,7 @@ namespace fe {
         */
         virtual void updateGamepadMappings(const std::string& mappings) = 0;
 
-        template<typename T = Window, typename... Args>
-        void createWindow(Args&&...args) {
-            auto& it = windows.emplace_back(std::make_unique<T>(getPrimaryMonitor()->getVideoMode(), std::forward<Args>(args)...));
-            onWindowCreate.publish(it.get(), true);
-        }
+        virtual Window* createWindow(const  WindowInfo& windowInfo) = 0;
         void destroyWindow(const Window* window) {
             auto it = std::find_if(windows.begin(), windows.end(), [window](const auto& w) {
                 return window == w->getNativeWindow();

@@ -91,17 +91,10 @@ namespace fe {
         glm::vec3 inverseTransformPoint(const glm::vec3& point) const { return glm::rotate(glm::inverse(rotation), (point - position) / scale); }
 
         template <typename Archive>
-        void save(Archive& archive) const {
-            archive(cereal::make_nvp("Position", position));
-            archive(cereal::make_nvp("Rotation", rotation));
-            archive(cereal::make_nvp("Scale", scale));
-        }
-
-        template <typename Archive>
-        void load(Archive& archive) {
-            archive(cereal::make_nvp("Position", position));
-            archive(cereal::make_nvp("Rotation", rotation));
-            archive(cereal::make_nvp("Scale", scale));
+        void serialize(Archive& archive) const {
+            archive(cereal::make_nvp("Position", position),
+                    cereal::make_nvp("Rotation", rotation),
+                    cereal::make_nvp("Scale", scale));
         }
     };
     struct DirtyTransformComponent {};
