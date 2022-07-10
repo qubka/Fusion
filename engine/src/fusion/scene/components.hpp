@@ -7,7 +7,8 @@
 
 #include <cereal/cereal.hpp>
 #include <entt/entt.hpp>
-#include <stduiid/uiid.h>
+
+#include <uuid.h>
 
 #define ALL_COMPONENTS  IdComponent, \
 #define ALL_COMPONENTS  TagComponent, \
@@ -32,6 +33,18 @@
 namespace fe {
     struct IdComponent {
         uuids::uuid uuid;
+
+        template<class Archive>
+        void save(Archive& archive) const {
+            archive(cereal::make_nvp("UUID", to_string(uuid)));
+        }
+
+        template<class Archive>
+        void load(Archive& archive) {
+            std::string str;
+            archive(str);
+            uuid = uuids::uuid::from_string(str).value();
+        }
     };
 
     struct TagComponent {

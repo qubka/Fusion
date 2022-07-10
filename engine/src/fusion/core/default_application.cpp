@@ -19,7 +19,7 @@ DefaultApplication::DefaultApplication(std::string name) : Application{std::move
     executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path();
 #endif
 
-    LOG_INFO << "Working directory : " << executablePath;
+    LOG_INFO << "Working directory: " << executablePath;
     fs::current_path(executablePath);
 
     projectSettings.projectVersion = version.string();
@@ -155,7 +155,7 @@ void DefaultApplication::serialise() {
     auto filePath = projectSettings.projectRoot / projectSettings.projectName;
     filePath += ".fsproj";
 
-    LOG_INFO << "Serialising Application : " << filePath;
+    LOG_INFO << "Serialising application: " << filePath;
 
     auto jsonStr = is.str();
     FileSystem::Write(filePath, jsonStr.data(), jsonStr.length());
@@ -171,7 +171,7 @@ void DefaultApplication::deserialise() {
     filePath += ".fsproj";
 
     if (!fs::exists(filePath)) {
-        LOG_INFO << "No saved Project file found : " << filePath;
+        LOG_INFO << "No saved Project file found: " << filePath;
         return;
     }
 

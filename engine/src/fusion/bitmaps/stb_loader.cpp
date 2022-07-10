@@ -35,7 +35,7 @@ void StbLoader::Load(Bitmap& bitmap, const fs::path& filename) {
     bitmap.hdr = hdr;
 
     if (bitmap.isEmpty()) {
-        LOG_ERROR << "Failed to load bitmap file: " << filename.string();
+        LOG_ERROR << "Failed to load bitmap file: " << filename;
         return;
     }
 

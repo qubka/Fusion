@@ -59,7 +59,7 @@ void FileSystem::Read(const fs::path& filename, const FileSystem::SimpleHandler&
 
     if (!fsFile) {
         if (!fs::exists(filename) || !fs::is_regular_file(filename)) {
-            LOG_ERROR << "Failed to open file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+            LOG_ERROR << "Failed to open file: " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
             return;
         }
 
@@ -76,7 +76,7 @@ void FileSystem::Read(const fs::path& filename, const FileSystem::SimpleHandler&
     PHYSFS_readBytes(fsFile, data.data(), static_cast<PHYSFS_uint64>(size));
 
     if (PHYSFS_close(fsFile) == 0) {
-        LOG_ERROR << "Failed to close file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_ERROR << "Failed to close file: " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
 
     handler(data.data(), data.size());
@@ -87,7 +87,7 @@ std::vector<uint8_t> FileSystem::ReadBytes(const fs::path& filename) {
 
     if (!fsFile) {
         if (!fs::exists(filename) || !fs::is_regular_file(filename)) {
-            LOG_ERROR << "Failed to open file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+            LOG_ERROR << "Failed to open file: " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
             return {};
         }
 
@@ -105,7 +105,7 @@ std::vector<uint8_t> FileSystem::ReadBytes(const fs::path& filename) {
     PHYSFS_readBytes(fsFile, data.data(), static_cast<PHYSFS_uint64>(size));
 
     if (PHYSFS_close(fsFile) == 0) {
-        LOG_ERROR << "Failed to close file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_ERROR << "Failed to close file: " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
 
     return data;
@@ -138,7 +138,7 @@ std::string FileSystem::ReadText(const fs::path& filename) {
     PHYSFS_readBytes(fsFile, data.data(), static_cast<PHYSFS_uint64>(size));
 
     if (PHYSFS_close(fsFile) == 0) {
-        LOG_ERROR << "Failed to close file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_ERROR << "Failed to close file: " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
 
     return { data.begin(), data.end() };
@@ -157,12 +157,12 @@ bool FileSystem::Write(const fs::path& filename, const void* buffer, size_t size
 
     auto written = PHYSFS_writeBytes(fsFile, buffer, size);
     if(written != size)
-        LOG_ERROR << "Failed to write in file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_ERROR << "Failed to write in file: " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     else
         ret = written;
 
     if (PHYSFS_close(fsFile) == 0) {
-        LOG_ERROR << "Failed to close file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_ERROR << "Failed to close file: " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
 
     return ret;

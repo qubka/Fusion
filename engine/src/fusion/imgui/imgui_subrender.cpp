@@ -46,7 +46,7 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     } else if (android::screenDensity >= ACONFIGURATION_DENSITY_HIGH) {
         fontScale = 2.0f;
     };
-    LOG_DEBUG << "Android UI scale "<< fontScale;
+    LOG_DEBUG << "Android UI scale: " << fontScale;
 #elif FUSION_PLATFORM_IOS
     fontScale = 2.0f;
 #else

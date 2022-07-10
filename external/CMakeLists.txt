@@ -47,11 +47,24 @@ endif()
 list(APPEND ALL_SYSTEM_LIBS plog)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
+# span
+#╒◖═════════════════════════════════════════════════════════════════════◗╕
+find_package(span QUIET)
+if(NOT span_FOUND)
+    add_library(span INTERFACE)
+
+    target_include_directories(span INTERFACE span/include)
+endif()
+list(APPEND ALL_SYSTEM_LIBS span)
+#╘◖═════════════════════════════════════════════════════════════════════◗╛
+
 # stduuid
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 find_package(stduuid 1.2.2 QUIET)
 if(NOT stduuid_FOUND)
-    add_subdirectory(stduuid)
+    add_library(stduuid INTERFACE)
+
+    target_include_directories(stduuid INTERFACE stduuid/include)
 endif()
 list(APPEND ALL_SYSTEM_LIBS stduuid)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛

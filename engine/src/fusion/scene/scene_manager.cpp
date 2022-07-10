@@ -36,7 +36,7 @@ void SceneManager::switchScene(const std::string& name) {
     if (found != UINT32_MAX) {
         switchScene(found);
     } else {
-        LOG_ERROR << "Unknown Scene Alias : " << name;
+        LOG_ERROR << "Unknown scene name: " << std::quoted(name);
     }
 }
 
@@ -79,7 +79,7 @@ void SceneManager::applySceneSwitch() {
     }
 
     if (queuedSceneIndex >= scenes.size()) {
-        LOG_INFO << "Invalid Scene Index : " << queuedSceneIndex;
+        LOG_INFO << "Invalid scene index: " << queuedSceneIndex;
         queuedSceneIndex = 0;
     }
 
@@ -92,7 +92,7 @@ void SceneManager::applySceneSwitch() {
         currentScene->deserialise(newPath, false);
     }*/
 
-    LOG_INFO << "Scene switched to : " << currentScene->getName();
+    LOG_INFO << "Scene switched to: " << std::quoted(currentScene->getName());
 
     switchingScenes = false;
 }
@@ -106,12 +106,12 @@ void SceneManager::enqueueSceneFromFile(const fs::path& filename) {
 
 void SceneManager::enqueueScene(std::unique_ptr<Scene>&& scene) {
     const auto& self = scenes.emplace_back(std::move(scene));
-    LOG_INFO << "Enqueued scene : " << self->getName();
+    LOG_INFO << "Enqueued scene: " << std::quoted(self->getName());
 }
 
 void SceneManager::enqueueScene(const std::string& name) {
     const auto& self = scenes.emplace_back(std::make_unique<Scene>(name));
-    LOG_INFO << "Enqueued scene : " << self->getName();
+    LOG_INFO << "Enqueued scene: " << std::quoted(self->getName());
 }
 
 void SceneManager::addFileToLoadList(const fs::path& filename) {

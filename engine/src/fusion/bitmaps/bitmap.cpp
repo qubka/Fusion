@@ -38,7 +38,7 @@ void Bitmap::load(const fs::path& filename) {
     }
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Bitmap " << filename << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Bitmap: " << filename << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 
@@ -58,7 +58,7 @@ void Bitmap::write(const fs::path& filename) const {
     }
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Bitmap " << filename << " written in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Bitmap: " << filename << " written in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 
