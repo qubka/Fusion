@@ -14,11 +14,12 @@ using namespace fe;
 
 DefaultApplication::DefaultApplication(std::string name) : Application{std::move(name)} {
 #if FUSION_PLATFORM_MAC
-    auto executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path().parent_path().parent_path().parent_path();
+    executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path().parent_path().parent_path().parent_path();
 #else
-    auto executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path();
+    executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path();
 #endif
-    LOG_INFO << "Working directory : " << executablePath.string();
+
+    LOG_INFO << "Working directory : " << executablePath;
     fs::current_path(executablePath);
 
     projectSettings.projectVersion = version.string();
@@ -29,6 +30,8 @@ DefaultApplication::~DefaultApplication() {
 }
 
 void DefaultApplication::onStart() {
+    FileSystem::Get()->mount(executablePath / "engine" / "assets" / "shaders", "EngineShaders");
+
     deserialise();
 
     WindowInfo windowInfo = {};
@@ -65,10 +68,10 @@ void DefaultApplication::openNewProject(const fs::path& path, const std::string&
     projectSettings.projectRoot = path / name;
     projectSettings.projectName = name;
 
-    //projectSettings.engineAssetPath = executablePath / "engine" / "assets";
-
     if (!fs::exists(projectSettings.projectRoot))
         fs::create_directory(projectSettings.projectRoot);
+
+    mountPaths();
 
     // Set Default values
     projectSettings.projectVersion = version.string();
@@ -98,6 +101,10 @@ void DefaultApplication::openNewProject(const fs::path& path, const std::string&
     if (!fs::exists(scriptPath))
         fs::create_directory(scriptPath);
 
+    auto shaderPath = assetPath / "shaders";
+    if (!fs::exists(shaderPath))
+        fs::create_directory(shaderPath);
+
     auto scenePath = assetPath / "scenes";
     if (!fs::exists(scenePath))
         fs::create_directory(scenePath);
@@ -113,6 +120,8 @@ void DefaultApplication::openNewProject(const fs::path& path, const std::string&
     auto soundPath = assetPath / "sounds";
     if (!fs::exists(soundPath))
         fs::create_directory(soundPath);
+
+    mountPaths();
 
     //m_SceneManager->EnqueueScene(new Scene("Empty Scene"));
     //m_SceneManager->SwitchScene(0);
@@ -148,7 +157,8 @@ void DefaultApplication::serialise() {
 
     LOG_INFO << "Serialising Application : " << filePath;
 
-    FileSystem::WriteText(filePath, is.str());
+    auto jsonStr = is.str();
+    FileSystem::Write(filePath, jsonStr.data(), jsonStr.length());
 }
 
 void DefaultApplication::deserialise() {
@@ -165,6 +175,8 @@ void DefaultApplication::deserialise() {
         return;
     }
 
+    mountPaths();
+
     std::string data = FileSystem::ReadText(filePath);
     std::istringstream is{data};
     try {
@@ -176,11 +188,22 @@ void DefaultApplication::deserialise() {
         projectSettings = {};
         projectSettings.projectVersion = version.string();
 
-        //projectSettings.engineAssetPath = executablePath / "engine" / "assets";
-
         //m_SceneManager->EnqueueScene(new Scene("Empty Scene"));
         //m_SceneManager->SwitchScene(0);
 
         LOG_ERROR << "Failed to load project";
     }
+}
+
+void DefaultApplication::mountPaths() const {
+    auto fs = FileSystem::Get();
+
+    auto assetPath = projectSettings.projectRoot / "assets";
+    fs->mount(assetPath, "Assets");
+    fs->mount(assetPath / "meshes", "Meshes");
+    fs->mount(assetPath / "textures", "Textures");
+    fs->mount(assetPath / "sounds", "Sounds");
+    fs->mount(assetPath / "scripts", "Scripts");
+    fs->mount(assetPath / "shaders", "Shaders");
+    fs->mount(assetPath / "scenes", "Scenes");
 }

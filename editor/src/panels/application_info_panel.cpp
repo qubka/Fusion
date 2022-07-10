@@ -3,6 +3,7 @@
 #include "fusion/core/engine.hpp"
 #include "fusion/core/time.hpp"
 #include "fusion/scene/scene_manager.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 using namespace fe;
 
@@ -24,19 +25,23 @@ void ApplicationInfoPanel::onImGui() {
             if (ImGui::TreeNode("Modules")) {
                 modules->onImGui();
                 ImGui::TreePop();
-            }
-
-            auto renderGraph = Graphics::Get().getRenderGraph();
-            if (ImGui::TreeNode("RenderGraph")) {
-                renderGraph->onImGui();
-                ImGui::TreePop();
             }*/
 
-            //ImGui::NewLine();
+            if (ImGui::TreeNode("Filesystem")) {
+                auto mounted = FileSystem::Get()->getMounted();
+                for (auto& [phys, virt] : mounted) {
+                    ImGui::TextUnformatted(virt.string().c_str());
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("%s", phys.string().c_str());
+                }
+                ImGui::TreePop();
+            }
+
+            ImGui::NewLine();
             ImGui::Text("FPS : %5.2i", Time::FramesPerSecond());
             ImGui::Text("Frame Time : %5.2f ms", Time::DeltaTime().asMilliseconds());
-            ImGui::NewLine();
-            ImGui::Text("Scene : %s", SceneManager::Get()->getCurrentScene()->getName().c_str());
+            //ImGui::NewLine();
+            //ImGui::Text("Scene : %s", SceneManager::Get()->getCurrentScene()->getName().c_str());
             ImGui::TreePop();
         };
     }

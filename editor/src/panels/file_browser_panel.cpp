@@ -1,6 +1,6 @@
 #include "file_browser_panel.hpp"
 
-#include <imgui-plugins/imfilebrowser.h>
+#include <imgui-plugins/imfile_browser.h>
 
 using namespace fe;
 

@@ -13,6 +13,7 @@ Scene::Scene(std::string name) : name{std::move(name)} {
 /*Scene::Scene(const Scene& other) {
     registry.assign(other.registry.data(), other.registry.data() + other.registry.size(), other.registry.released());
 
+    clone<IdComponent>(other.registry);
     clone<TagComponent>(other.registry);
     clone<RelationshipComponent>(other.registry);
     clone<TransformComponent>(other.registry);
@@ -102,6 +103,7 @@ void Scene::destroyEntity(entt::entity entity) {
 entt::entity Scene::duplicateEntity(entt::entity entity) {
     auto newEntity = registry.create();
     
+    clone<IdComponent>(newEntity, entity);
     clone<TagComponent>(newEntity, entity);
     // TODO: Clone children structure
     //clone<RelationshipComponent>(newEntity, entity);

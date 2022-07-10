@@ -13,8 +13,6 @@
 #include "panels/console_panel.hpp"
 #include "panels/content_browser_panel.hpp"
 
-#include <portable-file-dialogs/portable-file-dialogs.h>
-
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
 
@@ -513,7 +511,7 @@ void Editor::drawMenuBar() {
 
         ImGui::SameLine();
 
-        ImGui::TextUnformatted(projectLocation.empty() ? std::filesystem::current_path().string().c_str() : projectLocation.c_str());
+        ImGui::TextUnformatted(projectLocation.empty() ? fs::current_path().string().c_str() : projectLocation.c_str());
 
         ImGui::Separator();
 

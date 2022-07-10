@@ -40,6 +40,8 @@ namespace fe {
         void serialise();
         void deserialise();
 
+        void mountPaths() const;
+
         template <typename Archive>
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("Project Version", projectSettings.projectVersion),
@@ -57,6 +59,7 @@ namespace fe {
         }
 
     protected:
+        fs::path executablePath;
         ProjectSettings projectSettings;
         bool projectLoaded{ false };
     };

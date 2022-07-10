@@ -35,7 +35,7 @@
 // Detect operating systems
 #if defined(__linux__)
 #define FUSION_PLATFORM_LINUX 1
-#if FUSION_PLATFORM_ANDROID
+#if defined(__ANDROID__)
 #define FUSION_PLATFORM_ANDROID 1
 #endif
 #elif defined(_WIN32)
@@ -147,7 +147,7 @@
 #if defined(__ARM_NEON__) || defined(__ARM_NEON)
 #define FUSION_PLATFORM_NEON 1
 #endif
-// First, check the FUSION_PLATFORM_WINDOWS_PHONE define, because
+// First, check the PLATFORM_WINDOWS_PHONE define, because
 // the X86 instructions sets are not supported on the Windows Phone emulator
 #elif defined(FUSION_PLATFORM_WINDOWS_PHONE)
 #if defined(FUSION_PLATFORM_MSVC_ARM)

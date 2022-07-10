@@ -7,7 +7,9 @@
 
 #include <cereal/cereal.hpp>
 #include <entt/entt.hpp>
+#include <stduiid/uiid.h>
 
+#define ALL_COMPONENTS  IdComponent, \
 #define ALL_COMPONENTS  TagComponent, \
                         RelationshipComponent, \
                         TransformComponent, \
@@ -28,6 +30,10 @@
 */
 
 namespace fe {
+    struct IdComponent {
+        uuids::uuid uuid;
+    };
+
     struct TagComponent {
         std::string tag;
 

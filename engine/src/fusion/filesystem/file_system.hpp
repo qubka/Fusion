@@ -42,7 +42,7 @@ namespace fe {
          * @param path The path to look for.
          * @return If the path is found in one of the searches.
          */
-        //static bool Exists(const fs::path& path);
+        static bool Exists(const fs::path& path);
 
         /**
          * Reads a file found by real or partial path with a lambda.
@@ -72,15 +72,7 @@ namespace fe {
          * @param size The size of the buffer.
          * @return True on the success, false otherwise.
          */
-        static bool WriteBytes(const fs::path& filename, const uint8_t* buffer, size_t size);
-
-        /**
-         * Opens a file, write all data into the file, and then closes the file.
-         * @param filename The path to write.
-         * @param str The string object.
-         * @return True on the success, false otherwise.
-         */
-        static bool WriteText(const fs::path& filename, const std::string& str);
+        static bool Write(const fs::path& filename, const void* buffer, size_t size);
 
         /**
          * Finds all the files in a path.
@@ -95,28 +87,21 @@ namespace fe {
          * @param path The path to the file.
          * @return The FileStats of the file on the path.
          */
-        //static FileStats GetStats(const fs::path& path);
+        static FileStats GetStats(const fs::path& path);
 
         /**
          * Gets the FileAttributes of the file on the path.
          * @param path The path to the file.
          * @return The FileAttributes of the file on the path.
          */
-        //static bitmask::bitmask<FileAttributes> GetAttributes(const fs::path& path);
-
-        /**
-         * Checks that file is a directory and has other directories inside.
-         * @param path The path to the file.
-         * @returnTrue if path is a directory and has directories inside.
-         */
-        //static bool ContainsDirectories(const fs::path& path);
+        static bitmask::bitmask<FileAttributes> GetAttributes(const fs::path& path);
 
         /**
          * Checks that file is a directory.
          * @param path The path to the file.
          * @return True if path has a directory.
          */
-        //static bool IsDirectory(const fs::path& path);
+        static bool IsDirectory(const fs::path& path);
 
         /**
          * Gets the file extention in the lowercase format.
@@ -132,7 +117,26 @@ namespace fe {
          */
         static const char* GetIcon(const fs::path& path);
 
+        /**
+         * Add an archive or directory to the search path.
+         * @param path The path to the directory or archive.
+         */
+        void mount(const fs::path& path, const fs::path& mount);
+
+        /**
+         * Add an archive, contained in a PHYSFS_File handle, to the search path.
+         * @param path The path to the directory or archive.
+         */
+        void unmount(const fs::path& path);
+
+        /**
+         *
+         * @return
+         */
+        const std::map<fs::path, fs::path>& getMounted();
+
     private:
+        std::map<fs::path, fs::path> mountPoints;
         static std::unordered_map<std::string, std::string> Extensions;
     };
 }

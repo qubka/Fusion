@@ -177,6 +177,7 @@ void ContentBrowserPanel::onImGui() {
                     }
                     ImGui::EndPopup();
                 }
+
                 ImGui::EndChild();
             }
 
@@ -461,7 +462,7 @@ bool ContentBrowserPanel::canMove(const fs::path& filepath, const fs::path& move
 
     // TODO: Finish file move
 
-    return fs::exists(movepath / filepath.filename());
+    return FileSystem::Exists(movepath / filepath.filename());
 }
 
 DirectoryInfo::DirectoryInfo(fs::path filepath) : path{std::move(filepath)} {

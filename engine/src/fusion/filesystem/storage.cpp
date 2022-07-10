@@ -110,7 +110,7 @@ FileStorage::FileStorage(const fs::path& filename) {
     {
         DWORD dwFileSizeHigh;
         size = GetFileSize(file, &dwFileSizeHigh);
-        size += (((size_t)dwFileSizeHigh) << 32);
+        size += ((reinterpret_cast<size_t>(dwFileSizeHigh)) << 32);
     }
     mapFile = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, NULL);
     if (mapFile == INVALID_HANDLE_VALUE) {
@@ -142,6 +142,11 @@ StoragePointer Storage::readFile(const fs::path& filename) {
     // FIXME move to posix memory mapped files
     // open the file:
     std::ifstream is{filename, std::ios::binary};
+
+    if (!is.is_open()) {
+        throw std::runtime_error("File " + filename.string() + " could not be opened");
+    }
+
     // Stop eating new lines in binary mode!!!
     is.unsetf(std::ios::skipws);
 

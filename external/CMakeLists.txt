@@ -4,157 +4,135 @@ set(ALL_SYSTEM_LIBS)
 
 # vulkan
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-set(VULKAN_LIB_NAME "volk")
-
-if (ANDROID)
+if(ANDROID)
     set(VOLK_STATIC_DEFINES VK_USE_PLATFORM_ANDROID_KHR)
-elseif (WIN32)
+elseif(WIN32)
     set(VOLK_STATIC_DEFINES VK_USE_PLATFORM_WIN32_KHR)
 else()
     set(VOLK_STATIC_DEFINES VK_USE_PLATFORM_XCB_KHR)
 endif()
-
-add_subdirectory(${VULKAN_LIB_NAME})
-
+add_subdirectory(volk)
 list(APPEND ALL_SYSTEM_LIBS volk)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # tracy
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(tracy 0.8.2 QUIET)
+find_package(tracy 0.8.2 QUIET)
 if(NOT tracy_FOUND)
-    set(TRACY_LIB_NAME "tracy")
-
-    add_subdirectory(${TRACY_LIB_NAME})
+    add_subdirectory(tracy)
 endif()
 list(APPEND ALL_SYSTEM_LIBS TracyClient)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # glfw
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(glfw3 3.3.6 QUIET)
+find_package(glfw3 3.3.6 QUIET)
 if(NOT glfw_FOUND)
-    set(GLFW_LIB_NAME "glfw")
-
     foreach(_glfw3_option "GLFW_BUILD_TESTS" "GLFW_BUILD_EXAMPLES" "GLFW_BUILD_DOCS" "GLFW_INSTALL")
         set(${_glfw3_option} OFF CACHE INTERNAL "")
     endforeach()
 
-    add_subdirectory(${GLFW_LIB_NAME})
+    add_subdirectory(glfw)
 endif()
 list(APPEND ALL_SYSTEM_LIBS glfw)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # plog
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(plog 1.1.8 QUIET)
+find_package(plog 1.1.8 QUIET)
 if(NOT plog_FOUND)
-    set(PLOG_LIB_NAME "plog")
-
     set(PLOG_BUILD_SAMPLES OFF CACHE INTERNAL "")
-
-    add_subdirectory(${PLOG_LIB_NAME})
+    add_subdirectory(plog)
 endif()
 list(APPEND ALL_SYSTEM_LIBS plog)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
+# stduuid
+#╒◖═════════════════════════════════════════════════════════════════════◗╕
+find_package(stduuid 1.2.2 QUIET)
+if(NOT stduuid_FOUND)
+    add_subdirectory(stduuid)
+endif()
+list(APPEND ALL_SYSTEM_LIBS stduuid)
+#╘◖═════════════════════════════════════════════════════════════════════◗╛
+
 # glm
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(glm 0.9.9 QUIET)
+find_package(glm 0.9.9 QUIET)
 if(NOT glm_FOUND)
-    set(GLM_LIB_NAME "glm")
-    set(GLM_INC_PATH ${GLM_LIB_NAME})
+    add_library(glm INTERFACE)
 
-    add_library(${GLM_LIB_NAME} INTERFACE)
-
-    target_include_directories(${GLM_LIB_NAME} INTERFACE ${GLM_INC_PATH})
-    target_compile_definitions(${GLM_LIB_NAME} INTERFACE GLM_FORCE_DEPTH_ZERO_TO_ONE)
+    target_include_directories(glm INTERFACE glm/)
+    target_compile_definitions(glm INTERFACE GLM_FORCE_DEPTH_ZERO_TO_ONE)
 endif()
 list(APPEND ALL_SYSTEM_LIBS glm)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # gli
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(gli 0.8.2 QUIET)
+find_package(gli 0.8.2 QUIET)
 if(NOT gli_FOUND)
-    set(GLI_LIB_NAME "gli")
-    set(GLI_INC_PATH ${GLI_LIB_NAME})
+    add_library(gli INTERFACE)
 
-    add_library(${GLI_LIB_NAME} INTERFACE)
-
-    target_include_directories(${GLI_LIB_NAME} INTERFACE ${GLI_INC_PATH})
+    target_include_directories(gli INTERFACE gli/)
 endif()
 list(APPEND ALL_SYSTEM_LIBS gli)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # entt
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(entt 3.9.0 QUIET)
+find_package(entt 3.9.0 QUIET)
 if(NOT entt_FOUND)
-    set(ENTT_LIB_NAME "entt")
-    set(ENTT_INC_PATH ${ENTT_LIB_NAME}/src)
+    add_library(entt INTERFACE)
 
-    add_library(${ENTT_LIB_NAME} INTERFACE)
-
-    target_include_directories(${ENTT_LIB_NAME} INTERFACE ${ENTT_INC_PATH})
+    target_include_directories(entt INTERFACE entt/src)
 endif()
 list(APPEND ALL_SYSTEM_LIBS entt)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # bitmask
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(bitmask 1.1.2 QUIET)
+find_package(bitmask 0.10.2 QUIET)
 if(NOT bitmask_FOUND)
-    set(BITMASK_LIB_NAME "bitmask")
-    set(BITMASK_INC_PATH ${BITMASK_LIB_NAME}/include)
+    add_library(bitmask INTERFACE)
 
-    add_library(${BITMASK_LIB_NAME} INTERFACE)
-
-    target_include_directories(${BITMASK_LIB_NAME} INTERFACE ${BITMASK_INC_PATH})
+    target_include_directories(bitmask INTERFACE bitmask/include)
 endif()
 list(APPEND ALL_SYSTEM_LIBS bitmask)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # magic_enum
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(magic_enum 0.7.3 QUIET)
+find_package(magic_enum 0.7.3 QUIET)
 if(NOT magic_enum_FOUND)
-    set(MAGIC_ENUM_LIB_NAME "magic_enum")
-    set(MAGIC_ENUM_INC_PATH ${MAGIC_ENUM_LIB_NAME}/include)
+    add_library(magic_enum INTERFACE)
 
-    add_library(${MAGIC_ENUM_LIB_NAME} INTERFACE)
-
-    target_include_directories(${MAGIC_ENUM_LIB_NAME} INTERFACE ${MAGIC_ENUM_INC_PATH})
+    target_include_directories(magic_enum INTERFACE magic_enum/include)
 endif()
 list(APPEND ALL_SYSTEM_LIBS magic_enum)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # stb
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(stb QUIET)
+find_package(stb QUIET)
 if(NOT stb_FOUND)
-    set(STB_LIB_NAME "stb")
-    set(STB_INC_PATH ${STB_LIB_NAME}/)
+    add_library(stb INTERFACE)
 
-    add_library(${STB_LIB_NAME} INTERFACE)
-
-    target_include_directories(${STB_LIB_NAME} INTERFACE ${STB_INC_PATH})
+    target_include_directories(stb INTERFACE stb/)
 endif()
 list(APPEND ALL_SYSTEM_LIBS stb)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # freetype
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(Freetype 2.11.1 QUIET)
+find_package(Freetype 2.11.1 QUIET)
 if(NOT Freetype_FOUND)
-    set(FREETYPE_LIB_NAME "freetype")
+    set(FT_DISABLE_ZLIB TRUE CACHE INTERNAL "")
+    set(FT_DISABLE_BZIP2 TRUE CACHE INTERNAL "")
+    set(FT_DISABLE_PNG TRUE CACHE INTERNAL "")
+    set(FT_DISABLE_HARFBUZZ TRUE CACHE INTERNAL "")
 
-    set(CMAKE_DISABLE_FIND_PACKAGE_ZLIB TRUE)
-    set(CMAKE_DISABLE_FIND_PACKAGE_BZip2 TRUE)
-    set(CMAKE_DISABLE_FIND_PACKAGE_PNG TRUE)
-    set(CMAKE_DISABLE_FIND_PACKAGE_HarfBuzz TRUE)
-
-    add_subdirectory(${FREETYPE_LIB_NAME})
+    add_subdirectory(freetype)
 endif()
 list(APPEND ALL_SYSTEM_LIBS freetype)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
@@ -196,15 +174,13 @@ list(APPEND ALL_SYSTEM_LIBS glslang SPIRV)
 
 # cereal
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(cereal)
+find_package(cereal 1.3.2 QUIET)
 if(NOT cereal_FOUND)
-    set(CEREAL_LIB_NAME "cereal")
-
     set(BUILD_DOC OFF CACHE INTERNAL "")
     set(BUILD_SANDBOX OFF CACHE INTERNAL "")
     set(SKIP_PERFORMANCE_COMPARISON ON CACHE INTERNAL "")
 
-    add_subdirectory(${CEREAL_LIB_NAME})
+    add_subdirectory(cereal)
 endif()
 list(APPEND ALL_SYSTEM_LIBS cereal)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
@@ -289,10 +265,8 @@ endif()
 
 # physfs
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(PhysFS 3.0.2 QUIET)
+find_package(PhysFS 3.0.2 QUIET)
 if(NOT PhysFS_FOUND)
-    set(PHYSFS_LIB_NAME "physfs")
-
     if(BUILD_SHARED_LIBS)
         set(PHYSFS_BUILD_STATIC OFF CACHE INTERNAL "Build static library.")
     else()
@@ -303,29 +277,16 @@ if(NOT PhysFS_FOUND)
     set(PHYSFS_TARGETNAME_DIST "physfs-dist" CACHE INTERNAL STRING)
     set(PHYSFS_TARGETNAME_UNINSTALL "physfs-uninstall" CACHE INTERNAL STRING)
 
-    add_subdirectory(${PHYSFS_LIB_NAME})
+    add_subdirectory(physfs)
 endif()
-#list(APPEND ALL_SYSTEM_LIBS physfs-static )
-#╘◖═════════════════════════════════════════════════════════════════════◗╛
-
-# portfiledialog
-#╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(portable_file_dialogs QUIET)
-if(NOT portable_file_dialogs_FOUND)
-    set(PFD_LIB_NAME "portable-file-dialogs")
-
-    add_subdirectory(${PFD_LIB_NAME})
-endif()
-list(APPEND ALL_SYSTEM_LIBS portable_file_dialogs)
+list(APPEND ALL_SYSTEM_LIBS physfs-static)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # lz4
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-#find_package(LZ4 1.9.3 QUIET)
+find_package(LZ4 1.9.3 QUIET)
 if(NOT LZ4_FOUND)
-    set(LZ4_LIB_NAME "lz4")
-
-    add_subdirectory(${LZ4_LIB_NAME}/build/cmake/)
+    add_subdirectory(lz4/build/cmake/)
 endif()
 list(APPEND ALL_SYSTEM_LIBS lz4)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
@@ -334,11 +295,8 @@ list(APPEND ALL_SYSTEM_LIBS lz4)
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 find_package(assimp REQUIRED)
 if(NOT assimp_FOUND)
-    set(ASSIMP_LIB_NAME "assimp")
-    set(ASSIMP_INC_PATH ${ASSIMP_LIB_NAME}/include)
-
-    include_directories(${ASSIMP_INC_PATH})
-    add_subdirectory(${ASSIMP_LIB_NAME})
+    include_directories(assimp/include)
+    add_subdirectory(assimp)
 endif()
 list(APPEND ALL_SYSTEM_LIBS assimp)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
@@ -356,10 +314,6 @@ set(IMGUI_SOURCES
         "${IMGUI_LIB_NAME}/imgui_draw.cpp"
         "${IMGUI_LIB_NAME}/imgui_tables.cpp"
         "${IMGUI_LIB_NAME}/imgui_widgets.cpp"
-        #"${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.cpp"
-        #"${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.cpp"
-        #"${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.cpp"
-
         "${IMGUIZMO_LIB_NAME}/GraphEditor.cpp"
         "${IMGUIZMO_LIB_NAME}/ImCurveEdit.cpp"
         "${IMGUIZMO_LIB_NAME}/ImGradient.cpp"
@@ -371,14 +325,11 @@ set(IMGUI_HEADERS
         "${IMGUI_LIB_NAME}/imconfig.h"
         "${IMGUI_LIB_NAME}/imgui.h"
         "${IMGUI_LIB_NAME}/imgui_internal.h"
-        "${IMGUI_LIB_NAME}/imstb_rectpack.h"
-        "${IMGUI_LIB_NAME}/imstb_textedit.h"
-        "${IMGUI_LIB_NAME}/imstb_truetype.h"
-        #"${IMGUI_LIB_NAME}/backends/imgui_impl_glfw.h"
-        #"${IMGUI_LIB_NAME}/backends/imgui_impl_opengl3.h"
-        #"${IMGUI_LIB_NAME}/backends/imgui_impl_vulkan.h"
+        #"${IMGUI_LIB_NAME}/imstb_rectpack.h"
+        #"${IMGUI_LIB_NAME}/imstb_textedit.h"
+        #"${IMGUI_LIB_NAME}/imstb_truetype.h"
 
-        "${IMGUI_PLUGINS_NAME}/imfilebrowser.h"
+        "${IMGUI_PLUGINS_NAME}/imfile_browser.h"
 
         "${IMGUIZMO_LIB_NAME}/GraphEditor.h"
         "${IMGUIZMO_LIB_NAME}/ImCurveEdit.h"
@@ -410,7 +361,6 @@ target_include_directories(${IMGUI_LIB_NAME}
         "${GLFW_INC_PATH}"
         "${GLAD_INC_PATH}"
         "${IMGUIAL_LIB_NAME}/fonts/"
-        #"${ICON_HEADERS_LIB_NAME}"
         )
 
 list(APPEND ALL_SYSTEM_LIBS imgui)

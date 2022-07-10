@@ -1,13 +1,15 @@
 #pragma once
 
 namespace fe {
+    using CommandArg = std::pair<const std::string&, const std::string&>;
+
     class CommandLineArgs {
         std::map<std::string, std::string> arguments;
     public:
         CommandLineArgs() = default;
         CommandLineArgs(int count, char** args);
 
-        std::pair<std::string, std::string> operator[](size_t index) const;
+        CommandArg operator[](size_t index) const;
 
         //! Returns an iterator over the elements in this deque in proper sequence.
         std::map<std::string, std::string>::iterator begin() { return arguments.begin(); }
@@ -18,6 +20,9 @@ namespace fe {
         std::map<std::string, std::string>::const_iterator end() const { return arguments.end(); }
         std::map<std::string, std::string>::const_reverse_iterator rbegin() const { return arguments.rbegin(); }
         std::map<std::string, std::string>::const_reverse_iterator rend() const { return arguments.rend(); }
+
+    private:
+        static std::string Empty;
     };
 
     class CommandLineParser {

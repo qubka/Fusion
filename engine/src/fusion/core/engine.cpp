@@ -6,7 +6,7 @@
 
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/graphics/graphics.hpp"
-//#include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
 
 using namespace fe;
@@ -34,8 +34,8 @@ Engine::~Engine() {
 
 void Engine::init() {
     Time::Register(Module::Stage::Pre);
+    FileSystem::Register(Module::Stage::Post);
     SceneManager::Register(Module::Stage::Normal);
-    //FileSystem::Register(Module::Stage::Post);
     Graphics::Register(Module::Stage::Render);
 
     sortModules();

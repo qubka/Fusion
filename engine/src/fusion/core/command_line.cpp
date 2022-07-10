@@ -1,8 +1,11 @@
 #include "command_line.hpp"
 
 #include "fusion/utils/string.hpp"
+#include "fusion/utils/enumerate.hpp"
 
 using namespace fe;
+
+std::string CommandLineArgs::Empty;
 
 CommandLineArgs::CommandLineArgs(int count, char** args) {
     for (size_t i = 0; i < count; i++) {
@@ -15,15 +18,13 @@ CommandLineArgs::CommandLineArgs(int count, char** args) {
     }
 }
 
-std::pair<std::string, std::string> CommandLineArgs::operator[](size_t index) const {
-    size_t i = 0;
-    for (const auto& argument : arguments) {
+CommandArg CommandLineArgs::operator[](size_t index) const {
+    for (const auto& [i, argument] : enumerate(arguments)) {
         if (i == index) {
             return std::make_pair(argument.first, argument.second);
         }
-        i++;
     }
-    return std::make_pair("", "");
+    return std::make_pair(Empty, Empty);
 }
 
 CommandLineParser::CommandLineParser() {
