@@ -97,7 +97,7 @@ void SceneManager::applySceneSwitch() {
     switchingScenes = false;
 }
 
-void SceneManager::enqueueSceneFromFile(const std::filesystem::path& filename) {
+void SceneManager::enqueueSceneFromFile(const fs::path& filename) {
     sceneFilePaths.push_back(filename);
 
     auto name = filename.filename().replace_extension().string();
@@ -114,7 +114,7 @@ void SceneManager::enqueueScene(const std::string& name) {
     LOG_INFO << "Enqueued scene : " << self->getName();
 }
 
-void SceneManager::addFileToLoadList(const std::filesystem::path& filename) {
+void SceneManager::addFileToLoadList(const fs::path& filename) {
     sceneFilePathsToLoad.push_back(filename);
 }
 

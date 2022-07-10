@@ -1,6 +1,6 @@
 #include "file_browser_panel.hpp"
 
-#include <imgui-filebrowser/imfilebrowser.h>
+#include <imgui-plugins/imfilebrowser.h>
 
 using namespace fe;
 
@@ -26,7 +26,7 @@ void FileBrowserPanel::onImGui() {
     }
 }
 
-void FileBrowserPanel::setCurrentPath(const std::filesystem::path& path) {
+void FileBrowserPanel::setCurrentPath(const fs::path& path) {
     fileBrowser->SetPwd(path);
 }
 

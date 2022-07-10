@@ -7,7 +7,7 @@
 
 using namespace fe;
 
-PipelineGraphics::PipelineGraphics(Stage stage, std::vector<std::filesystem::path> shaderStages, std::vector<Vertex::Input> vertexInputs, std::vector<Shader::Define> defines,
+PipelineGraphics::PipelineGraphics(Stage stage, std::vector<fs::path> shaderStages, std::vector<Vertex::Input> vertexInputs, std::vector<Shader::Define> defines,
 	Mode mode, Depth depth, VkPrimitiveTopology topology, VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace, Blend blend, bool depthBiasEnabled,
     float depthBiasConstantFactor, float depthBiasSlopeFactor, float depthBiasClamp, float lineWidth, bool transparencyEnabled, bool pushDescriptors)
     : shader{}

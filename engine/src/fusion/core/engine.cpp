@@ -66,7 +66,8 @@ int32_t Engine::run() {
             // Render-Update
             updateStage(Module::Stage::Render);
         }
-    } catch (std::exception& e) {
+    }
+    catch (std::exception& e) {
         LOG_FATAL << e.what();
         return EXIT_FAILURE;
     }

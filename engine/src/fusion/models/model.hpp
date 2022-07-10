@@ -13,7 +13,7 @@ namespace fe {
         Model();
         ~Model();
     private:
-        std::filesystem::path directory;
+        fs::path directory;
         std::vector<std::unique_ptr<Mesh>> meshes;
         std::vector<std::shared_ptr<Texture>> texturesLoaded;
 

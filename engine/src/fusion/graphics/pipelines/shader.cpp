@@ -1,8 +1,5 @@
 #include "shader.hpp"
 
-#include <SPIRV/GlslangToSpv.h>
-#include <glslang/Public/ShaderLang.h>
-
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/buffers/uniform_buffer.hpp"
 #include "fusion/graphics/buffers/storage_buffer.hpp"
@@ -12,12 +9,15 @@
 #include "fusion/utils/string.hpp"
 #include "fusion/filesystem/file_system.hpp"
 
+#include <SPIRV/GlslangToSpv.h>
+#include <glslang/Public/ShaderLang.h>
+
 using namespace fe;
 
 class ShaderIncluder : public glslang::TShader::Includer {
 public:
 	IncludeResult* includeLocal(const char* headerName, const char* includerName, size_t inclusionDepth) override {
-		auto directory = std::filesystem::path(includerName).parent_path();
+		auto directory = fs::path(includerName).parent_path();
 		auto fileLoaded = FileSystem::ReadText(directory / headerName);
 		if (fileLoaded.empty()) {
             LOG_ERROR << "Shader Include could not be loaded: " << std::quoted(headerName);
@@ -148,7 +148,7 @@ std::optional<VkDescriptorType> Shader::getDescriptorType(uint32_t location) con
 	return std::nullopt;
 }
 
-VkShaderStageFlagBits Shader::GetShaderStage(const std::filesystem::path& filename) {
+VkShaderStageFlagBits Shader::GetShaderStage(const fs::path& filename) {
 	auto fileExt = FileSystem::GetExtension(filename);
 	if (fileExt == ".comp")
 		return VK_SHADER_STAGE_COMPUTE_BIT;
@@ -282,7 +282,7 @@ TBuiltInResource getResources() {
 	return resources;
 }
 
-VkShaderModule Shader::createShaderModule(const std::filesystem::path& moduleName, const std::string& moduleCode, const std::string& preamble, VkShaderStageFlags moduleFlag) {
+VkShaderModule Shader::createShaderModule(const fs::path& moduleName, const std::string& moduleCode, const std::string& preamble, VkShaderStageFlags moduleFlag) {
 	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
     if (name.empty())

@@ -6,12 +6,12 @@ namespace fe {
     struct DirectoryInfo {
         std::shared_ptr<DirectoryInfo> parent;
         std::vector<std::shared_ptr<DirectoryInfo>> children;
-        std::filesystem::path path;
+        fs::path path;
         std::string name;
         const char* icon;
         bool isDirectory;
 
-        explicit DirectoryInfo(std::filesystem::path filepath);
+        explicit DirectoryInfo(fs::path filepath);
     };
 
     class ContentBrowserPanel : public EditorPanel {
@@ -32,11 +32,11 @@ namespace fe {
         void drawBottom();
         //void drawBreadCrumbs();
 
-        const std::filesystem::path& processDirectory(const std::filesystem::path& path, const std::shared_ptr<DirectoryInfo>& parent);
-        bool canMove(const std::filesystem::path& filepath, const std::filesystem::path& movepath);
+        const fs::path& processDirectory(const fs::path& path, const std::shared_ptr<DirectoryInfo>& parent);
+        bool canMove(const fs::path& filepath, const fs::path& movepath);
 
-        std::filesystem::path basePath;
-        std::filesystem::path movePath;
+        fs::path basePath;
+        fs::path movePath;
 
         bool isLocked{ false };
         bool isDragging{ false };
@@ -52,7 +52,7 @@ namespace fe {
         std::shared_ptr<DirectoryInfo> previousDirectory;
         std::shared_ptr<DirectoryInfo> nextDirectory;
         std::shared_ptr<DirectoryInfo> baseDirectory;
-        std::unordered_map<std::filesystem::path, std::shared_ptr<DirectoryInfo>> directories;
+        std::unordered_map<fs::path, std::shared_ptr<DirectoryInfo>> directories;
         std::vector<std::shared_ptr<DirectoryInfo>> breadCrumbData;
     };
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "fusion/utils/cereal_extention.hpp"
+
 #include <cereal/cereal.hpp>
 
 namespace fe {
@@ -34,7 +36,7 @@ namespace fe {
         void setProjectionType(ProjectionType type) { projectionType = type; recalculateProjection(); }
 
         template <typename Archive>
-        void serialize(Archive& archive) const {
+        void serialize(Archive& archive) {
             archive(cereal::make_nvp("Projection Type", projectionType),
                     cereal::make_nvp("Projection Matrix", projectionMatrix),
                     cereal::make_nvp("Perspective FOV", perspectiveFOV),

@@ -36,8 +36,8 @@ namespace fe {
         std::vector<VkPushConstantRange> getPushConstantRanges() const;
 
         std::optional<VkDescriptorType> getDescriptorType(uint32_t location) const;
-        static VkShaderStageFlagBits GetShaderStage(const std::filesystem::path& filename);
-        VkShaderModule createShaderModule(const std::filesystem::path& moduleName, const std::string& moduleCode, const std::string& preamble, VkShaderStageFlags moduleFlag);
+        static VkShaderStageFlagBits GetShaderStage(const fs::path& filename);
+        VkShaderModule createShaderModule(const fs::path& moduleName, const std::string& moduleCode, const std::string& preamble, VkShaderStageFlags moduleFlag);
         void createReflection();
 
         const std::string& getName() const { return name; }
@@ -59,7 +59,7 @@ namespace fe {
         static int32_t computeSize(const glslang::TType* ttype);
 
         std::string name;
-        std::vector<std::filesystem::path> stages;
+        std::vector<fs::path> stages;
         std::map<std::string, Uniform> uniforms;
         std::map<std::string, UniformBlock> uniformBlocks;
         std::map<std::string, Attribute> attributes;

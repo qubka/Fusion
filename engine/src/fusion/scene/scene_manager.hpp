@@ -65,7 +65,7 @@ namespace fe {
          * Gets paths of enqueued scenes.
          * @return Array of scenes.
          */
-        const std::vector<std::filesystem::path>& getSceneFilePaths() const { return sceneFilePaths; }
+        const std::vector<fs::path>& getSceneFilePaths() const { return sceneFilePaths; }
 
         /**
          *
@@ -75,7 +75,7 @@ namespace fe {
         /**
          * Enqueue a new scene to the manager.
          */
-        void enqueueSceneFromFile(const std::filesystem::path& filename);
+        void enqueueSceneFromFile(const fs::path& filename);
         void enqueueScene(std::unique_ptr<Scene>&& scene);
         void enqueueScene(const std::string& name);
 
@@ -83,7 +83,7 @@ namespace fe {
          * Add scene file to the loading list.
          * @param filename The path to use.
          */
-        void addFileToLoadList(const std::filesystem::path& filename);
+        void addFileToLoadList(const fs::path& filename);
 
         /**
          * Loads all enqueued scenes.
@@ -97,7 +97,7 @@ namespace fe {
         bool switchingScenes{ false };
 
         std::vector<std::unique_ptr<Scene>> scenes;
-        std::vector<std::filesystem::path> sceneFilePaths;
-        std::vector<std::filesystem::path> sceneFilePathsToLoad;
+        std::vector<fs::path> sceneFilePaths;
+        std::vector<fs::path> sceneFilePathsToLoad;
     };
 }

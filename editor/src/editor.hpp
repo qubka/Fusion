@@ -54,10 +54,10 @@ namespace fe {
 
         void openFile();
 
-        void fileOpenCallback(const std::filesystem::path& path);
-        void projectOpenCallback(const std::filesystem::path& path);
-        void newProjectOpenCallback(const std::filesystem::path& path);
-        void newProjectLocationCallback(const std::filesystem::path& path);
+        void fileOpenCallback(const fs::path& path);
+        void projectOpenCallback(const fs::path& path);
+        void newProjectOpenCallback(const fs::path& path);
+        void newProjectLocationCallback(const fs::path& path);
 
         const EditorSettings& getSettings() { return editorSettings; }
         const EditorState& getState() { return editorState; }
@@ -77,5 +77,10 @@ namespace fe {
         entt::entity selectedEntity{ entt::null };
         entt::entity copiedEntity{ entt::null };
         bool cutCopyEntity{ false };
+
+        fs::path projectLocation{ };
+        bool reopenNewProjectPopup{ false };
+        bool newProjectPopupOpen{ false };
+        bool locationPopupOpened{ false };
     };
 }

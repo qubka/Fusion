@@ -18,7 +18,7 @@ namespace fe {
          * @param mipmap If mapmaps will be generated.
          * @param load If this resource will be loaded immediately, otherwise {@link Image2d#Load} can be called later.
          */
-        explicit Image2d(std::filesystem::path filename,
+        explicit Image2d(fs::path filename,
                          VkFilter filter = VK_FILTER_LINEAR,
                          VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT,
                          bool anisotropic = true,
@@ -77,7 +77,7 @@ namespace fe {
          */
         void setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer);
 
-        const std::filesystem::path& getFilename() const { return filename; }
+        const fs::path& getFilename() const { return filename; }
         bool isAnisotropic() const { return anisotropic; }
         bool isMipmap() const { return mipmap; }
         uint32_t getComponents() const { return components; }
@@ -85,7 +85,7 @@ namespace fe {
     private:
         void load(std::unique_ptr<Bitmap> loadBitmap = nullptr);
 
-        std::filesystem::path filename;
+        fs::path filename;
 
         uint32_t components{ 0 };
         bool anisotropic;

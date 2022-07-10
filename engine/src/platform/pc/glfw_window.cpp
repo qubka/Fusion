@@ -189,7 +189,7 @@ void Window::setCursor(const fe::Cursor* cursor) {
     glfwSetCursor(window, cursor ? reinterpret_cast<GLFWcursor*>(cursor->getNativeCursor()) : nullptr);
 }
 
-void Window::setIcons(const std::vector<std::filesystem::path>& filenames) {
+void Window::setIcons(const std::vector<fs::path>& filenames) {
     std::vector<std::unique_ptr<fe::Bitmap>> bitmaps;
     bitmaps.reserve(filenames.size());
 
@@ -444,7 +444,7 @@ namespace glfw {
 
         LOG_VERBOSE << "FileDropEvent: " << count;
 
-        std::vector<std::filesystem::path> result;
+        std::vector<fs::path> result;
         result.reserve(count);
 
         for (int i = 0; i < count; ++i) {

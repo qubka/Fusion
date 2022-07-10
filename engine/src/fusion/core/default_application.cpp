@@ -4,7 +4,6 @@
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/filesystem/file_system.hpp"
 
-#include <cereal/cereal.hpp>
 #include <cereal/archives/json.hpp>
 
 #if FUSION_PLATFORM_WINDOWS
@@ -14,26 +13,26 @@
 using namespace fe;
 
 DefaultApplication::DefaultApplication(std::string name) : Application{std::move(name)} {
-
-
 #if FUSION_PLATFORM_MAC
-    executablePath = std::filesystem::canonical("/proc/self/exe").parent_path().parent_path().parent_path().parent_path().parent_path().parent_path();
+    auto executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path().parent_path().parent_path().parent_path();
 #else
-    executablePath = std::filesystem::canonical("/proc/self/exe").parent_path().parent_path().parent_path();
+    auto executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path();
 #endif
     LOG_INFO << "Working directory : " << executablePath.string();
-    std::filesystem::current_path(executablePath);
+    fs::current_path(executablePath);
+
+    projectSettings.projectVersion = version.string();
 }
 
 DefaultApplication::~DefaultApplication() {
-
+    serialise();
 }
 
 void DefaultApplication::onStart() {
     deserialise();
 
     WindowInfo windowInfo = {};
-    windowInfo.size = projectSettings.viewport;
+    windowInfo.size = projectSettings.size;
     windowInfo.title = projectSettings.title;
     windowInfo.isBorderless = projectSettings.isBorderless;
     windowInfo.isResizable = projectSettings.isResizable;
@@ -62,48 +61,58 @@ void DefaultApplication::onStart() {
 #endif
 }
 
-void DefaultApplication::openNewProject(const std::filesystem::path& path) {
+void DefaultApplication::openNewProject(const fs::path& path, const std::string& name) {
     projectSettings.projectRoot = path / name;
     projectSettings.projectName = name;
 
-    projectSettings.engineAssetPath = executablePath / "engine" / "assets";
+    //projectSettings.engineAssetPath = executablePath / "engine" / "assets";
 
-    if (!std::filesystem::exists(projectSettings.projectRoot))
-        std::filesystem::create_directory(projectSettings.projectRoot);
+    if (!fs::exists(projectSettings.projectRoot))
+        fs::create_directory(projectSettings.projectRoot);
 
     // Set Default values
-    projectSettings.viewport = { 1280, 720 };
-    projectSettings.title = "Fusion App";
-    projectSettings.isBorderless = false;
-    projectSettings.isResizable = true;
-    projectSettings.isFloating = false;
-    projectSettings.isFullscreen = false;
-    projectSettings.isVSync = false;
+    projectSettings.projectVersion = version.string();
+    projectSettings.title = name;
+    if (auto window = DeviceManager::Get()->getWindow(0)) {
+        projectSettings.size = window->getSize();
+        projectSettings.isBorderless = window->isBorderless();
+        projectSettings.isResizable = window->isResizable();
+        projectSettings.isFloating = window->isFloating();
+        projectSettings.isFullscreen = window->isFullscreen();
+        projectSettings.isVSync = window->isVSync();
+    } else {
+        projectSettings.size = { 1280, 720 };
+        projectSettings.isBorderless = false;
+        projectSettings.isResizable = true;
+        projectSettings.isFloating = false;
+        projectSettings.isFullscreen = false;
+        projectSettings.isVSync = false;
+    }
     projectSettings.isShowConsole = true;
 
     auto assetPath = projectSettings.projectRoot / "assets";
-    if (!std::filesystem::exists(assetPath))
-        std::filesystem::create_directory(assetPath);
+    if (!fs::exists(assetPath))
+        fs::create_directory(assetPath);
 
     auto scriptPath = assetPath / "scripts";
-    if (!std::filesystem::exists(assetPath))
-        std::filesystem::create_directory(assetPath);
+    if (!fs::exists(scriptPath))
+        fs::create_directory(scriptPath);
 
     auto scenePath = assetPath / "scenes";
-    if (!std::filesystem::exists(assetPath))
-        std::filesystem::create_directory(assetPath);
+    if (!fs::exists(scenePath))
+        fs::create_directory(scenePath);
 
     auto texturePath = assetPath / "textures";
-    if (!std::filesystem::exists(assetPath))
-        std::filesystem::create_directory(assetPath);
+    if (!fs::exists(texturePath))
+        fs::create_directory(texturePath);
 
     auto meshPath = assetPath / "meshes";
-    if (!std::filesystem::exists(assetPath))
-        std::filesystem::create_directory(assetPath);
+    if (!fs::exists(meshPath))
+        fs::create_directory(meshPath);
 
     auto soundPath = assetPath / "sounds";
-    if (!std::filesystem::exists(assetPath))
-        std::filesystem::create_directory(assetPath);
+    if (!fs::exists(soundPath))
+        fs::create_directory(soundPath);
 
     //m_SceneManager->EnqueueScene(new Scene("Empty Scene"));
     //m_SceneManager->SwitchScene(0);
@@ -114,8 +123,8 @@ void DefaultApplication::openNewProject(const std::filesystem::path& path) {
     serialise();
 }
 
-void DefaultApplication::openProject(const std::filesystem::path& path) {
-    projectSettings.projectName = path.filename().replace_extension();
+void DefaultApplication::openProject(const fs::path& path) {
+    projectSettings.projectName = path.filename().replace_extension().string();
     projectSettings.projectRoot = path.parent_path();
 
     //m_SceneManager = CreateUniquePtr<SceneManager>();
@@ -143,14 +152,16 @@ void DefaultApplication::serialise() {
 }
 
 void DefaultApplication::deserialise() {
+    if (projectSettings.projectRoot.empty() || projectSettings.projectName.empty()) {
+        LOG_INFO << "No saved Project file found";
+        return;
+    }
+
     auto filePath = projectSettings.projectRoot / projectSettings.projectName;
     filePath += ".fsproj";
 
-    if (!std::filesystem::exists(filePath)) {
+    if (!fs::exists(filePath)) {
         LOG_INFO << "No saved Project file found : " << filePath;
-        {
-            openNewProject(executablePath);
-        }
         return;
     }
 
@@ -159,20 +170,13 @@ void DefaultApplication::deserialise() {
     try {
         cereal::JSONInputArchive input{is};
         input(*this);
-
-    } catch (...) {
+    }
+    catch (...) {
         // Set Default values
-        projectSettings.projectVersion = version;
-        projectSettings.title = "Fusion App";
-        projectSettings.viewport = { 1280, 720 };
-        projectSettings.isBorderless = false;
-        projectSettings.isResizable = true;
-        projectSettings.isFloating = false;
-        projectSettings.isFullscreen = false;
-        projectSettings.isVSync = false;
-        projectSettings.isShowConsole = true;
+        projectSettings = {};
+        projectSettings.projectVersion = version.string();
 
-        projectSettings.engineAssetPath = executablePath / "engine" / "assets";
+        //projectSettings.engineAssetPath = executablePath / "engine" / "assets";
 
         //m_SceneManager->EnqueueScene(new Scene("Empty Scene"));
         //m_SceneManager->SwitchScene(0);

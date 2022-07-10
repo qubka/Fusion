@@ -578,7 +578,7 @@ bool PropertyDropdown(const std::string& name, std::string* options, int32_t opt
     return updated;
 }
 
-bool PropertyFile(const std::string& name, const std::filesystem::path& path, std::filesystem::path& value, std::vector<std::filesystem::path>& files, std::filesystem::path& selected, ImGuiTextFilter& filter) {
+bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value, std::vector<fs::path>& files, fs::path& selected, ImGuiTextFilter& filter) {
     bool updated = false;
 
     if (files.empty()) {

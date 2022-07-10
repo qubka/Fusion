@@ -70,8 +70,8 @@ private:
 #if MAPPED_FILES
 class FileStorage : public Storage {
 public:
-    static StoragePointer create(const std::filesystem::path& filename, size_t size, const uint8_t* data);
-    explicit FileStorage(const std::filesystem::path& filename);
+    static StoragePointer create(const fs::path& filename, size_t size, const uint8_t* data);
+    explicit FileStorage(const fs::path& filename);
     ~FileStorage() override;
     // Prevent copying
     FileStorage(const FileStorage& other) = delete;
@@ -94,16 +94,16 @@ private:
 #endif
 };
 
-FileStorage::FileStorage(const std::filesystem::path& filename) {
+FileStorage::FileStorage(const fs::path& filename) {
 #if FUSION_PLATFORM_ANDROID
     // Load shader from compressed asset
-    asset = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
+    asset = AAssetManager_open(assetManager, filename.string().c_str(), AASSET_MODE_BUFFER);
     assert(asset);
     size = AAsset_getLength(asset);
     assert(size > 0);
     mapped = reinterpret_cast<uint8_t*>(AAsset_getBuffer(asset));
 #elif FUSION_PLATFORM_WINDOWS
-    file = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    file = CreateFileA(filename.string().c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     if (file == INVALID_HANDLE_VALUE) {
         throw std::runtime_error("Failed to open file");
     }
@@ -135,7 +135,7 @@ StoragePointer Storage::create(size_t size, uint8_t* data)  {
     return std::make_shared<MemoryStorage>(size, data);
 }
 
-StoragePointer Storage::readFile(const std::filesystem::path& filename) {
+StoragePointer Storage::readFile(const fs::path& filename) {
 #if MAPPED_FILES
     return std::make_shared<FileStorage>(filename);
 #else

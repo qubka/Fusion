@@ -11,7 +11,7 @@
 
 using namespace fe;
 
-void StbLoader::Load(Bitmap& bitmap, const std::filesystem::path& filename) {
+void StbLoader::Load(Bitmap& bitmap, const fs::path& filename) {
     std::unique_ptr<uint8_t[]> pixels;
     int width, height, channels;
     int desired_channels = STBI_rgb_alpha;
@@ -44,18 +44,18 @@ void StbLoader::Load(Bitmap& bitmap, const std::filesystem::path& filename) {
     }*/
 }
 
-void StbLoader::Write(const Bitmap& bitmap, const std::filesystem::path& filename) {
+void StbLoader::Write(const Bitmap& bitmap, const fs::path& filename) {
     auto fileExt = FileSystem::GetExtension(filename);
     if (fileExt == ".jpg" || fileExt == ".jpeg") {
-        stbi_write_jpg(filename.c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<uint8_t>(), 8);
+        stbi_write_jpg(filename.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<uint8_t>(), 8);
     } else if (fileExt == ".bmp") {
-        stbi_write_bmp(filename.c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<uint8_t>());
+        stbi_write_bmp(filename.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<uint8_t>());
     } else if (fileExt == ".png") {
-        stbi_write_png(filename.c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<uint8_t>(), 0);
+        stbi_write_png(filename.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<uint8_t>(), 0);
     } else if (fileExt == ".tga") {
-        stbi_write_tga(filename.c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<uint8_t>());
+        stbi_write_tga(filename.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<uint8_t>());
     } else if (fileExt == ".hdr") {
-        stbi_write_hdr(filename.c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<float>());
+        stbi_write_hdr(filename.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<float>());
     } else {
         LOG_ERROR << "Unknown extension format: " << std::quoted(fileExt) << " to write data in!";
     }

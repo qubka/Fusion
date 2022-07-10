@@ -14,12 +14,12 @@ namespace fe {
          * @param defines A list of defines added to the top of each shader.
          * @param pushDescriptors If no actual descriptor sets are allocated but instead pushed.
          */
-        explicit PipelineCompute(std::filesystem::path shaderStage, std::vector<Shader::Define> defines = {}, bool pushDescriptors = false);
+        explicit PipelineCompute(fs::path shaderStage, std::vector<Shader::Define> defines = {}, bool pushDescriptors = false);
         ~PipelineCompute();
 
         void cmdRender(const CommandBuffer& commandBuffer, const glm::uvec2& extent) const;
 
-        const std::filesystem::path& getShaderStage() const { return shaderStage; }
+        const fs::path& getShaderStage() const { return shaderStage; }
         const std::vector<Shader::Define>& getDefines() const { return defines; }
         bool isPushDescriptors() const override { return pushDescriptors; }
         const Shader& getShader() const override { return shader; }
@@ -36,7 +36,7 @@ namespace fe {
         void createPipelineLayout();
         void createPipelineCompute();
 
-        std::filesystem::path shaderStage;
+        fs::path shaderStage;
         std::vector<Shader::Define> defines;
         bool pushDescriptors;
 

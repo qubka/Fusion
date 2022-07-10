@@ -215,7 +215,7 @@ void Graphics::endFrame(FrameInfo& info) {
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-void Graphics::captureScreenshot(const std::filesystem::path& filename, size_t id) const {
+void Graphics::captureScreenshot(const fs::path& filename, size_t id) const {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif

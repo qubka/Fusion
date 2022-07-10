@@ -4,7 +4,7 @@
 
 using namespace glfw;
 
-Cursor::Cursor(const std::filesystem::path& filename, fe::CursorHotspot hotspot) {
+Cursor::Cursor(const fs::path& filename, fe::CursorHotspot hotspot) {
     fe::Bitmap bitmap{filename};
     if (!bitmap)
         return;

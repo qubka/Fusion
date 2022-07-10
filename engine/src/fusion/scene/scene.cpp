@@ -3,11 +3,6 @@
 #include "components.hpp"
 
 #include "fusion/utils/string.hpp"
-#include "fusion/utils/glm_extention.hpp"
-
-#include <cereal/types/polymorphic.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/json.hpp>
 
 using namespace fe;
 
@@ -127,7 +122,7 @@ entt::entity Scene::duplicateEntity(entt::entity entity) {
     return newEntity;
 }
 
-/*void Scene::serialise(std::filesystem::path filename, bool binary = false) {
+/*void Scene::serialise(fs::path filename, bool binary = false) {
     if (binary) {
         filename += ".bin";
         std::ofstream file{filename, std::ios::binary};
@@ -151,6 +146,6 @@ entt::entity Scene::duplicateEntity(entt::entity entity) {
     }
 }
 
-void Scene::deserialise(const std::filesystem::path& filename, bool binary = false) {
+void Scene::deserialise(const fs::path& filename, bool binary = false) {
 
 }*/

@@ -20,19 +20,19 @@ namespace fe {
 
     class IFileStream final : public BaseFileStream, public std::istream {
     public:
-        explicit IFileStream(const std::filesystem::path& filename);
+        explicit IFileStream(const fs::path& filename);
         ~IFileStream() override;
     };
 
     class OFileStream final : public BaseFileStream, public std::ostream {
     public:
-        explicit OFileStream(const std::filesystem::path& filename, FileMode writeMode = FileMode::Write);
+        explicit OFileStream(const fs::path& filename, FileMode writeMode = FileMode::Write);
         ~OFileStream() override;
     };
 
     class FileStream final : public BaseFileStream, public std::iostream {
     public:
-        explicit FileStream(const std::filesystem::path& filename, FileMode openMode = FileMode::Read);
+        explicit FileStream(const fs::path& filename, FileMode openMode = FileMode::Read);
         ~FileStream() override;
     };
 }*/

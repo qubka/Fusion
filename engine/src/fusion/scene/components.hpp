@@ -2,10 +2,11 @@
 
 #include "scene_camera.hpp"
 
+#include "fusion/utils/cereal_extention.hpp"
 #include "fusion/utils/glm_extention.hpp"
 
-#include <entt/entt.hpp>
 #include <cereal/cereal.hpp>
+#include <entt/entt.hpp>
 
 #define ALL_COMPONENTS  TagComponent, \
                         RelationshipComponent, \
@@ -35,7 +36,7 @@ namespace fe {
         operator std::string() const { return tag; }
 
         template <typename Archive>
-        void serialize(Archive& archive) const {
+        void serialize(Archive& archive) {
             archive(cereal::make_nvp("Tag", tag));
         }
     };
@@ -48,7 +49,7 @@ namespace fe {
         entt::entity parent{ entt::null }; // the entity identifier of the parent, if any.
 
         template <typename Archive>
-        void serialize(Archive& archive) const {
+        void serialize(Archive& archive) {
             archive(cereal::make_nvp("children", children),
                     cereal::make_nvp("first", first),
                     cereal::make_nvp("prev", prev),
@@ -91,7 +92,7 @@ namespace fe {
         glm::vec3 inverseTransformPoint(const glm::vec3& point) const { return glm::rotate(glm::inverse(rotation), (point - position) / scale); }
 
         template <typename Archive>
-        void serialize(Archive& archive) const {
+        void serialize(Archive& archive) {
             archive(cereal::make_nvp("Position", position),
                     cereal::make_nvp("Rotation", rotation),
                     cereal::make_nvp("Scale", scale));
@@ -110,7 +111,7 @@ namespace fe {
         bool fixedAspectRatio{ false };
 
         template <typename Archive>
-        void serialize(Archive& archive) const {
+        void serialize(Archive& archive) {
             archive(cereal::make_nvp("Camera", camera),
                     cereal::make_nvp("Primary", primary),
                     cereal::make_nvp("FixedAspectRatio", fixedAspectRatio));
@@ -125,7 +126,7 @@ namespace fe {
         void* runtimeModel{ nullptr };
 
         template <typename Archive>
-        void serialize(Archive& archive) const {
+        void serialize(Archive& archive) {
             archive(cereal::make_nvp("Path", path));
         }
     };

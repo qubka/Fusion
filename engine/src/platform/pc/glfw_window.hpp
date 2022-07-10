@@ -59,7 +59,7 @@ namespace glfw {
         void setCursorHidden(bool hidden) override;
 
         void setCursor(const fe::Cursor* cursor) override;
-        void setIcons(const std::vector<std::filesystem::path>& filenames) override;
+        void setIcons(const std::vector<fs::path>& filenames) override;
 
         fe::InputAction getKey(fe::Key key) const override;
         fe::InputAction getMouseButton(fe::MouseButton button) const override;

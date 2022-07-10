@@ -42,28 +42,28 @@ namespace fe {
          * @param path The path to look for.
          * @return If the path is found in one of the searches.
          */
-        //static bool Exists(const std::filesystem::path& path);
+        //static bool Exists(const fs::path& path);
 
         /**
          * Reads a file found by real or partial path with a lambda.
          * @param filename The path to read.
          * @param handler The lambda with data read from the file.
          */
-        static void Read(const std::filesystem::path& filename, const SimpleHandler& handler);
+        static void Read(const fs::path& filename, const SimpleHandler& handler);
 
         /**
          * Opens a binary file, reads the contents of the file into a byte array, and then closes the file.
          * @param filename The path to read.
          * @return The data read from the file.
          */
-        static std::vector<uint8_t> ReadBytes(const std::filesystem::path& filename);
+        static std::vector<uint8_t> ReadBytes(const fs::path& filename);
 
         /**
          * Opens a text file, reads all the text in the file into a string, and then closes the file.
          * @param filename The path to read.
          * @return The data read from the file.
          */
-        static std::string ReadText(const std::filesystem::path& filename);
+        static std::string ReadText(const fs::path& filename);
 
         /**
          * Opens a file, write all data into the file, and then closes the file.
@@ -72,7 +72,7 @@ namespace fe {
          * @param size The size of the buffer.
          * @return True on the success, false otherwise.
          */
-        static bool WriteBytes(const std::filesystem::path& filename, const uint8_t* buffer, size_t size);
+        static bool WriteBytes(const fs::path& filename, const uint8_t* buffer, size_t size);
 
         /**
          * Opens a file, write all data into the file, and then closes the file.
@@ -80,7 +80,7 @@ namespace fe {
          * @param str The string object.
          * @return True on the success, false otherwise.
          */
-        static bool WriteText(const std::filesystem::path& filename, const std::string& str);
+        static bool WriteText(const fs::path& filename, const std::string& str);
 
         /**
          * Finds all the files in a path.
@@ -88,49 +88,49 @@ namespace fe {
          * @param recursive If paths will be recursively searched.
          * @return The files found.
          */
-        static std::vector<std::filesystem::path> GetFiles(const std::filesystem::path& path, bool recursive = false);
+        static std::vector<fs::path> GetFiles(const fs::path& path, bool recursive = false);
 
         /**
          * Gets the FileStats of the file on the path.
          * @param path The path to the file.
          * @return The FileStats of the file on the path.
          */
-        //static FileStats GetStats(const std::filesystem::path& path);
+        //static FileStats GetStats(const fs::path& path);
 
         /**
          * Gets the FileAttributes of the file on the path.
          * @param path The path to the file.
          * @return The FileAttributes of the file on the path.
          */
-        //static bitmask::bitmask<FileAttributes> GetAttributes(const std::filesystem::path& path);
+        //static bitmask::bitmask<FileAttributes> GetAttributes(const fs::path& path);
 
         /**
          * Checks that file is a directory and has other directories inside.
          * @param path The path to the file.
          * @returnTrue if path is a directory and has directories inside.
          */
-        //static bool ContainsDirectories(const std::filesystem::path& path);
+        //static bool ContainsDirectories(const fs::path& path);
 
         /**
          * Checks that file is a directory.
          * @param path The path to the file.
          * @return True if path has a directory.
          */
-        //static bool IsDirectory(const std::filesystem::path& path);
+        //static bool IsDirectory(const fs::path& path);
 
         /**
          * Gets the file extention in the lowercase format.
          * @param path The path to the file.
          * @return The string extension.
          */
-        static std::string GetExtension(const std::filesystem::path& path);
+        static std::string GetExtension(const fs::path& path);
 
         /**
          * Gets the icon string for the specific file format.
          * @param path The path to the file.
          * @return The string with font awesome icon.
          */
-        static const char* GetIcon(const std::filesystem::path& path);
+        static const char* GetIcon(const fs::path& path);
 
     private:
         static std::unordered_map<std::string, std::string> Extensions;

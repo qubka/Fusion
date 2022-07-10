@@ -10,17 +10,20 @@ else()
     set(PLATFORM_FOLDER "pc")
 endif()
 
-file(GLOB_RECURSE SRC_SOURCES "src/fusion/*.cpp" "src/platform/${PLATFORM_FOLDER}/*.cpp")
-file(GLOB_RECURSE SRC_HEADERS "src/fusion/*.hpp" "src/platform/${PLATFORM_FOLDER}/*.hpp")
-set(HEADER_FILES "src/pch.hpp")
+file(GLOB_RECURSE SRC_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/fusion/*.cpp" "src/platform/${PLATFORM_FOLDER}/*.cpp")
+file(GLOB_RECURSE HDR_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/fusion/*.hpp" "src/platform/${PLATFORM_FOLDER}/*.hpp")
+set(PCH_FILE "src/pch.hpp")
 
 # create library and exectuable
-add_library(${PROJECT_NAME} STATIC ${SRC_SOURCES} ${SRC_HEADERS})
-target_precompile_headers(${PROJECT_NAME} PUBLIC ${HEADER_FILES})
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES} ${HDR_FILES})
+target_precompile_headers(${PROJECT_NAME} PUBLIC ${PCH_FILE})
 target_include_directories(${PROJECT_NAME} PUBLIC "src")
 
-# create a
-#configure_file(assets <output> COPYONLY)
+# copy all asset files to the binary directory of the engine
+file(GLOB_RECURSE ASSET_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "assets/*")
+foreach(ASSET_FILE ${ASSET_FILES})
+    configure_file(${ASSET_FILE} ${CMAKE_CURRENT_BINARY_DIR}/${ASSET_FILE} COPYONLY)
+endforeach()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
         git-info

@@ -27,9 +27,7 @@ namespace fe {
             return *this;
         }
 
-        operator uint32_t() const {
-            return FUSION_MAKE_VERSION(variant, major, minor, patch);
-        }
+        operator uint32_t() const { return FUSION_MAKE_VERSION(variant, major, minor, patch); }
 
         bool operator==(const Version& other) const { return (operator uint32_t()) == (other.operator uint32_t()); }
         bool operator!=(const Version& other) const { return (operator uint32_t()) != (other.operator uint32_t()); }

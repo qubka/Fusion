@@ -51,7 +51,7 @@ namespace fe {
          * @param pushDescriptors If no actual descriptor sets are allocated but instead pushed.
          */
         PipelineGraphics(Stage stage,
-                         std::vector<std::filesystem::path> shaderStages,
+                         std::vector<fs::path> shaderStages,
                          std::vector<Vertex::Input> vertexInputs,
                          std::vector<Shader::Define> defines = {},
                          Mode mode = Mode::Polygon,
@@ -95,7 +95,7 @@ namespace fe {
         void bindPipeline(const CommandBuffer& commandBuffer) const override;
 
         const Stage& getStage() const { return stage; }
-        const std::vector<std::filesystem::path>& getShaderStages() const { return shaderStages; }
+        const std::vector<fs::path>& getShaderStages() const { return shaderStages; }
         const std::vector<Vertex::Input>& getVertexInputs() const { return vertexInputs; }
         const std::vector<Shader::Define>& getDefines() const { return defines; }
         Mode getMode() const { return mode; }
@@ -123,7 +123,7 @@ namespace fe {
         void createPipelineMrt();
 
         Stage stage;
-        std::vector<std::filesystem::path> shaderStages;
+        std::vector<fs::path> shaderStages;
         std::vector<Vertex::Input> vertexInputs;
         std::vector<Shader::Define> defines;
         Mode mode;

@@ -59,7 +59,7 @@ namespace ImGuiUtils {
     bool PropertyDropdown(const std::string& name, E& value, const Flags& flags = PropertyFlag::None);
     bool PropertyDropdown(const std::string& name, std::string* options, int32_t optionCount, int32_t* selected);
 
-    bool PropertyFile(const std::string& name, const std::filesystem::path& path, std::filesystem::path& value, std::vector<std::filesystem::path>& files, std::filesystem::path& selected, ImGuiTextFilter& filter);
+    bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value, std::vector<fs::path>& files, fs::path& selected, ImGuiTextFilter& filter);
 
     void Tooltip(const std::string& text);
     void Tooltip(const char* text);

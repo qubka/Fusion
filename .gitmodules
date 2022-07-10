@@ -46,36 +46,48 @@
 [submodule "external/physx"]
 	path = external/physx
 	url = https://github.com/NVIDIAGameWorks/PhysX
+	ignore = all
 [submodule "external/iconfontcppheaders"]
 	path = external/iconfontcppheaders
 	url = https://github.com/juliettef/IconFontCppHeaders
+	ignore = all
 [submodule "external/freetype"]
 	path = external/freetype
 	url = https://github.com/freetype/freetype
+	ignore = all
 [submodule "external/glslang"]
 	path = external/glslang
 	url = https://github.com/KhronosGroup/glslang
+	ignore = all
 [submodule "external/volk"]
 	path = external/volk
 	url = https://github.com/zeux/volk
+	ignore = all
 [submodule "external/bitmask"]
 	path = external/bitmask
 	url = https://github.com/oliora/bitmask
+	ignore = all
 [submodule "external/cereal"]
 	path = external/cereal
 	url = https://github.com/USCiLab/cereal
+	ignore = all
 [submodule "external/physfs"]
 	path = external/physfs
 	url = https://github.com/icculus/physfs
+	ignore = all
 [submodule "external/imgui-filebrowser"]
 	path = external/imgui-filebrowser
 	url = https://github.com/AirGuanZ/imgui-filebrowser
+	ignore = all
 [submodule "external/imguial"]
 	path = external/imguial
 	url = https://github.com/leiradel/ImGuiAl
+	ignore = all
 [submodule "external/tracy"]
 	path = external/tracy
 	url = https://github.com/wolfpld/tracy
+	ignore = all
 [submodule "external/meshoptimizer"]
 	path = external/meshoptimizer
 	url = https://github.com/zeux/meshoptimizer
+	ignore = all

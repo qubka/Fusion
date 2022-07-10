@@ -17,15 +17,15 @@ namespace fe {
         void open();
         bool isOpened();
 
-        void setCurrentPath(const  std::filesystem::path& path);
+        void setCurrentPath(const  fs::path& path);
         void setOpenDirectory(bool value);
-        void setCallback(const std::function<void(const std::filesystem::path&)>& func) { callback = func; }
+        void setCallback(const std::function<void(const fs::path&)>& func) { callback = func; }
 
         void setFileTypeFilters(const std::vector<std::string>& formats);
         void clearFileTypeFilters();
 
     private:
-        std::function<void(const std::filesystem::path&)> callback;
+        std::function<void(const fs::path&)> callback;
         ImGui::FileBrowser* fileBrowser;
     };
 }

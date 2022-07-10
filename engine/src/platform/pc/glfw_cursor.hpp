@@ -12,7 +12,7 @@ namespace glfw {
          * @param filename The new custom mouse file.
          * @param hotspot The hotspot to display the cursor image at.
          */
-        Cursor(const std::filesystem::path& filename, fe::CursorHotspot hotspot);
+        Cursor(const fs::path& filename, fe::CursorHotspot hotspot);
 
         /**
          * Creates the cursor with a system style.

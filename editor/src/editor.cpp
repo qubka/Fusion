@@ -8,9 +8,6 @@
 #include "fusion/graphics/cameras/editor_camera.hpp"
 #include "fusion/scene/components.hpp"
 #include "fusion/scene/scene_manager.hpp"
-#include "fusion/utils/glm_extention.hpp"
-#include "fusion/utils/string.hpp"
-#include "fusion/filesystem/file_system.hpp"
 
 #include "panels/application_info_panel.hpp"
 #include "panels/console_panel.hpp"
@@ -36,23 +33,6 @@ void Editor::onStart() {
 
     Graphics::Get()->setRenderer(std::make_unique<MainRenderer>());
 
-    //editorCamera = std::make_shared<EditorCamera>();
-    //activeScene = std::make_shared<Scene>(editorCamera);
-    //SceneManager::Get()->setScene(activeScene);
-
-    /*auto commandLineArgs = Application::Instance().getCommandLineArgs();
-    if (commandLineArgs.count > 1) {
-        auto sceneFilePath = commandLineArgs[1];
-        SceneSerializer serializer{activeScene};
-        serializer.deserialize(sceneFilePath);
-    }*/
-    fileBrowserPanel.setCallback([](auto path){
-
-    });
-    fileBrowserPanel.open();
-    //contentBrowserPanel.onStart();
-    //sceneHierarchyPanel.setContext(activeScene);
-
     /*componentIconMap[typeid(TransformComponent)] = ICON_MDI_VECTOR_LINE;
     componentIconMap[typeid(MeshComponent)] = ICON_FA_CODEPEN;
     componentIconMap[typeid(CameraComponent)] = ICON_MDI_CAMERA;
@@ -75,9 +55,6 @@ void Editor::onUpdate() {
 }
 
 void Editor::onImGui() {
-    //ImGui::ShowDemoWindow();
-    fileBrowserPanel.onImGui();
-
     beginDockSpace(editorSettings.fullScreenOnPlay && editorState == EditorState::Play);
 
     drawMenuBar();
@@ -204,12 +181,16 @@ void Editor::endDockSpace() {
 }
 
 void Editor::drawMenuBar() {
+    bool openSaveScenePopup = false;
+    bool openNewScenePopup = false;
+    bool openReloadScenePopup = false;
+    bool openProjectLoadPopup = !projectLoaded;
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Open Project")) {
-                //reopenNewProjectPopup = false;
-                //openProjectLoadPopup = true;
+                reopenNewProjectPopup = false;
+                openProjectLoadPopup = true;
             }
 
             ImGui::Separator();
@@ -223,15 +204,15 @@ void Editor::drawMenuBar() {
             ImGui::Separator();
 
             if (ImGui::MenuItem("New Scene", "CTRL+N")) {
-                ImGui::OpenPopup("New Scene");
+                openNewScenePopup = true;
             }
 
             if (ImGui::MenuItem("Save Scene", "CTRL+S")) {
-                ImGui::OpenPopup("Save Scene");
+                openSaveScenePopup = true;
             }
 
             if (ImGui::MenuItem("Reload Scene", "CTRL+R")) {
-                ImGui::OpenPopup("Reload Scene");
+                openReloadScenePopup = true;
             }
 
             ImGui::Separator();
@@ -472,17 +453,36 @@ void Editor::drawMenuBar() {
         ImGui::EndMainMenuBar();
     }
 
-    /*ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2{0.5f, 0.5f});
+    if (openSaveScenePopup)
+        ImGui::OpenPopup("Save Scene");
 
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2{0.5f, 0.5f});
     const ImVec2 buttonSize{120, 0};
+
+    if (locationPopupOpened) {
+        // Cancel clicked on project location popups
+        if (!fileBrowserPanel.isOpened()) {
+            newProjectPopupOpen = false;
+            locationPopupOpened = false;
+            reopenNewProjectPopup = true;
+        }
+    }
+
+    if (openNewScenePopup)
+        ImGui::OpenPopup("New Scene");
+
+    if ((reopenNewProjectPopup || openProjectLoadPopup) && !newProjectPopupOpen) {
+        ImGui::OpenPopup("Open Project");
+        reopenNewProjectPopup = false;
+    }
 
     if (ImGui::BeginPopupModal("Open Project", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         if (ImGui::Button("Load Project")) {
             ImGui::CloseCurrentPopup();
 
-            //newProjectPopupOpen = true;
-            //locationPopupOpened = true;
+            newProjectPopupOpen = true;
+            locationPopupOpened = true;
 
             // Set filePath to working directory
             fileBrowserPanel.setFileTypeFilters({ ".fsproj" });
@@ -501,8 +501,8 @@ void Editor::drawMenuBar() {
         if (ImGui::Button(ICON_MDI_FOLDER)) {
             ImGui::CloseCurrentPopup();
 
-            //newProjectPopupOpen = true;
-            //locationPopupOpened = true;
+            newProjectPopupOpen = true;
+            locationPopupOpened = true;
 
             // Set filePath to working directory
             fileBrowserPanel.clearFileTypeFilters();
@@ -513,12 +513,12 @@ void Editor::drawMenuBar() {
 
         ImGui::SameLine();
 
-        ImGui::TextUnformatted(projectLocation.c_str());
+        ImGui::TextUnformatted(projectLocation.empty() ? std::filesystem::current_path().string().c_str() : projectLocation.c_str());
 
         ImGui::Separator();
 
         if (ImGui::Button("Create", buttonSize)) {
-            Application::Get().OpenNewProject(projectLocation, newProjectName);
+            openNewProject(projectLocation, newProjectName);
             fileBrowserPanel.setOpenDirectory(false);
 
             for (auto& panel : panels) {
@@ -537,7 +537,7 @@ void Editor::drawMenuBar() {
         ImGui::EndPopup();
     }
 
-    if (ImGui::BeginPopupModal("Save Scene", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    /*if (ImGui::BeginPopupModal("Save Scene", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Save Current Scene Changes?\n\n");
         ImGui::Separator();
 
@@ -586,6 +586,9 @@ void Editor::drawMenuBar() {
         ImGui::EndPopup();
     }
 
+    if (openReloadScenePopup)
+        ImGui::OpenPopup("Reload Scene");
+
     if (ImGui::BeginPopupModal("Reload Scene", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Reload Scene?\n\n");
         ImGui::Separator();
@@ -610,41 +613,39 @@ void Editor::openFile() {
     fileBrowserPanel.open();
 }
 
-void Editor::fileOpenCallback(const std::filesystem::path& path) {
-    //if (IsTextFile(filePath)) {
-    //} else if (IsModelFile(filePath)) {
-    //} else if (IsAudioFile(filePath)) {
-    //} else if (IsSceneFile(filePath)) {
-    //} else if (IsTextureFile(filePath)) {
+void Editor::fileOpenCallback(const fs::path& path) {
+    //if (IsTextFile(path)) {
+    //} else if (IsModelFile(path)) {
+    //} else if (IsAudioFile(path)) {
+    //} else if (IsSceneFile(path)) {
+    //} else if (IsTextureFile(path)) {
     //}
 }
 
-void Editor::projectOpenCallback(const std::filesystem::path& path) {
-    //m_NewProjectPopupOpen = false;
-    //reopenNewProjectPopup = false;
-    //locationPopupOpened = false;
-    //m_FileBrowserPanel.ClearFileTypeFilters();
-    //Application::Get().OpenProject(filePath);
-//
-    //for(int i = 0; i < int(m_Panels.size()); i++)
-    //{
-    //    m_Panels[i]->OnNewProject();
-    //}
+void Editor::projectOpenCallback(const fs::path& path) {
+    newProjectPopupOpen = false;
+    reopenNewProjectPopup = false;
+    locationPopupOpened = false;
+    fileBrowserPanel.clearFileTypeFilters();
+    openProject(path);
+
+    for (auto& panel : panels) {
+        panel->onNewProject();
+    }
 }
 
-void Editor::newProjectOpenCallback(const std::filesystem::path& path) {
-    //Application::Get().OpenNewProject(filePath);
-    //m_FileBrowserPanel.SetOpenDirectory(false);
+void Editor::newProjectOpenCallback(const fs::path& path) {
+    openNewProject(path);
+    fileBrowserPanel.setOpenDirectory(false);
 
-    //for(int i = 0; i < int(m_Panels.size()); i++)
-    //{
-    //    m_Panels[i]->OnNewProject();
-    //}
+    for (auto& panel : panels) {
+        panel->onNewProject();
+    }
 }
 
-void Editor::newProjectLocationCallback(const std::filesystem::path& path) {
-    //projectLocation = path;
-    //m_NewProjectPopupOpen = false;
-    //reopenNewProjectPopup = true;
-    //locationPopupOpened = false;
+void Editor::newProjectLocationCallback(const fs::path& path) {
+    projectLocation = path;
+    newProjectPopupOpen = false;
+    reopenNewProjectPopup = true;
+    locationPopupOpened = false;
 }

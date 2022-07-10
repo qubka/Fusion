@@ -7,8 +7,8 @@ namespace fe {
     template<typename Base>
     class BitmapFactory {
     public:
-        using TLoadMethod = std::function<void(Base&, const std::filesystem::path&)>;
-        using TWriteMethod = std::function<void(const Base&, const std::filesystem::path&)>;
+        using TLoadMethod = std::function<void(Base&, const fs::path&)>;
+        using TWriteMethod = std::function<void(const Base&, const fs::path&)>;
         using TRegistryMap = std::unordered_map<std::string, std::pair<TLoadMethod, TWriteMethod>>;
 
         //BitmapFactory() = default;

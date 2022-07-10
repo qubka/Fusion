@@ -9,12 +9,12 @@
 
 using namespace fe;
 
-void FileSystem::Read(const std::filesystem::path& filename, const FileSystem::SimpleHandler& handler) {
+void FileSystem::Read(const fs::path& filename, const FileSystem::SimpleHandler& handler) {
     auto storage = Storage::readFile(filename);
     handler(storage->getData(), storage->getSize());
 }
 
-std::vector<uint8_t> FileSystem::ReadBytes(const std::filesystem::path& filename) {
+std::vector<uint8_t> FileSystem::ReadBytes(const fs::path& filename) {
     std::vector<uint8_t> result;
     Read(filename, [&](const uint8_t* data, size_t size) {
         result.resize(size);
@@ -23,7 +23,7 @@ std::vector<uint8_t> FileSystem::ReadBytes(const std::filesystem::path& filename
     return result;
 }
 
-std::string FileSystem::ReadText(const std::filesystem::path& filename) {
+std::string FileSystem::ReadText(const fs::path& filename) {
     std::string content;
     std::ifstream is{filename, std::ios::in};
 
@@ -41,52 +41,52 @@ std::string FileSystem::ReadText(const std::filesystem::path& filename) {
 }
 
 
-bool FileSystem::WriteText(const std::filesystem::path& filename, const std::string& str) {
+bool FileSystem::WriteText(const fs::path& filename, const std::string& str) {
     std::ofstream os{filename, std::ios::binary};
     os.write(str.data(), str.size());
     return true;
 }
 
-bool FileSystem::WriteBytes(const std::filesystem::path& filename, const uint8_t* buffer, size_t size) {
+bool FileSystem::WriteBytes(const fs::path& filename, const uint8_t* buffer, size_t size) {
     std::ofstream os{filename, std::ios::binary};
     os.write(reinterpret_cast<const char*>(buffer), size);
     return true;
 }
 
-std::vector<std::filesystem::path> FileSystem::GetFiles(const std::filesystem::path& path, bool recursive) {
-    std::vector<std::filesystem::path> files;
+std::vector<fs::path> FileSystem::GetFiles(const fs::path& path, bool recursive) {
+    std::vector<fs::path> files;
 
     if (recursive) {
-        for (const auto& entry : std::filesystem::recursive_directory_iterator(path)) {
-            files.emplace_back(entry.path().c_str());
+        for (const auto& entry : fs::recursive_directory_iterator(path)) {
+            files.push_back(entry.path());
         }
-        std::sort(files.begin(), files.end(), [](const std::filesystem::path& a, const std::filesystem::path& b) {
+        std::sort(files.begin(), files.end(), [](const fs::path& a, const fs::path& b) {
             return is_directory(a) && !is_directory(b);
         });
 
     } else {
-        for (const auto& entry : std::filesystem::directory_iterator(path)) {
-            files.emplace_back(entry.path().c_str());
+        for (const auto& entry : fs::directory_iterator(path)) {
+            files.push_back(entry.path());
         }
     }
 
     return files;
 }
 
-/*bool FileSystem::Exists(const std::filesystem::path& path) {
-    return PHYSFS_exists(path.c_str()) != 0;
+/*bool FileSystem::Exists(const fs::path& path) {
+    return PHYSFS_exists(path.string().c_str()) != 0;
 }
 
-void FileSystem::Read(const std::filesystem::path& filename, const FileSystem::SimpleHandler& handler) {
+void FileSystem::Read(const fs::path& filename, const FileSystem::SimpleHandler& handler) {
     auto bytes = ReadBytes(filename);
     handler(bytes.data(), bytes.size());
 }
 
-std::vector<uint8_t> FileSystem::ReadBytes(const std::filesystem::path& filename) {
-    auto fsFile = PHYSFS_openRead(filename.c_str());
+std::vector<uint8_t> FileSystem::ReadBytes(const fs::path& filename) {
+    auto fsFile = PHYSFS_openRead(filename.string().c_str());
 
     if (!fsFile) {
-        if (!std::filesystem::exists(filename) || !std::filesystem::is_regular_file(filename)) {
+        if (!fs::exists(filename) || !fs::is_regular_file(filename)) {
             LOG_ERROR << "Failed to open file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
             return {};
         }
@@ -119,11 +119,11 @@ std::vector<uint8_t> FileSystem::ReadBytes(const std::filesystem::path& filename
     return data;
 }
 
-std::string FileSystem::ReadText(const std::filesystem::path& filename) {
-    auto fsFile = PHYSFS_openRead(filename.c_str());
+std::string FileSystem::ReadText(const fs::path& filename) {
+    auto fsFile = PHYSFS_openRead(filename.string().c_str());
 
     if (!fsFile) {
-        if (!std::filesystem::exists(filename) || !std::filesystem::is_regular_file(filename)) {
+        if (!fs::exists(filename) || !fs::is_regular_file(filename)) {
             LOG_ERROR << "Failed to open file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
             return "";
         }
@@ -145,11 +145,11 @@ std::string FileSystem::ReadText(const std::filesystem::path& filename) {
     return { data.begin(), data.end() };
 }
 
-bool FileSystem::WriteFile(const std::filesystem::path& filename, uint8_t* buffer, size_t size) {
-    auto fsFile = PHYSFS_openWrite(filename.c_str());
+bool FileSystem::WriteFile(const fs::path& filename, uint8_t* buffer, size_t size) {
+    auto fsFile = PHYSFS_openWrite(filename.string().c_str());
 
     if (!fsFile) {
-        if (!std::filesystem::exists(filename) || !std::filesystem::is_regular_file(filename)) {
+        if (!fs::exists(filename) || !fs::is_regular_file(filename)) {
             LOG_ERROR << "Failed to open file " << filename << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
             return false;
         }
@@ -174,10 +174,10 @@ bool FileSystem::WriteFile(const std::filesystem::path& filename, uint8_t* buffe
     return ret;
 }
 
-std::vector<std::filesystem::path> FileSystem::GetFiles(const std::filesystem::path& path, bool recursive) {
-    auto rc = PHYSFS_enumerateFiles(path.c_str());
+std::vector<fs::path> FileSystem::GetFiles(const fs::path& path, bool recursive) {
+    auto rc = PHYSFS_enumerateFiles(path.string().c_str());
 
-    std::vector<std::filesystem::path> files;
+    std::vector<fs::path> files;
 
     for (auto i = rc; *i; i++) {
         if (recursive && IsDirectory(*i)) {
@@ -192,10 +192,10 @@ std::vector<std::filesystem::path> FileSystem::GetFiles(const std::filesystem::p
     return files;
 }
 
-bool FileSystem::ContainsDirectories(const std::filesystem::path& path) {
+bool FileSystem::ContainsDirectories(const fs::path& path) {
     bool ret = false;
     if (IsDirectory(path)) {
-        auto rc = PHYSFS_enumerateFiles(path.c_str());
+        auto rc = PHYSFS_enumerateFiles(path.string().c_str());
 
         for (auto i = rc; *i; i++) {
             if (IsDirectory(*i)) {
@@ -209,18 +209,18 @@ bool FileSystem::ContainsDirectories(const std::filesystem::path& path) {
     return ret;
 }
 
-bool FileSystem::IsDirectory(const std::filesystem::path& path) {
+bool FileSystem::IsDirectory(const fs::path& path) {
     PHYSFS_Stat stat;
-    if (!PHYSFS_stat(path.c_str(), &stat)) {
+    if (!PHYSFS_stat(path.string().c_str(), &stat)) {
         return false;
     } else {
         if (stat.filetype == PHYSFS_FILETYPE_SYMLINK) {
             // PHYSFS_stat() doesn't follow symlinks, so we do it manually
-            const char* realdir = PHYSFS_getRealDir(path.c_str());
+            const char* realdir = PHYSFS_getRealDir(path.string().c_str());
             if (realdir == nullptr) {
                 return false;
             } else {
-                const std::filesystem::path realfile = std::filesystem::path{realdir} / path;
+                const fs::path realfile = fs::path{realdir} / path;
                 return IsDirectory(realfile);
             }
         } else {
@@ -229,9 +229,9 @@ bool FileSystem::IsDirectory(const std::filesystem::path& path) {
     }
 }
 
-FileStats FileSystem::GetStats(const std::filesystem::path& path) {
+FileStats FileSystem::GetStats(const fs::path& path) {
     PHYSFS_Stat stat = {};
-    PHYSFS_stat(path.c_str(), &stat);
+    PHYSFS_stat(path.string().c_str(), &stat);
 
     return {
         static_cast<size_t>(stat.filesize),
@@ -243,11 +243,11 @@ FileStats FileSystem::GetStats(const std::filesystem::path& path) {
     };
 }
 
-bitmask::bitmask<FileAttributes> FileSystem::GetAttributes(const std::filesystem::path& path) {
+bitmask::bitmask<FileAttributes> FileSystem::GetAttributes(const fs::path& path) {
     bitmask::bitmask<FileAttributes> attributes;
 
     PHYSFS_Stat stat = {};
-    PHYSFS_stat(path.c_str(), &stat);
+    PHYSFS_stat(path.string().c_str(), &stat);
 
     switch (stat.filetype) {
         case PHYSFS_FILETYPE_REGULAR:
@@ -267,11 +267,11 @@ bitmask::bitmask<FileAttributes> FileSystem::GetAttributes(const std::filesystem
     return attributes;
 }*/
 
-std::string FileSystem::GetExtension(const std::filesystem::path& path) {
+std::string FileSystem::GetExtension(const fs::path& path) {
     return String::Lowercase(path.extension().string());
 }
 
-const char* FileSystem::GetIcon(const std::filesystem::path& path) {
+const char* FileSystem::GetIcon(const fs::path& path) {
     auto key = Extensions.find(GetExtension(path));
     return key != Extensions.end() ? key->second.c_str() : ICON_MDI_FILE;
 }

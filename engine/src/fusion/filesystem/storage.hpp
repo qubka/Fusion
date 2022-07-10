@@ -19,7 +19,7 @@ namespace fe {
         virtual bool isFast() const = 0;
 
         static StoragePointer create(size_t size, uint8_t* data);
-        static StoragePointer readFile(const std::filesystem::path& filename);
+        static StoragePointer readFile(const fs::path& filename);
         StoragePointer createView(size_t size = 0, size_t offset = 0) const;
     };
 }

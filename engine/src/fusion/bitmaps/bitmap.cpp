@@ -6,7 +6,7 @@
 
 using namespace fe;
 
-Bitmap::Bitmap(const std::filesystem::path& filename) {
+Bitmap::Bitmap(const fs::path& filename) {
     load(filename);
 }
 
@@ -24,7 +24,7 @@ Bitmap::Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, Bitmap
     , data{std::move(data)} {
 }
 
-void Bitmap::load(const std::filesystem::path& filename) {
+void Bitmap::load(const fs::path& filename) {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
@@ -42,12 +42,12 @@ void Bitmap::load(const std::filesystem::path& filename) {
 #endif
 }
 
-void Bitmap::write(const std::filesystem::path& filename) const {
+void Bitmap::write(const fs::path& filename) const {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
     if (auto parent = filename.parent_path(); !parent.empty())
-        std::filesystem::create_directories(parent);
+        fs::create_directories(parent);
 
     auto fileExt = FileSystem::GetExtension(filename);
     if (auto it = Registry().find(fileExt); it != Registry().end()) {

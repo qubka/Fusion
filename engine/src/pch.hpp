@@ -29,8 +29,10 @@
 #include <mutex>
 #include <numeric>
 #include <random>
-#include <filesystem>
 #include <iterator>
+
+#include <filesystem>
+namespace fs = std::filesystem;
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
