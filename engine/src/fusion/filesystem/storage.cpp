@@ -49,7 +49,7 @@ public:
     explicit MemoryStorage(size_t size, const uint8_t* data = nullptr) {
         buffer.resize(size);
         if (data) {
-            memcpy(buffer.data(), data, size);
+            std::memcpy(buffer.data(), data, size);
         }
     }
 

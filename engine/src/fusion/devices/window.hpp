@@ -83,7 +83,7 @@ namespace fe {
          * @param flag If the window will be fullscreen.
          * @param monitor The monitor to display in.
          */
-        virtual void setFullscreen(bool flag, Monitor* monitor) = 0;
+        virtual void setFullscreen(bool flag, const Monitor* monitor) = 0;
 
         /**
          * Gets if the window is selected.

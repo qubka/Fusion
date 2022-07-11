@@ -78,7 +78,7 @@ std::unique_ptr<Bitmap> Image::getBitmap(uint32_t mipLevel, uint32_t arrayLayer)
 
 	void* data;
 	vkMapMemory(logicalDevice, dstImageMemory, dstSubresourceLayout.offset, dstSubresourceLayout.size, 0, &data);
-	memcpy(bitmap->getData<void>(), data, static_cast<size_t>(dstSubresourceLayout.size));
+	std::memcpy(bitmap->getData<void>(), data, static_cast<size_t>(dstSubresourceLayout.size));
 	vkUnmapMemory(logicalDevice, dstImageMemory);
 
 	vkFreeMemory(logicalDevice, dstImageMemory, nullptr);

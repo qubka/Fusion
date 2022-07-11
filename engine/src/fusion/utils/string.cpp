@@ -75,7 +75,7 @@ size_t String::FindCharPos(const std::string& str, char c) noexcept {
     return res == std::string::npos ? -1 : res;
 }
 
-std::string String::Trim(std::string str, const std::string& whitespace) {
+std::string String::Trim(const std::string& str, const std::string& whitespace) {
     auto strBegin = str.find_first_not_of(whitespace);
     if (strBegin == std::string::npos)
         return "";
@@ -83,6 +83,20 @@ std::string String::Trim(std::string str, const std::string& whitespace) {
     auto strEnd = str.find_last_not_of(whitespace);
     auto strRange = strEnd - strBegin + 1;
     return str.substr(strBegin, strRange);
+}
+
+std::string String::Extract(const std::string& str, const std::string& start, const std::string& stop) {
+    auto strBegin = str.find(start);
+    if (strBegin != std::string::npos)
+        strBegin += start.length();
+    else
+        strBegin = 0;
+
+    auto strEnd = str.find(stop);
+    if (strEnd == std::string::npos)
+        strEnd = str.length() - 1;
+
+    return str.substr(strBegin,  strEnd - strBegin);
 }
 
 std::string String::RemoveAll(std::string str, char token) {
@@ -104,8 +118,8 @@ std::string String::RemoveLast(std::string str, char token) {
 std::string String::ReplaceAll(std::string str, const std::string& token, const std::string& to) {
     auto pos = str.find(token);
     while (pos != std::string::npos) {
-        str.replace(pos, token.size(), to);
-        pos = str.find(token, pos + token.size());
+        str.replace(pos, token.length(), to);
+        pos = str.find(token, pos + token.length());
     }
 
     return str;
@@ -143,7 +157,7 @@ std::string String::UnfixEscapedChars(std::string str) {
             if (pos != 0 && str[pos - 1] == '\\')
                 str.erase(str.begin() + --pos);
             else
-                str.replace(pos, from.size(), 1, to);
+                str.replace(pos, from.length(), 1, to);
             pos = str.find(from, pos + 1);
         }
     }

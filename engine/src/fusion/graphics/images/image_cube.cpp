@@ -34,7 +34,7 @@ std::unique_ptr<Bitmap> ImageCube::getBitmap(uint32_t mipLevel) const {
 
 	for (uint32_t i = 0; i < 6; i++) {
 		auto bitmapSide = Image::getBitmap(mipLevel, i);
-		memcpy(offset, bitmapSide->getData<void>(), sizeSide);
+		std::memcpy(offset, bitmapSide->getData<void>(), sizeSide);
 		offset += sizeSide;
 	}
 
@@ -65,7 +65,7 @@ void ImageCube::load(std::unique_ptr<Bitmap> loadBitmap) {
 				offset = loadBitmap->getData<uint8_t>();
 			}
 
-			memcpy(offset, bitmapSide.getData<void>(), lengthSide);
+			std::memcpy(offset, bitmapSide.getData<void>(), lengthSide);
 			offset += lengthSide;
 		}
 

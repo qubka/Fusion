@@ -225,7 +225,7 @@ void ConsolePanel::Message::onImGui() {
 
         if (count > 1) {
             ImGui::SameLine(ImGui::GetContentRegionAvail().x - (count > 99 ? ImGui::GetFontSize() * 1.7f : ImGui::GetFontSize() * 1.5f));
-            ImGui::Text("%d", count);
+            ImGui::Text("%i", count);
         }
 
         ImGui::PopID();

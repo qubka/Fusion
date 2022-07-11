@@ -16,7 +16,7 @@ namespace fe {
 
         template<typename T>
         void push(const T& object, size_t offset, size_t size) {
-            memcpy(data.get() + offset, &object, size);
+            std::memcpy(data.get() + offset, &object, size);
         }
 
         template<typename T>

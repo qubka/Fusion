@@ -105,7 +105,16 @@ namespace fe {
          * @param whitespace The whitespace type.
          * @return The trimmed string.
          */
-        static std::string Trim(std::string str, const std::string& whitespace = " \t\n\r");
+        static std::string Trim(const std::string& str, const std::string& whitespace = " \t\n\r");
+
+        /**
+         * Extract string between the left and right side of a string of delimiter.
+         * @param str The string.
+         * @param start The start delimiter.
+         * @param stop The stop delimiter.
+         * @return The extracted string.
+         */
+        static std::string Extract(const std::string& str, const std::string& start, const std::string& stop);
 
         /**
          * Removes all tokens from a string.

@@ -2,8 +2,10 @@
 
 #include "fusion/core/engine.hpp"
 #include "fusion/core/time.hpp"
+#include "fusion/devices/device_manager.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/filesystem/file_system.hpp"
+#include "fusion/utils/enumerate.hpp"
 
 using namespace fe;
 
@@ -16,8 +18,7 @@ ApplicationInfoPanel::~ApplicationInfoPanel() {
 }
 
 void ApplicationInfoPanel::onImGui() {
-    auto flags = ImGuiWindowFlags_NoCollapse;
-    ImGui::Begin(name.c_str(), &enabled, flags);
+    ImGui::Begin(name.c_str(), &enabled);
     {
         if (ImGui::TreeNode("Application")) {
             /*auto modules = Engine::Get()->getModules();
@@ -26,6 +27,165 @@ void ApplicationInfoPanel::onImGui() {
                 modules->onImGui();
                 ImGui::TreePop();
             }*/
+
+            if (ImGui::TreeNode("Device Manager")) {
+                static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
+                        | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_NoSavedSettings;
+
+                auto manager = DeviceManager::Get();
+
+                if (!manager->getWindows().empty()) {
+                    ImGui::TextUnformatted("Windows");
+                    if (ImGui::BeginTable("##windows", 11, flags)) {
+                        ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Title", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Borderless", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Resizable", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Visible", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("VSync", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Iconified", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Focused", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Fullscreen", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Floating", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableHeadersRow();
+
+                        for (const auto& [i, window]: enumerate(manager->getWindows())) {
+                            ImGui::TableNextRow();
+
+                            ImGui::TableSetColumnIndex(0);
+                            ImGui::Text("%lu", i);
+
+                            ImGui::TableSetColumnIndex(1);
+                            ImGui::TextUnformatted(window->getTitle().c_str());
+
+                            ImGui::TableSetColumnIndex(2);
+                            const auto& size = window->getSize();
+                            ImGui::Text("[%d %d]", size.x, size.y);
+
+                            ImGui::TableSetColumnIndex(3);
+                            ImGui::SmallButton(window->isBorderless() ? "Yes" : "No");
+
+                            ImGui::TableSetColumnIndex(4);
+                            ImGui::SmallButton(window->isResizable() ? "Yes" : "No");
+
+                            ImGui::TableSetColumnIndex(5);
+                            ImGui::SmallButton(window->isVisible() ? "Yes" : "No");
+
+                            ImGui::TableSetColumnIndex(6);
+                            ImGui::SmallButton(window->isVSync() ? "Yes" : "No");
+
+                            ImGui::TableSetColumnIndex(7);
+                            ImGui::SmallButton(window->isIconified() ? "Yes" : "No");
+
+                            ImGui::TableSetColumnIndex(8);
+                            ImGui::SmallButton(window->isFocused() ? "Yes" : "No");
+
+                            ImGui::TableSetColumnIndex(9);
+                            ImGui::SmallButton(window->isFullscreen() ? "Yes" : "No");
+
+                            ImGui::TableSetColumnIndex(10);
+                            ImGui::SmallButton(window->isFloating() ? "Yes" : "No");
+                        }
+                        ImGui::EndTable();
+                    }
+                    ImGui::NewLine();
+                }
+
+                if (!manager->getMonitors().empty()) {
+                    ImGui::TextUnformatted("Monitors");
+                    if (ImGui::BeginTable("##monitors", 5, flags)) {
+                        ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Primary", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Content Scale", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableHeadersRow();
+
+                        for (const auto& [i, monitor]: enumerate(manager->getMonitors())) {
+                            ImGui::TableNextRow();
+
+                            ImGui::TableSetColumnIndex(0);
+                            ImGui::Text("%lu", i);
+
+                            ImGui::TableSetColumnIndex(1);
+                            ImGui::TextUnformatted(monitor->getName().c_str());
+
+                            ImGui::TableSetColumnIndex(2);
+                            bool primary = monitor->isPrimary();
+                            if (primary) {
+                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+                            }
+                            ImGui::SmallButton(primary ? "Yes" : "No");
+                            if (primary)
+                                ImGui::PopStyleColor(3);
+
+                            ImGui::TableSetColumnIndex(3);
+                            auto size = monitor->getSize();
+                            ImGui::Text("[%i %i]", size.x, size.y);
+
+                            ImGui::TableSetColumnIndex(4);
+                            auto scale = monitor->getContentScale();
+                            ImGui::Text("[%f %f]", scale.x, scale.y);
+                        }
+                        ImGui::EndTable();
+                    }
+                    ImGui::NewLine();
+                }
+
+                if (!manager->getJoystick().empty()) {
+                    ImGui::TextUnformatted("Joysticks");
+                    if (ImGui::BeginTable("##joysticks", 7, flags)) {
+                        ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Port", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Connected", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Axis Count", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Button Count", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Hat Count", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableHeadersRow();
+
+                        for (const auto& [i, joystick]: enumerate(manager->getJoystick())) {
+                            ImGui::TableNextRow();
+
+                            ImGui::TableSetColumnIndex(0);
+                            ImGui::Text("%lu", i);
+
+                            ImGui::TableSetColumnIndex(1);
+                            ImGui::Text("%i", joystick->getPort());
+
+                            ImGui::TableSetColumnIndex(2);
+                            ImGui::TextUnformatted(joystick->getName().c_str());
+
+                            ImGui::TableSetColumnIndex(3);
+                            bool connected = joystick->isConnected();
+                            if (connected) {
+                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+                            }
+                            ImGui::SmallButton(connected ? "Yes" : "No");
+                            if (connected)
+                                ImGui::PopStyleColor(3);
+
+                            ImGui::TableSetColumnIndex(4);
+                            ImGui::Text("%lu", joystick->getAxisCount());
+
+                            ImGui::TableSetColumnIndex(5);
+                            ImGui::Text("%lu", joystick->getButtonCount());
+
+                            ImGui::TableSetColumnIndex(6);
+                            ImGui::Text("%lu", joystick->getHatCount());
+                        }
+                        ImGui::EndTable();
+                    }
+                    ImGui::NewLine();
+                }
+
+                ImGui::TreePop();
+            }
 
             if (ImGui::TreeNode("Filesystem")) {
                 auto mounted = FileSystem::Get()->getMounted();

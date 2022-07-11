@@ -22,7 +22,7 @@ ProcessInfo::ProcessInfo(unsigned int processId) : mProcessId{processId} {
     // get system time
     FILETIME lFileTime;
     GetSystemTimeAsFileTime(&lFileTime);
-    memcpy(&mPrevSystemTime, &lFileTime, sizeof(FILETIME));
+    std::memcpy(&mPrevSystemTime, &lFileTime, sizeof(FILETIME));
 
     // get amount of time ran in kernel and user mode
     FILETIME lCreationTime, lExitTime, lKernelTime, lUserTime;
@@ -30,9 +30,9 @@ ProcessInfo::ProcessInfo(unsigned int processId) : mProcessId{processId} {
     if (lProcessHandle != NULL) {
         BOOL lSuccess = GetProcessTimes(lProcessHandle, &lCreationTime, &lExitTime, &lKernelTime, &lUserTime);
         if (lSuccess) {
-            memcpy(&mCreationTime, &lCreationTime, sizeof(FILETIME));
-            memcpy(&mPrevKernelTime, &lKernelTime, sizeof(FILETIME));
-            memcpy(&mPrevUserTime, &lUserTime, sizeof(FILETIME));
+            std::memcpy(&mCreationTime, &lCreationTime, sizeof(FILETIME));
+            std::memcpy(&mPrevKernelTime, &lKernelTime, sizeof(FILETIME));
+            std::memcpy(&mPrevUserTime, &lUserTime, sizeof(FILETIME));
         }
 
         CloseHandle(lProcessHandle);
@@ -100,7 +100,7 @@ unsigned long long ProcessInfo::getProcessUptime() {
     GetSystemTimeAsFileTime(&lCurrTime);
 
     ULARGE_INTEGER ulCurrTime;
-    memcpy(&ulCurrTime, &lCurrTime, sizeof(FILETIME));
+    std::memcpy(&ulCurrTime, &lCurrTime, sizeof(FILETIME));
 
     // The FILETIME structure represents the number of 100-nanosecond intervals,
     // so we need to divide by 10 million to get actual seconds
@@ -129,15 +129,15 @@ double ProcessInfo::getProcessCPUUsage() {
         FILETIME lFileTime;
         GetSystemTimeAsFileTime(&lFileTime);
         ULARGE_INTEGER lCurrSystemTime;
-        memcpy(&lCurrSystemTime, &lFileTime, sizeof(FILETIME));
+        std::memcpy(&lCurrSystemTime, &lFileTime, sizeof(FILETIME));
 
         // get amount of time ran in kernel and user mode
         FILETIME lKernelTime, lUserTime;
         BOOL lSuccess = GetProcessTimes(lProcessHandle, &lFileTime, &lFileTime, &lKernelTime, &lUserTime);
         if (lSuccess) {
             ULARGE_INTEGER lCurrKernelTime, lCurrUserTime;
-            memcpy(&lCurrKernelTime, &lKernelTime, sizeof(FILETIME));
-            memcpy(&lCurrUserTime, &lUserTime, sizeof(FILETIME));
+            std::memcpy(&lCurrKernelTime, &lKernelTime, sizeof(FILETIME));
+            std::memcpy(&lCurrUserTime, &lUserTime, sizeof(FILETIME));
 
             // calculate process cpu usage
             ULONGLONG lTotalProcess = (lCurrKernelTime.QuadPart - mPrevKernelTime.QuadPart) +

@@ -239,7 +239,7 @@ void Graphics::captureScreenshot(const fs::path& filename, size_t id) const {
 
     void* data;
     vkMapMemory(logicalDevice, dstImageMemory, dstSubresourceLayout.offset, dstSubresourceLayout.size, 0, &data);
-    memcpy(bitmap.getData<void>(), data, static_cast<size_t>(dstSubresourceLayout.size));
+    std::memcpy(bitmap.getData<void>(), data, static_cast<size_t>(dstSubresourceLayout.size));
     vkUnmapMemory(logicalDevice, dstImageMemory);
 
     // Frees temp image and memory

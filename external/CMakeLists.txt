@@ -316,64 +316,59 @@ list(APPEND ALL_SYSTEM_LIBS assimp)
 
 # imgui and plugins
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-set(IMGUI_LIB_NAME "imgui")
-set(IMGUIZMO_LIB_NAME "imguizmo")
-set(IMGUIAL_LIB_NAME "imguial")
-set(IMGUI_PLUGINS_NAME "imgui-plugins")
-
 set(IMGUI_SOURCES
-        "${IMGUI_LIB_NAME}/imgui.cpp"
-        "${IMGUI_LIB_NAME}/imgui_demo.cpp"
-        "${IMGUI_LIB_NAME}/imgui_draw.cpp"
-        "${IMGUI_LIB_NAME}/imgui_tables.cpp"
-        "${IMGUI_LIB_NAME}/imgui_widgets.cpp"
-        "${IMGUIZMO_LIB_NAME}/GraphEditor.cpp"
-        "${IMGUIZMO_LIB_NAME}/ImCurveEdit.cpp"
-        "${IMGUIZMO_LIB_NAME}/ImGradient.cpp"
-        "${IMGUIZMO_LIB_NAME}/ImGuizmo.cpp"
-        "${IMGUIZMO_LIB_NAME}/ImSequencer.cpp"
+        "imgui/imgui.cpp"
+        "imgui/imgui_demo.cpp"
+        "imgui/imgui_draw.cpp"
+        "imgui/imgui_tables.cpp"
+        "imgui/imgui_widgets.cpp"
+        "imguizmo/GraphEditor.cpp"
+        "imguizmo/ImCurveEdit.cpp"
+        "imguizmo/ImGradient.cpp"
+        "imguizmo/ImGuizmo.cpp"
+        "imguizmo/ImSequencer.cpp"
+
+        "imgui-plugins/ImTextEditor.cpp"
         )
 
 set(IMGUI_HEADERS
-        "${IMGUI_LIB_NAME}/imconfig.h"
-        "${IMGUI_LIB_NAME}/imgui.h"
-        "${IMGUI_LIB_NAME}/imgui_internal.h"
-        #"${IMGUI_LIB_NAME}/imstb_rectpack.h"
-        #"${IMGUI_LIB_NAME}/imstb_textedit.h"
-        #"${IMGUI_LIB_NAME}/imstb_truetype.h"
+        "imgui/imconfig.h"
+        "imgui/imgui.h"
+        "imgui/imgui_internal.h"
+        #"imgui/imstb_rectpack.h"
+        #"imgui/imstb_textedit.h"
+        #"imgui/imstb_truetype.h"
 
-        "${IMGUI_PLUGINS_NAME}/imfile_browser.h"
+        "imgui-plugins/ImFileBrowser.h"
+        "imgui-plugins/ImTextEditor.h"
 
-        "${IMGUIZMO_LIB_NAME}/GraphEditor.h"
-        "${IMGUIZMO_LIB_NAME}/ImCurveEdit.h"
-        "${IMGUIZMO_LIB_NAME}/ImGradient.h"
-        "${IMGUIZMO_LIB_NAME}/ImGuizmo.h"
-        "${IMGUIZMO_LIB_NAME}/ImSequencer.h"
-        "${IMGUIZMO_LIB_NAME}/ImZoomSlider.h"
+        "imguizmo/GraphEditor.h"
+        "imguizmo/ImCurveEdit.h"
+        "imguizmo/ImGradient.h"
+        "imguizmo/ImGuizmo.h"
+        "imguizmo/ImSequencer.h"
+        "imguizmo/ImZoomSlider.h"
         )
 
-set(IMGUI_INC_PATH "${IMGUI_LIB_NAME}/")
-set(IMGUIZMO_INC_PATH "${IMGUIZMO_LIB_NAME}/")
-
-add_library(${IMGUI_LIB_NAME}
+add_library(imgui
         STATIC
         ${IMGUI_SOURCES}
         ${IMGUI_HEADERS}
         )
 
-target_compile_definitions(${IMGUI_LIB_NAME}
+target_compile_definitions(imgui
         PRIVATE
         #IMGUI_IMPL_OPENGL_LOADER_GLAD=1
         USE_IMGUI_API
         )
 
-target_include_directories(${IMGUI_LIB_NAME}
+target_include_directories(imgui
         PUBLIC
-        "${IMGUI_INC_PATH}"
-        "${IMGUIZMO_INC_PATH}"
+        "imgui/"
+        "imguizmo/"
+        "imgui-plugins/"
         "${GLFW_INC_PATH}"
-        "${GLAD_INC_PATH}"
-        "${IMGUIAL_LIB_NAME}/fonts/"
+        #"${GLAD_INC_PATH}"
         )
 
 list(APPEND ALL_SYSTEM_LIBS imgui)

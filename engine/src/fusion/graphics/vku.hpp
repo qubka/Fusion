@@ -50,7 +50,7 @@ namespace vku {
 
     inline VkClearColorValue clearColor(const glm::vec4& v = {0.0f, 0.0f, 0.0f, 1.0f}) {
         VkClearColorValue result;
-        memcpy(&result.float32, &v, sizeof(result.float32));
+        std::memcpy(&result.float32, &v, sizeof(result.float32));
         return result;
     }
 

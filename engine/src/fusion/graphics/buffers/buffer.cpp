@@ -91,9 +91,9 @@ void Buffer::copy(const void* data, VkDeviceSize size, VkDeviceSize offset) {
     assert(mapped && "Cannot copy to unmapped buffer");
 
     if (size == VK_WHOLE_SIZE) {
-        memcpy(mapped, data, this->size);
+        std::memcpy(mapped, data, this->size);
     } else {
-        memcpy(reinterpret_cast<int8_t*>(mapped) + offset, data, size);
+        std::memcpy(reinterpret_cast<int8_t*>(mapped) + offset, data, size);
     }
 }
 
@@ -101,9 +101,9 @@ int Buffer::compare(const void* data, VkDeviceSize size, VkDeviceSize offset) {
     assert(mapped && "Cannot compare to unmapped buffer");
 
     if (size == VK_WHOLE_SIZE) {
-        return memcmp(mapped, data, this->size);
+        return std::memcmp(mapped, data, this->size);
     } else {
-        return memcmp(reinterpret_cast<int8_t*>(mapped) + offset, data, size);
+        return std::memcmp(reinterpret_cast<int8_t*>(mapped) + offset, data, size);
     }
 }
 
@@ -111,9 +111,9 @@ void Buffer::extract(void* data, VkDeviceSize size, VkDeviceSize offset) {
     assert(mapped && "Cannot extract from unmapped buffer");
 
     if (size == VK_WHOLE_SIZE) {
-        memcpy(data, mapped, this->size);
+        std::memcpy(data, mapped, this->size);
     } else {
-        memcpy(data, reinterpret_cast<int8_t*>(mapped) + offset, size);
+        std::memcpy(data, reinterpret_cast<int8_t*>(mapped) + offset, size);
     }
 }
 
