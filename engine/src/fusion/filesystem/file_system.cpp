@@ -20,10 +20,17 @@ FileSystem::~FileSystem() {
 }
 
 void FileSystem::mount(const fs::path& path, const fs::path& mount) {
-    if (auto it = mountPoints.find(path); it == mountPoints.end()) {
-        PHYSFS_mount(path.string().c_str(), mount.string().c_str(), 1);
-        mountPoints.emplace(path, mount);
+    if (auto it = mountPoints.find(path); it != mountPoints.end()) {
+        if (it->second == mount) {
+            return;
+        } else {
+            PHYSFS_unmount(path.string().c_str());
+            mountPoints.erase(it);
+        }
     }
+
+    PHYSFS_mount(path.string().c_str(), mount.string().c_str(), 1);
+    mountPoints.emplace(path, mount);
 }
 
 void FileSystem::unmount(const fs::path& path) {
@@ -93,7 +100,7 @@ std::vector<uint8_t> FileSystem::ReadBytes(const fs::path& filename) {
 
         auto storage = Storage::readFile(filename);
         std::vector<uint8_t> data(storage->getSize());
-        memcpy(data.data(), storage->getData(), storage->getSize());
+        std::memcpy(data.data(), storage->getData(), storage->getSize());
 
         LOG_INFO << "Reading file with default filesystem implementation: " << filename;
 

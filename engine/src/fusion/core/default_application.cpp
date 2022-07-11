@@ -50,18 +50,7 @@ void DefaultApplication::onStart() {
     window->OnClose().connect<&Engine::requestClose>(Engine::Get());
 
     // Win32 : Sets up a console window and redirects standard output to it
-#if FUSION_PLATFORM_WINDOWS
-    // Create console if needed
-    if (projectSettings.isShowConsole) {
-        AllocConsole();
-        AttachConsole(GetCurrentProcessId());
-        FILE* stream;
-        freopen_s(&stream, "CONIN$", "r", stdin);
-        freopen_s(&stream, "CONOUT$", "w+", stdout);
-        freopen_s(&stream, "CONOUT$", "w+", stderr);
-        SetConsoleTitle(TEXT(windowInfo.title.c_str()));
-    }
-#endif
+    showConsole();
 }
 
 void DefaultApplication::openNewProject(const fs::path& path, const std::string& name) {
@@ -77,6 +66,7 @@ void DefaultApplication::openNewProject(const fs::path& path, const std::string&
     projectSettings.projectVersion = version.string();
     projectSettings.title = name;
     if (auto window = DeviceManager::Get()->getWindow(0)) {
+        window->setTitle(name);
         projectSettings.size = window->getSize();
         projectSettings.isBorderless = window->isBorderless();
         projectSettings.isResizable = window->isResizable();
@@ -130,13 +120,14 @@ void DefaultApplication::openNewProject(const fs::path& path, const std::string&
     projectLoaded = true;
 
     serialise();
+
+    // Win32 : Sets up a console window and redirects standard output to it
+    showConsole();
 }
 
 void DefaultApplication::openProject(const fs::path& path) {
     projectSettings.projectName = path.filename().replace_extension().string();
     projectSettings.projectRoot = path.parent_path();
-
-    //m_SceneManager = CreateUniquePtr<SceneManager>();
 
     deserialise();
 
@@ -192,7 +183,10 @@ void DefaultApplication::deserialise() {
         //m_SceneManager->SwitchScene(0);
 
         LOG_ERROR << "Failed to load project";
+        return;
     }
+
+    projectLoaded = true;
 }
 
 void DefaultApplication::mountPaths() const {
@@ -206,4 +200,25 @@ void DefaultApplication::mountPaths() const {
     fs->mount(assetPath / "scripts", "Scripts");
     fs->mount(assetPath / "shaders", "Shaders");
     fs->mount(assetPath / "scenes", "Scenes");
+}
+
+void DefaultApplication::showConsole() {
+#if FUSION_PLATFORM_WINDOWS
+    // Create console if needed
+    if (projectSettings.isShowConsole && !consoleOpened) {
+        AllocConsole();
+        AttachConsole(GetCurrentProcessId());
+        FILE* stream;
+        freopen_s(&stream, "CONIN$", "r", stdin);
+        freopen_s(&stream, "CONOUT$", "w+", stdout);
+        freopen_s(&stream, "CONOUT$", "w+", stderr);
+        SetConsoleTitle(TEXT(windowInfo.title.c_str()));
+        consoleOpened = true;
+    } else if (!projectSettings.isShowConsole && consoleOpened) {
+        FreeConsole();
+        consoleOpened = false;
+    }
+#else
+    consoleOpened = true;
+#endif
 }

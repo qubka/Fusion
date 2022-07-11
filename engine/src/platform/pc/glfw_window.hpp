@@ -23,7 +23,7 @@ namespace glfw {
         void setFloating(bool flag) override;
 
         bool isFullscreen() const override { return fullscreen; }
-        void setFullscreen(bool flag, fe::Monitor* monitor = nullptr) override;
+        void setFullscreen(bool flag, const fe::Monitor* monitor = nullptr) override;
 
         bool isFocused() const override { return focused; }
         void setFocused() override;

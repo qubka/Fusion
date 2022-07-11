@@ -17,7 +17,7 @@ namespace fe {
         void open();
         bool isOpened();
 
-        void setCurrentPath(const  fs::path& path);
+        void setCurrentPath(const fs::path& path);
         void setOpenDirectory(bool value);
         void setCallback(const std::function<void(const fs::path&)>& func) { callback = func; }
 

@@ -53,8 +53,8 @@ void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& 
 
     for (int i = 0; i < drawData->CmdListsCount; i++) {
         const ImDrawList* cmdList = drawData->CmdLists[i];
-        memcpy(vtxDst, cmdList->VtxBuffer.Data, cmdList->VtxBuffer.Size * sizeof(ImDrawVert));
-        memcpy(idxDst, cmdList->IdxBuffer.Data, cmdList->IdxBuffer.Size * sizeof(ImDrawIdx));
+        std::memcpy(vtxDst, cmdList->VtxBuffer.Data, cmdList->VtxBuffer.Size * sizeof(ImDrawVert));
+        std::memcpy(idxDst, cmdList->IdxBuffer.Data, cmdList->IdxBuffer.Size * sizeof(ImDrawIdx));
         vtxDst += cmdList->VtxBuffer.Size;
         idxDst += cmdList->IdxBuffer.Size;
     }

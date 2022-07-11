@@ -4,7 +4,6 @@
 #include "fusion/graphics/images/image2d_array.hpp"
 #include "fusion/graphics/images/image_cube.hpp"
 
-#include "fusion/utils/string.hpp"
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/imgui/material_design_icons.hpp"
 
@@ -18,30 +17,8 @@ using namespace std::string_literals;
 glm::vec4 SelectedColor = glm::vec4{0.28f, 0.56f, 0.9f, 1.0f};
 glm::vec4 IconColor = glm::vec4{0.2f, 0.2f, 0.2f, 1.0f};
 
-bool Property(const std::string& name, std::string& value, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::TextUnformatted(value.c_str());
-    } else {
-        // TODO
-    }
-
-    Tooltip(value.c_str());
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-void PropertyConst(const std::string& name, const std::string& value) {
-    bool updated = false;
-
+void PropertyText(const std::string& name, const std::string& value) {
+    //ImGui::AlignTextToFramePadding();
     ImGui::TextUnformatted(name.c_str());
     ImGui::NextColumn();
     ImGui::PushItemWidth(-1);
@@ -50,495 +27,30 @@ void PropertyConst(const std::string& name, const std::string& value) {
         ImGui::TextUnformatted(value.c_str());
     }
 
-    Tooltip(value.c_str());
     ImGui::PopItemWidth();
     ImGui::NextColumn();
 }
 
-bool Property(const std::string& name, bool& value, const bitmask::bitmask<PropertyFlag>& flags) {
+bool PropertyText(const std::string& name, std::string& value, const Flags& flags) {
     bool updated = false;
 
+    //ImGui::AlignTextToFramePadding();
     ImGui::TextUnformatted(name.c_str());
     ImGui::NextColumn();
     ImGui::PushItemWidth(-1);
 
     if (flags & PropertyFlag::ReadOnly) {
-        ImGui::TextUnformatted(value ? "True" : "False");
+        ImGui::TextUnformatted(value.c_str());
     } else {
+        char buffer[256];
+        std::memset(buffer, 0, sizeof(buffer));
+        std::strncpy(buffer, value.c_str(), sizeof(buffer));
         std::string id = "##" + name;
-        if (ImGui::Checkbox(id.c_str(), &value))
+        if (ImGui::InputText(id.c_str(), buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
+            value = std::string{buffer};
             updated = true;
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-bool Property(const std::string& name, int& value, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::Text("%i", value);
-    } else {
-        std::string id = "##" + name;
-        if (ImGui::DragInt(id.c_str(), &value))
-            updated = true;
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-bool Property(const std::string& name, uint32_t& value, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::Text("%uui", value);
-    } else {
-        std::string id = "##" + name;
-        int valueInt = static_cast<int>(value);
-        if (ImGui::DragInt(id.c_str(), &valueInt)) {
-            updated = true;
-            value = (uint32_t) valueInt;
         }
     }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-bool Property(const std::string& name, float& value, float min, float max, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::Text("%.2f", value);
-    } else {
-        std::string id = "##" + name;
-        if (ImGui::DragFloat(id.c_str(), &value, min, max))
-            updated = true;
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-bool Property(const std::string& name, double& value, double min, double max, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::Text("%.2f", static_cast<float>(value));
-    } else {
-        std::string id = "##" + name;
-        if (ImGui::DragScalar(id.c_str(), ImGuiDataType_Double, &value))
-            updated = true;
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-bool Property(const std::string& name, int& value, int min, int max, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::Text("%i", value);
-    } else {
-        std::string id = "##" + name;
-        if (ImGui::DragInt(id.c_str(), &value, 1, min, max))
-            updated = true;
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-bool Property(const std::string& name, glm::vec2& value, const bitmask::bitmask<PropertyFlag>& flags) {
-    return Property(name, value, -1.0f, 1.0f, flags);
-}
-
-bool Property(const std::string& name, glm::vec2& value, float min, float max, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::Text("%.2f , %.2f", value.x, value.y);
-    } else {
-        std::string id = "##" + name;
-        if (ImGui::DragFloat2(id.c_str(), glm::value_ptr(value)))
-            updated = true;
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-bool Property(const std::string& name, glm::vec3& value, const bitmask::bitmask<PropertyFlag>& flags) {
-    return Property(name, value, -1.0f, 1.0f, flags);
-}
-
-bool Property(const std::string& name, glm::vec3& value, float min, float max, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::Text("%.2f , %.2f, %.2f", value.x, value.y, value.z);
-    } else {
-        std::string id = "##" + name;
-        if (flags & PropertyFlag::ColorProperty) {
-            if (ImGui::ColorEdit3(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs))
-                updated = true;
-        } else {
-            if (ImGui::DragFloat3(id.c_str(), glm::value_ptr(value)))
-                updated = true;
-        }
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-bool Property(const std::string& name, glm::vec4& value, bool exposeW, const bitmask::bitmask<PropertyFlag>& flags) {
-    return Property(name, value, -1.0f, 1.0f, exposeW, flags);
-}
-
-bool Property(const std::string& name, glm::vec4& value, float min, float max, bool exposeW, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::Text("%.2f , %.2f, %.2f , %.2f", value.x, value.y, value.z, value.w);
-    } else {
-        std::string id = "##" + name;
-        if (flags & PropertyFlag::ColorProperty) {
-            if (ImGui::ColorEdit4(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs))
-                updated = true;
-        } else if (exposeW && ImGui::DragFloat4(id.c_str(), glm::value_ptr(value)))
-            updated = true;
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-bool Property(const std::string& name, glm::quat& value, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::Text("%.2f , %.2f, %.2f , %.2f", value.x, value.y, value.z, value.w);
-    } else {
-        std::string id = "##" + name;
-        if (ImGui::DragFloat4(id.c_str(), glm::value_ptr(value)))
-            updated = true;
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-
-    return updated;
-}
-
-bool PropertyControl(const std::string& name, glm::vec3& value, float min, float max, float reset, float speed) {
-    uint8_t updated = 0;
-
-    ImGuiIO& io = ImGui::GetIO();
-
-    ImGui::PushID(name.c_str());
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-
-    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
-
-    float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
-    ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-    {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-        ImGui::PushFont(io.Fonts->Fonts[1]);
-        if (ImGui::Button("X", buttonSize)) {
-            value.x = reset;
-            updated += 1;
-        }
-        ImGui::PopFont();
-        ImGui::PopStyleColor(3);
-    }
-
-    ImGui::SameLine();
-    updated += ImGui::DragFloat("##X", &value.x, speed, min, max, "%.2f");
-    ImGui::SameLine();
-
-    {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-        ImGui::PushFont(io.Fonts->Fonts[1]);
-        if (ImGui::Button("Y", buttonSize)) {
-            value.y = reset;
-            updated += 1;
-        }
-        ImGui::PopFont();
-        ImGui::PopStyleColor(3);
-    }
-
-    ImGui::SameLine();
-    updated += ImGui::DragFloat("##Y", &value.y, speed, min, max, "%.2f");
-    ImGui::SameLine();
-
-    {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-        ImGui::PushFont(io.Fonts->Fonts[1]);
-        if (ImGui::Button("Z", buttonSize)) {
-            value.z = reset;
-            updated += 1;
-        }
-        ImGui::PopFont();
-        ImGui::PopStyleColor(3);
-    }
-
-    ImGui::SameLine();
-    updated += ImGui::DragFloat("##Z", &value.z, speed, min, max, "%.2f");
-
-    ImGui::PopStyleVar();
-
-    ImGui::PopID();
-
-    return updated;
-}
-
-bool PropertyControl(const std::string& name, glm::vec2& value, float min, float max, float reset, float speed) {
-    uint8_t updated = 0;
-
-    ImGuiIO& io = ImGui::GetIO();
-
-    ImGui::PushID(name.c_str());
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-
-    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
-
-    float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
-    ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-    {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-        ImGui::PushFont(io.Fonts->Fonts[1]);
-        if (ImGui::Button("X", buttonSize)) {
-            value.x = reset;
-            updated += 1;
-        }
-        ImGui::PopFont();
-        ImGui::PopStyleColor(3);
-    }
-
-    ImGui::SameLine();
-    updated += ImGui::DragFloat("##X", &value.x, speed, min, max, "%.2f");
-    ImGui::SameLine();
-
-    {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-        ImGui::PushFont(io.Fonts->Fonts[1]);
-        if (ImGui::Button("Y", buttonSize)) {
-            value.y = reset;
-            updated += 1;
-        }
-        ImGui::PopFont();
-        ImGui::PopStyleColor(3);
-    }
-
-    ImGui::SameLine();
-    updated += ImGui::DragFloat("##Y", &value.y, speed, min, max, "%.2f");
-
-    ImGui::PopStyleVar();
-
-    ImGui::PopID();
-
-    return updated;
-}
-
-bool PropertyControl(const std::string& name, glm::quat& value, float min, float max, float reset, float speed) {
-    uint8_t updated = 0;
-
-    ImGuiIO& io = ImGui::GetIO();
-
-    ImGui::PushID(name.c_str());
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-
-    ImGui::PushMultiItemsWidths(4, ImGui::CalcItemWidth());
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
-
-    float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
-    ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-    {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-        ImGui::PushFont(io.Fonts->Fonts[1]);
-        if (ImGui::Button("X", buttonSize)) {
-            value.x = reset;
-            updated += 1;
-        }
-        ImGui::PopFont();
-        ImGui::PopStyleColor(3);
-    }
-
-    ImGui::SameLine();
-    updated += ImGui::DragFloat("##X", &value.x, speed, min, max, "%.2f");
-    ImGui::SameLine();
-
-    {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-        ImGui::PushFont(io.Fonts->Fonts[1]);
-        if (ImGui::Button("Y", buttonSize)) {
-            value.y = reset;
-            updated += 1;
-        }
-        ImGui::PopFont();
-        ImGui::PopStyleColor(3);
-    }
-
-    ImGui::SameLine();
-    updated += ImGui::DragFloat("##Y", &value.y, speed, min, max, "%.2f");
-    ImGui::SameLine();
-
-    {
-
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-        ImGui::PushFont(io.Fonts->Fonts[1]);
-        if (ImGui::Button("Z", buttonSize)) {
-            value.z = reset;
-            updated += 1;
-        }
-        ImGui::PopFont();
-        ImGui::PopStyleColor(3);
-    }
-
-    ImGui::SameLine();
-    updated += ImGui::DragFloat("##Z", &value.z, speed, min, max, "%.2f");
-    ImGui::SameLine();
-
-    {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.2f, 0.8f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.3f, 0.9f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.2f, 0.8f, 1.0f });
-        ImGui::PushFont(io.Fonts->Fonts[1]);
-        if (ImGui::Button("W", buttonSize)) {
-            value.x = reset;
-            updated += 1;
-        }
-        ImGui::PopFont();
-        ImGui::PopStyleColor(3);
-    }
-
-    ImGui::SameLine();
-    updated += ImGui::DragFloat("##W", &value.x, speed, min, max, "%.2f");
-
-    ImGui::PopStyleVar();
-
-    ImGui::PopID();
-
-    return updated;
-}
-
-template<typename E>
-bool PropertyDropdown(const std::string& name, E& value, const bitmask::bitmask<PropertyFlag>& flags) {
-    bool updated = false;
-
-    ImGui::TextUnformatted(name.c_str());
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    constexpr auto entries = me::enum_entries<E>();
-    const char* current = entries[me::enum_index(value).value_or(0)].second.data();
-
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::TextUnformatted(current);
-    } else {
-        std::string id = "##" + name;
-        if (ImGui::BeginCombo(id.c_str(), current)) {
-            for (const auto& [type, title] : entries) {
-                const bool is_selected = (value == type);
-                if (ImGui::Selectable(title.data(), is_selected)) {
-                    value = type;
-                    updated = true;
-                }
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();
-            }
-            ImGui::EndCombo();
-        }
-    }
-
-    DrawItemActivityOutline(2.5f);
 
     ImGui::PopItemWidth();
     ImGui::NextColumn();
@@ -549,6 +61,7 @@ bool PropertyDropdown(const std::string& name, E& value, const bitmask::bitmask<
 bool PropertyDropdown(const std::string& name, std::string* options, int32_t optionCount, int32_t* selected) {
     bool updated = false;
 
+    //ImGui::AlignTextToFramePadding();
     ImGui::TextUnformatted(name.c_str());
     ImGui::NextColumn();
     ImGui::PushItemWidth(-1);
@@ -586,7 +99,6 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
         //LOG_WARNING << "Folder seems to be empty!";
     }
 
-    //ImGui::Columns(2);
     ImGui::TextUnformatted(name.c_str());
     ImGui::NextColumn();
 
@@ -692,8 +204,6 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
     }
 
     ImGui::PopStyleVar();
-
-    //ImGui::Columns(1);
 
     return updated;
 }
@@ -893,15 +403,15 @@ void DrawItemActivityOutline(float rounding, bool drawWhenInactive, const ImColo
     }
 }
 
-bool InputText(std::string& currentText) {
+bool InputText(const std::string& name, std::string& currentText) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
     ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
 
     char buffer[256];
-    memset(buffer, 0, 256);
-    memcpy(buffer, currentText.c_str(), currentText.length());
+    std::memset(buffer, 0, 256);
+    std::strncpy(buffer, currentText.c_str(), sizeof(buffer));
 
-    bool updated = ImGui::InputText("##SceneName", buffer, 256);
+    bool updated = ImGui::InputText(name.c_str(), buffer, 256);
 
     DrawItemActivityOutline(2.0f, false);
 

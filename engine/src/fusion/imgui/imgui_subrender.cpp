@@ -331,7 +331,7 @@ void ImGuiSubrender::rebuildFont() {
     int texWidth, texHeight;
     io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
     auto bitmap = std::make_unique<Bitmap>(glm::uvec2{texWidth, texHeight});
-    memcpy(bitmap->getData<void>(), fontBuffer, bitmap->getLength());
+    std::memcpy(bitmap->getData<void>(), fontBuffer, bitmap->getLength());
     auto& font = fontImages.emplace_back(std::make_unique<Image2d>(std::move(bitmap)));
 
     io.Fonts->SetTexID((ImTextureID)(font.get()));

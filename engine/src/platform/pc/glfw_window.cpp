@@ -107,7 +107,7 @@ void Window::setFloating(bool flag) {
     onFloating.publish(flag);
 }
 
-void Window::setFullscreen(bool flag, fe::Monitor* monitor) {
+void Window::setFullscreen(bool flag, const fe::Monitor* monitor) {
     auto selected = monitor ? monitor : getCurrentMonitor();
     auto videoMode = selected->getVideoMode();
 

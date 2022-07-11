@@ -35,12 +35,14 @@ namespace fe {
         //void onViewportResize(const glm::uvec2& size);
 
         bool isProjectLoaded() const { return projectLoaded; }
-        const ProjectSettings& getProjectSettings() const { return projectSettings; }
+        bool isConsoleOpened() const { return consoleOpened; }
+        ProjectSettings& getProjectSettings() { return projectSettings; }
 
         void serialise();
         void deserialise();
 
         void mountPaths() const;
+        void showConsole();
 
         template <typename Archive>
         void serialize(Archive& archive) {
@@ -62,5 +64,6 @@ namespace fe {
         fs::path executablePath;
         ProjectSettings projectSettings;
         bool projectLoaded{ false };
+        bool consoleOpened{ false };
     };
 }
