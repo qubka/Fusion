@@ -48,7 +48,7 @@ namespace fe {
          * @param append False to append to search path, true to prepend.
          * @return True on the success, false otherwise.
          */
-        bool addSearchPath(const fs::path& path, const std::string& mount = "", bool append = false);
+        bool addSearchPath(const fs::path& path, const std::string& mount = "", bool append = true);
 
         /**
          * Removes a file search path.

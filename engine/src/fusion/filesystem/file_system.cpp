@@ -204,7 +204,7 @@ bool FileSystem::WriteBytes(const fs::path& filepath, const void* buffer, size_t
 }
 
 bool FileSystem::WriteText(const fs::path& filepath, const std::string& text) {
-    WriteBytes(filepath, text.data(), text.length());
+    return WriteBytes(filepath, text.data(), text.length());
 }
 
 std::vector<fs::path> FileSystem::GetFilesInPath(const fs::path& path, bool recursive) {

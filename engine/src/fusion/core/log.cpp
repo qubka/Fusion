@@ -11,9 +11,9 @@ void Log::Init() {
     plog::init(plog::debug, &ConsoleAppender);
 #else
     const char* file = "fusion.log";
-    std::ofstream ofs;
-    ofs.open(file, std::ofstream::out | std::ofstream::trunc);
-    ofs.close();
+    std::ofstream os;
+    os.open(file, std::ofstream::out | std::ofstream::trunc);
+    os.close();
     plog::init(plog::debug, file);
 #endif
 }

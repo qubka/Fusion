@@ -24,7 +24,7 @@ GridRenderer::~GridRenderer() {
 
 void GridRenderer::onRender(const CommandBuffer& commandBuffer) {
     // Updates uniform
-    auto camera = SceneManager::Get()->getCurrentScene()->getCamera();
+    auto camera = SceneManager::Get()->getScene()->getCamera();
     pushObject.push("projection", camera->getProjectionMatrix());
     pushObject.push("view", camera->getViewMatrix());
 
