@@ -20,7 +20,7 @@ namespace fe {
         /**
          * Called when the scene is created.
          */
-        virtual void onCreate();
+        virtual void onStart();
 
         /**
          * Run when updating the scene.
@@ -30,7 +30,7 @@ namespace fe {
         /**
          * Called when scene is being activated, and will begin being rendered/updated.
          */
-        virtual void onStart();
+        virtual void onPlay();
 
         /**
          * Called when scene is being swapped and will no longer be rendered/updated
@@ -140,8 +140,8 @@ namespace fe {
         template<typename T>
         auto getAllEntitiesWith() { return registry.view<T>(); }
 
-        void serialise(const fs::path& path, bool binary = false);
-        void deserialise(const fs::path& path, bool binary = false);
+        void serialise(bool binary = false);
+        void deserialise(bool binary = false);
 
         template<typename Archive>
         void save(Archive& archive) const {
@@ -174,7 +174,7 @@ namespace fe {
         SystemHolder systems;
         entt::registry registry;
         std::shared_ptr<Camera> camera;
-        bool created{ false };
+        bool started{ false };
         bool runtime{ false };
     };
 }

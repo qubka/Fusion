@@ -5,19 +5,19 @@
 namespace fe {
     class System {
     public:
-        System(entt::registry& registry) : registry{registry} {}
+        explicit System(entt::registry& registry) : registry{registry} {}
         virtual ~System() = default;
         NONCOPYABLE(System);
 
         /**
-         * @brief Called when the system is created.
+         * @brief Run when switching to this scene from another.
          */
-        virtual void onCreate() {};
+        virtual void onStart() {};
 
         /**
          * @brief Whenever the system starts updating because scene in the active state.
          */
-        virtual void onStart() {};
+        virtual void onPlay() {};
 
         /**
          * @brief Every frame as long as the system has work to do and the system is Enabled.

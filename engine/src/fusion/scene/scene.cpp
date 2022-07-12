@@ -4,6 +4,7 @@
 
 #include "fusion/utils/string.hpp"
 #include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/virtual_file_system.hpp"
 
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/archives/binary.hpp>
@@ -36,43 +37,45 @@ Scene::Scene(std::string name) : name{std::move(name)} {
     clone<MaterialComponent>(other.registry);
 }*/
 
-void Scene::onCreate() {
-    /*systems.each([&](auto system) {
+void Scene::onStart() {
+    systems.each([&](auto system) {
         if (system->isEnabled())
-            system->onCreate();
-    });*/
+            system->onStart();
+    });
+
+    started = true;
 
     LOG_DEBUG << "Scene : " << name << " created first time";
 }
 
 void Scene::onUpdate() {
-    /*if (!runtime)
+    if (!runtime)
         return;
 
     systems.each([&](auto system) {
         if (system->isEnabled())
             system->onUpdate();
-    });*/
+    });
 }
 
-void Scene::onStart() {
-    /*runtime = true;
+void Scene::onPlay() {
+    runtime = true;
 
     systems.each([&](auto system) {
         if (system->isEnabled())
-            system->onStart();
-    });*/
+            system->onPlay();
+    });
 
     LOG_DEBUG << "Scene : " << name << " started runtime";
 }
 
 void Scene::onStop() {
-    /*systems.each([&](auto system) {
+    systems.each([&](auto system) {
         if (system->isEnabled())
             system->onStop();
     });
 
-    runtime = false;*/
+    runtime = false;
 
     LOG_DEBUG << "Scene : " << name << " stopped runtime";
 }
@@ -135,37 +138,37 @@ entt::entity Scene::duplicateEntity(entt::entity entity) {
     return newEntity;
 }
 
-void Scene::serialise(const fs::path& path, bool binary) {
-    auto filepath = path / name;
+void Scene::serialise(bool binary) {
     if (binary) {
-        filepath += ".bin";
-        std::ofstream file{filepath, std::ios::binary};
+        auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
+        std::ofstream os{filepath, std::ios::binary};
         {
             // output finishes flushing its contents when it goes out of scope
-            cereal::BinaryOutputArchive output{ file };
+            cereal::BinaryOutputArchive output{os};
             output(*this);
             entt::snapshot{ registry }.entities(output).component<ALL_COMPONENTS>(output);
         }
+
+        LOG_INFO << "Serialise scene as binary: " << filepath;
     } else {
-        filepath += ".fsn";
+        auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
         std::stringstream ss;
         {
             // output finishes flushing its contents when it goes out of scope
-            cereal::JSONOutputArchive output{ ss };
+            cereal::JSONOutputArchive output{ss};
             output(*this);
             entt::snapshot{ registry }.entities(output).component<ALL_COMPONENTS>(output);
         }
 
         FileSystem::WriteText(filepath, ss.str());
-    }
 
-    LOG_INFO << "Serialise scene: " << filepath;
+        LOG_INFO << "Serialise scene as JSON: " << filepath;
+    }
 }
 
-void Scene::deserialise(const fs::path& path, bool binary) {
-    auto filepath = path / name;
+void Scene::deserialise(bool binary) {
     if (binary) {
-        filepath += ".bin";
+        auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
 
         if (!FileSystem::ExistsInPath(filepath)) {
             LOG_ERROR << "No saved scene file found: " << filepath;
@@ -173,16 +176,18 @@ void Scene::deserialise(const fs::path& path, bool binary) {
         }
 
         try {
-            std::ifstream file{filepath, std::ios::binary};
-            cereal::BinaryInputArchive input(file);
+            std::ifstream is{filepath, std::ios::binary};
+            cereal::BinaryInputArchive input{is};
             input(*this);
             entt::snapshot_loader{ registry }.entities(input).component<ALL_COMPONENTS>(input);
         }
         catch (...) {
             LOG_ERROR << "Failed to load scene: " << filepath;
         }
+
+        LOG_INFO << "Deserialise scene as binary: " << filepath;
     } else {
-        filepath += ".fsn";
+        auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
 
         if (!FileSystem::ExistsInPath(filepath)) {
             LOG_ERROR << "No saved scene file found: " << filepath;
@@ -200,9 +205,7 @@ void Scene::deserialise(const fs::path& path, bool binary) {
         catch (...) {
             LOG_ERROR << "Failed to load scene: " << filepath;
         }
+
+        LOG_INFO << "Deserialise scene as JSON: " << filepath;
     }
-
-    LOG_INFO << "Deserialise scene: " << filepath;
-
-    //SceneManager::Get().onNewScene.publish(this);
 }
