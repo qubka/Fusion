@@ -18,33 +18,28 @@ FileSystem::~FileSystem() {
     PHYSFS_deinit();
 }
 
-void FileSystem::mount(const fs::path& path, const fs::path& mount) {
-    if (auto it = mountPoints.find(path); it != mountPoints.end()) {
-        if (it->second == mount) {
-            return;
-        } else {
-            PHYSFS_unmount(path.string().c_str());
-            mountPoints.erase(it);
-        }
+bool FileSystem::Mount(const fs::path& path, const fs::path& mount) {
+    int result =  PHYSFS_mount(path.string().c_str(), mount.string().c_str(), 1);
+    if (!result) {
+        LOG_ERROR << "Failed to mount directory or archive: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
-
-    PHYSFS_mount(path.string().c_str(), mount.string().c_str(), 1);
-    mountPoints.emplace(path, mount);
+    return result != 0;
 }
 
-void FileSystem::unmount(const fs::path& path) {
-    if (auto it = mountPoints.find(path); it != mountPoints.end()) {
-        PHYSFS_unmount(path.string().c_str());
-        mountPoints.erase(it);
+bool FileSystem::Unmount(const fs::path& path) {
+    int result = PHYSFS_unmount(path.string().c_str());
+    if (!result) {
+        LOG_ERROR << "Failed to create directory or archiv: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
+    return result != 0;
 }
 
 void FileSystem::onUpdate() {
 
 }
 
-const std::map<fs::path, fs::path>& FileSystem::getMounted() {
-    /*auto sp = PHYSFS_getSearchPath();
+std::vector<fs::path> FileSystem::getMounted() {
+    auto sp = PHYSFS_getSearchPath();
 
     std::vector<fs::path> files;
 
@@ -52,12 +47,27 @@ const std::map<fs::path, fs::path>& FileSystem::getMounted() {
         files.emplace_back(*i);
 
     PHYSFS_freeList(sp);
-    return files;*/
-    return mountPoints;
+    return files;
 }
 
 bool FileSystem::Exists(const fs::path& path) {
     return PHYSFS_exists(path.string().c_str()) != 0;
+}
+
+bool FileSystem::CreateDirectory(const fs::path& path) {
+    int result = PHYSFS_mkdir(path.string().c_str());
+    if (!result) {
+        LOG_ERROR << "Failed to create directory: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+    }
+    return result != 0;
+}
+
+bool FileSystem::SetWriteDirectory(const fs::path& path) {
+    int result = PHYSFS_setWriteDir(path.string().c_str());
+    if (!result) {
+        LOG_ERROR << "Failed to set directory to write: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+    }
+    return result != 0;
 }
 
 void FileSystem::Read(const fs::path& filepath, const FileSystem::SimpleHandler& handler) {

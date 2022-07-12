@@ -4,6 +4,8 @@
 #include "fusion/utils/date_time.hpp"
 
 namespace fe {
+    //inline fs::path operator""_p(const char* str, size_t len) { return fs::path{std::string{str, len}}; }
+
     enum class FileType {
         Regular,      /**< a normal file */
         Directory,    /**< a directory */
@@ -43,6 +45,21 @@ namespace fe {
          * @return If the path is found in one of the searches.
          */
         static bool Exists(const fs::path& path);
+
+        /**
+         * Create a directory.
+         * @param path The path to use. All missing parent directories are also created if they don't exist.
+         * @return True on the success, false otherwise.
+         */
+        static bool CreateDirectory(const fs::path& path);
+
+        /**
+         * Tell PhysicsFS where it may write files.
+         * Set a new write dir. This will override the previous setting.
+         * @param path The path to directory.
+         * @return True on the success, false otherwise.
+         */
+        static bool SetWriteDirectory(const fs::path& path);
 
         /**
          * Reads a file found by real or partial path with a lambda.
@@ -113,22 +130,24 @@ namespace fe {
         /**
          * Add an archive or directory to the search path.
          * @param path The path to the directory or archive.
+         * @param mount Location in the interpolated tree that this archive will be "mounted", in platform-independent notation. NULL or "" is equivalent to "/".
+         * @return True on the success, false otherwise.
          */
-        void mount(const fs::path& path, const fs::path& mount);
+        static bool Mount(const fs::path& path, const fs::path& mount);
 
         /**
-         * Add an archive, contained in a PHYSFS_File handle, to the search path.
+         * Remove a directory or archive from the search path.
          * @param path The path to the directory or archive.
+         * @return True on the success, false otherwise.
          */
-        void unmount(const fs::path& path);
+        static bool Unmount(const fs::path& path);
 
         /**
-         *
-         * @return
+         * Get the current search path.
+         * @return Array of null-terminated paths.
          */
-        const std::map<fs::path, fs::path>& getMounted();
+        static std::vector<fs::path> getMounted();
 
     private:
-        std::map<fs::path, fs::path> mountPoints;
     };
 }

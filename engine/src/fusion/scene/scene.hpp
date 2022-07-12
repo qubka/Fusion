@@ -140,8 +140,8 @@ namespace fe {
         template<typename T>
         auto getAllEntitiesWith() { return registry.view<T>(); }
 
-        void serialise(bool binary = false);
-        void deserialise(bool binary = false);
+        void serialise(const fs::path& path, bool binary = false);
+        void deserialise(const fs::path& path, bool binary = false);
 
         template<typename Archive>
         void save(Archive& archive) const {

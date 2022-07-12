@@ -135,10 +135,8 @@ entt::entity Scene::duplicateEntity(entt::entity entity) {
     return newEntity;
 }
 
-static fs::path sceneDir = "Scenes";
-
-void Scene::serialise(bool binary) {
-    auto filepath = sceneDir / name;
+void Scene::serialise(const fs::path& path, bool binary) {
+    auto filepath = path / name;
     if (binary) {
         filepath += ".bin";
         std::ofstream file{filepath, std::ios::binary};
@@ -164,8 +162,8 @@ void Scene::serialise(bool binary) {
     LOG_INFO << "Serialise scene: " << filepath;
 }
 
-void Scene::deserialise(bool binary) {
-    auto filepath = sceneDir / name;
+void Scene::deserialise(const fs::path& path, bool binary) {
+    auto filepath = path / name;
     if (binary) {
         filepath += ".bin";
 
