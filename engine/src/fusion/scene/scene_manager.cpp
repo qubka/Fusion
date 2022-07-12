@@ -1,6 +1,7 @@
 #include "scene_manager.hpp"
 
 #include "fusion/utils/enumerate.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 using namespace fe;
 
@@ -36,7 +37,7 @@ void SceneManager::switchScene(const std::string& name) {
     if (found != UINT32_MAX) {
         switchScene(found);
     } else {
-        LOG_ERROR << "Unknown scene name: " << std::quoted(name);
+        LOG_ERROR << "Unknown scene name: " << name;
     }
 }
 
@@ -94,26 +95,33 @@ void SceneManager::applySceneSwitch() {
 
     //onNewScene.publish(currentScene);
 
-    LOG_INFO << "Scene switched to: " << std::quoted(currentScene->getName());
+    LOG_INFO << "Scene switched to: " << currentScene->getName();
 
     switchingScenes = false;
 }
 
 void SceneManager::enqueueSceneFromFile(const fs::path& filepath) {
-    sceneFilePaths.push_back(filepath);
-
     auto name = filepath.filename().replace_extension().string();
     enqueueScene(name);
 }
 
 void SceneManager::enqueueScene(std::unique_ptr<Scene>&& scene) {
     const auto& self = scenes.emplace_back(std::move(scene));
-    LOG_INFO << "Enqueued scene: " << std::quoted(self->getName());
+    LOG_INFO << "Enqueued scene: " << self->getName();
 }
 
 void SceneManager::enqueueScene(const std::string& name) {
     const auto& self = scenes.emplace_back(std::make_unique<Scene>(name));
-    LOG_INFO << "Enqueued scene: " << std::quoted(self->getName());
+    LOG_INFO << "Enqueued scene: " << self->getName();
 }
 
+std::vector<fs::path> SceneManager::getSceneFilePaths() const {
+    std::vector<fs::path> paths;
+    paths.reserve(scenes.size());
+
+    for(auto& scene : scenes)
+        paths.push_back("Scenes"_p / scene->getName());
+
+    return paths;
+}
 

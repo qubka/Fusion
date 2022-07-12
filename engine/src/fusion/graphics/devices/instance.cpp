@@ -138,7 +138,7 @@ bool Instance::CheckValidationLayerSupport() {
 		}
 
 		if (!layerFound) {
-			LOG_ERROR << "Vulkan validation layer not found: " << std::quoted(layerName);
+			LOG_ERROR << "Vulkan validation layer not found: " << layerName;
 			return false;
 		}
 	}

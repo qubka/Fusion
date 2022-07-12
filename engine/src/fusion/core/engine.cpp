@@ -7,6 +7,7 @@
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
 
 using namespace fe;
@@ -34,7 +35,8 @@ Engine::~Engine() {
 
 void Engine::init() {
     Time::Register(Module::Stage::Pre);
-    FileSystem::Register(Module::Stage::Post);
+    FileSystem::Register(Module::Stage::Never);
+    VirtualFileSystem::Register(Module::Stage::Never);
     SceneManager::Register(Module::Stage::Normal);
     Graphics::Register(Module::Stage::Render);
 
@@ -91,7 +93,7 @@ void Engine::sortModules() {
         for (const auto& require: module.requires) {
             dependencies[module.stage][require]++;
         }
-        LOG_DEBUG << "Module: " << std::quoted(type.name()) << " was registered for the " << std::quoted(me::enum_name(module.stage)) << " stage";
+        LOG_DEBUG << "Module: " << type.name() << " was registered for the " << me::enum_name(module.stage) << " stage";
     }
 
     // Sort by dependency count

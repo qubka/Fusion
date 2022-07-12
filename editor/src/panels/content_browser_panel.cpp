@@ -63,9 +63,8 @@ void ContentBrowserPanel::onImGui() {
 
         ImGui::BeginChild("##directory_structure", ImVec2{0, ImGui::GetWindowHeight() - ImGui::GetFrameHeightWithSpacing() * 2.6f - offset});
         {
+            ImGui::BeginChild("##directory_breadcrumbs", ImVec2{ImGui::GetColumnWidth(), ImGui::GetFrameHeightWithSpacing()});
             {
-                ImGui::BeginChild("##directory_breadcrumbs", ImVec2{ImGui::GetColumnWidth(), ImGui::GetFrameHeightWithSpacing()});
-
                 if (ImGui::Button(ICON_MDI_ARROW_LEFT)) {
                     if (currentDirectory != baseDirectory && !isLocked) {
                         changeDirectory(currentDirectory->parent);
@@ -121,15 +120,13 @@ void ContentBrowserPanel::onImGui() {
                 ImGui::EndChild();
             }
 
+            ImGui::BeginChild("##Scrolling");
             {
-                ImGui::BeginChild("##Scrolling");
-
                 int shownIndex = 0;
 
                 float xAvail = ImGui::GetContentRegionAvail().x;
 
-                gridItemsPerRow = static_cast<int>(std::floor(xAvail / (gridSize + style.ItemSpacing.x)));
-                gridItemsPerRow = std::max(1, gridItemsPerRow);
+                gridItemsPerRow = std::max(1, static_cast<int>(std::floor(xAvail / (gridSize + style.ItemSpacing.x))));
 
                 if (isInListView) {
                     for (const auto& [i, child] : enumerate(currentDirectory->children)) {
@@ -139,8 +136,7 @@ void ContentBrowserPanel::onImGui() {
                             }
                         }
 
-                        bool doubleClicked = drawFile(i, child->isDirectory, shownIndex, !isInListView);
-                        if (doubleClicked)
+                        if (drawFile(i, child->isDirectory, shownIndex, false))
                             break;
 
                         shownIndex++;
@@ -153,8 +149,7 @@ void ContentBrowserPanel::onImGui() {
                             }
                         }
 
-                        bool doubleClicked = drawFile(i, child->isDirectory, shownIndex, !isInListView);
-                        if (doubleClicked)
+                        if (drawFile(i, child->isDirectory, shownIndex, true))
                             break;
 
                         shownIndex++;
@@ -162,19 +157,17 @@ void ContentBrowserPanel::onImGui() {
                 }
 
                 if (ImGui::BeginPopupContextWindow()) {
-                    {
-                        if (ImGui::Selectable("Import New Asset")) {
-                            editor->openFile();
-                        }
+                    if (ImGui::Selectable("Import New Asset")) {
+                        editor->openFile();
+                    }
 
-                        if (ImGui::Selectable("Refresh")) {
-                            refresh();
-                        }
+                    if (ImGui::Selectable("Refresh")) {
+                        refresh();
+                    }
 
-                        if (ImGui::Selectable("New folder")) {
-                            fs::create_directory(basePath / currentDirectory->path / "New Folder");
-                            refresh();
-                        }
+                    if (ImGui::Selectable("New folder")) {
+                        fs::create_directory(basePath / currentDirectory->path / "New Folder");
+                        refresh();
                     }
                     ImGui::EndPopup();
                 }
@@ -219,9 +212,37 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
         if (defaultOpen)
             nodeFlags |= ImGuiTreeNodeFlags_DefaultOpen;
 
-        nodeFlags |= ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
+        nodeFlags |= ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
 
-        bool isOpened = ImGui::TreeNodeEx(reinterpret_cast<void*>(dirInfo.get()), nodeFlags, "");
+        bool isOpened = ImGui::TreeNodeEx(reinterpret_cast<void*>((intptr_t)dirInfo.get()), nodeFlags, "");
+
+        if (ImGui::IsItemClicked() && !isLocked) {
+            changeDirectory(dirInfo);
+        }
+
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                fs::path file = fs::current_path() / fs::path{reinterpret_cast<const char*>(payload->Data)};
+                fs::path move = fs::current_path() / (dirInfo->parent ? basePath / dirInfo->path : basePath);
+                if (moveFile(file, move)) {
+                    LOG_INFO << "Moved File: " << file << " to " << move;
+                    refresh();
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        if (dirInfo->parent != nullptr)
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                ImGui::TextUnformatted(dirInfo->icon);
+
+                ImGui::SameLine();
+
+                std::string pathStr = (basePath / dirInfo->path).string();
+                ImGui::TextUnformatted(pathStr.c_str());
+                ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
+                ImGui::EndDragDropSource();
+            }
 
         const char* folderIcon = ((isOpened && isContains) || currentDirectory == dirInfo) ? ICON_MDI_FOLDER_OPEN : ICON_MDI_FOLDER;
         ImGui::SameLine();
@@ -231,38 +252,8 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
         ImGui::SameLine();
         ImGui::TextUnformatted(dirInfo->name.c_str());
 
-        if (ImGui::BeginDragDropTarget()) {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                fs::path path{ reinterpret_cast<const char*>(payload->Data) };
-                /*if (canMove(path, movePath)) {
-                    LOG_INFO << "Moved File: " << path << " to " << movePath;
-                }*/
-                LOG_INFO << path;
-                isDragging = false;
-            }
-            ImGui::EndDragDropTarget();
-        }
-
-        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-            ImGui::TextUnformatted(dirInfo->icon);
-
-            ImGui::SameLine();
-            movePath = basePath / dirInfo->path;
-
-            std::string pathStr = movePath.string();
-            ImGui::TextUnformatted(pathStr.c_str());
-            ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
-            isDragging = true;
-            ImGui::EndDragDropSource();
-        }
-
-        ImVec2 verticalLineStart = ImGui::GetCursorScreenPos();
-
-        if (ImGui::IsItemClicked() && !isLocked) {
-            changeDirectory(dirInfo);
-        }
-
         if (isOpened) {
+            ImVec2 verticalLineStart = ImGui::GetCursorScreenPos();
             verticalLineStart.x += smallOffsetX; // to nicely line up with the arrow symbol
             ImVec2 verticalLineEnd = verticalLineStart;
 
@@ -303,10 +294,6 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
             ImGui::TreePop();
         }
     }
-
-    if (isDragging && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) {
-        movePath = dirInfo->path.string().c_str();
-    }
 }
 
 bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex, bool gridView) {
@@ -316,17 +303,21 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
     bool doubleClicked = false;
 
     if (gridView) {
+        ImGui::PushID(shownIndex);
+
         ImGui::BeginGroup();
 
         if (ImGui::Button(folder ? ICON_MDI_FOLDER : icon, ImVec2{gridSize, gridSize})) {
         }
 
-        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
             doubleClicked = true;
         }
 
         ImGui::TextUnformatted(name.c_str());
         ImGui::EndGroup();
+
+        ImGui::PopID();
 
         if ((shownIndex + 1) % gridItemsPerRow != 0)
             ImGui::SameLine();
@@ -351,16 +342,28 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
         }
     }
 
+    if (folder)
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                fs::path file = fs::current_path() / fs::path{reinterpret_cast<const char*>(payload->Data)};
+                fs::path move = fs::current_path() / (parent ? basePath / path : basePath);
+                if (moveFile(file, move)) {
+                    LOG_INFO << "Moved File: " << file << " to " << move;
+                    refresh();
+                    return true;
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
         ImGui::TextUnformatted(icon);
 
         ImGui::SameLine();
-        movePath = basePath / path;
 
-        std::string pathStr = movePath.string();
+        std::string pathStr = (basePath / path).string();
         ImGui::TextUnformatted(pathStr.c_str());
         ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
-        isDragging = true;
         ImGui::EndDragDropSource();
     }
 
@@ -442,7 +445,7 @@ const fs::path& ContentBrowserPanel::processDirectory(const fs::path& path, cons
     auto directoryInfo = std::make_shared<DirectoryInfo>(path);
     directoryInfo->parent = parent;
 
-    if (path == basePath)
+    if (/*path == basePath*/parent == nullptr)
         directoryInfo->path = basePath;
     else
         directoryInfo->path = fs::relative(path, basePath);
@@ -458,9 +461,16 @@ const fs::path& ContentBrowserPanel::processDirectory(const fs::path& path, cons
     return directoryInfo->path;
 }
 
-bool ContentBrowserPanel::canMove(const fs::path& path, const fs::path& move) {
-    // TODO: Finish file move
-    return FileSystem::Exists(move / path.filename());
+bool ContentBrowserPanel::moveFile(const fs::path& filepath, const fs::path& movepath) {
+    std::string cmd = String::Quoted(filepath.string()) + " " + String::Quoted(movepath.string());
+#if FUSION_PLATFORM_LINUX
+    system(("mv " + cmd).c_str());
+#elif
+    #ifndef FUSION_PLATFORM_IOS
+        system(("move " + cmd).c_str());
+    #endif
+#endif
+    return fs::exists(movepath / filepath.filename());
 }
 
 DirectoryInfo::DirectoryInfo(fs::path filepath) : path{std::move(filepath)} {

@@ -180,3 +180,7 @@ size_t String::FindInsensitive(std::string str, std::string pattern, size_t pos)
     std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
     return str.find(pattern, pos);
 }
+
+std::string String::Quoted(const std::string& str) {
+    return '"' + str + '"';
+}

@@ -57,6 +57,6 @@ void StbLoader::Write(const Bitmap& bitmap, const fs::path& filepath) {
     } else if (extension == ".hdr") {
         stbi_write_hdr(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getChannels()), bitmap.getData<float>());
     } else {
-        LOG_ERROR << "Unknown extension format: " << std::quoted(extension) << " to write data in!";
+        LOG_ERROR << "Unknown extension format: " << extension << " to write data in!";
     }
 }

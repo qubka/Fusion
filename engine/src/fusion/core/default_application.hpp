@@ -3,6 +3,8 @@
 #include "application.hpp"
 
 #include "fusion/utils/cereal_extention.hpp"
+#include "fusion/scene/scene_manager.hpp"
+#include "fusion/filesystem/virtual_file_system.hpp"
 
 #include <cereal/cereal.hpp>
 #include <cereal/types/vector.hpp>
@@ -57,8 +59,12 @@ namespace fe {
                     cereal::make_nvp("Floating", projectSettings.isFloating),
                     cereal::make_nvp("Fullscreen", projectSettings.isFullscreen),
                     cereal::make_nvp("VSync", projectSettings.isVSync),
-                    cereal::make_nvp("Show Console", projectSettings.isShowConsole),
-                    cereal::make_nvp("Scenes", sceneFilePathsToLoad)
+                    cereal::make_nvp("Show Console", projectSettings.isShowConsole)
+            );
+
+            auto sceneManager = SceneManager::Get();
+            archive(cereal::make_nvp("Scene Index", sceneManager->getCurrentSceneIndex()),
+                    cereal::make_nvp("Scenes", SceneManager::Get()->getSceneFilePaths())
             );
         }
 
@@ -75,19 +81,31 @@ namespace fe {
                     cereal::make_nvp("Floating", projectSettings.isFloating),
                     cereal::make_nvp("Fullscreen", projectSettings.isFullscreen),
                     cereal::make_nvp("VSync", projectSettings.isVSync),
-                    cereal::make_nvp("Show Console", projectSettings.isShowConsole),
-                    cereal::make_nvp("Scenes", sceneFilePathsToLoad)
+                    cereal::make_nvp("Show Console", projectSettings.isShowConsole)
             );
+
+            auto sceneManager = SceneManager::Get();
+
+            uint32_t sceneIndex;
+            std::vector<std::string> sceneFilePaths;
+            archive(cereal::make_nvp("Scene Index", sceneIndex),
+                    cereal::make_nvp("Scenes", sceneFilePaths));
+
+            if (sceneFilePaths.empty()) {
+                sceneManager->enqueueScene("Empty Scene");
+                sceneManager->switchScene(0);
+            } else {
+                for (auto& filePath : sceneFilePaths) {
+                    auto path = VirtualFileSystem::Get()->resolvePhysicalPath(filePath);
+                    sceneManager->enqueueSceneFromFile(path);
+                }
+                sceneManager->switchScene(sceneIndex);
+            }
         }
 
-        /*template <typename Archive>
-        void serialize(Archive& archive) {
-
-        }*/
 
     protected:
         fs::path executablePath;
-        std::vector<fs::path> sceneFilePathsToLoad;
         ProjectSettings projectSettings;
         bool projectLoaded{ false };
         bool consoleOpened{ false };

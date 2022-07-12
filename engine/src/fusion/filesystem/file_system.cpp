@@ -9,37 +9,53 @@
 using namespace fe;
 
 FileSystem::FileSystem() {
-    const auto& args = Engine::Get()->getCommandLineArgs();
-    PHYSFS_init(args[0].first.c_str());
-    //PHYSFS_mount(PHYSFS_getBaseDir(), nullptr, 1);
+    PHYSFS_init(Engine::Get()->getCommandLineArgs()[0].first.c_str());
 }
 
 FileSystem::~FileSystem() {
     PHYSFS_deinit();
 }
 
-bool FileSystem::Mount(const fs::path& path, const fs::path& mount) {
-    int result =  PHYSFS_mount(path.string().c_str(), mount.string().c_str(), 1);
-    if (!result) {
-        LOG_ERROR << "Failed to mount directory or archive: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+bool FileSystem::addSearchPath(const fs::path& path, const std::string& mount, bool append) {
+    if (std::find(searchPaths.begin(), searchPaths.end(), path) != searchPaths.end())
+        return false;
+
+    if (PHYSFS_mount(path.c_str(), mount.empty() ? nullptr : mount.c_str(), append) == 0) {
+        LOG_WARNING << "Failed to mount path " << path << ", "  << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        return false;
     }
-    return result != 0;
+
+    searchPaths.emplace_back(path);
+    return true;
 }
 
-bool FileSystem::Unmount(const fs::path& path) {
-    int result = PHYSFS_unmount(path.string().c_str());
-    if (!result) {
-        LOG_ERROR << "Failed to create directory or archiv: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+bool FileSystem::removeSearchPath(const fs::path& path) {
+    auto it = std::find(searchPaths.begin(), searchPaths.end(), path);
+
+    if (it == searchPaths.end())
+        return false;
+
+    if (PHYSFS_unmount(path.string().c_str()) == 0) {
+        LOG_WARNING << "Failed to unmount path " << path << ", "  << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        return false;
     }
-    return result != 0;
+
+    searchPaths.erase(it);
+    return true;
 }
 
-void FileSystem::onUpdate() {
+void FileSystem::clearSearchPath() {
+    for (const auto& searchPath : searchPaths) {
+        if (PHYSFS_unmount(searchPath.string().c_str()) == 0) {
+            LOG_WARNING << "Failed to unmount path " << searchPath << ", "  << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        }
+    }
 
+    searchPaths.clear();
 }
 
-std::vector<fs::path> FileSystem::getMounted() {
-    auto sp = PHYSFS_getSearchPath();
+const std::vector<fs::path>& FileSystem::getSearchPath() {
+    /*auto sp = PHYSFS_getSearchPath();
 
     std::vector<fs::path> files;
 
@@ -47,27 +63,30 @@ std::vector<fs::path> FileSystem::getMounted() {
         files.emplace_back(*i);
 
     PHYSFS_freeList(sp);
-    return files;
+    return files;*/
+    return searchPaths;
 }
 
-bool FileSystem::Exists(const fs::path& path) {
+bool FileSystem::ExistsInPath(const fs::path& path) {
+    if (PHYSFS_isInit() == 0) return false;
+
     return PHYSFS_exists(path.string().c_str()) != 0;
 }
 
-bool FileSystem::CreateDirectory(const fs::path& path) {
-    int result = PHYSFS_mkdir(path.string().c_str());
-    if (!result) {
-        LOG_ERROR << "Failed to create directory: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+bool FileSystem::CreateDirectoryInPath(const fs::path& path) {
+    if (PHYSFS_mkdir(path.string().c_str()) == 0) {
+        LOG_WARNING << "Failed to create directory: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        return false;
     }
-    return result != 0;
+    return true;
 }
 
-bool FileSystem::SetWriteDirectory(const fs::path& path) {
-    int result = PHYSFS_setWriteDir(path.string().c_str());
-    if (!result) {
-        LOG_ERROR << "Failed to set directory to write: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+bool FileSystem::SetWriteDirectoryInPath(const fs::path& path) {
+    if (PHYSFS_setWriteDir(path.string().c_str()) == 0) {
+        LOG_WARNING << "Failed to set directory to write: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        return false;
     }
-    return result != 0;
+    return true;
 }
 
 void FileSystem::Read(const fs::path& filepath, const FileSystem::SimpleHandler& handler) {
@@ -160,7 +179,7 @@ std::string FileSystem::ReadText(const fs::path& filepath) {
     return { data.begin(), data.end() };
 }
 
-bool FileSystem::Write(const fs::path& filepath, const void* buffer, size_t size) {
+bool FileSystem::WriteBytes(const fs::path& filepath, const void* buffer, size_t size) {
     auto fsFile = PHYSFS_openWrite(filepath.string().c_str());
 
     if (!fsFile) {
@@ -184,14 +203,18 @@ bool FileSystem::Write(const fs::path& filepath, const void* buffer, size_t size
     return ret;
 }
 
-std::vector<fs::path> FileSystem::GetFiles(const fs::path& path, bool recursive) {
+bool FileSystem::WriteText(const fs::path& filepath, const std::string& text) {
+    WriteBytes(filepath, text.data(), text.length());
+}
+
+std::vector<fs::path> FileSystem::GetFilesInPath(const fs::path& path, bool recursive) {
     auto rc = PHYSFS_enumerateFiles(path.string().c_str());
 
     std::vector<fs::path> files;
 
     for (auto i = rc; *i; i++) {
-        if (recursive && IsDirectory(*i)) {
-            auto filesInFound = GetFiles(*i, recursive);
+        if (recursive && IsDirectoryInPath(*i)) {
+            auto filesInFound = GetFilesInPath(*i, recursive);
             files.insert(files.end(), filesInFound.begin(), filesInFound.end());
         } else {
             files.emplace_back(*i);
@@ -202,7 +225,7 @@ std::vector<fs::path> FileSystem::GetFiles(const fs::path& path, bool recursive)
     return files;
 }
 
-bool FileSystem::IsDirectory(const fs::path& path) {
+bool FileSystem::IsDirectoryInPath(const fs::path& path) {
     PHYSFS_Stat stat;
     if (!PHYSFS_stat(path.string().c_str(), &stat)) {
         return false;
@@ -213,7 +236,7 @@ bool FileSystem::IsDirectory(const fs::path& path) {
             if (realdir == nullptr) {
                 return false;
             } else {
-                return IsDirectory(fs::path{realdir} / path);
+                return IsDirectoryInPath(fs::path{realdir} / path);
             }
         } else {
             return stat.filetype == PHYSFS_FILETYPE_DIRECTORY;
@@ -221,7 +244,7 @@ bool FileSystem::IsDirectory(const fs::path& path) {
     }
 }
 
-FileStats FileSystem::GetStats(const fs::path& path) {
+FileStats FileSystem::GetStatsInPath(const fs::path& path) {
     PHYSFS_Stat stat = {};
     PHYSFS_stat(path.string().c_str(), &stat);
 
@@ -235,7 +258,7 @@ FileStats FileSystem::GetStats(const fs::path& path) {
     };
 }
 
-bitmask::bitmask<FileAttributes> FileSystem::GetAttributes(const fs::path& path) {
+bitmask::bitmask<FileAttributes> FileSystem::GetAttributesInPath(const fs::path& path) {
     bitmask::bitmask<FileAttributes> attributes;
 
     PHYSFS_Stat stat = {};

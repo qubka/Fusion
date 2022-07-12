@@ -16,7 +16,7 @@ Window::Window(const fe::VideoMode& videoMode, const fe::WindowInfo& windowInfo)
     , fullscreen{windowInfo.isFullscreen}
     , vsync{windowInfo.isVSync} {
 
-    LOG_INFO << "Creating window: " << title << " [" << size.x << " " << size.y << "]";
+    LOG_INFO << "Creating window: " << title << " [" << size.x << ' ' << size.y << "]";
 
     // Create a windowed mode window and its context.
     window = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, nullptr);

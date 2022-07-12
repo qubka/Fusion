@@ -3,6 +3,7 @@
 
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
 
 #include <cereal/archives/json.hpp>
@@ -31,7 +32,8 @@ DefaultApplication::~DefaultApplication() {
 }
 
 void DefaultApplication::onStart() {
-    FileSystem::Get()->mount(executablePath / "engine" / "assets" / "shaders", "EngineShaders");
+    FileSystem::Get()->addSearchPath(executablePath);
+    VirtualFileSystem::Get()->mount("EngineShaders", executablePath / "engine" / "assets" / "shaders");
 
     deserialise();
 
@@ -56,10 +58,9 @@ void DefaultApplication::openNewProject(const fs::path& path, const std::string&
     projectSettings.projectRoot = path / name;
     projectSettings.projectName = name;
 
-    if (!fs::exists(projectSettings.projectRoot))
+    if (!fs::exists(projectSettings.projectRoot)) {
         fs::create_directory(projectSettings.projectRoot);
-
-    mountPaths();
+    }
 
     // Set Default values
     projectSettings.projectVersion = version.string();
@@ -129,14 +130,11 @@ void DefaultApplication::openProject(const fs::path& path) {
     projectSettings.projectName = path.filename().replace_extension().string();
     projectSettings.projectRoot = path.parent_path();
 
+    mountPaths();
+
     deserialise();
 
-    auto sceneManager = SceneManager::Get();
-    for (auto& scene : sceneFilePathsToLoad) {
-        sceneManager->enqueueSceneFromFile(scene);
-    }
-
-    sceneManager->applySceneSwitch();
+    SceneManager::Get()->applySceneSwitch();
 }
 
 void DefaultApplication::serialise() {
@@ -150,10 +148,9 @@ void DefaultApplication::serialise() {
     auto filepath = projectSettings.projectRoot / projectSettings.projectName;
     filepath += ".fsproj";
 
-    LOG_INFO << "Serialising application: " << filepath;
+    FileSystem::WriteText(filepath, ss.str());
 
-    auto jsonStr = ss.str();
-    FileSystem::Write(filepath, jsonStr.data(), jsonStr.length());
+    LOG_INFO << "Serialising application: " << filepath;
 }
 
 void DefaultApplication::deserialise() {
@@ -190,22 +187,21 @@ void DefaultApplication::deserialise() {
         return;
     }
 
-    LOG_INFO << "Deserialise application: " << filepath;
-
     projectLoaded = true;
+
+    LOG_INFO << "Deserialise application: " << filepath;
 }
 
 void DefaultApplication::mountPaths() const {
-    auto fileSystem = FileSystem::Get();
-
+    auto vfs = VirtualFileSystem::Get();
     auto assetPath = projectSettings.projectRoot / "assets";
-    fileSystem->mount(assetPath, "Assets");
-    fileSystem->mount(assetPath / "meshes", "Meshes");
-    fileSystem->mount(assetPath / "textures", "Textures");
-    fileSystem->mount(assetPath / "sounds", "Sounds");
-    fileSystem->mount(assetPath / "scripts", "Scripts");
-    fileSystem->mount(assetPath / "shaders", "Shaders");
-    fileSystem->mount(assetPath / "scenes", "Scenes");
+    vfs->mount("Assets", assetPath);
+    vfs->mount( "Meshes", assetPath / "meshes");
+    vfs->mount("Textures", assetPath / "textures");
+    vfs->mount("Sounds", assetPath / "sounds");
+    vfs->mount("Scripts", assetPath / "scripts");
+    vfs->mount("Shaders", assetPath / "shaders");
+    vfs->mount("Scenes", assetPath / "scenes");
 }
 
 void DefaultApplication::showConsole() {

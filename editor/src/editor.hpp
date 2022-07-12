@@ -54,6 +54,7 @@ namespace fe {
 
         void openFile();
 
+        // TODO: Rework
         void fileOpenCallback(const fs::path& path);
         void projectOpenCallback(const fs::path& path);
         void newProjectOpenCallback(const fs::path& path);

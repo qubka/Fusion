@@ -33,13 +33,12 @@ namespace fe {
         //void drawBreadCrumbs();
 
         const fs::path& processDirectory(const fs::path& path, const std::shared_ptr<DirectoryInfo>& parent);
-        bool canMove(const fs::path& path, const fs::path& move);
+        bool moveFile(const fs::path& filepath, const fs::path& movepath);
 
         fs::path basePath;
-        fs::path movePath;
+        //fs::path movePath;
 
         bool isLocked{ false };
-        bool isDragging{ false };
         bool isInListView{ false };
         bool updateBreadCrumbs{ false };
         bool updateNavigationPath{ true };

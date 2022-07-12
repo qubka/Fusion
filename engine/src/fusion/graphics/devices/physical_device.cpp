@@ -35,7 +35,7 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, uint32_t desiredDeviceI
 
     findQueueFamilyIndices();
 
-    LOG_DEBUG << "Selected Physical Device: " << properties.deviceID << " " << std::quoted(properties.deviceName);
+    LOG_DEBUG << "Selected Physical Device: " << properties.deviceID << ' ' << properties.deviceName;
 }
 
 VkPhysicalDevice PhysicalDevice::ChoosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices) {
@@ -213,17 +213,17 @@ void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalD
             ss << " \"AMD\"";
             break;
         default:
-            ss << " \"" << physicalDeviceProperties.vendorID << '\"';
+            ss << " \"" << physicalDeviceProperties.vendorID << '"';
     }
 
-    ss << " " << std::quoted(physicalDeviceProperties.deviceName) << '\n';
+    ss << ' ' << std::quoted(physicalDeviceProperties.deviceName) << '\n';
 
     uint32_t supportedVersion[3] = {
         VK_VERSION_MAJOR(physicalDeviceProperties.apiVersion),
         VK_VERSION_MINOR(physicalDeviceProperties.apiVersion),
         VK_VERSION_PATCH(physicalDeviceProperties.apiVersion)
     };
-    ss << "API Version: " << supportedVersion[0] << "." << supportedVersion[1] << "." << supportedVersion[2] << '\n';
+    ss << "API Version: " << supportedVersion[0] << '.' << supportedVersion[1] << '.' << supportedVersion[2] << '\n';
 
     ss << "Extensions: ";
     for (const auto& extension : extensionProperties)

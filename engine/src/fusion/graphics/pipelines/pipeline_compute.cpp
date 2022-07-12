@@ -2,7 +2,7 @@
 
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/utils/date_time.hpp"
 
 using namespace fe;
@@ -24,7 +24,7 @@ PipelineCompute::PipelineCompute(fs::path shaderStage, std::vector<Shader::Defin
 	createPipelineCompute();
 
 #if FUSION_DEBUG
-	LOG_DEBUG << "Pipeline Compute " << std::quoted(shader.getName()) << " created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+	LOG_DEBUG << "Pipeline Compute " << shader.getName() << " created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 
@@ -48,9 +48,9 @@ void PipelineCompute::cmdRender(const CommandBuffer& commandBuffer, const glm::u
 void PipelineCompute::createShaderProgram() {
 	std::stringstream ss;
 	for (const auto& [defineName, defineValue] : defines)
-		ss << "#define " << defineName << " " << defineValue << '\n';
+		ss << "#define " << defineName << ' ' << defineValue << '\n';
 
-	auto fileLoaded = FileSystem::ReadText(shaderStage);
+	auto fileLoaded = VirtualFileSystem::Get()->readText(shaderStage);
 	if (fileLoaded.empty())
 		throw std::runtime_error("Could not create compute pipeline, missing shader stage");
 

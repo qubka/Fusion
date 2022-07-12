@@ -20,7 +20,7 @@ public:
 		auto directory = fs::path(includerName).parent_path();
 		auto fileLoaded = FileSystem::ReadText(directory / headerName);
 		if (fileLoaded.empty()) {
-            LOG_ERROR << "Shader Include could not be loaded: " << std::quoted(headerName);
+            LOG_ERROR << "Shader Include could not be loaded: " << headerName;
 			return nullptr;
 		}
 
@@ -33,7 +33,7 @@ public:
 	IncludeResult* includeSystem(const char* headerName, const char* includerName, size_t inclusionDepth) override {
 		auto fileLoaded = FileSystem::ReadText(headerName);
 		if (fileLoaded.empty()) {
-            LOG_ERROR << "Shader Include could not be loaded: " << std::quoted(headerName);
+            LOG_ERROR << "Shader Include could not be loaded: " << headerName;
 			return nullptr;
 		}
 
@@ -291,7 +291,7 @@ VkShaderModule Shader::createShaderModule(const fs::path& moduleName, const std:
     stages.push_back(moduleName);
 
     if (!String::Contains(moduleCode, "GL_ARB_separate_shader_objects") || !String::Contains(moduleCode, "GL_ARB_shading_language_420pack")) {
-        LOG_DEBUG << "Shader " << std::quoted(name) << "not have GL extentions";
+        LOG_DEBUG << "Shader: " << name << " not have GL extentions";
     }
 
 	// Starts converting GLSL to SPIR-V.

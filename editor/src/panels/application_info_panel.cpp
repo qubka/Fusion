@@ -188,11 +188,17 @@ void ApplicationInfoPanel::onImGui() {
             }
 
             if (ImGui::TreeNode("Filesystem")) {
-                auto mounted = FileSystem::Get()->getMounted();
-                for (auto& [phys, virt] : mounted) {
-                    ImGui::TextUnformatted(virt.string().c_str());
-                    if (ImGui::IsItemHovered())
-                        ImGui::SetTooltip("%s", phys.string().c_str());
+                auto paths = FileSystem::Get()->getSearchPath();
+                for (auto& path : paths) {
+                    ImGui::TextUnformatted(path.string().c_str());
+                }
+                ImGui::TreePop();
+            }
+
+            if (ImGui::TreeNode("Virtual File System")) {
+                auto paths = VirtialFileSystem::Get()->getSearchPath();
+                for (auto& path : paths) {
+                    ImGui::TextUnformatted(path.string().c_str());
                 }
                 ImGui::TreePop();
             }

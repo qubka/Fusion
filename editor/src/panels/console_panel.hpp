@@ -19,6 +19,7 @@ namespace fe {
         class Message {
         public:
             explicit Message(std::string message, MessageLevel level, std::string source = "");
+            ~Message();
 
             void onImGui();
 

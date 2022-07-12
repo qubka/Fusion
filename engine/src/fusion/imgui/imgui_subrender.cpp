@@ -30,7 +30,7 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
 
     LOG_INFO << "ImGui Version: " << IMGUI_VERSION;
 #ifdef IMGUI_USER_CONFIG
-    LOG_INFO << "ImConfig File: " << std::quoted(IMGUI_USER_CONFIG);
+    LOG_INFO << "ImConfig File: " << IMGUI_USER_CONFIG;
 #endif
 
     fontSize = 14.0f;

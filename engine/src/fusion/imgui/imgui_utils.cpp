@@ -96,7 +96,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
     bool updated = false;
 
     if (files.empty()) {
-        files = FileSystem::GetFiles("", true);
+        files = FileSystem::GetFilesInPath("", true);
         //LOG_WARNING << "Folder seems to be empty!";
     }
 
@@ -146,7 +146,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
             std::string title = FileFormat::GetIcon(file) + " "s + file.filename().string();
             if (ImGui::Selectable(title.c_str(), selected == file, ImGuiSelectableFlags_AllowDoubleClick)) {
                 selected = file;
-                if (ImGui::IsMouseDoubleClicked(0)) {
+                if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                     value = file;
                     updated = true;
                     ImGui::CloseCurrentPopup();
@@ -171,7 +171,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
         if (ImGui::Button("...", buttonSize)) {
             filter.Clear();
             selected = "";
-            files = FileSystem::GetFiles("", true);
+            files = FileSystem::GetFilesInPath("", true);
             ImGui::OpenPopup("File Explorer");
         }
     } else {
@@ -200,7 +200,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
     if (ImGui::Button(ICON_MDI_FILE_SEARCH)) {
         filter.Clear();
         selected = "";
-        files = FileSystem::GetFiles("", true);
+        files = FileSystem::GetFilesInPath("", true);
         ImGui::OpenPopup("File Explorer");
     }
 

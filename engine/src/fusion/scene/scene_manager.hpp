@@ -65,7 +65,7 @@ namespace fe {
          * Gets paths of enqueued scenes.
          * @return Array of scenes.
          */
-        const std::vector<fs::path>& getSceneFilePaths() const { return sceneFilePaths; }
+        std::vector<fs::path> getSceneFilePaths() const;
 
         /**
          *
@@ -86,6 +86,5 @@ namespace fe {
         bool switchingScenes{ false };
 
         std::vector<std::unique_ptr<Scene>> scenes;
-        std::vector<fs::path> sceneFilePaths;
     };
 }

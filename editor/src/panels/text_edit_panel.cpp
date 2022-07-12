@@ -53,8 +53,7 @@ void TextEditPanel::onImGui() {
 
     if (!!window->getKey(Key::LeftSuper) || (!!window->getKey(Key::LeftControl))) {
         if (!!window->getKey(Key::S)) {
-            auto textToSave = textEditor.GetText();
-            FileSystem::Write(filePath, textToSave.data(), textToSave.length());
+            FileSystem::WriteText(filePath, textEditor.GetText());
         }
     }
 
@@ -64,8 +63,7 @@ void TextEditPanel::onImGui() {
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Save", "CTRL+S")) {
-                    auto textToSave = textEditor.GetText();
-                    FileSystem::Write(filePath, textToSave.data(), textToSave.length());
+                    FileSystem::WriteText(filePath, textEditor.GetText());
                     callback();
                 }
                 ImGui::EndMenu();
@@ -122,8 +120,7 @@ void TextEditPanel::onImGui() {
 
         if (ImGui::IsItemActive()) {
             if (!!window->getKey(Key::LeftControl) && !!window->getKey(Key::S)) {
-                auto textToSave = textEditor.GetText();
-                FileSystem::Write(filePath, textToSave.data(), textToSave.length());
+                FileSystem::WriteText(filePath, textEditor.GetText());
             }
         }
 

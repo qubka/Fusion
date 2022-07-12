@@ -575,7 +575,7 @@ void Editor::drawMenuBar() {
         ImGui::Separator();
 
         if (ImGui::Button("OK", buttonSize)) {
-            sceneManager->getCurrentScene()->serialise();
+            sceneManager->getCurrentScene()->serialise(projectSettings.projectRoot / "assets" / "scenes");
             ImGui::CloseCurrentPopup();
         }
         ImGui::SetItemDefaultFocus();
@@ -588,7 +588,7 @@ void Editor::drawMenuBar() {
 
     if (ImGui::BeginPopupModal("New Scene", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         if (ImGui::Button("Save Current Scene Changes")) {
-            sceneManager->getCurrentScene()->serialise();
+            sceneManager->getCurrentScene()->serialise(projectSettings.projectRoot / "assets" / "scenes");
         }
 
         ImGui::Text("Create New Scene?\n\n");
@@ -599,7 +599,7 @@ void Editor::drawMenuBar() {
             int sameNameCount = 0;
             auto sceneNames = sceneManager->getSceneNames();
 
-            while (FileSystem::Exists("Scenes/" + sceneName + ".fsn") || std::find(sceneNames.begin(), sceneNames.end(), sceneName.c_str()) != sceneNames.end()) {
+            while (FileSystem::ExistsInPath(projectSettings.projectRoot / "assets" / "scenes" / (sceneName + ".fsn")) || std::find(sceneNames.begin(), sceneNames.end(), sceneName.c_str()) != sceneNames.end()) {
                 sameNameCount++;
                 sceneName = "NewScene(" + std::to_string(sameNameCount) + ")";
             }
@@ -652,7 +652,7 @@ void Editor::fileOpenCallback(const fs::path& path) {
     } else if (FileFormat::IsTextureFile(path)) {
     }
 
-    LOG_DEBUG << path;
+    LOG_DEBUG << "File opened: " << path;
 }
 
 void Editor::projectOpenCallback(const fs::path& path) {
@@ -666,7 +666,7 @@ void Editor::projectOpenCallback(const fs::path& path) {
         panel->onNewProject();
     }
 
-    LOG_DEBUG << path;
+    LOG_DEBUG << "Project opened: " << path;
 }
 
 void Editor::newProjectOpenCallback(const fs::path& path) {
@@ -677,7 +677,7 @@ void Editor::newProjectOpenCallback(const fs::path& path) {
         panel->onNewProject();
     }
 
-    LOG_DEBUG << path;
+    LOG_DEBUG << "New project opened: " << path;
 }
 
 void Editor::newProjectLocationCallback(const fs::path& path) {
@@ -686,7 +686,7 @@ void Editor::newProjectLocationCallback(const fs::path& path) {
     reopenNewProjectPopup = true;
     locationPopupOpened = false;
 
-    LOG_DEBUG << path;
+    LOG_DEBUG << "New Project opened: " << path;
 }
 
 void Editor::removePanel(EditorPanel* panel) {

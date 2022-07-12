@@ -3,7 +3,7 @@
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/render_stage.hpp"
 #include "fusion/utils/date_time.hpp"
-#include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/virtual_file_system.hpp"
 
 using namespace fe;
 
@@ -55,7 +55,7 @@ PipelineGraphics::PipelineGraphics(Stage stage, std::vector<fs::path> shaderStag
 	}
 
 #if FUSION_DEBUG
-	LOG_DEBUG << "Pipeline Graphics: " << std::quoted(shader.getName()) << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+	LOG_DEBUG << "Pipeline Graphics: " << shader.getName() << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 
@@ -86,10 +86,10 @@ const RenderArea& PipelineGraphics::getRenderArea(const std::optional<uint32_t>&
 void PipelineGraphics::createShaderProgram() {
 	std::stringstream ss;
 	for (const auto& [defineName, defineValue] : defines)
-		ss << "#define " << defineName << " " << defineValue << '\n';
+		ss << "#define " << defineName << ' ' << defineValue << '\n';
 
 	for (const auto& shaderStage : shaderStages) {
-		auto fileLoaded = FileSystem::ReadText(shaderStage);
+		auto fileLoaded = VirtualFileSystem::Get()->readText(shaderStage);
 		if (fileLoaded.empty())
 			throw std::runtime_error("Could not create pipeline, missing shader stage");
 

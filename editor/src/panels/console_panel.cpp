@@ -203,6 +203,9 @@ ConsolePanel::Message::Message(std::string message, MessageLevel level, std::str
     , messageID{MessageID++} {
 }
 
+ConsolePanel::Message::~Message() {
+
+}
 void ConsolePanel::Message::onImGui() {
     if (MessageBufferRenderFilter & level) {
         ImGui::PushID(messageID);

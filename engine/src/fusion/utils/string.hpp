@@ -2,6 +2,8 @@
 
 namespace fe {
     using namespace std::string_literals;
+    inline std::string operator"" _q(const char* str, size_t len) { return '"' + std::string(str, len) + '"'; }
+
     /**
      * @brief Helper class for C++ strings.
      */
@@ -177,6 +179,13 @@ namespace fe {
          * @return The uppercased string.
          */
         static std::string Uppercase(std::string str);
+
+        /**
+         * Quotes a string.
+         * @param str The string.
+         * @return The uppercased string.
+         */
+        static std::string Quoted(const std::string& str);
 
         /**
          * Find position of a string.

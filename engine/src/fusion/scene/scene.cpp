@@ -42,7 +42,7 @@ void Scene::onCreate() {
             system->onCreate();
     });*/
 
-    LOG_DEBUG << "Scene : " << std::quoted(name) << " created first time";
+    LOG_DEBUG << "Scene : " << name << " created first time";
 }
 
 void Scene::onUpdate() {
@@ -63,7 +63,7 @@ void Scene::onStart() {
             system->onStart();
     });*/
 
-    LOG_DEBUG << "Scene : " << std::quoted(name) << " started runtime";
+    LOG_DEBUG << "Scene : " << name << " started runtime";
 }
 
 void Scene::onStop() {
@@ -74,7 +74,7 @@ void Scene::onStop() {
 
     runtime = false;*/
 
-    LOG_DEBUG << "Scene : " << std::quoted(name) << " stopped runtime";
+    LOG_DEBUG << "Scene : " << name << " stopped runtime";
 }
 
 void Scene::clearSystems() {
@@ -155,8 +155,8 @@ void Scene::serialise(const fs::path& path, bool binary) {
             output(*this);
             entt::snapshot{ registry }.entities(output).component<ALL_COMPONENTS>(output);
         }
-        auto jsonStr = ss.str();
-        FileSystem::Write(filepath, jsonStr.data(), jsonStr.length());
+
+        FileSystem::WriteText(filepath, ss.str());
     }
 
     LOG_INFO << "Serialise scene: " << filepath;
@@ -167,7 +167,7 @@ void Scene::deserialise(const fs::path& path, bool binary) {
     if (binary) {
         filepath += ".bin";
 
-        if (!FileSystem::Exists(filepath)) {
+        if (!FileSystem::ExistsInPath(filepath)) {
             LOG_ERROR << "No saved scene file found: " << filepath;
             return;
         }
@@ -184,7 +184,7 @@ void Scene::deserialise(const fs::path& path, bool binary) {
     } else {
         filepath += ".fsn";
 
-        if (!FileSystem::Exists(filepath)) {
+        if (!FileSystem::ExistsInPath(filepath)) {
             LOG_ERROR << "No saved scene file found: " << filepath;
             return;
         }
