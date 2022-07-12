@@ -7,7 +7,7 @@
 namespace fe {
     class TextEditPanel : public EditorPanel {
     public:
-        TextEditPanel(fs::path filename, std::function<void()>&& callback, Editor* editor);
+        TextEditPanel(fs::path filepath, std::function<void()>&& callback, Editor* editor);
         ~TextEditPanel() override;
 
         void onImGui() override;

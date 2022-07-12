@@ -44,8 +44,8 @@ namespace fe {
         void mountPaths() const;
         void showConsole();
 
-        template <typename Archive>
-        void serialize(Archive& archive) {
+        template<typename Archive>
+        void save(Archive& archive) const {
             archive(cereal::make_nvp("Project Version", projectSettings.projectVersion),
                     cereal::make_nvp("Project Root", projectSettings.projectRoot),
                     cereal::make_nvp("Project Name", projectSettings.projectName),
@@ -57,11 +57,37 @@ namespace fe {
                     cereal::make_nvp("Floating", projectSettings.isFloating),
                     cereal::make_nvp("Fullscreen", projectSettings.isFullscreen),
                     cereal::make_nvp("VSync", projectSettings.isVSync),
-                    cereal::make_nvp("Show Console", projectSettings.isShowConsole));
+                    cereal::make_nvp("Show Console", projectSettings.isShowConsole),
+                    cereal::make_nvp("Scenes", sceneFilePathsToLoad)
+            );
         }
+
+        template<typename Archive>
+        void load(Archive& archive) {
+            archive(cereal::make_nvp("Project Version", projectSettings.projectVersion),
+                    cereal::make_nvp("Project Root", projectSettings.projectRoot),
+                    cereal::make_nvp("Project Name", projectSettings.projectName),
+                    //cereal::make_nvp("Engine Asset Path", projectSettings.engineAssetPath),
+                    cereal::make_nvp("Title", projectSettings.title),
+                    cereal::make_nvp("Size", projectSettings.size),
+                    cereal::make_nvp("Borderless", projectSettings.isBorderless),
+                    cereal::make_nvp("Resizable", projectSettings.isResizable),
+                    cereal::make_nvp("Floating", projectSettings.isFloating),
+                    cereal::make_nvp("Fullscreen", projectSettings.isFullscreen),
+                    cereal::make_nvp("VSync", projectSettings.isVSync),
+                    cereal::make_nvp("Show Console", projectSettings.isShowConsole),
+                    cereal::make_nvp("Scenes", sceneFilePathsToLoad)
+            );
+        }
+
+        /*template <typename Archive>
+        void serialize(Archive& archive) {
+
+        }*/
 
     protected:
         fs::path executablePath;
+        std::vector<fs::path> sceneFilePathsToLoad;
         ProjectSettings projectSettings;
         bool projectLoaded{ false };
         bool consoleOpened{ false };

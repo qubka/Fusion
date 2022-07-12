@@ -46,33 +46,33 @@ namespace fe {
 
         /**
          * Reads a file found by real or partial path with a lambda.
-         * @param filename The path to read.
+         * @param filepath The path to read.
          * @param handler The lambda with data read from the file.
          */
-        static void Read(const fs::path& filename, const SimpleHandler& handler);
+        static void Read(const fs::path& filepath, const SimpleHandler& handler);
 
         /**
          * Opens a binary file, reads the contents of the file into a byte array, and then closes the file.
-         * @param filename The path to read.
+         * @param filepath The path to read.
          * @return The data read from the file.
          */
-        static std::vector<uint8_t> ReadBytes(const fs::path& filename);
+        static std::vector<uint8_t> ReadBytes(const fs::path& filepath);
 
         /**
          * Opens a text file, reads all the text in the file into a string, and then closes the file.
-         * @param filename The path to read.
+         * @param filepath The path to read.
          * @return The data read from the file.
          */
-        static std::string ReadText(const fs::path& filename);
+        static std::string ReadText(const fs::path& filepath);
 
         /**
          * Opens a file, write all data into the file, and then closes the file.
-         * @param filename The path to write.
+         * @param filepath The path to write.
          * @param buffer The buffer data.
          * @param size The size of the buffer.
          * @return True on the success, false otherwise.
          */
-        static bool Write(const fs::path& filename, const void* buffer, size_t size);
+        static bool Write(const fs::path& filepath, const void* buffer, size_t size);
 
         /**
          * Finds all the files in a path.
@@ -111,13 +111,6 @@ namespace fe {
         static std::string GetExtension(const fs::path& path);
 
         /**
-         * Gets the icon string for the specific file format.
-         * @param path The path to the file.
-         * @return The string with font awesome icon.
-         */
-        static const char* GetIcon(const fs::path& path);
-
-        /**
          * Add an archive or directory to the search path.
          * @param path The path to the directory or archive.
          */
@@ -137,6 +130,5 @@ namespace fe {
 
     private:
         std::map<fs::path, fs::path> mountPoints;
-        static std::unordered_map<std::string, std::string> Extensions;
     };
 }

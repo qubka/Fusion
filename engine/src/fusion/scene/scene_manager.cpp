@@ -87,20 +87,22 @@ void SceneManager::applySceneSwitch() {
     currentScene = scenes[queuedSceneIndex].get();
 
     /*std::string physicalPath;
-    if ResolvePhysicalPath("//Scenes/" + m_CurrentScene->GetSceneName() + ".scene", physicalPath)) {
+    if ResolvePhysicalPath("//Scenes/" + m_CurrentScene->GetSceneName() + ".fsn", physicalPath)) {
         auto newPath = StringUtilities::RemoveName(physicalPath);
-        currentScene->deserialise(newPath, false);
+        currentScene->deserialise();
     }*/
+
+    //onNewScene.publish(currentScene);
 
     LOG_INFO << "Scene switched to: " << std::quoted(currentScene->getName());
 
     switchingScenes = false;
 }
 
-void SceneManager::enqueueSceneFromFile(const fs::path& filename) {
-    sceneFilePaths.push_back(filename);
+void SceneManager::enqueueSceneFromFile(const fs::path& filepath) {
+    sceneFilePaths.push_back(filepath);
 
-    auto name = filename.filename().replace_extension().string();
+    auto name = filepath.filename().replace_extension().string();
     enqueueScene(name);
 }
 
@@ -112,18 +114,6 @@ void SceneManager::enqueueScene(std::unique_ptr<Scene>&& scene) {
 void SceneManager::enqueueScene(const std::string& name) {
     const auto& self = scenes.emplace_back(std::make_unique<Scene>(name));
     LOG_INFO << "Enqueued scene: " << std::quoted(self->getName());
-}
-
-void SceneManager::addFileToLoadList(const fs::path& filename) {
-    sceneFilePathsToLoad.push_back(filename);
-}
-
-void SceneManager::loadCurrentList() {
-    for (auto& filename : sceneFilePathsToLoad) {
-        enqueueSceneFromFile(filename);
-    }
-
-    sceneFilePathsToLoad.clear();
 }
 
 

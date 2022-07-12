@@ -226,9 +226,9 @@ namespace fe {
 
         /**
          * Sets window icon images.
-         * @param filenames The new icon files.
+         * @param filepaths The new icon files.
          */
-        virtual void setIcons(const std::vector<fs::path>& filenames) = 0;
+        virtual void setIcons(const std::vector<fs::path>& filepaths) = 0;
 
         /**
          * Gets the current state of a key.

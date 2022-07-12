@@ -215,7 +215,7 @@ void Graphics::endFrame(FrameInfo& info) {
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-void Graphics::captureScreenshot(const fs::path& filename, size_t id) const {
+void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
@@ -247,10 +247,10 @@ void Graphics::captureScreenshot(const fs::path& filename, size_t id) const {
     vkDestroyImage(logicalDevice, dstImage, nullptr);
 
     // Writes the screenshot bitmap to the file
-    bitmap.write(filename);
+    bitmap.write(filepath);
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Screenshot " << filename << " created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Screenshot " << filepath << " created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 

@@ -6,9 +6,9 @@
 
 using namespace fe;
 
-void GliLoader::Load(Bitmap& bitmap, const fs::path& filename) {
+void GliLoader::Load(Bitmap& bitmap, const fs::path& filepath) {
     std::unique_ptr<gli::texture> texture;
-    FileSystem::Read(filename, [&texture](const uint8_t* data, size_t size) {
+    FileSystem::Read(filepath, [&texture](const uint8_t* data, size_t size) {
         texture = std::make_unique<gli::texture>(gli::load(reinterpret_cast<const char*>(data), size));
     });
 
@@ -18,11 +18,11 @@ void GliLoader::Load(Bitmap& bitmap, const fs::path& filename) {
     bitmap.hdr = false;
 
     if (bitmap.isEmpty()) {
-        LOG_ERROR << "Failed to load bitmap file: " << filename;
+        LOG_ERROR << "Failed to load bitmap file: " << filepath;
         return;
     }
 }
 
-void GliLoader::Write(const Bitmap& bitmap, const fs::path& filename) {
+void GliLoader::Write(const Bitmap& bitmap, const fs::path& filepath) {
     throw std::runtime_error("Error: gli::write not exist!");
 }

@@ -46,16 +46,16 @@ void PipelineCompute::cmdRender(const CommandBuffer& commandBuffer, const glm::u
 }
 
 void PipelineCompute::createShaderProgram() {
-	std::stringstream defineBlock;
+	std::stringstream ss;
 	for (const auto& [defineName, defineValue] : defines)
-		defineBlock << "#define " << defineName << " " << defineValue << '\n';
+		ss << "#define " << defineName << " " << defineValue << '\n';
 
 	auto fileLoaded = FileSystem::ReadText(shaderStage);
 	if (fileLoaded.empty())
 		throw std::runtime_error("Could not create compute pipeline, missing shader stage");
 
 	auto stageFlag = Shader::GetShaderStage(shaderStage);
-	shaderModule = shader.createShaderModule(shaderStage, fileLoaded, defineBlock.str(), stageFlag);
+	shaderModule = shader.createShaderModule(shaderStage, fileLoaded, ss.str(), stageFlag);
 
 	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStageCreateInfo.stage = stageFlag;

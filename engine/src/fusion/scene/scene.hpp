@@ -3,6 +3,7 @@
 #include "fusion/scene/system_holder.hpp"
 
 #include <entt/entity/registry.hpp>
+#include <cereal/cereal.hpp>
 
 namespace fe {
     class Camera;
@@ -123,9 +124,6 @@ namespace fe {
 
         entt::entity duplicateEntity(entt::entity entity);
 
-        //void serialise(fs::path filename, bool binary = false);
-        //void deserialise(fs::path filename, bool binary = false);
-
         /**
          * Gets the scene entity registry.
          * @return Entity registry.
@@ -141,6 +139,21 @@ namespace fe {
 
         template<typename T>
         auto getAllEntitiesWith() { return registry.view<T>(); }
+
+        void serialise(bool binary = false);
+        void deserialise(bool binary = false);
+
+        template<typename Archive>
+        void save(Archive& archive) const {
+            //archive(cereal::make_nvp("Version", sceneVersion));
+            archive(cereal::make_nvp("Scene Name", name));
+        }
+
+        template<typename Archive>
+        void load(Archive& archive) {
+            //archive(cereal::make_nvp("Version", sceneSerialisationVersion));
+            archive(cereal::make_nvp("Scene Name", name));
+        }
 
     private:
         template<typename T>

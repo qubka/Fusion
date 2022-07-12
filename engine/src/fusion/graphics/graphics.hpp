@@ -60,9 +60,9 @@ namespace fe {
 
         /**
          * Takes a screenshot of the current image of the display and saves it into a image file.
-         * @param filename The file to save the screenshot as.
+         * @param filepath The file to save the screenshot as.
          */
-        void captureScreenshot(const fs::path& filename, size_t id = 0) const;
+        void captureScreenshot(const fs::path& filepath, size_t id = 0) const;
 
     private:
         struct FrameInfo {

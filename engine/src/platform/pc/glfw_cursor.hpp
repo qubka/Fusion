@@ -9,10 +9,10 @@ namespace glfw {
     public:
         /**
          * Creates the cursor from a image file.
-         * @param filename The new custom mouse file.
+         * @param filepath The new custom mouse file.
          * @param hotspot The hotspot to display the cursor image at.
          */
-        Cursor(const fs::path& filename, fe::CursorHotspot hotspot);
+        Cursor(const fs::path& filepath, fe::CursorHotspot hotspot);
 
         /**
          * Creates the cursor with a system style.

@@ -148,8 +148,8 @@ std::optional<VkDescriptorType> Shader::getDescriptorType(uint32_t location) con
 	return std::nullopt;
 }
 
-VkShaderStageFlagBits Shader::GetShaderStage(const fs::path& filename) {
-	auto fileExt = FileSystem::GetExtension(filename);
+VkShaderStageFlagBits Shader::GetShaderStage(const fs::path& filepath) {
+	auto fileExt = FileSystem::GetExtension(filepath);
 	if (fileExt == ".comp")
 		return VK_SHADER_STAGE_COMPUTE_BIT;
 	if (fileExt == ".vert")

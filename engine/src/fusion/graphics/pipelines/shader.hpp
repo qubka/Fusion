@@ -36,7 +36,7 @@ namespace fe {
         std::vector<VkPushConstantRange> getPushConstantRanges() const;
 
         std::optional<VkDescriptorType> getDescriptorType(uint32_t location) const;
-        static VkShaderStageFlagBits GetShaderStage(const fs::path& filename);
+        static VkShaderStageFlagBits GetShaderStage(const fs::path& filepath);
         VkShaderModule createShaderModule(const fs::path& moduleName, const std::string& moduleCode, const std::string& preamble, VkShaderStageFlags moduleFlag);
         void createReflection();
 

@@ -189,15 +189,15 @@ void Window::setCursor(const fe::Cursor* cursor) {
     glfwSetCursor(window, cursor ? reinterpret_cast<GLFWcursor*>(cursor->getNativeCursor()) : nullptr);
 }
 
-void Window::setIcons(const std::vector<fs::path>& filenames) {
+void Window::setIcons(const std::vector<fs::path>& filepaths) {
     std::vector<std::unique_ptr<fe::Bitmap>> bitmaps;
-    bitmaps.reserve(filenames.size());
+    bitmaps.reserve(filepaths.size());
 
     std::vector<GLFWimage> icons;
-    icons.reserve(filenames.size());
+    icons.reserve(filepaths.size());
 
-    for (const auto& filename : filenames) {
-        auto bitmap = std::make_unique<fe::Bitmap>(filename);
+    for (const auto& filepath : filepaths) {
+        auto bitmap = std::make_unique<fe::Bitmap>(filepath);
         if (!bitmap)
             continue;
 

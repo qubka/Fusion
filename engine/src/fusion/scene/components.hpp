@@ -10,14 +10,17 @@
 
 #include <uuid.h>
 
-#define ALL_COMPONENTS  IdComponent, \
-#define ALL_COMPONENTS  TagComponent, \
+#define ALL_COMPONENTS  TagComponent, RelationshipComponent
+
+
+/*                      IdComponent, \
+                        TagComponent, \
                         RelationshipComponent, \
                         TransformComponent, \
                         CameraComponent, \
                         MeshComponent
 
-/*
+
                         PointLightComponent, \
                         DirectionalLightComponent, \
                         ScriptComponent, \
@@ -31,7 +34,7 @@
 */
 
 namespace fe {
-    struct IdComponent {
+    /*struct IdComponent {
         uuids::uuid uuid;
 
         template<class Archive>
@@ -45,7 +48,7 @@ namespace fe {
             archive(str);
             uuid = uuids::uuid::from_string(str).value();
         }
-    };
+    };*/
 
     struct TagComponent {
         std::string tag;
@@ -54,7 +57,7 @@ namespace fe {
         const std::string& operator*() const { return tag; }
         operator std::string() const { return tag; }
 
-        template <typename Archive>
+        template<typename Archive>
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("Tag", tag));
         }
@@ -67,7 +70,7 @@ namespace fe {
         entt::entity next{ entt::null }; // the next sibling in the list of children for the parent.
         entt::entity parent{ entt::null }; // the entity identifier of the parent, if any.
 
-        template <typename Archive>
+        template<typename Archive>
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("children", children),
                     cereal::make_nvp("first", first),
@@ -110,7 +113,7 @@ namespace fe {
         glm::vec3 inverseTransformVector(const glm::vec3& vector) const { return glm::rotate(glm::inverse(rotation), vector / scale); }
         glm::vec3 inverseTransformPoint(const glm::vec3& point) const { return glm::rotate(glm::inverse(rotation), (point - position) / scale); }
 
-        template <typename Archive>
+        template<typename Archive>
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("Position", position),
                     cereal::make_nvp("Rotation", rotation),
@@ -129,7 +132,7 @@ namespace fe {
         bool primary{ true };
         bool fixedAspectRatio{ false };
 
-        template <typename Archive>
+        template<typename Archive>
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("Camera", camera),
                     cereal::make_nvp("Primary", primary),
@@ -144,7 +147,7 @@ namespace fe {
         // Storage for runtime
         void* runtimeModel{ nullptr };
 
-        template <typename Archive>
+        template<typename Archive>
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("Path", path));
         }

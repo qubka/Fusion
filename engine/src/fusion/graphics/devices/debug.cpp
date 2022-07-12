@@ -58,7 +58,7 @@ void DebugMarker::beginRegion(VkCommandBuffer commandBuffer, const std::string& 
     if (pfnCmdDebugMarkerBegin) {
         VkDebugMarkerMarkerInfoEXT markerInfo = {};
         markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
-        memcpy(markerInfo.color, glm::value_ptr(color), sizeof(glm::vec4));
+        std::memcpy(markerInfo.color, glm::value_ptr(color), sizeof(glm::vec4));
         markerInfo.pMarkerName = markerName.c_str();
         pfnCmdDebugMarkerBegin(commandBuffer, &markerInfo);
     }
@@ -69,7 +69,7 @@ void DebugMarker::insert(VkCommandBuffer commandBuffer, const std::string& marke
     if (pfnCmdDebugMarkerInsert) {
         VkDebugMarkerMarkerInfoEXT markerInfo = {};
         markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
-        memcpy(markerInfo.color, glm::value_ptr(color), sizeof(glm::vec4));
+        std::memcpy(markerInfo.color, glm::value_ptr(color), sizeof(glm::vec4));
         markerInfo.pMarkerName = markerName.c_str();
         pfnCmdDebugMarkerInsert(commandBuffer, &markerInfo);
     }

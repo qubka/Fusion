@@ -75,20 +75,9 @@ namespace fe {
         /**
          * Enqueue a new scene to the manager.
          */
-        void enqueueSceneFromFile(const fs::path& filename);
+        void enqueueSceneFromFile(const fs::path& filepath);
         void enqueueScene(std::unique_ptr<Scene>&& scene);
         void enqueueScene(const std::string& name);
-
-        /**
-         * Add scene file to the loading list.
-         * @param filename The path to use.
-         */
-        void addFileToLoadList(const fs::path& filename);
-
-        /**
-         * Loads all enqueued scenes.
-         */
-        void loadCurrentList();
 
     private:
         uint32_t sceneIndex{ 0 };
@@ -98,6 +87,5 @@ namespace fe {
 
         std::vector<std::unique_ptr<Scene>> scenes;
         std::vector<fs::path> sceneFilePaths;
-        std::vector<fs::path> sceneFilePathsToLoad;
     };
 }

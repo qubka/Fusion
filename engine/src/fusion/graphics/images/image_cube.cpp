@@ -53,11 +53,11 @@ void ImageCube::setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t b
 }
 
 void ImageCube::load(std::unique_ptr<Bitmap> loadBitmap) {
-	if (!filename.empty() && !loadBitmap) {
+	if (!filePath.empty() && !loadBitmap) {
 		uint8_t* offset = nullptr;
 
 		for (const auto& side : fileSides) {
-			Bitmap bitmapSide{filename / (side + fileSuffix)};
+			Bitmap bitmapSide{filePath / (side + fileSuffix)};
 			auto lengthSide = bitmapSide.getLength();
 
 			if (!loadBitmap) {

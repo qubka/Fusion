@@ -6,8 +6,8 @@
 
 using namespace fe;
 
-Bitmap::Bitmap(const fs::path& filename) {
-    load(filename);
+Bitmap::Bitmap(const fs::path& filepath) {
+    load(filepath);
 }
 
 Bitmap::Bitmap(const glm::uvec2& size, BitmapChannels channels, bool hdr)
@@ -24,41 +24,41 @@ Bitmap::Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, Bitmap
     , data{std::move(data)} {
 }
 
-void Bitmap::load(const fs::path& filename) {
+void Bitmap::load(const fs::path& filepath) {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
-    auto fileExt = FileSystem::GetExtension(filename);
-    if (auto it = Registry().find(fileExt); it != Registry().end()) {
-        it->second.first(*this, filename);
-        this->filename = filename;
+    auto extension = FileSystem::GetExtension(filepath);
+    if (auto it = Registry().find(extension); it != Registry().end()) {
+        it->second.first(*this, filepath);
+        filePath = filepath;
     } else {
-        LOG_ERROR << "Unknown file extension format: " << std::quoted(fileExt) << " for the file: " << filename.string();
+        LOG_ERROR << "Unknown file extension format: " << std::quoted(extension) << " for the file: " << filepath;
         return;
     }
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Bitmap: " << filename << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Bitmap: " << filepath << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 
-void Bitmap::write(const fs::path& filename) const {
+void Bitmap::write(const fs::path& filepath) const {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
-    if (auto parent = filename.parent_path(); !parent.empty())
+    if (auto parent = filepath.parent_path(); !parent.empty())
         fs::create_directories(parent);
 
-    auto fileExt = FileSystem::GetExtension(filename);
-    if (auto it = Registry().find(fileExt); it != Registry().end()) {
-        it->second.second(*this, filename);
+    auto extension = FileSystem::GetExtension(filepath);
+    if (auto it = Registry().find(extension); it != Registry().end()) {
+        it->second.second(*this, filepath);
     } else {
-        LOG_ERROR << "Unknown file extension format: " << std::quoted(fileExt) << " for the file: " << filename.string();
+        LOG_ERROR << "Unknown file extension format: " << std::quoted(extension) << " for the file: " << filepath;
         return;
     }
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Bitmap: " << filename << " written in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Bitmap: " << filepath << " written in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 

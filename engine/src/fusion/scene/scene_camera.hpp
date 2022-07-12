@@ -35,7 +35,7 @@ namespace fe {
         ProjectionType getProjectionType() const { return projectionType; }
         void setProjectionType(ProjectionType type) { projectionType = type; recalculateProjection(); }
 
-        template <typename Archive>
+        template<typename Archive>
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("Projection Type", projectionType),
                     cereal::make_nvp("Projection Matrix", projectionMatrix),

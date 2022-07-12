@@ -4,6 +4,7 @@
 
 #include "fusion/core/engine.hpp"
 #include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/file_format.hpp"
 #include "fusion/utils/string.hpp"
 #include "fusion/utils/enumerate.hpp"
 
@@ -457,16 +458,13 @@ const fs::path& ContentBrowserPanel::processDirectory(const fs::path& path, cons
     return directoryInfo->path;
 }
 
-bool ContentBrowserPanel::canMove(const fs::path& filepath, const fs::path& movepath) {
-    //std::string s = "move " + filepath.string() + " " + movepath.string();
-
+bool ContentBrowserPanel::canMove(const fs::path& path, const fs::path& move) {
     // TODO: Finish file move
-
-    return FileSystem::Exists(movepath / filepath.filename());
+    return FileSystem::Exists(move / path.filename());
 }
 
 DirectoryInfo::DirectoryInfo(fs::path filepath) : path{std::move(filepath)} {
-    name = this->path.filename().string();
-    icon = FileSystem::GetIcon(this->path);
-    isDirectory = fs::is_directory(this->path);
+    name = path.filename().string();
+    icon = FileFormat::GetIcon(path);
+    isDirectory = fs::is_directory(path);
 }

@@ -70,8 +70,8 @@ private:
 #if MAPPED_FILES
 class FileStorage : public Storage {
 public:
-    static StoragePointer create(const fs::path& filename, size_t size, const uint8_t* data);
-    explicit FileStorage(const fs::path& filename);
+    static StoragePointer create(const fs::path& filepath, size_t size, const uint8_t* data);
+    explicit FileStorage(const fs::path& filepath);
     ~FileStorage() override;
     // Prevent copying
     FileStorage(const FileStorage& other) = delete;
@@ -94,16 +94,16 @@ private:
 #endif
 };
 
-FileStorage::FileStorage(const fs::path& filename) {
+FileStorage::FileStorage(const fs::path& filepath) {
 #if FUSION_PLATFORM_ANDROID
     // Load shader from compressed asset
-    asset = AAssetManager_open(assetManager, filename.string().c_str(), AASSET_MODE_BUFFER);
+    asset = AAssetManager_open(assetManager, filepath.string().c_str(), AASSET_MODE_BUFFER);
     assert(asset);
     size = AAsset_getLength(asset);
     assert(size > 0);
     mapped = reinterpret_cast<uint8_t*>(AAsset_getBuffer(asset));
 #elif FUSION_PLATFORM_WINDOWS
-    file = CreateFileA(filename.string().c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    file = CreateFileA(filepath.string().c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     if (file == INVALID_HANDLE_VALUE) {
         throw std::runtime_error("Failed to open file");
     }
@@ -135,16 +135,16 @@ StoragePointer Storage::create(size_t size, uint8_t* data)  {
     return std::make_shared<MemoryStorage>(size, data);
 }
 
-StoragePointer Storage::readFile(const fs::path& filename) {
+StoragePointer Storage::readFile(const fs::path& filepath) {
 #if MAPPED_FILES
-    return std::make_shared<FileStorage>(filename);
+    return std::make_shared<FileStorage>(filepath);
 #else
     // FIXME move to posix memory mapped files
     // open the file:
-    std::ifstream is{filename, std::ios::binary};
+    std::ifstream is{filepath, std::ios::binary};
 
     if (!is.is_open()) {
-        throw std::runtime_error("File " + filename.string() + " could not be opened");
+        throw std::runtime_error("File " + filepath.string() + " could not be opened");
     }
 
     // Stop eating new lines in binary mode!!!

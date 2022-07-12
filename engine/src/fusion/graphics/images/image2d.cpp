@@ -7,9 +7,9 @@
 
 using namespace fe;
 
-Image2d::Image2d(fs::path filename, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
+Image2d::Image2d(fs::path filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
     : Image{filter, addressMode, VK_SAMPLE_COUNT_1_BIT, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_FORMAT_R8G8B8A8_UNORM, 1, 1, {0, 0, 1}}
-    , filename{std::move(filename)}
+    , filePath{std::move(filepath)}
     , anisotropic{anisotropic}
     , mipmap{mipmap} {
 	if (load) {
@@ -47,8 +47,8 @@ void Image2d::setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t bas
 }
 
 void Image2d::load(std::unique_ptr<Bitmap> loadBitmap) {
-	if (!filename.empty() && !loadBitmap) {
-		loadBitmap = std::make_unique<Bitmap>(filename);
+	if (!filePath.empty() && !loadBitmap) {
+		loadBitmap = std::make_unique<Bitmap>(filePath);
 		extent = loadBitmap->getExtent();
 		components = static_cast<uint32_t>(loadBitmap->getChannels());
 	}

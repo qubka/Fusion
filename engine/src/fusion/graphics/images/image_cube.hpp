@@ -12,7 +12,7 @@ namespace fe {
     public:
         /**
          * Creates a new cubemap image.
-         * @param filename The file to load the image from.
+         * @param filepath The file to load the image from.
          * @param fileSuffix The files extension type (ex .png).
          * @param filter The magnification/minification filter to apply to lookups.
          * @param addressMode The addressing mode for outside [0..1] range.
@@ -20,7 +20,7 @@ namespace fe {
          * @param mipmap If mapmaps will be generated.
          * @param load If this resource will be loaded immediately, otherwise {@link ImageCube#Load} can be called later.
          */
-        explicit ImageCube(fs::path filename,
+        explicit ImageCube(fs::path filepath,
                            std::string fileSuffix = ".png",
                            VkFilter filter = VK_FILTER_LINEAR,
                            VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
@@ -87,7 +87,7 @@ namespace fe {
          */
         void setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer);
 
-        const fs::path& getFilename() const { return filename; }
+        const fs::path& getFilePath() const { return filePath; }
         const std::string& getFileSuffix() const { return fileSuffix; }
         const std::vector<std::string>& getFileSides() const { return fileSides; }
         bool isAnisotropic() const { return anisotropic; }
@@ -97,7 +97,7 @@ namespace fe {
     private:
         void load(std::unique_ptr<Bitmap> loadBitmap = nullptr);
 
-        fs::path filename;
+        fs::path filePath;
         std::string fileSuffix;
         /// X, -X, +Y, -Y, +Z, -Z
         std::vector<std::string> fileSides{ "Right", "Left", "Top", "Bottom", "Back", "Front" };

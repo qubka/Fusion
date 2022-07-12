@@ -95,18 +95,18 @@ namespace fe {
 
 using namespace fe;
 
-PHYSFS_File* OpenWithMode(const fs::path& filename, FileMode openMode) {
+PHYSFS_File* OpenWithMode(const fs::path& filepath, FileMode openMode) {
     PHYSFS_File* file = nullptr;
 
     switch (openMode) {
         case FileMode::Write:
-            file = PHYSFS_openWrite(filename.string().c_str());
+            file = PHYSFS_openWrite(filepath.string().c_str());
             break;
         case FileMode::Append:
-            file = PHYSFS_openAppend(filename.string().c_str());
+            file = PHYSFS_openAppend(filepath.string().c_str());
             break;
         case FileMode::Read:
-            file = PHYSFS_openRead(filename.string().c_str());
+            file = PHYSFS_openRead(filepath.string().c_str());
     }
 
     if (file == nullptr)
@@ -129,8 +129,8 @@ size_t BaseFileStream::length() {
     return PHYSFS_fileLength(file);
 }
 
-IFileStream::IFileStream(const fs::path& filename)
-    : BaseFileStream{OpenWithMode(filename, FileMode::Read)}
+IFileStream::IFileStream(const fs::path& filepath)
+    : BaseFileStream{OpenWithMode(filepath, FileMode::Read)}
     , std::istream{new FBuffer{file}} {
 }
 
@@ -138,8 +138,8 @@ IFileStream::~IFileStream() {
     delete rdbuf();
 }
 
-OFileStream::OFileStream(const fs::path& filename, FileMode writeMode)
-    : BaseFileStream{OpenWithMode(filename, writeMode)}
+OFileStream::OFileStream(const fs::path& filepath, FileMode writeMode)
+    : BaseFileStream{OpenWithMode(filepath, writeMode)}
     , std::ostream{new FBuffer{file}} {
 }
 
@@ -147,8 +147,8 @@ OFileStream::~OFileStream() {
     delete rdbuf();
 }
 
-FileStream::FileStream(const fs::path &filename, FileMode openMode)
-    : BaseFileStream{OpenWithMode(filename, openMode)}
+FileStream::FileStream(const fs::path &filepath, FileMode openMode)
+    : BaseFileStream{OpenWithMode(filepath, openMode)}
     , std::iostream{new FBuffer{file}} {
 }
 

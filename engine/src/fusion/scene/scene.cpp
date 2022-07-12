@@ -3,6 +3,11 @@
 #include "components.hpp"
 
 #include "fusion/utils/string.hpp"
+#include "fusion/filesystem/file_system.hpp"
+
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
 
 using namespace fe;
 
@@ -32,38 +37,44 @@ Scene::Scene(std::string name) : name{std::move(name)} {
 }*/
 
 void Scene::onCreate() {
-    systems.each([&](auto system) {
+    /*systems.each([&](auto system) {
         if (system->isEnabled())
             system->onCreate();
-    });
+    });*/
+
+    LOG_DEBUG << "Scene : " << std::quoted(name) << " created first time";
 }
 
 void Scene::onUpdate() {
-    if (!runtime)
+    /*if (!runtime)
         return;
 
     systems.each([&](auto system) {
         if (system->isEnabled())
             system->onUpdate();
-    });
+    });*/
 }
 
 void Scene::onStart() {
-    runtime = true;
+    /*runtime = true;
 
     systems.each([&](auto system) {
         if (system->isEnabled())
             system->onStart();
-    });
+    });*/
+
+    LOG_DEBUG << "Scene : " << std::quoted(name) << " started runtime";
 }
 
 void Scene::onStop() {
-    systems.each([&](auto system) {
+    /*systems.each([&](auto system) {
         if (system->isEnabled())
             system->onStop();
     });
 
-    runtime = false;
+    runtime = false;*/
+
+    LOG_DEBUG << "Scene : " << std::quoted(name) << " stopped runtime";
 }
 
 void Scene::clearSystems() {
@@ -102,15 +113,15 @@ void Scene::destroyEntity(entt::entity entity) {
 
 entt::entity Scene::duplicateEntity(entt::entity entity) {
     auto newEntity = registry.create();
-    
-    clone<IdComponent>(newEntity, entity);
+
+    /*clone<IdComponent>(newEntity, entity);
     clone<TagComponent>(newEntity, entity);
     // TODO: Clone children structure
     //clone<RelationshipComponent>(newEntity, entity);
     clone<TransformComponent>(newEntity, entity);
     clone<CameraComponent>(newEntity, entity);
     clone<MeshComponent>(newEntity, entity);
-    /*clone<PointLightComponent>(newEntity, entity);
+    clone<PointLightComponent>(newEntity, entity);
     clone<DirectionalLightComponent>(newEntity, entity);
     clone<ScriptComponent>(newEntity, entity);
     clone<RigidBodyComponent>(newEntity, entity);
@@ -124,30 +135,76 @@ entt::entity Scene::duplicateEntity(entt::entity entity) {
     return newEntity;
 }
 
-/*void Scene::serialise(fs::path filename, bool binary = false) {
+static fs::path sceneDir = "Scenes";
+
+void Scene::serialise(bool binary) {
+    auto filepath = sceneDir / name;
     if (binary) {
-        filename += ".bin";
-        std::ofstream file{filename, std::ios::binary};
+        filepath += ".bin";
+        std::ofstream file{filepath, std::ios::binary};
         {
             // output finishes flushing its contents when it goes out of scope
             cereal::BinaryOutputArchive output{ file };
-            //output(*this);
+            output(*this);
             entt::snapshot{ registry }.entities(output).component<ALL_COMPONENTS>(output);
         }
-        file.close();
     } else {
-        filename += ".fsn";
-        std::stringstream storage;
+        filepath += ".fsn";
+        std::stringstream ss;
         {
             // output finishes flushing its contents when it goes out of scope
-            cereal::JSONOutputArchive output{ storage };
-            //output(*this);
+            cereal::JSONOutputArchive output{ ss };
+            output(*this);
             entt::snapshot{ registry }.entities(output).component<ALL_COMPONENTS>(output);
         }
-        FileSystem::WriteTextFile(filename, storage.str());
+        auto jsonStr = ss.str();
+        FileSystem::Write(filepath, jsonStr.data(), jsonStr.length());
     }
+
+    LOG_INFO << "Serialise scene: " << filepath;
 }
 
-void Scene::deserialise(const fs::path& filename, bool binary = false) {
+void Scene::deserialise(bool binary) {
+    auto filepath = sceneDir / name;
+    if (binary) {
+        filepath += ".bin";
 
-}*/
+        if (!FileSystem::Exists(filepath)) {
+            LOG_ERROR << "No saved scene file found: " << filepath;
+            return;
+        }
+
+        try {
+            std::ifstream file{filepath, std::ios::binary};
+            cereal::BinaryInputArchive input(file);
+            input(*this);
+            entt::snapshot_loader{ registry }.entities(input).component<ALL_COMPONENTS>(input);
+        }
+        catch (...) {
+            LOG_ERROR << "Failed to load scene: " << filepath;
+        }
+    } else {
+        filepath += ".fsn";
+
+        if (!FileSystem::Exists(filepath)) {
+            LOG_ERROR << "No saved scene file found: " << filepath;
+            return;
+        }
+        try {
+            std::string data = FileSystem::ReadText(filepath);
+            std::istringstream is;
+            is.str(data);
+            cereal::JSONInputArchive input{is};
+            input(*this);
+
+            entt::snapshot_loader{ registry }.entities(input).component<ALL_COMPONENTS>(input);
+        }
+        catch (...) {
+            LOG_ERROR << "Failed to load scene: " << filepath;
+        }
+    }
+
+    LOG_INFO << "Deserialise scene: " << filepath;
+
+    //SceneManager::Get().onNewScene.publish(this);
+}

@@ -5,6 +5,7 @@
 #include "fusion/graphics/images/image_cube.hpp"
 
 #include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/file_format.hpp"
 #include "fusion/imgui/material_design_icons.hpp"
 
 #include <imgui/imgui.h>
@@ -142,7 +143,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
             if (filter.IsActive() && !filter.PassFilter(file.c_str()))
                 continue;
 
-            std::string title = FileSystem::GetIcon(file) + " "s + file.filename().string();
+            std::string title = FileFormat::GetIcon(file) + " "s + file.filename().string();
             if (ImGui::Selectable(title.c_str(), selected == file, ImGuiSelectableFlags_AllowDoubleClick)) {
                 selected = file;
                 if (ImGui::IsMouseDoubleClicked(0)) {
@@ -157,7 +158,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
         ImGui::Separator();
 
         if (!selected.empty()) {
-            std::string title = FileSystem::GetIcon(selected) + " "s + selected.string();
+            std::string title = FileFormat::GetIcon(selected) + " "s + selected.string();
             ImGui::TextUnformatted(title.c_str());
         }
 
@@ -174,7 +175,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
             ImGui::OpenPopup("File Explorer");
         }
     } else {
-        std::string title = FileSystem::GetIcon(value) + " "s + value.filename().string();
+        std::string title = FileFormat::GetIcon(value) + " "s + value.filename().string();
         if (ImGui::Button(title.c_str(), buttonSize)) {
             //contentBrowserPanel.selectFile(value);
             // TODO: Finish

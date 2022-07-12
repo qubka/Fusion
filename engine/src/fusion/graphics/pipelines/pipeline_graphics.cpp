@@ -84,9 +84,9 @@ const RenderArea& PipelineGraphics::getRenderArea(const std::optional<uint32_t>&
 }
 
 void PipelineGraphics::createShaderProgram() {
-	std::stringstream defineBlock;
+	std::stringstream ss;
 	for (const auto& [defineName, defineValue] : defines)
-		defineBlock << "#define " << defineName << " " << defineValue << '\n';
+		ss << "#define " << defineName << " " << defineValue << '\n';
 
 	for (const auto& shaderStage : shaderStages) {
 		auto fileLoaded = FileSystem::ReadText(shaderStage);
@@ -94,7 +94,7 @@ void PipelineGraphics::createShaderProgram() {
 			throw std::runtime_error("Could not create pipeline, missing shader stage");
 
 		auto stageFlag = Shader::GetShaderStage(shaderStage);
-		auto shaderModule = shader.createShaderModule(shaderStage, fileLoaded, defineBlock.str(), stageFlag);
+		auto shaderModule = shader.createShaderModule(shaderStage, fileLoaded, ss.str(), stageFlag);
 
 		VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfo = {};
 		pipelineShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

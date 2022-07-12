@@ -12,14 +12,14 @@ namespace fe {
         friend class GliLoader;
     public:
         Bitmap() = default;
-        explicit Bitmap(const fs::path& filename);
+        explicit Bitmap(const fs::path& filepath);
         explicit Bitmap(const glm::uvec2& size, BitmapChannels channels = BitmapChannels::RgbAlpha, bool hdr = false);
         Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, BitmapChannels channels = BitmapChannels::RgbAlpha, bool hdr = false);
         ~Bitmap() override = default;
         NONCOPYABLE(Bitmap);
 
-        void load(const fs::path& filename);
-        void write(const fs::path& filename) const;
+        void load(const fs::path& filepath);
+        void write(const fs::path& filepath) const;
 
         operator bool() const { return data.operator bool(); }
 
@@ -31,7 +31,7 @@ namespace fe {
         uint8_t getBytesPerPixel() const { return static_cast<uint8_t>(channels) * (hdr ? sizeof(float) : sizeof(uint8_t)); }
         uint32_t getPitch() const { return size.x * getBytesPerPixel(); }
         size_t getLength() const { return size.x * size.y * getBytesPerPixel(); }
-        const fs::path& getFilename() const { return filename; }
+        const fs::path& getFilePath() const { return filePath; }
 
         template<typename T>
         T* getData() { return reinterpret_cast<T*>(data.get()); }
@@ -43,7 +43,7 @@ namespace fe {
 
     private:
         std::unique_ptr<uint8_t[]> data;
-        fs::path filename;
+        fs::path filePath;
         glm::uvec2 size{ 0 };
         BitmapChannels channels{ BitmapChannels::RgbAlpha };
         bool hdr{ false };

@@ -3,6 +3,7 @@
 
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/filesystem/file_system.hpp"
+#include "fusion/scene/scene_manager.hpp"
 
 #include <cereal/archives/json.hpp>
 
@@ -44,9 +45,7 @@ void DefaultApplication::onStart() {
     windowInfo.isVSync = projectSettings.isVSync;
 
     // Initialise the window
-    auto deviceManager = DeviceManager::Get();
-    auto window = deviceManager->createWindow(windowInfo);
-
+    auto window = DeviceManager::Get()->createWindow(windowInfo);
     window->OnClose().connect<&Engine::requestClose>(Engine::Get());
 
     // Win32 : Sets up a console window and redirects standard output to it
@@ -113,13 +112,14 @@ void DefaultApplication::openNewProject(const fs::path& path, const std::string&
 
     mountPaths();
 
-    //m_SceneManager->EnqueueScene(new Scene("Empty Scene"));
-    //m_SceneManager->SwitchScene(0);
-    //m_SceneManager->ApplySceneSwitch();
-
-    projectLoaded = true;
+    auto sceneManager = SceneManager::Get();
+    sceneManager->enqueueScene("Empty Scene");
+    sceneManager->switchScene(0);
+    sceneManager->applySceneSwitch();
 
     serialise();
+
+    projectLoaded = true;
 
     // Win32 : Sets up a console window and redirects standard output to it
     showConsole();
@@ -131,25 +131,29 @@ void DefaultApplication::openProject(const fs::path& path) {
 
     deserialise();
 
-    //m_SceneManager->LoadCurrentList();
-    //m_SceneManager->ApplySceneSwitch();
+    auto sceneManager = SceneManager::Get();
+    for (auto& scene : sceneFilePathsToLoad) {
+        sceneManager->enqueueSceneFromFile(scene);
+    }
+
+    sceneManager->applySceneSwitch();
 }
 
 void DefaultApplication::serialise() {
-    std::stringstream is;
+    std::stringstream ss;
     {
         // output finishes flushing its contents when it goes out of scope
-        cereal::JSONOutputArchive output{is};
+        cereal::JSONOutputArchive output{ss};
         output(*this);
     }
 
-    auto filePath = projectSettings.projectRoot / projectSettings.projectName;
-    filePath += ".fsproj";
+    auto filepath = projectSettings.projectRoot / projectSettings.projectName;
+    filepath += ".fsproj";
 
-    LOG_INFO << "Serialising application: " << filePath;
+    LOG_INFO << "Serialising application: " << filepath;
 
-    auto jsonStr = is.str();
-    FileSystem::Write(filePath, jsonStr.data(), jsonStr.length());
+    auto jsonStr = ss.str();
+    FileSystem::Write(filepath, jsonStr.data(), jsonStr.length());
 }
 
 void DefaultApplication::deserialise() {
@@ -158,48 +162,50 @@ void DefaultApplication::deserialise() {
         return;
     }
 
-    auto filePath = projectSettings.projectRoot / projectSettings.projectName;
-    filePath += ".fsproj";
+    auto filepath = projectSettings.projectRoot / projectSettings.projectName;
+    filepath += ".fsproj";
 
-    if (!fs::exists(filePath)) {
-        LOG_INFO << "No saved Project file found: " << filePath;
+    if (!fs::exists(filepath)) {
+        LOG_INFO << "No saved Project file found: " << filepath;
         return;
     }
 
     mountPaths();
 
-    std::string data = FileSystem::ReadText(filePath);
+    std::string data = FileSystem::ReadText(filepath);
     std::istringstream is{data};
     try {
         cereal::JSONInputArchive input{is};
         input(*this);
     }
     catch (...) {
-        // Set Default values
         projectSettings = {};
         projectSettings.projectVersion = version.string();
 
-        //m_SceneManager->EnqueueScene(new Scene("Empty Scene"));
-        //m_SceneManager->SwitchScene(0);
+        auto sceneManager = SceneManager::Get();
+        sceneManager->enqueueScene("Empty Scene");
+        sceneManager->switchScene(0);
 
         LOG_ERROR << "Failed to load project";
         return;
     }
 
+    LOG_INFO << "Deserialise application: " << filepath;
+
     projectLoaded = true;
 }
 
 void DefaultApplication::mountPaths() const {
-    auto fs = FileSystem::Get();
+    auto fileSystem = FileSystem::Get();
 
     auto assetPath = projectSettings.projectRoot / "assets";
-    fs->mount(assetPath, "Assets");
-    fs->mount(assetPath / "meshes", "Meshes");
-    fs->mount(assetPath / "textures", "Textures");
-    fs->mount(assetPath / "sounds", "Sounds");
-    fs->mount(assetPath / "scripts", "Scripts");
-    fs->mount(assetPath / "shaders", "Shaders");
-    fs->mount(assetPath / "scenes", "Scenes");
+    fileSystem->mount(assetPath, "Assets");
+    fileSystem->mount(assetPath / "meshes", "Meshes");
+    fileSystem->mount(assetPath / "textures", "Textures");
+    fileSystem->mount(assetPath / "sounds", "Sounds");
+    fileSystem->mount(assetPath / "scripts", "Scripts");
+    fileSystem->mount(assetPath / "shaders", "Shaders");
+    fileSystem->mount(assetPath / "scenes", "Scenes");
 }
 
 void DefaultApplication::showConsole() {
