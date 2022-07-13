@@ -4,9 +4,10 @@
 #include "fusion/core/engine.hpp"
 #include "fusion/utils/string.hpp"
 
-#include <physfs.h>
-
 using namespace fe;
+
+#if PHYSFS
+#include <physfs.h>
 
 FileSystem::FileSystem() {
     PHYSFS_init(Engine::Get()->getCommandLineArgs()[0].first.c_str());
@@ -52,19 +53,6 @@ void FileSystem::clearSearchPath() {
     }
 
     searchPaths.clear();
-}
-
-const std::vector<fs::path>& FileSystem::getSearchPath() {
-    /*auto sp = PHYSFS_getSearchPath();
-
-    std::vector<fs::path> files;
-
-    for (auto i = sp; *i; i++)
-        files.emplace_back(*i);
-
-    PHYSFS_freeList(sp);
-    return files;*/
-    return searchPaths;
 }
 
 bool FileSystem::ExistsInPath(const fs::path& path) {
@@ -281,6 +269,54 @@ bitmask::bitmask<FileAttributes> FileSystem::GetAttributesInPath(const fs::path&
 
     return attributes;
 }
+#else
+FileSystem::FileSystem() {
+}
+
+FileSystem::~FileSystem() {
+}
+
+void FileSystem::Read(const fs::path& filepath, const FileSystem::SimpleHandler& handler) {
+    auto storage = Storage::readFile(filepath);
+    handler(storage->getData(), storage->getSize());
+
+    LOG_INFO << "Reading text with default filesystem implementation: " << filepath;
+}
+
+std::vector<uint8_t> FileSystem::ReadBytes(const fs::path& filepath) {
+    auto storage = Storage::readFile(filepath);
+    std::vector<uint8_t> data(storage->getSize());
+    std::memcpy(data.data(), storage->getData(), storage->getSize());
+    return data;
+}
+
+std::string FileSystem::ReadText(const fs::path& filepath) {
+    std::ifstream is{filepath, std::ios::in};
+
+    if (!is.is_open()) {
+        throw std::runtime_error("File " + filepath.string() + " could not be opened");
+    }
+
+    std::stringstream ss;
+    std::string line;
+    while (!is.eof()) {
+        getline(is, line);
+        ss << line << '\n';
+    }
+
+    return ss.str();
+}
+
+bool FileSystem::WriteBytes(const fs::path& filepath, const void* buffer, size_t size) {
+    std::ofstream os{filepath, std::ios::binary};
+    os.write(reinterpret_cast<const char*>(buffer), size);
+    return true;
+}
+
+bool FileSystem::WriteText(const fs::path& filepath, const std::string& text) {
+    return WriteBytes(filepath, text.data(), text.length());
+}
+#endif
 
 std::string FileSystem::GetExtension(const fs::path& path) {
     return String::Lowercase(path.extension().string());

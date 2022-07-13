@@ -3,38 +3,45 @@
 
 using namespace fe;
 
-bool ParentSystem::has_children(const entt::entity entity) const {
-    if (auto component = registry.try_get<HierarchyComponent>(entity); component && component->children > 0) {
+bool HierarchySystem::hasChildren(entt::entity entity) const {
+    if (auto component = registry.try_get<HierarchyComponent>(entity); component && component->first != entt::null) {
         return true;
     }
     return false;
 }
 
-entt::entity ParentSystem::get_parent(const entt::entity entity) const {
+entt::entity HierarchySystem::getParent(entt::entity entity) const {
     if (auto component = registry.try_get<HierarchyComponent>(entity)) {
         return component->parent;
     }
     return entt::null;
 }
 
-void ParentSystem::destroy_parent(const entt::entity entity) {
-    // Remove entity from existing parent if any
-    if (auto parent = get_parent(entity); parent != entt::null) {
-        remove_child(parent, entity);
+bool HierarchySystem::isParent(entt::entity parent, entt::entity child) const {
+    if (auto component = registry.try_get<HierarchyComponent>(child)) {
+        return component->parent == parent;
     }
-    each_child(entity, [&](const entt::entity e) {
-        registry.destroy(e);
-    });
+    return false;
+}
+
+void HierarchySystem::destroyParent(entt::entity entity) {
+    // Remove entity from existing parent if any
+    if (auto parent = getParent(entity); parent != entt::null) {
+        removeChild(parent, entity);
+    }
+    for (auto& child : getChildren(entity)) {
+        registry.destroy(child);
+    }
     registry.destroy(entity);
 }
 
-void ParentSystem::remove_parent(const entt::entity entity) {
-    if (auto component = registry.try_get<HierarchyComponent>(entity); component && component->children > 0) {
+void HierarchySystem::removeParent(entt::entity entity) {
+    if (auto component = registry.try_get<HierarchyComponent>(entity); component && component->first != entt::null) {
         auto curr = component->first;
         while (curr != entt::null) {
             auto& i = registry.get<HierarchyComponent>(curr);
             auto next = i.next;
-            if (i.children == 0) {
+            if (i.first == entt::null) {
                 registry.erase<HierarchyComponent>(curr);
             } else {
                 i.prev = entt::null;
@@ -47,15 +54,15 @@ void ParentSystem::remove_parent(const entt::entity entity) {
     }
 }
 
-void ParentSystem::assign_child(const entt::entity parent, const entt::entity child) {
+void HierarchySystem::assignChild(entt::entity parent, entt::entity child) {
     // Remove child from existing parent if any
-    if (auto root = get_parent(child); root != entt::null) {
+    if (auto root = getParent(child); root != entt::null) {
         if (root == parent) return;
-        remove_child(root, child);
+        removeChild(root, child);
     }
 
     auto& p = registry.get_or_emplace<HierarchyComponent>(parent);
-    if (p.children == 0) {
+    if (p.first == entt::null) {
         p.first = child;
 
         auto& c = registry.get_or_emplace<HierarchyComponent>(child);
@@ -83,8 +90,8 @@ void ParentSystem::assign_child(const entt::entity parent, const entt::entity ch
     p.children++;
 }
 
-void ParentSystem::remove_child(const entt::entity parent, const entt::entity child) {
-    if (auto component = registry.try_get<HierarchyComponent>(parent); component && component->children > 0) {
+void HierarchySystem::removeChild(entt::entity parent, entt::entity child) {
+    if (auto component = registry.try_get<HierarchyComponent>(parent); component && component->first != entt::null) {
         if (component->children == 1) {
             registry.get<HierarchyComponent>(child).parent = entt::null;
             component->first = entt::null;
@@ -104,7 +111,7 @@ void ParentSystem::remove_child(const entt::entity parent, const entt::entity ch
                     if (i.next != entt::null) {
                         registry.get<HierarchyComponent>(i.next).prev = i.prev;
                     }
-                    if (i.children == 0) {
+                    if (i.first == entt::null) {
                         registry.erase<HierarchyComponent>(curr);
                     } else {
                         i.prev = entt::null;
@@ -117,18 +124,21 @@ void ParentSystem::remove_child(const entt::entity parent, const entt::entity ch
             }
         }
         component->children--;
-        if (component->children == 0 && component->prev == entt::null && component->next == entt::null && component->parent == entt::null) {
+        if (component->first == entt::null && component->prev == entt::null && component->next == entt::null && component->parent == entt::null) {
             registry.erase<HierarchyComponent>(parent);
         }
     }
 }
 
-void ParentSystem::each_child(const entt::entity entity, const std::function<void(const entt::entity)>& function) const {
-    if (auto component = registry.try_get<HierarchyComponent>(entity); component && component->children > 0) {
+std::vector<entt::entity> HierarchySystem::getChildren(entt::entity entity) const {
+    std::vector<entt::entity> children;
+    if (auto component = registry.try_get<HierarchyComponent>(entity); component && component->first != entt::null) {
+        children.reserve(component->children);
         auto curr = component->first;
         while (curr != entt::null) {
-            function(curr);
+            children.push_back(curr);
             curr = registry.get<HierarchyComponent>(curr).next;
         }
     }
+    return children;
 }

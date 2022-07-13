@@ -21,7 +21,7 @@ Scene::Scene(std::string name) : name{std::move(name)} {
 
     clone<IdComponent>(other.registry);
     clone<TagComponent>(other.registry);
-    clone<RelationshipComponent>(other.registry);
+    clone<HierarchyComponent>(other.registry);
     clone<TransformComponent>(other.registry);
     clone<CameraComponent>(other.registry);
     clone<MeshComponent>(other.registry);
@@ -96,16 +96,16 @@ entt::entity Scene::createEntity(std::string name) {
         name = "Empty Entity";
 
     size_t idx = 0;
-    auto view = registry.view<const TagComponent>();
-    for (auto [e, tag] : view.each()) {
-        if (String::Contains(tag, name)) {
+    auto view = registry.view<const NameComponent>();
+    for (auto [e, str] : view.each()) {
+        if (String::Contains(str, name)) {
             idx++;
         }
     }
     if (idx > 0)
-        name += " (" + std::to_string(idx) + ")";
+        name += " (" + String::ToString(idx) + ")";
 
-    registry.emplace<TagComponent>(entity, name);
+    registry.emplace<NameComponent>(entity, name);
 
     return entity;
 }
@@ -114,13 +114,13 @@ void Scene::destroyEntity(entt::entity entity) {
     registry.destroy(entity);
 }
 
-entt::entity Scene::duplicateEntity(entt::entity entity) {
+entt::entity Scene::duplicateEntity(entt::entity entity, entt::entity parent) {
     auto newEntity = registry.create();
 
     /*clone<IdComponent>(newEntity, entity);
     clone<TagComponent>(newEntity, entity);
     // TODO: Clone children structure
-    //clone<RelationshipComponent>(newEntity, entity);
+    //clone<HierarchyComponent>(newEntity, entity);
     clone<TransformComponent>(newEntity, entity);
     clone<CameraComponent>(newEntity, entity);
     clone<MeshComponent>(newEntity, entity);
@@ -162,7 +162,7 @@ void Scene::serialise(bool binary) {
 
         FileSystem::WriteText(filepath, ss.str());
 
-        LOG_INFO << "Serialise scene as JSON: " << filepath;
+        LOG_INFO << "Serialise scene: " << filepath;
     }
 }
 
@@ -170,7 +170,7 @@ void Scene::deserialise(bool binary) {
     if (binary) {
         auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
 
-        if (!FileSystem::ExistsInPath(filepath)) {
+        if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
             LOG_ERROR << "No saved scene file found: " << filepath;
             return;
         }
@@ -189,7 +189,7 @@ void Scene::deserialise(bool binary) {
     } else {
         auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
 
-        if (!FileSystem::ExistsInPath(filepath)) {
+        if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
             LOG_ERROR << "No saved scene file found: " << filepath;
             return;
         }
@@ -206,6 +206,6 @@ void Scene::deserialise(bool binary) {
             LOG_ERROR << "Failed to load scene: " << filepath;
         }
 
-        LOG_INFO << "Deserialise scene as JSON: " << filepath;
+        LOG_INFO << "Deserialise scene: " << filepath;
     }
 }

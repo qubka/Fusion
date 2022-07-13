@@ -67,6 +67,25 @@ namespace fe {
         const EditorSettings& getSettings() { return editorSettings; }
         const EditorState& getState() { return editorState; }
 
+        void setSelected(entt::entity entity) { selectedEntity = entity; }
+        entt::entity getSelected() const { return selectedEntity; }
+
+        void setCopiedEntity(entt::entity entity, bool cut = false) { copiedEntity = entity; cutCopyEntity = cut; }
+        entt::entity getCopiedEntity() const { return copiedEntity; }
+
+        bool getCutCopyEntity() const { return cutCopyEntity; }
+
+        const std::unordered_map<std::type_index, std::string>& getComponentIconMap() const { return componentIconMap; }
+        bool setComponentIcon(const std::type_index& index, std::string& out) const {
+            if (auto icon = componentIconMap.find(index); icon != componentIconMap.end()) {
+                out = icon->second;
+                return true;
+            }
+            return false;
+        }
+
+        //void focusCamera(const glm::vec3& point, float distance, float speed = 1.0f);
+
     private:
         void beginDockSpace(bool gameFullScreen);
         void endDockSpace();

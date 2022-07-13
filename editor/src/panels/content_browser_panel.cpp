@@ -25,7 +25,8 @@ ContentBrowserPanel::~ContentBrowserPanel() {
 }
 
 void ContentBrowserPanel::onImGui() {
-    ImGui::Begin(name.c_str(), &enabled);
+    auto flags = ImGuiWindowFlags_NoCollapse;
+    ImGui::Begin(name.c_str(), &enabled, flags);
     {
         auto windowSize = ImGui::GetWindowSize();
         bool vertical = windowSize.y > windowSize.x;
@@ -300,7 +301,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
     const auto& directory = currentDirectory->children[dirIndex];
     const auto& [parent, children, path, name, icon, dir] = *directory;
 
-    bool doubleClicked = false;
+    bool isDoubleClicked = false;
 
     if (gridView) {
         ImGui::PushID(shownIndex);
@@ -311,7 +312,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
         }
 
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            doubleClicked = true;
+            isDoubleClicked = true;
         }
 
         ImGui::TextUnformatted(name.c_str());
@@ -326,14 +327,14 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
         ImGui::SameLine();
         if (ImGui::Selectable(name.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                doubleClicked = true;
+                isDoubleClicked = true;
             }
         }
     }
 
     ImGuiUtils::Tooltip(name);
 
-    if (doubleClicked) {
+    if (isDoubleClicked) {
         if (folder) {
             changeDirectory(directory);
             return true;
@@ -367,7 +368,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
         ImGui::EndDragDropSource();
     }
 
-    return doubleClicked;
+    return isDoubleClicked;
 }
 
 void ContentBrowserPanel::drawBottom() {

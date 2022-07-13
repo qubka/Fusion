@@ -3,55 +3,64 @@
 #include <entt/entity/registry.hpp>
 
 namespace fe {
-    class ParentSystem final {
+    class HierarchySystem final {
     public:
-        ParentSystem(entt::registry& registry) : registry{registry} {}
+        HierarchySystem(entt::registry& registry) : registry{ registry} {}
 
         /**
          * @brief Check if an entity is a parent.
          * @param entity A valid identifier.
          * @return True if entity is a parent.
          */
-        [[nodiscard]] bool has_children(const entt::entity entity) const;
+        [[nodiscard]] bool hasChildren(entt::entity entity) const;
 
         /**
          * @brief Get the parent of an entity if exists.
          * @param entity A valid identifier.
          * @return Parent or nullptr if not exist.
          */
-        [[nodiscard]] entt::entity get_parent(const entt::entity entity) const;
+        [[nodiscard]] entt::entity getParent(entt::entity entity) const;
+
+        /**
+         * @brief Checks that a parent entity has a specific child.
+         * @param parent Parent entity of a relationship.
+         * @param child Child entity to form a relationship with a parent.
+         * @return Parent or nullptr if not exist.
+         */
+        [[nodiscard]] bool isParent(entt::entity parent, entt::entity child) const;
 
         /**
          * @brief Removes a parent and all its children.
          * @param entity A valid identifier.
          */
-        void remove_parent(const entt::entity entity);
+        void removeParent(entt::entity entity);
 
         /**
          * @brief Destroy a parent entity and all its children.
          * @param entity A valid identifier.
          */
-        void destroy_parent(const entt::entity entity);
+        void destroyParent(entt::entity entity);
 
         /**
          * @brief Assign an entity to a parent as a child.
          * @param parent Parent entity of a relationship.
          * @param child Child entity to form a relationship with a parent.
          */
-        void assign_child(const entt::entity parent, const entt::entity child);
+        void assignChild(entt::entity parent, entt::entity child);
 
         /**
          * @brief Remove a child entity from a parent entity.
          * @param parent Parent entity of a relationship.
          * @param child Child entity to remove.
          */
-        void remove_child(const entt::entity parent, const entt::entity child);
+        void removeChild(entt::entity parent, entt::entity child);
 
         /**
-         * @brief Call function to all children of a parent entity.
+         * @brief Generate array of all children of a parent entity.
          * @param entity A valid identifier.
+         * @return Array of all children.
          */
-        void each_child(const entt::entity entity, const std::function<void(const entt::entity)>& function) const;
+        std::vector<entt::entity> getChildren(entt::entity entity) const;
 
     protected:
         entt::registry& registry;

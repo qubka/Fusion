@@ -122,7 +122,7 @@ namespace fe {
 
         void destroyEntity(entt::entity entity);
 
-        entt::entity duplicateEntity(entt::entity entity);
+        entt::entity duplicateEntity(entt::entity entity, entt::entity parent = entt::null);
 
         /**
          * Gets the scene entity registry.

@@ -5,6 +5,7 @@
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/utils/enumerate.hpp"
 
 using namespace fe;
@@ -18,8 +19,12 @@ ApplicationInfoPanel::~ApplicationInfoPanel() {
 }
 
 void ApplicationInfoPanel::onImGui() {
-    ImGui::Begin(name.c_str(), &enabled);
+    auto flags = ImGuiWindowFlags_NoCollapse;
+    ImGui::Begin(name.c_str(), &enabled, flags);
     {
+        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
+                                       | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_NoSavedSettings;
+
         if (ImGui::TreeNode("Application")) {
             /*auto modules = Engine::Get()->getModules();
 
@@ -29,9 +34,6 @@ void ApplicationInfoPanel::onImGui() {
             }*/
 
             if (ImGui::TreeNode("Device Manager")) {
-                static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
-                        | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_NoSavedSettings;
-
                 auto manager = DeviceManager::Get();
 
                 if (!manager->getWindows().empty()) {
@@ -187,23 +189,50 @@ void ApplicationInfoPanel::onImGui() {
                 ImGui::TreePop();
             }
 
-            if (ImGui::TreeNode("Filesystem")) {
-                auto paths = FileSystem::Get()->getSearchPath();
-                for (auto& path : paths) {
-                    ImGui::TextUnformatted(path.string().c_str());
+            if (ImGui::TreeNode("File System")) {
+                auto fs = FileSystem::Get();
+                if (!fs->getSearchPath().empty()) {
+                    if (ImGui::BeginTable("##search_paths", 1, flags)) {
+                        ImGui::TableSetupColumn("Search Path", ImGuiTableColumnFlags_WidthStretch);
+                        ImGui::TableHeadersRow();
+
+                        for (const auto& path: fs->getSearchPath()) {
+                            ImGui::TableNextRow();
+
+                            ImGui::TableSetColumnIndex(0);
+                            ImGui::TextUnformatted(path.string().c_str());
+                        }
+                        ImGui::EndTable();
+                    }
+                    ImGui::NewLine();
                 }
                 ImGui::TreePop();
             }
 
             if (ImGui::TreeNode("Virtual File System")) {
-                auto paths = VirtialFileSystem::Get()->getSearchPath();
-                for (auto& path : paths) {
-                    ImGui::TextUnformatted(path.string().c_str());
+                auto vfs = VirtualFileSystem::Get();
+                if (!vfs->getMounted().empty()) {
+                    if (ImGui::BeginTable("##mounted_paths", 2, flags)) {
+                        ImGui::TableSetupColumn("Virtual Path", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Physical Path", ImGuiTableColumnFlags_WidthStretch);
+                        ImGui::TableHeadersRow();
+
+                        for (const auto& [virt, phys] : vfs->getMounted()) {
+                            ImGui::TableNextRow();
+
+                            ImGui::TableSetColumnIndex(0);
+                            ImGui::TextUnformatted(virt.string().c_str());
+
+                            ImGui::TableSetColumnIndex(1);
+                            ImGui::TextUnformatted(phys.string().c_str());
+                        }
+                        ImGui::EndTable();
+                    }
+                    ImGui::NewLine();
                 }
                 ImGui::TreePop();
             }
 
-            ImGui::NewLine();
             ImGui::Text("FPS : %5.2i", Time::FramesPerSecond());
             ImGui::Text("Frame Time : %5.2f ms", Time::DeltaTime().asMilliseconds());
             //ImGui::NewLine();

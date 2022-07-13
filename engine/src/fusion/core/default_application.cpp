@@ -32,8 +32,10 @@ DefaultApplication::~DefaultApplication() {
 }
 
 void DefaultApplication::onStart() {
-    FileSystem::Get()->addSearchPath(executablePath);
-    VirtualFileSystem::Get()->mount("EngineShaders", executablePath / "engine" / "assets" / "shaders");
+    LOG_INFO << "Default application starting!";
+
+    //FileSystem::Get()->addSearchPath(executablePath, executablePath.string());
+    VirtualFileSystem::Get()->mount("EngineShaders", "engine"_p / "assets" / "shaders");
 
     deserialise();
 
@@ -113,10 +115,7 @@ void DefaultApplication::openNewProject(const fs::path& path, const std::string&
 
     mountPaths();
 
-    auto sceneManager = SceneManager::Get();
-    sceneManager->enqueueScene("Empty Scene");
-    sceneManager->switchScene(0);
-    sceneManager->applySceneSwitch();
+    SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
 
     serialise();
 
@@ -133,8 +132,6 @@ void DefaultApplication::openProject(const fs::path& path) {
     mountPaths();
 
     deserialise();
-
-    SceneManager::Get()->applySceneSwitch();
 }
 
 void DefaultApplication::serialise() {
@@ -179,9 +176,7 @@ void DefaultApplication::deserialise() {
         projectSettings = {};
         projectSettings.projectVersion = version.string();
 
-        auto sceneManager = SceneManager::Get();
-        sceneManager->enqueueScene("Empty Scene");
-        sceneManager->switchScene(0);
+        SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
 
         LOG_ERROR << "Failed to load project";
         return;

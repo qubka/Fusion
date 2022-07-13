@@ -5,6 +5,7 @@
 #include "fusion/utils/cereal_extention.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 #include <cereal/cereal.hpp>
 #include <cereal/types/vector.hpp>
@@ -59,17 +60,14 @@ namespace fe {
                     cereal::make_nvp("Floating", projectSettings.isFloating),
                     cereal::make_nvp("Fullscreen", projectSettings.isFullscreen),
                     cereal::make_nvp("VSync", projectSettings.isVSync),
-                    cereal::make_nvp("Show Console", projectSettings.isShowConsole)
-            );
-
-            auto sceneManager = SceneManager::Get();
-            archive(cereal::make_nvp("Scene Index", sceneManager->getCurrentSceneIndex()),
-                    cereal::make_nvp("Scenes", SceneManager::Get()->getSceneFilePaths())
+                    cereal::make_nvp("Show Console", projectSettings.isShowConsole),
+                    cereal::make_nvp("Current Scene", SceneManager::Get()->getScene()->getName())
             );
         }
 
         template<typename Archive>
         void load(Archive& archive) {
+            std::string sceneName;
             archive(cereal::make_nvp("Project Version", projectSettings.projectVersion),
                     cereal::make_nvp("Project Root", projectSettings.projectRoot),
                     cereal::make_nvp("Project Name", projectSettings.projectName),
@@ -81,28 +79,20 @@ namespace fe {
                     cereal::make_nvp("Floating", projectSettings.isFloating),
                     cereal::make_nvp("Fullscreen", projectSettings.isFullscreen),
                     cereal::make_nvp("VSync", projectSettings.isVSync),
-                    cereal::make_nvp("Show Console", projectSettings.isShowConsole)
+                    cereal::make_nvp("Show Console", projectSettings.isShowConsole),
+                    cereal::make_nvp("Current Scene", sceneName)
             );
 
             auto sceneManager = SceneManager::Get();
 
-            uint32_t sceneIndex;
-            std::vector<std::string> sceneFilePaths;
-            archive(cereal::make_nvp("Scene Index", sceneIndex),
-                    cereal::make_nvp("Scenes", sceneFilePaths));
-
-            if (sceneFilePaths.empty()) {
-                sceneManager->enqueueScene("Empty Scene");
-                sceneManager->switchScene(0);
+            if (sceneName.empty()) {
+                sceneManager->setScene(std::make_unique<Scene>("Empty Scene"));
             } else {
-                for (auto& filePath : sceneFilePaths) {
-                    auto path = VirtualFileSystem::Get()->resolvePhysicalPath(filePath);
-                    sceneManager->enqueueSceneFromFile(path);
-                }
-                sceneManager->switchScene(sceneIndex);
+                auto scene = std::make_unique<Scene>(sceneName);
+                scene->deserialise();
+                sceneManager->setScene(std::move(scene));
             }
         }
-
 
     protected:
         fs::path executablePath;

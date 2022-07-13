@@ -26,7 +26,7 @@ public:
 
         auto size = fileLoaded.length() + 1;
         auto content = new char[size];
-        strcpy(content, fileLoaded.c_str());
+        std::strcpy(content, fileLoaded.c_str());
 		return new IncludeResult(headerName, content, size, content);
 	}
 
@@ -39,7 +39,7 @@ public:
 
         auto size = fileLoaded.length() + 1;
         auto content = new char[size];
-        strcpy(content, fileLoaded.c_str());
+        std::strcpy(content, fileLoaded.c_str());
 		return new IncludeResult(headerName, content, size, content);
 	}
 

@@ -96,14 +96,15 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
     bool updated = false;
 
     if (files.empty()) {
-        files = FileSystem::GetFilesInPath("", true);
+        //files = FileSystem::GetFilesInPath("", true);
         //LOG_WARNING << "Folder seems to be empty!";
     }
 
     ImGui::TextUnformatted(name.c_str());
     ImGui::NextColumn();
 
-    float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
+    float yPadding = ImGui::GetStyle().FramePadding.y;
+    float lineHeight = ImGui::GetFontSize() + yPadding * 2.0f;
 
     ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{4, 4});
@@ -129,7 +130,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
             ImGui::SameLine();
             ImGui::PushFont(io.Fonts->Fonts[1]);
             ImGui::SetCursorPosX(ImGui::GetFontSize() * 2.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 0.0f, ImGui::GetStyle().FramePadding.y});
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 0.0f, yPadding });
             ImGui::TextUnformatted("Search...");
             ImGui::PopStyleVar();
             ImGui::PopFont();
@@ -171,7 +172,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
         if (ImGui::Button("...", buttonSize)) {
             filter.Clear();
             selected = "";
-            files = FileSystem::GetFilesInPath("", true);
+            //files = FileSystem::GetFilesInPath("", true);
             ImGui::OpenPopup("File Explorer");
         }
     } else {
@@ -200,7 +201,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
     if (ImGui::Button(ICON_MDI_FILE_SEARCH)) {
         filter.Clear();
         selected = "";
-        files = FileSystem::GetFilesInPath("", true);
+        //files = FileSystem::GetFilesInPath("", true);
         ImGui::OpenPopup("File Explorer");
     }
 

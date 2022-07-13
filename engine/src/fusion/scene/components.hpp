@@ -8,62 +8,34 @@
 #include <cereal/cereal.hpp>
 #include <entt/entt.hpp>
 
-#include <uuid.h>
+//#include <uuid.h>
 
-#define ALL_COMPONENTS  TagComponent, RelationshipComponent
-
-
-/*                      IdComponent, \
-                        TagComponent, \
-                        RelationshipComponent, \
-                        TransformComponent, \
-                        CameraComponent, \
-                        MeshComponent
-
-
-                        PointLightComponent, \
-                        DirectionalLightComponent, \
-                        ScriptComponent, \
-                        RigidBodyComponent, \
-                        BoxColliderComponent, \
-                        SphereColliderComponent, \
-                        CapsuleColliderComponent, \
-                        MeshColliderComponent, \
-                        PhysicsMaterialComponent, \
-                        MaterialComponent \
-*/
+#define ALL_COMPONENTS NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, ModelComponent
 
 namespace fe {
-    /*struct IdComponent {
-        uuids::uuid uuid;
+    struct NameComponent {
+        std::string name;
 
-        template<class Archive>
-        void save(Archive& archive) const {
-            archive(cereal::make_nvp("UUID", to_string(uuid)));
-        }
-
-        template<class Archive>
-        void load(Archive& archive) {
-            std::string str;
-            archive(str);
-            uuid = uuids::uuid::from_string(str).value();
-        }
-    };*/
-
-    struct TagComponent {
-        std::string tag;
-
-        std::string& operator*() { return tag; }
-        const std::string& operator*() const { return tag; }
-        operator std::string() const { return tag; }
+        std::string& operator*() { return name; }
+        const std::string& operator*() const { return name; }
+        operator std::string() const { return name; }
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("Tag", tag));
+            archive(cereal::make_nvp("Name", name));
         }
     };
 
-    struct RelationshipComponent {
+    struct ActiveComponent {
+        bool active{ true };
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("Active", active));
+        }
+    };
+
+    struct HierarchyComponent {
         size_t children{ 0 }; //! the number of children for the given entity.
         entt::entity first{ entt::null }; //! the entity identifier of the first child, if any.
         entt::entity prev{ entt::null }; // the previous sibling in the list of children for the parent.
@@ -72,11 +44,11 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("children", children),
-                    cereal::make_nvp("first", first),
-                    cereal::make_nvp("prev", prev),
-                    cereal::make_nvp("next", next),
-                    cereal::make_nvp("parent", parent));
+            archive(cereal::make_nvp("Children", children),
+                    cereal::make_nvp("First", first),
+                    cereal::make_nvp("Prev", prev),
+                    cereal::make_nvp("Next", next),
+                    cereal::make_nvp("Parent", parent));
         }
     };
 
@@ -122,11 +94,6 @@ namespace fe {
     };
     struct DirtyTransformComponent {};
 
-    /*struct BoundsComponent {
-        glm::vec3 min{ -1.0f };
-        glm::vec3 max{ 1.0f };
-    };*/
-
     struct CameraComponent {
         SceneCamera camera;
         bool primary{ true };
@@ -140,8 +107,8 @@ namespace fe {
         }
     };
 
-    struct MeshComponent {
-        std::string path;
+    struct ModelComponent {
+        fs::path path;
         //bool castShadows{ false };
 
         // Storage for runtime
@@ -167,9 +134,14 @@ namespace fe {
 
     struct ScriptComponent {
         std::string name;
-    };*/
 
-    /*struct RigidBodyComponent {
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("Name", name));
+        }
+    };
+
+    struct RigidBodyComponent {
         enum class BodyType { Static = 0, Dynamic = 1 };
         BodyType type{ BodyType::Static };
         //Layer layer;
@@ -192,6 +164,12 @@ namespace fe {
 
         // Storage for runtime
         void* runtimeShape{ nullptr };
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("Extent", extent),
+                    cereal::make_nvp("Trigger", trigger));
+        }
     };
 
     struct SphereColliderComponent {
@@ -201,6 +179,12 @@ namespace fe {
 
         // Storage for runtime
         void* runtimeShape{ nullptr };
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("Radius", radius),
+                    cereal::make_nvp("Trigger", trigger));
+        }
     };
 
     struct CapsuleColliderComponent {
@@ -211,6 +195,13 @@ namespace fe {
 
         // Storage for runtime
         void* runtimeShape{ nullptr };
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("Radius", radius),
+                    cereal::make_nvp("Radius", radius),
+                    cereal::make_nvp("Trigger", trigger));
+        }
     };
 
     struct MeshColliderComponent {
@@ -221,6 +212,13 @@ namespace fe {
 
         // Storage for runtime
         void* runtimeShape{ nullptr };
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("Convex", convex),
+                    cereal::make_nvp("Trigger", trigger),
+                    cereal::make_nvp("Override Mesh", overrideMesh));
+        }
     };
 
     struct PhysicsMaterialComponent {

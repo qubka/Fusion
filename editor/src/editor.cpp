@@ -17,6 +17,7 @@
 #include "panels/content_browser_panel.hpp"
 #include "panels/project_settings_panel.hpp"
 #include "panels/text_edit_panel.hpp"
+#include "panels/hierarchy_panel.hpp"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
@@ -36,22 +37,30 @@ void Editor::onStart() {
 
     Graphics::Get()->setRenderer(std::make_unique<MainRenderer>());
 
-    /*componentIconMap[typeid(TransformComponent)] = ICON_MDI_VECTOR_LINE;
-    componentIconMap[typeid(MeshComponent)] = ICON_FA_CODEPEN;
+    componentIconMap[typeid(TransformComponent)] = ICON_MDI_AXIS_ARROW;
+    componentIconMap[typeid(ModelComponent)] = ICON_MDI_SHAPE;
+    //componentIconMap[typeid(MeshComponent)] = ICON_MDI_SHAPE;
     componentIconMap[typeid(CameraComponent)] = ICON_MDI_CAMERA;
-    componentIconMap[typeid(RigidBodyComponent)] = ICON_MDI_CUBE_OUTLINE;
+    /*componentIconMap[typeid(RigidBodyComponent)] = ICON_MDI_CUBE_OUTLINE;
     componentIconMap[typeid(PhysicsMaterialComponent)] = ICON_FA_TENCENT_WEIBO;
     componentIconMap[typeid(BoxColliderComponent)] = ICON_FA_SQUARE_O;
     componentIconMap[typeid(SphereColliderComponent)] = ICON_FA_CIRCLE_O;
     componentIconMap[typeid(CapsuleColliderComponent)] = ICON_FA_TOGGLE_OFF;
-    componentIconMap[typeid(MaterialComponent)] = ICON_FA_DELICIOUS;*/
+    componentIconMap[typeid(MaterialComponent)] = ICON_MDI_MATERIAL_UI;
+    componentIconMap[typeid(PointLightComponent)] = ICON_MDI_LIGHTBULB;
+    componentIconMap[typeid(DirectionalLightComponent)] = ICON_MDI_SPOTLIGHT_BEAM;
+    componentIconMap[typeid(SoundComponent)] = ICON_MDI_VOLUME_HIGH;
+    componentIconMap[typeid(SpriteComponent)] = ICON_MDI_IMAGE;
+    componentIconMap[typeid(LuaScriptComponent)] = ICON_MDI_SCRIPT;
+    componentIconMap[typeid(EnvironmentComponent)] = ICON_MDI_EARTH;*/
 
-   panels.push_back(std::make_unique<ApplicationInfoPanel>(this));
-   panels.push_back(std::make_unique<ConsolePanel>(this));
-   panels.push_back(std::make_unique<ContentBrowserPanel>(this));
-   panels.push_back(std::make_unique<ProjectSettingsPanel>(this));
+    panels.push_back(std::make_unique<ApplicationInfoPanel>(this));
+    panels.push_back(std::make_unique<ConsolePanel>(this));
+    panels.push_back(std::make_unique<ContentBrowserPanel>(this));
+    panels.push_back(std::make_unique<ProjectSettingsPanel>(this));
+    panels.push_back(std::make_unique<HierarchyPanel>(this));
 
-   editorSettings.showImGuiDemo = false;
+    editorSettings.showImGuiDemo = false;
 }
 
 void Editor::onUpdate() {
@@ -272,11 +281,16 @@ void Editor::drawMenuBar() {
         }
 
         if (ImGui::BeginMenu("Scenes")) {
-            auto manager = SceneManager::Get();
-
-            for (auto name : manager->getSceneNames()) {
-                if (ImGui::MenuItem(name)) {
-                    manager->switchScene(name);
+            auto scenePath = projectSettings.projectRoot / "assets" / "scenes";
+            if (fs::exists(scenePath)) {
+                for (const auto& entry : fs::directory_iterator(scenePath)) {
+                    const auto& path = entry.path();
+                    if (FileFormat::IsSceneFile(path)) {
+                        auto name = path.filename().replace_extension().string();
+                        if (ImGui::MenuItem(name.c_str())) {
+                            SceneManager::Get()->setScene(std::make_unique<Scene>(name));
+                        }
+                    }
                 }
             }
 
@@ -288,6 +302,8 @@ void Editor::drawMenuBar() {
 
             ImGui::EndMenu();
         }
+
+        ImGuiStyle& style = ImGui::GetStyle();
 
         if (ImGui::BeginMenu("Window")) {
             auto window = DeviceManager::Get()->getWindow(0);
@@ -313,8 +329,6 @@ void Editor::drawMenuBar() {
             }
 
             ImGui::Separator();
-
-            ImGuiStyle& style = ImGui::GetStyle();
 
             if (ImGui::BeginMenu("Style")) {
                 if (ImGui::MenuItem("Dark", "", editorSettings.theme == ImGuiUtils::Theme::Dark)) {
@@ -399,7 +413,7 @@ void Editor::drawMenuBar() {
 
         //_____________________________________________________________________________________//
 
-        ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (1.5f * (ImGui::GetFontSize() + ImGui::GetStyle().ItemSpacing.x)));
+        ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (1.5f * (ImGui::GetFontSize() + style.ItemSpacing.x)));
 
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.1f, 0.2f, 0.7f, 0.0f});
 
@@ -472,7 +486,7 @@ void Editor::drawMenuBar() {
         }
 
         auto size = ImGui::CalcTextSize("%.2f ms (%.i FPS)");
-        ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - size.x - ImGui::GetStyle().ItemSpacing.x * 2.0f);
+        ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - size.x - style.ItemSpacing.x * 2.0f);
 
         ImGui::Text("%.2f ms (%.i FPS)", Time::DeltaTime().asMilliseconds(), Time::FramesPerSecond());
 
@@ -575,7 +589,7 @@ void Editor::drawMenuBar() {
         ImGui::Separator();
 
         if (ImGui::Button("OK", buttonSize)) {
-            sceneManager->getCurrentScene()->serialise(projectSettings.projectRoot / "assets" / "scenes");
+            sceneManager->getScene()->serialise();
             ImGui::CloseCurrentPopup();
         }
         ImGui::SetItemDefaultFocus();
@@ -588,24 +602,23 @@ void Editor::drawMenuBar() {
 
     if (ImGui::BeginPopupModal("New Scene", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         if (ImGui::Button("Save Current Scene Changes")) {
-            sceneManager->getCurrentScene()->serialise(projectSettings.projectRoot / "assets" / "scenes");
+            sceneManager->getScene()->serialise();
         }
 
         ImGui::Text("Create New Scene?\n\n");
         ImGui::Separator();
 
         if (ImGui::Button("OK", buttonSize)) {
-            std::string sceneName = "NewScene";
+            /*std::string sceneName = "NewScene";
             int sameNameCount = 0;
             auto sceneNames = sceneManager->getSceneNames();
 
-            while (FileSystem::ExistsInPath(projectSettings.projectRoot / "assets" / "scenes" / (sceneName + ".fsn")) || std::find(sceneNames.begin(), sceneNames.end(), sceneName.c_str()) != sceneNames.end()) {
+            while (FileSystem::ExistsInPath("Scenes" / (sceneName + ".fsn"))) {
                 sameNameCount++;
-                sceneName = "NewScene(" + std::to_string(sameNameCount) + ")";
+                sceneName = "NewScene(" + String::ToString(sameNameCount) + ")";
             }
 
-            sceneManager->enqueueScene(sceneName);
-            sceneManager->switchScene(sceneManager->sceneCount() - 1);
+            sceneManager->setScene(std::make_unique<Scene>());*/
 
             ImGui::CloseCurrentPopup();
         }
@@ -625,7 +638,7 @@ void Editor::drawMenuBar() {
         ImGui::Separator();
 
         if (ImGui::Button("OK", buttonSize)) {
-            sceneManager->switchScene(sceneManager->getCurrentSceneIndex());
+            sceneManager->getScene()->deserialise();
 
             ImGui::CloseCurrentPopup();
         }

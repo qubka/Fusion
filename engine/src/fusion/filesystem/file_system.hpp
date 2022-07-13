@@ -3,6 +3,8 @@
 #include "fusion/core/module.hpp"
 #include "fusion/utils/date_time.hpp"
 
+#define PHYSFS 0
+
 namespace fe {
     inline fs::path operator""_p(const char* str, size_t len) { return fs::path{std::string{str, len}}; }
     inline fs::path strip_root(fs::path p) {
@@ -11,6 +13,7 @@ namespace fe {
         return p.lexically_relative(*p.begin());
     }
 
+#if PHYSFS
     enum class FileType {
         Regular,      /**< a normal file */
         Directory,    /**< a directory */
@@ -34,6 +37,7 @@ namespace fe {
         Symlink = 8,
     };
     BITMASK_DEFINE_MAX_ELEMENT(FileAttributes, Symlink);
+#endif
 
     class FileSystem : public Module::Registrar<FileSystem> {
         using SimpleHandler = std::function<void(const uint8_t*, size_t)>;
@@ -41,6 +45,7 @@ namespace fe {
         FileSystem();
         ~FileSystem() override;
 
+#if PHYSFS
         /**
          * Adds an file search path.
          * @param path The path to add.
@@ -63,12 +68,6 @@ namespace fe {
         void clearSearchPath();
 
         /**
-         * Get the current search path.
-         * @return Array of null-terminated paths.
-         */
-        const std::vector<fs::path>& getSearchPath();
-
-        /**
          * Gets if the path is found in one of the search paths.
          * @param path The path to look for.
          * @return If the path is found in one of the searches.
@@ -89,6 +88,41 @@ namespace fe {
          * @return True on the success, false otherwise.
          */
         static bool SetWriteDirectoryInPath(const fs::path& path);
+
+        /**
+         * Get a file listing of a search path's directory.
+         * @param path The path to search.
+         * @param recursive If paths will be recursively searched.
+         * @return The files found.
+         */
+        static std::vector<fs::path> GetFilesInPath(const fs::path& path, bool recursive = false);
+
+        /**
+         * Determine if a file in the search path is really a directory.
+         * @param path The path to the file.
+         * @return True if path has a directory.
+         */
+        static bool IsDirectoryInPath(const fs::path& path);
+
+        /**
+         * Gets the FileStats of the file on the search path.
+         * @param path The path to the file.
+         * @return The FileStats of the file on the path.
+         */
+        static FileStats GetStatsInPath(const fs::path& path);
+
+        /**
+         * Gets the FileAttributes of the file on the search path.
+         * @param path The path to the file.
+         * @return The FileAttributes of the file on the path.
+         */
+        static bitmask::bitmask<FileAttributes> GetAttributesInPath(const fs::path& path);
+#endif
+        /**
+         * Get the current search path.
+         * @return Array of null-terminated paths.
+         */
+        const std::vector<fs::path>& getSearchPath() const { return searchPaths; };
 
         /**
          * Reads a file found by real or partial path with a lambda.
@@ -127,35 +161,6 @@ namespace fe {
          * @return True on the success, false otherwise.
          */
         static bool WriteText(const fs::path& filepath, const std::string& text);
-
-        /**
-         * Get a file listing of a search path's directory.
-         * @param path The path to search.
-         * @param recursive If paths will be recursively searched.
-         * @return The files found.
-         */
-        static std::vector<fs::path> GetFilesInPath(const fs::path& path, bool recursive = false);
-
-        /**
-         * Determine if a file in the search path is really a directory.
-         * @param path The path to the file.
-         * @return True if path has a directory.
-         */
-        static bool IsDirectoryInPath(const fs::path& path);
-
-        /**
-         * Gets the FileStats of the file on the search path.
-         * @param path The path to the file.
-         * @return The FileStats of the file on the path.
-         */
-        static FileStats GetStatsInPath(const fs::path& path);
-
-        /**
-         * Gets the FileAttributes of the file on the search path.
-         * @param path The path to the file.
-         * @return The FileAttributes of the file on the path.
-         */
-        static bitmask::bitmask<FileAttributes> GetAttributesInPath(const fs::path& path);
 
         /**
          * Gets the file extention in the lowercase format.
