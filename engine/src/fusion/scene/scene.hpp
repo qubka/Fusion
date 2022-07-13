@@ -118,10 +118,25 @@ namespace fe {
          */
         bool isRuntime() { return runtime; }
 
+        /**
+         * Creates an entity with default components.
+         * @param name Name string.
+         * @return The Entity handle that you can use to access the entity.
+         */
         entt::entity createEntity(std::string name = "");
 
+        /**
+         * Destroys an entity.
+         * @param entity The Entity handle of the entity to destroy.
+         */
         void destroyEntity(entt::entity entity);
 
+        /**
+         * Clones an entity.
+         * @param entity The Entity handle of the entity to clone.
+         * @param parent Optional parent of created entity.
+         * @return The Entity handle of the entity to destroy.
+         */
         entt::entity duplicateEntity(entt::entity entity, entt::entity parent = entt::null);
 
         /**

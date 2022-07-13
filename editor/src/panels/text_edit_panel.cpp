@@ -18,24 +18,24 @@ TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()>&& callback
     auto extension = FileSystem::GetExtension(filePath);
 
     /*if (extension == "lua" || extension == "Lua") {
-        auto lang = TextEditor::LanguageDefinition::Lua();
+        auto lang = ImGui::TextEditor::LanguageDefinition::Lua();
         textEditor.SetLanguageDefinition(lang);
 
         auto& customIdentifiers = LuaManager::GetIdentifiers();
-        TextEditor::Identifiers identifiers;
+        ImGui::TextEditor::Identifiers identifiers;
 
         for (auto& k: customIdentifiers) {
-            TextEditor::Identifier id;
+            ImGui::TextEditor::Identifier id;
             id.mDeclaration = "Engine function";
             identifiers.insert(std::make_pair(k, id));
         }
 
         textEditor.SetCustomIdentifiers(identifiers);
     }*/ if (extension == "cpp") {
-        auto lang = TextEditor::LanguageDefinition::CPlusPlus();
+        auto lang = ImGui::TextEditor::LanguageDefinition::CPlusPlus();
         textEditor.SetLanguageDefinition(lang);
     } else if (extension == "glsl" || extension == "vert" || extension == "frag") {
-        auto lang = TextEditor::LanguageDefinition::GLSL();
+        auto lang = ImGui::TextEditor::LanguageDefinition::GLSL();
         textEditor.SetLanguageDefinition(lang);
     }
 
@@ -59,7 +59,7 @@ void TextEditPanel::onImGui() {
 
     auto cpos = textEditor.GetCursorPosition();
     ImGui::SetWindowSize(ImVec2{800, 600}, ImGuiCond_FirstUseEver);
-    if (ImGui::Begin(name.c_str(), &enabled, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar)) {
+    if (ImGui::Begin(title.c_str(), &enabled, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar)) {
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Save", "CTRL+S")) {
@@ -93,7 +93,7 @@ void TextEditPanel::onImGui() {
                 ImGui::Separator();
 
                 if (ImGui::MenuItem("Select all", nullptr, nullptr))
-                    textEditor.SetSelection(TextEditor::Coordinates(), TextEditor::Coordinates(textEditor.GetTotalLines(), 0));
+                    textEditor.SetSelection(ImGui::TextEditor::Coordinates(), ImGui::TextEditor::Coordinates(textEditor.GetTotalLines(), 0));
 
                 if (ImGui::MenuItem("Close", nullptr, nullptr))
                     onClose();
@@ -103,11 +103,11 @@ void TextEditPanel::onImGui() {
 
             if (ImGui::BeginMenu("View")) {
                 if (ImGui::MenuItem("Dark palette"))
-                    textEditor.SetPalette(TextEditor::GetDarkPalette());
+                    textEditor.SetPalette(ImGui::TextEditor::GetDarkPalette());
                 if (ImGui::MenuItem("Light palette"))
-                    textEditor.SetPalette(TextEditor::GetLightPalette());
+                    textEditor.SetPalette(ImGui::TextEditor::GetLightPalette());
                 if (ImGui::MenuItem("Retro blue palette"))
-                    textEditor.SetPalette(TextEditor::GetRetroBluePalette());
+                    textEditor.SetPalette(ImGui::TextEditor::GetRetroBluePalette());
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();

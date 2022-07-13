@@ -11,11 +11,11 @@ namespace fe {
     class Scene;
     class EditorPanel {
     public:
-        EditorPanel(std::string name, std::string simpleName, Editor* editor) : name{std::move(name)}, simpleName{std::move(simpleName)}, editor{editor} {};
+        EditorPanel(std::string title, std::string name, Editor* editor) : title{std::move(title)}, name{std::move(name)}, editor{editor} {};
         virtual ~EditorPanel() = default;
 
+        const std::string& getTitle() const { return title; }
         const std::string& getName() const { return name; }
-        const std::string& getSimpleName() const { return simpleName; }
 
         virtual void onImGui() = 0;
         virtual void onNewScene(Scene* scene) {}
@@ -29,8 +29,8 @@ namespace fe {
         void setEditor(Editor* ptr) { editor = ptr; }
 
     protected:
+        std::string title;
         std::string name;
-        std::string simpleName;
         Editor* editor;
         bool enabled{ true };
     };

@@ -18,6 +18,7 @@
 #include "panels/project_settings_panel.hpp"
 #include "panels/text_edit_panel.hpp"
 #include "panels/hierarchy_panel.hpp"
+#include "panels/inspector_panel.hpp"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
@@ -53,12 +54,14 @@ void Editor::onStart() {
     componentIconMap[typeid(SpriteComponent)] = ICON_MDI_IMAGE;
     componentIconMap[typeid(LuaScriptComponent)] = ICON_MDI_SCRIPT;
     componentIconMap[typeid(EnvironmentComponent)] = ICON_MDI_EARTH;*/
+    componentIconMap[typeid(Editor)] = ICON_MDI_SQUARE;
 
     panels.push_back(std::make_unique<ApplicationInfoPanel>(this));
     panels.push_back(std::make_unique<ConsolePanel>(this));
     panels.push_back(std::make_unique<ContentBrowserPanel>(this));
     panels.push_back(std::make_unique<ProjectSettingsPanel>(this));
     panels.push_back(std::make_unique<HierarchyPanel>(this));
+    panels.push_back(std::make_unique<InspectorPanel>(this));
 
     editorSettings.showImGuiDemo = false;
 }
@@ -127,7 +130,7 @@ void Editor::beginDockSpace(bool gameFullScreen) {
 
         if (editorSettings.fullScreenSceneView) {
             for (auto& panel : panels) {
-                if (panel->getSimpleName() != "Game" && panel->isEnabled()) {
+                if (panel->getName() != "Game" && panel->isEnabled()) {
                     panel->setEnabled(false);
                     hiddenPanels.push_back(panel.get());
                 }
@@ -268,7 +271,7 @@ void Editor::drawMenuBar() {
 
         if (ImGui::BeginMenu("Panels")) {
             for (auto& panel : panels) {
-                if (ImGui::MenuItem(panel->getName().c_str(), "", &panel->Enabled(), true)) {
+                if (ImGui::MenuItem(panel->getTitle().c_str(), "", &panel->Enabled(), true)) {
                     panel->setEnabled(true);
                 }
             }
@@ -713,7 +716,7 @@ void Editor::removePanel(EditorPanel* panel) {
 
 void Editor::openTextFile(const fs::path& filepath, std::function<void()>&& callback) {
     for (const auto& [i, p] : enumerate(panels)) {
-        if (p->getSimpleName() == "TextEdit") {
+        if (p->getName() == "TextEdit") {
             panels.erase(panels.begin() + i);
             break;
         }
@@ -724,7 +727,7 @@ void Editor::openTextFile(const fs::path& filepath, std::function<void()>&& call
 
 EditorPanel* Editor::getTextEditPanel() {
     for (auto& panel : panels) {
-        if (panel->getSimpleName() == "TextEdit") {
+        if (panel->getName() == "TextEdit") {
             return panel.get();
         }
     }

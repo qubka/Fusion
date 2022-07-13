@@ -76,7 +76,7 @@ namespace fe {
         bool getCutCopyEntity() const { return cutCopyEntity; }
 
         const std::unordered_map<std::type_index, std::string>& getComponentIconMap() const { return componentIconMap; }
-        bool setComponentIcon(const std::type_index& index, std::string& out) const {
+        bool getComponentIcon(const std::type_index& index, std::string& out) const {
             if (auto icon = componentIconMap.find(index); icon != componentIconMap.end()) {
                 out = icon->second;
                 return true;

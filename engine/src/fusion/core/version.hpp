@@ -38,7 +38,7 @@ namespace fe {
 
         std::string string() const {
             std::stringstream ss;
-            ss << variant << "." << major << "." << minor << "." << patch;
+            ss << static_cast<long>(variant) << "." <<  static_cast<long>(major) << "." <<  static_cast<long>(minor) << "." <<  static_cast<long>(patch);
             return ss.str();
         }
 

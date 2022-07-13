@@ -7,7 +7,9 @@
 #include "ImTextEditor.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui.h" // for imGui::GetCurrentWindow()
+#include <imgui.h> // for imGui::GetCurrentWindow()
+
+using namespace ImGui;
 
 // TODO
 // - multiline comments vs single-line: latter is blocking start of a ML

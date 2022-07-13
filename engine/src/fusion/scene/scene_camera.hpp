@@ -18,33 +18,24 @@ namespace fe {
 
         //void setViewportSize(uint32_t width, uint32_t height);
 
-        float getPerspectiveVerticalFOV() const { return perspectiveFOV; }
-        void setPerspectiveVerticalFOV(float verticalFov) { perspectiveFOV = verticalFov; recalculateProjection(); }
-        float getPerspectiveNearClip() const { return perspectiveNear; }
-        void setPerspectiveNearClip(float nearClip) { perspectiveNear = nearClip; recalculateProjection(); }
-        float getPerspectiveFarClip() const { return perspectiveFar; }
-        void setPerspectiveFarClip(float farClip) { perspectiveFar = farClip; recalculateProjection(); }
-
-        float getOrthographicSize() const { return orthographicSize; }
-        void setOrthographicSize(float size) { orthographicSize = size; recalculateProjection(); }
-        float getOrthographicNearClip() const { return orthographicNear; }
-        void setOrthographicNearClip(float nearClip) { orthographicNear = nearClip; recalculateProjection(); }
-        float getOrthographicFarClip() const { return orthographicFar; }
-        void setOrthographicFarClip(float farClip) { orthographicFar = farClip; recalculateProjection(); }
+        float getFOV() const { return fov; } // used as size for orthographic
+        void setFOV(float verticalFov) { fov = verticalFov; recalculateProjection(); }
+        float getNearClip() const { return nearClip; }
+        void setNearClip(float near) { nearClip = near; recalculateProjection(); }
+        float getFarClip() const { return farClip; }
+        void setFarClip(float far) { farClip = far; recalculateProjection(); }
 
         ProjectionType getProjectionType() const { return projectionType; }
         void setProjectionType(ProjectionType type) { projectionType = type; recalculateProjection(); }
 
+        bool isPerspective() const { return projectionType == ProjectionType::Perspective; }
+
         template<typename Archive>
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("Projection Type", projectionType),
-                    cereal::make_nvp("Projection Matrix", projectionMatrix),
-                    cereal::make_nvp("Perspective FOV", perspectiveFOV),
-                    cereal::make_nvp("Perspective Near", perspectiveNear),
-                    cereal::make_nvp("Perspective Far", perspectiveFar),
-                    cereal::make_nvp("Orthographic Size", orthographicSize),
-                    cereal::make_nvp("Orthographic Near", orthographicNear),
-                    cereal::make_nvp("Orthographic Far", orthographicFar),
+                    cereal::make_nvp("Fov", fov),
+                    cereal::make_nvp("Near Clip", nearClip),
+                    cereal::make_nvp("Far CLip", farClip),
                     cereal::make_nvp("Aspect Ratio", aspectRatio));
         }
 
@@ -52,17 +43,12 @@ namespace fe {
         void recalculateProjection();
 
     private:
-        ProjectionType projectionType{ ProjectionType::Orthographic };
+        ProjectionType projectionType{ ProjectionType::Perspective };
         glm::mat4 projectionMatrix{ 1.0f };
 
-        float perspectiveFOV{ glm::radians(45.0f) };
-        float perspectiveNear{ 0.01f };
-        float perspectiveFar{ 1000.0f };
-
-        float orthographicSize{ 10.0f };
-        float orthographicNear{ -1.0f };
-        float orthographicFar{ 1.0f };
-
-        float aspectRatio{ 0.0f };
+        float fov{ 35.0f }; // vertical field of view in degrees
+        float aspectRatio{ 1.0f };
+        float nearClip{ 0.1f };
+        float farClip{ 1000.f };
     };
 }

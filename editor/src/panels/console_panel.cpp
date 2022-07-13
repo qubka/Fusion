@@ -23,7 +23,7 @@ ConsolePanel::~ConsolePanel() {
 void ConsolePanel::onImGui() {
     auto flags = ImGuiWindowFlags_NoCollapse;
     ImGui::SetNextWindowSize(ImVec2{640, 480}, ImGuiCond_FirstUseEver);
-    ImGui::Begin(name.c_str(), &enabled, flags);
+    ImGui::Begin(title.c_str(), &enabled, flags);
     {
         renderHeader();
         ImGui::Separator();

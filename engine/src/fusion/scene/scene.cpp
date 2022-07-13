@@ -6,6 +6,7 @@
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
 
+#include <entt/entt.hpp>
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
@@ -13,7 +14,7 @@
 using namespace fe;
 
 Scene::Scene(std::string name) : name{std::move(name)} {
-
+    HierarchySystem::Init(registry);
 }
 
 /*Scene::Scene(const Scene& other) {
@@ -90,7 +91,8 @@ void Scene::clearEntities() {
 
 entt::entity Scene::createEntity(std::string name) {
     auto entity = registry.create();
-    registry.emplace<TransformComponent>(entity);
+    registry.emplace<IdComponent>(entity);
+    //registry.emplace<TransformComponent>(entity);
 
     if (name.empty())
         name = "Empty Entity";
@@ -193,6 +195,7 @@ void Scene::deserialise(bool binary) {
             LOG_ERROR << "No saved scene file found: " << filepath;
             return;
         }
+
         try {
             std::string data = FileSystem::ReadText(filepath);
             std::istringstream is;

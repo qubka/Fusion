@@ -20,7 +20,7 @@ ApplicationInfoPanel::~ApplicationInfoPanel() {
 
 void ApplicationInfoPanel::onImGui() {
     auto flags = ImGuiWindowFlags_NoCollapse;
-    ImGui::Begin(name.c_str(), &enabled, flags);
+    ImGui::Begin(title.c_str(), &enabled, flags);
     {
         static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
                                        | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_NoSavedSettings;

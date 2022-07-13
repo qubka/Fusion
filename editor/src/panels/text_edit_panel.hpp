@@ -17,7 +17,7 @@ namespace fe {
         void setErrors(const std::map<int, std::string>& errors);
 
     private:
-        TextEditor textEditor;
+        ImGui::TextEditor textEditor;
         fs::path filePath;
         std::function<void()> callback;
     };
