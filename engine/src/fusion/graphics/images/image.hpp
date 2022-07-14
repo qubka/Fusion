@@ -50,10 +50,15 @@ namespace fe {
         VkFilter getFilter() const { return filter; }
         VkSamplerAddressMode getAddressMode() const { return addressMode; }
         VkImageLayout getLayout() const { return layout; }
-        const VkImage& getImage() { return image; }
-        const VkDeviceMemory& getMemory() { return memory; }
+        const VkImage& getImage() const { return image; }
+        const VkDeviceMemory& getMemory() const { return memory; }
         const VkSampler& getSampler() const { return sampler; }
         const VkImageView& getView() const { return view; }
+
+        VkImage& getImage() { return image; }
+        VkDeviceMemory& getMemory() { return memory; }
+
+        operator const VkImage&() const { return image; }
 
         static uint32_t getMipLevels(const VkExtent3D& extent);
 

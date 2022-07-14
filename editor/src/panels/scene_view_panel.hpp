@@ -23,5 +23,9 @@ namespace fe {
         //SharedPtr<Graphics::Texture2D> m_GameViewTexture = nullptr;
         //Scene* currentScene{ nullptr };
         //uint32_t m_Width, m_Height;
+
+        std::unique_ptr<Image2d> output;
+        glm::uvec2 lastSize{ UINT32_MAX };
+        //float outputScale{ 1.0f };
     };
 }

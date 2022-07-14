@@ -1,5 +1,5 @@
 #include "editor.hpp"
-#include "main_renderer.hpp"
+#include "editor_renderer.hpp"
 
 #include "fusion/core/engine.hpp"
 #include "fusion/core/time.hpp"
@@ -37,7 +37,7 @@ Editor::~Editor() {
 void Editor::onStart() {
     DefaultApplication::onStart();
 
-    Graphics::Get()->setRenderer(std::make_unique<MainRenderer>());
+    Graphics::Get()->setRenderer(std::make_unique<EditorRenderer>());
 
     componentIconMap[typeid(TransformComponent)] = ICON_MDI_AXIS_ARROW;
     componentIconMap[typeid(ModelComponent)] = ICON_MDI_SHAPE;
