@@ -104,7 +104,7 @@ namespace fe {
 
         const Shader* shader{ nullptr };
         std::unique_ptr<DescriptorSet> descriptorSet;
-        std::map<std::string, DescriptorValue> descriptors;
+        std::unordered_map<std::string, DescriptorValue> descriptors;
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         bool pushDescriptors{ false };
         bool changed{ false };
