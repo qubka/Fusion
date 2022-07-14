@@ -23,7 +23,7 @@ void HierarchyPanel::onImGui() {
     selectUp = !!window->getKey(Key::Up);
     selectDown = !!window->getKey(Key::Down);
 
-    ImGui::Begin(title.c_str(), &enabled, flags);
+    ImGui::Begin(title.c_str(), &active, flags);
     {
         auto scene = SceneManager::Get()->getScene();
         if (!scene) {

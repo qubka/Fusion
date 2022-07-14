@@ -21,9 +21,9 @@ namespace fe {
         virtual void onNewScene(Scene* scene) {}
         virtual void onNewProject() {}
 
-        bool& Enabled() { return enabled; }
-        bool isEnabled() const { return enabled; }
-        void setEnabled(bool flag) { enabled = flag; }
+        bool& Active() { return active; }
+        bool isActive() const { return active; }
+        void setActive(bool flag) { active = flag; }
 
         Editor* getEditor() { return editor; }
         void setEditor(Editor* ptr) { editor = ptr; }
@@ -32,6 +32,6 @@ namespace fe {
         std::string title;
         std::string name;
         Editor* editor;
-        bool enabled{ true };
+        bool active{ true };
     };
 }

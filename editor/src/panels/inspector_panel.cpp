@@ -91,7 +91,7 @@ InspectorPanel::~InspectorPanel() {
 void InspectorPanel::onImGui() {
     auto selected = editor->getSelected();
 
-    if (ImGui::Begin(title.c_str(), &enabled)) {
+    if (ImGui::Begin(title.c_str(), &active)) {
         auto scene = SceneManager::Get()->getScene();
         if (!scene) {
             editor->setSelected(entt::null);

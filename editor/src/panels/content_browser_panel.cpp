@@ -26,7 +26,7 @@ ContentBrowserPanel::~ContentBrowserPanel() {
 
 void ContentBrowserPanel::onImGui() {
     auto flags = ImGuiWindowFlags_NoCollapse;
-    ImGui::Begin(title.c_str(), &enabled, flags);
+    ImGui::Begin(title.c_str(), &active, flags);
     {
         auto windowSize = ImGui::GetWindowSize();
         bool vertical = windowSize.y > windowSize.x;

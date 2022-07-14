@@ -16,7 +16,7 @@ ProjectSettingsPanel::~ProjectSettingsPanel() {
 void ProjectSettingsPanel::onImGui() {
     auto flags = ImGuiWindowFlags_NoCollapse;
     ImGui::SetNextWindowSize(ImVec2{640, 480}, ImGuiCond_FirstUseEver);
-    ImGui::Begin(title.c_str(), &enabled, flags);
+    ImGui::Begin(title.c_str(), &active, flags);
     {
         auto window = DeviceManager::Get()->getWindow(0);
 

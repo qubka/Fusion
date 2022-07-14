@@ -76,7 +76,7 @@ void Editor::onImGui() {
     drawMenuBar();
 
     for (auto& panel : panels) {
-        if (panel->isEnabled()) {
+        if (panel->isActive()) {
             panel->onImGui();
         }
     }
@@ -130,14 +130,14 @@ void Editor::beginDockSpace(bool gameFullScreen) {
 
         if (editorSettings.fullScreenSceneView) {
             for (auto& panel : panels) {
-                if (panel->getName() != "Game" && panel->isEnabled()) {
-                    panel->setEnabled(false);
+                if (panel->getName() != "Game" && panel->isActive()) {
+                    panel->setActive(false);
                     hiddenPanels.push_back(panel.get());
                 }
             }
         } else {
             for (auto& panel: hiddenPanels) {
-                panel->setEnabled(true);
+                panel->setActive(true);
             }
 
             hiddenPanels.clear();
@@ -271,8 +271,8 @@ void Editor::drawMenuBar() {
 
         if (ImGui::BeginMenu("Panels")) {
             for (auto& panel : panels) {
-                if (ImGui::MenuItem(panel->getTitle().c_str(), "", &panel->Enabled(), true)) {
-                    panel->setEnabled(true);
+                if (ImGui::MenuItem(panel->getTitle().c_str(), "", &panel->Active(), true)) {
+                    panel->setActive(true);
                 }
             }
 
