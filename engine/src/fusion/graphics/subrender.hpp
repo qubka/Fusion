@@ -7,6 +7,7 @@ namespace fe {
      * @brief Represents a render pipeline that is used to render a type of pipeline.
      */
     class Subrender {
+        //friend class Renderer;
     public:
         /**
          * Creates a new render pipeline.
@@ -30,12 +31,29 @@ namespace fe {
         const Pipeline::Stage& getStage() const { return stage; }
 
         bool isEnabled() const { return enabled; }
-        void setEnabled(bool flag) { enabled = flag; }
+        void setEnabled(bool flag) {
+            if (enabled == flag)
+                return;
+            enabled = flag;
+            if (enabled)
+                onEnabled();
+            else
+                onDisabled();
+        }
 
-    private:
+    protected:
+        /**
+         * @brief Called when the renderer is enabled.
+         */
+        virtual void onEnabled() {};
+
+        /**
+         * @brief Called when the renderer is disabled.
+         */
+        virtual void onDisabled() {};
+
+    protected:
         bool enabled{ true };
         Pipeline::Stage stage;
     };
-
-    //template class TypeInfo<Subrender>;
 }
