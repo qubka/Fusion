@@ -642,7 +642,9 @@ void Editor::drawMenuBar() {
         ImGui::Separator();
 
         if (ImGui::Button("OK", buttonSize)) {
-            SceneManager::Get()->getScene()->deserialise();
+            auto sceneManager = SceneManager::Get()->getScene();
+            sceneManager->clearEntities();
+            sceneManager->deserialise();
 
             ImGui::CloseCurrentPopup();
         }

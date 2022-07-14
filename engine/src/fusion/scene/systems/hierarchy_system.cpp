@@ -49,14 +49,14 @@ void HierarchySystem::reparent(entt::entity entity, entt::entity parent, Hierarc
 }
 
 bool HierarchySystem::isParent(entt::entity entity, entt::entity child) {
-    if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(child)) {
-        auto parent = hierarchyComponent->parent;
+    if (auto hierarchy = registry.try_get<HierarchyComponent>(child)) {
+        auto parent = hierarchy->parent;
         while (parent != entt::null) {
             if (parent == entity) {
                 return true;
             } else {
-                hierarchyComponent = registry.try_get<HierarchyComponent>(parent);
-                parent = hierarchyComponent ? hierarchyComponent->parent : entt::null;
+                hierarchy = registry.try_get<HierarchyComponent>(parent);
+                parent = hierarchy ? hierarchy->parent : entt::null;
             }
         }
     }
@@ -66,28 +66,28 @@ bool HierarchySystem::isParent(entt::entity entity, entt::entity child) {
 
 void HierarchySystem::setParent(entt::entity entity, entt::entity parent) {
     bool acceptable = false;
-    auto hierarchyComponent = registry.try_get<HierarchyComponent>(entity);
-    if (hierarchyComponent != nullptr) {
-        acceptable = parent != entity && (!isParent(parent, entity)) && (hierarchyComponent->parent != entity);
+    auto hierarchy = registry.try_get<HierarchyComponent>(entity);
+    if (hierarchy != nullptr) {
+        acceptable = parent != entity && (!isParent(parent, entity)) && (hierarchy->parent != entity);
     } else
         acceptable = parent != entity;
 
     if (!acceptable)
         return;
 
-    if (hierarchyComponent)
-        reparent(entity, parent, *hierarchyComponent);
+    if (hierarchy)
+        reparent(entity, parent, *hierarchy);
     else {
         registry.emplace<HierarchyComponent>(entity, parent);
     }
 }
 
 void HierarchySystem::destroyParent(entt::entity entity) {
-    if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(entity)) {
-        auto child = hierarchyComponent->first;
+    if (auto hierarchy = registry.try_get<HierarchyComponent>(entity)) {
+        auto child = hierarchy->first;
         while (child != entt::null) {
-            hierarchyComponent = registry.try_get<HierarchyComponent>(child);
-            auto next = hierarchyComponent ? hierarchyComponent->next : entt::null;
+            hierarchy = registry.try_get<HierarchyComponent>(child);
+            auto next = hierarchy ? hierarchy->next : entt::null;
             destroyParent(child);
             child = next;
         }
@@ -98,13 +98,13 @@ void HierarchySystem::destroyParent(entt::entity entity) {
 std::vector<entt::entity> HierarchySystem::getChildren(entt::entity entity) {
     std::vector<entt::entity> children;
 
-    if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(entity)) {
-        auto child = hierarchyComponent->first;
+    if (auto hierarchy = registry.try_get<HierarchyComponent>(entity)) {
+        auto child = hierarchy->first;
         while (child != entt::null && registry.valid(child)) {
             children.push_back(child);
-            hierarchyComponent = registry.try_get<HierarchyComponent>(child);
-            if (hierarchyComponent)
-                child = hierarchyComponent->next;
+            hierarchy = registry.try_get<HierarchyComponent>(child);
+            if (hierarchy)
+                child = hierarchy->next;
         }
     }
 
@@ -119,15 +119,15 @@ void HierarchySystem::OnConstruct(entt::registry& registry, entt::entity entity)
             parentHierarchy.first = entity;
         } else {
             // get last children
-            auto prevEntity = parentHierarchy.first;
-            auto current = registry.try_get<HierarchyComponent>(prevEntity);
-            while (current != nullptr && current->next != entt::null) {
-                prevEntity = current->next;
-                current = registry.try_get<HierarchyComponent>(prevEntity);
+            auto prev = parentHierarchy.first;
+            auto currentHierarchy = registry.try_get<HierarchyComponent>(prev);
+            while (currentHierarchy != nullptr && currentHierarchy->next != entt::null) {
+                prev = currentHierarchy->next;
+                currentHierarchy = registry.try_get<HierarchyComponent>(prev);
             }
             // add new
-            current->next = entity;
-            hierarchy.prev = prevEntity;
+            currentHierarchy->next = entity;
+            hierarchy.prev = prev;
         }
     }
 }
@@ -137,22 +137,22 @@ void HierarchySystem::OnDestroy(entt::registry& registry, entt::entity entity) {
     // if is the first child
     if (hierarchy.prev == entt::null || !registry.valid(hierarchy.prev)) {
         if (hierarchy.parent != entt::null && registry.valid(hierarchy.parent)) {
-            if (auto parent = registry.try_get<HierarchyComponent>(hierarchy.parent)) {
-                parent->first = hierarchy.next;
+            if (auto parentHierarchy = registry.try_get<HierarchyComponent>(hierarchy.parent)) {
+                parentHierarchy->first = hierarchy.next;
                 if (hierarchy.next != entt::null) {
-                    if (auto next = registry.try_get<HierarchyComponent>(hierarchy.next)) {
-                        next->prev = entt::null;
+                    if (auto nextHierarchy = registry.try_get<HierarchyComponent>(hierarchy.next)) {
+                        nextHierarchy->prev = entt::null;
                     }
                 }
             }
         }
     } else {
-        if (auto prev = registry.try_get<HierarchyComponent>(hierarchy.prev)) {
-            prev->next = hierarchy.next;
+        if (auto prevHierarchy = registry.try_get<HierarchyComponent>(hierarchy.prev)) {
+            prevHierarchy->next = hierarchy.next;
         }
         if (hierarchy.next != entt::null) {
-            if (auto next = registry.try_get<HierarchyComponent>(hierarchy.next)) {
-                next->prev = hierarchy.prev;
+            if (auto nextHierarchy = registry.try_get<HierarchyComponent>(hierarchy.next)) {
+                nextHierarchy->prev = hierarchy.prev;
             }
         }
     }
@@ -163,22 +163,22 @@ void HierarchySystem::OnUpdate(entt::registry& registry, entt::entity entity) {
     // if is the first child
     if (hierarchy.prev == entt::null) {
         if (hierarchy.parent != entt::null) {
-            if (auto parent = registry.try_get<HierarchyComponent>(hierarchy.parent)) {
-                parent->first = hierarchy.next;
+            if (auto parentHierarchy = registry.try_get<HierarchyComponent>(hierarchy.parent)) {
+                parentHierarchy->first = hierarchy.next;
                 if (hierarchy.next != entt::null) {
-                    if (auto next = registry.try_get<HierarchyComponent>(hierarchy.next)) {
-                        next->prev = entt::null;
+                    if (auto nextHierarchy = registry.try_get<HierarchyComponent>(hierarchy.next)) {
+                        nextHierarchy->prev = entt::null;
                     }
                 }
             }
         }
     } else {
-        if (auto prev = registry.try_get<HierarchyComponent>(hierarchy.prev)) {
-            prev->next = hierarchy.next;
+        if (auto prevHierarchy = registry.try_get<HierarchyComponent>(hierarchy.prev)) {
+            prevHierarchy->next = hierarchy.next;
         }
         if (hierarchy.next != entt::null) {
-            if (auto next = registry.try_get<HierarchyComponent>(hierarchy.next)) {
-                next->prev = hierarchy.prev;
+            if (auto nextHierarchy = registry.try_get<HierarchyComponent>(hierarchy.next)) {
+                nextHierarchy->prev = hierarchy.prev;
             }
         }
     }
