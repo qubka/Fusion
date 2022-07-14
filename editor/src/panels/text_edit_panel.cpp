@@ -59,7 +59,7 @@ void TextEditPanel::onImGui() {
 
     auto cpos = textEditor.GetCursorPosition();
     ImGui::SetWindowSize(ImVec2{800, 600}, ImGuiCond_FirstUseEver);
-    if (ImGui::Begin(title.c_str(), &enabled, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar)) {
+    if (ImGui::Begin(title.c_str(), &active, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar)) {
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Save", "CTRL+S")) {

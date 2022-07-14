@@ -4,6 +4,7 @@ using namespace fe;
 
 void SubrenderHolder::clear() {
 	stages.clear();
+    subrenders.clear();
 }
 
 void SubrenderHolder::updateAll() {
@@ -12,16 +13,6 @@ void SubrenderHolder::updateAll() {
             subrender->onUpdate();
         }
     }
-}
-
-void SubrenderHolder::removeSubrenderStage(const std::type_index& id) {
-	for (auto it = stages.begin(); it != stages.end();) {
-		if (it->second == id) {
-			it = stages.erase(it);
-		} else {
-			++it;
-		}
-	}
 }
 
 void SubrenderHolder::renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer) {

@@ -73,7 +73,13 @@ namespace fe {
             const auto& typeId = typeid(T);
 
             // Remove the stage value for this Subrender
-            removeSubrenderStage(typeId);
+            for (auto it = stages.begin(); it != stages.end();) {
+                if (it->second == typeId) {
+                    it = stages.erase(it);
+                } else {
+                    ++it;
+                }
+            }
 
             // Then, remove the Subrender
             subrenders.erase(typeId);
@@ -99,11 +105,9 @@ namespace fe {
          */
         void renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer);
 
-        void removeSubrenderStage(const std::type_index& id);
-
-        /// List of all Subrenders.
+        /// List of all Subrenders
         std::unordered_map<std::type_index, std::unique_ptr<Subrender>> subrenders;
-        /// List of subrender stages.
+        /// List of subrender stages
         std::multimap<StageIndex, std::type_index> stages;
     };
 }
