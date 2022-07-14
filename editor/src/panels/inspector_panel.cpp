@@ -160,9 +160,9 @@ void InspectorPanel::onImGui() {
 
             ImGui::Text("UUID: %s", uuids::to_string(idComponent->uuid).c_str());
 
-            if (auto hierarchy = registry.try_get<HierarchyComponent>(selected)) {
-                if (hierarchy->parent != entt::null && registry.valid(hierarchy->parent)) {
-                    ImGui::Text("Parent : ID: %d", static_cast<int>(hierarchy->parent));
+            if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(selected)) {
+                if (hierarchyComponent->parent != entt::null && registry.valid(hierarchyComponent->parent)) {
+                    ImGui::Text("Parent : ID: %d", static_cast<int>(hierarchyComponent->parent));
                 } else {
                     ImGui::TextUnformatted("Parent : null");
                 }
@@ -170,11 +170,12 @@ void InspectorPanel::onImGui() {
                 ImGui::TextUnformatted("Children : ");
                 ImGui::Indent(24.0f);
 
-                entt::entity child = hierarchy->first;
+                auto child = hierarchyComponent->first;
                 while (child != entt::null) {
                     ImGui::Text("ID: %d", static_cast<int>(child));
-                    if (auto childHierarchy = registry.try_get<HierarchyComponent>(child)) {
-                        child = childHierarchy->next;
+                    hierarchyComponent = registry.try_get<HierarchyComponent>(child);
+                    if (hierarchyComponent) {
+                        child = hierarchyComponent->next;
                     }
                 }
 
