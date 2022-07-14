@@ -38,13 +38,13 @@ namespace ImGuiUtils {
     void Tooltip(const std::string& text);
     void Tooltip(const char* text);
 
-    void Tooltip(fe::Image2d* texture, const glm::vec2& size);
-    void Tooltip(fe::Image2d* texture, const glm::vec2& size, const std::string& text);
-    void Tooltip(fe::Image2dArray* texture, uint32_t index, const glm::vec2& size);
+    void Tooltip(fe::Image2d* texture, const glm::vec2& size, bool flipImage = false);
+    void Tooltip(fe::Image2d* texture, const glm::vec2& size, const std::string& text, bool flipImage = false);
+    void Tooltip(fe::Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
 
-    void Image(fe::Image2d* texture, const glm::vec2& size);
-    void Image(fe::ImageCube* texture, const glm::vec2& size);
-    void Image(fe::Image2dArray* texture, uint32_t index, const glm::vec2& size);
+    void Image(fe::Image2d* texture, const glm::vec2& size, bool flipImage = false);
+    void Image(fe::ImageCube* texture, const glm::vec2& size, bool flipImage = false);
+    void Image(fe::Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
 
     void SetTheme(Theme theme);
 

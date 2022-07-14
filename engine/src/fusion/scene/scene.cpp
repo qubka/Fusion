@@ -19,33 +19,10 @@ Scene::Scene(std::string name) : name{std::move(name)} {
     addSystem<HierarchySystem>();
 }
 
-/*Scene::Scene(const Scene& other) {
-    registry.assign(other.registry.data(), other.registry.data() + other.registry.size(), other.registry.released());
-
-    clone<IdComponent>(other.registry);
-    clone<TagComponent>(other.registry);
-    clone<HierarchyComponent>(other.registry);
-    clone<TransformComponent>(other.registry);
-    clone<CameraComponent>(other.registry);
-    clone<MeshComponent>(other.registry);
-    clone<PointLightComponent>(other.registry);
-    clone<DirectionalLightComponent>(other.registry);
-    clone<ScriptComponent>(other.registry);
-    clone<RigidBodyComponent>(other.registry);
-    clone<BoxColliderComponent>(other.registry);
-    clone<SphereColliderComponent>(other.registry);
-    clone<CapsuleColliderComponent>(other.registry);
-    clone<MeshColliderComponent>(other.registry);
-    clone<PhysicsMaterialComponent>(other.registry);
-    clone<MaterialComponent>(other.registry);
-}*/
-
 void Scene::onStart() {
     systems.each([&](auto system) {
-        system->onStart();
+        system->setEnabled(true);
     });
-
-    started = true;
 
     LOG_DEBUG << "Scene : " << name << " created first time";
 }
@@ -118,25 +95,29 @@ void Scene::destroyEntity(entt::entity entity) {
 }
 
 entt::entity Scene::duplicateEntity(entt::entity entity, entt::entity parent) {
-    auto newEntity = registry.create();
+    auto hierarchySystem = getSystem<HierarchySystem>();
+    hierarchySystem->setEnabled(false);
 
-    /*clone<IdComponent>(newEntity, entity);
-    clone<TagComponent>(newEntity, entity);
-    // TODO: Clone children structure
-    //clone<HierarchyComponent>(newEntity, entity);
-    clone<TransformComponent>(newEntity, entity);
-    clone<CameraComponent>(newEntity, entity);
-    clone<MeshComponent>(newEntity, entity);
-    clone<PointLightComponent>(newEntity, entity);
-    clone<DirectionalLightComponent>(newEntity, entity);
-    clone<ScriptComponent>(newEntity, entity);
-    clone<RigidBodyComponent>(newEntity, entity);
-    clone<BoxColliderComponent>(newEntity, entity);
-    clone<SphereColliderComponent>(newEntity, entity);
-    clone<CapsuleColliderComponent>(newEntity, entity);
-    clone<MeshColliderComponent>(newEntity, entity);
-    clone<PhysicsMaterialComponent>(newEntity, entity);
-    clone<MaterialComponent>(newEntity, entity);*/
+    auto newEntity = registry.create();
+    copyEntity<ALL_COMPONENTS>(newEntity, entity);
+
+    if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(newEntity)) {
+        hierarchyComponent->first = entt::null;
+        hierarchyComponent->parent = entt::null;
+        hierarchyComponent->next = entt::null;
+        hierarchyComponent->prev = entt::null;
+    }
+
+    auto children = hierarchySystem->getChildren(entity);
+
+    for (auto child : children)  {
+        duplicateEntity(child, newEntity);
+    }
+
+    if (parent != entt::null)
+        hierarchySystem->setParent(newEntity, parent);
+
+    hierarchySystem->setEnabled(true);
     
     return newEntity;
 }

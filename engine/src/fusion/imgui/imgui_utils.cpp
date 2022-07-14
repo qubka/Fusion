@@ -228,24 +228,25 @@ void Tooltip(const char* text) {
     ImGui::PopStyleVar();
 }
 
-void Tooltip(Image2d* texture, const glm::vec2& size) {
+void Tooltip(Image2d* texture, const glm::vec2& size, bool flipImage) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
 
     if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
-        ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, 0.0f}, ImVec2{1.0f, 1.0f});
+        ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
         ImGui::EndTooltip();
     }
 
     ImGui::PopStyleVar();
 }
 
-void Tooltip(Image2d* texture, const glm::vec2& size, const std::string& text) {
+void Tooltip(Image2d* texture, const glm::vec2& size, const std::string& text, bool flipImage) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
 
     if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
-        ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, 0.0f}, ImVec2{1.0f, 1.0f});
+
+        ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
         ImGui::TextUnformatted(text.c_str());
         ImGui::EndTooltip();
     }
@@ -253,29 +254,29 @@ void Tooltip(Image2d* texture, const glm::vec2& size, const std::string& text) {
     ImGui::PopStyleVar();
 }
 
-void Tooltip(Image2dArray* texture, uint32_t index, const glm::vec2& size) {
+void Tooltip(Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
 
     if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
 
-        ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, 0.0f}, ImVec2{1.0f, 1.0f});
+        ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
         ImGui::EndTooltip();
     }
 
     ImGui::PopStyleVar();
 }
 
-void Image(Image2d* texture, const glm::vec2& size) {
-    ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, 0.0f}, ImVec2{1.0f, 1.0f});
+void Image(Image2d* texture, const glm::vec2& size, bool flipImage) {
+    ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
 }
 
-void Image(ImageCube* texture, const glm::vec2& size) {
-    ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, 0.0f}, ImVec2{1.0f, 1.0f});
+void Image(ImageCube* texture, const glm::vec2& size, bool flipImage) {
+    ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
 }
 
-void Image(Image2dArray* texture, uint32_t index, const glm::vec2& size) {
-    ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, 0.0f}, ImVec2{1.0f, 1.0f});
+void Image(Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage) {
+    ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
 }
 
 bool BufferingBar(const std::string& name, float value, const glm::vec2& size_arg, uint32_t bg_col, uint32_t fg_col) {

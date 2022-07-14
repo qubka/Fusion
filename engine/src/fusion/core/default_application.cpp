@@ -35,7 +35,7 @@ void DefaultApplication::onStart() {
     LOG_INFO << "Default application starting!";
 
     //FileSystem::Get()->addSearchPath(executablePath, executablePath.string());
-    VirtualFileSystem::Get()->mount("EngineShaders", "engine"_p / "assets" / "shaders");
+    VirtualFileSystem::Get()->mount("EngineShaders", executablePath / "engine"_p / "assets" / "shaders");
 
     deserialise();
 

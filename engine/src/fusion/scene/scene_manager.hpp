@@ -27,6 +27,8 @@ namespace fe {
         void setScene(std::unique_ptr<Scene>&& scene) { this->scene = std::move(scene); }
 
     private:
+        void onWindowResize(const glm::uvec2& size);
+
         std::unique_ptr<Scene> scene;
     };
 }

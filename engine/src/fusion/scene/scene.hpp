@@ -172,22 +172,19 @@ namespace fe {
 
     private:
         template<typename T>
-        void clone(const entt::registry& src) {
-            auto view = src.view<const T>();
-            for (const auto& [entity, component] : view.each()) {
-                registry.emplace_or_replace<T>(entity, component);
-            }
-        }
-
-        template<typename T>
-        void clone(entt::entity dst, entt::entity src) {
+        void copyComponent(entt::entity dst, entt::entity src) {
             if (auto component = registry.try_get<T>(src))
                 registry.emplace_or_replace<T>(dst, *component);
         }
 
+        template <typename... Component>
+        void copyEntity(entt::entity dst, entt::entity src) {
+            (copyComponent<Component>(dst, src), ...);
+        }
+
         std::string name;
-        SystemHolder systems;
         entt::registry registry;
+        SystemHolder systems;
         std::shared_ptr<Camera> camera;
         bool started{ false };
         bool runtime{ false };

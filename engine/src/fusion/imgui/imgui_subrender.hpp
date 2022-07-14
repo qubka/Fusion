@@ -26,14 +26,14 @@ namespace fe {
         void addIconFont();
         void rebuildFont();
 
-        void onMouseButtonEvent(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods);
-        void onMouseMotionEvent(const glm::vec2& pos);
-        void onMouseScrollEvent(const glm::vec2& offset);
-        void onMouseEnterEvent(bool entered);
-        void onKeyEvent(Key key, InputAction action, Key scan, bitmask::bitmask<InputMod> mods);
-        void onCharInputEvent(uint32_t chr);
-        void onFocusEvent(bool focuses);
-        void onSizeChange(const glm::uvec2& size);
+        void onMouseButton(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods);
+        void onMouseMotion(const glm::vec2& pos);
+        void onMouseScroll(const glm::vec2& offset);
+        void onMouseEnter(bool entered);
+        void onKeyPress(Key key, InputAction action, Key scan, bitmask::bitmask<InputMod> mods);
+        void onCharInput(uint32_t chr);
+        void onWindowFocus(bool focuses);
+        void onWindowResize(const glm::uvec2& size);
 
         static const char* GetClipboardText(void* userData);
         static void SetClipboardText(void* userData, const char* text);

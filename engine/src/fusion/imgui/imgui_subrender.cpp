@@ -121,28 +121,28 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer) {
     canvasObject.cmdRender(commandBuffer, pipeline, descriptorSet);
 }
 
-void ImGuiSubrender::onMouseButtonEvent(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods) {
+void ImGuiSubrender::onMouseButton(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods) {
     if (button >= MouseButton::Button0 && button < MouseButton::Button5) {
         ImGuiIO& io = ImGui::GetIO();
         io.AddMouseButtonEvent(static_cast<int>(button), action == InputAction::Press);
     }
 }
 
-void ImGuiSubrender::onMouseMotionEvent(const glm::vec2& pos) {
+void ImGuiSubrender::onMouseMotion(const glm::vec2& pos) {
     if (!window->isCursorHidden()) {
         ImGuiIO& io = ImGui::GetIO();
         io.AddMousePosEvent(pos.x, pos.y);
     }
 }
 
-void ImGuiSubrender::onMouseScrollEvent(const glm::vec2& offset) {
+void ImGuiSubrender::onMouseScroll(const glm::vec2& offset) {
     ImGuiIO& io = ImGui::GetIO();
     io.AddMouseWheelEvent(offset.x, offset.y);
 }
 
 // Workaround: X11 seems to send spurious Leave/Enter events which would make us lose our position,
 // so we back it up and restore on Leave/Enter (see https://github.com/ocornut/imgui/issues/4984)
-void ImGuiSubrender::onMouseEnterEvent(bool entered) {
+void ImGuiSubrender::onMouseEnter(bool entered) {
     ImGuiIO& io = ImGui::GetIO();
     if (entered) {
         currentWindow = window;
@@ -155,7 +155,7 @@ void ImGuiSubrender::onMouseEnterEvent(bool entered) {
     }
 }
 
-void ImGuiSubrender::onKeyEvent(Key key, InputAction action, Key scan, bitmask::bitmask<InputMod> mods) {
+void ImGuiSubrender::onKeyPress(Key key, InputAction action, Key scan, bitmask::bitmask<InputMod> mods) {
     if (action >= InputAction::Repeat)
         return;
 
@@ -169,19 +169,19 @@ void ImGuiSubrender::onKeyEvent(Key key, InputAction action, Key scan, bitmask::
     io.AddKeyEvent(KeyToImGuiKey(key), action == InputAction::Press);
 }
 
-void ImGuiSubrender::onCharInputEvent(uint32_t chr) {
+void ImGuiSubrender::onCharInput(uint32_t chr) {
     if (chr > 0 && chr < 0x10000) {
         ImGuiIO& io = ImGui::GetIO();
         io.AddInputCharacter(chr);
     }
 }
 
-void ImGuiSubrender::onFocusEvent(bool focuses) {
+void ImGuiSubrender::onWindowFocus(bool focuses) {
     ImGuiIO& io = ImGui::GetIO();
     io.AddFocusEvent(focuses);
 }
 
-void ImGuiSubrender::onSizeChange(const glm::uvec2& size) {
+void ImGuiSubrender::onWindowResize(const glm::uvec2& size) {
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
 }
@@ -189,24 +189,24 @@ void ImGuiSubrender::onSizeChange(const glm::uvec2& size) {
 void ImGuiSubrender::setupEvents(bool connect) {
     if (connect) {
         // Set the window events callbacks.
-        window->OnMouseButton().connect<&ImGuiSubrender::onMouseButtonEvent>(this);
-        window->OnMouseMotion().connect<&ImGuiSubrender::onMouseMotionEvent>(this);
-        window->OnMouseScroll().connect<&ImGuiSubrender::onMouseScrollEvent>(this);
-        window->OnMouseEnter().connect<&ImGuiSubrender::onMouseEnterEvent>(this);
-        window->OnKey().connect<&ImGuiSubrender::onKeyEvent>(this);
-        window->OnCharInput().connect<&ImGuiSubrender::onCharInputEvent>(this);
-        window->OnFocus().connect<&ImGuiSubrender::onFocusEvent>(this);
-        window->OnResize().connect<&ImGuiSubrender::onSizeChange>(this);
+        window->OnMouseButton().connect<&ImGuiSubrender::onMouseButton>(this);
+        window->OnMouseMotion().connect<&ImGuiSubrender::onMouseMotion>(this);
+        window->OnMouseScroll().connect<&ImGuiSubrender::onMouseScroll>(this);
+        window->OnMouseEnter().connect<&ImGuiSubrender::onMouseEnter>(this);
+        window->OnKey().connect<&ImGuiSubrender::onKeyPress>(this);
+        window->OnCharInput().connect<&ImGuiSubrender::onCharInput>(this);
+        window->OnFocus().connect<&ImGuiSubrender::onWindowFocus>(this);
+        window->OnResize().connect<&ImGuiSubrender::onWindowResize>(this);
     } else {
         // Remove the window events callbacks.
-        window->OnMouseButton().disconnect<&ImGuiSubrender::onMouseButtonEvent>(this);
-        window->OnMouseMotion().disconnect<&ImGuiSubrender::onMouseMotionEvent>(this);
-        window->OnMouseScroll().disconnect<&ImGuiSubrender::onMouseScrollEvent>(this);
-        window->OnMouseEnter().disconnect<&ImGuiSubrender::onMouseEnterEvent>(this);
-        window->OnKey().disconnect<&ImGuiSubrender::onKeyEvent>(this);
-        window->OnCharInput().disconnect<&ImGuiSubrender::onCharInputEvent>(this);
-        window->OnFocus().disconnect<&ImGuiSubrender::onFocusEvent>(this);
-        window->OnResize().disconnect<&ImGuiSubrender::onSizeChange>(this);
+        window->OnMouseButton().disconnect<&ImGuiSubrender::onMouseButton>(this);
+        window->OnMouseMotion().disconnect<&ImGuiSubrender::onMouseMotion>(this);
+        window->OnMouseScroll().disconnect<&ImGuiSubrender::onMouseScroll>(this);
+        window->OnMouseEnter().disconnect<&ImGuiSubrender::onMouseEnter>(this);
+        window->OnKey().disconnect<&ImGuiSubrender::onKeyPress>(this);
+        window->OnCharInput().disconnect<&ImGuiSubrender::onCharInput>(this);
+        window->OnFocus().disconnect<&ImGuiSubrender::onWindowFocus>(this);
+        window->OnResize().disconnect<&ImGuiSubrender::onWindowResize>(this);
     }
 }
 

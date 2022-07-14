@@ -19,6 +19,7 @@
 #include "panels/text_edit_panel.hpp"
 #include "panels/hierarchy_panel.hpp"
 #include "panels/inspector_panel.hpp"
+#include "panels/scene_view_panel.hpp"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
@@ -62,6 +63,7 @@ void Editor::onStart() {
     panels.push_back(std::make_unique<ProjectSettingsPanel>(this));
     panels.push_back(std::make_unique<HierarchyPanel>(this));
     panels.push_back(std::make_unique<InspectorPanel>(this));
+    panels.push_back(std::make_unique<SceneViewPanel>(this));
 
     editorSettings.showImGuiDemo = false;
 }

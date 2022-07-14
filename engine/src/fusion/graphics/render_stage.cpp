@@ -25,8 +25,7 @@ RenderStage::RenderStage(std::vector<Attachment> images, std::vector<SubpassType
                 clearValue.color = vku::clearColor(image.clearColor);
 
                 for (const auto& subpass : this->subpasses) {
-                    if (const auto& subpassBindings = subpass.attachmentBindings;
-                        std::find(subpassBindings.begin(), subpassBindings.end(), image.binding) != subpassBindings.end()) {
+                    if (const auto& subpassBindings = subpass.attachmentBindings; std::find(subpassBindings.begin(), subpassBindings.end(), image.binding) != subpassBindings.end()) {
                         subpassAttachmentCount[subpass.binding]++;
 
                         if (image.multisampled)
