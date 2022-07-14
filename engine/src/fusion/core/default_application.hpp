@@ -83,14 +83,12 @@ namespace fe {
                     cereal::make_nvp("Current Scene", sceneName)
             );
 
-            auto sceneManager = SceneManager::Get();
-
             if (sceneName.empty()) {
-                sceneManager->setScene(std::make_unique<Scene>("Empty Scene"));
+                SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
             } else {
                 auto scene = std::make_unique<Scene>(sceneName);
                 scene->deserialise();
-                sceneManager->setScene(std::move(scene));
+                SceneManager::Get()->setScene(std::move(scene));
             }
         }
 

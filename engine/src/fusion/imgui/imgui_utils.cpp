@@ -285,10 +285,10 @@ bool BufferingBar(const std::string& name, float value, const glm::vec2& size_ar
     const ImGuiID id = ImGui::GetID(name.c_str());
 
     ImVec2 pos = ImGui::GetCursorPos();
-    ImVec2 size = { size_arg.x, size_arg.y };
+    ImVec2 size{ size_arg.x, size_arg.y };
     size.x -= style.FramePadding.x * 2;
 
-    const ImRect bb(pos, ImVec2{pos.x + size.x, pos.y + size.y});
+    const ImRect bb{pos, ImVec2{pos.x + size.x, pos.y + size.y}};
     ImGui::ItemSize(bb, style.FramePadding.y);
     if (!ImGui::ItemAdd(bb, id))
         return false;
@@ -327,9 +327,9 @@ bool Spinner(const std::string& name, float radius, int thickness, uint32_t colo
     auto drawList = ImGui::GetWindowDrawList();
 
     ImVec2 pos = ImGui::GetCursorPos();
-    ImVec2 size((radius) * 2, (radius + style.FramePadding.y) * 2);
+    ImVec2 size{ (radius) * 2, (radius + style.FramePadding.y) * 2 };
 
-    const ImRect bb(pos, ImVec2{pos.x + size.x, pos.y + size.y});
+    const ImRect bb{pos, ImVec2{pos.x + size.x, pos.y + size.y}};
     ImGui::ItemSize(bb, style.FramePadding.y);
     if (!ImGui::ItemAdd(bb, id))
         return false;
@@ -385,7 +385,7 @@ const glm::vec4& GetIconColor() {
 void DrawItemActivityOutline(float rounding, bool drawWhenInactive, const ImColor& colourWhenActive) {
     auto* drawList = ImGui::GetWindowDrawList();
 
-    ImRect expandedRect = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+    ImRect expandedRect = ImRect{ImGui::GetItemRectMin(), ImGui::GetItemRectMax()};
     expandedRect.Min.x -= 1.0f;
     expandedRect.Min.y -= 1.0f;
     expandedRect.Max.x += 1.0f;

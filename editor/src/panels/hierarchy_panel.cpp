@@ -4,6 +4,7 @@
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/scene/components.hpp"
+#include "fusion/scene/systems/hierarchy_system.hpp"
 
 using namespace fe;
 
@@ -26,6 +27,12 @@ void HierarchyPanel::onImGui() {
     {
         auto scene = SceneManager::Get()->getScene();
         if (!scene) {
+            ImGui::End();
+            return;
+        }
+
+        auto hierarchySystem = scene->getSystem<HierarchySystem>();
+        if (!hierarchySystem || !hierarchySystem->isEnabled()) {
             ImGui::End();
             return;
         }
@@ -124,10 +131,10 @@ void HierarchyPanel::onImGui() {
                         if (!registry.valid(copiedEntity)) {
                             editor->setCopiedEntity(entt::null);
                         } else {
-                            SceneManager::Get()->getScene()->duplicateEntity(copiedEntity);
+                            scene->duplicateEntity(copiedEntity);
 
                             if (editor->getCutCopyEntity()) {
-                                HierarchySystem::DestroyParent(editor->getCopiedEntity(), registry);
+                                hierarchySystem->destroyParent(editor->getCopiedEntity());
                             }
                         }
                     }
@@ -147,7 +154,7 @@ void HierarchyPanel::onImGui() {
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
                         auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
                         if (auto hierarchy = registry.try_get<HierarchyComponent>(entity)) {
-                            HierarchySystem::Reparent(entity, entt::null, registry, *hierarchy);
+                            hierarchySystem->reparent(entity, entt::null, *hierarchy);
                         }
                     }
                     ImGui::EndDragDropTarget();
@@ -189,7 +196,7 @@ void HierarchyPanel::onImGui() {
                             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
                                 auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
                                 if (auto hierarchy = registry.try_get<HierarchyComponent>(entity)) {
-                                    HierarchySystem::Reparent(entity, entt::null, registry, *hierarchy);
+                                    hierarchySystem->reparent(entity, entt::null, *hierarchy);
                                     registry.remove<HierarchyComponent>(entity);
                                 }
                             }
@@ -213,7 +220,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         return;
 
     const auto nameComponent = registry.try_get<NameComponent>(node);
-    std::string name = nameComponent ? *nameComponent : String::ToString(entt::to_integral(node));
+    std::string name = nameComponent ? *nameComponent : std::to_string(entt::to_integral(node));
 
     if (hierarchyFilter.IsActive()) {
         if (!hierarchyFilter.PassFilter(name.c_str())) {
@@ -299,6 +306,8 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             }
             ImGui::PopStyleColor();
 #endif
+        auto scene = SceneManager::Get()->getScene();
+        auto hierarchySystem = scene->getSystem<HierarchySystem>();
 
         if (!active)
             ImGui::PopStyleColor();
@@ -317,7 +326,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
                     if (!registry.valid(copiedEntity)) {
                         editor->setCopiedEntity(entt::null);
                     } else {
-                        SceneManager::Get()->getScene()->duplicateEntity(copiedEntity, node);
+                        scene->duplicateEntity(copiedEntity, node);
 
                         if (editor->getCutCopyEntity())
                             deleteEntity = true;
@@ -330,7 +339,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             ImGui::Separator();
 
             if (ImGui::Selectable("Duplicate")) {
-                SceneManager::Get()->getScene()->duplicateEntity(node);
+                scene->duplicateEntity(node);
             }
             if (ImGui::Selectable("Delete"))
                 deleteEntity = true;
@@ -342,8 +351,8 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             ImGui::Separator();
 
             if (ImGui::Selectable("Add Child")) {
-                auto child = SceneManager::Get()->getScene()->createEntity();
-                HierarchySystem::SetParent(child, node, registry);
+                auto child = scene->createEntity();
+                hierarchySystem->setParent(child, node);
             }
             ImGui::EndPopup();
         }
@@ -361,7 +370,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
             auto hierarchy = registry.try_get<HierarchyComponent>(entity);
             if (hierarchy) {
-                acceptable = entity != node && (!HierarchySystem::IsParent(entity, node, registry)) && (hierarchy->parent != node);
+                acceptable = entity != node && (!hierarchySystem->isParent(entity, node)) && (hierarchy->parent != node);
             } else
                 acceptable = entity != node;
 
@@ -370,7 +379,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
                 if (ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
                     if (acceptable) {
                         if(hierarchy)
-                            HierarchySystem::Reparent(entity, node, registry, *hierarchy);
+                            hierarchySystem->reparent(entity, node, *hierarchy);
                         else
                             registry.emplace<HierarchyComponent>(entity, node);
                         hadRecentDroppedEntity = node;
@@ -399,7 +408,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         }
 
         if (deleteEntity) {
-            HierarchySystem::DestroyParent(node, registry);
+            hierarchySystem->destroyParent(node);
             if (nodeOpen)
                 ImGui::TreePop();
 

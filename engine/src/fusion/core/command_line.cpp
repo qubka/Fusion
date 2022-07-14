@@ -5,26 +5,26 @@
 
 using namespace fe;
 
-std::string CommandLineArgs::Empty;
+CommandArg CommandLineArgs::Empty = std::make_pair("", "");
 
 CommandLineArgs::CommandLineArgs(int count, char** args) {
     for (size_t i = 0; i < count; i++) {
         std::string argument{ args[i] };
         if (auto pos = argument.find('='); pos != std::string::npos) {
-            arguments.emplace(argument.substr(0, pos), argument.substr(pos + 1));
+            arguments.emplace_back(argument.substr(0, pos), argument.substr(pos + 1));
         } else {
-            arguments.emplace(argument, "");
+            arguments.emplace_back(argument, "");
         }
     }
 }
 
-CommandArg CommandLineArgs::operator[](size_t index) const {
+const CommandArg& CommandLineArgs::operator[](size_t index) const {
     for (const auto& [i, argument] : enumerate(arguments)) {
         if (i == index) {
-            return std::make_pair(argument.first, argument.second);
+            return argument;
         }
     }
-    return std::make_pair(Empty, Empty);
+    return Empty;
 }
 
 CommandLineParser::CommandLineParser() {

@@ -1,28 +1,28 @@
 #pragma once
 
 namespace fe {
-    using CommandArg = std::pair<const std::string&, const std::string&>;
+    using CommandArg = std::pair<std::string, std::string>;
 
     class CommandLineArgs {
-        std::map<std::string, std::string> arguments;
+        std::vector<CommandArg> arguments;
     public:
         CommandLineArgs() = default;
         CommandLineArgs(int count, char** args);
 
-        CommandArg operator[](size_t index) const;
+        const CommandArg& operator[](size_t index) const;
 
         //! Returns an iterator over the elements in this deque in proper sequence.
-        std::map<std::string, std::string>::iterator begin() { return arguments.begin(); }
-        std::map<std::string, std::string>::iterator end() { return arguments.end(); }
-        std::map<std::string, std::string>::reverse_iterator rbegin() { return arguments.rbegin(); }
-        std::map<std::string, std::string>::reverse_iterator rend() { return arguments.rend(); }
-        std::map<std::string, std::string>::const_iterator begin() const { return arguments.begin(); }
-        std::map<std::string, std::string>::const_iterator end() const { return arguments.end(); }
-        std::map<std::string, std::string>::const_reverse_iterator rbegin() const { return arguments.rbegin(); }
-        std::map<std::string, std::string>::const_reverse_iterator rend() const { return arguments.rend(); }
+        std::vector<CommandArg>::iterator begin() { return arguments.begin(); }
+        std::vector<CommandArg>::iterator end() { return arguments.end(); }
+        std::vector<CommandArg>::reverse_iterator rbegin() { return arguments.rbegin(); }
+        std::vector<CommandArg>::reverse_iterator rend() { return arguments.rend(); }
+        [[nodiscard]] std::vector<CommandArg>::const_iterator begin() const { return arguments.begin(); }
+        [[nodiscard]] std::vector<CommandArg>::const_iterator end() const { return arguments.end(); }
+        [[nodiscard]] std::vector<CommandArg>::const_reverse_iterator rbegin() const { return arguments.rbegin(); }
+        [[nodiscard]] std::vector<CommandArg>::const_reverse_iterator rend() const { return arguments.rend(); }
 
     private:
-        static std::string Empty;
+        static CommandArg Empty;
     };
 
     class CommandLineParser {
@@ -47,6 +47,6 @@ namespace fe {
             bool hasValue{ false };
             bool set{ false };
         };
-        std::map<std::string, CommandLineOption> options;
+        std::unordered_map<std::string, CommandLineOption> options;
     };
 }

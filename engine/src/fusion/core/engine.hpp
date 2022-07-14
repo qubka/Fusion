@@ -106,7 +106,7 @@ namespace fe {
         std::unique_ptr<DeviceManager> devices;
 
         std::unordered_map<std::type_index, std::unique_ptr<Module>> modules;
-        std::map<Module::Stage, std::vector<std::type_index>> moduleStages;
+        std::unordered_map<Module::Stage, std::vector<std::type_index>> moduleStages;
 
         bool running{ false };
 

@@ -12,22 +12,6 @@ namespace fe {
         String() = delete;
 
         /**
-         * Converts type to a string.
-         * @param input The data to convert.
-         * @return The generated string.
-         */
-        template <typename T>
-        static std::string ToString(const T& input) {
-#ifdef FUSION_PLATFORM_ANDROID
-            std::ostringstream os;
-            os << input;
-            return os.str();
-#else
-            return std::to_string(input);
-#endif
-        }
-
-        /**
          * Converts a CTF16 (wide) string to a UTF8 string.
          * @param str The string to convert.
          * @return The converted string.

@@ -19,9 +19,9 @@ namespace fe {
         bool writeBytes(const fs::path& path, uint8_t* buffer, size_t size);
         bool writeText(const fs::path& path, const std::string& text);
 
-        const std::map<fs::path, fs::path>& getMounted() { return mountPoints; };
+        const std::unordered_map<fs::path, fs::path>& getMounted() { return mountPoints; };
 
     private:
-        std::map<fs::path, fs::path> mountPoints;
+        std::unordered_map<fs::path, fs::path> mountPoints;
     };
 }

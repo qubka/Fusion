@@ -100,7 +100,7 @@ namespace fe {
         LogicalDevice logicalDevice{ instance, physicalDevice };
         PipelineCache pipelineCache{ logicalDevice };
 
-        std::map<std::string, const Descriptor*> attachments;
+        std::unordered_map<std::string, const Descriptor*> attachments;
 
         std::unique_ptr<CommandPool> commandPool;
         std::unique_ptr<Renderer> renderer;

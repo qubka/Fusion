@@ -1,9 +1,109 @@
-#include "hierarchy_component.hpp"
+#include "hierarchy_system.hpp"
 
 using namespace fe;
 
+HierarchySystem::HierarchySystem(entt::registry& registry) : System{registry} {
+}
+
+HierarchySystem::~HierarchySystem() {
+    if (enabled) {
+        onDisabled();
+    }
+}
+
+void HierarchySystem::onStart() {
+    if (!enabled) {
+        onEnabled();
+        enabled = true;
+    }
+}
+
+void HierarchySystem::onPlay() {
+
+}
+
+void HierarchySystem::onUpdate() {
+
+}
+
+void HierarchySystem::onStop() {
+
+}
+
+void HierarchySystem::onEnabled() {
+    registry.on_construct<HierarchyComponent>().connect<&OnConstruct>();
+    registry.on_update<HierarchyComponent>().connect<&OnUpdate>();
+    registry.on_destroy<HierarchyComponent>().connect<&OnDestroy>();
+}
+
+void HierarchySystem::onDisabled() {
+    registry.on_construct<HierarchyComponent>().disconnect<&OnConstruct>();
+    registry.on_update<HierarchyComponent>().disconnect<&OnUpdate>();
+    registry.on_destroy<HierarchyComponent>().disconnect<&OnDestroy>();
+}
+
+void HierarchySystem::reparent(entt::entity entity, entt::entity parent, HierarchyComponent& hierarchy) {
+    HierarchySystem::OnDestroy(registry, entity);
+
+    hierarchy.parent = entt::null;
+    hierarchy.next = entt::null;
+    hierarchy.prev = entt::null;
+
+    if (parent != entt::null) {
+        hierarchy.parent = parent;
+        HierarchySystem::OnConstruct(registry, entity);
+    }
+}
+
+bool HierarchySystem::isParent(entt::entity entity, entt::entity child) {
+    if (auto hierarchy = registry.try_get<HierarchyComponent>(child)) {
+        auto parent = hierarchy->parent;
+        while (parent != entt::null) {
+            if (parent == entity) {
+                return true;
+            } else {
+                hierarchy = registry.try_get<HierarchyComponent>(parent);
+                parent = hierarchy ? hierarchy->parent : entt::null;
+            }
+        }
+    }
+
+    return false;
+}
+
+void HierarchySystem::setParent(entt::entity entity, entt::entity parent) {
+    bool acceptable = false;
+    auto hierarchy = registry.try_get<HierarchyComponent>(entity);
+    if (hierarchy != nullptr) {
+        acceptable = parent != entity && (!isParent(parent, entity)) && (hierarchy->parent != entity);
+    } else
+        acceptable = parent != entity;
+
+    if (!acceptable)
+        return;
+
+    if (hierarchy)
+        reparent(entity, parent, *hierarchy);
+    else {
+        registry.emplace<HierarchyComponent>(entity, parent);
+    }
+}
+
+void HierarchySystem::destroyParent(entt::entity entity) {
+    if (auto hierarchy = registry.try_get<HierarchyComponent>(entity)) {
+        auto child = hierarchy->first;
+        while (child != entt::null) {
+            auto childHierarchy = registry.try_get<HierarchyComponent>(child);
+            auto next = childHierarchy ? childHierarchy->next : entt::null;
+            destroyParent(child);
+            child = next;
+        }
+    }
+    registry.destroy(entity);
+}
+
 void HierarchySystem::OnConstruct(entt::registry& registry, entt::entity entity) {
-    /*auto& hierarchy = registry.get<HierarchyComponent>(entity);
+    auto& hierarchy = registry.get<HierarchyComponent>(entity);
     if (hierarchy.parent != entt::null) {
         auto& parent_hierarchy = registry.get_or_emplace<HierarchyComponent>(hierarchy.parent);
         if (parent_hierarchy.first == entt::null) {
@@ -20,7 +120,7 @@ void HierarchySystem::OnConstruct(entt::registry& registry, entt::entity entity)
             current_hierarchy->next = entity;
             hierarchy.prev = prev_ent;
         }
-    }*/
+    }
 }
 
 void HierarchySystem::OnDestroy(entt::registry& registry, entt::entity entity) {
@@ -74,70 +174,4 @@ void HierarchySystem::OnUpdate(entt::registry& registry, entt::entity entity) {
             }
         }
     }
-}
-
-void HierarchySystem::Reparent(entt::entity entity, entt::entity parent, entt::registry& registry, HierarchyComponent& hierarchy) {
-    HierarchySystem::OnDestroy(registry, entity);
-
-    hierarchy.parent = entt::null;
-    hierarchy.next = entt::null;
-    hierarchy.prev = entt::null;
-
-    if (parent != entt::null) {
-        hierarchy.parent = parent;
-        HierarchySystem::OnConstruct(registry, entity);
-    }
-}
-
-bool HierarchySystem::IsParent(entt::entity entity, entt::entity child, entt::registry& registry) {
-    if (auto hierarchy = registry.try_get<HierarchyComponent>(child)) {
-        auto parent = hierarchy->parent;
-        while (parent != entt::null) {
-            if (parent == entity) {
-                return true;
-            } else {
-                hierarchy = registry.try_get<HierarchyComponent>(parent);
-                parent = hierarchy ? hierarchy->parent : entt::null;
-            }
-        }
-    }
-
-    return false;
-}
-
-void HierarchySystem::DestroyParent(entt::entity entity, entt::registry& registry) {
-    if (auto hierarchy = registry.try_get<HierarchyComponent>(entity)) {
-        auto child = hierarchy->first;
-        while (child != entt::null) {
-            auto childHierarchy = registry.try_get<HierarchyComponent>(child);
-            auto next = childHierarchy ? childHierarchy->next : entt::null;
-            DestroyParent(child, registry);
-            child = next;
-        }
-    }
-    registry.destroy(entity);
-}
-
-void HierarchySystem::SetParent(entt::entity entity, entt::entity parent, entt::registry& registry) {
-    bool acceptable = false;
-    auto hierarchy = registry.try_get<HierarchyComponent>(entity);
-    if (hierarchy != nullptr) {
-        acceptable = parent != entity && (!IsParent(parent, entity, registry)) && (hierarchy->parent != entity);
-    } else
-        acceptable = parent != entity;
-
-    if (!acceptable)
-        return;
-
-    if (hierarchy)
-        Reparent(entity, parent, registry, *hierarchy);
-    else {
-        registry.emplace<HierarchyComponent>(entity, parent);
-    }
-}
-
-void HierarchySystem::Init(entt::registry& registry) {
-    registry.on_construct<HierarchyComponent>().connect<&OnConstruct>();
-    registry.on_update<HierarchyComponent>().connect<&OnUpdate>();
-    registry.on_destroy<HierarchyComponent>().connect<&OnDestroy>();
 }

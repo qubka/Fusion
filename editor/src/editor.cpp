@@ -290,8 +290,11 @@ void Editor::drawMenuBar() {
                     const auto& path = entry.path();
                     if (FileFormat::IsSceneFile(path)) {
                         auto name = path.filename().replace_extension().string();
-                        if (ImGui::MenuItem(name.c_str())) {
-                            SceneManager::Get()->setScene(std::make_unique<Scene>(name));
+                        auto sceneManager = SceneManager::Get();
+                        if (ImGui::MenuItem(name.c_str(), nullptr, name == sceneManager->getScene()->getName())) {
+                            auto scene = std::make_unique<Scene>(name);
+                            scene->deserialise();
+                            sceneManager->setScene(std::move(scene));
                         }
                     }
                 }
@@ -585,14 +588,12 @@ void Editor::drawMenuBar() {
         ImGui::EndPopup();
     }
 
-    auto sceneManager = SceneManager::Get();
-
     if (ImGui::BeginPopupModal("Save Scene", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Save Current Scene Changes?\n\n");
         ImGui::Separator();
 
         if (ImGui::Button("OK", buttonSize)) {
-            sceneManager->getScene()->serialise();
+            SceneManager::Get()->getScene()->serialise();
             ImGui::CloseCurrentPopup();
         }
         ImGui::SetItemDefaultFocus();
@@ -605,7 +606,7 @@ void Editor::drawMenuBar() {
 
     if (ImGui::BeginPopupModal("New Scene", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         if (ImGui::Button("Save Current Scene Changes")) {
-            sceneManager->getScene()->serialise();
+            SceneManager::Get()->getScene()->serialise();
         }
 
         ImGui::Text("Create New Scene?\n\n");
@@ -618,7 +619,7 @@ void Editor::drawMenuBar() {
 
             while (FileSystem::ExistsInPath("Scenes" / (sceneName + ".fsn"))) {
                 sameNameCount++;
-                sceneName = "NewScene(" + String::ToString(sameNameCount) + ")";
+                sceneName = "NewScene(" + std::to_string(sameNameCount) + ")";
             }
 
             sceneManager->setScene(std::make_unique<Scene>());*/
@@ -641,7 +642,7 @@ void Editor::drawMenuBar() {
         ImGui::Separator();
 
         if (ImGui::Button("OK", buttonSize)) {
-            sceneManager->getScene()->deserialise();
+            SceneManager::Get()->getScene()->deserialise();
 
             ImGui::CloseCurrentPopup();
         }

@@ -84,7 +84,7 @@ void Engine::updateStage(Module::Stage stage) {
 void Engine::sortModules() {
     // Use the table to sort the modules for each stage depending on the number of mentions
     // in the list of requirements specified in the registration of each module
-    std::map<Module::Stage, std::unordered_map<std::type_index, size_t>> dependencies;
+    std::unordered_map<Module::Stage, std::unordered_map<std::type_index, size_t>> dependencies;
 
     // Create all registered modules
     for (const auto& [type, module] : Module::Registry()) {

@@ -6,6 +6,8 @@
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
 
+#include "fusion/scene/systems/hierarchy_system.hpp"
+
 #include <entt/entt.hpp>
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/archives/binary.hpp>
@@ -14,7 +16,7 @@
 using namespace fe;
 
 Scene::Scene(std::string name) : name{std::move(name)} {
-    HierarchySystem::Init(registry);
+    addSystem<HierarchySystem>();
 }
 
 /*Scene::Scene(const Scene& other) {
@@ -40,8 +42,7 @@ Scene::Scene(std::string name) : name{std::move(name)} {
 
 void Scene::onStart() {
     systems.each([&](auto system) {
-        if (system->isEnabled())
-            system->onStart();
+        system->onStart();
     });
 
     started = true;
@@ -105,7 +106,7 @@ entt::entity Scene::createEntity(std::string name) {
         }
     }
     if (idx > 0)
-        name += " (" + String::ToString(idx) + ")";
+        name += " (" + std::to_string(idx) + ")";
 
     registry.emplace<NameComponent>(entity, name);
 
@@ -169,6 +170,10 @@ void Scene::serialise(bool binary) {
 }
 
 void Scene::deserialise(bool binary) {
+    systems.each([&](auto system) {
+        system->setEnabled(false);
+    });
+
     if (binary) {
         auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
 
@@ -211,4 +216,8 @@ void Scene::deserialise(bool binary) {
 
         LOG_INFO << "Deserialise scene: " << filepath;
     }
+
+    systems.each([&](auto system) {
+        system->setEnabled(true);
+    });
 }

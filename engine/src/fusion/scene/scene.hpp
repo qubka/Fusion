@@ -66,7 +66,7 @@ namespace fe {
          */
         template<typename T, typename... Args>
         void addSystem(Args&&...args) {
-            systems.add<T>(std::make_shared<T>(registry, std::forward<Args>(args)...));
+            systems.add<T>(std::make_unique<T>(registry, std::forward<Args>(args)...));
         }
 
         /**

@@ -21,23 +21,4 @@ namespace fe {
                     ); //cereal::make_nvp("Children", children)
         }
     };
-
-    // TODO:: Move in system class
-    class HierarchySystem {
-    public:
-        static void Init(entt::registry& registry, bool enable = true);
-
-        // update hierarchy components when hierarchy component is modify
-        static void OnConstruct(entt::registry& registry, entt::entity entity);
-        static void OnDestroy(entt::registry& registry, entt::entity entity);
-        static void OnUpdate(entt::registry& registry, entt::entity entity);
-
-        static void Reparent(entt::entity entity, entt::entity parent, entt::registry& registry, HierarchyComponent& hierarchy);
-
-        static bool IsParent(entt::entity entity, entt::entity child, entt::registry& registry);
-
-        static void DestroyParent(entt::entity entity, entt::registry& registry);
-
-        static void SetParent(entt::entity entity, entt::entity parent, entt::registry& registry);
-    };
 }

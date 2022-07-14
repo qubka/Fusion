@@ -99,3 +99,7 @@
 	path = external/imgui-texteditor
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit
 	ignore = all
+[submodule "external/imgui_entt_entity_editor"]
+	path = external/imgui_entt_entity_editor
+	url = https://github.com/Green-Sky/imgui_entt_entity_editor
+	ignore = all
