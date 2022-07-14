@@ -9,7 +9,6 @@ namespace fe {
         explicit HierarchySystem(entt::registry& registry);
         ~HierarchySystem() override;
 
-        void onStart() override;
         void onPlay() override;
         void onUpdate() override;
         void onStop() override;
@@ -18,6 +17,7 @@ namespace fe {
         bool isParent(entt::entity entity, entt::entity child);
         void setParent(entt::entity entity, entt::entity parent);
         void destroyParent(entt::entity entity);
+        std::vector<entt::entity> getChildren(entt::entity entity);
 
     private:
         void onEnabled() override;
