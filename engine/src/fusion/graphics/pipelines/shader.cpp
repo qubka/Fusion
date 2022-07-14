@@ -382,7 +382,7 @@ VkShaderModule Shader::createShaderModule(const fs::path& moduleName, const std:
 }
 
 void Shader::createReflection() {
-	std::map<VkDescriptorType, uint32_t> descriptorPoolCounts;
+	std::unordered_map<VkDescriptorType, uint32_t> descriptorPoolCounts;
 
 	// Process to descriptors.
 	for (const auto& [uniformBlockName, uniformBlock] : uniformBlocks) {
@@ -486,7 +486,7 @@ void Shader::createReflection() {
 	}
 }
 
-void Shader::incrementDescriptorPool(std::map<VkDescriptorType, uint32_t>& descriptorPoolCounts, VkDescriptorType type) {
+void Shader::incrementDescriptorPool(std::unordered_map<VkDescriptorType, uint32_t>& descriptorPoolCounts, VkDescriptorType type) {
 	if (type == VK_DESCRIPTOR_TYPE_MAX_ENUM)
 		return;
 
@@ -499,12 +499,10 @@ void Shader::incrementDescriptorPool(std::map<VkDescriptorType, uint32_t>& descr
 void Shader::loadUniformBlock(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i) {
 	auto reflection = program.getUniformBlock(i);
 
-	for (auto& [uniformBlockName, uniformBlock] : uniformBlocks) {
-		if (uniformBlockName == reflection.name) {
-			uniformBlock.stageFlags |= stageFlag;
-			return;
-		}
-	}
+    if (auto it = uniformBlocks.find(reflection.name); it != uniformBlocks.end()) {
+        it->second.stageFlags |= stageFlag;
+        return;
+    }
 
 	auto type = UniformBlock::Type::None;
 	if (reflection.getType()->getQualifier().storage == glslang::EvqUniform)
@@ -525,13 +523,11 @@ void Shader::loadUniform(const glslang::TProgram& program, VkShaderStageFlags st
 
 		if (splitName.size() > 1) {
             auto& name = splitName[0];
-			for (auto& [uniformBlockName, uniformBlock] : uniformBlocks) {
-				if (uniformBlockName == name) {
-					uniformBlock.uniforms.emplace(String::ReplaceFirst(reflection.name, name + ".", ""),
-                        Uniform{ reflection.getBinding(), reflection.offset, computeSize(reflection.getType()), reflection.glDefineType, false, false, stageFlag });
-					return;
-				}
-			}
+            if (auto it = uniformBlocks.find(name); it != uniformBlocks.end()) {
+                it->second.uniforms.emplace(String::ReplaceFirst(reflection.name, name + ".", ""),
+                                            Uniform{ reflection.getBinding(), reflection.offset, computeSize(reflection.getType()), reflection.glDefineType, false, false, stageFlag });
+                return;
+            }
 		}
 	}
 
@@ -552,10 +548,9 @@ void Shader::loadAttribute(const glslang::TProgram& program, VkShaderStageFlags 
 	if (reflection.name.empty())
 		return;
 
-	for (const auto& [attributeName, attribute] : attributes) {
-		if (attributeName == reflection.name)
-			return;
-	}
+    if (attributes.find(reflection.name) != attributes.end()) {
+        return;
+    }
 
 	auto& qualifier = reflection.getType()->getQualifier();
 	attributes.emplace(reflection.name, Attribute{ static_cast<int32_t>(qualifier.layoutSet), static_cast<int32_t>(qualifier.layoutLocation), computeSize(reflection.getType()), reflection.glDefineType });

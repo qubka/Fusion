@@ -10,7 +10,7 @@ namespace fe {
     class GridRenderer final : public Subrender {
     public:
         explicit GridRenderer(const Pipeline::Stage& pipelineStage);
-        ~GridRenderer();
+        ~GridRenderer() override;
 
     private:
         void onUpdate() override {};

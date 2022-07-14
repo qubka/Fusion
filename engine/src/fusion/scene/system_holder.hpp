@@ -20,8 +20,9 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
         bool has() const {
-            const auto it = systems.find(typeid(T));
-            return it != systems.end() && it->second;
+            const auto& typeId = typeid(T);
+
+            return indexes.find(typeId) != indexes.end();
         }
 
         /**
@@ -33,10 +34,12 @@ namespace fe {
         T* get() const {
             const auto& typeId = typeid(T);
 
-            if (auto it = systems.find(typeId); it != systems.end() && it->second)
-                return static_cast<T*>(it->second.get());
+            if (auto it = indexes.find(typeId); it != indexes.end()) {
+                auto& system = systems[it->second];
+                return system ? static_cast<T*>(system.get()) : nullptr;
+            }
 
-            //throw std::runtime_error("Scene does not have requested System");
+            //throw std::runtime_error("System Holder does not have requested Subrender");
             return nullptr;
         }
 
@@ -53,7 +56,8 @@ namespace fe {
             const auto& typeId = typeid(T);
 
             // Then, add the System
-            systems[typeId] = std::move(system);
+            indexes.emplace(typeId, systems.size());
+            systems.push_back(std::move(system));
         }
 
         /**
@@ -64,8 +68,11 @@ namespace fe {
         void remove() {
             const auto& typeId = typeid(T);
 
-            // Then, remove the System.
-            systems.erase(typeId);
+            // Then, remove the System
+            if (auto it = indexes.find(typeId); it != indexes.end()) {
+                systems.erase(systems.begin() + it->second);
+                indexes.erase(it);
+            }
         }
 
         /**
@@ -80,12 +87,15 @@ namespace fe {
          */
         template<typename Func>
         void each(Func&& func) {
-            for (auto& [typeId, system] : systems) {
+            for (const auto& system : systems) {
                 func(system.get());
             }
         }
 
     private:
-        std::unordered_map<std::type_index, std::unique_ptr<System>> systems;
+        /// List of all Indexes of data stored
+        std::unordered_map<std::type_index, size_t> indexes;
+        /// List of all Systems in insertion order
+        std::vector<std::unique_ptr<System>> systems;
     };
 }

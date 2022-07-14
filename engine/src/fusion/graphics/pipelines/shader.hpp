@@ -42,17 +42,17 @@ namespace fe {
 
         const std::string& getName() const { return name; }
         uint32_t GetLastDescriptorBinding() const { return lastDescriptorBinding; }
-        const std::map<std::string, Uniform>& getUniforms() const { return uniforms; };
-        const std::map<std::string, UniformBlock>& getUniformBlocks() const { return uniformBlocks; };
-        const std::map<std::string, Attribute>& getAttributes() const { return attributes; };
-        const std::map<std::string, Constant>& getConstants() const { return constants; };
+        const std::unordered_map<std::string, Uniform>& getUniforms() const { return uniforms; };
+        const std::unordered_map<std::string, UniformBlock>& getUniformBlocks() const { return uniformBlocks; };
+        const std::unordered_map<std::string, Attribute>& getAttributes() const { return attributes; };
+        const std::unordered_map<std::string, Constant>& getConstants() const { return constants; };
         const std::array<std::optional<uint32_t>, 3>& getLocalSizes() const { return localSizes; }
         const std::vector<VkDescriptorSetLayoutBinding>& getDescriptorSetLayouts() const { return descriptorSetLayouts; }
         const std::vector<VkDescriptorPoolSize>& getDescriptorPools() const { return descriptorPools; }
         const std::vector<VkVertexInputAttributeDescription>& getAttributeDescriptions() const { return attributeDescriptions; }
 
     private:
-        static void incrementDescriptorPool(std::map<VkDescriptorType, uint32_t>& descriptorPoolCounts, VkDescriptorType type);
+        static void incrementDescriptorPool(std::unordered_map<VkDescriptorType, uint32_t>& descriptorPoolCounts, VkDescriptorType type);
         void loadUniformBlock(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i);
         void loadUniform(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i);
         void loadAttribute(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i);
@@ -60,10 +60,10 @@ namespace fe {
 
         std::string name;
         std::vector<fs::path> stages;
-        std::map<std::string, Uniform> uniforms;
-        std::map<std::string, UniformBlock> uniformBlocks;
-        std::map<std::string, Attribute> attributes;
-        std::map<std::string, Constant> constants;
+        std::unordered_map<std::string, Uniform> uniforms;
+        std::unordered_map<std::string, UniformBlock> uniformBlocks;
+        std::unordered_map<std::string, Attribute> attributes;
+        std::unordered_map<std::string, Constant> constants;
 
         std::array<std::optional<uint32_t>, 3> localSizes;
 
@@ -73,7 +73,7 @@ namespace fe {
         std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayouts;
         uint32_t lastDescriptorBinding{ 0 };
         std::vector<VkDescriptorPoolSize> descriptorPools;
-        std::map<uint32_t, VkDescriptorType> descriptorTypes;
+        std::unordered_map<uint32_t, VkDescriptorType> descriptorTypes;
         std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 
         mutable std::vector<std::string> notFoundNames;
