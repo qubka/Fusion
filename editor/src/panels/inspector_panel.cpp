@@ -49,7 +49,7 @@ namespace ImGui {
         }
 
         float fov = sceneCamera.getFOV();
-        if (ImGuiUtils::Property(sceneCamera.isPerspective() ? "Vertical FOV" : "Size", fov, 1.0f, 120.0f)) {
+        if (ImGuiUtils::Property(sceneCamera.isOrthographic() ? "Size" : "Vertical FOV", fov, 1.0f, 120.0f)) {
             sceneCamera.setFOV(fov);
         }
 

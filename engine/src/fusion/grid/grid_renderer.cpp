@@ -23,10 +23,17 @@ GridRenderer::~GridRenderer() {
 }
 
 void GridRenderer::onRender(const CommandBuffer& commandBuffer) {
+    auto scene =  SceneManager::Get()->getScene();
+    if (!scene)
+        return;
+
+    auto camera = scene->getCamera();
+    if (!camera)
+        return;
+
     // Updates uniform
-   // auto camera = SceneManager::Get()->getScene()->getCamera();
-    pushObject.push("projection", glm::mat4{1}/*camera->getProjectionMatrix()*/);
-    pushObject.push("view", glm::mat4{1}/*camera->getViewMatrix()*/);
+    pushObject.push("projection", camera->getProjectionMatrix());
+    pushObject.push("view", camera->getViewMatrix());
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);

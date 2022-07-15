@@ -12,8 +12,6 @@ namespace fe {
         //! Constructs screen-aligned camera
         PerspectiveCamera(const glm::vec2& size, float fov, float near, float far);
 
-        void onUpdate() override {};
-
         //! Configures the camera's projection according to the provided parameters.
         void setPerspective(float verticalFovDegrees, float aspect, float near, float far);
 
@@ -38,7 +36,7 @@ namespace fe {
             A vertical lens shift of 1 (-1) will shift the view up (down) by half the height of the viewport. */
         void setLensShiftVertical(float vertical) { setLensShift({lensShift.x, vertical}); }
 
-        bool isPerspective() const override { return true; }
+        bool isOrthographic() const override { return false; }
 
         //! Returns a Camera whose eyePoint is positioned to exactly frame \a worldSpaceSphere but is equivalent in other parameters (including orientation). Sets the result's pivotDistance to be the distance to \a worldSpaceSphere's center.
         PerspectiveCamera calcFraming(const Sphere& worldSpaceSphere) const;

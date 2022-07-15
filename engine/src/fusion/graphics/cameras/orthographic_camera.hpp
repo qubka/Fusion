@@ -12,7 +12,7 @@ namespace fe {
 
         void setOrthographic(float left, float right, float bottom, float top, float near, float far);
 
-        bool isPerspective() const override { return false; }
+        bool isOrthographic() const override { return true; }
 
         void getNearClipCoordinates(glm::vec3& topLeft, glm::vec3& topRight, glm::vec3& bottomLeft, glm::vec3& bottomRight) const override { getClipCoordinates(nearClip, 1.0f, topLeft, topRight, bottomLeft, bottomRight ); }
         void getFarClipCoordinates(glm::vec3& topLeft, glm::vec3& topRight, glm::vec3& bottomLeft, glm::vec3& bottomRight) const override { getClipCoordinates(farClip, 1.0f, topLeft, topRight, bottomLeft, bottomRight ); }

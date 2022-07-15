@@ -98,7 +98,7 @@ namespace fe {
          * Sets the current camera to a new camera.
          * @param cam The new camera.
          */
-        void setCamera(std::shared_ptr<Camera> cam) { camera = std::move(cam); }
+        void setCamera(const std::shared_ptr<Camera>& cam) { camera = cam; }
 
         /**
          * Gets the name of the scene.

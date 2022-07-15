@@ -83,7 +83,6 @@ std::unique_ptr<Bitmap> Image::getBitmap(uint32_t mipLevel, uint32_t arrayLayer)
     vkFreeMemory(logicalDevice, dstImageMemory, nullptr);
     vkDestroyImage(logicalDevice, dstImage, nullptr);
 
-
 	return bitmap;
 }
 

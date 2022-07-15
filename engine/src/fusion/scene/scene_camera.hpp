@@ -28,7 +28,7 @@ namespace fe {
         ProjectionType getProjectionType() const { return projectionType; }
         void setProjectionType(ProjectionType type) { projectionType = type; recalculateProjection(); }
 
-        bool isPerspective() const { return projectionType == ProjectionType::Perspective; }
+        bool isOrthographic() const { return projectionType == ProjectionType::Orthographic; }
 
         template<typename Archive>
         void serialize(Archive& archive) {
