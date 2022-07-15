@@ -14,6 +14,7 @@ namespace fe {
      * @brief Module used for managing some devices.
      */
     class DeviceManager {
+        friend class Engine;
     public:
         DeviceManager();
         virtual ~DeviceManager();
@@ -22,11 +23,6 @@ namespace fe {
         static std::unique_ptr<DeviceManager> Init();
 
         static DeviceManager* Get() { return Instance; }
-
-        /**
-         * Run every frame as long as the manager has work to do.
-         */
-        virtual void onUpdate() = 0;
 
         /**
          * Waits until events are queued and processes them.
@@ -90,6 +86,12 @@ namespace fe {
         const std::vector<std::unique_ptr<Window>>& getWindows() const { return windows; };
         const std::vector<std::unique_ptr<Monitor>>& getMonitors() const { return monitors; };
         const std::vector<std::unique_ptr<Joystick>>& getJoystick() const { return joysticks; };
+
+    protected:
+        /**
+         * Run every frame as long as the manager has work to do.
+         */
+        virtual void onUpdate() = 0;
 
     public:
         /**

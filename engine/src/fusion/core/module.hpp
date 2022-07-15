@@ -65,6 +65,7 @@ namespace fe {
      * @brief A interface used for defining engine modules.
      */
     class Module : public ModuleFactory<Module> {
+        friend class Engine;
     public:
         /**
          * @brief Represents the stage where the module will be updated in the engine.
@@ -77,6 +78,7 @@ namespace fe {
         ~Module() override = default;
         NONCOPYABLE(Module);
 
+    protected:
         /**
          * The update function for the module.
          */

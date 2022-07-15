@@ -9,6 +9,7 @@
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
+#include "fusion/input/input.hpp"
 
 #include "fusion/bitmaps/gli_loader.hpp"
 #include "fusion/bitmaps/stb_loader.hpp"
@@ -40,6 +41,7 @@ void Engine::init() {
     Time::Register(Module::Stage::Pre);
     FileSystem::Register(Module::Stage::Never);
     VirtualFileSystem::Register(Module::Stage::Never);
+    Input::Register(Module::Stage::Normal);
     SceneManager::Register(Module::Stage::Normal);
     Graphics::Register(Module::Stage::Render);
 

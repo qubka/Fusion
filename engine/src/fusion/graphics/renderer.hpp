@@ -18,16 +18,6 @@ namespace fe {
         NONCOPYABLE(Renderer);
 
         /**
-         * Run when switching to this scene from another, use this method to create {@link Subrender}'s.
-         */
-        virtual void onStart() = 0;
-
-        /**
-         * Run when updating the renderer module.
-         */
-        virtual void onUpdate() = 0;
-
-        /**
          * Checks whether a Subrender exists or not.
          * @tparam T The Subrender type.
          * @return If the Subrender has the System.
@@ -83,6 +73,17 @@ namespace fe {
         void addRenderStage(std::unique_ptr<RenderStage>&& renderStage) {
             renderStages.push_back(std::move(renderStage));
         }
+
+    protected:
+        /**
+         * Run when switching to this scene from another, use this method to create {@link Subrender}'s.
+         */
+        virtual void onStart() = 0;
+
+        /**
+         * Run when updating the renderer module.
+         */
+        virtual void onUpdate() = 0;
 
     private:
         std::vector<std::unique_ptr<RenderStage>> renderStages;

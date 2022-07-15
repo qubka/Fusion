@@ -4,11 +4,11 @@
 
 namespace glfw {
     class DeviceManager : public fe::DeviceManager {
+        friend Engine;
     public:
         DeviceManager();
         ~DeviceManager() override;
 
-        void onUpdate() override;
         void waitEvents() override;
 
         fe::Key getScanCode(fe::Key key) const override;
@@ -19,6 +19,9 @@ namespace glfw {
         void updateGamepadMappings(const std::string& mappings) override;
 
         fe::Window* createWindow(const fe::WindowInfo& windowInfo) override;
+
+    protected:
+        void onUpdate() override;
 
     private:
 #if GLFW_VERSION_MINOR >= 2

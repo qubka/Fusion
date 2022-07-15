@@ -56,15 +56,15 @@ void DeviceManager::onUpdate() {
     glfwPollEvents();
 
     for (auto& window : windows) {
-        window->onUpdate();
+        reinterpret_cast<Window*>(window.get())->onUpdate();
     }
 
     for (auto& monitor : monitors) {
-        monitor->onUpdate();
+        reinterpret_cast<Monitor*>(monitor.get())->onUpdate();
     }
 
     for (auto& joystick : joysticks) {
-        joystick->onUpdate();
+        reinterpret_cast<Joystick*>(joystick.get())->onUpdate();
     }
 }
 

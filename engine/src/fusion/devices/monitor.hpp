@@ -37,15 +37,11 @@ namespace fe {
      * @brief Class used to represent a monitor.
      */
     class Monitor {
+        friend class DeviceManager;
     public:
         Monitor() = default;
         virtual ~Monitor() = default;
         NONCOPYABLE(Monitor);
-
-        /**
-         * Run every frame as long as the monitor has work to do.
-         */
-        virtual void onUpdate() = 0;
 
         /**
          * Validate that monitor is primary.
@@ -118,5 +114,11 @@ namespace fe {
          * @return The object.
          */
         virtual void* getNativeMonitor() const = 0;
+
+    protected:
+        /**
+         * Run every frame as long as the monitor has work to do.
+         */
+        virtual void onUpdate() = 0;
     };
 }

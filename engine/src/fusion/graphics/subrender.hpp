@@ -7,7 +7,8 @@ namespace fe {
      * @brief Represents a render pipeline that is used to render a type of pipeline.
      */
     class Subrender {
-        //friend class Renderer;
+        friend class Renderer;
+        friend class SubrenderHolder;
     public:
         /**
          * Creates a new render pipeline.
@@ -16,17 +17,6 @@ namespace fe {
         explicit Subrender(Pipeline::Stage stage) : stage{std::move(stage)} { }
         virtual ~Subrender() = default;
         NONCOPYABLE(Subrender);
-
-        /**
-         * Called after main renderer update.
-         */
-        virtual void onUpdate() = 0;
-
-        /**
-         * Runs the render pipeline in the current renderpass.
-         * @param commandBuffer The command buffer to record render command into.
-         */
-        virtual void onRender(const CommandBuffer& commandBuffer) = 0;
 
         const Pipeline::Stage& getStage() const { return stage; }
 
@@ -42,6 +32,17 @@ namespace fe {
         }
 
     protected:
+        /**
+         * Called after main renderer update.
+         */
+        virtual void onUpdate() = 0;
+
+        /**
+         * Runs the render pipeline in the current renderpass.
+         * @param commandBuffer The command buffer to record render command into.
+         */
+        virtual void onRender(const CommandBuffer& commandBuffer) = 0;
+
         /**
          * @brief Called when the renderer is enabled.
          */

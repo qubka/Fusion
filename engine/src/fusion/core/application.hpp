@@ -5,25 +5,11 @@
 namespace fe {
     class Application {
         friend class Engine;
+        friend class ImGuiSubrender;
     public:
         Application(std::string name) : name{std::move(name)} { }
         virtual ~Application() = default;
         NONCOPYABLE(Application);
-
-        /**
-         * Run when switching to this app from another.
-         */
-        virtual void onStart() = 0;
-
-        /**
-         * Run every frame as long as the app has work to do.
-         */
-        virtual void onUpdate() = 0;
-
-        /**
-         * Run when ImGui should be drawn.
-         */
-        virtual void onImGui() = 0;
 
         /**
          * Gets the application's name.
@@ -50,6 +36,21 @@ namespace fe {
         void setVersion(Version ver) { version = ver; }
 
     protected:
+        /**
+         * Run when switching to this app from another.
+         */
+        virtual void onStart() = 0;
+
+        /**
+         * Run every frame as long as the app has work to do.
+         */
+        virtual void onUpdate() = 0;
+
+        /**
+         * Run when ImGui should be drawn.
+         */
+        virtual void onImGui() = 0;
+
         std::string name;
         Version version{ 0, 1, 0, 0 };
         bool started{ false };

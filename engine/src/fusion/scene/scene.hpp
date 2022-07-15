@@ -18,26 +18,6 @@ namespace fe {
         ~Scene() = default;
 
         /**
-         * Called when the scene is created.
-         */
-        virtual void onStart();
-
-        /**
-         * Run when updating the scene.
-         */
-        virtual void onUpdate();
-
-        /**
-         * Called when scene is being activated, and will begin being rendered/updated.
-         */
-        virtual void onPlay();
-
-        /**
-         * Called when scene is being swapped and will no longer be rendered/updated
-         */
-        virtual void onStop();
-
-        /**
          * Checks whether a System exists or not.
          * @tparam T The System type.
          * @return If the System exists.
@@ -169,6 +149,27 @@ namespace fe {
             //archive(cereal::make_nvp("Version", sceneSerialisationVersion));
             archive(cereal::make_nvp("Scene Name", name));
         }
+
+    protected:
+        /**
+         * Called when the scene is created.
+         */
+        virtual void onStart();
+
+        /**
+         * Run when updating the scene.
+         */
+        virtual void onUpdate();
+
+        /**
+         * Called when scene is being activated, and will begin being rendered/updated.
+         */
+        virtual void onPlay();
+
+        /**
+         * Called when scene is being swapped and will no longer be rendered/updated
+         */
+        virtual void onStop();
 
     private:
         template<typename T>

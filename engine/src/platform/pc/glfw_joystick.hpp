@@ -6,11 +6,10 @@
 
 namespace glfw {
     class Joystick : public fe::Joystick {
+        friend class DeviceManager;
     public:
         explicit Joystick(uint8_t port);
         ~Joystick() override = default;
-
-        void onUpdate() override;
 
         uint8_t getPort() const override { return port; }
         bool isConnected() const override { return connected; }
@@ -29,6 +28,9 @@ namespace glfw {
         const fe::GamepadState& getGamepadState() const override;
 
         void* getNativeJoystick() const override { return (void*) this; }
+
+    protected:
+        void onUpdate() override;
 
     private:
         uint8_t port;

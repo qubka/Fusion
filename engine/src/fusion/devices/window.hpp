@@ -26,15 +26,11 @@ namespace fe {
      * @brief Class used to represent a window.
      */
     class Window {
+        friend class DeviceManager;
     public:
         Window() = default;
         virtual ~Window() = default;
         NONCOPYABLE(Window);
-
-        /**
-         * Run every frame as long as the window has work to do.
-         */
-        virtual void onUpdate() = 0;
 
         /**
          * Gets weather the window is borderless or not.
@@ -312,6 +308,12 @@ namespace fe {
          * @return `VK_SUCCESS` if successful, or a Vulkan error code if an [error](@ref error_handling) occurred.
          */
         virtual VkResult createSurface(const VkInstance& instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const = 0;
+
+    protected:
+        /**
+         * Run every frame as long as the window has work to do.
+         */
+        virtual void onUpdate() = 0;
 
     public:
         /**

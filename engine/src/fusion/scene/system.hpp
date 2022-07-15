@@ -4,12 +4,24 @@
 
 namespace fe {
     class System {
-        //friend class Scene;
+        friend class Scene;
     public:
         explicit System(entt::registry& registry) : registry{registry} {}
         virtual ~System() = default;
         NONCOPYABLE(System);
 
+        bool isEnabled() const { return enabled; }
+        void setEnabled(bool flag) {
+            if (enabled == flag)
+                return;
+            enabled = flag;
+            if (enabled)
+                onEnabled();
+            else
+                onDisabled();
+        }
+
+    protected:
         /**
          * @brief Whenever the system starts updating because scene in the active state.
          */
@@ -25,18 +37,6 @@ namespace fe {
         */
         virtual void onStop() = 0;
 
-        bool isEnabled() const { return enabled; }
-        void setEnabled(bool flag) {
-            if (enabled == flag)
-                return;
-            enabled = flag;
-            if (enabled)
-                onEnabled();
-            else
-                onDisabled();
-        }
-
-    protected:
         /**
          * @brief Called when the system is enabled.
          */

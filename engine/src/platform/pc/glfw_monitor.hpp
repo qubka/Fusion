@@ -6,11 +6,10 @@
 
 namespace glfw {
     class Monitor : public fe::Monitor {
+        friend class DeviceManager;
     public:
         explicit Monitor(GLFWmonitor* monitor);
         ~Monitor() override = default;
-
-        void onUpdate() override {}
 
         bool isPrimary() const override{ return monitor == glfwGetPrimaryMonitor(); }
 
@@ -29,6 +28,9 @@ namespace glfw {
         void setGammaRamp(const fe::GammaRamp& gammaRamp) override;
 
         void* getNativeMonitor() const override { return monitor; }
+
+    protected:
+        void onUpdate() override {};
 
     private:
         GLFWmonitor* monitor;

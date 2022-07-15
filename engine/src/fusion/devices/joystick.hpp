@@ -19,15 +19,11 @@ namespace fe {
      * @brief Class used to represent a joystick.
      */
     class Joystick {
+        friend class DeviceManager;
     public:
         Joystick() = default;
         virtual ~Joystick() = default;
         NONCOPYABLE(Joystick);
-
-        /**
-         * Run every frame as long as the joystick has work to do.
-         */
-        virtual void onUpdate() = 0;
 
         /**
          * Gets the port of the joystick.
@@ -103,6 +99,12 @@ namespace fe {
          * @return The object.
          */
         virtual void* getNativeJoystick() const = 0;
+
+    protected:
+        /**
+         * Run every frame as long as the joystick has work to do.
+         */
+        virtual void onUpdate() = 0;
 
     public:
         /**
