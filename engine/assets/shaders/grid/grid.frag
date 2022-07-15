@@ -44,7 +44,7 @@ float computeLinearDepth(float depth, float near, float far) {
 }
 
 void main() {
-    /*float t = -inNearPoint.y / (inFarPoint.y - inNearPoint.y);
+    float t = -inNearPoint.y / (inFarPoint.y - inNearPoint.y);
     vec3 fragPos = inNearPoint + t * (inFarPoint - inNearPoint);
 
     float depth = computeDepth(fragPos);
@@ -53,6 +53,5 @@ void main() {
     outFragColor = (grid(fragPos, 10) + grid(fragPos, 1)) * float(t > 0); // adding multiple resolution for the grid
     outFragColor.a *= fading;
 
-    gl_FragDepth = depth;*/
-    outFragColor = vec4(1, 1, 1, 1);
+    gl_FragDepth = depth;
 }

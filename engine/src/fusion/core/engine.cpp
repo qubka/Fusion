@@ -10,6 +10,9 @@
 #include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
 
+#include "fusion/bitmaps/gli_loader.hpp"
+#include "fusion/bitmaps/stb_loader.hpp"
+
 using namespace fe;
 
 Engine* Engine::Instance = nullptr;
@@ -39,6 +42,9 @@ void Engine::init() {
     VirtualFileSystem::Register(Module::Stage::Never);
     SceneManager::Register(Module::Stage::Normal);
     Graphics::Register(Module::Stage::Render);
+
+    StbLoader::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
+    GliLoader::Register(".ktx", ".kmg", ".dds");
 
     sortModules();
 }

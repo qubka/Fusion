@@ -61,28 +61,28 @@ std::unique_ptr<Bitmap> Image::getBitmap(uint32_t mipLevel, uint32_t arrayLayer)
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
     auto size = glm::uvec2{extent.width, extent.height} >> mipLevel;
-	
-	VkImage dstImage;
-	VkDeviceMemory dstImageMemory;
-	CopyImage(image, dstImage, dstImageMemory, format, {size.x, size.y, 1}, layout, mipLevel, arrayLayer);
+    VkImage dstImage;
+    VkDeviceMemory dstImageMemory;
+    CopyImage(image, dstImage, dstImageMemory, format, {size.x, size.y, 1}, layout, mipLevel, arrayLayer);
 
-	VkImageSubresource dstImageSubresource = {};
-	dstImageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	dstImageSubresource.mipLevel = 0;
-	dstImageSubresource.arrayLayer = 0;
+    VkImageSubresource dstImageSubresource = {};
+    dstImageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    dstImageSubresource.mipLevel = 0;
+    dstImageSubresource.arrayLayer = 0;
 
-	VkSubresourceLayout dstSubresourceLayout;
-	vkGetImageSubresourceLayout(logicalDevice, dstImage, &dstImageSubresource, &dstSubresourceLayout);
+    VkSubresourceLayout dstSubresourceLayout;
+    vkGetImageSubresourceLayout(logicalDevice, dstImage, &dstImageSubresource, &dstSubresourceLayout);
 
-	auto bitmap = std::make_unique<Bitmap>(std::make_unique<uint8_t[]>(dstSubresourceLayout.size), size);
+    auto bitmap = std::make_unique<Bitmap>(std::make_unique<uint8_t[]>(dstSubresourceLayout.size), size);
 
-	void* data;
-	vkMapMemory(logicalDevice, dstImageMemory, dstSubresourceLayout.offset, dstSubresourceLayout.size, 0, &data);
-	std::memcpy(bitmap->getData<void>(), data, static_cast<size_t>(dstSubresourceLayout.size));
-	vkUnmapMemory(logicalDevice, dstImageMemory);
+    void* data;
+    vkMapMemory(logicalDevice, dstImageMemory, dstSubresourceLayout.offset, dstSubresourceLayout.size, 0, &data);
+    std::memcpy(bitmap->getData<void>(), data, static_cast<size_t>(dstSubresourceLayout.size));
+    vkUnmapMemory(logicalDevice, dstImageMemory);
 
-	vkFreeMemory(logicalDevice, dstImageMemory, nullptr);
-	vkDestroyImage(logicalDevice, dstImage, nullptr);
+    vkFreeMemory(logicalDevice, dstImageMemory, nullptr);
+    vkDestroyImage(logicalDevice, dstImage, nullptr);
+
 
 	return bitmap;
 }

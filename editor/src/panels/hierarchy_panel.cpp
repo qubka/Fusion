@@ -446,7 +446,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         }
 
         const ImColor TreeLineColor = ImColor{128, 128, 128, 128};
-        const float smallOffsetX = 6.0f;
+        const float smallOffsetX = 6.0f * DeviceManager::Get()->getWindow(0)->getWindowDPI();
         ImDrawList* drawList = ImGui::GetWindowDrawList();
 
         ImVec2 verticalLineStart = ImGui::GetCursorScreenPos();

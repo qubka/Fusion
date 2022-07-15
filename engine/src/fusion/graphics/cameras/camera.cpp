@@ -5,7 +5,7 @@
 using namespace fe;
 
 void Camera::setFov(float verticalFov) {
-    if (fov == verticalFov)
+    if (glm::epsilonEqual(fov, verticalFov, FLT_EPSILON))
         return;
 
     fov = verticalFov;
@@ -14,7 +14,7 @@ void Camera::setFov(float verticalFov) {
 
 void Camera::setFovHorizontal(float horizontalFov) {
     horizontalFov = glm::degrees(2.0f * std::atan(std::tan(glm::radians(horizontalFov) * 0.5f) / aspectRatio));
-    if (fov == horizontalFov)
+    if (glm::epsilonEqual(fov, horizontalFov, FLT_EPSILON))
         return;
 
     fov = horizontalFov;
@@ -22,7 +22,7 @@ void Camera::setFovHorizontal(float horizontalFov) {
 }
 
 void Camera::setAspectRatio(float aspect) {
-    if (aspectRatio == aspect)
+    if (glm::epsilonEqual(aspectRatio, aspect, FLT_EPSILON))
         return;
 
     aspectRatio = aspect;
@@ -30,7 +30,7 @@ void Camera::setAspectRatio(float aspect) {
 }
 
 void Camera::setNearClip(float near) {
-    if (nearClip == near)
+    if (glm::epsilonEqual(nearClip, near, FLT_EPSILON))
         return;
 
     nearClip = near;
@@ -38,7 +38,7 @@ void Camera::setNearClip(float near) {
 }
 
 void Camera::setFarClip(float far) {
-    if (farClip == far)
+    if (glm::epsilonEqual(farClip, far, FLT_EPSILON))
         return;
 
     farClip = far;
@@ -46,7 +46,7 @@ void Camera::setFarClip(float far) {
 }
 
 void Camera::setEyePoint(const glm::vec3& point) {
-    if (eyePoint == point)
+    if (glm::all(glm::epsilonEqual(eyePoint, point, FLT_EPSILON)))
         return;
 
     eyePoint = point;
@@ -55,7 +55,7 @@ void Camera::setEyePoint(const glm::vec3& point) {
 
 void Camera::setViewDirection(glm::vec3 direction) {
     direction = glm::normalize(direction);
-    if (viewDirection == direction)
+    if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)))
         return;
 
     viewDirection = direction;
@@ -65,7 +65,7 @@ void Camera::setViewDirection(glm::vec3 direction) {
 
 void Camera::setOrientation(glm::quat rotation) {
     rotation = glm::normalize(rotation);
-    if (orientation == rotation)
+    if (glm::all(glm::epsilonEqual(orientation, rotation, FLT_EPSILON)))
         return;
 
     orientation = rotation;
@@ -75,7 +75,7 @@ void Camera::setOrientation(glm::quat rotation) {
 
 void Camera::setWorldUp(glm::vec3 up) {
     up = glm::normalize(up);
-    if (worldUp == up)
+    if (glm::all(glm::epsilonEqual(worldUp, up, FLT_EPSILON)))
         return;
 
     worldUp = up;
@@ -92,7 +92,7 @@ void Camera::lookAt(glm::vec3 target) {
     target -= eyePoint; // ray from target to eye
 
     glm::vec3 direction { glm::normalize(target) };
-    if (viewDirection == direction)
+    if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)))
         return;
 
     viewDirection = direction;
@@ -106,7 +106,7 @@ void Camera::lookAt(const glm::vec3& point, glm::vec3 target) {
     target -= eyePoint; // ray from target to eye
 
     glm::vec3 direction { glm::normalize(target) };
-    if (viewDirection == direction && eyePoint == point)
+    if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)) && glm::all(glm::epsilonEqual(eyePoint, point, FLT_EPSILON)))
         return;
 
     eyePoint = point;
@@ -122,7 +122,7 @@ void Camera::lookAt(const glm::vec3& point, glm::vec3 target, glm::vec3 up) {
     up = glm::normalize(up);
 
     glm::vec3 direction { glm::normalize(target) };
-    if (viewDirection == direction && eyePoint == point && worldUp == up)
+    if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)) && glm::all(glm::epsilonEqual(eyePoint, point, FLT_EPSILON)) && glm::all(glm::epsilonEqual(worldUp, up, FLT_EPSILON)))
         return;
 
     eyePoint = point;

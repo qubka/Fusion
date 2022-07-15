@@ -24,7 +24,8 @@ using namespace fe;
 ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     : Subrender{pipelineStage}
     , pipeline{pipelineStage, {"EngineShaders/imgui/imgui.vert", "EngineShaders/imgui/imgui.frag"}, {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}}, {}
-    , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE}
+    , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE/*, VK_FRONT_FACE_CLOCKWISE, PipelineGraphics::Blend::SrcAlphaOneMinusSrcAlpha
+    , false, 0.0f, 0.0f, 0.0f, 1.0f, true, true*/}
     , descriptorSet{pipeline} {
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
@@ -70,6 +71,7 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     window = DeviceManager::Get()->getWindow(0);
     auto& size = window->getSize();
     io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
+    fontScale *= window->getWindowDPI();
 
     setupKeyCodes();
     setupStyle();
@@ -113,10 +115,15 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer) {
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
+    descriptorSet.push("fontSampler", dynamic_cast<const Image2d*>(Graphics::Get()->getAttachment("offscreen")));
+
+    if (!descriptorSet.update(pipeline))
+        return;
 
     // Draws the canvas
     pipeline.bindPipeline(commandBuffer);
     pushObject.bindPush(commandBuffer, pipeline);
+    descriptorSet.bindDescriptor(commandBuffer, pipeline);
 
     canvasObject.cmdRender(commandBuffer, pipeline, descriptorSet);
 }

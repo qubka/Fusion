@@ -21,7 +21,7 @@ namespace fe {
 
         template<typename T>
         class Registrar {
-        protected:
+        public:
             template<typename ...Args>
             static bool Register(Args&& ... names) {
                 for (std::string&& name : { names... })

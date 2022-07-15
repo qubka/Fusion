@@ -3,6 +3,7 @@
 #include "editor.hpp"
 
 #include "fusion/core/engine.hpp"
+#include "fusion/devices/device_manager.hpp"
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/filesystem/file_format.hpp"
 #include "fusion/utils/string.hpp"
@@ -193,8 +194,10 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
     if (dirInfo->parent == nullptr)
         nodeFlags |= ImGuiTreeNodeFlags_Framed;
 
+    float dpi = DeviceManager::Get()->getWindow(0)->getWindowDPI();
+
     const ImColor TreeLineColor = ImColor{128, 128, 128, 128};
-    const float smallOffsetX = 6.0f;
+    const float smallOffsetX = 6.0f * dpi;
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     if (dirInfo->isDirectory) {
@@ -272,7 +275,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
                         }
                     }
 
-                    float horizontalTreeLineSize = 16.0f;
+                    float horizontalTreeLineSize = 16.0f * dpi;
                     if (containsFolderTemp)
                         horizontalTreeLineSize *= 0.5f;
 
