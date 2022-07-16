@@ -4,12 +4,13 @@
 
 using namespace fe;
 
-SceneManager::SceneManager() {
-    //DeviceManager::Get()->getWindow(0)->OnResize().connect<&SceneManager::onWindowResize>(this);
+SceneManager::~SceneManager() {
+    //if (started) DeviceManager::Get()->getWindow(0)->OnResize().connect<&SceneManager::onWindowResize>(this);
 }
 
-SceneManager::~SceneManager() {
-    //DeviceManager::Get()->getWindow(0)->OnResize().connect<&SceneManager::onWindowResize>(this);
+void SceneManager::onStart() {
+    DeviceManager::Get()->getWindow(0)->OnResize().connect<&SceneManager::onWindowResize>(this);
+    // TODO: Delete hook ?
 }
 
 void SceneManager::onUpdate() {

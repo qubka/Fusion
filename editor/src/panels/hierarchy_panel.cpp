@@ -1,6 +1,7 @@
 #include "hierarchy_panel.hpp"
 #include "editor.hpp"
 
+#include "fusion/input/input.hpp"
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/scene/components.hpp"
@@ -19,9 +20,9 @@ HierarchyPanel::~HierarchyPanel() {
 void HierarchyPanel::onImGui() {
     auto flags = ImGuiWindowFlags_NoCollapse;
     currentPrevious = entt::null;
-    auto window = DeviceManager::Get()->getWindow(0);
-    selectUp = !!window->getKey(Key::Up);
-    selectDown = !!window->getKey(Key::Down);
+    auto input = Input::Get();
+    selectUp = input->getKey(Key::Up);
+    selectDown = input->getKey(Key::Down);
 
     ImGui::Begin(title.c_str(), &active, flags);
     {

@@ -18,7 +18,7 @@ namespace fe {
         /** Returns both the horizontal and vertical lens shift.
             A horizontal lens shift of 1 (-1) will shift the view right (left) by half the width of the viewport.
             A vertical lens shift of 1 (-1) will shift the view up (down) by half the height of the viewport. */
-       glm::vec2 getLensShift() const { return lensShift; }
+        glm::vec2 getLensShift() const { return lensShift; }
         /** Sets both the horizontal and vertical lens shift.
             A horizontal lens shift of 1 (-1) will shift the view right (left) by half the width of the viewport.
             A vertical lens shift of 1 (-1) will shift the view up (down) by half the height of the viewport. */

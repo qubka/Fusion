@@ -80,8 +80,15 @@ namespace fe {
 
     protected:
         /**
+         * The start function for the module.
+         */
+        virtual void onStart() {};
+
+        /**
          * The update function for the module.
          */
         virtual void onUpdate() {};
+
+        bool started{ false };
     };
 }

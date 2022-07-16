@@ -11,8 +11,6 @@ namespace fe {
     public:
         virtual ~Camera() = default;
 
-        virtual void onUpdate() = 0;
-
         //! Returns the position in world-space from which the Camera is viewing
         glm::vec3 getEyePoint() const { return eyePoint; }
         //! Sets the position in world-space from which the Camera is viewing
@@ -81,8 +79,8 @@ namespace fe {
         //! Returns the four corners of the Camera's Far clipping plane, expressed in world-space
         virtual void getFarClipCoordinates(glm::vec3& topLeft, glm::vec3& topRight, glm::vec3& bottomLeft, glm::vec3& bottomRight) const { getClipCoordinates(farClip, farClip / nearClip, topLeft, topRight, bottomLeft, bottomRight); }
 
-        //! Returns whether the camera represents a perspective projection instead of an orthographic
-        virtual bool isPerspective() const = 0;
+        //! Returns whether the camera represents an orthographic projection instead of an perspective
+        virtual bool isOrthographic() const = 0;
         //! Returns the coordinates of the camera's frustum, suitable for passing to \c glFrustum
         void getFrustum(float& left, float& top, float& right, float& bottom, float& near, float& far) const;
         //! Returns the Camera's Projection matrix, which converts view-space into clip-space
@@ -122,6 +120,11 @@ namespace fe {
         float calcScreenArea(const Sphere& sphere, const glm::vec2& screenSize) const;
         //! Calculates the screen-space elliptical projection of \a sphere, putting the results in \a outCenter, \a outAxisA and \a outAxisB
         void calcScreenProjection(const Sphere& sphere, const glm::vec2& screenSize, glm::vec2* outCenter, glm::vec2* outAxisA, glm::vec2* outAxisB) const;
+
+        //! Gets the camera rotation dirs
+        const glm::vec3& getForwardDirection() const { return viewDirection; }
+        const glm::vec3& getRightDirection() const { return rightVector; }
+        const glm::vec3& getUpDirection() const { return upVector; }
 
     protected:
         Camera() = default;

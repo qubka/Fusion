@@ -5,21 +5,19 @@
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
+#include <imguizmo/ImGuizmo.h>
 
 namespace fe {
     class Editor;
     class Scene;
     class EditorPanel {
+        friend class Editor;
     public:
         EditorPanel(std::string title, std::string name, Editor* editor) : title{std::move(title)}, name{std::move(name)}, editor{editor} {};
         virtual ~EditorPanel() = default;
 
         const std::string& getTitle() const { return title; }
         const std::string& getName() const { return name; }
-
-        virtual void onImGui() = 0;
-        virtual void onNewScene(Scene* scene) {}
-        virtual void onNewProject() {}
 
         bool& Active() { return active; }
         bool isActive() const { return active; }
@@ -29,6 +27,10 @@ namespace fe {
         void setEditor(Editor* ptr) { editor = ptr; }
 
     protected:
+        virtual void onImGui() = 0;
+        virtual void onNewScene(Scene* scene) {}
+        virtual void onNewProject() {}
+
         std::string title;
         std::string name;
         Editor* editor;

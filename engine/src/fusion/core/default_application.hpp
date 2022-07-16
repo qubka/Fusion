@@ -31,8 +31,12 @@ namespace fe {
         explicit DefaultApplication(std::string name);
         ~DefaultApplication() override;
 
+    protected:
         void onStart() override;
+        void onUpdate() override {};
+        void onImGui() override {};
 
+    public:
         void openNewProject(const fs::path& path, const std::string& name = "New Project");
         void openProject(const fs::path& path);
         //void onViewportResize(const glm::uvec2& size);
@@ -40,6 +44,10 @@ namespace fe {
         bool isProjectLoaded() const { return projectLoaded; }
         bool isConsoleOpened() const { return consoleOpened; }
         ProjectSettings& getProjectSettings() { return projectSettings; }
+
+        // TODO: Move may be?
+        bool isSceneActive() { return sceneActive; }
+        void setSceneActive(bool flag) { sceneActive = flag; }
 
         void serialise();
         void deserialise();
@@ -97,5 +105,6 @@ namespace fe {
         ProjectSettings projectSettings;
         bool projectLoaded{ false };
         bool consoleOpened{ false };
+        bool sceneActive{ false };
     };
 }

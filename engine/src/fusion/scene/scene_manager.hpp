@@ -9,10 +9,8 @@ namespace fe {
      */
     class SceneManager : public Module::Registrar<SceneManager> {
     public:
-        SceneManager();
+        SceneManager() = default;
         ~SceneManager() override;
-
-        void onUpdate() override;
 
         /**
          * Gets the current scene.
@@ -27,6 +25,8 @@ namespace fe {
         void setScene(std::unique_ptr<Scene>&& scene) { this->scene = std::move(scene); }
 
     private:
+        void onStart() override;
+        void onUpdate() override;
         void onWindowResize(const glm::uvec2& size);
 
         std::unique_ptr<Scene> scene;

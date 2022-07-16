@@ -4,7 +4,7 @@
 
 namespace glfw {
     class DeviceManager : public fe::DeviceManager {
-        friend Engine;
+        friend class Engine;
     public:
         DeviceManager();
         ~DeviceManager() override;

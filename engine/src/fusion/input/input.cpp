@@ -8,17 +8,20 @@
 
 using namespace fe;
 
-Input::Input() {
-    setupEvents(true);
-}
+void Input::onStart() {
+    // Set the window events callbacks.
+    auto window = DeviceManager::Get()->getWindow(0);
+    window->OnMouseButton().connect<&Input::onMouseButton>(this);
+    window->OnMouseMotion().connect<&Input::onMouseMotion>(this);
+    window->OnMouseScroll().connect<&Input::onMouseScroll>(this);
+    window->OnKey().connect<&Input::onKeyPress>(this);
 
-Input::~Input() {
-    setupEvents(false);
+    // TODO: Delete hooks ?
 }
 
 void Input::onUpdate() {
-    delta = vec3::zero;
-    scroll = vec3::zero;
+    mousePositionDelta = vec3::zero;
+    mouseScroll = vec3::zero;
 }
 
 bool Input::getKey(Key key) {
@@ -55,30 +58,13 @@ bool Input::getMouseButtonUp(MouseButton button) {
     return !press && frame == Time::FrameCount();
 }
 
-void Input::setupEvents(bool connect) {
-    auto window = DeviceManager::Get()->getWindow(0);
-    if (connect) {
-        // Set the window events callbacks.
-        window->OnMouseButton().connect<&Input::onMouseButton>(this);
-        window->OnMouseMotion().connect<&Input::onMouseMotion>(this);
-        window->OnMouseScroll().connect<&Input::onMouseScroll>(this);
-        window->OnKey().connect<&Input::onKeyPress>(this);
-    } else {
-        // Remove the window events callbacks.
-        window->OnMouseButton().disconnect<&Input::onMouseButton>(this);
-        window->OnMouseMotion().disconnect<&Input::onMouseMotion>(this);
-        window->OnMouseScroll().disconnect<&Input::onMouseScroll>(this);
-        window->OnKey().disconnect<&Input::onKeyPress>(this);
-    }
-}
-
 void Input::onMouseMotion(const glm::vec2& pos) {
-    delta += pos - position;
-    position = pos;
+    mousePositionDelta += pos - mousePosition;
+    mousePosition = pos;
 }
 
 void Input::onMouseScroll(const glm::vec2& offset) {
-    scroll = offset;
+    mouseScroll = offset;
 }
 
 void Input::onMouseButton(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods) {

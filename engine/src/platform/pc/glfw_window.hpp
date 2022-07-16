@@ -7,11 +7,10 @@
 
 namespace glfw {
     class Window : public fe::Window {
+        friend class DeviceManager;
     public:
         Window(const fe::VideoMode& videoMode, const fe::WindowInfo& windowInfo);
         ~Window() override;
-
-        void onUpdate() override;
 
         bool isBorderless() const override { return borderless; }
         void setBorderless(bool flag) override;
@@ -78,6 +77,9 @@ namespace glfw {
         void* getNativeWindow() const override { return window; }
 
         VkResult createSurface(VkInstance const& instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const override;
+
+    protected:
+        void onUpdate() override;
 
     private:
         GLFWwindow* window{ nullptr };

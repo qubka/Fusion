@@ -62,10 +62,7 @@ int32_t Engine::run() {
             // Main application and devices processing
             devices->onUpdate();
             if (application) {
-                if (!application->started) {
-                    application->onStart();
-                    application->started = true;
-                }
+                startup();
                 application->onUpdate();
             }
 
@@ -82,6 +79,20 @@ int32_t Engine::run() {
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
+}
+
+void Engine::startup() {
+    if (!application->started) {
+        application->onStart();
+        application->started = true;
+
+        for (auto& [type, module] : modules) {
+            if (!module->started) {
+                module->onStart();
+                module->started = true;
+            }
+        }
+    }
 }
 
 void Engine::updateStage(Module::Stage stage) {

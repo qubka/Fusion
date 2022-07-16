@@ -88,6 +88,11 @@ namespace fe {
         void init();
 
         /**
+         * The startup function for the application and modules.
+         */
+        void startup();
+
+        /**
          * The update engine modules for the required stage.
          */
         void updateStage(Module::Stage stage);

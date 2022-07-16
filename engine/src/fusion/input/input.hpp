@@ -8,10 +8,8 @@ namespace fe {
     // if you want use individual inputs, not called init here, use BaseInput's classes
     class Input : public Module::Registrar<Input>{
     public:
-        Input();
-        ~Input() override;
-
-        void onUpdate() override;
+        Input() = default;
+        ~Input() override = default;
 
         //! Returns true while the user holds down the key identified by GLFW code.
         bool getKey(Key key);
@@ -28,14 +26,15 @@ namespace fe {
         bool getMouseButtonUp(MouseButton button);
 
         //! The current mouse position in pixel coordinates.
-        const glm::vec2& getMousePosition() const { return position; }
+        const glm::vec2& getMousePosition() const { return mousePosition; }
         //! The current mouse position delta.
-        const glm::vec2& getMouseDelta() const { return delta; }
-        //! The current mouse scroll delta.
-        const glm::vec2& getMouseScroll() const { return scroll; }
+        const glm::vec2& getMousePositionDelta() const { return mousePositionDelta; }
+        //! The current mouse scroll.
+        const glm::vec2& getMouseScroll() const { return mouseScroll; }
 
     private:
-        void setupEvents(bool connect);
+        void onStart() override;
+        void onUpdate() override;
 
         void onMouseButton(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods);
         void onMouseMotion(const glm::vec2& pos);
@@ -49,8 +48,8 @@ namespace fe {
         };
 
         std::array<KeyData, 1032> keys{};
-        glm::vec2 delta{ 0.0f };
-        glm::vec2 position{ 0.0f };
-        glm::vec2 scroll{ 0.0f };
+        glm::vec2 mousePosition{ 0.0f };
+        glm::vec2 mousePositionDelta{ 0.0f };
+        glm::vec2 mouseScroll{ 0.0f };
     };
 }

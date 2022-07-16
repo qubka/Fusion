@@ -33,8 +33,6 @@ namespace fe {
         Graphics();
         ~Graphics() override;
 
-        void onUpdate() override;
-
         /**
          * Gets the current renderer.
          * @return The renderer.
@@ -65,6 +63,8 @@ namespace fe {
         void captureScreenshot(const fs::path& filepath, size_t id = 0) const;
 
     private:
+        void onUpdate() override;
+
         struct FrameInfo {
             const size_t& id;
             size_t& currentFrame;

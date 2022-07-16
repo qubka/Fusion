@@ -11,24 +11,26 @@ namespace fe {
             std::vector<Attachment> renderpassAttachments0 = {
                     {0, "depth", Attachment::Type::Depth, false},
                     {1, "swapchain", Attachment::Type::Swapchain},
-                    {2, "offscreen", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM, {0.5f, 0.5f, 0.5f, 1.0f}}
+
+                    {2, "scene", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM, {0.5f, 0.5f, 0.5f, 1.0f}},
+                    //{3, "game", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM, {0.5f, 0.5f, 0.5f, 1.0f}}
             };
             std::vector<SubpassType> renderpassSubpasses0 = {
-                    {0, {0, 1}},
-                    {1, {0, 2}},
+                    {0, {0, 2}},
+                    {1, {0, 1}},
             };
+
             addRenderStage(std::make_unique<RenderStage>(renderpassAttachments0, renderpassSubpasses0));
         }
         ~EditorRenderer() override = default;
 
+    private:
         void onStart() override {
-            addSubrender<ImGuiSubrender>({0, 0});
-            addSubrender<GridRenderer>({0, 1});
+            addSubrender<GridRenderer>({0, 0});
+            addSubrender<ImGuiSubrender>({0, 1});
         }
 
         void onUpdate() override {
         }
-
-    private:
     };
 }

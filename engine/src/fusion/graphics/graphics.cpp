@@ -38,7 +38,7 @@ Graphics::~Graphics() {
 
     swapchains.clear();
 
-    DeviceManager::Get()->OnWindowCreate().disconnect<&Graphics::onWindowCreate>(this);
+    //DeviceManager::Get()->OnWindowCreate().disconnect<&Graphics::onWindowCreate>(this);
 
     VK_CHECK(vkQueueWaitIdle(graphicsQueue));
 

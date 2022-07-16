@@ -103,7 +103,7 @@ void Camera::lookAt(glm::vec3 target) {
 }
 
 void Camera::lookAt(const glm::vec3& point, glm::vec3 target) {
-    target -= eyePoint; // ray from target to eye
+    target -= point; // ray from target to eye
 
     glm::vec3 direction { glm::normalize(target) };
     if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)) && glm::all(glm::epsilonEqual(eyePoint, point, FLT_EPSILON)))
@@ -118,7 +118,7 @@ void Camera::lookAt(const glm::vec3& point, glm::vec3 target) {
 }
 
 void Camera::lookAt(const glm::vec3& point, glm::vec3 target, glm::vec3 up) {
-    target -= eyePoint; // ray from target to eye
+    target -= point; // ray from target to eye
     up = glm::normalize(up);
 
     glm::vec3 direction { glm::normalize(target) };

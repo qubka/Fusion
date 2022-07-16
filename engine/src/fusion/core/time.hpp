@@ -20,6 +20,7 @@ namespace fe {
         //! The number of frames per second
         static uint32_t FramesPerSecond() { return ModuleInstance->framesPerSecond; }
 
+    private:
         void onUpdate() override {
             auto currentTime = DateTime::Now();
             deltaTime = (currentTime - lastTime);
