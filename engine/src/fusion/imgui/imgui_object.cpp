@@ -4,6 +4,8 @@
 #include "fusion/graphics/images/image2d.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/descriptors/descriptors_handler.hpp"
+#include "fusion/graphics/buffers/push_handler.hpp"
+#include "fusion/graphics/buffers/uniform_handler.hpp"
 #include "fusion/graphics/vku.hpp"
 
 #include <volk/volk.h>
@@ -93,6 +95,7 @@ void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& 
 
             indexOffset += static_cast<int32_t>(cmd.ElemCount);
         }
+
         vertexOffset += cmdLists->VtxBuffer.Size;
     }
 }

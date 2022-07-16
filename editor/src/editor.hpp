@@ -4,6 +4,7 @@
 
 #include "panels/editor_panel.hpp"
 #include "panels/file_browser_panel.hpp"
+#include "fusion/graphics/cameras/controllers/editor_camera_controller.hpp"
 
 #include <entt/entity/entity.hpp>
 
@@ -14,7 +15,13 @@ namespace fe {
     struct EditorSettings {
         bool fullScreenOnPlay{ false };
         bool fullScreenSceneView{ false };
+        bool halfRes{ false };
         bool showImGuiDemo{ false };
+        bool showGizmos{ true };
+        bool snapGizmos{ false };
+        float snapAmount{ 0.5f };
+        float snapBound{ 0.1f };
+        uint32_t gizmosOperation{ 14463 };
         ImGuiUtils::Theme theme{ ImGuiUtils::Theme::ClassicDark };
 
         /*float gridSize{ 10.0f };
@@ -22,15 +29,13 @@ namespace fe {
         uint32_t physics2DDebugFlags{ 0 };
         uint32_t physics3DDebugFlags{ 0 };
         bool showGrid{ true };
-        bool showGizmos{ true };
+
         bool showViewSelected{ false };
-        bool snapQuizmo{ false };
+
         bool showImGuiDemo{ true };
         bool view2D{ false };
         bool sleepOutofFocus{ true };
         bool freeAspect{ true };
-        bool halfRes{ false };
-        float snapAmount{ 1.0f };
         float imGuizmoScale{ 0.25f };
         float fixedAspect{ 1.0f };
         float aspectRatio{ 1.0f };*/
@@ -48,10 +53,6 @@ namespace fe {
         explicit Editor(std::string name);
         ~Editor() override;
 
-        void onStart() override;
-        void onUpdate() override;
-        void onImGui() override;
-
         void openFile();
 
         // TODO: Rework
@@ -62,10 +63,13 @@ namespace fe {
 
         void openTextFile(const fs::path& filepath, std::function<void()>&& callback);
         void removePanel(EditorPanel* panel);
-        EditorPanel* getTextEditPanel();
+        EditorPanel* getPanel(const std::string& name);
 
-        const EditorSettings& getSettings() { return editorSettings; }
-        const EditorState& getState() { return editorState; }
+        Camera* getCamera() { return editorCamera.get(); }
+        //const EditorCameraController& getEditorCameraController() { return editorCameraController; }
+
+        EditorSettings& getSettings() { return editorSettings; }
+        EditorState& getState() { return editorState; }
 
         void setSelected(entt::entity entity) { selectedEntity = entity; }
         entt::entity getSelected() const { return selectedEntity; }
@@ -84,15 +88,33 @@ namespace fe {
             return false;
         }
 
+        const glm::vec2& getSceneViewPanelPosition() { return sceneViewPanelPosition; }
+        void setSceneViewPanelPosition(const glm::vec2& pos) { sceneViewPanelPosition = pos; }
+        void setSceneViewActive(bool flag) { sceneViewActive = flag; }
+
         //void focusCamera(const glm::vec3& point, float distance, float speed = 1.0f);
 
+        void onImGuizmo();
     private:
+        void onStart() override;
+        void onUpdate() override;
+        void onImGui() override;
+
         void beginDockSpace(bool gameFullScreen);
         void endDockSpace();
         void drawMenuBar();
 
         EditorSettings editorSettings;
         EditorState editorState{ EditorState::Paused };
+
+        EditorCameraController editorCameraController;
+        std::shared_ptr<Camera> editorCamera;
+        float currentSceneAspectRatio{ 0.0f };
+        float cameraTransitionStartTime{ 0.0f };
+        float cameraTransitionSpeed{ 0.0f };
+        bool transitioningCamera{ false };
+        glm::vec3 cameraDestination{ 0.0f };
+        glm::vec3 cameraStartPosition{ 0.0f };
 
         FileBrowserPanel fileBrowserPanel{ this };
         std::vector<std::unique_ptr<EditorPanel>> panels;
@@ -106,5 +128,9 @@ namespace fe {
         bool reopenNewProjectPopup{ false };
         bool newProjectPopupOpen{ false };
         bool locationPopupOpened{ false };
+
+        bool sceneViewActive{ false };
+        glm::vec2 sceneViewPanelPosition{ 0.0f };
+
     };
 }

@@ -4,8 +4,10 @@
 #include "fusion/core/engine.hpp"
 #include "fusion/core/time.hpp"
 #include "fusion/devices/device_manager.hpp"
+#include "fusion/input/input.hpp"
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/cameras/editor_camera.hpp"
+#include "fusion/graphics/cameras/camera.hpp"
+#include "fusion/graphics/cameras/perspective_camera.hpp"
 #include "fusion/scene/components.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/utils/enumerate.hpp"
@@ -39,6 +41,11 @@ void Editor::onStart() {
 
     Graphics::Get()->setRenderer(std::make_unique<EditorRenderer>());
 
+    const auto& size = DeviceManager::Get()->getWindow(0)->getSize();
+    editorCamera = std::make_shared<PerspectiveCamera>();
+    //editorCamera->setAspectRatio(size.x / size.y);
+    //editorCamera = std::make_shared<EditorCamera>();
+
     componentIconMap[typeid(TransformComponent)] = ICON_MDI_AXIS_ARROW;
     componentIconMap[typeid(ModelComponent)] = ICON_MDI_SHAPE;
     //componentIconMap[typeid(MeshComponent)] = ICON_MDI_SHAPE;
@@ -69,7 +76,178 @@ void Editor::onStart() {
 }
 
 void Editor::onUpdate() {
+    auto scene = SceneManager::Get()->getScene();
+    if (scene) {
+        scene->setCamera(editorCamera);
+    }
 
+
+    if (sceneViewActive && scene) {
+        auto input = Input::Get();
+
+        {
+            editorCameraController.update(*editorCamera);
+            //std::reinterpret_pointer_cast<EditorCamera>(editorCamera)->onUpdate();
+
+            if (input->getKeyDown(Key::F)) {
+                auto& registry = scene->getRegistry();
+                if (registry.valid(selectedEntity)) {
+                    /*auto transform = registry.try_get<TransformComponent>(selectedEntity);
+                    if (transform)
+                        FocusCamera(transform->GetWorldPosition(), 2.0f, 2.0f);*/
+                }
+            }
+        }
+
+        if (input->getKey(Key::O)) {
+            //focusCamera(glm::vec3(0.0f, 0.0f, 0.0f), 2.0f, 2.0f);
+        }
+
+        if (transitioningCamera) {
+            float ts = Time::DeltaTime().asSeconds();
+
+            if (cameraTransitionStartTime < 0.0f)
+                cameraTransitionStartTime = ts;
+
+            float focusProgress = std::min((ts - cameraTransitionStartTime) / cameraTransitionSpeed, 1.f);
+            glm::vec3 newCameraPosition = glm::mix(cameraStartPosition, cameraDestination, focusProgress);
+            editorCamera->setEyePoint(newCameraPosition);
+
+            if (editorCamera->getEyePoint() == cameraDestination)
+                transitioningCamera = false;
+        }
+
+        if (!input->getMouseButton(MouseButton::ButtonRight) && !ImGuizmo::IsUsing()) {
+            if (input->getKeyDown(Key::Q)) {
+                editorSettings.gizmosOperation = ImGuizmo::OPERATION::BOUNDS;
+            }
+
+            if (input->getKeyDown(Key::W)) {
+                editorSettings.gizmosOperation = ImGuizmo::OPERATION::TRANSLATE;
+            }
+
+            if (input->getKeyDown(Key::E)) {
+                editorSettings.gizmosOperation = ImGuizmo::OPERATION::ROTATE;
+            }
+
+            if (input->getKeyDown(Key::R)) {
+                editorSettings.gizmosOperation = ImGuizmo::OPERATION::SCALE;
+            }
+
+            if (input->getKeyDown(Key::T)) {
+                editorSettings.gizmosOperation = ImGuizmo::OPERATION::UNIVERSAL;
+            }
+
+            if (input->getKeyDown(Key::Y)) {
+                editorSettings.snapGizmos = !editorSettings.snapGizmos;
+            }
+        }
+
+        if ((input->getKey(Key::LeftSuper) || (input->getKey(Key::LeftControl)))) {
+            if (input->getKeyDown(Key::S) && sceneActive) {
+                scene->serialise();
+            }
+
+            if (input->getKeyDown(Key::O))
+               scene->deserialise();
+
+            if (input->getKeyDown(Key::X)) {
+                copiedEntity = selectedEntity;
+                cutCopyEntity = true;
+            }
+
+            if (input->getKeyDown(Key::C)) {
+                copiedEntity = selectedEntity;
+                cutCopyEntity = false;
+            }
+
+            if (input->getKeyDown(Key::V) && copiedEntity != entt::null) {
+                scene->duplicateEntity(copiedEntity);
+                if (cutCopyEntity) {
+                    if (copiedEntity == selectedEntity)
+                        selectedEntity = entt::null;
+                   scene->destroyEntity(copiedEntity);
+                }
+            }
+
+            if (input->getKeyDown(Key::D) && selectedEntity != entt::null) {
+                scene->duplicateEntity(selectedEntity);
+            }
+        }
+    } else
+        editorCameraController.stopMovement();
+
+    DefaultApplication::onUpdate();
+}
+
+void Editor::onImGuizmo() {
+    const glm::mat4& view = editorCamera->getViewMatrix();
+    const glm::mat4& proj = editorCamera->getProjectionMatrix();
+
+#ifdef USE_IMGUIZMO_GRID
+    if(m_Settings.m_ShowGrid && !m_CurrentCamera->IsOrthographic())
+            ImGuizmo::DrawGrid(glm::value_ptr(view),
+                glm::value_ptr(proj), identityMatrix, 120.f);
+#endif
+
+    if (selectedEntity == entt::null || editorSettings.gizmosOperation == 4)
+        return;
+
+    if (editorSettings.showGizmos) {
+        ImGuizmo::SetDrawlist();
+        ImGuizmo::SetOrthographic(editorCamera->isOrthographic());
+
+        auto& registry = SceneManager::Get()->getScene()->getRegistry();
+        if (auto transform = registry.try_get<TransformComponent>(selectedEntity)) {
+            glm::mat4 model = glm::mat4{1};//transform->GetWorldMatrix();
+
+            auto gizmosType = static_cast<ImGuizmo::OPERATION>(editorSettings.gizmosOperation);
+
+            // Snapping
+            float snapValue = editorSettings.snapAmount; // Snap to 0.5m for translation/scale
+            if (gizmosType == ImGuizmo::ROTATE)
+                snapValue = 45.0f;
+            glm::vec3 snapValues{ snapValue };
+
+            // Bounding
+            auto bounds = gizmosType == ImGuizmo::BOUNDS;
+            glm::vec3 boundsSnap{ editorSettings.snapBound };  // Snap to 0.1m for bound change
+            static glm::mat2x3 boundsValues = { glm::vec3{-1.0f}, glm::vec3{1.0f} };
+
+            float delta[16];
+
+            ImGuizmo::Manipulate(glm::value_ptr(view),
+                                 glm::value_ptr(proj),
+                                 gizmosType,
+                                 ImGuizmo::LOCAL,
+                                 glm::value_ptr(model),
+                                 delta,
+                                 editorSettings.snapGizmos ? glm::value_ptr(snapValues) : nullptr,
+                                 bounds ? glm::value_ptr(boundsValues) : nullptr, bounds ? glm::value_ptr(boundsSnap) : nullptr);
+
+            if (ImGuizmo::IsUsing()) {
+               /* if (guizmoType == ImGuizmo::OPERATION::SCALE) {
+                    model = glm::inverse(transform->GetParentMatrix()) * model;
+                    transform->SetLocalScale(Lumos::Maths::GetScale(model));
+                } else {
+                    model = glm::inverse(transform->GetParentMatrix()) * model;
+                    transform->SetLocalTransform(model);
+
+                    RigidBody2DComponent* rigidBody2DComponent = registry.try_get<Lumos::RigidBody2DComponent>(m_SelectedEntity);
+
+                    if (rigidBody2DComponent) {
+                        rigidBody2DComponent->GetRigidBody()->SetPosition( { model[3].x, model[3].y });
+                    } else {
+                        Lumos::RigidBody3DComponent* rigidBody3DComponent = registry.try_get<Lumos::RigidBody3DComponent>(m_SelectedEntity);
+                        if (rigidBody3DComponent) {
+                            rigidBody3DComponent->GetRigidBody()->SetPosition(model[3]);
+                            rigidBody3DComponent->GetRigidBody()->SetOrientation(Maths::GetRotation(model));
+                        }
+                    }
+                }*/
+            }
+        }
+    }
 }
 
 void Editor::onImGui() {
@@ -89,6 +267,8 @@ void Editor::onImGui() {
     fileBrowserPanel.onImGui();
 
     endDockSpace();
+
+    DefaultApplication::onImGui();
 }
 
 void Editor::beginDockSpace(bool gameFullScreen) {
@@ -116,7 +296,7 @@ void Editor::beginDockSpace(bool gameFullScreen) {
     if (opt_flags & ImGuiDockNodeFlags_DockSpace || opt_flags & ImGuiDockNodeFlags_PassthruCentralNode)
         window_flags |= ImGuiWindowFlags_NoBackground;
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0.0f, 0.0f});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
     ImGui::Begin("DockSpace", &p_open, window_flags);
     ImGui::PopStyleVar();
 
@@ -405,6 +585,10 @@ void Editor::drawMenuBar() {
 
             ImGui::Text("Version : %s", version.string().c_str());
             ImGui::Separator();
+
+            if (ImGui::MenuItem(ICON_MDI_PROJECTOR_SCREEN " Screenshot")) {
+                Graphics::Get()->captureScreenshot("screenshot_" + DateTime::Get("%Y_%m_%d_%H_%M_%S") + ".png");
+            }
 
             if (ImGui::MenuItem(ICON_MDI_GITHUB_BOX " Github")) {
 #if FUSION_PLATFORM_WINDOWS
@@ -730,9 +914,9 @@ void Editor::openTextFile(const fs::path& filepath, std::function<void()>&& call
     panels.emplace_back(std::make_unique<TextEditPanel>(filepath, std::move(callback), this));
 }
 
-EditorPanel* Editor::getTextEditPanel() {
+EditorPanel* Editor::getPanel(const std::string& name) {
     for (auto& panel : panels) {
-        if (panel->getName() == "TextEdit") {
+        if (panel->getName() == name) {
             return panel.get();
         }
     }

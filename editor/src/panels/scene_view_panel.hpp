@@ -2,6 +2,8 @@
 
 #include "editor_panel.hpp"
 
+#include <volk/volk.h>
+
 namespace fe {
     class SceneViewPanel : public EditorPanel {
     public:
@@ -11,21 +13,11 @@ namespace fe {
         void onImGui() override;
         //void onNewScene(Scene* scene) override;
 
-        //void toolBar();
         //void drawGizmos(float width, float height, float xpos, float ypos, Scene* scene);
 
-        //voidresize(uint32_t width, uint32_t height);
+        void drawToolBar();
 
     private:
         std::unordered_map<std::type_index, bool> showComponentGizmoMap;
-
-        //bool showStats{ false };
-        //SharedPtr<Graphics::Texture2D> m_GameViewTexture = nullptr;
-        //Scene* currentScene{ nullptr };
-        //uint32_t m_Width, m_Height;
-
-        std::unique_ptr<Image2d> output;
-        glm::uvec2 lastSize{ UINT32_MAX };
-        //float outputScale{ 1.0f };
     };
 }

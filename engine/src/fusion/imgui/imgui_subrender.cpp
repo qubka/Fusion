@@ -115,15 +115,14 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer) {
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
-    descriptorSet.push("fontSampler", dynamic_cast<const Image2d*>(Graphics::Get()->getAttachment("offscreen")));
-
-    if (!descriptorSet.update(pipeline))
-        return;
+    //descriptorSet.push("sceneView", Graphics::Get()->getAttachment("scene"));
+    //if (!descriptorSet.update(pipeline))
+    //    return;
 
     // Draws the canvas
     pipeline.bindPipeline(commandBuffer);
     pushObject.bindPush(commandBuffer, pipeline);
-    descriptorSet.bindDescriptor(commandBuffer, pipeline);
+    //descriptorSet.bindDescriptor(commandBuffer, pipeline);
 
     canvasObject.cmdRender(commandBuffer, pipeline, descriptorSet);
 }

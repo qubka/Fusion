@@ -5,6 +5,7 @@
 #include "fusion/graphics/subrender.hpp"
 #include "fusion/graphics/pipelines/pipeline_graphics.hpp"
 #include "fusion/graphics/buffers/push_handler.hpp"
+#include "fusion/graphics/buffers/uniform_handler.hpp"
 #include "fusion/graphics/descriptors/descriptors_handler.hpp"
 #include "fusion/input/codes.hpp"
 
@@ -16,10 +17,10 @@ namespace fe {
         explicit ImGuiSubrender(const Pipeline::Stage& pipelineStage);
         ~ImGuiSubrender() override;
 
+    private:
         void onUpdate() override;
         void onRender(const CommandBuffer& commandBuffer) override;
 
-    private:
         void setupEvents(bool connect);
         void setupKeyCodes();
         void setupStyle();
@@ -44,6 +45,7 @@ namespace fe {
 
         DescriptorsHandler descriptorSet;
         PushHandler pushObject;
+        UniformHandler uniformBuffer;
 
         ImGuiObject canvasObject;
 
