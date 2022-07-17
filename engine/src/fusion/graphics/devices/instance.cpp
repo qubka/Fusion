@@ -7,7 +7,7 @@
 using namespace fe;
 
 #if USE_DEBUG_MESSENGER
-const std::vector<const char*> Instance::ValidationLayers = { "VK_LAYER_KHRONOS_validation" }; // "VK_LAYER_RENDERDOC_Capture"
+const std::vector<const char*> Instance::ValidationLayers = { "VK_LAYER_KHRONOS_validation" }; // "VK_LAYER_RENDERDOC_Capture", "VK_LAYER_LUNARG_api_dump"
 
 VKAPI_ATTR VkBool32 VKAPI_CALL CallbackDebug(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
     if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {

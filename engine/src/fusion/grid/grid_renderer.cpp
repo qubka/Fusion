@@ -2,6 +2,7 @@
 
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/cameras/camera.hpp"
+#include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/scene/scene_manager.hpp"
 
@@ -23,7 +24,7 @@ GridRenderer::~GridRenderer() {
 }
 
 void GridRenderer::onRender(const CommandBuffer& commandBuffer) {
-    auto scene =  SceneManager::Get()->getScene();
+    auto scene = SceneManager::Get()->getScene();
     if (!scene)
         return;
 

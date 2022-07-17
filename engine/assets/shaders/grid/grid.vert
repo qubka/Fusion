@@ -14,6 +14,10 @@ layout (push_constant) uniform PushObject {
 layout (location = 0) out vec3 outNearPoint;
 layout (location = 1) out vec3 outFarPoint;
 
+out gl_PerVertex {
+    vec4 gl_Position;
+};
+
 vec3 UnprojectPoint(float x, float y, float z) {
     mat4 viewInv = inverse(push.view);
     mat4 projInv = inverse(push.projection);
