@@ -80,14 +80,14 @@ namespace fe {
         const fs::path& getFilePath() const { return filePath; }
         bool isAnisotropic() const { return anisotropic; }
         bool isMipmap() const { return mipmap; }
-        uint32_t getComponents() const { return components; }
+        uint8_t getComponents() const { return components; }
 
         void load(std::unique_ptr<Bitmap> loadBitmap = nullptr);
 
     private:
         fs::path filePath;
 
-        uint32_t components{ 0 };
+        uint8_t components{ 0 };
         bool anisotropic;
         bool mipmap;
     };

@@ -10,6 +10,22 @@ namespace fe {
     public:
         /**
          * Creates a new array of 2D images.
+         * @param filename The file to load the image from. (supports .ktx and .dds)
+         * @param filter The magnification/minification filter to apply to lookups.
+         * @param addressMode The addressing mode for outside [0..1] range.
+         * @param anisotropic If anisotropic filtering is enabled.
+         * @param mipmap If mapmaps will be generated.
+         * @param load If this resource will be loaded immediately, otherwise {@link Image2d#Load} can be called later.
+         */
+        explicit Image2dArray(fs::path filepath,
+                         VkFilter filter = VK_FILTER_LINEAR,
+                         VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+                         bool anisotropic = true,
+                         bool mipmap = true,
+                         bool load = true);
+
+        /**
+         * Creates a new array of 2D images.
          * @param extent The images extent in pixels.
          * @param arrayLayers The number of layers in the image .
          * @param format The format and type of the texel blocks that will be contained in the image.
@@ -20,15 +36,15 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        Image2dArray(const glm::uvec2& extent,
-                     uint32_t arrayLayers,
-                     VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
-                     VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                     VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
-                     VkFilter filter = VK_FILTER_LINEAR,
-                     VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-                     bool anisotropic = false,
-                     bool mipmap = false);
+        explicit Image2dArray(const glm::uvec2& extent,
+                              uint32_t arrayLayers,
+                              VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
+                              VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                              VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+                              VkFilter filter = VK_FILTER_LINEAR,
+                              VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                              bool anisotropic = false,
+                              bool mipmap = false);
 
         /**
          * Creates a new array of 2D images.
@@ -42,14 +58,14 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        Image2dArray(std::unique_ptr<Bitmap>&& bitmap, uint32_t arrayLayers,
-                     VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
-                     VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                     VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
-                     VkFilter filter = VK_FILTER_LINEAR,
-                     VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-                     bool anisotropic = false,
-                     bool mipmap = false);
+        explicit Image2dArray(std::unique_ptr<Bitmap>&& bitmap, uint32_t arrayLayers,
+                              VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
+                              VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                              VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+                              VkFilter filter = VK_FILTER_LINEAR,
+                              VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                              bool anisotropic = false,
+                              bool mipmap = false);
 
         /**
          * Sets the pixels of this image.
@@ -58,10 +74,17 @@ namespace fe {
          */
         void setPixels(const float* pixels, uint32_t arrayLayer);
 
+        const fs::path& getFilePath() const { return filePath; }
         bool isAnisotropic() const { return anisotropic; }
         bool isMipmap() const { return mipmap; }
+        uint8_t getComponents() const { return components; }
+
+        void load();
 
     private:
+        fs::path filePath;
+
+        uint8_t components{ 0 };
         bool anisotropic;
         bool mipmap;
     };

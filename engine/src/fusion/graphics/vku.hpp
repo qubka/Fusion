@@ -55,14 +55,14 @@ namespace vku {
     }
 
     // For converting between VULKAN and glm
-    static inline const VkOffset2D& ivec2_cast(const glm::ivec2& v) { return *reinterpret_cast<const VkOffset2D*>(&v); }
-    static inline const VkOffset3D& ivec3_cast(const glm::ivec3& v) { return *reinterpret_cast<const VkOffset3D*>(&v); }
-    static inline const VkExtent2D& uvec2_cast(const glm::uvec2& v) { return *reinterpret_cast<const VkExtent2D*>(&v); }
-    static inline const VkExtent3D& uvec3_cast(const glm::uvec3& v) { return *reinterpret_cast<const VkExtent3D*>(&v); }
-    static inline const glm::ivec2& offset2D_cast(const VkOffset2D& v) { return *reinterpret_cast<const glm::ivec2*>(&v); }
-    static inline const glm::ivec3& offset3D_cast(const VkOffset3D& v) { return *reinterpret_cast<const glm::ivec3*>(&v); }
-    static inline const glm::uvec2& extent2D_cast(const VkExtent2D& v) { return *reinterpret_cast<const glm::uvec2*>(&v); }
-    static inline const glm::uvec3& extent3D_cast(const VkExtent3D& v) { return *reinterpret_cast<const glm::uvec3*>(&v); }
+    inline const VkOffset2D& ivec2_cast(const glm::ivec2& v) { return *reinterpret_cast<const VkOffset2D*>(&v); }
+    inline const VkOffset3D& ivec3_cast(const glm::ivec3& v) { return *reinterpret_cast<const VkOffset3D*>(&v); }
+    inline const VkExtent2D& uvec2_cast(const glm::uvec2& v) { return *reinterpret_cast<const VkExtent2D*>(&v); }
+    inline const VkExtent3D& uvec3_cast(const glm::uvec3& v) { return *reinterpret_cast<const VkExtent3D*>(&v); }
+    inline const glm::ivec2& offset2D_cast(const VkOffset2D& v) { return *reinterpret_cast<const glm::ivec2*>(&v); }
+    inline const glm::ivec3& offset3D_cast(const VkOffset3D& v) { return *reinterpret_cast<const glm::ivec3*>(&v); }
+    inline const glm::uvec2& extent2D_cast(const VkExtent2D& v) { return *reinterpret_cast<const glm::uvec2*>(&v); }
+    inline const glm::uvec3& extent3D_cast(const VkExtent3D& v) { return *reinterpret_cast<const glm::uvec3*>(&v); }
 
     inline std::string StringifyResultVk(VkResult result) {
         switch (result) {
