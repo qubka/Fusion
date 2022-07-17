@@ -82,9 +82,9 @@ namespace fe {
         bool isMipmap() const { return mipmap; }
         uint32_t getComponents() const { return components; }
 
-    private:
         void load(std::unique_ptr<Bitmap> loadBitmap = nullptr);
 
+    private:
         fs::path filePath;
 
         uint32_t components{ 0 };

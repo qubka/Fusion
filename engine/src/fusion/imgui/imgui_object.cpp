@@ -13,7 +13,7 @@
 
 using namespace fe;
 
-void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, DescriptorsHandler& descriptorSet) {
+void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, DescriptorsHandler& descriptorSet, PushHandler& pushObject) {
     ImDrawData* drawData = ImGui::GetDrawData();
 
     // Note: Alignment is done inside buffer creation
@@ -83,15 +83,10 @@ void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& 
                     glm::ivec2{std::max(static_cast<int>((cmd.ClipRect.x)), 0), std::max(static_cast<int>((cmd.ClipRect.y)), 0)} // offset
             );
             vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-
-            descriptorSet.push("fontSampler", reinterpret_cast<Image2d*>(cmd.TextureId));
-
-            if (!descriptorSet.update(pipeline))
-                continue;
-
-            descriptorSet.bindDescriptor(commandBuffer, pipeline);
-
             vkCmdDrawIndexed(commandBuffer, cmd.ElemCount, 1, indexOffset, vertexOffset, 0);
+
+            pushObject.push("texture", cmd.UserCallbackData ? *(int32_t*)(cmd.UserCallbackData) : 0);
+            pushObject.bindPush(commandBuffer, pipeline);
 
             indexOffset += static_cast<int32_t>(cmd.ElemCount);
         }

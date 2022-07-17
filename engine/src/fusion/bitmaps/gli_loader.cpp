@@ -7,9 +7,9 @@
 using namespace fe;
 
 void GliLoader::Load(Bitmap& bitmap, const fs::path& filepath) {
-    std::unique_ptr<gli::texture> texture;
+    std::unique_ptr<gli::texture2d> texture;
     FileSystem::Read(filepath, [&texture](const uint8_t* data, size_t size) {
-        texture = std::make_unique<gli::texture>(gli::load(reinterpret_cast<const char*>(data), size));
+        texture = std::make_unique<gli::texture2d>(gli::load(reinterpret_cast<const char*>(data), size));
     });
 
     bitmap.data = std::unique_ptr<uint8_t[]>(texture->data<uint8_t>());

@@ -67,8 +67,8 @@ VkSurfaceFormatKHR Surface::getOptimalSurfaceFormat() const {
 
     // If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
     // there is no preferred format, so we assume VK_FORMAT_B8G8R8A8_UNORM
-    if (surfaceFormats.size() == 1 && surfaceFormats[0].format == VK_FORMAT_UNDEFINED) {
-        return { VK_FORMAT_B8G8R8A8_UNORM, surfaceFormats[0].colorSpace };
+    if (surfaceFormats.size() == 1 && surfaceFormats.front().format == VK_FORMAT_UNDEFINED) {
+        return { VK_FORMAT_B8G8R8A8_UNORM, surfaceFormats.front().colorSpace };
     }
 
     // iterate over the list of available surface format and
@@ -81,7 +81,7 @@ VkSurfaceFormatKHR Surface::getOptimalSurfaceFormat() const {
 
     // in case VK_FORMAT_B8G8R8A8_UNORM is not available
     // select the first available color format
-    return surfaceFormats[0];
+    return surfaceFormats.front();
 }
 
 VkPresentModeKHR Surface::getOptimalPresentMode() const {

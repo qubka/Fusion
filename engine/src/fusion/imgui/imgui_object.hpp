@@ -6,13 +6,15 @@ namespace fe {
     class Pipeline;
     class CommandBuffer;
     class DescriptorsHandler;
+    class DescriptorsHandler;
+    class PushHandler;
     class ImGuiObject {
     public:
         ImGuiObject() = default;
         ~ImGuiObject() = default;
         NONCOPYABLE(ImGuiObject);
 
-        void cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, DescriptorsHandler& descriptorSet);
+        void cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, DescriptorsHandler& descriptorSet, PushHandler& pushObject);
 
     private:
         std::unique_ptr<Buffer> vertexBuffer;

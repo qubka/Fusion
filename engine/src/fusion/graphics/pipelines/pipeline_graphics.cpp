@@ -347,16 +347,17 @@ void PipelineGraphics::createPipelineMrt() {
 	std::vector<VkPipelineColorBlendAttachmentState> blendAttachmentStates;
 	blendAttachmentStates.reserve(attachmentCount);
 
+    VkPipelineColorBlendAttachmentState blendAttachmentState = {};
+    blendAttachmentState.blendEnable = VK_TRUE;
+    blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    blendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD;
+    blendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    blendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    blendAttachmentState.alphaBlendOp = VK_BLEND_OP_ADD;
+    blendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+
 	for (uint32_t i = 0; i < attachmentCount; i++) {
-		VkPipelineColorBlendAttachmentState blendAttachmentState = {};
-		blendAttachmentState.blendEnable = VK_TRUE;
-		blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-		blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		blendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD;
-		blendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-		blendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		blendAttachmentState.alphaBlendOp = VK_BLEND_OP_ADD;
-		blendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 		blendAttachmentStates.push_back(blendAttachmentState);
 	}
 

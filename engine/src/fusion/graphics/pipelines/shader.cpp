@@ -518,7 +518,7 @@ void Shader::loadUniform(const glslang::TProgram& program, VkShaderStageFlags st
 		auto splitName = String::Split(reflection.name, '.');
 
 		if (splitName.size() > 1) {
-            auto& name = splitName[0];
+            auto& name = splitName.front();
             if (auto it = uniformBlocks.find(name); it != uniformBlocks.end()) {
                 it->second.uniforms.emplace(String::ReplaceFirst(reflection.name, name + ".", ""),
                                             Uniform{ reflection.getBinding(), reflection.offset, computeSize(reflection.getType()), reflection.glDefineType, false, false, stageFlag });

@@ -63,7 +63,7 @@ SkyboxRenderer::SkyboxRenderer(const Pipeline::Stage& pipelineStage)
     vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(glm::vec3) * vertices.size(), vertices.data());
     indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint16_t) * indices.size(), indices.data());
 
-    skyboxSampler = std::make_unique<ImageCube>("engine/assets/textures/skybox/GalaxyTex");
+    skyboxSampler = std::make_unique<ImageCube>("engine/assets/textures/cubemap_vulkan.ktx");
 }
 
 SkyboxRenderer::~SkyboxRenderer() {

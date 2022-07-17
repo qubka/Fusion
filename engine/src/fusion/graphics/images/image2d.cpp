@@ -54,7 +54,7 @@ void Image2d::load(std::unique_ptr<Bitmap> loadBitmap) {
 	}
 		
 	if (extent.width == 0 || extent.height == 0)
-		return;
+        throw std::runtime_error("Width or height is empty");
 
 	mipLevels = mipmap ? getMipLevels(extent) : 1;
 

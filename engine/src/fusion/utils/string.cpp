@@ -41,7 +41,7 @@ std::vector<std::string> String::Split(const std::string& str, char sep) {
 std::string String::Join(const std::vector<std::string>& strings, const std::string& separator) {
     switch (strings.size()) {
         case 0: return {};
-        case 1: return strings[0];
+        case 1: return strings.front();
         default:
             std::ostringstream os;
             std::copy(strings.begin(), strings.end() - 1, std::ostream_iterator<std::string>(os, separator.c_str()));
