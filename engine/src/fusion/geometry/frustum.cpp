@@ -91,6 +91,7 @@ bool Frustum::contains(const AABB& box) const {
 
 bool Frustum::contains(const Rect& rect) const {
     std::runtime_error("Not implemented");
+    return false;
 }
 
 bool Frustum::intersects(const glm::vec3& loc) const {

@@ -9,6 +9,7 @@ namespace fe {
         explicit HierarchySystem(entt::registry& registry);
         ~HierarchySystem() override;
 
+        void update(entt::entity entity);
         void reparent(entt::entity entity, entt::entity parent, HierarchyComponent& hierarchy);
         bool isParent(entt::entity entity, entt::entity child);
         void setParent(entt::entity entity, entt::entity parent);

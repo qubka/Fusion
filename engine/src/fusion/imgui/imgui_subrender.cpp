@@ -116,8 +116,8 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer) {
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
-    descriptorSet.push("fontSampler", reinterpret_cast<Image2d*>(ImGui::GetIO().Fonts[0].TexID));
-    descriptorSet.push("sceneSampler", reinterpret_cast<Image2d*>(Graphics::Get()->getAttachment("scene")));
+    descriptorSet.push("fontSampler", reinterpret_cast<const Image2d*>(ImGui::GetIO().Fonts[0].TexID));
+    descriptorSet.push("sceneSampler", reinterpret_cast<const Image2d*>(Graphics::Get()->getAttachment("scene")));
 
     if (!descriptorSet.update(pipeline))
         return;

@@ -87,7 +87,6 @@ void Editor::onUpdate() {
 
         {
             editorCameraController.update(*editorCamera);
-            //std::reinterpret_pointer_cast<EditorCamera>(editorCamera)->onUpdate();
 
             if (input->getKeyDown(Key::F)) {
                 auto& registry = scene->getRegistry();
@@ -181,15 +180,6 @@ void Editor::onUpdate() {
 }
 
 void Editor::onImGuizmo() {
-    const glm::mat4& view = editorCamera->getViewMatrix();
-    const glm::mat4& proj = editorCamera->getProjectionMatrix();
-
-#ifdef USE_IMGUIZMO_GRID
-    if(m_Settings.m_ShowGrid && !m_CurrentCamera->IsOrthographic())
-            ImGuizmo::DrawGrid(glm::value_ptr(view),
-                glm::value_ptr(proj), identityMatrix, 120.f);
-#endif
-
     if (selectedEntity == entt::null || editorSettings.gizmosOperation == 4)
         return;
 
@@ -199,7 +189,10 @@ void Editor::onImGuizmo() {
 
         auto& registry = SceneManager::Get()->getScene()->getRegistry();
         if (auto transform = registry.try_get<TransformComponent>(selectedEntity)) {
-            glm::mat4 model = glm::mat4{1};//transform->GetWorldMatrix();
+            const glm::mat4& view = editorCamera->getViewMatrix();
+            const glm::mat4& proj = editorCamera->getProjectionMatrix();
+            glm::mat4 model = transform->getWorldMatrix();
+            glm::mat4 delta{1};
 
             auto gizmosType = static_cast<ImGuizmo::OPERATION>(editorSettings.gizmosOperation);
 
@@ -214,37 +207,36 @@ void Editor::onImGuizmo() {
             glm::vec3 boundsSnap{ editorSettings.snapBound };  // Snap to 0.1m for bound change
             static glm::mat2x3 boundsValues = { glm::vec3{-1.0f}, glm::vec3{1.0f} };
 
-            float delta[16];
-
             ImGuizmo::Manipulate(glm::value_ptr(view),
                                  glm::value_ptr(proj),
                                  gizmosType,
                                  ImGuizmo::LOCAL,
                                  glm::value_ptr(model),
-                                 delta,
+                                 glm::value_ptr(delta),
                                  editorSettings.snapGizmos ? glm::value_ptr(snapValues) : nullptr,
-                                 bounds ? glm::value_ptr(boundsValues) : nullptr, bounds ? glm::value_ptr(boundsSnap) : nullptr);
+                                 bounds ? glm::value_ptr(boundsValues) : nullptr,
+                                 bounds ? glm::value_ptr(boundsSnap) : nullptr);
 
             if (ImGuizmo::IsUsing()) {
-               /* if (guizmoType == ImGuizmo::OPERATION::SCALE) {
-                    model = glm::inverse(transform->GetParentMatrix()) * model;
-                    transform->SetLocalScale(Lumos::Maths::GetScale(model));
+               if (gizmosType == ImGuizmo::OPERATION::SCALE) {
+                    model = glm::inverse(transform->getParentMatrix()) * model;
+                    transform->setLocalScale(glm::vec3(model[0][0], model[1][1], model[2][2])); // TODO: Move to utils
                 } else {
-                    model = glm::inverse(transform->GetParentMatrix()) * model;
-                    transform->SetLocalTransform(model);
+                    model = glm::inverse(transform->getParentMatrix()) * model;
+                    transform->setLocalTransform(model);
 
-                    RigidBody2DComponent* rigidBody2DComponent = registry.try_get<Lumos::RigidBody2DComponent>(m_SelectedEntity);
+                    /*RigidBody2DComponent* rigidBody2DComponent = registry.try_get<RigidBody2DComponent>(selectedEntity);
 
                     if (rigidBody2DComponent) {
                         rigidBody2DComponent->GetRigidBody()->SetPosition( { model[3].x, model[3].y });
                     } else {
-                        Lumos::RigidBody3DComponent* rigidBody3DComponent = registry.try_get<Lumos::RigidBody3DComponent>(m_SelectedEntity);
+                        RigidBody3DComponent* rigidBody3DComponent = registry.try_get<RigidBody3DComponent>(selectedEntity);
                         if (rigidBody3DComponent) {
                             rigidBody3DComponent->GetRigidBody()->SetPosition(model[3]);
-                            rigidBody3DComponent->GetRigidBody()->SetOrientation(Maths::GetRotation(model));
+                            rigidBody3DComponent->GetRigidBody()->SetOrientation(glm::eulerAngles(glm::quat_cast((model)));
                         }
-                    }
-                }*/
+                    }*/
+                }
             }
         }
     }
@@ -440,11 +432,12 @@ void Editor::drawMenuBar() {
             enabled = copiedEntity != entt::null;
 
             if (ImGui::MenuItem("Paste", "CTRL+V", false, enabled)) {
-                //Application::Get().GetCurrentScene()->DuplicateEntity({ copiedEntity, Application::Get().GetCurrentScene() });
+                auto scene = SceneManager::Get()->getScene();
+                scene->duplicateEntity(copiedEntity);
                 if (cutCopyEntity) {
                     if (copiedEntity == selectedEntity)
                         selectedEntity = entt::null;
-                    //Entity(copiedEntity, Application::Get().GetCurrentScene()).Destroy();
+                    scene->destroyEntity(copiedEntity);
                 }
             }
 

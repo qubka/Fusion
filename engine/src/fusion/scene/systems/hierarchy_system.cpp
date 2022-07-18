@@ -16,7 +16,38 @@ void HierarchySystem::onPlay() {
 }
 
 void HierarchySystem::onUpdate() {
+    /*auto nonHierarchyView = registry.view<TransformComponent>(entt::exclude<HierarchyComponent>);
 
+    for (const auto& [entity, transform] : nonHierarchyView.each()) {
+        transform.setWorldMatrix(glm::mat4{1.0f});
+    }
+
+    auto view = registry.view<TransformComponent, HierarchyComponent>();
+    for (const auto& [entity, transform, hierarchy] : view.each()) {
+        if (hierarchy.parent == entt::null) {
+            // Recursively update children
+            update(entity);
+        }
+    }*/
+
+    auto transformGroup = registry.group<DirtyTransformComponent, TransformComponent>();
+    transformGroup.sort([&](const entt::entity lhs, const entt::entity rhs) {
+        auto clhs = registry.try_get<HierarchyComponent>(lhs);
+        if (clhs == nullptr)
+            return false;
+        auto crhs = registry.try_get<HierarchyComponent>(rhs);
+        if (crhs == nullptr)
+            return false;
+        //return !(clhs->parent != entt::null && clhs->children < crhs->children);
+        return !(clhs->parent != entt::null && getChildren(lhs).size() < getChildren(rhs).size());
+    });
+
+    for (auto [entity, transform] : transformGroup.each()) {
+        transform.setWorldMatrix(glm::mat4{1.0f});
+        update(entity);
+    }
+
+    registry.clear<DirtyTransformComponent>();
 }
 
 void HierarchySystem::onStop() {
@@ -27,12 +58,41 @@ void HierarchySystem::onEnabled() {
     registry.on_construct<HierarchyComponent>().connect<&OnConstruct>();
     registry.on_update<HierarchyComponent>().connect<&OnUpdate>();
     registry.on_destroy<HierarchyComponent>().connect<&OnDestroy>();
+
+    registry.on_construct<TransformComponent>().connect<&entt::registry::emplace<DirtyTransformComponent>>();
+    registry.on_update<TransformComponent>().connect<&entt::registry::emplace_or_replace<DirtyTransformComponent>>();
 }
 
 void HierarchySystem::onDisabled() {
     registry.on_construct<HierarchyComponent>().disconnect<&OnConstruct>();
     registry.on_update<HierarchyComponent>().disconnect<&OnUpdate>();
     registry.on_destroy<HierarchyComponent>().disconnect<&OnDestroy>();
+
+    registry.on_construct<TransformComponent>().disconnect<&entt::registry::emplace<DirtyTransformComponent>>();
+    registry.on_update<TransformComponent>().disconnect<&entt::registry::emplace_or_replace<DirtyTransformComponent>>();
+}
+
+void HierarchySystem::update(entt::entity entity) {
+    if (auto hierarchy = registry.try_get<HierarchyComponent>(entity)) {
+        if (auto transform = registry.try_get<TransformComponent>(entity)) {
+            if (hierarchy->parent != entt::null) {
+                auto parentTransform = registry.try_get<TransformComponent>(hierarchy->parent);
+                if (parentTransform) {
+                    transform->setWorldMatrix(parentTransform->getWorldMatrix());
+                }
+            } else {
+                transform->setWorldMatrix(glm::mat4{1.0f});
+            }
+        }
+
+        entt::entity child = hierarchy->first;
+        while (child != entt::null) {
+            hierarchy = registry.try_get<HierarchyComponent>(child);
+            auto next = hierarchy ? hierarchy->next : entt::null;
+            update(child);
+            child = next;
+        }
+    }
 }
 
 void HierarchySystem::reparent(entt::entity entity, entt::entity parent, HierarchyComponent& hierarchy) {
@@ -65,7 +125,7 @@ bool HierarchySystem::isParent(entt::entity entity, entt::entity child) {
 }
 
 void HierarchySystem::setParent(entt::entity entity, entt::entity parent) {
-    bool acceptable = false;
+    bool acceptable;
     auto hierarchy = registry.try_get<HierarchyComponent>(entity);
     if (hierarchy != nullptr) {
         acceptable = parent != entity && (!isParent(parent, entity)) && (hierarchy->parent != entity);
@@ -103,8 +163,7 @@ std::vector<entt::entity> HierarchySystem::getChildren(entt::entity entity) {
         while (child != entt::null && registry.valid(child)) {
             children.push_back(child);
             hierarchy = registry.try_get<HierarchyComponent>(child);
-            if (hierarchy)
-                child = hierarchy->next;
+            child = hierarchy ? hierarchy->next : entt::null;
         }
     }
 

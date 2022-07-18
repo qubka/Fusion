@@ -70,14 +70,14 @@ void SceneViewPanel::onImGui() {
     if (halfRes)
         sceneViewSize *= 2.0f;
 
-    //static uint32_t id = 1; // custom image
-    //ImGuiUtils::Image("##sceneview", &id, glm::vec2{sceneViewSize.x, sceneViewSize.y}, true);
-    ImGuiUtils::Image((Image2d*)Graphics::Get()->getAttachment("scene"), glm::vec2{sceneViewSize.x, sceneViewSize.y}, true);
+    static uint32_t id = 1; // custom image
+    ImGuiUtils::Image(&id, glm::vec2{ sceneViewSize.x, sceneViewSize.y }, true);
 
     auto windowSize = ImGui::GetWindowSize();
-    ImVec2 minBound = sceneViewPosition;
 
+    ImVec2 minBound = sceneViewPosition;
     ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+
     bool updateCamera = ImGui::IsMouseHoveringRect(minBound, maxBound); // || Input::Get().GetMouseMode() == MouseMode::Captured;
 
     editor->setSceneActive(ImGui::IsWindowFocused() && !ImGuizmo::IsUsing() && updateCamera);
@@ -86,15 +86,7 @@ void SceneViewPanel::onImGui() {
 
     editor->setSceneViewActive(updateCamera);
 
-    /*if (editor->ShowGrid()) {
-        if (camera->isOrthographic()) {
-            editor->Draw2DGrid(ImGui::GetWindowDrawList(), { transform->GetWorldPosition().x, transform->GetWorldPosition().y }, sceneViewPosition, { sceneViewSize.x, sceneViewSize.y }, 1.0f, 1.5f);
-        }
-    }*/
-
-    {
-        ImGui::GetWindowDrawList()->PushClipRect(sceneViewPosition, { sceneViewSize.x + sceneViewPosition.x, sceneViewSize.y + sceneViewPosition.y - 2.0f });
-    }
+    ImGui::GetWindowDrawList()->PushClipRect(sceneViewPosition, { sceneViewSize.x + sceneViewPosition.x, sceneViewSize.y + sceneViewPosition.y - 2.0f });
 
     editor->onImGuizmo();
 

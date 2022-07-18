@@ -27,5 +27,5 @@ namespace fe {
             setLocalScale(scale);
         }
     };
-    //struct DirtyTransformComponent {};
+    struct DirtyTransformComponent {};
 }

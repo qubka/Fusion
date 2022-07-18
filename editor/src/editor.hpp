@@ -88,9 +88,12 @@ namespace fe {
             return false;
         }
 
+        bool isSceneActive() const { return sceneActive; }
+        void setSceneActive(bool flag) { sceneActive = flag; }
+        bool isSceneViewActive() const { return sceneViewActive; }
+        void setSceneViewActive(bool flag) { sceneViewActive = flag; }
         const glm::vec2& getSceneViewPanelPosition() { return sceneViewPanelPosition; }
         void setSceneViewPanelPosition(const glm::vec2& pos) { sceneViewPanelPosition = pos; }
-        void setSceneViewActive(bool flag) { sceneViewActive = flag; }
 
         //void focusCamera(const glm::vec3& point, float distance, float speed = 1.0f);
 
@@ -124,13 +127,13 @@ namespace fe {
         entt::entity copiedEntity{ entt::null };
         bool cutCopyEntity{ false };
 
-        fs::path projectLocation{ };
         bool reopenNewProjectPopup{ false };
         bool newProjectPopupOpen{ false };
         bool locationPopupOpened{ false };
+        fs::path projectLocation{ };
 
+        bool sceneActive{ false };
         bool sceneViewActive{ false };
         glm::vec2 sceneViewPanelPosition{ 0.0f };
-
     };
 }

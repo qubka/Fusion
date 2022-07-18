@@ -16,14 +16,23 @@ namespace ImGui {
         ImGui::Separator();
 
         bool updated = false;
-        updated |= ImGuiUtils::PropertyControl("Position", transform.position);
-        glm::vec3 rotation{ glm::degrees(glm::eulerAngles(transform.rotation)) };
-        updated |= ImGuiUtils::PropertyControl("Rotation", rotation, -180.0f, 180.0f);
-        transform.rotation = glm::radians(rotation);
-        updated |= ImGuiUtils::PropertyControl("Scale", transform.scale, 0.01f, FLT_MAX, 1.0f, 0.01f);
 
-        if (updated)
-            registry.patch<TransformComponent>(entity);
+         // TODO:: REWORK
+
+        glm::vec3 position{ transform.getLocalPosition() };
+        updated |= ImGuiUtils::PropertyControl("Position", position);
+        transform.setLocalPosition(position);
+
+        glm::vec3 rotation{ glm::degrees(glm::eulerAngles(transform.getLocalOrientation())) };
+        updated |= ImGuiUtils::PropertyControl("Rotation", rotation, -180.0f, 180.0f);
+        transform.setLocalOrientation(glm::radians(rotation));
+
+        glm::vec3 scale{ transform.getLocalScale() };
+        updated |= ImGuiUtils::PropertyControl("Scale", scale, 0.01f, FLT_MAX, 1.0f, 0.01f);
+        transform.setLocalScale(scale);
+
+        //if (updated)
+        //    registry.patch<TransformComponent>(entity);
 
         ImGui::Columns(1);
         ImGui::Separator();
@@ -49,7 +58,7 @@ namespace ImGui {
         }
 
         float fov = sceneCamera.getFOV();
-        if (ImGuiUtils::Property(sceneCamera.isOrthographic() ? "Size" : "Vertical FOV", fov, 1.0f, 120.0f)) {
+        if (ImGuiUtils::Property(sceneCamera.isOrthographic() ? "Size" : "Fov", fov, 1.0f, 120.0f)) {
             sceneCamera.setFOV(fov);
         }
 
