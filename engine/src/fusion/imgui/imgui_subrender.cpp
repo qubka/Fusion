@@ -112,19 +112,22 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer) {
     ImGuiIO& io = ImGui::GetIO();
     pushObject.push("scale", glm::vec2{ 2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y });
     pushObject.push("translate", glm::vec2{ -1.0f });
+    pushObject.push("texture", 1);
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
-    //descriptorSet.push("sceneView", Graphics::Get()->getAttachment("scene"));
-    //if (!descriptorSet.update(pipeline))
-    //    return;
+    descriptorSet.push("fontSampler", reinterpret_cast<Image2d*>(ImGui::GetIO().Fonts[0].TexID));
+    descriptorSet.push("sceneSampler", reinterpret_cast<Image2d*>(Graphics::Get()->getAttachment("scene")));
+
+    if (!descriptorSet.update(pipeline))
+        return;
 
     // Draws the canvas
     pipeline.bindPipeline(commandBuffer);
     pushObject.bindPush(commandBuffer, pipeline);
-    //descriptorSet.bindDescriptor(commandBuffer, pipeline);
+    descriptorSet.bindDescriptor(commandBuffer, pipeline);
 
-    canvasObject.cmdRender(commandBuffer, pipeline, descriptorSet);
+    canvasObject.cmdRender(commandBuffer, pipeline, descriptorSet, pushObject);
 }
 
 void ImGuiSubrender::onMouseButton(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods) {
