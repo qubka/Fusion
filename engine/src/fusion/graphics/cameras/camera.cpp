@@ -4,20 +4,20 @@
 
 using namespace fe;
 
-void Camera::setFov(float verticalFov) {
-    if (glm::epsilonEqual(fov, verticalFov, FLT_EPSILON))
+void Camera::setFov(float fov) {
+    if (glm::epsilonEqual(fovDegrees, fov, FLT_EPSILON))
         return;
 
-    fov = verticalFov;
+    fovDegrees = fov;
     dirtyProjectionCaches();
 }
 
-void Camera::setFovHorizontal(float horizontalFov) {
-    horizontalFov = glm::degrees(2.0f * std::atan(std::tan(glm::radians(horizontalFov) * 0.5f) / aspectRatio));
-    if (glm::epsilonEqual(fov, horizontalFov, FLT_EPSILON))
+void Camera::setFovHorizontal(float fov) {
+    fov = glm::degrees(2.0f * std::atan(std::tan(glm::radians(fov) * 0.5f) / aspectRatio));
+    if (glm::epsilonEqual(fovDegrees, fov, FLT_EPSILON))
         return;
 
-    fov = horizontalFov;
+    fovDegrees = fov;
     dirtyProjectionCaches();
 }
 
@@ -85,7 +85,7 @@ void Camera::setWorldUp(glm::vec3 up) {
 
 /// @link http://paulbourke.net/miscellaneous/lens/
 float Camera::getFocalLength() const {
-    return 1.0f / (glm::tan(glm::radians(fov) * 0.5f) * 2.0f);
+    return 1.0f / (glm::tan(glm::radians(fovDegrees) * 0.5f) * 2.0f);
 }
 
 void Camera::lookAt(glm::vec3 target) {

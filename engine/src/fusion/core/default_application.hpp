@@ -45,10 +45,6 @@ namespace fe {
         bool isConsoleOpened() const { return consoleOpened; }
         ProjectSettings& getProjectSettings() { return projectSettings; }
 
-        // TODO: Move may be?
-        bool isSceneActive() { return sceneActive; }
-        void setSceneActive(bool flag) { sceneActive = flag; }
-
         void serialise();
         void deserialise();
 
@@ -105,6 +101,5 @@ namespace fe {
         ProjectSettings projectSettings;
         bool projectLoaded{ false };
         bool consoleOpened{ false };
-        bool sceneActive{ false };
     };
 }

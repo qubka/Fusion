@@ -1,10 +1,9 @@
 #include "text_edit_panel.hpp"
-
-#include <utility>
 #include "editor.hpp"
 
-#include "fusion/filesystem/file_system.hpp"
 #include "fusion/devices/device_manager.hpp"
+#include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/file_format.hpp"
 
 using namespace fe;
 
@@ -15,9 +14,9 @@ TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()>&& callback
 {
     textEditor.SetCustomIdentifiers({});
 
+    // T
     auto extension = FileSystem::GetExtension(filePath);
-
-    /*if (extension == "lua" || extension == "Lua") {
+    /*if (extension == "lua") {
         auto lang = ImGui::TextEditor::LanguageDefinition::Lua();
         textEditor.SetLanguageDefinition(lang);
 
@@ -34,7 +33,7 @@ TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()>&& callback
     }*/ if (extension == "cpp") {
         auto lang = ImGui::TextEditor::LanguageDefinition::CPlusPlus();
         textEditor.SetLanguageDefinition(lang);
-    } else if (extension == "glsl" || extension == "vert" || extension == "frag") {
+    } else if (extension == "glsl" || extension == "vert" || extension == "frag" || extension == "comp" || extension == "tesc" || extension == "tese" || extension == "geom") {
         auto lang = ImGui::TextEditor::LanguageDefinition::GLSL();
         textEditor.SetLanguageDefinition(lang);
     }

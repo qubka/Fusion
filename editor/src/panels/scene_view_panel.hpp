@@ -18,6 +18,8 @@ namespace fe {
         void drawToolBar();
 
     private:
+        std::unique_ptr<Image2d> sceneTexture;
+
         std::unordered_map<std::type_index, bool> showComponentGizmoMap;
     };
 }

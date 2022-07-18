@@ -1,9 +1,9 @@
 #pragma once
 
-//#include <thread>
 #include <volk/volk.h>
 
 namespace fe {
+    class LogicalDevice;
     /**
      * @brief Class that represents a command pool.
      */

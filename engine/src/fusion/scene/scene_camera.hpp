@@ -18,8 +18,8 @@ namespace fe {
 
         //void setViewportSize(uint32_t width, uint32_t height);
 
-        float getFOV() const { return fov; } // used as size for orthographic
-        void setFOV(float verticalFov) { fov = verticalFov; recalculateProjection(); }
+        float getFOV() const { return fovDegrees; } // used as size for orthographic
+        void setFOV(float fov) { fovDegrees = fov; recalculateProjection(); }
         float getNearClip() const { return nearClip; }
         void setNearClip(float near) { nearClip = near; recalculateProjection(); }
         float getFarClip() const { return farClip; }
@@ -33,7 +33,7 @@ namespace fe {
         template<typename Archive>
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("Projection Type", projectionType),
-                    cereal::make_nvp("Fov", fov),
+                    cereal::make_nvp("Fov", fovDegrees),
                     cereal::make_nvp("Near Clip", nearClip),
                     cereal::make_nvp("Far CLip", farClip),
                     cereal::make_nvp("Aspect Ratio", aspectRatio));
@@ -46,7 +46,7 @@ namespace fe {
         ProjectionType projectionType{ ProjectionType::Perspective };
         glm::mat4 projectionMatrix{ 1.0f };
 
-        float fov{ 35.0f }; // vertical field of view in degrees
+        float fovDegrees{ 35.0f }; // vertical field of view in degrees
         float aspectRatio{ 1.0f };
         float nearClip{ 0.1f };
         float farClip{ 1000.f };

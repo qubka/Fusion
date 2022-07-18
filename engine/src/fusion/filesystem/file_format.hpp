@@ -16,6 +16,7 @@ namespace fe {
         static bool IsModelFile(const fs::path& filepath);
         static bool IsTextureFile(const fs::path& filepath);
         static bool IsShaderFile(const fs::path& filepath);
+        static bool IsTextureStorageFile(const fs::path& filepath);
 
         /**
          * Gets the icon string for the specific file format.

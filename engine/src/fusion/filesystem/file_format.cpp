@@ -120,6 +120,19 @@ bool FileFormat::IsTextureFile(const fs::path& filepath) {
             ".pic",
             ".pgm",
             ".ppm",
+
+            ".ktx",
+            ".kmg",
+            ".dds"
+    };
+
+    return TEXTURE_FORMATS.find(extension) != TEXTURE_FORMATS.end();
+}
+
+bool FileFormat::IsTextureStorageFile(const fs::path& filepath) {
+    std::string extension = FileSystem::GetExtension(filepath);
+
+    static const std::set<std::string> TEXTURE_FORMATS = {
             ".ktx",
             ".kmg",
             ".dds"
@@ -243,4 +256,3 @@ const char* FileFormat::GetIcon(const fs::path& filepath) {
     auto key = ICON_FORMATS.find(FileSystem::GetExtension(filepath));
     return key != ICON_FORMATS.end() ? key->second.c_str() : ICON_MDI_FILE;
 }
-

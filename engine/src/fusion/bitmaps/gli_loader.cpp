@@ -7,20 +7,24 @@
 using namespace fe;
 
 void GliLoader::Load(Bitmap& bitmap, const fs::path& filepath) {
-    std::unique_ptr<gli::texture2d> texture;
+    std::unique_ptr<gli::texture> texture;
     FileSystem::Read(filepath, [&texture](const uint8_t* data, size_t size) {
-        texture = std::make_unique<gli::texture2d>(gli::load(reinterpret_cast<const char*>(data), size));
+        texture = std::make_unique<gli::texture>(gli::load(reinterpret_cast<const char*>(data), size));
     });
 
-    bitmap.data = std::unique_ptr<uint8_t[]>(texture->data<uint8_t>());
-    bitmap.size = texture->extent();
-    bitmap.channels = static_cast<BitmapChannels>(block_size(texture->format()));
-    bitmap.hdr = false;
-
-    if (bitmap.isEmpty()) {
+    const gli::texture& tex = *texture;
+    if (tex.empty()) {
         LOG_ERROR << "Failed to load bitmap file: " << filepath;
         return;
     }
+
+    auto pixels = std::make_unique<uint8_t[]>(tex.size());
+    std::memcpy(pixels.get(), tex.data(), tex.size());
+
+    bitmap.data = std::move(pixels);
+    bitmap.size = tex.extent();
+    bitmap.components = static_cast<uint8_t>(component_count(tex.format()));
+    bitmap.hdr = false;
 }
 
 void GliLoader::Write(const Bitmap& bitmap, const fs::path& filepath) {

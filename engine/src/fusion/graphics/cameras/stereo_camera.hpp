@@ -6,10 +6,10 @@ namespace fe {
     class StereoCamera : public PerspectiveCamera {
     public:
         StereoCamera() = default;
-        StereoCamera(const glm::vec2& size, float fov)
-            : PerspectiveCamera{size, fov} {}
-        StereoCamera(const glm::vec2& size, float fov, float near, float far)
-            : PerspectiveCamera{size, fov, near, far} {}
+        StereoCamera(const glm::vec2& size, float fovDegrees)
+            : PerspectiveCamera{size, fovDegrees} {}
+        StereoCamera(const glm::vec2& size, float fovDegrees, float nearClip, float farClip)
+            : PerspectiveCamera{size, fovDegrees, nearClip, farClip} {}
 
         //! Returns the current convergence, which is the distance at which there is no parallax.
         float getConvergence() const { return convergence; }
@@ -59,7 +59,7 @@ namespace fe {
 
     private:
         bool isStereo{ false };
-        bool isLeft { true };
+        bool isLeft{ true };
         float convergence{ 1.0f };
         float eyeSeparation{ 0.05f };
     };

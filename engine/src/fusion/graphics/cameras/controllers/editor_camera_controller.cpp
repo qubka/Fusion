@@ -59,15 +59,15 @@ void EditorCameraController::handleMouse(Camera& camera, float dt) {
         }
 
         if (glm::length(rotateVelocity) > FLT_EPSILON) {
-            glm::quat rotation = camera.getOrientation();
+            glm::quat orientation = camera.getOrientation();
             glm::quat rotationX = glm::angleAxis(rotateVelocity.y, vec3::right);
             glm::quat rotationY = glm::angleAxis(-rotateVelocity.x, vec3::up);
 
-            rotation = rotationY * rotation;
-            rotation = rotation * rotationX;
+            orientation = rotationY * orientation;
+            orientation = orientation * rotationX;
 
             previousCurserPos = pos;
-            camera.setOrientation(rotation);
+            camera.setOrientation(orientation);
         }
     }
 

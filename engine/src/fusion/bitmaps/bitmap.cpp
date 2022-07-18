@@ -10,16 +10,16 @@ Bitmap::Bitmap(const fs::path& filepath) {
     load(filepath);
 }
 
-Bitmap::Bitmap(const glm::uvec2& size, BitmapChannels channels, bool hdr)
+Bitmap::Bitmap(const glm::uvec2& size, uint8_t components, bool hdr)
     : size{size}
-    , channels{channels}
+    , components{components}
     , hdr{hdr}
-    , data{std::make_unique<uint8_t[]>(CalculateLength(size, channels, hdr))} {
+    , data{std::make_unique<uint8_t[]>(CalculateLength(size, components, hdr))} {
 }
 
-Bitmap::Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, BitmapChannels channels, bool hdr)
+Bitmap::Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, uint8_t components, bool hdr)
     : size{size}
-    , channels{channels}
+    , components{components}
     , hdr{hdr}
     , data{std::move(data)} {
 }
@@ -62,6 +62,6 @@ void Bitmap::write(const fs::path& filepath) const {
 #endif
 }
 
-size_t Bitmap::CalculateLength(const glm::uvec2& size, BitmapChannels channels, bool hdr) {
-    return size.x * size.y * static_cast<uint8_t>(channels) * (hdr ? sizeof(float) : sizeof(uint8_t));
+size_t Bitmap::CalculateLength(const glm::uvec2& size, uint8_t components, bool hdr) {
+    return size.x * size.y * components * (hdr ? sizeof(float) : sizeof(uint8_t));
 }

@@ -5,9 +5,7 @@
 namespace fe {
     class OffsetSize {
     public:
-        OffsetSize(uint32_t offset, uint32_t size) : offset{offset}, size{size} {
-        }
-
+        OffsetSize(uint32_t offset, uint32_t size) : offset{offset}, size{size} {}
         uint32_t getOffset() const { return offset; }
         uint32_t getSize() const { return size; }
 

@@ -7,38 +7,38 @@ PerspectiveCamera::PerspectiveCamera() {
     setPerspective(35, 1.3333f, 0.1f, 1000.0f);
 }
 
-PerspectiveCamera::PerspectiveCamera(const glm::vec2& size, float fovDegrees) {
+PerspectiveCamera::PerspectiveCamera(const glm::vec2& size, float fov) {
     float eyeX = size.x / 2.0f;
     float eyeY = size.y / 2.0f;
-    float halfFov = 3.14159f * fovDegrees / 360.0f;
+    float halfFov = 3.14159f * fov / 360.0f;
     float theTan = std::tan(halfFov);
     float dist = eyeY / theTan;
     float nearDist = dist / 10.0f;    // near / far clip plane
     float farDist = dist * 10.0f;
     float aspect = size.x / size.y;
 
-    setPerspective(fovDegrees, aspect, nearDist, farDist);
+    setPerspective(fov, aspect, nearDist, farDist);
     lookAt({eyeX, eyeY, dist}, {eyeX, eyeY, 0.0f});
 }
 
-PerspectiveCamera::PerspectiveCamera(const glm::vec2& size, float fovDegrees, float near, float far) {
+PerspectiveCamera::PerspectiveCamera(const glm::vec2& size, float fov, float near, float far) {
     float halfFov, theTan, aspect;
     float eyeX = size.x / 2.0f;
     float eyeY = size.y / 2.0f;
-    halfFov = 3.14159f * fovDegrees / 360.0f;
+    halfFov = 3.14159f * fov / 360.0f;
     theTan = std::tan(halfFov);
     float dist = eyeY / theTan;
     aspect = size.x / size.y;
 
-    setPerspective(fovDegrees, aspect, near, far);
+    setPerspective(fov, aspect, near, far);
     lookAt({eyeX, eyeY, dist}, {eyeX, eyeY, 0.0f});
 }
 
-void PerspectiveCamera::setPerspective(float verticalFovDegrees, float aspect, float near, float far) {
-    if (!isProjectionCachesDirty() && fov == verticalFovDegrees && aspectRatio == aspect && nearClip == near && farClip == far)
+void PerspectiveCamera::setPerspective(float fov, float aspect, float near, float far) {
+    if (!isProjectionCachesDirty() && fovDegrees == fov && aspectRatio == aspect && nearClip == near && farClip == far)
         return;
 
-    fov = verticalFovDegrees;
+    fovDegrees = fov;
     aspectRatio = aspect;
     nearClip = near;
     farClip = far;
@@ -57,7 +57,7 @@ Ray PerspectiveCamera::calcRay(const glm::vec2& uv, float imagePlaneAspectRatio)
 }
 
 void PerspectiveCamera::calcProjection() const {
-    frustumTop = nearClip * std::tan(static_cast<float>(M_PI) / 180.0f * fov * 0.5f);
+    frustumTop = nearClip * std::tan(glm::radians(fovDegrees) * 0.5f);
     frustumBottom = -frustumTop;
     frustumRight = frustumTop * aspectRatio;
     frustumLeft = -frustumRight;

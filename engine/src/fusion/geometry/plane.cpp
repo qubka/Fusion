@@ -18,6 +18,10 @@ Plane::Plane(const glm::vec4& abcd) {
     set(abcd);
 }
 
+Plane::Plane(float a, float b, float c, float d) {
+    set(a, b, c, d);
+}
+
 Plane::Plane(const glm::vec3& n, float d) {
     set(n, d);
 }
@@ -27,7 +31,7 @@ void Plane::set(const glm::vec3& n, const glm::vec3& p) {
         throw std::invalid_argument("Degenerate сase exception");
 
     normal = glm::normalize(n);
-    distance = -glm::dot(normal, p);
+    distance = glm::dot(normal, p);
 }
 
 void Plane::set(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
@@ -37,18 +41,7 @@ void Plane::set(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
         throw std::invalid_argument("Degenerate сase exception");
 
     normal = glm::normalize(n);
-    distance = -glm::dot(normal, a);
-}
-
-void Plane::set(const glm::vec4& m) {
-    glm::vec3 n{m};
-
-    float length = glm::length2(n);
-    if (length == 0)
-        throw std::invalid_argument("Degenerate сase exception");
-
-    normal = glm::normalize(n);
-    distance = m.w / glm::sqrt(length);
+    distance = glm::dot(normal, a);
 }
 
 void Plane::set(const glm::vec3& n, float d) {
@@ -59,12 +52,56 @@ void Plane::set(const glm::vec3& n, float d) {
     distance = d;
 }
 
+void Plane::set(const glm::vec4& m) {
+    normal = glm::vec3{m};
+    distance = m.w;
+}
+
+void Plane::set(float a, float b, float c, float d) {
+    normal = {a, b, c};
+    distance = d;
+}
+
+void Plane::setNormal(const glm::vec3& n) {
+    if (glm::length2(n) == 0)
+        throw std::invalid_argument("Degenerate сase exception");
+
+    normal = glm::normalize(n);
+}
+
+void Plane::setDistance(float d) {
+    distance = d;
+}
+
 void Plane::translate(const glm::vec3& translation) {
     distance += glm::dot(normal, translation);
 }
 
 Plane Plane::translated(const glm::vec3& translation) const {
     return { normal, distance + glm::dot(normal, translation) };
+}
+
+void Plane::transform(const glm::mat4& transform) {
+    glm::vec4 plane{normal, distance};
+    plane = transform * plane;
+    normal = glm::vec3{plane};
+    distance = plane.w;
+}
+
+Plane Plane::transformed(const glm::mat4& transform) const {
+    glm::vec4 plane{normal, distance};
+    plane = transform * plane;
+    return { glm::vec3(plane), plane.w };
+}
+
+void Plane::normalize() {
+    float magnitude = glm::length2(normal);
+    if (magnitude == 0)
+        throw std::invalid_argument("Degenerate сase exception");
+
+    magnitude = std::sqrt(magnitude);
+    normal /= magnitude;
+    distance /= magnitude;
 }
 
 void Plane::flip() {
@@ -82,6 +119,10 @@ glm::vec3 Plane::closestPoint(const glm::vec3& point) const {
 
 float Plane::getDistanceToPoint(const glm::vec3& point) const {
     return glm::dot(normal, point) + distance;
+}
+
+bool Plane::isPointOnPlane(const glm::vec3& point) const {
+    return getDistanceToPoint(point) >= -FLT_EPSILON;
 }
 
 bool Plane::sameSide(const glm::vec3& p0, const glm::vec3& p1) const {

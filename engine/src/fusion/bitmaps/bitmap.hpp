@@ -44,6 +44,8 @@ namespace fe {
         uint8_t components{ 4 };
         bool hdr{ false };
 
+        void* native;
+
     private:
         static size_t CalculateLength(const glm::uvec2& size, uint8_t components = 4, bool hdr = false);
     };

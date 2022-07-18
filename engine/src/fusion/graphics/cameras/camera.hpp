@@ -39,12 +39,12 @@ namespace fe {
         void setOrientation(glm::quat orientation);
 
         //! Returns the camera's vertical field of view measured in degrees.
-        float getFov() const { return fov; }
+        float getFov() const { return fovDegrees; }
         //! Sets the camera's vertical field of view measured in degrees.
-        void setFov(float verticalFov);
+        void setFov(float fov);
 
         //! Returns the camera's horizontal field of view measured in degrees.
-        float getFovHorizontal() const { return glm::degrees(2.0f * std::atan(std::tan(glm::radians(fov) * 0.5f) * aspectRatio)); }
+        float getFovHorizontal() const { return glm::degrees(2.0f * std::atan(std::tan(glm::radians(fovDegrees) * 0.5f) * aspectRatio)); }
         //! Sets the camera's horizontal field of view measured in degrees.
         void setFovHorizontal(float horizontalFov);
 
@@ -139,16 +139,16 @@ namespace fe {
 
         void getClipCoordinates(float clipDist, float ratio, glm::vec3& topLeft, glm::vec3& topRight, glm::vec3& bottomLeft, glm::vec3& bottomRight) const;
         void dirtyViewCaches() { modelViewCached = inverseModelViewCached = false; }
-        bool isViewCachesDirty() { return modelViewCached || inverseModelViewCached; }
+        bool isViewCachesDirty() const { return modelViewCached || inverseModelViewCached; }
         void dirtyProjectionCaches() { projectionCached = inverseProjectionCached = false; }
-        bool isProjectionCachesDirty() { return projectionCached || inverseProjectionCached; }
+        bool isProjectionCachesDirty() const { return projectionCached || inverseProjectionCached; }
 
         glm::vec3 eyePoint{ vec3::zero };
         glm::vec3 viewDirection{ vec3::forward };
         glm::quat orientation{ quat::identity };
         glm::vec3 worldUp{ vec3::up };
 
-        float fov{ 35.0f }; // vertical field of view in degrees
+        float fovDegrees{ 35.0f }; // vertical field of view in degrees
         float aspectRatio{ 1.0f };
         float nearClip{ 0.1f };
         float farClip{ 1000.f };

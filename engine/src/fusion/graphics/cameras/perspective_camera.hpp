@@ -8,12 +8,12 @@ namespace fe {
         //! Creates a default camera with eyePoint at ( 28, 21, 28 ), looking at the origin, 35deg vertical field-of-view and a 1.333 aspect ratio.
         PerspectiveCamera();
         //! Constructs screen-aligned camera
-        PerspectiveCamera(const glm::vec2& size, float fov);
+        PerspectiveCamera(const glm::vec2& size, float fovDegrees);
         //! Constructs screen-aligned camera
-        PerspectiveCamera(const glm::vec2& size, float fov, float near, float far);
+        PerspectiveCamera(const glm::vec2& size, float fovDegrees, float nearClip, float farClip);
 
         //! Configures the camera's projection according to the provided parameters.
-        void setPerspective(float verticalFovDegrees, float aspect, float near, float far);
+        void setPerspective(float verticalFovDegrees, float aspectRatio, float nearClip, float farClip);
 
         /** Returns both the horizontal and vertical lens shift.
             A horizontal lens shift of 1 (-1) will shift the view right (left) by half the width of the viewport.
