@@ -31,7 +31,7 @@ void Plane::set(const glm::vec3& n, const glm::vec3& p) {
         throw std::invalid_argument("Degenerate сase exception");
 
     normal = glm::normalize(n);
-    distance = glm::dot(normal, p);
+    distance = -glm::dot(normal, p);
 }
 
 void Plane::set(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
@@ -41,7 +41,7 @@ void Plane::set(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
         throw std::invalid_argument("Degenerate сase exception");
 
     normal = glm::normalize(n);
-    distance = glm::dot(normal, a);
+    distance = -glm::dot(normal, a);
 }
 
 void Plane::set(const glm::vec3& n, float d) {
@@ -53,13 +53,23 @@ void Plane::set(const glm::vec3& n, float d) {
 }
 
 void Plane::set(const glm::vec4& m) {
-    normal = glm::vec3{m};
-    distance = m.w;
+    glm::vec3 n{m};
+    float lengthSq = glm::length2(n);
+    if (lengthSq == 0)
+        throw std::invalid_argument("Degenerate сase exception");
+
+    normal = glm::normalize(n);
+    distance = m.w / glm::sqrt(lengthSq);
 }
 
 void Plane::set(float a, float b, float c, float d) {
-    normal = {a, b, c};
-    distance = d;
+    glm::vec3 n{a, b, c};
+    float lengthSq = glm::length2(n);
+    if (lengthSq == 0)
+        throw std::invalid_argument("Degenerate сase exception");
+
+    normal = glm::normalize(n);
+    distance = d / glm::sqrt(lengthSq);
 }
 
 void Plane::setNormal(const glm::vec3& n) {
@@ -95,13 +105,9 @@ Plane Plane::transformed(const glm::mat4& transform) const {
 }
 
 void Plane::normalize() {
-    float magnitude = glm::length2(normal);
-    if (magnitude == 0)
-        throw std::invalid_argument("Degenerate сase exception");
-
-    magnitude = std::sqrt(magnitude);
-    normal /= magnitude;
-    distance /= magnitude;
+    float length = glm::length(normal);
+    normal /= length;
+    distance /= length;
 }
 
 void Plane::flip() {

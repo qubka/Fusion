@@ -22,8 +22,8 @@ namespace fe {
         void setLocalOrientation(const glm::vec3& axis, float angle);
 
         const glm::mat4& getParentMatrix() const { return parentMatrix; }
-        const glm::mat4& getWorldMatrix();
-        const glm::mat4& getLocalMatrix();
+        const glm::mat4& getWorldMatrix() const;
+        const glm::mat4& getLocalMatrix() const;
 
         glm::vec3 getWorldPosition() const { return worldMatrix[3]; }
         glm::quat getWorldOrientation() const { return glm::toQuat(worldMatrix); }
@@ -58,23 +58,18 @@ namespace fe {
         //glm::vec3 inverseTransformPoint(const glm::vec3& point);
         //glm::vec3 inverseTransformDirection(const glm::vec3& direction);
 
-        void calcMatrices();
-        void applyTransform();
-
-        bool isUpdated() const { return updated; }
-        void setUpdated(bool flag) { updated = flag; }
-        void setDirty(bool flag) { dirty = flag; }
-
     private:
-        glm::mat4 parentMatrix{ 1.0f };
-        glm::mat4 localMatrix{ 1.0f };
-        glm::mat4 worldMatrix{ 1.0f };
+        void calcMatrices() const;
+        void applyTransform();
 
         glm::vec3 localPosition{ vec3::zero };
         glm::quat localOrientation{ quat::identity };
         glm::vec3 localScale{ vec3::one };
 
-        bool updated{ false };
-        bool dirty{ false };
+        glm::mat4 parentMatrix{ 1.0f };
+        mutable glm::mat4 localMatrix{ 1.0f };
+        mutable glm::mat4 worldMatrix{ 1.0f };
+
+        mutable bool dirty{ false };
     };
 }

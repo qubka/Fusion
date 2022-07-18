@@ -91,7 +91,7 @@ float Camera::getFocalLength() const {
 void Camera::lookAt(glm::vec3 target) {
     target -= eyePoint; // ray from target to eye
 
-    glm::vec3 direction { glm::normalize(target) };
+    glm::vec3 direction = glm::normalize(target);
     if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)))
         return;
 
@@ -105,7 +105,7 @@ void Camera::lookAt(glm::vec3 target) {
 void Camera::lookAt(const glm::vec3& point, glm::vec3 target) {
     target -= point; // ray from target to eye
 
-    glm::vec3 direction { glm::normalize(target) };
+    glm::vec3 direction = glm::normalize(target);
     if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)) && glm::all(glm::epsilonEqual(eyePoint, point, FLT_EPSILON)))
         return;
 
@@ -121,7 +121,7 @@ void Camera::lookAt(const glm::vec3& point, glm::vec3 target, glm::vec3 up) {
     target -= point; // ray from target to eye
     up = glm::normalize(up);
 
-    glm::vec3 direction { glm::normalize(target) };
+    glm::vec3 direction = glm::normalize(target);
     if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)) && glm::all(glm::epsilonEqual(eyePoint, point, FLT_EPSILON)) && glm::all(glm::epsilonEqual(worldUp, up, FLT_EPSILON)))
         return;
 
@@ -145,6 +145,13 @@ void Camera::getFrustum(float& left, float& top, float& right, float& bottom, fl
     far = farClip;
 }
 
+void Camera::calcFrustum() {
+    calcMatrices();
+
+    frustum.set(projectionMatrix * viewMatrix);
+    frustumCached = true;
+}
+
 void Camera::getBillboardVectors(glm::vec3& right, glm::vec3& up) const {
     right = glm::row(getViewMatrix(), 0);
     up = glm::row(getViewMatrix(), 1);
@@ -158,7 +165,7 @@ glm::vec2 Camera::worldToScreen(const glm::vec3& worldCoord, const glm::vec2& sc
     glm::vec4 ndc{ getProjectionMatrix() * eyeCoord };
     ndc.x /= ndc.w;
     ndc.y /= ndc.w;
-    ndc.z /= ndc.w;
+    //ndc.z /= ndc.w;
     return { (ndc.x + 1.0f) / 2.0f * screenSize.x, (1.0f - (ndc.y + 1.0f) / 2.0f) * screenSize.y };
 }
 
@@ -169,7 +176,7 @@ glm::vec2 Camera::eyeToScreen(const glm::vec3& eyeCoord, const glm::vec2& screen
     glm::vec4 ndc{ getProjectionMatrix() * glm::vec4{eyeCoord, 1} };
     ndc.x /= ndc.w;
     ndc.y /= ndc.w;
-    ndc.z /= ndc.w;
+    //ndc.z /= ndc.w;
     return { (ndc.x + 1.0f) / 2.0f * screenSize.x, (1.0f - (ndc.y + 1.0f) / 2.0f) * screenSize.y };
 }
 
@@ -182,9 +189,9 @@ float Camera::worldToEyeDepth(const glm::vec3& worldCoord) const {
 }
 
 glm::vec3 Camera::worldToNdc(const glm::vec3& worldCoord) const {
-    glm::vec4 eye{ getViewMatrix() * glm::vec4{worldCoord, 1} };
-    glm::vec4 unproj{ getProjectionMatrix() * eye };
-    return { unproj.x / unproj.w, unproj.y / unproj.w, unproj.z / unproj.w };
+    glm::vec4 eyeCoord{ getViewMatrix() * glm::vec4{worldCoord, 1} };
+    glm::vec4 ndc{ getProjectionMatrix() * eyeCoord };
+    return { ndc.x / ndc.w, ndc.y / ndc.w, ndc.z / ndc.w };
 }
 
 /// @link https://discourse.libcinder.org/t/screen-to-world-coordinates/1014/2

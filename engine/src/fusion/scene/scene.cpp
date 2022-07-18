@@ -88,6 +88,7 @@ entt::entity Scene::createEntity(std::string name) {
 }
 
 void Scene::destroyEntity(entt::entity entity) {
+    // TODO: Children ?
     registry.destroy(entity);
 }
 

@@ -155,8 +155,8 @@ void Frustum::calculateVertices(const glm::mat4& transform) {
     vertices[7] = glm::vec3{-1.0f, 1.0f, 1.0f};
 
     for (auto& vertex : vertices) {
-        glm::vec4 mat{ transformInv * glm::vec4{vertex, 1} };
-        vertex = mat / mat.w;
+        glm::vec4 ndc{ transformInv * glm::vec4{vertex, 1} };
+        vertex = ndc / ndc.w;
     }
 }
 

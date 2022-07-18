@@ -1,5 +1,12 @@
 #include "string.hpp"
 
+#ifdef FUSION_PLATFORM_WINDOWS
+#include <windows.h>
+#include <DbgHelp.h>
+#else
+#include <cxxabi.h> // __cxa_demangle()
+#endif
+
 using namespace fe;
 
 std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> UTF8_TO_UTF16_CONVERTER;
@@ -183,4 +190,24 @@ size_t String::FindInsensitive(std::string str, std::string pattern, size_t pos)
 
 std::string String::Quoted(const std::string& str) {
     return '"' + str + '"';
+}
+
+std::string String::Demangle(const std::string& str) {
+    if(str.empty())
+        return {};
+
+#if defined(FUSION_PLATFORM_WINDOWS)
+    char undecorated_name[1024];
+    if(!UnDecorateSymbolName(str.c_str(), undecorated_name, sizeof(undecorated_name), UNDNAME_COMPLETE)) {
+        return str;
+    } else {
+        return std::string{undecorated_name};
+    }
+#else
+    int status = -1;
+    char* demangled = abi::__cxa_demangle(str.c_str(), nullptr, nullptr, &status);
+    std::string ret = status == 0 ? std::string{demangled} : str;
+    free(demangled);
+    return ret;
+#endif
 }

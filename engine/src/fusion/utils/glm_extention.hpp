@@ -77,7 +77,7 @@ namespace glm {
     }
 
     template<typename T, qualifier Q>
-    GLM_FUNC_DECL vec<3, T, Q> smoothdamp(vec<3, T, Q> const& current, vec<3, T, Q> const& target, vec<3, T, Q>& currentVelocity, float smoothTime, float maxSpeed, float deltaTime) {
+    GLM_FUNC_DECL vec<3, T, Q> smoothdamp(const vec<3, T, Q>& current, const vec<3, T, Q>& target, vec<3, T, Q>& currentVelocity, float smoothTime, float maxSpeed, float deltaTime) {
         // Based on Game Programming Gems 4 Chapter 1.10
         smoothTime = max(0.0001f, smoothTime);
         float omega = 2.0f / smoothTime;
@@ -157,7 +157,20 @@ namespace glm {
     }
 
     template<typename T, qualifier Q>
-    GLM_FUNC_QUALIFIER GLM_CONSTEXPR T cross(vec<2, T, Q> const& x, vec<2, T, Q> const& y)  {
+    GLM_FUNC_QUALIFIER GLM_CONSTEXPR T cross(const vec<2, T, Q>& x, const vec<2, T, Q>& y)  {
         return x.x * y.y - x.y * y.x;
+    }
+
+    template<typename T, qualifier Q>
+    GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<2, T, Q> worldToScreen(const vec<3, T, Q>& worldCoord, const mat<4, 4, T, Q>& mvp, const vec<2, T, Q>& size, const vec<2, T, Q>& offset = vec<2, T, Q>{0, 0}) {
+        glm::vec4 trans{ mvp * glm::vec4{worldCoord, 1} };
+        trans *= 0.5f / trans.w;
+        trans += glm::vec4{0.5f, 0.5f, 0.0f, 0.0f};
+        trans.y = 1.f - trans.y;
+        trans.x *= size.x;
+        trans.y *= size.y;
+        trans.x += offset.x;
+        trans.y += offset.y;
+        return { trans.x, trans.y };
     }
 }

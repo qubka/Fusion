@@ -23,7 +23,7 @@ Transform::Transform(const glm::vec3& position) {
     setLocalPosition(position);
 }
 
-void Transform::calcMatrices() {
+void Transform::calcMatrices() const {
     localMatrix =
     glm::mat4{ //translate
         { 1.0f, 0.0f, 0.0f, 0.0f },
@@ -41,24 +41,22 @@ void Transform::calcMatrices() {
 
     worldMatrix = parentMatrix * localMatrix;
     dirty = false;
-    updated = true;
 }
 
 void Transform::applyTransform() {
-    glm::vec3 skew;
-    glm::vec4 perspective;
-    glm::decompose(localMatrix, localScale, localOrientation, localPosition, skew, perspective);
+    glm::vec3 rotation;
+    glm::decompose(localMatrix, localPosition, rotation, localScale);
+    localOrientation = rotation;
     dirty = false;
-    updated = true;
 }
 
-const glm::mat4& Transform::getWorldMatrix() {
+const glm::mat4& Transform::getWorldMatrix() const {
     if (dirty)
         calcMatrices();
     return worldMatrix;
 }
 
-const glm::mat4& Transform::getLocalMatrix() {
+const glm::mat4& Transform::getLocalMatrix() const {
     if (dirty)
         calcMatrices();
     return localMatrix;
@@ -73,7 +71,6 @@ void Transform::setWorldMatrix(const glm::mat4& mat) {
 
 void Transform::setLocalTransform(const glm::mat4& localMat) {
     localMatrix = localMat;
-    updated = true;
 
     applyTransform();
 

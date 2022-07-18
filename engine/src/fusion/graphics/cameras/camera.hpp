@@ -81,6 +81,8 @@ namespace fe {
 
         //! Returns whether the camera represents an orthographic projection instead of an perspective
         virtual bool isOrthographic() const = 0;
+        //! Returns the Camera's frustum object using current view and current projection matrices
+        const Frustum& getFrustum() { if (!frustumCached) calcFrustum(); return frustum; }
         //! Returns the coordinates of the camera's frustum, suitable for passing to \c glFrustum
         void getFrustum(float& left, float& top, float& right, float& bottom, float& near, float& far) const;
         //! Returns the Camera's Projection matrix, which converts view-space into clip-space
@@ -89,7 +91,7 @@ namespace fe {
         virtual const glm::mat4& getInverseProjectionMatrix() const { if (!inverseProjectionCached) calcInverseProjection(); return inverseProjectionMatrix; }
         //! Returns the Camera's View matrix, which converts world-space into view-space
         virtual const glm::mat4& getViewMatrix() const { if (!modelViewCached) calcViewMatrix(); return viewMatrix; }
-        //! Returns th Camera's Inverse View matrix, which converts view-space into world-space
+        //! Returns the Camera's Inverse View matrix, which converts view-space into world-space
         virtual const glm::mat4& getInverseViewMatrix() const { if (!inverseModelViewCached) calcInverseView(); return inverseModelViewMatrix; }
 
         //! Returns a Ray that passes through the image plane coordinates (\a u, \a v) (expressed in the range [0,1]) on an image plane of aspect ratio \a imagePlaneAspectRatio
@@ -134,13 +136,15 @@ namespace fe {
         virtual void calcInverseView() const;
         virtual void calcProjection() const = 0;
         virtual void calcInverseProjection() const;
+        void calcFrustum();
 
         virtual Ray calcRay(const glm::vec2& uv, float imagePlaneAspectRatio) const = 0;
 
         void getClipCoordinates(float clipDist, float ratio, glm::vec3& topLeft, glm::vec3& topRight, glm::vec3& bottomLeft, glm::vec3& bottomRight) const;
-        void dirtyViewCaches() { modelViewCached = inverseModelViewCached = false; }
+
+        void dirtyViewCaches() { modelViewCached = inverseModelViewCached = frustumCached = false; }
         bool isViewCachesDirty() const { return modelViewCached || inverseModelViewCached; }
-        void dirtyProjectionCaches() { projectionCached = inverseProjectionCached = false; }
+        void dirtyProjectionCaches() { projectionCached = inverseProjectionCached = frustumCached = false; }
         bool isProjectionCachesDirty() const { return projectionCached || inverseProjectionCached; }
 
         glm::vec3 eyePoint{ vec3::zero };
@@ -168,10 +172,12 @@ namespace fe {
         mutable bool modelViewCached{ false };
         mutable bool inverseModelViewCached{ false };
 
-        //Frustum frustum;
         mutable float frustumLeft{ -1.0f };
         mutable float frustumRight{ 1.0f };
         mutable float frustumBottom{ -1.0f };
         mutable float frustumTop{ 1.0f };
+
+        Frustum frustum;
+        mutable bool frustumCached{ false };
     };
 }

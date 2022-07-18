@@ -8,8 +8,8 @@ namespace fe {
     class Rect;
     /// @brief Create frustum from matrix
     /// if extracted from projection matrix only, planes will be in eye-space
-    /// if extracted from view*projection, planes will be in world space
-    /// if extracted from model*view*projection planes will be in model space
+    /// if extracted from projection*view, planes will be in world space
+    /// if extracted from projection*view*model planes will be in model space
     class Frustum {
     public:
         enum FrustumSection { Top, Bottom, Left, Right, Near, Far };
