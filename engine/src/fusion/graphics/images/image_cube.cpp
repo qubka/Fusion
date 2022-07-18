@@ -4,6 +4,7 @@
 #include "fusion/graphics/vku.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/filesystem/file_format.hpp"
 #include "fusion/filesystem/file_system.hpp"
 
 #include <gli/gli.hpp>
@@ -15,8 +16,7 @@ ImageCube::ImageCube(fs::path filepath, VkFilter filter, VkSamplerAddressMode ad
         , filePath{std::move(filepath)}
         , anisotropic{anisotropic}
         , mipmap{mipmap} {
-    auto extension = FileSystem::GetExtension(filePath);
-    if (extension != ".ktx" && extension != ".kmg" && extension != ".dds")
+    if (!FileFormat::IsTextureStorageFile(filePath))
         throw std::runtime_error("Unsupported format for fast and single loading");
 
     if (load) {
@@ -24,8 +24,8 @@ ImageCube::ImageCube(fs::path filepath, VkFilter filter, VkSamplerAddressMode ad
     }
 }
 
-ImageCube::ImageCube(const glm::uvec2& extent, VkFormat format, VkImageLayout layout, VkImageUsageFlags usage, VkFilter filter, VkSamplerAddressMode addressMode,
-	VkSampleCountFlagBits samples, bool anisotropic, bool mipmap)
+ImageCube::ImageCube(const glm::uvec2& extent, VkFormat format, VkImageLayout layout, VkImageUsageFlags usage, VkFilter filter,
+                     VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, bool anisotropic, bool mipmap)
     : Image{filter, addressMode, samples, layout, usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, format, 1, 6, {extent.x, extent.y, 1}}
     , anisotropic{anisotropic}
     , mipmap{mipmap}
@@ -47,8 +47,8 @@ ImageCube::ImageCube(const glm::uvec2& extent, VkFormat format, VkImageLayout la
     }
 }
 
-ImageCube::ImageCube(std::unique_ptr<Bitmap>&& bitmap, VkFormat format, VkImageLayout layout, VkImageUsageFlags usage, VkFilter filter, VkSamplerAddressMode addressMode,
-	VkSampleCountFlagBits samples, bool anisotropic, bool mipmap)
+ImageCube::ImageCube(std::unique_ptr<Bitmap>&& bitmap, VkFormat format, VkImageLayout layout, VkImageUsageFlags usage, VkFilter filter,
+                     VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, bool anisotropic, bool mipmap)
     : Image{filter, addressMode, samples, layout, usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, format, 1, 6, vku::uvec3_cast(bitmap->getExtent())}
     , anisotropic{anisotropic}
     , mipmap{mipmap}
@@ -58,7 +58,7 @@ ImageCube::ImageCube(std::unique_ptr<Bitmap>&& bitmap, VkFormat format, VkImageL
 
     mipLevels = mipmap ? getMipLevels(extent) : 1;
 
-    CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
+    CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, this->usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
     CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
     CreateImageView(image, view, VK_IMAGE_VIEW_TYPE_CUBE, format, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
     TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
@@ -103,6 +103,9 @@ void ImageCube::load() {
     FileSystem::Read(filePath, [&texture](const uint8_t* data, size_t size) {
         texture = std::make_unique<gli::texture_cube>(gli::load(reinterpret_cast<const char*>(data), size));
     });
+#if FUSION_DEBUG
+    LOG_DEBUG << "ImageCube: " << filePath << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+#endif
 
     const gli::texture_cube& texCube = *texture;
     if (texCube.empty())
@@ -110,7 +113,9 @@ void ImageCube::load() {
 
     extent.width = static_cast<uint32_t>(texCube.extent().x);
     extent.height = static_cast<uint32_t>(texCube.extent().y);
+    // arrayLayers = 6
     mipLevels = static_cast<uint32_t>(texCube.levels());
+    components = static_cast<uint8_t>(component_count(texCube.format()));
 
     if (extent.width == 0 || extent.height == 0)
         throw std::runtime_error("Width or height is empty");
@@ -123,7 +128,7 @@ void ImageCube::load() {
     CreateImageView(image, view, VK_IMAGE_VIEW_TYPE_CUBE, format, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
     TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
 
-    Buffer bufferStaging{static_cast<VkDeviceSize>(texCube.size()), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, texCube.data()};
+    Buffer bufferStaging{texCube.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, texCube.data()};
 
     // Setup buffer copy regions for each layer including all of it's miplevels
     std::vector<VkBufferImageCopy> bufferCopyRegions;
@@ -162,8 +167,4 @@ void ImageCube::load() {
     } else {
         TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
     }
-
-#if FUSION_DEBUG
-    LOG_DEBUG << "ImageCube: " << filePath << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
-#endif
 }

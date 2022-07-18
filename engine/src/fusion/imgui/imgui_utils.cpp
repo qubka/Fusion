@@ -281,11 +281,11 @@ void Image(Image2dArray* texture, uint32_t index, const glm::vec2& size, bool fl
 
 struct Image { static void Callback(const ImDrawList* parent_list, const ImDrawCmd* cmd) {} };
 
-void Image(const std::string& name, uint32_t* texture_id, const glm::vec2& size, bool flipImage) {
-    ImGui::BeginChild(name.c_str());
-    ImGui::GetWindowDrawList()->AddCallback(Image::Callback, texture_id);
+void Image(uint32_t* texture_id, const glm::vec2& size, bool flipImage) {
+    auto drawList = ImGui::GetWindowDrawList();
+    drawList->AddCallback(Image::Callback, texture_id);
     ImGui::Image(nullptr, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
-    ImGui::EndChild();
+    drawList->AddCallback(nullptr, nullptr);
 }
 
 bool BufferingBar(const std::string& name, float value, const glm::vec2& size_arg, uint32_t bg_col, uint32_t fg_col) {

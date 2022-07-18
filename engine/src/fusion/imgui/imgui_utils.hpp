@@ -45,7 +45,7 @@ namespace ImGuiUtils {
     void Image(fe::Image2d* texture, const glm::vec2& size, bool flipImage = false);
     void Image(fe::ImageCube* texture, const glm::vec2& size, bool flipImage = false);
     void Image(fe::Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
-    void Image(const std::string& name, uint32_t* texture_id, const glm::vec2& size, bool flipImage = false);
+    void Image(uint32_t* texture_id, const glm::vec2& size, bool flipImage = false);
 
     void SetTheme(Theme theme);
 

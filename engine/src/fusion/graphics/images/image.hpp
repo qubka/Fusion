@@ -25,8 +25,15 @@ namespace fe {
          * @param arrayLayers The number of layers in the image.
          * @param extent The number of data elements in each dimension of the base level.
          */
-        Image(VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, VkImageLayout layout, VkImageUsageFlags usage,
-            VkFormat format, uint32_t mipLevels, uint32_t arrayLayers, const VkExtent3D& extent);
+        Image(VkFilter filter,
+              VkSamplerAddressMode addressMode,
+              VkSampleCountFlagBits samples,
+              VkImageLayout layout,
+              VkImageUsageFlags usage,
+              VkFormat format,
+              uint32_t mipLevels,
+              uint32_t arrayLayers,
+              const VkExtent3D& extent);
         ~Image() override;
 
         WriteDescriptorSet getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const override;
