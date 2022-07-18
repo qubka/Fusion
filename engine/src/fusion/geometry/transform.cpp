@@ -2,12 +2,21 @@
 
 using namespace fe;
 
-Transform::Transform(const glm::mat4& matrix) {
-    glm::vec3 skew;
-    glm::vec4 perspective;
-    glm::decompose(matrix, localScale, localOrientation, localPosition, skew, perspective);
-    localMatrix = matrix;
-    worldMatrix = matrix;
+Transform::Transform(const glm::mat4& local) {
+    glm::vec3 rotation;
+    glm::decompose(local, localPosition, rotation, localScale);
+    localOrientation = rotation;
+    localMatrix = local;
+    worldMatrix = local;
+}
+
+Transform::Transform(const glm::mat4& parent, const glm::mat4& local) {
+    glm::vec3 rotation;
+    glm::decompose(local, localPosition, rotation, localScale);
+    localOrientation = rotation;
+    parentMatrix = parent;
+    localMatrix = local;
+    worldMatrix = parent * local;
 }
 
 Transform::Transform(const glm::vec3& position) {

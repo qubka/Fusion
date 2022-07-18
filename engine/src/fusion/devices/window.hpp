@@ -283,12 +283,6 @@ namespace fe {
         virtual const glm::vec2& getMouseScrollDelta() const = 0;
 
         /**
-         * Gets the current window DPI if presents.
-         * @return The window DPI.
-         */
-        virtual float getWindowDPI() const = 0;
-
-        /**
          * Gets the current monitor if presents.
          * @return The monitor.
          */

@@ -93,7 +93,6 @@ void SceneViewPanel::onImGui() {
     //auto window = DeviceManager::Get()->getWindow(0);
 
     /*if (updateCamera && editor->isSceneActive() && !ImGuizmo::IsUsing() && !!window->getMouseButton(MouseButton::ButtonLeft)) {
-        float dpi = window->getWindowDPI();
         auto clickPos = window->getMousePosition() - glm::vec2{sceneViewPosition.x / dpi, sceneViewPosition.y / dpi};
 
         Ray ray = editor->getScreenRay(int(clickPos.x), int(clickPos.y), camera, int(sceneViewSize.x / dpi), int(sceneViewSize.y / dpi));

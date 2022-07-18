@@ -15,24 +15,23 @@ namespace ImGui {
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
-        bool updated = false;
-
-         // TODO:: REWORK
-
         glm::vec3 position{ transform.getLocalPosition() };
-        updated |= ImGuiUtils::PropertyControl("Position", position);
-        transform.setLocalPosition(position);
+        if (ImGuiUtils::PropertyControl("Position", position)) {
+            transform.setLocalPosition(position);
+            //registry.patch<TransformComponent>(entity);
+        }
 
         glm::vec3 rotation{ glm::degrees(glm::eulerAngles(transform.getLocalOrientation())) };
-        updated |= ImGuiUtils::PropertyControl("Rotation", rotation, -180.0f, 180.0f);
-        transform.setLocalOrientation(glm::radians(rotation));
+        if (ImGuiUtils::PropertyControl("Rotation", rotation, -180.0f, 180.0f)) {
+            transform.setLocalOrientation(glm::radians(rotation));
+            //registry.patch<TransformComponent>(entity);
+        }
 
         glm::vec3 scale{ transform.getLocalScale() };
-        updated |= ImGuiUtils::PropertyControl("Scale", scale, 0.01f, FLT_MAX, 1.0f, 0.01f);
-        transform.setLocalScale(scale);
-
-        //if (updated)
-        //    registry.patch<TransformComponent>(entity);
+        if (ImGuiUtils::PropertyControl("Scale", scale, 0.01f, FLT_MAX, 1.0f, 0.01f)) {
+            transform.setLocalScale(scale);
+            //registry.patch<TransformComponent>(entity);
+        }
 
         ImGui::Columns(1);
         ImGui::Separator();
@@ -128,15 +127,11 @@ void InspectorPanel::onImGui() {
         ImGui::TextUnformatted(ICON_MDI_CUBE);
         ImGui::SameLine();
 
-        const auto nameComponent = registry.try_get<NameComponent>(selected);
+        auto nameComponent = registry.try_get<NameComponent>(selected);
         std::string name = nameComponent ? *nameComponent : std::to_string(entt::to_integral(selected));
 
         if (debugMode) {
-            if (registry.valid(selected)) {
-                ImGui::Text("ID: %d", static_cast<int>(selected));
-            } else {
-                ImGui::TextUnformatted("INVALID ENTITY");
-            }
+            ImGui::Text("ID: %d", static_cast<int>(selected));
         }
 
         ImGui::SameLine();
@@ -170,22 +165,28 @@ void InspectorPanel::onImGui() {
             ImGui::Text("UUID: %s", uuids::to_string(idComponent->uuid).c_str());
 
             if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(selected)) {
-                if (hierarchyComponent->parent != entt::null && registry.valid(hierarchyComponent->parent)) {
-                    ImGui::Text("Parent : ID: %d", static_cast<int>(hierarchyComponent->parent));
+                auto parent = hierarchyComponent->parent;
+                if (parent != entt::null) {
+                    ImGui::Text("Parent : ID: %d", static_cast<int>(parent));
+                    if (auto nameComponent = registry.try_get<NameComponent>(parent)) {
+                        ImGui::SameLine();
+                        ImGui::Text(" (%s)", nameComponent->name.c_str());
+                    }
                 } else {
                     ImGui::TextUnformatted("Parent : null");
                 }
 
-                ImGui::TextUnformatted("Children : ");
+                ImGui::Text("Children : %d", hierarchyComponent->children);
                 ImGui::Indent(24.0f);
 
                 auto child = hierarchyComponent->first;
                 while (child != entt::null) {
                     ImGui::Text("ID: %d", static_cast<int>(child));
-                    hierarchyComponent = registry.try_get<HierarchyComponent>(child);
-                    if (hierarchyComponent) {
-                        child = hierarchyComponent->next;
+                    if (auto nameComponent = registry.try_get<NameComponent>(child)) {
+                        ImGui::SameLine();
+                        ImGui::Text(" (%s)", nameComponent->name.c_str());
                     }
+                    child = registry.get<HierarchyComponent>(child).next;
                 }
 
                 ImGui::Unindent(24.0f);

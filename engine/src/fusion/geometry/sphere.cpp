@@ -139,7 +139,7 @@ void Sphere::calcProjection(float focalLength, glm::vec2* outCenter, glm::vec2* 
     float l2 = glm::dot(o, o);
 
     if (outCenter)
-        *outCenter = focalLength * o.z * glm::vec2{o} / (z2 - r2);
+        *outCenter = focalLength * o.z * glm::vec2{o.x, o.y} / (z2 - r2);
     if (std::fabs(z2 - l2) > 0.00001f) {
         if (outAxisA)
             *outAxisA = focalLength * sqrtf(-r2 * (r2 - l2) / ((l2 - z2) * (r2 - z2) * (r2 - z2))) * glm::vec2{o.x, o.y};

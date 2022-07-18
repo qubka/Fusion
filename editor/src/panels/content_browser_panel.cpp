@@ -194,10 +194,8 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
     if (dirInfo->parent == nullptr)
         nodeFlags |= ImGuiTreeNodeFlags_Framed;
 
-    float dpi = DeviceManager::Get()->getWindow(0)->getWindowDPI();
-
     const ImColor TreeLineColor = ImColor{128, 128, 128, 128};
-    const float smallOffsetX = 6.0f * dpi;
+    const float smallOffsetX = 6.0f;
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     if (dirInfo->isDirectory) {
@@ -275,7 +273,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
                         }
                     }
 
-                    float horizontalTreeLineSize = 16.0f * dpi;
+                    float horizontalTreeLineSize = 16.0f;
                     if (containsFolderTemp)
                         horizontalTreeLineSize *= 0.5f;
 

@@ -28,9 +28,6 @@ void Scene::onStart() {
 }
 
 void Scene::onUpdate() {
-    if (!runtime)
-        return;
-
     systems.each([&](auto system) {
         if (system->isEnabled())
             system->onUpdate();
@@ -102,6 +99,7 @@ entt::entity Scene::duplicateEntity(entt::entity entity, entt::entity parent) {
     copyEntity<ALL_COMPONENTS>(newEntity, entity);
 
     if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(newEntity)) {
+        hierarchyComponent->children = 0;
         hierarchyComponent->first = entt::null;
         hierarchyComponent->parent = entt::null;
         hierarchyComponent->next = entt::null;
@@ -115,7 +113,7 @@ entt::entity Scene::duplicateEntity(entt::entity entity, entt::entity parent) {
     }
 
     if (parent != entt::null)
-        hierarchySystem->setParent(newEntity, parent);
+        hierarchySystem->assignChild(parent, newEntity);
 
     hierarchySystem->setEnabled(true);
     

@@ -71,7 +71,6 @@ ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
     window = DeviceManager::Get()->getWindow(0);
     auto& size = window->getSize();
     io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
-    fontScale *= window->getWindowDPI();
 
     setupKeyCodes();
     setupStyle();

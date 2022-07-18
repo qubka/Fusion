@@ -72,7 +72,6 @@ namespace glfw {
         void setMouseScroll(const glm::vec2& scroll) override;
         const glm::vec2& getMouseScrollDelta() const override { return mouseScrollDelta; }
 
-        float getWindowDPI() const override { return 1.0f; }
         const fe::Monitor* getCurrentMonitor() const override;
         void* getNativeWindow() const override { return window; }
 

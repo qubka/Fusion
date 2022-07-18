@@ -15,8 +15,8 @@ namespace ImGuiUtils {
 using namespace fe;
 using namespace std::string_literals;
 
-glm::vec4 SelectedColor = glm::vec4{0.28f, 0.56f, 0.9f, 1.0f};
-glm::vec4 IconColor = glm::vec4{0.2f, 0.2f, 0.2f, 1.0f};
+glm::vec4 SelectedColor = glm::vec4{ 0.28f, 0.56f, 0.9f, 1.0f };
+glm::vec4 IconColor = glm::vec4{ 0.2f, 0.2f, 0.2f, 1.0f };
 
 void PropertyText(const std::string& name, const std::string& value) {
     //ImGui::AlignTextToFramePadding();

@@ -8,8 +8,9 @@ namespace fe {
         enum class Space { Self, Parent, World };
 
         Transform() = default;
-        explicit Transform(const glm::mat4& matrix);
+        explicit Transform(const glm::mat4& local);
         explicit Transform(const glm::vec3& position);
+        Transform(const glm::mat4& parent, const glm::mat4& local);
         ~Transform() = default;
 
         void setWorldMatrix(const glm::mat4& mat);

@@ -218,26 +218,44 @@ void Editor::onImGuizmo() {
                                  bounds ? glm::value_ptr(boundsSnap) : nullptr);
 
             if (ImGuizmo::IsUsing()) {
-               if (gizmosType == ImGuizmo::OPERATION::SCALE) {
-                    model = glm::inverse(transform->getParentMatrix()) * model;
-                    transform->setLocalScale(glm::vec3(model[0][0], model[1][1], model[2][2])); // TODO: Move to utils
-                } else {
-                    model = glm::inverse(transform->getParentMatrix()) * model;
-                    transform->setLocalTransform(model);
+                model = glm::inverse(transform->getParentMatrix()) * model;
 
-                    /*RigidBody2DComponent* rigidBody2DComponent = registry.try_get<RigidBody2DComponent>(selectedEntity);
+                glm::vec3 position, rotation, scale;
+                glm::decompose(model, position, rotation, scale);
 
-                    if (rigidBody2DComponent) {
-                        rigidBody2DComponent->GetRigidBody()->SetPosition( { model[3].x, model[3].y });
-                    } else {
-                        RigidBody3DComponent* rigidBody3DComponent = registry.try_get<RigidBody3DComponent>(selectedEntity);
-                        if (rigidBody3DComponent) {
-                            rigidBody3DComponent->GetRigidBody()->SetPosition(model[3]);
-                            rigidBody3DComponent->GetRigidBody()->SetOrientation(glm::eulerAngles(glm::quat_cast((model)));
-                        }
-                    }*/
+                switch (gizmosType) {
+                    case ImGuizmo::TRANSLATE:
+                        transform->setLocalPosition(position);
+                        break;
+                    case ImGuizmo::ROTATE:
+                        transform->setLocalOrientation(rotation);
+                        break;
+                    case ImGuizmo::SCALE:
+                        transform->setLocalScale(scale);
+                        break;
+                    default:
+                        transform->setLocalPosition(position);
+                        transform->setLocalOrientation(rotation);
+                        transform->setLocalScale(scale);
+                        break;
                 }
+
+                //registry.patch<TransformComponent>(selectedEntity);
             }
+
+            //transform->setLocalTransform(model);
+
+            /*RigidBody2DComponent* rigidBody2DComponent = registry.try_get<RigidBody2DComponent>(selectedEntity);
+
+            if (rigidBody2DComponent) {
+                rigidBody2DComponent->GetRigidBody()->SetPosition( { model[3].x, model[3].y });
+            } else {
+                RigidBody3DComponent* rigidBody3DComponent = registry.try_get<RigidBody3DComponent>(selectedEntity);
+                if (rigidBody3DComponent) {
+                    rigidBody3DComponent->GetRigidBody()->SetPosition(model[3]);
+                    rigidBody3DComponent->GetRigidBody()->SetOrientation(glm::eulerAngles(glm::quat_cast((model)));
+                }
+            }*/
         }
     }
 }
