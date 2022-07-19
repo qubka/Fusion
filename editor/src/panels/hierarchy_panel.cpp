@@ -100,7 +100,7 @@ void HierarchyPanel::onImGui() {
         {
             ImGui::PushFont(io.Fonts->Fonts[1]);
             ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-            ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
             hierarchyFilter.Draw("##HierarchyFilter", ImGui::GetContentRegionAvail().x - style.IndentSpacing);
             ImGuiUtils::DrawItemActivityOutline(2.0f, false);
             ImGui::PopStyleVar();
@@ -255,7 +255,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             editor->getComponentIcon(typeid(CameraComponent), icon);
         }
 
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetIconColor());
+        //ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColorScheme::GetIconColor());
         // ImGui::BeginGroup();
         bool nodeOpen = ImGui::TreeNodeEx((void*) (intptr_t) entt::to_integral(node), nodeFlags, "%s", icon.c_str());
         {
@@ -266,7 +266,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
                 doubleClicked = entt::null;
         }
 
-        ImGui::PopStyleColor();
+        //ImGui::PopStyleColor();
         ImGui::SameLine();
         if (!isDoubleClicked)
             ImGui::TextUnformatted(name.c_str());
@@ -283,7 +283,8 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
 
 #if 0
         ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 22.0f);
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.7f, 0.7f, 0.7f, 0.0f});
+            ImVec4{0.7f, 0.7f, 0.7f, 0.0f}
+            ImGui::PushStyleColor(ImGuiCol_Button, color);
             if (ImGui::Button(active ? ICON_MDI_EYE : ICON_MDI_EYE_OFF)) {
                 auto& activeComponent = registry.get_or_emplace<ActiveComponent>(node);
                 activeComponent.active = !active;

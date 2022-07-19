@@ -121,9 +121,11 @@ entt::entity Scene::duplicateEntity(entt::entity entity, entt::entity parent) {
     return newEntity;
 }
 
-void Scene::serialise(bool binary) {
+void Scene::serialise(fs::path filepath, bool binary) {
     if (binary) {
-        auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
+        if (filepath.empty())
+            filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
+
         std::ofstream os{filepath, std::ios::binary};
         {
             // output finishes flushing its contents when it goes out of scope
@@ -134,7 +136,9 @@ void Scene::serialise(bool binary) {
 
         LOG_INFO << "Serialise scene as binary: " << filepath;
     } else {
-        auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
+        if (filepath.empty())
+            filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
+
         std::stringstream ss;
         {
             // output finishes flushing its contents when it goes out of scope
@@ -149,13 +153,14 @@ void Scene::serialise(bool binary) {
     }
 }
 
-void Scene::deserialise(bool binary) {
+void Scene::deserialise(fs::path filepath, bool binary) {
     systems.each([&](auto system) {
         system->setEnabled(false);
     });
 
     if (binary) {
-        auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
+        if (filepath.empty())
+            filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
 
         if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
             LOG_ERROR << "No saved scene file found: " << filepath;
@@ -174,7 +179,8 @@ void Scene::deserialise(bool binary) {
 
         LOG_INFO << "Deserialise scene as binary: " << filepath;
     } else {
-        auto filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
+        if (filepath.empty())
+            filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
 
         if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
             LOG_ERROR << "No saved scene file found: " << filepath;

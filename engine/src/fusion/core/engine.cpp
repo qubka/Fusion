@@ -10,7 +10,7 @@
 #include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/input/input.hpp"
-
+#include "fusion/utils/string.hpp"
 #include "fusion/bitmaps/gli_loader.hpp"
 #include "fusion/bitmaps/stb_loader.hpp"
 
@@ -112,7 +112,7 @@ void Engine::sortModules() {
         for (const auto& require: module.requires) {
             dependencies[module.stage][require]++;
         }
-        LOG_DEBUG << "Module: " << type.name() << " was registered for the " << me::enum_name(module.stage) << " stage";
+        LOG_DEBUG << "Module: " << String::Demangle(type.name()) << " was registered for the " << me::enum_name(module.stage) << " stage";
     }
 
     // Sort by dependency count

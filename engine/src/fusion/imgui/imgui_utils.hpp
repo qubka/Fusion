@@ -26,7 +26,8 @@ namespace ImGuiUtils {
         ClassicDark,
         Classic,
         Cherry,
-        Cinder
+        Cinder,
+        Steam
     };
 
     enum class PropertyFlag : uint8_t {

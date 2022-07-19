@@ -28,7 +28,7 @@ void EditorCameraController::update(Camera& camera) {
 
 void EditorCameraController::handleMouse(Camera& camera, float dt) {
     const glm::vec2& pos = Input::Get()->getMousePosition();
-    auto window =  DeviceManager::Get()->getWindow(0);
+    auto window = DeviceManager::Get()->getWindow(0);
 
     if (camera.isOrthographic()) {
         if (Input::Get()->getMouseButton(MouseButton::ButtonRight)) {

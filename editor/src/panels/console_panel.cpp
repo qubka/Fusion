@@ -113,7 +113,7 @@ void ConsolePanel::renderHeader() {
     {
         ImGui::PushFont(io.Fonts->Fonts[1]);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
         Filter.Draw("###ConsoleFilter", ImGui::GetContentRegionAvail().x - (levelButtonWidths));
         ImGuiUtils::DrawItemActivityOutline(2.0f, false);
         ImGui::PopStyleVar();

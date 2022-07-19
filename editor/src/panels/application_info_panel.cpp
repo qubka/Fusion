@@ -116,9 +116,10 @@ void ApplicationInfoPanel::onImGui() {
                             ImGui::TableSetColumnIndex(2);
                             bool primary = monitor->isPrimary();
                             if (primary) {
-                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+                                ImVec4 color{ 0.2f, 0.7f, 0.2f, 1.0f };
+                                ImGui::PushStyleColor(ImGuiCol_Button, color);
+                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
                             }
                             ImGui::SmallButton(primary ? "Yes" : "No");
                             if (primary)
@@ -164,9 +165,10 @@ void ApplicationInfoPanel::onImGui() {
                             ImGui::TableSetColumnIndex(3);
                             bool connected = joystick->isConnected();
                             if (connected) {
-                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+                                ImVec4 color{ 0.2f, 0.7f, 0.2f, 1.0f };
+                                ImGui::PushStyleColor(ImGuiCol_Button, color);
+                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
                             }
                             ImGui::SmallButton(connected ? "Yes" : "No");
                             if (connected)

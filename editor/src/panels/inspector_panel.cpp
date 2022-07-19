@@ -15,22 +15,19 @@ namespace ImGui {
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
-        glm::vec3 position{ transform.getLocalPosition() };
+        glm::vec3 position = transform.getLocalPosition();
         if (ImGuiUtils::PropertyControl("Position", position)) {
             transform.setLocalPosition(position);
-            //registry.patch<TransformComponent>(entity);
         }
 
-        glm::vec3 rotation{ glm::degrees(glm::eulerAngles(transform.getLocalOrientation())) };
+        glm::vec3 rotation = glm::degrees(glm::eulerAngles(transform.getLocalOrientation()));
         if (ImGuiUtils::PropertyControl("Rotation", rotation, -180.0f, 180.0f)) {
             transform.setLocalOrientation(glm::radians(rotation));
-            //registry.patch<TransformComponent>(entity);
         }
 
-        glm::vec3 scale{ transform.getLocalScale() };
+        glm::vec3 scale = transform.getLocalScale();
         if (ImGuiUtils::PropertyControl("Scale", scale, 0.01f, FLT_MAX, 1.0f, 0.01f)) {
             transform.setLocalScale(scale);
-            //registry.patch<TransformComponent>(entity);
         }
 
         ImGui::Columns(1);
@@ -144,11 +141,15 @@ void InspectorPanel::onImGui() {
         }
         ImGui::SameLine();
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.7f, 0.7f, 0.7f, 0.0f});
+        ImVec4 color{0.7f, 0.7f, 0.7f, 0.0f};
+        ImGui::PushStyleColor(ImGuiCol_Button, color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
 
         if (ImGui::Button(ICON_MDI_TUNE))
             ImGui::OpenPopup("SetDebugMode");
-        ImGui::PopStyleColor();
+
+        ImGui::PopStyleColor(3);
 
         if (ImGui::BeginPopup("SetDebugMode", ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize)) {
             if (ImGui::Selectable("Debug Mode", debugMode)) {

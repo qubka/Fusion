@@ -6,6 +6,7 @@
 #include <string>
 
 #include "material_design_icons.hpp"
+#include "imgui_utils.hpp"
 
 #include <entt/entt.hpp>
 #include <imgui/imgui.h>
@@ -87,14 +88,17 @@ namespace ImGui {
                         bool open = ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen);
                         bool removed = false;
 
-                        ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::GetFontSize() -  style.ItemSpacing.x);
+                        ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::GetFontSize() - style.ItemSpacing.x);
 
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.7f, 0.7f, 0.7f, 0.0f});
+                        ImVec4 color{ 0.7f, 0.7f, 0.7f, 0.0f };
+                        ImGui::PushStyleColor(ImGuiCol_Button, color);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
 
                         if (ImGui::Button((ICON_MDI_TUNE "##" + label).c_str()))
                             ImGui::OpenPopup(("Remove Component" + label).c_str());
 
-                        ImGui::PopStyleColor();
+                        ImGui::PopStyleColor(3);
 
                         if (ImGui::BeginPopup(("Remove Component" + label).c_str(), 3)) {
                             if (ImGui::Selectable(("Remove##" + label).c_str())) {

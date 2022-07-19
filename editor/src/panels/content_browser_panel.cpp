@@ -248,9 +248,9 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
 
         const char* folderIcon = ((isOpened && isContains) || currentDirectory == dirInfo) ? ICON_MDI_FOLDER_OPEN : ICON_MDI_FOLDER;
         ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetIconColor());
+        //ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColorScheme::GetIconColor());
         ImGui::Text("%s ", folderIcon);
-        ImGui::PopStyleColor();
+        //ImGui::PopStyleColor();
         ImGui::SameLine();
         ImGui::TextUnformatted(dirInfo->name.c_str());
 
@@ -379,7 +379,10 @@ void ContentBrowserPanel::drawBottom() {
     {
         float xAvail = ImGui::GetContentRegionAvail().x;
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.1f, 0.2f, 0.7f, 0.0f});
+        ImVec4 color{0.1f, 0.2f, 0.7f, 0.0f};
+        ImGui::PushStyleColor(ImGuiCol_Button, color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
 
         for (auto& directory : breadCrumbData) {
             if (ImGui::SmallButton(directory->name.c_str())) {
@@ -393,7 +396,7 @@ void ContentBrowserPanel::drawBottom() {
             ImGui::SameLine();
         }
 
-        ImGui::PopStyleColor();
+        ImGui::PopStyleColor(3);
 
         ImGui::SameLine(xAvail - sizeWidth);
     }

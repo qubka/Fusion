@@ -3,7 +3,6 @@
 
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/cameras/camera.hpp"
 #include "fusion/graphics/images/image2d.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/devices/device_manager.hpp"
@@ -36,7 +35,7 @@ void SceneViewPanel::onImGui() {
         drawToolBar();
     }
 
-    Camera* camera = editor->getCamera();
+    auto camera = editor->getCamera();
     if (!camera) {
         ImGui::PopStyleVar();
         ImGui::End();
@@ -75,8 +74,8 @@ void SceneViewPanel::onImGui() {
 
     auto windowSize = ImGui::GetWindowSize();
 
-    ImVec2 minBound = sceneViewPosition;
-    ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+    ImVec2& minBound = sceneViewPosition;
+    ImVec2  maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
 
     bool updateCamera = ImGui::IsMouseHoveringRect(minBound, maxBound); // || Input::Get().GetMouseMode() == MouseMode::Captured;
 
@@ -106,9 +105,7 @@ void SceneViewPanel::onImGui() {
         ImGui::EndDragDropTarget();
     }
 
-    /*auto scene = SceneManager::Get()->getScene();
-    if (scene)
-        drawGizmos(sceneViewSize.x, sceneViewSize.y, offset.x, offset.y, scene);*/
+    drawGizmos(scene->getRegistry(), *camera, {sceneViewSize.x, sceneViewSize.y}, {offset.x, offset.y});
 
     ImGui::PopStyleVar();
     ImGui::End();
@@ -116,13 +113,13 @@ void SceneViewPanel::onImGui() {
 
 void SceneViewPanel::drawToolBar() {
     ImGui::Indent();
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
     bool selected = false;
 
     {
         selected = editor->getSettings().gizmosOperation == 4; // TODO:
         if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
         ImGui::SameLine();
         if (ImGui::Button(ICON_MDI_CURSOR_DEFAULT))
             editor->getSettings().gizmosOperation = 4;
@@ -139,7 +136,7 @@ void SceneViewPanel::drawToolBar() {
     {
         selected = editor->getSettings().gizmosOperation == ImGuizmo::TRANSLATE;
         if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
         ImGui::SameLine();
         if (ImGui::Button(ICON_MDI_ARROW_ALL))
             editor->getSettings().gizmosOperation = ImGuizmo::TRANSLATE;
@@ -152,7 +149,7 @@ void SceneViewPanel::drawToolBar() {
     {
         selected = editor->getSettings().gizmosOperation == ImGuizmo::ROTATE;
         if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
 
         ImGui::SameLine();
         if (ImGui::Button(ICON_MDI_ROTATE_ORBIT))
@@ -166,7 +163,7 @@ void SceneViewPanel::drawToolBar() {
     {
         selected = editor->getSettings().gizmosOperation == ImGuizmo::SCALE;
         if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
 
         ImGui::SameLine();
         if (ImGui::Button(ICON_MDI_ARROW_EXPAND_ALL))
@@ -184,7 +181,7 @@ void SceneViewPanel::drawToolBar() {
     {
         selected = editor->getSettings().gizmosOperation == ImGuizmo::UNIVERSAL;
         if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
 
         ImGui::SameLine();
         if (ImGui::Button(ICON_MDI_CROP_ROTATE))
@@ -202,7 +199,7 @@ void SceneViewPanel::drawToolBar() {
     {
         selected = editor->getSettings().gizmosOperation == ImGuizmo::BOUNDS;
         if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
 
         ImGui::SameLine();
         if (ImGui::Button(ICON_MDI_BORDER_NONE))
@@ -222,7 +219,7 @@ void SceneViewPanel::drawToolBar() {
         selected = (editor->getSettings().snapGizmos == true);
 
         if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
 
         if (ImGui::Button(ICON_MDI_MAGNET))
             editor->getSettings().snapGizmos = !selected;
@@ -240,16 +237,16 @@ void SceneViewPanel::drawToolBar() {
         ImGui::OpenPopup("GizmosPopup");
     if (ImGui::BeginPopup("GizmosPopup")) {
         {
-            /*ImGui::Checkbox("Grid", &m_Editor->ShowGrid());
-            ImGui::Checkbox("Selected Gizmos", &m_Editor->ShowGizmos());
-            ImGui::Checkbox("View Selected", &m_Editor->ShowViewSelected());
+            //ImGui::Checkbox("Grid", &m_Editor->ShowGrid());
+           // ImGui::Checkbox("Selected Gizmos", &m_Editor->ShowGizmos());
+            //ImGui::Checkbox("View Selected", &m_Editor->ShowViewSelected());
 
             ImGui::Separator();
-            ImGui::Checkbox("Camera", &m_ShowComponentGizmoMap[typeid(Camera).hash_code()]);
-            ImGui::Checkbox("Light", &m_ShowComponentGizmoMap[typeid(Graphics::Light).hash_code()]);
-            ImGui::Checkbox("Audio", &m_ShowComponentGizmoMap[typeid(SoundComponent).hash_code()]);
+            ImGui::Checkbox("Camera", &showComponentGizmosMap[typeid(CameraComponent)]);
+            //ImGui::Checkbox("Light", &showComponentGizmosMap[typeid(LightComponent)]);
+            //ImGui::Checkbox("Audio", &showComponentGizmosMap[typeid(SoundComponent)]);
 
-            ImGui::Separator();
+            /*ImGui::Separator();
 
             uint32_t flags = m_Editor->GetSettings().m_DebugDrawFlags;
 
@@ -422,10 +419,10 @@ void SceneViewPanel::drawToolBar() {
 
     selected = !ortho;
     if (selected)
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
     if (ImGui::Button(ICON_MDI_AXIS_ARROW " 3D")) {
         if (ortho) {
-            // TODO:: Switch camera
+
         }
     }
 
@@ -435,7 +432,7 @@ void SceneViewPanel::drawToolBar() {
 
     selected = ortho;
     if (selected)
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
     if (ImGui::Button(ICON_MDI_ANGLE_RIGHT "2D")) {
         if (!ortho) {
             // TODO:: Switch camera
@@ -446,4 +443,10 @@ void SceneViewPanel::drawToolBar() {
 
     ImGui::PopStyleColor();
     ImGui::Unindent();
+}
+
+void SceneViewPanel::drawGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset) {
+    //showComponentGizmos<LightComponent>(registry, camera, coord, offset);
+    showComponentGizmos<CameraComponent>(registry, camera, coord, offset);
+    //showComponentGizmos<SoundComponent>(registry, camera, coord, offset);
 }

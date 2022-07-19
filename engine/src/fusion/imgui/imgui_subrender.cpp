@@ -313,9 +313,8 @@ void ImGuiSubrender::setupStyle() {
 #endif
 
     //ImGuiColorScheme::SetColors(0x252131FF /* Background */, 0xF4F1DEFF /* Text */, 0xDA115EFF /* MainColor */, 0x792359FF /* MainAccent */, 0xC7EF00FF /* Highlight */ );
-    //ImGuiColorScheme::SetColors(0x14213DFF /* Background */,  0x000000FF/* Text */, 0xFCA311FF /* MainColor */, 0xE5E5E5FF /* MainAccent */, 0xFFFFFFFF /* Highlight */ );
     //ImGuiColorScheme::ApplyTheme();
-    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Dark);
+    ImGuiUtils::SetTheme(ImGuiUtils::Theme::ClassicDark);
 }
 
 void ImGuiSubrender::addIconFont() {

@@ -22,31 +22,15 @@ void HierarchySystem::onUpdate() {
         transform.setWorldMatrix(glm::mat4{1.0f});
     }
 
-    auto view = registry.view<TransformComponent, HierarchyComponent>();
-    for (const auto& [entity, transform, hierarchy] : view.each()) {
+    auto hierarchyView = registry.view<TransformComponent, HierarchyComponent>();
+    for (const auto& [entity, transform, hierarchy] : hierarchyView.each()) {
         if (hierarchy.parent == entt::null) {
             // Recursively update children
             update(entity);
         }
     }
 
-    /*auto transformGroup = registry.group<DirtyTransformComponent, TransformComponent>();
-    transformGroup.sort([&](entt::entity lhs, entt::entity rhs) {
-        auto clhs = registry.try_get<HierarchyComponent>(lhs);
-        if (clhs == nullptr)
-            return false;
-        auto crhs = registry.try_get<HierarchyComponent>(rhs);
-        if (crhs == nullptr)
-            return false;
-        return !(clhs->parent != entt::null && clhs->children < crhs->children);
-    });
-
-    for (auto [entity, transform] : transformGroup.each()) {
-        transform.setWorldMatrix(getTRS(entity));
-        LOG_INFO << "UPDATE";
-    }
-
-    registry.clear<DirtyTransformComponent>();*/
+    //registry.clear<DirtyTransformComponent>();
 }
 
 void HierarchySystem::onStop() {
@@ -58,8 +42,8 @@ void HierarchySystem::onEnabled() {
     //registry.on_update<HierarchyComponent>().connect<&OnUpdate>();
     //registry.on_destroy<HierarchyComponent>().connect<&OnDestroy>();
 
-    registry.on_construct<TransformComponent>().connect<&entt::registry::emplace<DirtyTransformComponent>>();
-    registry.on_update<TransformComponent>().connect<&entt::registry::emplace_or_replace<DirtyTransformComponent>>();
+    //registry.on_construct<TransformComponent>().connect<&entt::registry::emplace<DirtyTransformComponent>>();
+    //registry.on_update<TransformComponent>().connect<&entt::registry::emplace_or_replace<DirtyTransformComponent>>();
 }
 
 void HierarchySystem::onDisabled() {
@@ -67,8 +51,8 @@ void HierarchySystem::onDisabled() {
     //registry.on_update<HierarchyComponent>().disconnect<&OnUpdate>();
     //registry.on_destroy<HierarchyComponent>().disconnect<&OnDestroy>();
 
-    registry.on_construct<TransformComponent>().disconnect<&entt::registry::emplace<DirtyTransformComponent>>();
-    registry.on_update<TransformComponent>().disconnect<&entt::registry::emplace_or_replace<DirtyTransformComponent>>();
+    //registry.on_construct<TransformComponent>().disconnect<&entt::registry::emplace<DirtyTransformComponent>>();
+    //registry.on_update<TransformComponent>().disconnect<&entt::registry::emplace_or_replace<DirtyTransformComponent>>();
 }
 
 void HierarchySystem::update(entt::entity entity) {

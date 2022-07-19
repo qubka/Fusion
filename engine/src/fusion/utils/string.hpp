@@ -188,6 +188,13 @@ namespace fe {
         static std::string Quoted(const std::string& str);
 
         /**
+         * Demangles a string.
+         * @param str The string.
+         * @return The demangled string.
+         */
+        static std::string Demangle(const std::string& str);
+
+        /**
          * Find position of a string.
          * @param str The string.
          * @param pattern The pattern
