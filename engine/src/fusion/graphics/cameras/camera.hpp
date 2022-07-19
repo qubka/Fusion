@@ -1,22 +1,25 @@
 #pragma once
 
-#include "fusion/geometry/ray.hpp"
-#include "fusion/geometry/sphere.hpp"
 #include "fusion/geometry/frustum.hpp"
+#include "fusion/geometry/ray.hpp"
 #include "fusion/utils/glm_extention.hpp"
 
 namespace fe {
-    //! Base Camera class, which manages the projection and view matrices for a 3-dimensional scene, as well as providing mapping functionality.
     class Camera {
     public:
-        virtual ~Camera() = default;
+        Camera();
+        Camera(float fov, float near, float far, float aspect);
+        Camera(const glm::vec3& position, float fov, float near, float far, float aspect);
+        Camera(float aspect, float scale);
+        Camera(float aspect, float near, float far);
+        ~Camera() = default;
 
         //! Returns the position in world-space from which the Camera is viewing
         glm::vec3 getEyePoint() const { return eyePoint; }
         //! Sets the position in world-space from which the Camera is viewing
         void setEyePoint(const glm::vec3& eyePoint);
-        
-        //! Returns the vector in world-space which represents "up" - typically glm::vec3( 0, 1, 0 ) 
+
+        //! Returns the vector in world-space which represents "up" - typically glm::vec3( 0, 1, 0 )
         glm::vec3 getWorldUp() const { return worldUp; }
         //! Sets the vector in world-space which represents "up" - typically glm::vec3( 0, 1, 0 )
         void setWorldUp(glm::vec3 worldUp);
@@ -38,19 +41,14 @@ namespace fe {
         //! Sets the camera's orientation with world-space glm::quaternion \a orientation
         void setOrientation(glm::quat orientation);
 
-        //! Returns the camera's vertical field of view measured in degrees.
-        float getFov() const { return fovDegrees; }
-        //! Sets the camera's vertical field of view measured in degrees.
-        void setFov(float fov);
-
-        //! Returns the camera's horizontal field of view measured in degrees.
-        float getFovHorizontal() const { return glm::degrees(2.0f * std::atan(std::tan(glm::radians(fovDegrees) * 0.5f) * aspectRatio)); }
-        //! Sets the camera's horizontal field of view measured in degrees.
-        void setFovHorizontal(float horizontalFov);
+        //! Returns whether the camera represents an orthographic projection instead of an perspective
+        bool isOrthographic() const { return orthographic; }
+        //! Switch the camera mode to orthographic projection
+        void setOrthographic(bool flag);
 
         //! Returns the camera's focal length, calculating it based on the field of view.
-        float getFocalLength() const;
-        
+        float getFocalLength() const { return 1.0f / (glm::tan(glm::radians(fovDegrees) * 0.5f) * 2.0f); } /// @link http://paulbourke.net/miscellaneous/lens/
+
         //! Primarily for user interaction, such as with CameraUi. Returns the distance from the camera along the view direction relative to which tumbling and dollying occur.
         float getPivotDistance() const { return pivotDistance; }
         //! Primarily for user interaction, such as with CameraUi. Sets the distance from the camera along the view direction relative to which tumbling and dollying occur.
@@ -59,48 +57,46 @@ namespace fe {
         //! Primarily for user interaction, such as with CameraUi. Returns the world-space point relative to which tumbling and dollying occur.
         glm::vec3 getPivotPoint() const { return eyePoint - viewDirection * pivotDistance; }
 
+        //! Returns the Camera's frustum object using current view and current projection matrices
+        const Frustum& getFrustum() { if (frustumDirty) calcFrustum(); return frustum; }
+        //! Returns the Camera's Projection matrix, which converts view-space into clip-space
+        const glm::mat4& getProjectionMatrix() const { if (projectionDirty) calcProjection(); return projectionMatrix; }
+        //! Returns the Camera's Inverse Projection matrix, which converts view-space into clip-space
+        const glm::mat4& getInverseProjectionMatrix() const { if (inverseProjectionDirty) calcInverseProjection(); return inverseProjectionMatrix; }
+        //! Returns the Camera's View matrix, which converts world-space into view-space
+        const glm::mat4& getViewMatrix() const { if (viewDirty) calcView(); return viewMatrix; }
+        //! Returns the Camera's Inverse View matrix, which converts view-space into world-space
+        const glm::mat4& getInverseViewMatrix() const { if (inverseViewDirty) calcInverseView(); return inverseViewMatrix; }
+
+        //! Returns the camera's vertical field of view measured in degrees.
+        float getFov() const { return fovDegrees; }
+        //! Sets the camera's vertical field of view measured in degrees.
+        void setFov(float value);
+
+        //! Returns the camera's horizontal field of view measured in degrees.
+        float getFovHorizontal() const { return glm::degrees(2.0f * std::atan(std::tan(glm::radians(fovDegrees) * 0.5f) * aspectRatio)); }
+        //! Sets the camera's horizontal field of view measured in degrees.
+        void setFovHorizontal(float value);
+
         //! Returns the aspect ratio of the image plane - its width divided by its height
         float getAspectRatio() const { return aspectRatio; }
         //! Sets the aspect ratio of the image plane - its width divided by its height
-        void setAspectRatio(float aspect);
+        void setAspectRatio(float value);
 
         //! Returns the distance along the view direction to the Near clipping plane.
         float getNearClip() const { return nearClip; }
         //! Sets the distance along the view direction to the Near clipping plane.
-        void setNearClip(float near);
+        void setNearClip(float value);
 
         //! Returns the distance along the view direction to the Far clipping plane.
         float getFarClip() const { return farClip; }
         //! Sets the distance along the view direction to the Far clipping plane.
-        void setFarClip(float far);
+        void setFarClip(float value);
 
-        //! Returns the four corners of the Camera's Near clipping plane, expressed in world-space
-        virtual void getNearClipCoordinates(glm::vec3& topLeft, glm::vec3& topRight, glm::vec3& bottomLeft, glm::vec3& bottomRight) const { return getClipCoordinates(nearClip, 1.0f, topLeft, topRight, bottomLeft, bottomRight); }
-        //! Returns the four corners of the Camera's Far clipping plane, expressed in world-space
-        virtual void getFarClipCoordinates(glm::vec3& topLeft, glm::vec3& topRight, glm::vec3& bottomLeft, glm::vec3& bottomRight) const { getClipCoordinates(farClip, farClip / nearClip, topLeft, topRight, bottomLeft, bottomRight); }
-
-        //! Returns whether the camera represents an orthographic projection instead of an perspective
-        virtual bool isOrthographic() const = 0;
-        //! Returns the Camera's frustum object using current view and current projection matrices
-        const Frustum& getFrustum() { if (!frustumCached) calcFrustum(); return frustum; }
-        //! Returns the coordinates of the camera's frustum, suitable for passing to \c glFrustum
-        void getFrustum(float& left, float& top, float& right, float& bottom, float& near, float& far) const;
-        //! Returns the Camera's Projection matrix, which converts view-space into clip-space
-        virtual const glm::mat4& getProjectionMatrix() const { if (!projectionCached) calcProjection(); return projectionMatrix; }
-        //! Returns the Camera's Inverse Projection matrix, which converts view-space into clip-space
-        virtual const glm::mat4& getInverseProjectionMatrix() const { if (!inverseProjectionCached) calcInverseProjection(); return inverseProjectionMatrix; }
-        //! Returns the Camera's View matrix, which converts world-space into view-space
-        virtual const glm::mat4& getViewMatrix() const { if (!modelViewCached) calcViewMatrix(); return viewMatrix; }
-        //! Returns the Camera's Inverse View matrix, which converts view-space into world-space
-        virtual const glm::mat4& getInverseViewMatrix() const { if (!inverseModelViewCached) calcInverseView(); return inverseModelViewMatrix; }
-
-        //! Returns a Ray that passes through the image plane coordinates (\a u, \a v) (expressed in the range [0,1]) on an image plane of aspect ratio \a imagePlaneAspectRatio
-        Ray generateRay(const glm::vec2& uv, float imagePlaneAspectRatio) const { return calcRay(uv, imagePlaneAspectRatio); }
-        //! Returns a Ray that passes through the pixels coordinates \a posPixels on an image of size \a imageSize
-        Ray generateRay(const glm::vec2& pos, const glm::vec2& imageSize) const { return calcRay({pos.x / imageSize.x, (imageSize.y - pos.y) / imageSize.y}, imageSize.x / imageSize.y); }
-
-        //! Returns the \a right and \a up vectors suitable for billboarding relative to the Camera
-        void getBillboardVectors(glm::vec3& right, glm::vec3& up) const;
+        //! Returns the scale distance of the Orthographic projection
+        float getScale() const { return scale; }
+        //! Sets the scale distance to the Orthographic projection
+        void setScale(float value);
 
         //! Converts a world-space coordinate \a worldCoord to screen coordinates as viewed by the camera, based on a screen which is \a screen.width x \a screen.height pixels.
         glm::vec2 worldToScreen(const glm::vec3& worldCoord, const glm::vec2& screenSize) const;
@@ -109,7 +105,7 @@ namespace fe {
         //! Converts a screen coordinates as viewed by the camera, based on a screen which is \a screen.width x \a screen.height pixels to a world-space coordinate \a worldCoord.
         glm::vec3 screenToWorld(const glm::vec2& screenCoord, const glm::vec2& screenSize) const;
         //! Converts a screen coordinates as viewed by the camera, based on a screen which is \a screen.width x \a screen.height pixels to a world-space ray.
-        Ray screenPointToRay(const glm::vec2& screenCoord, const glm::vec2& screenSize) const;
+        Ray screenPointToRay(const glm::vec2& screenCoord, const glm::vec2& screenSize) const; // alternative to generateRay
 
         //! Converts a world-space coordinate \a worldCoord to eye-space, also known as camera-space. -Z is along the view direction.
         glm::vec3 worldToEye(const glm::vec3& worldCoord) const { return { getViewMatrix() * glm::vec4{worldCoord, 1} }; }
@@ -118,45 +114,39 @@ namespace fe {
         //! Converts a world-space coordinate \a worldCoord to normalized device coordinates
         glm::vec3 worldToNdc(const glm::vec3& worldCoord) const;
 
-        //! Calculates the area of the screen-space elliptical projection of \a sphere
-        float calcScreenArea(const Sphere& sphere, const glm::vec2& screenSize) const;
-        //! Calculates the screen-space elliptical projection of \a sphere, putting the results in \a outCenter, \a outAxisA and \a outAxisB
-        void calcScreenProjection(const Sphere& sphere, const glm::vec2& screenSize, glm::vec2* outCenter, glm::vec2* outAxisA, glm::vec2* outAxisB) const;
-
         //! Gets the camera rotation dirs
         const glm::vec3& getForwardDirection() const { return viewDirection; }
         const glm::vec3& getRightDirection() const { return rightVector; }
         const glm::vec3& getUpDirection() const { return upVector; }
 
-    protected:
-        Camera() = default;
+        ///@link https://google.github.io/filament/Filament.html
+        float getAperture() const { return aperture; }
+        void setAperture(float value) { aperture = value; }
+        float getShutterSpeed() const { return shutterSpeed; }
+        void setShutterSpeed(float value) { shutterSpeed = value; }
+        float getSensitivity() const { return sensitivity; }
+        void setSensitivity(float value) { sensitivity = value; }
+        float getEv100() const { return std::log2((aperture * aperture) / shutterSpeed * 100.0f / sensitivity); }
+        float getExposure() const { return 1.0f / (std::pow(2.0f, getEv100()) * 1.2f); }
+        float getShadowBoundingRadius() const { return shadowBoundingRadius; }
 
-        void calcMatrices() const;
-        virtual void calcViewMatrix() const;
-        virtual void calcInverseView() const;
-        virtual void calcProjection() const = 0;
-        virtual void calcInverseProjection() const;
+    protected:
+        void calcProjection() const;
+        void calcInverseProjection() const;
+        void calcView() const;
+        void calcInverseView() const;
         void calcFrustum();
 
-        virtual Ray calcRay(const glm::vec2& uv, float imagePlaneAspectRatio) const = 0;
+        void dirtyView() const { viewDirty = inverseViewDirty = frustumDirty = true; }
+        bool isViewDirty() const { return viewDirty || inverseViewDirty; }
+        void dirtyProjection() const { projectionDirty = inverseProjectionDirty = frustumDirty = true; }
+        bool isProjectionDirty() const { return projectionDirty || inverseProjectionDirty; }
 
-        void getClipCoordinates(float clipDist, float ratio, glm::vec3& topLeft, glm::vec3& topRight, glm::vec3& bottomLeft, glm::vec3& bottomRight) const;
-
-        void dirtyViewCaches() { modelViewCached = inverseModelViewCached = frustumCached = false; }
-        bool isViewCachesDirty() const { return modelViewCached || inverseModelViewCached; }
-        void dirtyProjectionCaches() { projectionCached = inverseProjectionCached = frustumCached = false; }
-        bool isProjectionCachesDirty() const { return projectionCached || inverseProjectionCached; }
-
+    protected:
         glm::vec3 eyePoint{ vec3::zero };
         glm::vec3 viewDirection{ vec3::forward };
         glm::quat orientation{ quat::identity };
         glm::vec3 worldUp{ vec3::up };
-
-        float fovDegrees{ 35.0f }; // vertical field of view in degrees
-        float aspectRatio{ 1.0f };
-        float nearClip{ 0.1f };
-        float farClip{ 1000.f };
-        float pivotDistance{ 1.0f };
 
         //mutable glm::vec3 forwardVector;
         mutable glm::vec3 rightVector;
@@ -165,19 +155,27 @@ namespace fe {
         mutable glm::mat4 projectionMatrix;
         mutable glm::mat4 inverseProjectionMatrix;
         mutable glm::mat4 viewMatrix;
-        mutable glm::mat4 inverseModelViewMatrix;
+        mutable glm::mat4 inverseViewMatrix;
 
-        mutable bool projectionCached{ false };
-        mutable bool inverseProjectionCached{ false };
-        mutable bool modelViewCached{ false };
-        mutable bool inverseModelViewCached{ false };
+        float fovDegrees{ 60.0f };
+        float nearClip{ 0.001f };
+        float farClip{ 1000.0f };
+        float aspectRatio{ 10.0f };
+        float pivotDistance{ 1.0f };
+        float scale{ 10.0f };
+        float aperture{ 50.0f };
+        float shutterSpeed{ 1.0f / 60.0f };
+        float sensitivity{ 200.0f };
+        float shadowBoundingRadius{ 10.0f };
 
-        mutable float frustumLeft{ -1.0f };
-        mutable float frustumRight{ 1.0f };
-        mutable float frustumBottom{ -1.0f };
-        mutable float frustumTop{ 1.0f };
+        bool orthographic{ false };
+
+        mutable bool projectionDirty{ true };
+        mutable bool inverseProjectionDirty{ true };
+        mutable bool viewDirty{ true };
+        mutable bool inverseViewDirty{ true };
+        mutable bool frustumDirty{ true };
 
         Frustum frustum;
-        mutable bool frustumCached{ false };
     };
 }

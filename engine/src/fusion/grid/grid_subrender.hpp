@@ -7,11 +7,10 @@
 
 namespace fe {
     class Buffer;
-    class ImageCube;
-    class SkyboxRenderer final : public Subrender {
+    class GridSubrender final : public Subrender {
     public:
-        explicit SkyboxRenderer(const Pipeline::Stage& pipelineStage);
-        ~SkyboxRenderer() override;
+        explicit GridSubrender(const Pipeline::Stage& pipelineStage);
+        ~GridSubrender() override;
 
     private:
         void onUpdate() override {};
@@ -22,8 +21,5 @@ namespace fe {
         PushHandler pushObject;
 
         std::unique_ptr<Buffer> vertexBuffer;
-        std::unique_ptr<Buffer> indexBuffer;
-
-        std::unique_ptr<ImageCube> skyboxSampler;
     };
 }

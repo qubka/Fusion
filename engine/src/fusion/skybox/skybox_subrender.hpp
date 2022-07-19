@@ -7,10 +7,11 @@
 
 namespace fe {
     class Buffer;
-    class AtmosphereRenderer final : public Subrender {
+    class ImageCube;
+    class SkyboxSubrender final : public Subrender {
     public:
-        explicit AtmosphereRenderer(const Pipeline::Stage& pipelineStage);
-        ~AtmosphereRenderer() override;
+        explicit SkyboxSubrender(const Pipeline::Stage& pipelineStage);
+        ~SkyboxSubrender() override;
 
     private:
         void onUpdate() override {};
@@ -21,5 +22,8 @@ namespace fe {
         PushHandler pushObject;
 
         std::unique_ptr<Buffer> vertexBuffer;
+        std::unique_ptr<Buffer> indexBuffer;
+
+        std::unique_ptr<ImageCube> skyboxSampler;
     };
 }

@@ -7,10 +7,10 @@
 
 namespace fe {
     class Buffer;
-    class GridRenderer final : public Subrender {
+    class AtmosphereSubrender final : public Subrender {
     public:
-        explicit GridRenderer(const Pipeline::Stage& pipelineStage);
-        ~GridRenderer() override;
+        explicit AtmosphereSubrender(const Pipeline::Stage& pipelineStage);
+        ~AtmosphereSubrender() override;
 
     private:
         void onUpdate() override {};

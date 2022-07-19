@@ -30,6 +30,6 @@ namespace fe {
          * @param filepath The path to the file.
          * @return The unique path.
          */
-        static fs::path GetNextFile(fs::path filepath);
+        static fs::path GetNextFileName(fs::path filepath);
     };
 }

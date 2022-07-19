@@ -2,9 +2,9 @@
 
 #include "fusion/graphics/renderer.hpp"
 #include "fusion/imgui/imgui_subrender.hpp"
-#include "fusion/grid/grid_renderer.hpp"
-#include "fusion/skybox/atmosphere_renderer.hpp"
-#include "fusion/skybox/skybox_renderer.hpp"
+#include "fusion/grid/grid_subrender.hpp"
+#include "fusion/skybox/atmosphere_subrender.hpp"
+#include "fusion/skybox/skybox_subrender.hpp"
 
 namespace fe {
     class EditorRenderer : public Renderer {
@@ -27,9 +27,9 @@ namespace fe {
 
     private:
         void onStart() override {
-            //addSubrender<AtmosphereRenderer>({ 0, 0});
-            addSubrender<SkyboxRenderer>({0, 0});
-            addSubrender<GridRenderer>({0, 1});
+            //addSubrender<AtmosphereSubrender>({ 0, 0});
+            addSubrender<SkyboxSubrender>({ 0, 0});
+            addSubrender<GridSubrender>({0, 1});
             addSubrender<ImGuiSubrender>({0, 2});
         }
 

@@ -206,8 +206,8 @@ std::string String::Demangle(const std::string& str) {
 #else
     int status = -1;
     char* demangled = abi::__cxa_demangle(str.c_str(), nullptr, nullptr, &status);
-    std::string ret = status == 0 ? std::string{demangled} : str;
+    std::string ret{ demangled };
     free(demangled);
-    return ret;
+    return status == 0 ? ret : str;
 #endif
 }

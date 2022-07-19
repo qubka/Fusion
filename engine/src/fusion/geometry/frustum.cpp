@@ -8,9 +8,23 @@ using namespace fe;
 Frustum::Frustum() {
     set(glm::mat4{1.0f});
 }
+Frustum::Frustum(const glm::vec3& ntl, const glm::vec3& ntr, const glm::vec3& nbl, const glm::vec3& nbr, const glm::vec3& ftl, const glm::vec3& ftr, const glm::vec3& fbl, const glm::vec3& fbr) {
+    set(ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr);
+}
 
 Frustum::Frustum(const glm::mat4& m) {
     set(m);
+}
+
+void Frustum::set(const glm::vec3& ntl, const glm::vec3& ntr, const glm::vec3& nbl, const glm::vec3& nbr, const glm::vec3& ftl, const glm::vec3& ftr, const glm::vec3& fbl, const glm::vec3& fbr) {
+    planes[Top].set(ntr, ntl, ftl);
+    planes[Bottom].set(nbl, nbr, fbr);
+    planes[Left].set(ntl, nbl, fbl);
+    planes[Right].set(nbr, ntr, fbr);
+    planes[Near].set(ntl, ntr, nbr);
+    planes[Far].set(ftr, ftl, fbl);
+
+    //calculateVertices(m);
 }
 
 void Frustum::set(const glm::mat4& m) {
@@ -24,23 +38,7 @@ void Frustum::set(const glm::mat4& m) {
     planes[Near].set({m[0][3] + m[0][2], m[1][3] + m[1][2], m[2][3] + m[2][2], m[3][3] + m[3][2]});
     planes[Far].set({m[0][3] - m[0][2], m[1][3] - m[1][2], m[2][3] - m[2][2], m[3][3] - m[3][2]});
 
-    for (auto& plane : planes) {
-        plane.normalize();
-    }
-
     calculateVertices(m);
-}
-
-void Frustum::set(float fovDegrees, float aspect, float near, float far, const glm::mat4& viewMatrix) {
-    float tangent = std::tan(glm::radians(fovDegrees) * 0.5f);
-    float height = near * tangent;
-    float width = height * aspect;
-
-    set(glm::frustum(-width, width, -height, height, near, far) * viewMatrix);
-}
-
-void Frustum::setOrtho(float scale, float aspect, float near, float far, const glm::mat4& viewMatrix) {
-    set(glm::ortho(-scale * aspect, scale * aspect, -scale, scale, near, far) * viewMatrix);
 }
 
 void Frustum::transform(const glm::mat4& m) {

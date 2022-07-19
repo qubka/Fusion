@@ -15,15 +15,15 @@ namespace fe {
         enum FrustumSection { Top, Bottom, Left, Right, Near, Far };
 
         Frustum();
+        //! Creates a frustum based on the corners of a near and far portal.
+        Frustum(const glm::vec3& ntl, const glm::vec3& ntr, const glm::vec3& nbl, const glm::vec3& nbr, const glm::vec3& ftl, const glm::vec3& ftr, const glm::vec3& fbl, const glm::vec3& fbr);
         //! Creates a frustum based on a (projection) matrix. The six planes of the frustum are derived from the matrix. To create a world space frustum, use a view-projection matrix.
         explicit Frustum(const glm::mat4& matrix);
 
+        //! Creates a frustum based on the corners of a near and far portal.
+        void set(const glm::vec3& ntl, const glm::vec3& ntr, const glm::vec3& nbl, const glm::vec3& nbr, const glm::vec3& ftl, const glm::vec3& ftr, const glm::vec3& fbl, const glm::vec3& fbr);
         //! Creates a frustum based on a (projection) matrix. The six planes of the frustum are derived from the matrix. To create a world space frustum, use a view-projection matrix.
         void set(const glm::mat4& matrix);
-        //! Creates a frustum based on a (perspective) matrix.
-        void set(float fovDegrees, float aspect, float near, float far, const glm::mat4& viewMatrix);
-        //! Creates a frustum based on a (orthographic) matrix.
-        void setOrtho(float scale, float aspect, float near, float far, const glm::mat4& viewMatrix);
 
         //! Returns true if point is within frustum.
         bool contains(const glm::vec3& loc) const;

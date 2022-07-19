@@ -1,30 +1,29 @@
-#include "atmosphere_renderer.hpp"
+#include "grid_subrender.hpp"
 
 #include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/cameras/camera.hpp"
+#include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/scene/scene_manager.hpp"
 
 using namespace fe;
 
-AtmosphereRenderer::AtmosphereRenderer(const Pipeline::Stage& pipelineStage)
+GridSubrender::GridSubrender(const Pipeline::Stage& pipelineStage)
     : Subrender{pipelineStage}
-    , pipeline{pipelineStage, {"EngineShaders/sky/atmosphere.vert", "EngineShaders/sky/atmosphere.frag"}, {{{Vertex::Component::Position2}}}} {
+    , pipeline{pipelineStage, {"EngineShaders/grid/grid.vert", "EngineShaders/grid/grid.frag"}, {{{Vertex::Component::Position2}}}} {
 
     std::array<glm::vec2, 6> vertices{{
         {-1, 1}, {-1, -1}, {1, 1},
         {1, -1}, {1, 1}, {-1, -1}
-      }};
+    }};
 
     vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(glm::vec2) * vertices.size(), vertices.data());
 }
 
-AtmosphereRenderer::~AtmosphereRenderer() {
-
+GridSubrender::~GridSubrender() {
 }
 
-void AtmosphereRenderer::onRender(const CommandBuffer& commandBuffer) {
+void GridSubrender::onRender(const CommandBuffer& commandBuffer) {
     auto scene = SceneManager::Get()->getScene();
     if (!scene)
         return;

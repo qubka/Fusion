@@ -34,8 +34,8 @@ void EditorCameraController::handleMouse(Camera& camera, float dt) {
         if (Input::Get()->getMouseButton(MouseButton::ButtonRight)) {
             mouseSensitivity = 0.0005f;
             glm::vec3 position = camera.getEyePoint();
-            position.x -= (pos.x - previousCurserPos.x) /** camera->getScale() */ * mouseSensitivity * 0.5f;
-            position.y += (pos.y - previousCurserPos.y) /** camera->getScale() */ * mouseSensitivity * 0.5f;
+            position.x -= (pos.x - previousCurserPos.x) * /*camera.getScale() **/ mouseSensitivity * 0.5f;
+            position.y += (pos.y - previousCurserPos.y) * /*camera.getScale() **/ mouseSensitivity * 0.5f;
             camera.setEyePoint(position);
         }
     } else {
@@ -76,22 +76,22 @@ void EditorCameraController::handleMouse(Camera& camera, float dt) {
 
 void EditorCameraController::handleKeyboard(Camera& camera, float dt) {
     if (camera.isOrthographic()) {
-        cameraSpeed = /*camera->GetScale() **/ dt * 20.0f;
+        cameraSpeed = camera.getScale() * dt * 20.0f;
 
         if (Input::Get()->getKey(Key::A)) {
-            velocity -= vec3::right * cameraSpeed;
+            velocity += camera.getRightDirection() * cameraSpeed;
         }
 
         if (Input::Get()->getKey(Key::D)) {
-            velocity += vec3::right * cameraSpeed;
+            velocity -= camera.getRightDirection() * cameraSpeed;
         }
 
         if (Input::Get()->getKey(Key::W)) {
-            velocity += vec3::up * cameraSpeed;
+            velocity += camera.getUpDirection() * cameraSpeed;
         }
 
         if (Input::Get()->getKey(Key::S)) {
-            velocity -= vec3::up * cameraSpeed;
+            velocity -= camera.getUpDirection() * cameraSpeed;
         }
 
         if (glm::length(velocity) > FLT_EPSILON) {
@@ -159,7 +159,7 @@ void EditorCameraController::handleScroll(Camera& camera, float dt) {
         }
 
         if (!glm::epsilonEqual(zoomVelocity, 0.0f, FLT_EPSILON)) {
-            float scale = 1.0f; //camera->getScale();
+            float scale = camera.getScale();
 
             scale -= zoomVelocity;
 
@@ -170,7 +170,7 @@ void EditorCameraController::handleScroll(Camera& camera, float dt) {
                 zoomVelocity *= std::pow(zoomDampeningFactor, dt);
             }
 
-            //camera->setScale(scale);
+            camera.setScale(scale);
         }
     } else {
         if (offset != 0.0f) {

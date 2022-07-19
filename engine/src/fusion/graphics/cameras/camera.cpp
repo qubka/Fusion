@@ -1,15 +1,62 @@
 #include "camera.hpp"
 
-#include "fusion/utils/glm_extention.hpp"
-
 using namespace fe;
+
+Camera::Camera()
+    : aspectRatio{1.333f}
+    , nearClip{0.1f}
+    , farClip{1000.0f}
+    , fovDegrees{45.0f}
+    , orthographic{false} {
+    lookAt(glm::vec3{28, 21, 28}, vec3::zero, vec3::up);
+}
+
+Camera::Camera(float fov, float near, float far, float aspect)
+    : aspectRatio{aspect}
+    , fovDegrees{fov}
+    , nearClip{near}
+    , farClip{far}
+    , orthographic{false}
+    , scale{1.0f} {
+    lookAt(glm::vec3{28, 21, 28}, vec3::zero, vec3::up);
+};
+
+Camera::Camera(const glm::vec3& position, float fov, float near, float far, float aspect)
+    : aspectRatio{aspect}
+    , fovDegrees{fov}
+    , nearClip{near}
+    , farClip{far}
+    , orthographic{false}
+    , scale{1.0f} {
+    lookAt(position, vec3::zero, vec3::up);
+}
+
+Camera::Camera(float aspect, float scale)
+    : aspectRatio{aspect}
+    , scale{scale}
+    , fovDegrees{60.0f}
+    , nearClip{-10.0}
+    , farClip{10.0f}
+    , orthographic{true} {
+    lookAt(glm::vec3{28, 21, 28}, vec3::zero, vec3::up);
+}
+
+Camera::Camera(float aspect, float near, float far)
+    : aspectRatio{aspect}
+    , scale{1.0f}
+    , fovDegrees{60.0f}
+    , nearClip{near}
+    , farClip{far}
+    , orthographic{true} {
+    lookAt(glm::vec3{28, 21, 28}, vec3::zero, vec3::up);
+}
 
 void Camera::setFov(float fov) {
     if (glm::epsilonEqual(fovDegrees, fov, FLT_EPSILON))
         return;
 
     fovDegrees = fov;
-    dirtyProjectionCaches();
+    dirtyProjection();
 }
 
 void Camera::setFovHorizontal(float fov) {
@@ -18,7 +65,7 @@ void Camera::setFovHorizontal(float fov) {
         return;
 
     fovDegrees = fov;
-    dirtyProjectionCaches();
+    dirtyProjection();
 }
 
 void Camera::setAspectRatio(float aspect) {
@@ -26,7 +73,7 @@ void Camera::setAspectRatio(float aspect) {
         return;
 
     aspectRatio = aspect;
-    dirtyProjectionCaches();
+    dirtyProjection();
 }
 
 void Camera::setNearClip(float near) {
@@ -34,7 +81,7 @@ void Camera::setNearClip(float near) {
         return;
 
     nearClip = near;
-    dirtyProjectionCaches();
+    dirtyProjection();
 }
 
 void Camera::setFarClip(float far) {
@@ -42,7 +89,18 @@ void Camera::setFarClip(float far) {
         return;
 
     farClip = far;
-    dirtyProjectionCaches();
+    dirtyProjection();
+}
+
+
+void Camera::setScale(float scalar) {
+    if (glm::epsilonEqual(scale, scalar, FLT_EPSILON))
+        return;
+
+    scale = scalar;
+
+    if (orthographic)
+        dirtyProjection();
 }
 
 void Camera::setEyePoint(const glm::vec3& point) {
@@ -50,7 +108,7 @@ void Camera::setEyePoint(const glm::vec3& point) {
         return;
 
     eyePoint = point;
-    dirtyViewCaches();
+    dirtyView();
 }
 
 void Camera::setViewDirection(glm::vec3 direction) {
@@ -60,7 +118,7 @@ void Camera::setViewDirection(glm::vec3 direction) {
 
     viewDirection = direction;
     orientation = glm::rotation(viewDirection, vec3::forward);
-    dirtyViewCaches();
+    dirtyView();
 }
 
 void Camera::setOrientation(glm::quat rotation) {
@@ -70,7 +128,7 @@ void Camera::setOrientation(glm::quat rotation) {
 
     orientation = rotation;
     viewDirection = orientation * vec3::forward;
-    dirtyViewCaches();
+    dirtyView();
 }
 
 void Camera::setWorldUp(glm::vec3 up) {
@@ -80,12 +138,17 @@ void Camera::setWorldUp(glm::vec3 up) {
 
     worldUp = up;
     orientation = glm::toQuat(glm::alignZAxisWithTarget(viewDirection, worldUp));
-    dirtyViewCaches();
+    dirtyView();
 }
 
-/// @link http://paulbourke.net/miscellaneous/lens/
-float Camera::getFocalLength() const {
-    return 1.0f / (glm::tan(glm::radians(fovDegrees) * 0.5f) * 2.0f);
+void Camera::setOrthographic(bool flag) {
+    if (orthographic == flag)
+        return;
+
+    orthographic = flag;
+
+    //dirtyView();
+    dirtyProjection();
 }
 
 void Camera::lookAt(glm::vec3 target) {
@@ -99,7 +162,7 @@ void Camera::lookAt(glm::vec3 target) {
     orientation = glm::toQuat(alignZAxisWithTarget(viewDirection, worldUp));
     pivotDistance = glm::length(target);
 
-    dirtyViewCaches();
+    dirtyView();
 }
 
 void Camera::lookAt(const glm::vec3& point, glm::vec3 target) {
@@ -114,7 +177,7 @@ void Camera::lookAt(const glm::vec3& point, glm::vec3 target) {
     orientation = glm::quat(glm::toQuat(alignZAxisWithTarget(viewDirection, worldUp)));
     pivotDistance = glm::length(target);
 
-    dirtyViewCaches();
+    dirtyView();
 }
 
 void Camera::lookAt(const glm::vec3& point, glm::vec3 target, glm::vec3 up) {
@@ -131,30 +194,7 @@ void Camera::lookAt(const glm::vec3& point, glm::vec3 target, glm::vec3 up) {
     orientation = glm::toQuat(alignZAxisWithTarget(viewDirection, worldUp));
     pivotDistance = glm::length(target);
 
-    dirtyViewCaches();
-}
-
-void Camera::getFrustum(float& left, float& top, float& right, float& bottom, float& near, float& far) const {
-    calcMatrices();
-
-    left = frustumLeft;
-    top = frustumTop;
-    right = frustumRight;
-    bottom = frustumBottom;
-    near = nearClip;
-    far = farClip;
-}
-
-void Camera::calcFrustum() {
-    calcMatrices();
-
-    frustum.set(projectionMatrix * viewMatrix);
-    frustumCached = true;
-}
-
-void Camera::getBillboardVectors(glm::vec3& right, glm::vec3& up) const {
-    right = glm::row(getViewMatrix(), 0);
-    up = glm::row(getViewMatrix(), 1);
+    dirtyView();
 }
 
 glm::vec2 Camera::worldToScreen(const glm::vec3& worldCoord, const glm::vec2& screenSize) const {
@@ -223,76 +263,49 @@ Ray Camera::screenPointToRay(const glm::vec2& screenCoord, const glm::vec2& scre
     return { eyePoint, glm::normalize(glm::vec3{worldRay}) };
 }
 
-float Camera::calcScreenArea(const Sphere& sphere, const glm::vec2& screenSize) const {
-    Sphere camSpaceSphere{glm::vec3{getViewMatrix() * glm::vec4{sphere.getCenter(), 1}}, sphere.getRadius()};
-    return camSpaceSphere.calcProjectedArea(getFocalLength(), screenSize);
-}
+void Camera::calcProjection() const {
+    if(orthographic)
+        projectionMatrix = glm::ortho(-aspectRatio * scale, aspectRatio * scale, -scale, scale, nearClip, farClip);
+    else
+        projectionMatrix = glm::perspective(glm::radians(fovDegrees), aspectRatio, nearClip, farClip);
 
-void Camera::calcScreenProjection(const Sphere& sphere, const glm::vec2& screenSize, glm::vec2* outCenter, glm::vec2* outAxisA, glm::vec2* outAxisB) const {
-    if (screenSize.x == 0.0f || screenSize.y == 0.0f)
-        return;
-
-    auto toScreenPixels = [=](glm::vec2 result, const glm::vec2& windowSize) {
-        result.x *= 1 / (windowSize.x / windowSize.y);
-        result += glm::vec2{0.5f};
-        result *= windowSize;
-        return result;
-    };
-
-    Sphere camSpaceSphere{glm::vec3{getViewMatrix() * glm::vec4{sphere.getCenter(), 1}}, sphere.getRadius()};
-    glm::vec2 center, axisA, axisB;
-    camSpaceSphere.calcProjection(getFocalLength(), &center, &axisA, &axisB);
-
-    if (outCenter)
-        *outCenter = toScreenPixels(center, screenSize);
-
-    if (outAxisA)
-        *outAxisA = toScreenPixels(center + axisA * 0.5f, screenSize) -
-                    toScreenPixels(center - axisA * 0.5f, screenSize);
-    if (outAxisB)
-        *outAxisB = toScreenPixels(center + axisB * 0.5f, screenSize) -
-                    toScreenPixels(center - axisB * 0.5f, screenSize);
+    projectionDirty = false;
+    inverseProjectionDirty = true;
 }
 
 void Camera::calcInverseProjection() const {
-    if (!projectionCached)
+    if (projectionDirty)
         calcProjection();
 
     inverseProjectionMatrix = glm::inverse(projectionMatrix);
-    inverseProjectionCached = true;
+    inverseProjectionDirty = false;
 }
 
-void Camera::calcMatrices() const {
-    if (!modelViewCached)
-        calcViewMatrix();
-    if (!projectionCached)
-        calcProjection();
-}
-
-void Camera::calcViewMatrix() const {
-    //forwardVector = orientation * vec3::forward; // should be same as viewDirection
+void Camera::calcView() const {
+    //forwardVector = orientation * vec3::forward; // same as viewDirection
     rightVector = orientation * vec3::right;
     upVector = orientation * vec3::up;
 
     viewMatrix = glm::lookAt(eyePoint, eyePoint + viewDirection, upVector);
 
-    modelViewCached = true;
-    inverseModelViewCached = false;
+    viewDirty = false;
+    inverseViewDirty = true;
 }
 
 void Camera::calcInverseView() const {
-    if (!modelViewCached)
-        calcViewMatrix();
+    if (viewDirty)
+        calcView();
 
-    inverseModelViewMatrix = glm::inverse(viewMatrix);
-    inverseModelViewCached = true;
+    inverseViewMatrix = glm::inverse(viewMatrix);
+    inverseViewDirty = false;
 }
 
-void Camera::getClipCoordinates(float clipDist, float ratio, glm::vec3& topLeft, glm::vec3& topRight, glm::vec3& bottomLeft, glm::vec3& bottomRight) const {
-    calcMatrices();
+void Camera::calcFrustum() {
+    if (projectionDirty)
+        calcProjection();
+    if (viewDirty)
+        calcView();
 
-    topLeft = eyePoint - clipDist * viewDirection + ratio * (frustumTop * upVector) + ratio * (frustumLeft * rightVector);
-    topRight = eyePoint - clipDist * viewDirection + ratio * (frustumTop * upVector) + ratio * (frustumRight * rightVector);
-    bottomLeft = eyePoint - clipDist * viewDirection + ratio * (frustumBottom * upVector) + ratio * (frustumLeft * rightVector);
-    bottomRight = eyePoint - clipDist * viewDirection + ratio * (frustumBottom * upVector) + ratio * (frustumRight * rightVector);
+    frustum.set(projectionMatrix * viewMatrix);
+    frustumDirty = false;
 }

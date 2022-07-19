@@ -1,4 +1,4 @@
-#include "skybox_renderer.hpp"
+#include "skybox_subrender.hpp"
 
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/cameras/camera.hpp"
@@ -9,7 +9,7 @@
 
 using namespace fe;
 
-SkyboxRenderer::SkyboxRenderer(const Pipeline::Stage& pipelineStage)
+SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& pipelineStage)
     : Subrender{pipelineStage}
     , pipeline{pipelineStage, {"EngineShaders/sky/skybox.vert", "EngineShaders/sky/skybox.frag"}, {{{Vertex::Component::Position}}}} {
 
@@ -66,10 +66,10 @@ SkyboxRenderer::SkyboxRenderer(const Pipeline::Stage& pipelineStage)
     skyboxSampler = std::make_unique<ImageCube>("engine/assets/textures/cubemap_vulkan.ktx");
 }
 
-SkyboxRenderer::~SkyboxRenderer() {
+SkyboxSubrender::~SkyboxSubrender() {
 }
 
-void SkyboxRenderer::onRender(const CommandBuffer& commandBuffer) {
+void SkyboxSubrender::onRender(const CommandBuffer& commandBuffer) {
     auto scene = SceneManager::Get()->getScene();
     if (!scene)
         return;

@@ -260,9 +260,9 @@ const char* FileFormat::GetIcon(const fs::path& filepath) {
     return key != ICON_FORMATS.end() ? key->second.c_str() : ICON_MDI_FILE;
 }
 
-fs::path FileFormat::GetNextFile(fs::path filepath) {
-    auto stem = filepath.stem().string();
-    auto ext = filepath.extension().string();
+fs::path FileFormat::GetNextFileName(fs::path filepath) {
+    std::string stem{ filepath.stem().string() };
+    std::string ext{ filepath.extension().string() };
 
     for (int i = 1; fs::exists(filepath); ++i) {
         std::ostringstream fn;
