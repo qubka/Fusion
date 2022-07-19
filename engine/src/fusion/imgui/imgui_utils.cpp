@@ -15,9 +15,6 @@ namespace ImGuiUtils {
 using namespace fe;
 using namespace std::string_literals;
 
-glm::vec4 SelectedColor = glm::vec4{ 0.28f, 0.56f, 0.9f, 1.0f };
-glm::vec4 IconColor = glm::vec4{ 0.2f, 0.2f, 0.2f, 1.0f };
-
 void PropertyText(const std::string& name, const std::string& value) {
     //ImGui::AlignTextToFramePadding();
     ImGui::TextUnformatted(name.c_str());
@@ -118,7 +115,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
         {
             ImGui::PushFont(io.Fonts->Fonts[1]);
             ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-            ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
             filter.Draw("###FileFilter");
             DrawItemActivityOutline(2.0f, false);
             ImGui::PopStyleColor();
@@ -384,14 +381,6 @@ void DrawRowsBackground(int row_count, float line_height, float x1, float x2, fl
     }
 }
 
-const glm::vec4& GetSelectedColor() {
-    return SelectedColor;
-}
-
-const glm::vec4& GetIconColor() {
-    return IconColor;
-}
-
 void DrawItemActivityOutline(float rounding, bool drawWhenInactive, const ImColor& colourWhenActive) {
     auto* drawList = ImGui::GetWindowDrawList();
 
@@ -417,7 +406,7 @@ void DrawItemActivityOutline(float rounding, bool drawWhenInactive, const ImColo
 
 bool InputText(const std::string& name, std::string& currentText) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
 
     char buffer[256];
     std::memset(buffer, 0, 256);
@@ -483,7 +472,6 @@ void SetTheme(Theme theme) {
 
     ImGuiStyle& style = ImGui::GetStyle();
     ImVec4* colors = style.Colors;
-    SelectedColor = glm::vec4{ 0.28f, 0.56f, 0.9f, 1.0f };
 
     if (theme == Theme::Black)
     {
@@ -551,11 +539,9 @@ void SetTheme(Theme theme) {
         ImVec4 TabActive = ImVec4{ 52.0f / max, 54.0f / max, 64.0f / max, 1.0f };
         ImVec4 TabUnactive = ImVec4{ 35.0f / max, 43.0f / max, 59.0f / max, 1.0f };
 
-        SelectedColor = ImVec4{ 155.0f / 255.0f, 130.0f / 255.0f, 207.0f / 255.0f, 1.00f };
         colors[ImGuiCol_Text] = ImVec4{ 200.0f / 255.0f, 200.0f / 255.0f, 200.0f / 255.0f, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ 0.36f, 0.42f, 0.47f, 1.00f };
 
-        IconColor = colors[ImGuiCol_Text];
         colors[ImGuiCol_WindowBg] = TabActive;
         colors[ImGuiCol_ChildBg] = TabActive;
 
@@ -623,7 +609,6 @@ void SetTheme(Theme theme) {
         ImGui::StyleColorsDark();
         colors[ImGuiCol_Text] = ImVec4{ 1.00f, 1.00f, 1.00f, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ 0.40f, 0.40f, 0.40f, 1.00f };
-        IconColor = colors[ImGuiCol_Text];
 
         colors[ImGuiCol_ChildBg] = ImVec4{ 0.25f, 0.25f, 0.25f, 1.00f };
         colors[ImGuiCol_WindowBg] = ImVec4{ 0.25f, 0.25f, 0.25f, 1.00f };
@@ -682,7 +667,6 @@ void SetTheme(Theme theme) {
         ImGui::StyleColorsLight();
         colors[ImGuiCol_Text] = ImVec4{ 0.00f, 0.00f, 0.00f, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ 0.60f, 0.60f, 0.60f, 1.00f };
-        IconColor = colors[ImGuiCol_Text];
 
         colors[ImGuiCol_WindowBg] = ImVec4{ 0.94f, 0.94f, 0.94f, 0.94f };
         colors[ImGuiCol_PopupBg] = ImVec4{ 1.00f, 1.00f, 1.00f, 0.94f };
@@ -728,7 +712,6 @@ void SetTheme(Theme theme) {
 
         colors[ImGuiCol_Text] = ImVec4{ 0.95f, 0.96f, 0.98f, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ 0.36f, 0.42f, 0.47f, 1.00f };
-        IconColor = colors[ImGuiCol_Text];
 
         colors[ImGuiCol_WindowBg] = ImVec4{ 0.13f, 0.14f, 0.17f, 1.00f };
         colors[ImGuiCol_PopupBg] = BG(0.9f);
@@ -774,7 +757,6 @@ void SetTheme(Theme theme) {
         ImVec4 color_for_pops = ImVec4{ 33.f / 255.f, 46.f / 255.f, 60.f / 255.f, 1.0f };
         colors[ImGuiCol_Text] = ImVec4{ color_for_text.x, color_for_text.y, color_for_text.z, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ color_for_text.x, color_for_text.y, color_for_text.z, 0.58f };
-        IconColor = colors[ImGuiCol_Text];
 
         colors[ImGuiCol_WindowBg] = ImVec4{ color_for_body.x, color_for_body.y, color_for_body.z, 0.95f };
         colors[ImGuiCol_Border] = ImVec4{ color_for_body.x, color_for_body.y, color_for_body.z, 0.00f };
@@ -812,23 +794,19 @@ void SetTheme(Theme theme) {
     else if (theme == Theme::Classic)
     {
         ImGui::StyleColorsClassic();
-        IconColor = colors[ImGuiCol_Text];
     }
     else if (theme == Theme::ClassicDark)
     {
         ImGui::StyleColorsDark();
-        IconColor = colors[ImGuiCol_Text];
     }
     else if (theme == Theme::ClassicLight)
     {
         ImGui::StyleColorsLight();
-        IconColor = colors[ImGuiCol_Text];
     }
     else if (theme == Theme::Cinder)
     {
         colors[ImGuiCol_Text] = ImVec4{ 0.95f, 0.96f, 0.98f, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ 0.36f, 0.42f, 0.47f, 1.00f };
-        IconColor = colors[ImGuiCol_Text];
         colors[ImGuiCol_WindowBg] = ImVec4{ 0.13f, 0.14f, 0.17f, 1.00f };
         colors[ImGuiCol_Border] = ImVec4{ 0.31f, 0.31f, 1.00f, 0.00f };
         colors[ImGuiCol_BorderShadow] = ImVec4{ 0.00f, 0.00f, 0.00f, 0.00f };
@@ -870,8 +848,6 @@ void SetTheme(Theme theme) {
         ImVec4 TabActive = ImVec4{ 40.0f / max, 42.0f / max, 54.0f / max, 1.0f };
         ImVec4 TabUnactive = ImVec4{ 35.0f / max, 43.0f / max, 59.0f / max, 1.0f };
 
-        IconColor = ImVec4{ 183.0f / 255.0f, 158.0f / 255.0f, 220.0f / 255.0f, 1.00f };
-        SelectedColor = ImVec4{ 145.0f / 255.0f, 111.0f / 255.0f, 186.0f / 255.0f, 1.00f };
         colors[ImGuiCol_Text] = ImVec4{ 159.0f / 255.0f, 159.0f / 255.0f, 163.0f / 255.0f, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ 0.36f, 0.42f, 0.47f, 1.00f };
 

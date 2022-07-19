@@ -1,5 +1,6 @@
 #pragma once
 
+#include "imgui_color_scheme.hpp"
 #include "fusion/utils/string.hpp"
 
 #include <imgui/imgui.h>
@@ -10,6 +11,8 @@ namespace fe {
     class Image2dArray;
     class ImageCube;
 }
+
+using namespace fe;
 
 namespace ImGuiUtils {
     enum class Theme {
@@ -38,19 +41,16 @@ namespace ImGuiUtils {
     void Tooltip(const std::string& text);
     void Tooltip(const char* text);
 
-    void Tooltip(fe::Image2d* texture, const glm::vec2& size, bool flipImage = false);
-    void Tooltip(fe::Image2d* texture, const glm::vec2& size, const std::string& text, bool flipImage = false);
-    void Tooltip(fe::Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
+    void Tooltip(Image2d* texture, const glm::vec2& size, bool flipImage = false);
+    void Tooltip(Image2d* texture, const glm::vec2& size, const std::string& text, bool flipImage = false);
+    void Tooltip(Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
 
-    void Image(fe::Image2d* texture, const glm::vec2& size, bool flipImage = false);
-    void Image(fe::ImageCube* texture, const glm::vec2& size, bool flipImage = false);
-    void Image(fe::Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
+    void Image(Image2d* texture, const glm::vec2& size, bool flipImage = false);
+    void Image(ImageCube* texture, const glm::vec2& size, bool flipImage = false);
+    void Image(Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
     void Image(uint32_t* texture_id, const glm::vec2& size, bool flipImage = false);
 
     void SetTheme(Theme theme);
-
-    const glm::vec4& GetSelectedColor();
-    const glm::vec4& GetIconColor();
 
     bool BufferingBar(const std::string& name, float value, const glm::vec2& size_arg, uint32_t bg_col, uint32_t fg_col);
     bool Spinner(const std::string& name, float radius, int thickness, uint32_t color);
@@ -154,7 +154,7 @@ namespace ImGuiUtils {
         ImGui::PushItemWidth(-1);
 
         if (flags & PropertyFlag::ReadOnly) {
-            ImGui::TextUnformatted(fe::String::Extract(glm::to_string(value), "(", ")").c_str());
+            ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").c_str());
         } else {
             for (int i = 0; i < L; i++) {
                 std::string id = "##" + name + std::to_string(i);
@@ -179,7 +179,7 @@ namespace ImGuiUtils {
         ImGui::PushItemWidth(-1);
 
         if (flags & PropertyFlag::ReadOnly) {
-            ImGui::TextUnformatted(fe::String::Extract(glm::to_string(value), "(", ")").c_str());
+            ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").c_str());
         } else if (flags & PropertyFlag::ColorProperty) {
             std::string id = "##" + name;
             if constexpr (L == 3) {
@@ -225,9 +225,10 @@ namespace ImGuiUtils {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
        if constexpr(L > 0) {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+            ImVec4 color{ 0.8f, 0.1f, 0.15f, 1.0f };
+            ImGui::PushStyleColor(ImGuiCol_Button, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("X", buttonSize)) {
                 value.x = reset;
@@ -244,9 +245,10 @@ namespace ImGuiUtils {
         if constexpr(L > 1) {
             ImGui::SameLine();
 
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+            ImVec4 color{ 0.2f, 0.7f, 0.2f, 1.0f };
+            ImGui::PushStyleColor(ImGuiCol_Button, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("Y", buttonSize)) {
                 value.y = reset;
@@ -263,9 +265,10 @@ namespace ImGuiUtils {
         if constexpr(L > 2) {
             ImGui::SameLine();
 
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+            ImVec4 color{ 0.1f, 0.25f, 0.8f, 1.0f };
+            ImGui::PushStyleColor(ImGuiCol_Button, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("Z", buttonSize)) {
                 value.z = reset;
@@ -282,9 +285,10 @@ namespace ImGuiUtils {
         if constexpr(L > 3) {
             ImGui::SameLine();
 
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.2f, 0.8f, 1.0f });
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.3f, 0.9f, 1.0f });
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.2f, 0.8f, 1.0f });
+            ImVec4 color{ 0.8f, 0.2f, 0.8f, 1.0f };
+            ImGui::PushStyleColor(ImGuiCol_Button, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("W", buttonSize)) {
                 value.w = reset;
