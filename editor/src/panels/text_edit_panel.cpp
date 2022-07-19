@@ -15,7 +15,7 @@ TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()>&& callback
     textEditor.SetCustomIdentifiers({});
 
     // T
-    auto extension = FileSystem::GetExtension(filePath);
+    std::string extension{ FileSystem::GetExtension(filePath) };
     /*if (extension == "lua") {
         auto lang = ImGui::TextEditor::LanguageDefinition::Lua();
         textEditor.SetLanguageDefinition(lang);
@@ -38,8 +38,7 @@ TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()>&& callback
         textEditor.SetLanguageDefinition(lang);
     }
 
-    auto string = FileSystem::ReadText(filePath);
-    textEditor.SetText(string);
+    textEditor.SetText(FileSystem::ReadText(filePath));
     textEditor.SetShowWhitespaces(false);
 }
 

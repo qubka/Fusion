@@ -85,31 +85,31 @@ void DefaultApplication::openNewProject(const fs::path& path, const std::string&
     }
     projectSettings.isShowConsole = true;
 
-    auto assetPath = projectSettings.projectRoot / "assets";
+    fs::path assetPath{ projectSettings.projectRoot / "assets" };
     if (!fs::exists(assetPath))
         fs::create_directory(assetPath);
 
-    auto scriptPath = assetPath / "scripts";
+    fs::path scriptPath{ assetPath / "scripts" };
     if (!fs::exists(scriptPath))
         fs::create_directory(scriptPath);
 
-    auto shaderPath = assetPath / "shaders";
+    fs::path shaderPath{ assetPath / "shaders" };
     if (!fs::exists(shaderPath))
         fs::create_directory(shaderPath);
 
-    auto scenePath = assetPath / "scenes";
+    fs::path scenePath{ assetPath / "scenes" };
     if (!fs::exists(scenePath))
         fs::create_directory(scenePath);
 
-    auto texturePath = assetPath / "textures";
+    fs::path texturePath{ assetPath / "textures" };
     if (!fs::exists(texturePath))
         fs::create_directory(texturePath);
 
-    auto meshPath = assetPath / "meshes";
+    fs::path meshPath{ assetPath / "meshes" };
     if (!fs::exists(meshPath))
         fs::create_directory(meshPath);
 
-    auto soundPath = assetPath / "sounds";
+    fs::path soundPath{ assetPath / "sounds" };
     if (!fs::exists(soundPath))
         fs::create_directory(soundPath);
 
@@ -142,12 +142,10 @@ void DefaultApplication::serialise() {
         output(*this);
     }
 
-    auto filepath = projectSettings.projectRoot / projectSettings.projectName;
-    filepath += ".fsproj";
+    fs::path projectPath{ projectSettings.projectRoot / (projectSettings.projectName + ".fsproj") };
+    FileSystem::WriteText(projectPath, ss.str());
 
-    FileSystem::WriteText(filepath, ss.str());
-
-    LOG_INFO << "Serialising application: " << filepath;
+    LOG_INFO << "Serialising application: " << projectPath;
 }
 
 void DefaultApplication::deserialise() {
@@ -156,18 +154,15 @@ void DefaultApplication::deserialise() {
         return;
     }
 
-    auto filepath = projectSettings.projectRoot / projectSettings.projectName;
-    filepath += ".fsproj";
-
-    if (!fs::exists(filepath)) {
-        LOG_INFO << "No saved Project file found: " << filepath;
+    fs::path projectPath{ projectSettings.projectRoot / (projectSettings.projectName + ".fsproj") };
+    if (!fs::exists(projectPath)) {
+        LOG_INFO << "No saved Project file found: " << projectPath;
         return;
     }
 
     mountPaths();
 
-    std::string data = FileSystem::ReadText(filepath);
-    std::istringstream is{data};
+    std::istringstream is{FileSystem::ReadText(projectPath)};
     try {
         cereal::JSONInputArchive input{is};
         input(*this);
@@ -184,12 +179,12 @@ void DefaultApplication::deserialise() {
 
     projectLoaded = true;
 
-    LOG_INFO << "Deserialise application: " << filepath;
+    LOG_INFO << "Deserialise application: " << projectPath;
 }
 
 void DefaultApplication::mountPaths() const {
     auto vfs = VirtualFileSystem::Get();
-    auto assetPath = projectSettings.projectRoot / "assets";
+    fs::path assetPath{ projectSettings.projectRoot / "assets" };
     vfs->mount("Assets", assetPath);
     vfs->mount( "Meshes", assetPath / "meshes");
     vfs->mount("Textures", assetPath / "textures");

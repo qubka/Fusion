@@ -188,9 +188,8 @@ void Scene::deserialise(fs::path filepath, bool binary) {
         }
 
         try {
-            std::string data = FileSystem::ReadText(filepath);
             std::istringstream is;
-            is.str(data);
+            is.str(FileSystem::ReadText(filepath));
             cereal::JSONInputArchive input{is};
             input(*this);
 

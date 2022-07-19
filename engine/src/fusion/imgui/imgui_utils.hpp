@@ -108,7 +108,7 @@ namespace ImGuiUtils {
         if (flags & PropertyFlag::ReadOnly) {
             ImGui::TextUnformatted(value ? glm::detail::LabelTrue : glm::detail::LabelFalse);
         } else {
-            std::string id = "##" + name;
+            std::string id{ "##" + name };
             if (ImGui::Checkbox(id.c_str(), &value))
                 updated = true;
         }
@@ -130,11 +130,11 @@ namespace ImGuiUtils {
         if (flags & PropertyFlag::ReadOnly) {
             ImGui::Text(ImGui::DataTypeGetInfo(GetDataType<T>())->PrintFmt, value);
         } if (flags & PropertyFlag::SliderValue) {
-            std::string id = "##" + name;
+            std::string id{ "##" + name };
             if (ImGui::SliderScalar(id.c_str(), GetDataType<T>(), &value, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
                 updated = true;
         } else {
-            std::string id = "##" + name;
+            std::string id{ "##" + name };
             if (ImGui::DragScalar(id.c_str(), GetDataType<T>(), &value, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
                 updated = true;
         }
@@ -158,7 +158,7 @@ namespace ImGuiUtils {
             ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").c_str());
         } else {
             for (int i = 0; i < L; i++) {
-                std::string id = "##" + name + std::to_string(i);
+                std::string id{ "##" + name + std::to_string(i) };
                 if (ImGui::Checkbox(id.c_str(), &value[i]))
                     updated = true;
             }
@@ -182,7 +182,7 @@ namespace ImGuiUtils {
         if (flags & PropertyFlag::ReadOnly) {
             ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").c_str());
         } else if (flags & PropertyFlag::ColorProperty) {
-            std::string id = "##" + name;
+            std::string id{ "##" + name };
             if constexpr (L == 3) {
                 if (ImGui::ColorEdit3(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs))
                     updated = true;
@@ -191,11 +191,11 @@ namespace ImGuiUtils {
                     updated = true;
             }
         } if (flags & PropertyFlag::SliderValue) {
-            std::string id = "##" + name;
+            std::string id{ "##" + name };
             if (ImGui::SliderScalarN(id.c_str(), GetDataType<T>(), glm::value_ptr(value), L, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
                 updated = true;
         } else {
-            std::string id = "##" + name;
+            std::string id{ "##" + name };
             if (ImGui::DragScalarN(id.c_str(), GetDataType<T>(), glm::value_ptr(value), L, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
                 updated = true;
         }
@@ -328,7 +328,7 @@ namespace ImGuiUtils {
         if (flags & PropertyFlag::ReadOnly) {
             ImGui::TextUnformatted(current);
         } else {
-            std::string id = "##" + name;
+            std::string id{ "##" + name };
             if (ImGui::BeginCombo(id.c_str(), current)) {
                 for (const auto& [type, title] : entries) {
                     const bool is_selected = (value == type);

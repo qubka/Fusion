@@ -2,12 +2,13 @@
 #include "file_system.hpp"
 
 #include "fusion/imgui/material_design_icons.hpp"
+#include "fusion/utils/string.hpp"
 
 using namespace fe;
 
 
 bool FileFormat::IsTextFile(const fs::path& filepath) {
-    std::string extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
 
     static const std::set<std::string> TEXT_FORMATS = {
             ".txt",
@@ -38,7 +39,7 @@ bool FileFormat::IsTextFile(const fs::path& filepath) {
 }
 
 bool FileFormat::IsAudioFile(const fs::path& filepath) {
-    std::string extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
 
     static const std::set<std::string> AUDIO_FORMATS = {
             ".ogg",
@@ -50,7 +51,7 @@ bool FileFormat::IsAudioFile(const fs::path& filepath) {
 }
 
 bool FileFormat::IsShaderFile(const fs::path& filepath) {
-    std::string extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
 
     static const std::set<std::string> SHADER_FORMATS = {
             ".vert",
@@ -65,7 +66,7 @@ bool FileFormat::IsShaderFile(const fs::path& filepath) {
 }
 
 bool FileFormat::IsSceneFile(const fs::path& filepath) {
-    auto extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
 
     if (extension == ".fsn")
         return true;
@@ -74,7 +75,7 @@ bool FileFormat::IsSceneFile(const fs::path& filepath) {
 }
 
 bool FileFormat::IsModelFile(const fs::path& filepath) {
-    std::string extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
 
     // http://assimp.sourceforge.net/main_features_Formats.html
     static const std::set<std::string> MODEL_FORMATS = {
@@ -106,7 +107,7 @@ bool FileFormat::IsModelFile(const fs::path& filepath) {
 }
 
 bool FileFormat::IsTextureFile(const fs::path& filepath) {
-    std::string extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
 
     static const std::set<std::string> TEXTURE_FORMATS = {
             ".jpeg",
@@ -130,7 +131,7 @@ bool FileFormat::IsTextureFile(const fs::path& filepath) {
 }
 
 bool FileFormat::IsTextureStorageFile(const fs::path& filepath) {
-    std::string extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
 
     static const std::set<std::string> TEXTURE_FORMATS = {
             ".ktx",
@@ -142,6 +143,8 @@ bool FileFormat::IsTextureStorageFile(const fs::path& filepath) {
 }
 
 const char* FileFormat::GetIcon(const fs::path& filepath) {
+    std::string extension{ FileSystem::GetExtension(filepath) };
+
     static std::unordered_map<std::string, std::string> ICON_FORMATS = {
             {".gif", ICON_MDI_FILE_IMAGE},
             {".jpeg", ICON_MDI_FILE_IMAGE},
@@ -253,6 +256,18 @@ const char* FileFormat::GetIcon(const fs::path& filepath) {
             {".db", ICON_MDI_DATABASE},
     };
 
-    auto key = ICON_FORMATS.find(FileSystem::GetExtension(filepath));
+    auto key = ICON_FORMATS.find(extension);
     return key != ICON_FORMATS.end() ? key->second.c_str() : ICON_MDI_FILE;
+}
+
+fs::path FileFormat::GetNextFile(fs::path filepath) {
+    auto stem = filepath.stem().string();
+    auto ext = filepath.extension().string();
+
+    for (int i = 1; fs::exists(filepath); ++i) {
+        std::ostringstream fn;
+        fn << stem << "(" << i << ")" << ext;
+        filepath.replace_filename(fn.str());
+    }
+    return filepath;
 }

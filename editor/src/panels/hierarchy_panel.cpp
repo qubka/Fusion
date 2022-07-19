@@ -205,7 +205,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
     bool show = true;
 
     const auto nameComponent = registry.try_get<NameComponent>(node);
-    std::string name = nameComponent ? *nameComponent : std::to_string(entt::to_integral(node));
+    std::string name{ nameComponent ? *nameComponent : std::to_string(entt::to_integral(node)) };
 
     if (hierarchyFilter.IsActive()) {
         if (!hierarchyFilter.PassFilter(name.c_str())) {
@@ -249,7 +249,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             hadRecentDroppedEntity = entt::null;
         }
 
-        std::string icon = ICON_MDI_CUBE_OUTLINE;
+        std::string icon{ ICON_MDI_CUBE_OUTLINE };
 
         if (registry.any_of<CameraComponent>(node)) {
             editor->getComponentIcon(typeid(CameraComponent), icon);

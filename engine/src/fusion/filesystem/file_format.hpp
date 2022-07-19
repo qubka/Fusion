@@ -24,5 +24,12 @@ namespace fe {
          * @return The string with font awesome icon.
          */
         static const char* GetIcon(const fs::path& filepath);
+
+        /**
+         * Checks if the file name is available, if file with the same name exist, generates a new name from the given one.
+         * @param filepath The path to the file.
+         * @return The unique path.
+         */
+        static fs::path GetNextFile(fs::path filepath);
     };
 }

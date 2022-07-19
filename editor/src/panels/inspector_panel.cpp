@@ -125,7 +125,7 @@ void InspectorPanel::onImGui() {
         ImGui::SameLine();
 
         auto nameComponent = registry.try_get<NameComponent>(selected);
-        std::string name = nameComponent ? *nameComponent : std::to_string(entt::to_integral(selected));
+        std::string name{ nameComponent ? *nameComponent : std::to_string(entt::to_integral(selected)) };
 
         if (debugMode) {
             ImGui::Text("ID: %d", static_cast<int>(selected));

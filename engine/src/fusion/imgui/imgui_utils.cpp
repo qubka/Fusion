@@ -43,7 +43,7 @@ bool PropertyText(const std::string& name, std::string& value, const Flags& flag
         char buffer[256];
         std::memset(buffer, 0, sizeof(buffer));
         std::strncpy(buffer, value.c_str(), sizeof(buffer));
-        std::string id = "##" + name;
+        std::string id{ "##" + name };
         if (ImGui::InputText(id.c_str(), buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
             value = std::string{buffer};
             updated = true;
@@ -66,7 +66,7 @@ bool PropertyDropdown(const std::string& name, std::string* options, int32_t opt
 
     const char* current = options[*selected].c_str();
 
-    std::string id = "##" + name;
+    std::string id{ "##" + name };
     if (ImGui::BeginCombo(id.c_str(), current)) {
         for (int i = 0; i < optionCount; i++) {
             const bool is_selected = (current == options[i]);
@@ -141,7 +141,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
             if (filter.IsActive() && !filter.PassFilter(file.c_str()))
                 continue;
 
-            std::string title = FileFormat::GetIcon(file) + " "s + file.filename().string();
+            std::string title{ FileFormat::GetIcon(file) + " "s + file.filename().string() };
             if (ImGui::Selectable(title.c_str(), selected == file, ImGuiSelectableFlags_AllowDoubleClick)) {
                 selected = file;
                 if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
@@ -156,7 +156,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
         ImGui::Separator();
 
         if (!selected.empty()) {
-            std::string title = FileFormat::GetIcon(selected) + " "s + selected.string();
+            std::string title{ FileFormat::GetIcon(selected) + " "s + selected.string() };
             ImGui::TextUnformatted(title.c_str());
         }
 
@@ -173,7 +173,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
             ImGui::OpenPopup("File Explorer");
         }
     } else {
-        std::string title = FileFormat::GetIcon(value) + " "s + value.filename().string();
+        std::string title{ FileFormat::GetIcon(value) + " "s + value.filename().string() };
         if (ImGui::Button(title.c_str(), buttonSize)) {
             //contentBrowserPanel.selectFile(value);
             // TODO: Finish

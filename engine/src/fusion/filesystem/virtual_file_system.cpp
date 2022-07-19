@@ -4,8 +4,7 @@
 using namespace fe;
 
 fs::path VirtualFileSystem::resolvePhysicalPath(const fs::path& path) {
-    auto dir = *path.begin();
-    if (auto it = mountPoints.find(dir); it != mountPoints.end()) {
+    if (auto it = mountPoints.find(*path.begin()); it != mountPoints.end()) {
         return it->second / strip_root(path);
     }
     LOG_WARNING << "Physical path: " << path << " was not found";

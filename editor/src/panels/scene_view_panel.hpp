@@ -43,7 +43,7 @@ namespace fe {
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
 
-                    std::string icon = ICON_MDI_CUBE_OUTLINE;
+                    std::string icon{ ICON_MDI_CUBE_OUTLINE };
                     editor->getComponentIcon(typeId, icon);
 
                     if (ImGui::Button(icon.c_str())) {

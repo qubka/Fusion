@@ -50,12 +50,12 @@ void PipelineCompute::createShaderProgram() {
 	for (const auto& [defineName, defineValue] : defines)
 		ss << "#define " << defineName << ' ' << defineValue << '\n';
 
-	auto fileLoaded = VirtualFileSystem::Get()->readText(shaderStage);
-	if (fileLoaded.empty())
+    std::string shaderCode{ VirtualFileSystem::Get()->readText(shaderStage) };
+	if (shaderCode.empty())
 		throw std::runtime_error("Could not create compute pipeline, missing shader stage");
 
 	auto stageFlag = Shader::GetShaderStage(shaderStage);
-	shaderModule = shader.createShaderModule(shaderStage, fileLoaded, ss.str(), stageFlag);
+	shaderModule = shader.createShaderModule(shaderStage, shaderCode, ss.str(), stageFlag);
 
 	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStageCreateInfo.stage = stageFlag;

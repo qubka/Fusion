@@ -240,7 +240,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
 
                 ImGui::SameLine();
 
-                std::string pathStr = (basePath / dirInfo->path).string();
+                std::string pathStr{ (basePath / dirInfo->path).string() };
                 ImGui::TextUnformatted(pathStr.c_str());
                 ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
                 ImGui::EndDragDropSource();
@@ -363,7 +363,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
 
         ImGui::SameLine();
 
-        std::string pathStr = (basePath / path).string();
+        std::string pathStr{ (basePath / path).string() };
         ImGui::TextUnformatted(pathStr.c_str());
         ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
         ImGui::EndDragDropSource();
@@ -467,7 +467,7 @@ const fs::path& ContentBrowserPanel::processDirectory(const fs::path& path, cons
 }
 
 bool ContentBrowserPanel::moveFile(const fs::path& filepath, const fs::path& movepath) {
-    std::string cmd = String::Quoted(filepath.string()) + " " + String::Quoted(movepath.string());
+    std::string cmd{ String::Quoted(filepath.string()) + " " + String::Quoted(movepath.string()) };
 #if FUSION_PLATFORM_LINUX
     system(("mv " + cmd).c_str());
 #elif

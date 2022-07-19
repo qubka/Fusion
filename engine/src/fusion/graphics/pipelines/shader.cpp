@@ -149,18 +149,18 @@ std::optional<VkDescriptorType> Shader::getDescriptorType(uint32_t location) con
 }
 
 VkShaderStageFlagBits Shader::GetShaderStage(const fs::path& filepath) {
-	auto fileExt = FileSystem::GetExtension(filepath);
-	if (fileExt == ".comp")
+	std::string extension{ FileSystem::GetExtension(filepath) };
+	if (extension == ".comp")
 		return VK_SHADER_STAGE_COMPUTE_BIT;
-	if (fileExt == ".vert")
+	if (extension == ".vert")
 		return VK_SHADER_STAGE_VERTEX_BIT;
-	if (fileExt == ".tesc")
+	if (extension == ".tesc")
 		return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-	if (fileExt == ".tese")
+	if (extension == ".tese")
 		return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-	if (fileExt == ".geom")
+	if (extension == ".geom")
 		return VK_SHADER_STAGE_GEOMETRY_BIT;
-	if (fileExt == ".frag")
+	if (extension == ".frag")
 		return VK_SHADER_STAGE_FRAGMENT_BIT;
 
 	return VK_SHADER_STAGE_ALL;

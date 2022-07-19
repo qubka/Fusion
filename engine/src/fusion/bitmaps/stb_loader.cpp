@@ -16,7 +16,7 @@ void StbLoader::Load(Bitmap& bitmap, const fs::path& filepath) {
     int desired_channels = STBI_rgb_alpha;
     bool hdr = false;
 
-    auto extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
     if (extension == ".hdr") {
         FileSystem::Read(filepath, [&](const uint8_t* data, size_t size) {
             pixels = std::unique_ptr<uint8_t[]>(reinterpret_cast<uint8_t*>(stbi_loadf_from_memory(data, static_cast<int>(size), &width, &height, &channels, desired_channels)));
@@ -40,7 +40,7 @@ void StbLoader::Load(Bitmap& bitmap, const fs::path& filepath) {
 }
 
 void StbLoader::Write(const Bitmap& bitmap, const fs::path& filepath) {
-    auto extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
     if (extension == ".jpg" || extension == ".jpeg") {
         stbi_write_jpg(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getComponents()), bitmap.getData<uint8_t>(), 8);
     } else if (extension == ".bmp") {

@@ -83,7 +83,7 @@ namespace ImGui {
                     if (entityHasComponent(registry, entity, component)) {
                         ImGui::PushID(component);
 
-                        std::string label = info.name;
+                        const auto& label = info.name;
 
                         bool open = ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen);
                         bool removed = false;

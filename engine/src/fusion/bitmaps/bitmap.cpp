@@ -28,7 +28,7 @@ void Bitmap::load(const fs::path& filepath) {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
-    auto extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
     if (auto it = Registry().find(extension); it != Registry().end()) {
         it->second.first(*this, filepath);
         filePath = filepath;
@@ -49,7 +49,7 @@ void Bitmap::write(const fs::path& filepath) const {
     if (auto parent = filepath.parent_path(); !parent.empty())
         fs::create_directories(parent);
 
-    auto extension = FileSystem::GetExtension(filepath);
+    std::string extension{ FileSystem::GetExtension(filepath) };
     if (auto it = Registry().find(extension); it != Registry().end()) {
         it->second.second(*this, filepath);
     } else {
