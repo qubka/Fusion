@@ -31,7 +31,7 @@ void Bitmap::load(const fs::path& filepath) {
     std::string extension{ FileSystem::GetExtension(filepath) };
     if (auto it = Registry().find(extension); it != Registry().end()) {
         it->second.first(*this, filepath);
-        filePath = filepath;
+        path = filepath;
     } else {
         LOG_ERROR << "Unknown file extension format: " << extension << " for the file: " << filepath;
         return;

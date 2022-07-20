@@ -90,7 +90,7 @@ void ConsolePanel::renderHeader() {
         ImGui::PopStyleColor();
     }
 
-    if (ImGui::BeginPopup("SettingsPopup")) {
+    if (ImGui::BeginPopup("SettingsPopup", ImGuiWindowFlags_AlwaysAutoResize)) {
         // Checkbox for scrolling lock
         ImGui::Checkbox("Scroll to bottom", &AllowScrollingToBottom);
 
@@ -114,7 +114,7 @@ void ConsolePanel::renderHeader() {
         ImGui::PushFont(io.Fonts->Fonts[1]);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
-        Filter.Draw("###ConsoleFilter", ImGui::GetContentRegionAvail().x - (levelButtonWidths));
+        Filter.Draw("###ConsoleFilter", ImGui::GetContentRegionAvail().x - levelButtonWidths);
         ImGuiUtils::DrawItemActivityOutline(2.0f, false);
         ImGui::PopStyleVar();
         ImGui::PopStyleColor();

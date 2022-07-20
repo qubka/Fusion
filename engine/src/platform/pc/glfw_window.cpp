@@ -142,7 +142,7 @@ void Window::setIconified(bool flag) {
 void Window::setVisible(bool flag) {
     if (!visible && flag) {
         glfwShowWindow(window);
-    } else if (visible && !flag){
+    } else if (visible && !flag) {
         glfwHideWindow(window);
     }
     visible = flag;

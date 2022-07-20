@@ -35,8 +35,7 @@ namespace fe {
         const fs::path& processDirectory(const fs::path& path, const std::shared_ptr<DirectoryInfo>& parent);
         bool moveFile(const fs::path& filepath, const fs::path& movepath);
 
-        fs::path basePath;
-        //fs::path movePath;
+        fs::path root;
 
         bool isLocked{ false };
         bool isInListView{ false };

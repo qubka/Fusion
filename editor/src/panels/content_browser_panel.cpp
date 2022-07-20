@@ -14,9 +14,9 @@
 using namespace fe;
 
 ContentBrowserPanel::ContentBrowserPanel(Editor* editor) : EditorPanel{ICON_MDI_ARCHIVE " Content Browser##content", "ContentBrowser", editor} {
-    basePath = editor->getProjectSettings().projectRoot / "assets";
+    root = editor->getProjectSettings().projectRoot / "assets";
 
-    auto base = processDirectory(basePath, nullptr);
+    auto base = processDirectory(root, nullptr);
     baseDirectory = directories[base];
     changeDirectory(baseDirectory);
 }
@@ -168,7 +168,7 @@ void ContentBrowserPanel::onImGui() {
                     }
 
                     if (ImGui::Selectable("New folder")) {
-                        fs::create_directory(basePath / currentDirectory->path / "New Folder");
+                        fs::create_directory(root / currentDirectory->path / "New Folder");
                         refresh();
                     }
                     ImGui::EndPopup();
@@ -225,7 +225,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                 fs::path file = fs::current_path() / fs::path{reinterpret_cast<const char*>(payload->Data)};
-                fs::path move = fs::current_path() / (dirInfo->parent ? basePath / dirInfo->path : basePath);
+                fs::path move = fs::current_path() / (dirInfo->parent ? root / dirInfo->path : root);
                 if (moveFile(file, move)) {
                     LOG_INFO << "Moved File: " << file << " to " << move;
                     refresh();
@@ -240,7 +240,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
 
                 ImGui::SameLine();
 
-                std::string pathStr{ (basePath / dirInfo->path).string() };
+                std::string pathStr{ (root / dirInfo->path).string() };
                 ImGui::TextUnformatted(pathStr.c_str());
                 ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
                 ImGui::EndDragDropSource();
@@ -255,9 +255,9 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
         ImGui::TextUnformatted(dirInfo->name.c_str());
 
         if (isOpened) {
-            ImVec2 verticalLineStart = ImGui::GetCursorScreenPos();
+            ImVec2 verticalLineStart{ ImGui::GetCursorScreenPos() };
             verticalLineStart.x += smallOffsetX; // to nicely line up with the arrow symbol
-            ImVec2 verticalLineEnd = verticalLineStart;
+            ImVec2 verticalLineEnd{ verticalLineStart };
 
             for (auto& file : dirInfo->children) {
                 if (file->isDirectory) {
@@ -279,7 +279,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
 
                     drawFolder(file);
 
-                    const ImRect childRect = ImRect{currentPos, currentPos + ImVec2{0.0f, ImGui::GetFontSize()}};
+                    ImRect childRect{currentPos, currentPos + ImVec2{0.0f, ImGui::GetFontSize()}};
 
                     const float midpoint = (childRect.Min.y + childRect.Max.y) * 0.5f;
                     drawList->AddLine(ImVec2{verticalLineStart.x, midpoint},
@@ -340,7 +340,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
             changeDirectory(directory);
             return true;
         } else {
-            editor->fileOpenCallback(basePath / path);
+            editor->fileOpenCallback(root / path);
         }
     }
 
@@ -348,7 +348,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                 fs::path file = fs::current_path() / fs::path{reinterpret_cast<const char*>(payload->Data)};
-                fs::path move = fs::current_path() / (parent ? basePath / path : basePath);
+                fs::path move = fs::current_path() / (parent ? root / path : root);
                 if (moveFile(file, move)) {
                     LOG_INFO << "Moved File: " << file << " to " << move;
                     refresh();
@@ -363,7 +363,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
 
         ImGui::SameLine();
 
-        std::string pathStr{ (basePath / path).string() };
+        std::string pathStr{ (root / path).string() };
         ImGui::TextUnformatted(pathStr.c_str());
         ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
         ImGui::EndDragDropSource();
@@ -398,7 +398,7 @@ void ContentBrowserPanel::drawBottom() {
 
         ImGui::PopStyleColor(3);
 
-        ImGui::SameLine(xAvail - sizeWidth);
+        ImGui::SameLine(xAvail > sizeWidth * static_cast<float>(breadCrumbData.size()) ? xAvail - sizeWidth : 0.0f);
     }
 
     if (!isInListView) {
@@ -415,14 +415,14 @@ void ContentBrowserPanel::onNewProject() {
 }
 
 void ContentBrowserPanel::refresh() {
-    basePath = editor->getProjectSettings().projectRoot / "assets";
+    root = editor->getProjectSettings().projectRoot / "assets";
 
     const auto& currentPath = currentDirectory->path;
 
     updateNavigationPath = true;
 
     directories.clear();
-    auto base = processDirectory(basePath, nullptr);
+    auto base = processDirectory(root, nullptr);
     baseDirectory = directories[base];
     previousDirectory = nullptr;
     currentDirectory = nullptr;
@@ -450,10 +450,10 @@ const fs::path& ContentBrowserPanel::processDirectory(const fs::path& path, cons
     auto directoryInfo = std::make_shared<DirectoryInfo>(path);
     directoryInfo->parent = parent;
 
-    if (/*path == basePath*/parent == nullptr)
-        directoryInfo->path = basePath;
+    if (/*path == root*/parent == nullptr)
+        directoryInfo->path = root;
     else
-        directoryInfo->path = fs::relative(path, basePath);
+        directoryInfo->path = fs::relative(path, root);
 
     if (fs::is_directory(path)) {
         for (const auto& entry : fs::directory_iterator(path)) {

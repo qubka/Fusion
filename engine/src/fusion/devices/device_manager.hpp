@@ -3,6 +3,7 @@
 #include "monitor.hpp"
 #include "window.hpp"
 #include "joystick.hpp"
+#include "cursor.hpp"
 
 #include "fusion/input/codes.hpp"
 
@@ -62,14 +63,25 @@ namespace fe {
         */
         virtual void updateGamepadMappings(const std::string& mappings) = 0;
 
-        virtual Window* createWindow(const  WindowInfo& windowInfo) = 0;
+        virtual Window* createWindow(const WindowInfo& windowInfo) = 0;
         void destroyWindow(const Window* window) {
             auto it = std::find_if(windows.begin(), windows.end(), [window](const auto& w) {
-                return window == w->getNativeWindow();
+                return window == w.get();
             });
             if (it != windows.end()) {
                 onWindowCreate.publish(it->get(), false);
                 windows.erase(it);
+            }
+        }
+
+        virtual Cursor* createCursor(fs::path filepath, fe::CursorHotspot hotspot) = 0;
+        void destroyCursor(const Cursor* cursor) {
+            auto it = std::find_if(cursors.begin(), cursors.end(), [cursor](const auto& c) {
+                return cursor == c.get();
+            });
+            if (it != cursors.end()) {
+                onCursorCreate.publish(it->get(), false);
+                cursors.erase(it);
             }
         }
 
@@ -83,9 +95,13 @@ namespace fe {
         const Joystick* getJoystick(size_t id) const { return id < joysticks.size() ? joysticks[id].get() : nullptr; }
         Joystick* getJoystick(size_t id) { return id < joysticks.size() ? joysticks[id].get() : nullptr; }
 
+        const Cursor* getCursor(size_t id) const { return id < cursors.size() ? cursors[id].get() : nullptr; }
+        Cursor* getCursor(size_t id) { return id < cursors.size() ? cursors[id].get() : nullptr; }
+
         const std::vector<std::unique_ptr<Window>>& getWindows() const { return windows; };
         const std::vector<std::unique_ptr<Monitor>>& getMonitors() const { return monitors; };
-        const std::vector<std::unique_ptr<Joystick>>& getJoystick() const { return joysticks; };
+        const std::vector<std::unique_ptr<Joystick>>& getJoysticks() const { return joysticks; };
+        const std::vector<std::unique_ptr<Cursor>>& getCursors() const { return cursors; };
 
     protected:
         /**
@@ -99,6 +115,12 @@ namespace fe {
          * @return A sink is used to connect listeners to signals and to disconnect them.
          */
         auto OnWindowCreate() { return entt::sink{onWindowCreate}; }
+
+        /**
+         * Event when a cursor has been created or destroy.
+         * @return A sink is used to connect listeners to signals and to disconnect them.
+         */
+        auto OnCursorCreate() { return entt::sink{onCursorCreate}; }
 
         /**
          * Event when a monitor has been connected or disconnected.
@@ -118,8 +140,10 @@ namespace fe {
         std::vector<std::unique_ptr<Window>> windows{};
         std::vector<std::unique_ptr<Monitor>> monitors{};
         std::vector<std::unique_ptr<Joystick>> joysticks{};
+        std::vector<std::unique_ptr<Cursor>> cursors{};
 
         entt::sigh<void(Window*, bool)> onWindowCreate{};
+        entt::sigh<void(Cursor*, bool)> onCursorCreate{};
         entt::sigh<void(Monitor*, bool)> onMonitorConnect{};
         entt::sigh<void(Joystick*, bool)> onJoystickConnect{};
     };

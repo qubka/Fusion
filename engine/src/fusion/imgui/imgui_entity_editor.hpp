@@ -100,7 +100,7 @@ namespace ImGui {
 
                         ImGui::PopStyleColor(3);
 
-                        if (ImGui::BeginPopup(("Remove Component" + label).c_str(), 3)) {
+                        if (ImGui::BeginPopup(("Remove Component" + label).c_str(), ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize)) {
                             if (ImGui::Selectable(("Remove##" + label).c_str())) {
                                 info.destroy(registry, entity);
                                 removed = true;
@@ -127,7 +127,8 @@ namespace ImGui {
                         ImGui::OpenPopup("addComponent");
                     }
 
-                    if (ImGui::BeginPopup("addComponent")) {
+                    if (ImGui::BeginPopup("addComponent", ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::Dummy({200.0f, 0.0f}); // fix resize
                         ImGui::Separator();
 
                         ImGui::TextUnformatted(ICON_MDI_MAGNIFY);

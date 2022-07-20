@@ -34,8 +34,11 @@ DefaultApplication::~DefaultApplication() {
 void DefaultApplication::onStart() {
     LOG_INFO << "Default application starting!";
 
+    auto vfs = VirtualFileSystem::Get();
+
     //FileSystem::Get()->addSearchPath(executablePath, executablePath.string());
-    VirtualFileSystem::Get()->mount("EngineShaders", executablePath / "engine"_p / "assets" / "shaders");
+    fs::path shaderPath{ executablePath / "engine" / "assets" / "shaders" };
+    vfs->mount("EngineShaders", shaderPath);
 
     deserialise();
 
@@ -51,6 +54,15 @@ void DefaultApplication::onStart() {
     // Initialise the window
     auto window = DeviceManager::Get()->createWindow(windowInfo);
     window->OnClose().connect<&Engine::requestClose>(Engine::Get());
+
+    // Sets icons to window
+    fs::path iconPath{ executablePath / "engine" / "assets" / "icons" };
+    vfs->mount("EngineIcons", iconPath);
+    window->setIcons({
+        iconPath / "icon-16.png", iconPath / "icon-24.png", iconPath / "icon-32.png",
+        iconPath / "icon-48.png", iconPath / "icon-64.png", iconPath / "icon-96.png",
+        iconPath / "icon-128.png", iconPath / "icon-192.png", iconPath / "icon-256.png"
+    });
 
     // Win32 : Sets up a console window and redirects standard output to it
     showConsole();
@@ -135,6 +147,9 @@ void DefaultApplication::openProject(const fs::path& path) {
 }
 
 void DefaultApplication::serialise() {
+    if (!projectLoaded)
+        return;
+
     std::stringstream ss;
     {
         // output finishes flushing its contents when it goes out of scope
@@ -162,8 +177,8 @@ void DefaultApplication::deserialise() {
 
     mountPaths();
 
-    std::istringstream is{FileSystem::ReadText(projectPath)};
     try {
+        std::istringstream is{FileSystem::ReadText(projectPath)};
         cereal::JSONInputArchive input{is};
         input(*this);
     }

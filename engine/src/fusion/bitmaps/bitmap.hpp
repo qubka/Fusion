@@ -27,7 +27,7 @@ namespace fe {
         uint8_t getBytesPerPixel() const { return components * (hdr ? sizeof(float) : sizeof(uint8_t)); }
         uint32_t getPitch() const { return size.x * getBytesPerPixel(); }
         size_t getLength() const { return size.x * size.y * getBytesPerPixel(); }
-        const fs::path& getFilePath() const { return filePath; }
+        const fs::path& getPath() const { return path; }
 
         template<typename T>
         T* getData() { return reinterpret_cast<T*>(data.get()); }
@@ -39,7 +39,7 @@ namespace fe {
 
     private:
         std::unique_ptr<uint8_t[]> data;
-        fs::path filePath;
+        fs::path path;
         glm::uvec2 size{ 0 };
         uint8_t components{ 4 };
         bool hdr{ false };

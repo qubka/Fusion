@@ -4,8 +4,8 @@
 
 using namespace glfw;
 
-Cursor::Cursor(const fs::path& filepath, fe::CursorHotspot hotspot) {
-    fe::Bitmap bitmap{filepath};
+Cursor::Cursor(fs::path filepath, fe::CursorHotspot hotspot) : path{std::move(filepath)}, hotspot{hotspot} {
+    fe::Bitmap bitmap{path};
     if (!bitmap)
         return;
 
@@ -33,8 +33,9 @@ Cursor::Cursor(const fs::path& filepath, fe::CursorHotspot hotspot) {
     }
 }
 
-Cursor::Cursor(fe::CursorStandard standard) {
-    cursor = glfwCreateStandardCursor(0x00036000 | static_cast<int>(standard));
+Cursor::Cursor(fe::CursorStandard standard) : standard{standard} {
+    if (standard == fe::CursorStandard::None) standard = fe::CursorStandard::Arrow;
+    cursor = glfwCreateStandardCursor(0x00036000 | (static_cast<int>(standard)));
 }
 
 Cursor::~Cursor() {

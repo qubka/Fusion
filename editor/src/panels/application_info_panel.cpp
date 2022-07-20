@@ -138,7 +138,7 @@ void ApplicationInfoPanel::onImGui() {
                     ImGui::NewLine();
                 }
 
-                if (!manager->getJoystick().empty()) {
+                if (!manager->getJoysticks().empty()) {
                     ImGui::TextUnformatted("Joysticks");
                     if (ImGui::BeginTable("##joysticks", 7, flags)) {
                         ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
@@ -150,7 +150,7 @@ void ApplicationInfoPanel::onImGui() {
                         ImGui::TableSetupColumn("Hat Count", ImGuiTableColumnFlags_WidthFixed);
                         ImGui::TableHeadersRow();
 
-                        for (const auto& [i, joystick]: enumerate(manager->getJoystick())) {
+                        for (const auto& [i, joystick]: enumerate(manager->getJoysticks())) {
                             ImGui::TableNextRow();
 
                             ImGui::TableSetColumnIndex(0);
@@ -182,6 +182,35 @@ void ApplicationInfoPanel::onImGui() {
 
                             ImGui::TableSetColumnIndex(6);
                             ImGui::Text("%lu", joystick->getHatCount());
+                        }
+                        ImGui::EndTable();
+                    }
+                    ImGui::NewLine();
+                }
+
+                if (!manager->getCursors().empty()) {
+                    ImGui::TextUnformatted("Cursors");
+                    if (ImGui::BeginTable("##cursors", 4, flags)) {
+                        ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Path", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Hotspot", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Standard", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableHeadersRow();
+
+                        for (const auto& [i, cursor]: enumerate(manager->getCursors())) {
+                            ImGui::TableNextRow();
+
+                            ImGui::TableSetColumnIndex(0);
+                            ImGui::Text("%lu", i);
+
+                            ImGui::TableSetColumnIndex(1);
+                            ImGui::Text("%s", cursor->getPath().empty() ? "Empty" : cursor->getPath().string().c_str());
+
+                            ImGui::TableSetColumnIndex(2);
+                            ImGui::TextUnformatted(me::enum_name(cursor->getHotspot()).data());
+
+                            ImGui::TableSetColumnIndex(3);
+                            ImGui::TextUnformatted(me::enum_name(cursor->getStandard()).data());
                         }
                         ImGui::EndTable();
                     }

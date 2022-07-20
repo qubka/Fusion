@@ -2,6 +2,7 @@
 #include "glfw_monitor.hpp"
 #include "glfw_window.hpp"
 #include "glfw_joystick.hpp"
+#include "glfw_cursor.hpp"
 
 using namespace glfw;
 
@@ -39,6 +40,11 @@ DeviceManager::DeviceManager() : fe::DeviceManager{} {
     auto glfwMonitors = glfwGetMonitors(&count);
     for (int i = 0; i < count; i++)
         monitors.push_back(std::make_unique<Monitor>(glfwMonitors[i]));
+
+    constexpr auto values = me::enum_values<fe::CursorStandard>();
+    for (auto& cursor : values) {
+        cursors.push_back(std::make_unique<Cursor>(cursor));
+    }
 }
 
 DeviceManager::~DeviceManager() {
@@ -46,6 +52,7 @@ DeviceManager::~DeviceManager() {
     windows.clear();
     monitors.clear();
     joysticks.clear();
+    cursors.clear();
 
     // Terminate GLFW
     glfwTerminate();
@@ -105,6 +112,12 @@ void DeviceManager::updateGamepadMappings(const std::string& mappings) {
 fe::Window* DeviceManager::createWindow(const fe::WindowInfo& windowInfo) {
     auto& it = windows.emplace_back(std::make_unique<glfw::Window>(getPrimaryMonitor()->getVideoMode(), windowInfo));
     onWindowCreate.publish(it.get(), true);
+    return it.get();
+}
+
+fe::Cursor* DeviceManager::createCursor(fs::path filepath, fe::CursorHotspot hotspot) {
+    auto& it = cursors.emplace_back(std::make_unique<glfw::Cursor>(std::move(filepath), hotspot));
+    onCursorCreate.publish(it.get(), true);
     return it.get();
 }
 

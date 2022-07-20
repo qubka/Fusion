@@ -10,6 +10,7 @@ namespace fe {
     };
 
     enum class CursorStandard {
+        None = 0,
         Arrow = 1,
         IBeam = 2,
         Crosshair = 3,
@@ -30,6 +31,24 @@ namespace fe {
         Cursor() = default;
         virtual ~Cursor() = default;
         NONCOPYABLE(Cursor);
+
+        /**
+         * Gets the cursor path to image.
+         * @return The cursor image.
+         */
+        virtual const fs::path& getPath() const = 0;
+
+        /**
+         * Gets the cursor hotspot.
+         * @return The cursor hotspot.
+         */
+        virtual CursorHotspot getHotspot() const = 0;
+
+        /**
+         * Gets the cursor standart.
+         * @return The cursor standart.
+         */
+        virtual CursorStandard getStandard() const = 0;
 
         /**
          * Gets the current cursor object.
