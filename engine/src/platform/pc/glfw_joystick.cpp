@@ -2,9 +2,7 @@
 
 using namespace glfw;
 
-Joystick::Joystick(uint8_t port)
-    : port{port}
-    , name{isGamePad() ? glfwGetGamepadName(port) : glfwGetJoystickName(port)} {
+Joystick::Joystick(uint8_t port) : port{port}, name{isGamePad() ? glfwGetGamepadName(port) : glfwGetJoystickName(port)} {
     // Validate whether the specified joystick is present.
     if (glfwJoystickPresent(port) == GLFW_FALSE)
         throw std::runtime_error("GLFW joystick failed to be identified");

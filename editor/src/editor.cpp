@@ -7,7 +7,6 @@
 #include "fusion/input/input.hpp"
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/cameras/camera.hpp"
-#include "fusion/graphics/cameras/perspective_camera.hpp"
 #include "fusion/scene/components.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/utils/enumerate.hpp"
@@ -42,7 +41,7 @@ void Editor::onStart() {
     Graphics::Get()->setRenderer(std::make_unique<EditorRenderer>());
 
     const auto& size = DeviceManager::Get()->getWindow(0)->getSize();
-    editorCamera = std::make_shared<PerspectiveCamera>();
+    editorCamera = std::make_shared<Camera>();
     //editorCamera->setAspectRatio(size.x / size.y);
     //editorCamera = std::make_shared<EditorCamera>();
 
@@ -239,8 +238,6 @@ void Editor::onImGuizmo() {
                         transform->setLocalScale(scale);
                         break;
                 }
-
-                //registry.patch<TransformComponent>(selectedEntity);
             }
 
             //transform->setLocalTransform(model);
@@ -477,15 +474,15 @@ void Editor::drawMenuBar() {
         }
 
         if (ImGui::BeginMenu("Scenes")) {
-            auto scenePath = projectSettings.projectRoot / "assets" / "scenes";
+            fs::path scenePath{ projectSettings.projectRoot / "assets" / "scenes" };
             if (fs::exists(scenePath)) {
                 for (const auto& entry : fs::directory_iterator(scenePath)) {
                     const auto& path = entry.path();
                     if (FileFormat::IsSceneFile(path)) {
-                        auto name = path.filename().replace_extension().string();
+                        std::string sceneName{ path.filename().replace_extension().string() };
                         auto sceneManager = SceneManager::Get();
-                        if (ImGui::MenuItem(name.c_str(), nullptr, name == sceneManager->getScene()->getName())) {
-                            auto scene = std::make_unique<Scene>(name);
+                        if (ImGui::MenuItem(sceneName.c_str(), nullptr, sceneName == sceneManager->getScene()->getName())) {
+                            auto scene = std::make_unique<Scene>(sceneName);
                             scene->deserialise();
                             sceneManager->setScene(std::move(scene));
                         }
@@ -530,60 +527,12 @@ void Editor::drawMenuBar() {
             ImGui::Separator();
 
             if (ImGui::BeginMenu("Style")) {
-                if (ImGui::MenuItem("Dark", "", editorSettings.theme == ImGuiUtils::Theme::Dark)) {
-                    editorSettings.theme = ImGuiUtils::Theme::Dark;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Dark);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
-                }
-                if (ImGui::MenuItem("Dracula", "", editorSettings.theme == ImGuiUtils::Theme::Dracula)) {
-                    editorSettings.theme = ImGuiUtils::Theme::Dracula;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Dracula);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
-                }
-                if (ImGui::MenuItem("Black", "", editorSettings.theme == ImGuiUtils::Theme::Black)) {
-                    editorSettings.theme = ImGuiUtils::Theme::Black;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Black);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
-                }
-                if (ImGui::MenuItem("Grey", "", editorSettings.theme == ImGuiUtils::Theme::Grey)) {
-                    editorSettings.theme = ImGuiUtils::Theme::Grey;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Grey);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
-                }
-                if (ImGui::MenuItem("Light", "", editorSettings.theme == ImGuiUtils::Theme::Light)) {
-                    editorSettings.theme = ImGuiUtils::Theme::Light;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Light);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
-                }
-                if (ImGui::MenuItem("Cherry", "", editorSettings.theme == ImGuiUtils::Theme::Cherry)) {
-                    editorSettings.theme = ImGuiUtils::Theme::Cherry;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Cherry);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
-                }
-                if (ImGui::MenuItem("Blue", "", editorSettings.theme == ImGuiUtils::Theme::Blue)) {
-                    editorSettings.theme = ImGuiUtils::Theme::Blue;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Blue);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
-                }
-                if (ImGui::MenuItem("Cinder", "", editorSettings.theme == ImGuiUtils::Theme::Cinder)) {
-                    editorSettings.theme = ImGuiUtils::Theme::Cinder;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Cinder);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
-                }
-                if (ImGui::MenuItem("Classic", "", editorSettings.theme == ImGuiUtils::Theme::Classic)) {
-                    editorSettings.theme = ImGuiUtils::Theme::Classic;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Classic);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
-                }
-                if (ImGui::MenuItem("ClassicDark", "", editorSettings.theme == ImGuiUtils::Theme::ClassicDark)) {
-                    editorSettings.theme = ImGuiUtils::Theme::ClassicDark;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::ClassicDark);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
-                }
-                if (ImGui::MenuItem("ClassicLight", "", editorSettings.theme == ImGuiUtils::Theme::ClassicLight)) {
-                    editorSettings.theme = ImGuiUtils::Theme::ClassicLight;
-                    ImGuiUtils::SetTheme(ImGuiUtils::Theme::ClassicLight);
-                    //setTitleBarColour(style.Colors[ImGuiCol_MenuBarBg]);
+                constexpr auto entries = me::enum_entries<ImGuiUtils::Theme>();
+                for (const auto& [type, title] : entries) {
+                    if (ImGui::MenuItem(title.data(), "", editorSettings.theme == type)) {
+                        editorSettings.theme = type;
+                        ImGuiUtils::SetTheme(type);
+                    }
                 }
                 ImGui::EndMenu();
             }
@@ -618,7 +567,10 @@ void Editor::drawMenuBar() {
 
         ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (1.5f * (ImGui::GetFontSize() + style.ItemSpacing.x)));
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.1f, 0.2f, 0.7f, 0.0f});
+        ImVec4 color{0.1f, 0.2f, 0.7f, 0.0f};
+        ImGui::PushStyleColor(ImGuiCol_Button, color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
 
         if (editorState == EditorState::Next)
             editorState = EditorState::Paused;
@@ -627,65 +579,42 @@ void Editor::drawMenuBar() {
 
         {
             selected = editorState == EditorState::Play;
-            if (selected)
-                ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
-
-            if (ImGui::Button(ICON_MDI_PLAY)) {
+            if (ImGuiUtils::ToggleButton(ICON_MDI_STEP_FORWARD, selected, true)) {
                 /*Application::Get().GetSystem<PhysicsEngine>()->SetPaused(selected);
                 Application::Get().GetSystem<AudioManager>()->UpdateListener(Application::Get().GetCurrentScene());
                 Application::Get().GetSystem<AudioManager>()->SetPaused(selected);*/
 
-                editorState = (selected ? EditorState::Preview : EditorState::Play);
-
+                editorState = selected ? EditorState::Play : EditorState::Preview;
                 selectedEntity = entt::null;
+
                 if (selected) {
-                    //ImGui::SetWindowFocus("###scene");
-                    //loadCachedScene();
-                } else {
                     //ImGui::SetWindowFocus("###game");
                     //cacheScene();
                     //Application::Get().GetCurrentScene()->OnInit();
+                } else {
+                    //ImGui::SetWindowFocus("###scene");
+                    //loadCachedScene();
                 }
             }
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Play");
-
-            if (selected)
-                ImGui::PopStyleColor();
+            ImGuiUtils::Tooltip("Play");
         }
 
         ImGui::SameLine();
 
         {
             selected = editorState == EditorState::Paused;
-            if (selected)
-                ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
-
-            if (ImGui::Button(ICON_MDI_PAUSE))
-                editorState = selected ? EditorState::Play : EditorState::Paused;
-
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Pause");
-
-            if (selected)
-                ImGui::PopStyleColor();
+            if (ImGuiUtils::ToggleButton(ICON_MDI_PAUSE, selected, true))
+                editorState = selected ? EditorState::Paused : EditorState::Play;
+            ImGuiUtils::Tooltip("Pause");
         }
 
         ImGui::SameLine();
 
         {
             selected = editorState == EditorState::Next;
-            if (selected)
-                ImGui::PushStyleColor(ImGuiCol_Text, ImGuiUtils::GetSelectedColor());
-
-            if (ImGui::Button(ICON_MDI_STEP_FORWARD))
+            if (ImGuiUtils::ToggleButton(ICON_MDI_STEP_FORWARD, selected, true))
                 editorState = EditorState::Next;
-
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Next");
-
-            if (selected)
-                ImGui::PopStyleColor();
+            ImGuiUtils::Tooltip("Next");
         }
 
         auto size = ImGui::CalcTextSize("%.2f ms (%.i FPS)");
@@ -693,7 +622,7 @@ void Editor::drawMenuBar() {
 
         ImGui::Text("%.2f ms (%.i FPS)", Time::DeltaTime().asMilliseconds(), Time::FramesPerSecond());
 
-        ImGui::PopStyleColor();
+        ImGui::PopStyleColor(3);
 
         //_____________________________________________________________________________________//
 
@@ -810,17 +739,12 @@ void Editor::drawMenuBar() {
         ImGui::Separator();
 
         if (ImGui::Button("OK", buttonSize)) {
-            /*std::string sceneName = "NewScene";
-            int sameNameCount = 0;
-            auto sceneNames = sceneManager->getSceneNames();
-
-            while (FileSystem::ExistsInPath("Scenes" / (sceneName + ".fsn"))) {
-                sameNameCount++;
-                sceneName = "NewScene(" + std::to_string(sameNameCount) + ")";
+            fs::path scenePath{ VirtualFileSystem::Get()->resolvePhysicalPath("Scenes") };
+            if (!scenePath.empty()) {
+                scenePath = FileFormat::GetNextFileName(scenePath);
+                std::string sceneName{ scenePath.filename().replace_extension().string() };
+                SceneManager::Get()->setScene(std::make_unique<Scene>(sceneName));
             }
-
-            sceneManager->setScene(std::make_unique<Scene>());*/
-
             ImGui::CloseCurrentPopup();
         }
         ImGui::SetItemDefaultFocus();
@@ -865,6 +789,15 @@ void Editor::fileOpenCallback(const fs::path& path) {
     } else if (FileFormat::IsModelFile(path)) {
     } else if (FileFormat::IsAudioFile(path)) {
     } else if (FileFormat::IsSceneFile(path)) {
+        /*auto sceneManager = SceneManager::Get()->getScene();
+        sceneManager->serialise();
+
+        auto scene = std::make_unique<Scene>(path.filename().string());
+        scene->deserialise();
+        sceneManager->setScene(std::move(scene));
+
+        sceneManager->deserialise(path);
+        sceneManager->serialise();*/
     } else if (FileFormat::IsTextureFile(path)) {
     }
 

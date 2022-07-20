@@ -3,9 +3,11 @@
 
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/images/image2d.hpp"
+#include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/devices/device_manager.hpp"
+#include "fusion/input/input.hpp"
+#include "fusion/grid/grid_subrender.hpp"
 
 using namespace fe;
 
@@ -42,61 +44,58 @@ void SceneViewPanel::onImGui() {
         return;
     }
 
-    ImVec2 offset = ImGui::GetCursorPos(); // Usually ImVec2{0.0f, 50.0f};
-
     ImGuizmo::SetDrawlist();
-    auto sceneViewSize = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin() - offset * 0.5f; // - offset * 0.5f;
-    auto sceneViewPosition = ImGui::GetWindowPos() + offset;
 
-    sceneViewSize.x -= static_cast<int>(sceneViewSize.x) % 2 != 0 ? 1.0f : 0.0f;
-    sceneViewSize.y -= static_cast<int>(sceneViewSize.y) % 2 != 0 ? 1.0f : 0.0f;
+    // TODO:: Refactor
+    ImVec2 viewportOffset = ImGui::GetCursorPos();
+    ImVec2 viewportSize = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin() - viewportOffset * 0.5f; // - offset * 0.5f;
+    ImVec2 viewportPos = ImGui::GetWindowPos() + viewportOffset;
 
-    float aspect = static_cast<float>(sceneViewSize.x) / static_cast<float>(sceneViewSize.y);
+    viewportSize.x -= static_cast<int>(viewportSize.x) % 2 != 0 ? 1.0f : 0.0f;
+    viewportSize.y -= static_cast<int>(viewportSize.y) % 2 != 0 ? 1.0f : 0.0f;
 
-    if (glm::epsilonEqual(aspect, camera->getAspectRatio(), FLT_EPSILON)) {
-        camera->setAspectRatio(aspect);
-    }
+    float aspect = static_cast<float>(viewportSize.x) / static_cast<float>(viewportSize.y);
+    camera->setAspectRatio(aspect);
 
-    editor->setSceneViewPanelPosition({sceneViewPosition.x, sceneViewPosition.y});
+    editor->setSceneViewPanelPosition({ viewportPos.x, viewportPos.y});
 
     bool halfRes = editor->getSettings().halfRes;
 
     if (halfRes)
-        sceneViewSize *= 0.5f;
+        viewportSize *= 0.5f;
 
     //resize({sceneViewSize.x, sceneViewSize.y});
 
     if (halfRes)
-        sceneViewSize *= 2.0f;
+        viewportSize *= 2.0f;
 
     static uint32_t id = 1; // custom image
-    ImGuiUtils::Image(&id, glm::vec2{ sceneViewSize.x, sceneViewSize.y }, true);
+    ImGuiUtils::Image(&id, { viewportSize.x, viewportSize.y }, true);
 
     auto windowSize = ImGui::GetWindowSize();
 
-    ImVec2& minBound = sceneViewPosition;
+    ImVec2& minBound = viewportPos;
     ImVec2  maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
 
     bool updateCamera = ImGui::IsMouseHoveringRect(minBound, maxBound); // || Input::Get().GetMouseMode() == MouseMode::Captured;
 
     editor->setSceneActive(ImGui::IsWindowFocused() && !ImGuizmo::IsUsing() && updateCamera);
 
-    ImGuizmo::SetRect(sceneViewPosition.x, sceneViewPosition.y, sceneViewSize.x, sceneViewSize.y);
+    ImGuizmo::SetRect(viewportPos.x, viewportPos.y, viewportSize.x, viewportSize.y);
 
     editor->setSceneViewActive(updateCamera);
 
-    ImGui::GetWindowDrawList()->PushClipRect(sceneViewPosition, { sceneViewSize.x + sceneViewPosition.x, sceneViewSize.y + sceneViewPosition.y - 2.0f });
+    ImGui::GetWindowDrawList()->PushClipRect(viewportPos, { viewportSize.x + viewportPos.x, viewportSize.y + viewportPos.y - 2.0f });
 
     editor->onImGuizmo();
 
-    //auto window = DeviceManager::Get()->getWindow(0);
+    auto input = Input::Get();
+    if (updateCamera && editor->isSceneActive() && !ImGuizmo::IsUsing() && input->getMouseButton(MouseButton::ButtonLeft)) {
+        auto clickPos = input->getMousePosition() - glm::vec2{viewportPos.x, viewportPos.y};
 
-    /*if (updateCamera && editor->isSceneActive() && !ImGuizmo::IsUsing() && !!window->getMouseButton(MouseButton::ButtonLeft)) {
-        auto clickPos = window->getMousePosition() - glm::vec2{sceneViewPosition.x / dpi, sceneViewPosition.y / dpi};
-
-        Ray ray = editor->getScreenRay(int(clickPos.x), int(clickPos.y), camera, int(sceneViewSize.x / dpi), int(sceneViewSize.y / dpi));
-        editor->selectObject(ray);
-    }*/
+        Ray ray = camera->screenPointToRay(clickPos, { viewportSize.x, viewportSize.y });
+        //editor->selectObject(ray);
+    }
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM", ImGuiDragDropFlags_AcceptNoDrawDefaultRect)) {
@@ -105,7 +104,7 @@ void SceneViewPanel::onImGui() {
         ImGui::EndDragDropTarget();
     }
 
-    drawGizmos(scene->getRegistry(), *camera, {sceneViewSize.x, sceneViewSize.y}, {offset.x, offset.y});
+    drawGizmos(scene->getRegistry(), *camera, { viewportSize.x, viewportSize.y}, { viewportOffset.x, viewportOffset.y});
 
     ImGui::PopStyleVar();
     ImGui::End();
@@ -117,16 +116,11 @@ void SceneViewPanel::drawToolBar() {
     bool selected = false;
 
     {
-        selected = editor->getSettings().gizmosOperation == 4; // TODO:
-        if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
+        selected = editor->getSettings().gizmosOperation == UINT32_MAX;
         ImGui::SameLine();
-        if (ImGui::Button(ICON_MDI_CURSOR_DEFAULT))
-            editor->getSettings().gizmosOperation = 4;
-
-        if (selected)
-            ImGui::PopStyleColor();
-        ImGuiUtils::Tooltip("Select");
+        if (ImGuiUtils::ToggleButton(ICON_MDI_CURSOR_DEFAULT, selected))
+            editor->getSettings().gizmosOperation = UINT32_MAX;
+        ImGuiUtils::Tooltip("Select mode");
     }
 
     ImGui::SameLine();
@@ -135,43 +129,26 @@ void SceneViewPanel::drawToolBar() {
 
     {
         selected = editor->getSettings().gizmosOperation == ImGuizmo::TRANSLATE;
-        if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
         ImGui::SameLine();
-        if (ImGui::Button(ICON_MDI_ARROW_ALL))
+        if (ImGuiUtils::ToggleButton(ICON_MDI_ARROW_ALL, selected))
             editor->getSettings().gizmosOperation = ImGuizmo::TRANSLATE;
-
-        if (selected)
-            ImGui::PopStyleColor();
-        ImGuiUtils::Tooltip("Translate");
+        ImGuiUtils::Tooltip("Translation mode");
     }
 
     {
         selected = editor->getSettings().gizmosOperation == ImGuizmo::ROTATE;
-        if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
-
         ImGui::SameLine();
-        if (ImGui::Button(ICON_MDI_ROTATE_ORBIT))
+        if (ImGuiUtils::ToggleButton(ICON_MDI_ROTATE_3D, selected))
             editor->getSettings().gizmosOperation = ImGuizmo::ROTATE;
-
-        if (selected)
-            ImGui::PopStyleColor();
-        ImGuiUtils::Tooltip("Rotate");
+        ImGuiUtils::Tooltip("Rotatation mode");
     }
 
     {
         selected = editor->getSettings().gizmosOperation == ImGuizmo::SCALE;
-        if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
-
         ImGui::SameLine();
-        if (ImGui::Button(ICON_MDI_ARROW_EXPAND_ALL))
+        if (ImGuiUtils::ToggleButton(ICON_MDI_ARROW_EXPAND_ALL, selected))
             editor->getSettings().gizmosOperation = ImGuizmo::SCALE;
-
-        if (selected)
-            ImGui::PopStyleColor();
-        ImGuiUtils::Tooltip("Scale");
+        ImGuiUtils::Tooltip("Scaling mode");
     }
 
     ImGui::SameLine();
@@ -180,16 +157,10 @@ void SceneViewPanel::drawToolBar() {
 
     {
         selected = editor->getSettings().gizmosOperation == ImGuizmo::UNIVERSAL;
-        if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
-
         ImGui::SameLine();
-        if (ImGui::Button(ICON_MDI_CROP_ROTATE))
+        if (ImGuiUtils::ToggleButton(ICON_MDI_CROP_ROTATE, selected))
             editor->getSettings().gizmosOperation = ImGuizmo::UNIVERSAL;
-
-        if (selected)
-            ImGui::PopStyleColor();
-        ImGuiUtils::Tooltip("Universal");
+        ImGuiUtils::Tooltip("Universal mode");
     }
 
     ImGui::SameLine();
@@ -198,35 +169,110 @@ void SceneViewPanel::drawToolBar() {
 
     {
         selected = editor->getSettings().gizmosOperation == ImGuizmo::BOUNDS;
-        if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
-
         ImGui::SameLine();
-        if (ImGui::Button(ICON_MDI_BORDER_NONE))
+        if (ImGuiUtils::ToggleButton(ICON_MDI_BORDER_NONE, selected))
             editor->getSettings().gizmosOperation = ImGuizmo::BOUNDS;
-
-        if (selected)
-            ImGui::PopStyleColor();
-        ImGuiUtils::Tooltip("Bounds");
+        ImGuiUtils::Tooltip("Bounds mode");
     }
 
     ImGui::SameLine();
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
     ImGui::SameLine();
 
-    ImGui::SameLine();
     {
-        selected = (editor->getSettings().snapGizmos == true);
+        selected = editor->getSettings().snapGizmos;
+        ImGui::SameLine();
+        if (ImGuiUtils::ToggleButton(ICON_MDI_MAGNET, selected))
+            editor->getSettings().snapGizmos = selected;
+        ImGuiUtils::Tooltip("Snap enable");
+    }
 
-        if (selected)
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
+    ImGui::SameLine();
+    ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+    ImGui::SameLine();
 
-        if (ImGui::Button(ICON_MDI_MAGNET))
-            editor->getSettings().snapGizmos = !selected;
+    {
+        selected = editor->getSettings().showGrid;
+        ImGui::SameLine();
+        if (ImGuiUtils::ToggleButton(selected ? ICON_MDI_GRID : ICON_MDI_GRID_OFF, selected)) {
+            editor->getSettings().showGrid = selected;
+            Graphics::Get()->getRenderer()->getSubrender<GridSubrender>()->setEnabled(selected);
+        }
+        ImGuiUtils::Tooltip("Toggle visibility of the grid");
+    }
 
-        if (selected)
-            ImGui::PopStyleColor();
-        ImGuiUtils::Tooltip("Snap");
+    ImGui::SameLine();
+    ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+    ImGui::SameLine();
+
+    {
+        // Editor Camera Modes
+        auto& camera = *editor->getCamera();
+        bool ortho = camera.isOrthographic();
+
+        selected = !ortho;
+        if (ImGuiUtils::ToggleButton(ICON_MDI_AXIS_ARROW " 3D", selected)) {
+            if (ortho) {
+                camera.setOrthographic(false);
+            }
+        }
+
+        ImGui::SameLine();
+
+        selected = ortho;
+        if (ImGuiUtils::ToggleButton(ICON_MDI_ANGLE_RIGHT "2D", selected)) {
+            if (!ortho) {
+                camera.setOrthographic(true);
+                camera.lookAt(glm::vec3{ 0, 1, 0 }, vec3::zero, vec3::up);
+            }
+        }
+    }
+
+    ImGui::SameLine();
+    ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+
+    // TODO: Edit if needed
+    float xAvail = ImGui::GetContentRegionAvail().x;
+    ImGui::SameLine(xAvail > 500.0f ? xAvail - 120.0f : 0.0f);
+
+    if (ImGui::Button(ICON_MDI_CAMERA_WIRELESS " " ICON_MDI_CHEVRON_DOWN)) {
+        ImGui::OpenPopup("CameraPopup");
+    }
+
+    if (ImGui::BeginPopup("CameraPopup", ImGuiWindowFlags_AlwaysAutoResize)) {
+        {
+            // Editor Camera Settings
+            auto& camera = *editor->getCamera();
+            bool ortho = camera.isOrthographic();
+
+            ImGui::Dummy({200.0f, 0.0f});  // fix resize
+            ImGui::TextUnformatted(" Scene camera");
+            ImGui::Separator();
+
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+            ImGui::Columns(2);
+            ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+
+            float fov = camera.getFov();
+            if (ImGuiUtils::Property("Fov", fov, 1.0f, 120.0f, 1.0f, ortho ? ImGuiUtils::PropertyFlag::ReadOnly :  ImGuiUtils::PropertyFlag::None)) {
+                camera.setFov(fov);
+            }
+
+            float nearClip = camera.getNearClip();
+            if (ImGuiUtils::Property("Near Clip", nearClip, 0.0f, 10.0f)) {
+                camera.setNearClip(nearClip);
+            }
+
+            float farClip = camera.getFarClip();
+            if (ImGuiUtils::Property("Far Clip", farClip, 10.0f, 10000.0f)) {
+                camera.setFarClip(farClip);
+            }
+
+            ImGui::Columns(1);
+            ImGui::PopStyleVar();
+
+            ImGui::EndPopup();
+        }
     }
 
     ImGui::SameLine();
@@ -235,11 +281,9 @@ void SceneViewPanel::drawToolBar() {
 
     if (ImGui::Button("Gizmos " ICON_MDI_CHEVRON_DOWN))
         ImGui::OpenPopup("GizmosPopup");
-    if (ImGui::BeginPopup("GizmosPopup")) {
+    if (ImGui::BeginPopup("GizmosPopup", ImGuiWindowFlags_AlwaysAutoResize)) {
         {
-            //ImGui::Checkbox("Grid", &m_Editor->ShowGrid());
-           // ImGui::Checkbox("Selected Gizmos", &m_Editor->ShowGizmos());
-            //ImGui::Checkbox("View Selected", &m_Editor->ShowViewSelected());
+            ImGui::Checkbox("Selected Gizmos", &editor->getSettings().showGizmos);
 
             ImGui::Separator();
             ImGui::Checkbox("Camera", &showComponentGizmosMap[typeid(CameraComponent)]);
@@ -408,38 +452,6 @@ void SceneViewPanel::drawToolBar() {
             ImGui::EndPopup();
         }
     }
-
-    ImGui::SameLine();
-    ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
-    ImGui::SameLine();
-    // Editor Camera Settings
-
-    auto& camera = *editor->getCamera();
-    bool ortho = camera.isOrthographic();
-
-    selected = !ortho;
-    if (selected)
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
-    if (ImGui::Button(ICON_MDI_AXIS_ARROW " 3D")) {
-        if (ortho) {
-
-        }
-    }
-
-    if (selected)
-        ImGui::PopStyleColor();
-    ImGui::SameLine();
-
-    selected = ortho;
-    if (selected)
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
-    if (ImGui::Button(ICON_MDI_ANGLE_RIGHT "2D")) {
-        if (!ortho) {
-            // TODO:: Switch camera
-        }
-    }
-    if (selected)
-        ImGui::PopStyleColor();
 
     ImGui::PopStyleColor();
     ImGui::Unindent();

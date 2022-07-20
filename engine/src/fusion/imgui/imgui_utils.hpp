@@ -7,9 +7,9 @@
 #include <imgui/imgui_internal.h>
 
 namespace fe {
-    class Image2d;
-    class Image2dArray;
-    class ImageCube;
+    class Texture2d;
+    class Texture2dArray;
+    class TextureCube;
 }
 
 using namespace fe;
@@ -40,21 +40,23 @@ namespace ImGuiUtils {
     BITMASK_DEFINE_MAX_ELEMENT(PropertyFlag, SliderValue);
 
     void Tooltip(const std::string& text);
-    void Tooltip(const char* text);
 
-    void Tooltip(Image2d* texture, const glm::vec2& size, bool flipImage = false);
-    void Tooltip(Image2d* texture, const glm::vec2& size, const std::string& text, bool flipImage = false);
-    void Tooltip(Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
+    void Tooltip(Texture2d* texture, const glm::vec2& size, bool flipImage = false);
+    void Tooltip(Texture2d* texture, const glm::vec2& size, const std::string& text, bool flipImage = false);
+    void Tooltip(Texture2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
 
-    void Image(Image2d* texture, const glm::vec2& size, bool flipImage = false);
-    void Image(ImageCube* texture, const glm::vec2& size, bool flipImage = false);
-    void Image(Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
+    void Image(Texture2d* texture, const glm::vec2& size, bool flipImage = false);
+    void Image(TextureCube* texture, const glm::vec2& size, bool flipImage = false);
+    void Image(Texture2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
     void Image(uint32_t* texture_id, const glm::vec2& size, bool flipImage = false);
 
     void SetTheme(Theme theme);
 
-    bool BufferingBar(const std::string& name, float value, const glm::vec2& size_arg, uint32_t bg_col, uint32_t fg_col);
-    bool Spinner(const std::string& name, float radius, int thickness, uint32_t color);
+    bool BufferingBar(const char* str_id, float value, const glm::vec2& size_arg, uint32_t bg_col, uint32_t fg_col);
+    bool Spinner(const char* str_id, float radius, int thickness, uint32_t color);
+
+    bool ToggleRoundButton(const char* str_id, bool& value);
+    bool ToggleButton(const char* str_id, bool& value, bool text_style = false); // if text true, select text on active
 
     void DrawRowsBackground(int row_count, float line_height, float x1, float x2, float y_offset, uint32_t col_even, uint32_t col_odd);
 
@@ -220,7 +222,7 @@ namespace ImGuiUtils {
 
         ImGuiDataType_ dataType = GetDataType<T>();
         float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
-        ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+        ImVec2 buttonSize{ lineHeight + 3.0f, lineHeight };
 
         ImGui::PushMultiItemsWidths(L, ImGui::GetColumnWidth() - L * lineHeight); // ImGui::CalcItemWidth()
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });

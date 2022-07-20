@@ -6,9 +6,9 @@
 using namespace fe;
 
 DescriptorSet::DescriptorSet(const Pipeline& pipeline)
-    : pipelineLayout{pipeline.getPipelineLayout()}
-    , pipelineBindPoint{pipeline.getPipelineBindPoint()}
-    , descriptorPool{pipeline.getDescriptorPool()} {
+        : pipelineLayout{pipeline.getPipelineLayout()}
+        , pipelineBindPoint{pipeline.getPipelineBindPoint()}
+        , descriptorPool{pipeline.getDescriptorPool()} {
 	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
 	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};

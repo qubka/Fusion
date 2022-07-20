@@ -18,7 +18,9 @@ using namespace fe;
 
 Engine* Engine::Instance = nullptr;
 
-Engine::Engine(CommandLineArgs args) : commandLineArgs{std::move(args)}, version{FUSION_VERSION_VARIANT, FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
+Engine::Engine(CommandLineArgs args)
+        : commandLineArgs{std::move(args)}
+        , version{FUSION_VERSION_VARIANT, FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
     Instance = this;
 
     Log::Init();

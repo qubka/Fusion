@@ -11,17 +11,17 @@ Bitmap::Bitmap(const fs::path& filepath) {
 }
 
 Bitmap::Bitmap(const glm::uvec2& size, uint8_t components, bool hdr)
-    : size{size}
-    , components{components}
-    , hdr{hdr}
-    , data{std::make_unique<uint8_t[]>(CalculateLength(size, components, hdr))} {
+        : size{size}
+        , components{components}
+        , hdr{hdr}
+        , data{std::make_unique<uint8_t[]>(CalculateLength(size, components, hdr))} {
 }
 
 Bitmap::Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, uint8_t components, bool hdr)
-    : size{size}
-    , components{components}
-    , hdr{hdr}
-    , data{std::move(data)} {
+        : size{size}
+        , components{components}
+        , hdr{hdr}
+        , data{std::move(data)} {
 }
 
 void Bitmap::load(const fs::path& filepath) {

@@ -2,8 +2,8 @@
 #include "graphics.hpp"
 
 #include "fusion/devices/device_manager.hpp"
-#include "fusion/graphics/images/image_depth.hpp"
-#include "fusion/graphics/images/image2d.hpp"
+#include "fusion/graphics/textures/image_depth.hpp"
+#include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/graphics/renderpass/framebuffers.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
 #include "fusion/graphics/renderpass/swapchain.hpp"
@@ -12,11 +12,11 @@
 using namespace fe;
 
 RenderStage::RenderStage(std::vector<Attachment> images, std::vector<SubpassType> subpasses, const Viewport& viewport)
-    : attachments{std::move(images)}
-    , subpasses{std::move(subpasses)}
-    , viewport{viewport}
-    , subpassAttachmentCount(this->subpasses.size())
-    , subpassMultisampled(this->subpasses.size()) {
+        : attachments{std::move(images)}
+        , subpasses{std::move(subpasses)}
+        , viewport{viewport}
+        , subpassAttachmentCount(this->subpasses.size())
+        , subpassMultisampled(this->subpasses.size()) {
 	for (const auto& image : attachments) {
 		VkClearValue clearValue = {};
 

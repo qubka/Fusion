@@ -3,8 +3,7 @@
 
 using namespace fe;
 
-Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& renderStage, VkFormat depthFormat, VkFormat surfaceFormat, VkSampleCountFlagBits samples)
-    : logicalDevice{logicalDevice} {
+Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& renderStage, VkFormat depthFormat, VkFormat surfaceFormat, VkSampleCountFlagBits samples) : logicalDevice{logicalDevice} {
 	// Creates the renderpasses attachment descriptions,
 	std::vector<VkAttachmentDescription> attachmentDescriptions;
     attachmentDescriptions.reserve(renderStage.getAttachments().size());

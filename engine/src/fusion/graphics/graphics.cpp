@@ -7,7 +7,7 @@
 #include "fusion/graphics/renderpass/framebuffers.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
 #include "fusion/graphics/commands/command_pool.hpp"
-#include "fusion/graphics/images/image_depth.hpp"
+#include "fusion/graphics/textures/image_depth.hpp"
 #include "fusion/graphics/render_stage.hpp"
 #include "fusion/graphics/renderer.hpp"
 #include "fusion/graphics/subrender.hpp"
@@ -224,7 +224,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
 
     VkImage dstImage;
     VkDeviceMemory dstImageMemory;
-    auto supportsBlit = Image::CopyImage(swapchains[id]->getActiveImage(), dstImage, dstImageMemory, surfaces[id]->getFormat().format, {size.x, size.y, 1}, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
+    auto supportsBlit = Image::CopyImage(swapchains[id]->getActiveImage(), dstImage, dstImageMemory, surfaces[id]->getFormat().format, { size.x, size.y, 1}, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
 
     // Get layout of the image (including row pitch)
     VkImageSubresource imageSubresource = {};

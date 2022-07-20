@@ -30,23 +30,32 @@ void EditorCameraController::handleMouse(Camera& camera, float dt) {
     const glm::vec2& pos = Input::Get()->getMousePosition();
     auto window = DeviceManager::Get()->getWindow(0);
 
+    static bool mouseHeld = false;
+    if (Input::Get()->getMouseButtonDown(MouseButton::ButtonRight)) {
+        mouseHeld = true;
+        window->setCursorHidden(true);
+        //window->setCursor(manager->getCursor(static_cast<size_t>(CursorStandard::Crosshair)));
+        storedCursorPos = pos;
+        previousCurserPos = storedCursorPos;
+    }
+
     if (camera.isOrthographic()) {
         if (Input::Get()->getMouseButton(MouseButton::ButtonRight)) {
             mouseSensitivity = 0.0005f;
             glm::vec3 position = camera.getEyePoint();
-            position.x -= (pos.x - previousCurserPos.x) * /*camera.getScale() **/ mouseSensitivity * 0.5f;
-            position.y += (pos.y - previousCurserPos.y) * /*camera.getScale() **/ mouseSensitivity * 0.5f;
+            position.x -= (pos.x - previousCurserPos.x) * /*camera.getScale() **/ mouseSensitivity * 10.0f;
+            position.z -= (pos.y - previousCurserPos.y) * /*camera.getScale() **/ mouseSensitivity * 10.0f;
             camera.setEyePoint(position);
+            previousCurserPos = pos;
+        } else {
+            if (mouseHeld) {
+                mouseHeld = false;
+                window->setCursorHidden(false);
+                //window->setCursor(nullptr);
+                window->setMousePosition(storedCursorPos);
+            }
         }
     } else {
-        static bool mouseHeld = false;
-        if (Input::Get()->getMouseButtonDown(MouseButton::ButtonRight)) {
-            mouseHeld = true;
-            window->setCursorHidden(true);
-            storedCursorPos = pos;
-            previousCurserPos = storedCursorPos;
-        }
-
         if (Input::Get()->getMouseButton(MouseButton::ButtonRight)) {
             mouseSensitivity = 0.0002f;
             rotateVelocity = glm::vec2{(pos.x - previousCurserPos.x), (pos.y - previousCurserPos.y)} * mouseSensitivity * 10.0f;
@@ -54,6 +63,7 @@ void EditorCameraController::handleMouse(Camera& camera, float dt) {
             if (mouseHeld) {
                 mouseHeld = false;
                 window->setCursorHidden(false);
+                //window->setCursor(nullptr);
                 window->setMousePosition(storedCursorPos);
             }
         }

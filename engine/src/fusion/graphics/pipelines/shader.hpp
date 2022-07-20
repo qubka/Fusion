@@ -41,7 +41,7 @@ namespace fe {
         void createReflection();
 
         const std::string& getName() const { return name; }
-        uint32_t GetLastDescriptorBinding() const { return lastDescriptorBinding; }
+        uint32_t getLastDescriptorBinding() const { return lastDescriptorBinding; }
         const std::unordered_map<std::string, Uniform>& getUniforms() const { return uniforms; };
         const std::unordered_map<std::string, UniformBlock>& getUniformBlocks() const { return uniformBlocks; };
         const std::unordered_map<std::string, Attribute>& getAttributes() const { return attributes; };

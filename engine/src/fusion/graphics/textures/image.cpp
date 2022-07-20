@@ -10,16 +10,15 @@ using namespace fe;
 constexpr static float ANISOTROPY = 16.0f;
 
 Image::Image(VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, VkImageLayout layout,
-			 VkImageUsageFlags usage, VkFormat format, uint32_t mipLevels, uint32_t arrayLayers, const VkExtent3D& extent)
-    : extent{extent}
-    , samples{samples}
-    , usage{usage}
-    , format{format}
-    , mipLevels{mipLevels}
-    , arrayLayers{arrayLayers}
-    , filter{filter}
-    , addressMode{addressMode}
-    , layout{layout} {
+             VkImageUsageFlags usage, VkImageViewType viewType, VkFormat format, const VkExtent3D& extent)
+		: extent{extent}
+		, samples{samples}
+		, usage{usage}
+		, format{format}
+		, filter{filter}
+        , addressMode{addressMode}
+        , viewType{viewType}
+        , layout{layout} {
 }
 
 Image::~Image() {
@@ -87,7 +86,7 @@ std::unique_ptr<Bitmap> Image::getBitmap(uint32_t mipLevel, uint32_t arrayLayer)
 	return bitmap;
 }
 
-uint32_t Image::getMipLevels(const VkExtent3D& extent) {
+uint32_t Image::GetMipLevels(const VkExtent3D& extent) {
 	return static_cast<uint32_t>(std::floor(std::log2(std::max(extent.width, std::max(extent.height, extent.depth)))) + 1);
 }
 
@@ -130,7 +129,7 @@ bool Image::HasStencil(VkFormat format) {
 }
 
 void Image::CreateImage(VkImage& image, VkDeviceMemory& memory, const VkExtent3D& extent, VkFormat format, VkSampleCountFlagBits samples,
-	VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, uint32_t mipLevels, uint32_t arrayLayers, VkImageType type) {
+                        VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, uint32_t mipLevels, uint32_t arrayLayers, VkImageType type) {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
 	VkImageCreateInfo imageCreateInfo = {};
@@ -185,7 +184,7 @@ void Image::CreateImageSampler(VkSampler& sampler, VkFilter filter, VkSamplerAdd
 }
 
 void Image::CreateImageView(const VkImage& image, VkImageView& imageView, VkImageViewType type, VkFormat format, VkImageAspectFlags imageAspect,
-	uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer) {
+                            uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer) {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
 	VkImageViewCreateInfo imageViewCreateInfo = {};
@@ -203,7 +202,7 @@ void Image::CreateImageView(const VkImage& image, VkImageView& imageView, VkImag
 }
 
 void Image::CreateMipmaps(const VkImage& image, const VkExtent3D& extent, VkFormat format, VkImageLayout dstImageLayout, uint32_t mipLevels,
-	uint32_t baseArrayLayer, uint32_t layerCount) {
+                          uint32_t baseArrayLayer, uint32_t layerCount) {
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
 
 	// Get device properites for the requested Image format.
@@ -283,7 +282,7 @@ void Image::CreateMipmaps(const VkImage& image, const VkExtent3D& extent, VkForm
 }
 
 void Image::TransitionImageLayout(const VkImage& image, VkFormat format, VkImageLayout srcImageLayout, VkImageLayout dstImageLayout,
-	VkImageAspectFlags imageAspect, uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer) {
+                                  VkImageAspectFlags imageAspect, uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer) {
 	CommandBuffer commandBuffer;
 
 	VkImageMemoryBarrier imageMemoryBarrier = {};
@@ -358,8 +357,8 @@ void Image::TransitionImageLayout(const VkImage& image, VkFormat format, VkImage
 }
 
 void Image::InsertImageMemoryBarrier(const CommandBuffer& commandBuffer, const VkImage& image, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask,
-	VkImageLayout oldImageLayout, VkImageLayout newImageLayout, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask,
-	VkImageAspectFlags imageAspect, uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer) {
+                                     VkImageLayout oldImageLayout, VkImageLayout newImageLayout, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask,
+                                     VkImageAspectFlags imageAspect, uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer) {
 	VkImageMemoryBarrier imageMemoryBarrier = {};
 	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 	imageMemoryBarrier.srcAccessMask = srcAccessMask;
@@ -396,7 +395,7 @@ void Image::CopyBufferToImage(const VkBuffer& buffer, const VkImage& image, cons
 }
 
 bool Image::CopyImage(const VkImage& srcImage, VkImage& dstImage, VkDeviceMemory& dstImageMemory, VkFormat srcFormat, const VkExtent3D& extent,
-	VkImageLayout srcImageLayout, uint32_t mipLevel, uint32_t arrayLayer) {
+                      VkImageLayout srcImageLayout, uint32_t mipLevel, uint32_t arrayLayer) {
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
 	auto swapchain = Graphics::Get()->getSwapchain(0); /// TODO:: WTF
 

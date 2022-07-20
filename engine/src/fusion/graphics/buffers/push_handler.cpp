@@ -9,9 +9,9 @@ PushHandler::PushHandler(bool multipipeline) : multipipeline{multipipeline} {
 }
 
 PushHandler::PushHandler(const Shader::UniformBlock& uniformBlock, bool multipipeline)
-    : multipipeline{multipipeline}
-    , uniformBlock{uniformBlock}
-    , data{std::make_unique<char[]>(this->uniformBlock->getSize())} {
+        : multipipeline{multipipeline}
+        , uniformBlock{uniformBlock}
+        , data{std::make_unique<char[]>(this->uniformBlock->getSize())} {
 }
 
 bool PushHandler::update(const std::optional<Shader::UniformBlock>& uniformBlock) {

@@ -7,7 +7,7 @@
 
 namespace fe {
     class Buffer;
-    class ImageCube;
+    class TextureCube;
     class SkyboxSubrender final : public Subrender {
     public:
         explicit SkyboxSubrender(const Pipeline::Stage& pipelineStage);
@@ -24,6 +24,6 @@ namespace fe {
         std::unique_ptr<Buffer> vertexBuffer;
         std::unique_ptr<Buffer> indexBuffer;
 
-        std::unique_ptr<ImageCube> skyboxSampler;
+        std::unique_ptr<TextureCube> skyboxSampler;
     };
 }

@@ -9,9 +9,9 @@
 using namespace fe;
 
 Surface::Surface(const Instance& instance, const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Window& window)
-    : instance{instance}
-    , physicalDevice{physicalDevice}
-    , window{window} {
+        : instance{instance}
+        , physicalDevice{physicalDevice}
+        , window{window} {
     // Creates the surface
     VK_CHECK(window.createSurface(instance, nullptr, &surface));
 

@@ -1,7 +1,7 @@
 #include "imgui_object.hpp"
 
 #include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/images/image2d.hpp"
+#include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/descriptors/descriptors_handler.hpp"
 #include "fusion/graphics/buffers/push_handler.hpp"

@@ -197,10 +197,10 @@ void ConsolePanel::renderMessages() {
 }
 
 ConsolePanel::Message::Message(std::string message, MessageLevel level, std::string source)
-    : message{std::move(message)}
-    , level{level}
-    , source{std::move(source)}
-    , messageID{MessageID++} {
+        : message{std::move(message)}
+        , level{level}
+        , source{std::move(source)}
+        , messageID{MessageID++} {
 }
 
 ConsolePanel::Message::~Message() {

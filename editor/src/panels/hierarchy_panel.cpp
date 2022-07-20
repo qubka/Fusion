@@ -85,7 +85,7 @@ void HierarchyPanel::onImGui() {
             ImGui::OpenPopup("AddEntity");
         }
 
-        if (ImGui::BeginPopup("AddEntity")) {
+        if (ImGui::BeginPopup("AddEntity", ImGuiWindowFlags_AlwaysAutoResize)) {
             addEntity();
             ImGui::EndPopup();
         }
@@ -445,7 +445,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
 
                 ImGui::Unindent(10.0f);
 
-                const ImRect childRect = ImRect{ currentPos, currentPos + ImVec2{0.0f, ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y} };
+                ImRect childRect{ currentPos, currentPos + ImVec2{0.0f, ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y} };
 
                 const float midpoint = (childRect.Min.y + childRect.Max.y) * 0.5f;
                 drawList->AddLine(ImVec2{verticalLineStart.x, midpoint},

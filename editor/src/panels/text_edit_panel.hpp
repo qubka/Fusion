@@ -18,7 +18,7 @@ namespace fe {
 
     private:
         ImGui::TextEditor textEditor;
-        fs::path filePath;
+        fs::path path;
         std::function<void()> callback;
     };
 }

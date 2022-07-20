@@ -10,26 +10,26 @@ using namespace fe;
 PipelineGraphics::PipelineGraphics(Stage stage, std::vector<fs::path> shaderStages, std::vector<Vertex::Input> vertexInputs, std::vector<Shader::Define> defines,
 	Mode mode, Depth depth, VkPrimitiveTopology topology, VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace, Blend blend, bool depthBiasEnabled,
     float depthBiasConstantFactor, float depthBiasSlopeFactor, float depthBiasClamp, float lineWidth, bool transparencyEnabled, bool pushDescriptors)
-    : shader{}
-    , stage{std::move(stage)}
-    , shaderStages{std::move(shaderStages)}
-    , vertexInputs{std::move(vertexInputs)}
-    , defines{std::move(defines)}
-    , mode{mode}
-    , depth{depth}
-    , topology{topology}
-    , polygonMode{polygonMode}
-    , cullMode{cullMode}
-    , frontFace{frontFace}
-    , blend{blend}
-    , depthBiasEnabled{depthBiasEnabled}
-    , depthBiasConstantFactor{depthBiasConstantFactor}
-    , depthBiasSlopeFactor{depthBiasSlopeFactor}
-    , depthBiasClamp{depthBiasClamp}
-    , lineWidth{lineWidth}
-    , transparencyEnabled{transparencyEnabled}
-    , pushDescriptors{pushDescriptors}
-    , pipelineBindPoint{VK_PIPELINE_BIND_POINT_GRAPHICS} {
+        : shader{}
+        , stage{std::move(stage)}
+        , shaderStages{std::move(shaderStages)}
+        , vertexInputs{std::move(vertexInputs)}
+        , defines{std::move(defines)}
+        , mode{mode}
+        , depth{depth}
+        , topology{topology}
+        , polygonMode{polygonMode}
+        , cullMode{cullMode}
+        , frontFace{frontFace}
+        , blend{blend}
+        , depthBiasEnabled{depthBiasEnabled}
+        , depthBiasConstantFactor{depthBiasConstantFactor}
+        , depthBiasSlopeFactor{depthBiasSlopeFactor}
+        , depthBiasClamp{depthBiasClamp}
+        , lineWidth{lineWidth}
+        , transparencyEnabled{transparencyEnabled}
+        , pushDescriptors{pushDescriptors}
+        , pipelineBindPoint{VK_PIPELINE_BIND_POINT_GRAPHICS} {
 
 #if FUSION_DEBUG
 	auto debugStart = DateTime::Now();
@@ -75,7 +75,7 @@ const ImageDepth* PipelineGraphics::getDepthStencil(const std::optional<uint32_t
 	return Graphics::Get()->getRenderStage(stage ? *stage : this->stage.first)->getDepthStencil();
 }
 
-const Image2d* PipelineGraphics::getImage(size_t index, const std::optional<uint32_t>& stage) const {
+const Texture2d* PipelineGraphics::getImage(size_t index, const std::optional<uint32_t>& stage) const {
 	return Graphics::Get()->getRenderStage(stage ? *stage : this->stage.first)->getFramebuffers()->getAttachment(index);
 }
 

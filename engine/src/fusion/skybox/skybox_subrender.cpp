@@ -3,15 +3,15 @@
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/cameras/camera.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
-#include "fusion/graphics/images/image_cube.hpp"
+#include "fusion/graphics/textures/texture_cube.hpp"
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/scene/scene_manager.hpp"
 
 using namespace fe;
 
 SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& pipelineStage)
-    : Subrender{pipelineStage}
-    , pipeline{pipelineStage, {"EngineShaders/sky/skybox.vert", "EngineShaders/sky/skybox.frag"}, {{{Vertex::Component::Position}}}} {
+        : Subrender{pipelineStage}
+        , pipeline{pipelineStage, {"EngineShaders/sky/skybox.vert", "EngineShaders/sky/skybox.frag"}, {{{Vertex::Component::Position}}}} {
 
     std::vector<glm::vec3> vertices {
             //front
@@ -63,7 +63,7 @@ SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& pipelineStage)
     vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(glm::vec3) * vertices.size(), vertices.data());
     indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint16_t) * indices.size(), indices.data());
 
-    skyboxSampler = std::make_unique<ImageCube>("engine/assets/textures/cubemap_vulkan.ktx");
+    skyboxSampler = std::make_unique<TextureCube>("engine/assets/textures/cubemap_vulkan.ktx");
 }
 
 SkyboxSubrender::~SkyboxSubrender() {

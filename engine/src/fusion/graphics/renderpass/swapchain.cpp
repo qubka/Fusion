@@ -3,7 +3,7 @@
 #include "fusion/graphics/devices/physical_device.hpp"
 #include "fusion/graphics/devices/logical_device.hpp"
 #include "fusion/graphics/devices/surface.hpp"
-#include "fusion/graphics/images/image.hpp"
+#include "fusion/graphics/textures/image.hpp"
 #include "fusion/graphics/vku.hpp"
 
 using namespace fe;

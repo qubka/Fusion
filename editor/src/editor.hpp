@@ -21,17 +21,15 @@ namespace fe {
         bool snapGizmos{ false };
         float snapAmount{ 0.5f };
         float snapBound{ 0.1f };
-        uint32_t gizmosOperation{ 14463 };
+        uint32_t gizmosOperation{ UINT32_MAX };
+        bool showGrid{ true };
         ImGuiUtils::Theme theme{ ImGuiUtils::Theme::ClassicDark };
 
-        /*float gridSize{ 10.0f };
+        /*f
         uint32_t debugDrawFlags{ 0 };
         uint32_t physics2DDebugFlags{ 0 };
         uint32_t physics3DDebugFlags{ 0 };
-        bool showGrid{ true };
-
         bool showViewSelected{ false };
-
         bool showImGuiDemo{ true };
         bool view2D{ false };
         bool sleepOutofFocus{ true };

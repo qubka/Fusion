@@ -9,9 +9,7 @@ using namespace fe;
 
 const std::vector<const char*> LogicalDevice::DeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME }; // VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME
 
-LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& physicalDevice)
-    : instance{instance}
-    , physicalDevice{physicalDevice} {
+LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& physicalDevice) : instance{instance}, physicalDevice{physicalDevice} {
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     const float queuePriority = 0.0f;
 

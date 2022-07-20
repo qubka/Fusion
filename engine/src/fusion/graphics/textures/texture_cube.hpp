@@ -1,14 +1,12 @@
 #pragma once
 
-#include "image.hpp"
+#include "texture.hpp"
 
 namespace fe {
-    class Bitmap;
-
     /**
      * @brief Resource that represents a cubemap image.
      */
-    class ImageCube : public Image {
+    class TextureCube : public Texture {
     public:
         /**
          * Creates a new cubemap image.
@@ -19,12 +17,12 @@ namespace fe {
          * @param mipmap If mapmaps will be generated.
          * @param load If this resource will be loaded immediately, otherwise {@link ImageCube#Load} can be called later.
          */
-        explicit ImageCube(fs::path filepath,
-                           VkFilter filter = VK_FILTER_LINEAR,
-                           VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-                           bool anisotropic = true,
-                           bool mipmap = true,
-                           bool load = true);
+        explicit TextureCube(fs::path filepath,
+                             VkFilter filter = VK_FILTER_LINEAR,
+                             VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                             bool anisotropic = true,
+                             bool mipmap = true,
+                             bool load = true);
 
         /**
          * Creates a new cubemap image.
@@ -38,15 +36,15 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        explicit ImageCube(const glm::uvec2& extent,
-                           VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
-                           VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                           VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
-                           VkFilter filter = VK_FILTER_LINEAR,
-                           VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-                           VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT,
-                           bool anisotropic = false,
-                           bool mipmap = false);
+        explicit TextureCube(const glm::uvec2& extent,
+                             VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
+                             VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                             VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+                             VkFilter filter = VK_FILTER_LINEAR,
+                             VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                             VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT,
+                             bool anisotropic = false,
+                             bool mipmap = false);
 
         /**
          * Creates a new cubemap image.
@@ -60,15 +58,15 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        explicit ImageCube(std::unique_ptr<Bitmap>&& bitmap,
-                           VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
-                           VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                           VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
-                           VkFilter filter = VK_FILTER_LINEAR,
-                           VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-                           VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT,
-                           bool anisotropic = false,
-                           bool mipmap = false);
+        explicit TextureCube(const std::unique_ptr<Bitmap>& bitmap,
+                             VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
+                             VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                             VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+                             VkFilter filter = VK_FILTER_LINEAR,
+                             VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                             VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT,
+                             bool anisotropic = false,
+                             bool mipmap = false);
 
         /**
          * Copies the images pixels from memory to a bitmap. The bitmap height will be scaled by the amount of layers.
@@ -85,18 +83,6 @@ namespace fe {
          */
         void setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer);
 
-        const fs::path& getFilePath() const { return filePath; }
-        bool isAnisotropic() const { return anisotropic; }
-        bool isMipmap() const { return mipmap; }
-        uint8_t getComponents() const { return components; }
-
         void load();
-
-    private:
-        fs::path filePath;
-
-        uint8_t components{ 0 };
-        bool anisotropic;
-        bool mipmap;
     };
 }

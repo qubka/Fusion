@@ -7,7 +7,7 @@
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/input/codes.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/graphics/images/image2d.hpp"
+#include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/imgui/material_design_icons.hpp"
@@ -22,11 +22,11 @@
 using namespace fe;
 
 ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
-    : Subrender{pipelineStage}
-    , pipeline{pipelineStage, {"EngineShaders/imgui/imgui.vert", "EngineShaders/imgui/imgui.frag"}, {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}}, {}
-    , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE/*, VK_FRONT_FACE_CLOCKWISE, PipelineGraphics::Blend::SrcAlphaOneMinusSrcAlpha
-    , false, 0.0f, 0.0f, 0.0f, 1.0f, true, true*/}
-    , descriptorSet{pipeline} {
+        : Subrender{pipelineStage}
+        , pipeline{pipelineStage, {"EngineShaders/imgui/imgui.vert", "EngineShaders/imgui/imgui.frag"}, {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}}, {}
+        , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE/*, VK_FRONT_FACE_CLOCKWISE, PipelineGraphics::Blend::SrcAlphaOneMinusSrcAlpha
+        , false, 0.0f, 0.0f, 0.0f, 1.0f, true, true*/}
+        , descriptorSet{pipeline} {
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
     LOG_INFO << "ImGui Version: " << IMGUI_VERSION;
@@ -115,8 +115,8 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer) {
 
     // Updates descriptors
     descriptorSet.push("PushObject", pushObject);
-    descriptorSet.push("fontSampler", reinterpret_cast<const Image2d*>(ImGui::GetIO().Fonts[0].TexID));
-    descriptorSet.push("sceneSampler", reinterpret_cast<const Image2d*>(Graphics::Get()->getAttachment("scene")));
+    descriptorSet.push("fontSampler", reinterpret_cast<const Texture2d*>(ImGui::GetIO().Fonts[0].TexID));
+    descriptorSet.push("sceneSampler", reinterpret_cast<const Texture2d*>(Graphics::Get()->getAttachment("scene")));
 
     if (!descriptorSet.update(pipeline))
         return;
@@ -342,7 +342,7 @@ void ImGuiSubrender::rebuildFont() {
     io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
     auto bitmap = std::make_unique<Bitmap>(glm::uvec2{texWidth, texHeight});
     std::memcpy(bitmap->getData<void>(), fontBuffer, bitmap->getLength());
-    auto& font = fontImages.emplace_back(std::make_unique<Image2d>(std::move(bitmap)));
+    auto& font = fontImages.emplace_back(std::make_unique<Texture2d>(std::move(bitmap)));
 
     io.Fonts->SetTexID((ImTextureID)(font.get()));
 }

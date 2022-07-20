@@ -6,10 +6,10 @@
 using namespace fe;
 
 Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, const void* data)
-    : logicalDevice{Graphics::Get()->getLogicalDevice()}
-    , size{size}
-    , usageFlags{usage}
-    , memoryPropertyFlags{properties} {
+        : logicalDevice{Graphics::Get()->getLogicalDevice()}
+        , size{size}
+        , usageFlags{usage}
+        , memoryPropertyFlags{properties} {
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
 
     auto graphicsFamily = physicalDevice.getGraphicsFamily();

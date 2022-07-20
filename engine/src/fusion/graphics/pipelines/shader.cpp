@@ -3,9 +3,9 @@
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/buffers/uniform_buffer.hpp"
 #include "fusion/graphics/buffers/storage_buffer.hpp"
-#include "fusion/graphics/images/image.hpp"
-#include "fusion/graphics/images/image2d.hpp"
-#include "fusion/graphics/images/image_cube.hpp"
+#include "fusion/graphics/textures/image.hpp"
+#include "fusion/graphics/textures/texture2d.hpp"
+#include "fusion/graphics/textures/texture_cube.hpp"
 #include "fusion/utils/string.hpp"
 #include "fusion/filesystem/file_system.hpp"
 
@@ -415,13 +415,13 @@ void Shader::createReflection() {
             case 0x9108: // GL_SAMPLER_2D_MULTISAMPLE
             case 0x9055: // GL_IMAGE_2D_MULTISAMPLE
                 descriptorType = uniform.writeOnly ? VK_DESCRIPTOR_TYPE_STORAGE_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                descriptorSetLayouts.push_back(Image2d::GetDescriptorSetLayout(static_cast<uint32_t>(uniform.binding), descriptorType, uniform.stageFlags, 1));
+                descriptorSetLayouts.push_back(Texture2d::GetDescriptorSetLayout(static_cast<uint32_t>(uniform.binding), descriptorType, uniform.stageFlags, 1));
                 break;
             case 0x8B60: // GL_SAMPLER_CUBE
             case 0x9050: // GL_IMAGE_CUBE
             case 0x9054: // GL_IMAGE_CUBE_MAP_ARRAY
                 descriptorType = uniform.writeOnly ? VK_DESCRIPTOR_TYPE_STORAGE_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                descriptorSetLayouts.push_back(ImageCube::GetDescriptorSetLayout(static_cast<uint32_t>(uniform.binding), descriptorType, uniform.stageFlags, 1));
+                descriptorSetLayouts.push_back(TextureCube::GetDescriptorSetLayout(static_cast<uint32_t>(uniform.binding), descriptorType, uniform.stageFlags, 1));
                 break;
             default:
                 break;

@@ -1,8 +1,8 @@
 #include "imgui_utils.hpp"
 
-#include "fusion/graphics/images/image2d.hpp"
-#include "fusion/graphics/images/image2d_array.hpp"
-#include "fusion/graphics/images/image_cube.hpp"
+#include "fusion/graphics/textures/texture2d.hpp"
+#include "fusion/graphics/textures/texture2d_array.hpp"
+#include "fusion/graphics/textures/texture_cube.hpp"
 
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/filesystem/file_format.hpp"
@@ -106,7 +106,8 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
     ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{4, 4});
 
-    if (ImGui::BeginPopup("File Explorer")) {
+    if (ImGui::BeginPopup("FileExplorer", ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Dummy({200.0f, 0.0f});  // fix resize
         ImGui::TextUnformatted(ICON_MDI_FILE_SEARCH);
         ImGui::SameLine();
 
@@ -170,7 +171,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
             filter.Clear();
             selected = "";
             //files = FileSystem::GetFilesInPath("", true);
-            ImGui::OpenPopup("File Explorer");
+            ImGui::OpenPopup("FileExplorer");
         }
     } else {
         std::string title{ FileFormat::GetIcon(value) + " "s + value.filename().string() };
@@ -199,7 +200,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
         filter.Clear();
         selected = "";
         //files = FileSystem::GetFilesInPath("", true);
-        ImGui::OpenPopup("File Explorer");
+        ImGui::OpenPopup("FileExplorer");
     }
 
     ImGui::PopStyleVar();
@@ -209,23 +210,17 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
 
 void Tooltip(const std::string& text) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
-    Tooltip(text.c_str());
-    ImGui::PopStyleVar();
-}
-
-void Tooltip(const char* text) {
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
 
     if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
-        ImGui::TextUnformatted(text);
+        ImGui::TextUnformatted(text.c_str());
         ImGui::EndTooltip();
     }
 
     ImGui::PopStyleVar();
 }
 
-void Tooltip(Image2d* texture, const glm::vec2& size, bool flipImage) {
+void Tooltip(Texture2d* texture, const glm::vec2& size, bool flipImage) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
 
     if (ImGui::IsItemHovered()) {
@@ -237,7 +232,7 @@ void Tooltip(Image2d* texture, const glm::vec2& size, bool flipImage) {
     ImGui::PopStyleVar();
 }
 
-void Tooltip(Image2d* texture, const glm::vec2& size, const std::string& text, bool flipImage) {
+void Tooltip(Texture2d* texture, const glm::vec2& size, const std::string& text, bool flipImage) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
 
     if (ImGui::IsItemHovered()) {
@@ -251,7 +246,7 @@ void Tooltip(Image2d* texture, const glm::vec2& size, const std::string& text, b
     ImGui::PopStyleVar();
 }
 
-void Tooltip(Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage) {
+void Tooltip(Texture2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
 
     if (ImGui::IsItemHovered()) {
@@ -264,38 +259,38 @@ void Tooltip(Image2dArray* texture, uint32_t index, const glm::vec2& size, bool 
     ImGui::PopStyleVar();
 }
 
-void Image(Image2d* texture, const glm::vec2& size, bool flipImage) {
+void Image(Texture2d* texture, const glm::vec2& size, bool flipImage) {
     ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
 }
 
-void Image(ImageCube* texture, const glm::vec2& size, bool flipImage) {
+void Image(TextureCube* texture, const glm::vec2& size, bool flipImage) {
     ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
 }
 
-void Image(Image2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage) {
+void Image(Texture2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage) {
     ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
 }
 
 struct Image { static void Callback(const ImDrawList* parent_list, const ImDrawCmd* cmd) {} };
 
 void Image(uint32_t* texture_id, const glm::vec2& size, bool flipImage) {
-    auto drawList = ImGui::GetWindowDrawList();
-    drawList->AddCallback(Image::Callback, texture_id);
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    draw_list->AddCallback(Image::Callback, texture_id);
     ImGui::Image(nullptr, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
-    drawList->AddCallback(nullptr, nullptr);
+    draw_list->AddCallback(nullptr, nullptr);
 }
 
-bool BufferingBar(const std::string& name, float value, const glm::vec2& size_arg, uint32_t bg_col, uint32_t fg_col) {
-    auto g = ImGui::GetCurrentContext();
-    auto drawList = ImGui::GetWindowDrawList();
+bool BufferingBar(const char* str_id, float value, const glm::vec2& size_arg, uint32_t bg_col, uint32_t fg_col) {
+    ImGuiContext* g = ImGui::GetCurrentContext();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const ImGuiStyle& style = ImGui::GetStyle();
-    const ImGuiID id = ImGui::GetID(name.c_str());
+    const ImGuiID id = ImGui::GetID(str_id);
 
     ImVec2 pos = ImGui::GetCursorPos();
     ImVec2 size{ size_arg.x, size_arg.y };
     size.x -= style.FramePadding.x * 2;
 
-    const ImRect bb{pos, ImVec2{pos.x + size.x, pos.y + size.y}};
+    const ImRect bb{pos, pos + size};
     ImGui::ItemSize(bb, style.FramePadding.y);
     if (!ImGui::ItemAdd(bb, id))
         return false;
@@ -305,8 +300,8 @@ bool BufferingBar(const std::string& name, float value, const glm::vec2& size_ar
     const float circleEnd = size.x;
     const float circleWidth = circleEnd - circleStart;
 
-    drawList->AddRectFilled(bb.Min, ImVec2{pos.x + circleStart, bb.Max.y}, bg_col);
-    drawList->AddRectFilled(bb.Min, ImVec2{pos.x + circleStart * value, bb.Max.y}, fg_col);
+    draw_list->AddRectFilled(bb.Min, ImVec2{pos.x + circleStart, bb.Max.y}, bg_col);
+    draw_list->AddRectFilled(bb.Min, ImVec2{pos.x + circleStart * value, bb.Max.y}, fg_col);
 
     const float t = static_cast<float>(g->Time);
     const float r = size.y * 0.5f;
@@ -320,21 +315,21 @@ bool BufferingBar(const std::string& name, float value, const glm::vec2& size_ar
     const float o2 = (circleWidth + r) * (t + b - speed * std::round((t + b) / speed)) / speed;
     const float o3 = (circleWidth + r) * (t + c - speed * std::round((t + c) / speed)) / speed;
 
-    drawList->AddCircleFilled(ImVec2{pos.x + circleEnd - o1, bb.Min.y + r}, r, bg_col);
-    drawList->AddCircleFilled(ImVec2{pos.x + circleEnd - o2, bb.Min.y + r}, r, bg_col);
-    drawList->AddCircleFilled(ImVec2{pos.x + circleEnd - o3, bb.Min.y + r}, r, bg_col);
+    draw_list->AddCircleFilled(ImVec2{pos.x + circleEnd - o1, bb.Min.y + r}, r, bg_col);
+    draw_list->AddCircleFilled(ImVec2{pos.x + circleEnd - o2, bb.Min.y + r}, r, bg_col);
+    draw_list->AddCircleFilled(ImVec2{pos.x + circleEnd - o3, bb.Min.y + r}, r, bg_col);
 
     return true;
 }
 
-bool Spinner(const std::string& name, float radius, int thickness, uint32_t color) {
-    auto g = ImGui::GetCurrentContext();
+bool Spinner(const char* str_id, float radius, int thickness, uint32_t color) {
+    ImGuiContext* g = ImGui::GetCurrentContext();
     const ImGuiStyle& style = g->Style;
-    const ImGuiID id = ImGui::GetID(name.c_str());
-    auto drawList = ImGui::GetWindowDrawList();
+    const ImGuiID id = ImGui::GetID(str_id);
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     ImVec2 pos = ImGui::GetCursorPos();
-    ImVec2 size{ (radius) * 2, (radius + style.FramePadding.y) * 2 };
+    ImVec2 size{ radius * 2, (radius + style.FramePadding.y) * 2 };
 
     const ImRect bb{pos, ImVec2{pos.x + size.x, pos.y + size.y}};
     ImGui::ItemSize(bb, style.FramePadding.y);
@@ -342,9 +337,9 @@ bool Spinner(const std::string& name, float radius, int thickness, uint32_t colo
         return false;
 
     // Render
-    drawList->PathClear();
+    draw_list->PathClear();
 
-    int num_segments = 30;
+    const int num_segments = 30;
     float start = abs(ImSin(static_cast<float>(g->Time) * 1.8f) * static_cast<float>(num_segments - 5));
 
     const float a_min = IM_PI * 2.0f * (start / static_cast<float>(num_segments));
@@ -354,17 +349,79 @@ bool Spinner(const std::string& name, float radius, int thickness, uint32_t colo
 
     for (int i = 0; i < num_segments; i++) {
         const float a = a_min + (static_cast<float>(i) / static_cast<float>(num_segments)) * (a_max - a_min);
-        drawList->PathLineTo(ImVec2{centre.x + ImCos(a + static_cast<float>(g->Time) * 8) * radius,
-                                    centre.y + ImSin(a + static_cast<float>(g->Time) * 8) * radius});
+        draw_list->PathLineTo(ImVec2{centre.x + ImCos(a + static_cast<float>(g->Time) * 8) * radius,
+                                     centre.y + ImSin(a + static_cast<float>(g->Time) * 8) * radius});
     }
 
-    drawList->PathStroke(color, false, static_cast<float>(thickness));
+    draw_list->PathStroke(color, false, static_cast<float>(thickness));
 
     return true;
 }
 
+// https://gist.github.com/moebiussurfing/c1110be8bb3f6776311512b63523a0a3
+bool ToggleRoundButton(const char* str_id, bool& value) {
+    bool updated = false;
+
+    ImVec2 p = ImGui::GetCursorScreenPos();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    float height = ImGui::GetFrameHeight();
+    float width = height * 1.55f;
+    float radius = height * 0.50f;
+
+    ImGui::InvisibleButton(str_id, ImVec2{width, height});
+    if (ImGui::IsItemClicked()) {
+        value = !value;
+        updated = true;
+    }
+
+    float t = value ? 1.0f : 0.0f;
+
+    ImGuiContext* g = ImGui::GetCurrentContext();
+    float ANIM_SPEED = 0.08f;
+    if (g->LastActiveId == g->CurrentWindow->GetID(str_id)) {
+        float t_anim = ImSaturate(g->LastActiveIdTimer / ANIM_SPEED);
+        t = value ? (t_anim) : (1.0f - t_anim);
+    }
+
+    ImU32 col = ImGui::IsItemHovered() ?
+        ImGui::GetColorU32(ImLerp(ImGui::GetStyleColorVec4(ImGuiCol_FrameBg), ImGui::GetStyleColorVec4(ImGuiCol_FrameBgHovered), t))
+    :
+        ImGui::GetColorU32(ImLerp(ImGui::GetStyleColorVec4(ImGuiCol_Button), ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered), t));
+
+    draw_list->AddRectFilled(p, ImVec2{p.x + width, p.y + height}, col, height * 0.5f);
+    draw_list->AddCircleFilled(ImVec2{p.x + radius + t * (width - radius * 2.0f), p.y + radius}, radius - 1.5f, IM_COL32(255, 255, 255, 255));
+
+    return updated;
+}
+
+bool ToggleButton(const char* str_id, bool& value, bool text_style) {
+    bool updated = false;
+    if (value) {
+        if (text_style) {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
+        } else {
+            ImVec4 color{ ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive) };
+            ImGui::PushStyleColor(ImGuiCol_Button, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+        }
+        if (ImGui::Button(str_id)) {
+            value = !value;
+            updated = true;
+        }
+        ImGui::PopStyleColor(text_style ? 1 : 3);
+    } else {
+        if (ImGui::Button(str_id)) {
+            value = true;
+            updated = true;
+        }
+    }
+    return updated;
+}
+
 void DrawRowsBackground(int row_count, float line_height, float x1, float x2, float y_offset, uint32_t col_even, uint32_t col_odd) {
-    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
     float y0 = ImGui::GetCursorScreenPos().y + std::round(y_offset);
 
     ImGuiListClipper clipper;
@@ -376,31 +433,27 @@ void DrawRowsBackground(int row_count, float line_height, float x1, float x2, fl
                 continue;
             float y1 = y0 + (line_height * static_cast<float>(i));
             float y2 = y1 + line_height;
-            drawList->AddRectFilled(ImVec2{ x1, y1 }, ImVec2{ x2, y2 }, col);
+            draw_list->AddRectFilled(ImVec2{ x1, y1 }, ImVec2{ x2, y2 }, col);
         }
     }
 }
 
 void DrawItemActivityOutline(float rounding, bool drawWhenInactive, const ImColor& colourWhenActive) {
-    auto* drawList = ImGui::GetWindowDrawList();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    ImRect expandedRect = ImRect{ImGui::GetItemRectMin(), ImGui::GetItemRectMax()};
-    expandedRect.Min.x -= 1.0f;
-    expandedRect.Min.y -= 1.0f;
-    expandedRect.Max.x += 1.0f;
-    expandedRect.Max.y += 1.0f;
+    ImRect rect{ImGui::GetItemRectMin(), ImGui::GetItemRectMax()};
+    rect.Min.x -= 1.0f;
+    rect.Min.y -= 1.0f;
+    rect.Max.x += 1.0f;
+    rect.Max.y += 1.0f;
 
-    const ImRect rect = expandedRect;
     if (ImGui::IsItemHovered() && !ImGui::IsItemActive()) {
-        drawList->AddRect(rect.Min, rect.Max,
-                          ImColor{60, 60, 60}, rounding, 0, 1.5f);
+        draw_list->AddRect(rect.Min, rect.Max, ImColor{60, 60, 60}, rounding, 0, 1.5f);
     }
     if (ImGui::IsItemActive()) {
-        drawList->AddRect(rect.Min, rect.Max,
-                          colourWhenActive, rounding, 0, 1.0f);
+        draw_list->AddRect(rect.Min, rect.Max, colourWhenActive, rounding, 0, 1.0f);
     } else if (!ImGui::IsItemHovered() && drawWhenInactive) {
-        drawList->AddRect(rect.Min, rect.Max,
-                          ImColor{50, 50, 50}, rounding, 0, 1.0f);
+        draw_list->AddRect(rect.Min, rect.Max, ImColor{50, 50, 50}, rounding, 0, 1.0f);
     }
 }
 
@@ -429,8 +482,8 @@ bool InputText(const std::string& name, std::string& currentText) {
 void AlternatingRowsBackground(float lineHeight) {
     const ImU32 im_color = ImGui::GetColorU32(ImGuiCol_TableRowBgAlt);
 
-    auto* drawList = ImGui::GetWindowDrawList();
-    const auto& style = ImGui::GetStyle();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImGuiStyle& style = ImGui::GetStyle();
 
     if (lineHeight < 0) {
         lineHeight = ImGui::GetTextLineHeight();
@@ -443,14 +496,14 @@ void AlternatingRowsBackground(float lineHeight) {
     float scrolled_out_lines = std::floor(scroll_offset_v / lineHeight);
     scroll_offset_v -= lineHeight * scrolled_out_lines;
 
-    ImVec2 clip_rect_min(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
-    ImVec2 clip_rect_max(clip_rect_min.x + ImGui::GetWindowWidth(), clip_rect_min.y + ImGui::GetWindowHeight());
+    ImVec2 clip_rect_min{ImGui::GetWindowPos()};
+    ImVec2 clip_rect_max{clip_rect_min.x + ImGui::GetWindowWidth(), clip_rect_min.y + ImGui::GetWindowHeight()};
 
     if (ImGui::GetScrollMaxX() > 0) {
         clip_rect_max.y -= style.ScrollbarSize;
     }
 
-    drawList->PushClipRect(clip_rect_min, clip_rect_max);
+    draw_list->PushClipRect(clip_rect_min, clip_rect_max);
 
     const float y_min = clip_rect_min.y - scroll_offset_v + ImGui::GetCursorPosY();
     const float y_max = clip_rect_max.y - scroll_offset_v + lineHeight;
@@ -460,11 +513,11 @@ void AlternatingRowsBackground(float lineHeight) {
     bool is_odd = (static_cast<int>(scrolled_out_lines) % 2) == 0;
     for (float y = y_min; y < y_max; y += lineHeight, is_odd = !is_odd) {
         if (is_odd) {
-            drawList->AddRectFilled({ x_min, y - style.ItemSpacing.y }, { x_max, y + lineHeight }, im_color);
+            draw_list->AddRectFilled({ x_min, y - style.ItemSpacing.y }, { x_max, y + lineHeight }, im_color);
         }
     }
 
-    drawList->PopClipRect();
+    draw_list->PopClipRect();
 }
 
 void SetTheme(Theme theme) {

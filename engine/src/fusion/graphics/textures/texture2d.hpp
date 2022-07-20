@@ -1,13 +1,12 @@
 #pragma once
 
-#include "image.hpp"
+#include "texture.hpp"
 
 namespace fe {
-    class Bitmap;
     /**
      * @brief Resource that represents a 2D image.
      */
-    class Image2d : public Image {
+    class Texture2d : public Texture {
     public:
         /**
          * Creates a new 2D image.
@@ -16,14 +15,14 @@ namespace fe {
          * @param addressMode The addressing mode for outside [0..1] range.
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
-         * @param load If this resource will be loaded immediately, otherwise {@link Image2d#Load} can be called later.
+         * @param load If this resource will be loaded immediately, otherwise {@link Texture2d#Load} can be called later.
          */
-        explicit Image2d(fs::path filepath,
-                         VkFilter filter = VK_FILTER_LINEAR,
-                         VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-                         bool anisotropic = true,
-                         bool mipmap = true,
-                         bool load = true);
+        explicit Texture2d(fs::path filepath,
+                           VkFilter filter = VK_FILTER_LINEAR,
+                           VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+                           bool anisotropic = true,
+                           bool mipmap = true,
+                           bool load = true);
 
         /**
          * Creates a new 2D image.
@@ -37,15 +36,15 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        explicit Image2d(const glm::uvec2& extent,
-                         VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
-                         VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                         VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
-                         VkFilter filter = VK_FILTER_LINEAR,
-                         VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-                         VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT,
-                         bool anisotropic = false,
-                         bool mipmap = false);
+        explicit Texture2d(const glm::uvec2& extent,
+                           VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
+                           VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                           VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+                           VkFilter filter = VK_FILTER_LINEAR,
+                           VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                           VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT,
+                           bool anisotropic = false,
+                           bool mipmap = false);
 
         /**
          * Creates a new 2D image.
@@ -59,15 +58,15 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        explicit Image2d(std::unique_ptr<Bitmap>&& bitmap,
-                         VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
-                         VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                         VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
-                         VkFilter filter = VK_FILTER_LINEAR,
-                         VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-                         VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT,
-                         bool anisotropic = false,
-                         bool mipmap = false);
+        explicit Texture2d(const std::unique_ptr<Bitmap>& bitmap,
+                           VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
+                           VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                           VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+                           VkFilter filter = VK_FILTER_LINEAR,
+                           VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                           VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT,
+                           bool anisotropic = false,
+                           bool mipmap = false);
 
         /**
          * Sets the pixels of this image.
@@ -77,18 +76,6 @@ namespace fe {
          */
         void setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer);
 
-        const fs::path& getFilePath() const { return filePath; }
-        bool isAnisotropic() const { return anisotropic; }
-        bool isMipmap() const { return mipmap; }
-        uint8_t getComponents() const { return components; }
-
         void load(std::unique_ptr<Bitmap> loadBitmap = nullptr);
-
-    private:
-        fs::path filePath;
-
-        uint8_t components{ 0 };
-        bool anisotropic;
-        bool mipmap;
     };
 }

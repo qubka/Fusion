@@ -3,51 +3,51 @@
 using namespace fe;
 
 Camera::Camera()
-    : aspectRatio{1.333f}
-    , nearClip{0.1f}
-    , farClip{1000.0f}
-    , fovDegrees{45.0f}
-    , orthographic{false} {
+        : aspectRatio{1.333f}
+        , nearClip{0.1f}
+        , farClip{1000.0f}
+        , fovDegrees{45.0f}
+        , orthographic{false} {
     lookAt(glm::vec3{28, 21, 28}, vec3::zero, vec3::up);
 }
 
 Camera::Camera(float fov, float near, float far, float aspect)
-    : aspectRatio{aspect}
-    , fovDegrees{fov}
-    , nearClip{near}
-    , farClip{far}
-    , orthographic{false}
-    , scale{1.0f} {
+        : aspectRatio{aspect}
+        , fovDegrees{fov}
+        , nearClip{near}
+        , farClip{far}
+        , orthographic{false}
+        , scale{1.0f} {
     lookAt(glm::vec3{28, 21, 28}, vec3::zero, vec3::up);
 };
 
 Camera::Camera(const glm::vec3& position, float fov, float near, float far, float aspect)
-    : aspectRatio{aspect}
-    , fovDegrees{fov}
-    , nearClip{near}
-    , farClip{far}
-    , orthographic{false}
-    , scale{1.0f} {
+        : aspectRatio{aspect}
+        , fovDegrees{fov}
+        , nearClip{near}
+        , farClip{far}
+        , orthographic{false}
+        , scale{1.0f} {
     lookAt(position, vec3::zero, vec3::up);
 }
 
 Camera::Camera(float aspect, float scale)
-    : aspectRatio{aspect}
-    , scale{scale}
-    , fovDegrees{60.0f}
-    , nearClip{-10.0}
-    , farClip{10.0f}
-    , orthographic{true} {
+        : aspectRatio{aspect}
+        , scale{scale}
+        , fovDegrees{60.0f}
+        , nearClip{-10.0}
+        , farClip{10.0f}
+        , orthographic{true} {
     lookAt(glm::vec3{28, 21, 28}, vec3::zero, vec3::up);
 }
 
 Camera::Camera(float aspect, float near, float far)
-    : aspectRatio{aspect}
-    , scale{1.0f}
-    , fovDegrees{60.0f}
-    , nearClip{near}
-    , farClip{far}
-    , orthographic{true} {
+        : aspectRatio{aspect}
+        , scale{1.0f}
+        , fovDegrees{60.0f}
+        , nearClip{near}
+        , farClip{far}
+        , orthographic{true} {
     lookAt(glm::vec3{28, 21, 28}, vec3::zero, vec3::up);
 }
 

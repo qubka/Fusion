@@ -8,14 +8,14 @@
 using namespace fe;
 
 TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()>&& callback, Editor* editor)
-    : filePath{std::move(filepath)}
-    , callback{std::move(callback)}
-    , EditorPanel{ICON_MDI_NOTE_TEXT "Text Editor###textedit", "TextEdit", editor}
+        : path{std::move(filepath)}
+        , callback{std::move(callback)}
+        , EditorPanel{ICON_MDI_NOTE_TEXT "Text Editor###textedit", "TextEdit", editor}
 {
     textEditor.SetCustomIdentifiers({});
 
     // T
-    std::string extension{ FileSystem::GetExtension(filePath) };
+    std::string extension{ FileSystem::GetExtension(path) };
     /*if (extension == "lua") {
         auto lang = ImGui::TextEditor::LanguageDefinition::Lua();
         textEditor.SetLanguageDefinition(lang);
@@ -38,7 +38,7 @@ TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()>&& callback
         textEditor.SetLanguageDefinition(lang);
     }
 
-    textEditor.SetText(FileSystem::ReadText(filePath));
+    textEditor.SetText(FileSystem::ReadText(path));
     textEditor.SetShowWhitespaces(false);
 }
 
@@ -51,7 +51,7 @@ void TextEditPanel::onImGui() {
 
     if (!!window->getKey(Key::LeftSuper) || (!!window->getKey(Key::LeftControl))) {
         if (!!window->getKey(Key::S)) {
-            FileSystem::WriteText(filePath, textEditor.GetText());
+            FileSystem::WriteText(path, textEditor.GetText());
         }
     }
 
@@ -61,7 +61,7 @@ void TextEditPanel::onImGui() {
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Save", "CTRL+S")) {
-                    FileSystem::WriteText(filePath, textEditor.GetText());
+                    FileSystem::WriteText(path, textEditor.GetText());
                     callback();
                 }
                 ImGui::EndMenu();
@@ -114,11 +114,11 @@ void TextEditPanel::onImGui() {
         ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1,
                     textEditor.GetTotalLines(), textEditor.IsOverwrite() ? "Ovr" : "Ins",
                     textEditor.CanUndo() ? "*" : " ", textEditor.GetLanguageDefinition().mName.c_str(),
-                    filePath.filename().c_str());
+                    path.filename().string().c_str());
 
         if (ImGui::IsItemActive()) {
             if (!!window->getKey(Key::LeftControl) && !!window->getKey(Key::S)) {
-                FileSystem::WriteText(filePath, textEditor.GetText());
+                FileSystem::WriteText(path, textEditor.GetText());
             }
         }
 

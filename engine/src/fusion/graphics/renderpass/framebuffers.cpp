@@ -1,8 +1,8 @@
 #include "framebuffers.hpp"
 
 #include "fusion/graphics/render_stage.hpp"
-#include "fusion/graphics/images/image_depth.hpp"
-#include "fusion/graphics/images/image2d.hpp"
+#include "fusion/graphics/textures/image_depth.hpp"
+#include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
 #include "fusion/graphics/renderpass/swapchain.hpp"
 #include "fusion/graphics/graphics.hpp"
@@ -15,7 +15,7 @@ Framebuffers::Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& 
 	for (const auto& attachment : renderStage.getAttachments()) {
         switch (attachment.type) {
             case Attachment::Type::Image:
-                imageAttachments.push_back(std::make_unique<Image2d>(extent, attachment.format, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                imageAttachments.push_back(std::make_unique<Texture2d>(extent, attachment.format, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                     VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, attachment.multisampled ? samples : VK_SAMPLE_COUNT_1_BIT));
                 break;
             case Attachment::Type::Depth:

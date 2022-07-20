@@ -8,11 +8,11 @@
 using namespace fe;
 
 PipelineCompute::PipelineCompute(fs::path shaderStage, std::vector<Shader::Define> defines, bool pushDescriptors)
-    : shader{}
-    , shaderStage{std::move(shaderStage)}
-    , defines{std::move(defines)}
-    , pushDescriptors{pushDescriptors}
-    , pipelineBindPoint{VK_PIPELINE_BIND_POINT_COMPUTE} {
+        : shader{}
+        , shaderStage{std::move(shaderStage)}
+        , defines{std::move(defines)}
+        , pushDescriptors{pushDescriptors}
+        , pipelineBindPoint{VK_PIPELINE_BIND_POINT_COMPUTE} {
 #if FUSION_DEBUG
 	auto debugStart = DateTime::Now();
 #endif

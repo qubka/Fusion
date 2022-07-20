@@ -11,7 +11,7 @@
 
 namespace fe {
     class Window;
-    class Image2d;
+    class Texture2d;
     class ImGuiSubrender final : public Subrender {
     public:
         explicit ImGuiSubrender(const Pipeline::Stage& pipelineStage);
@@ -49,7 +49,7 @@ namespace fe {
 
         ImGuiObject canvasObject;
 
-        std::vector<std::unique_ptr<Image2d>> fontImages;
+        std::vector<std::unique_ptr<Texture2d>> fontImages;
 
         float fontSize;
         float fontScale;

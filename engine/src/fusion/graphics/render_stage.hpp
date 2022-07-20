@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fusion/graphics/images/image_depth.hpp"
+#include "fusion/graphics/textures/image_depth.hpp"
 #include "fusion/graphics/renderpass/framebuffers.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
 #include "fusion/graphics/renderpass/swapchain.hpp"

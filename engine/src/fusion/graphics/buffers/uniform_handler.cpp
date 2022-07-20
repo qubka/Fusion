@@ -4,16 +4,16 @@
 using namespace fe;
 
 UniformHandler::UniformHandler(bool multipipeline)
-    : multipipeline{multipipeline}
-    , handlerStatus{Buffer::Status::Normal} {
+        : multipipeline{multipipeline}
+        , handlerStatus{Buffer::Status::Normal} {
 }
 
 UniformHandler::UniformHandler(const Shader::UniformBlock& uniformBlock, bool multipipeline)
-    : multipipeline{multipipeline}
-    , uniformBlock{uniformBlock}
-    , size{static_cast<uint32_t>(this->uniformBlock->getSize())}
-    , uniformBuffer{std::make_unique<UniformBuffer>(static_cast<VkDeviceSize>(size))}
-    , handlerStatus{Buffer::Status::Normal} {
+        : multipipeline{multipipeline}
+        , uniformBlock{uniformBlock}
+        , size{static_cast<uint32_t>(this->uniformBlock->getSize())}
+        , uniformBuffer{std::make_unique<UniformBuffer>(static_cast<VkDeviceSize>(size))}
+        , handlerStatus{Buffer::Status::Normal} {
 }
 
 bool UniformHandler::update(const std::optional<Shader::UniformBlock>& uniformBlock) {

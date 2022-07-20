@@ -20,9 +20,8 @@ namespace fe {
          * @param samples The number of samples per texel.
          * @param layout The layout that the image subresources accessible from.
          * @param usage The intended usage of the image.
+         * @param viewType The value specifying the type of the image view.
          * @param format The format and type of the texel blocks that will be contained in the image.
-         * @param mipLevels The number of levels of detail available for minified sampling of the image.
-         * @param arrayLayers The number of layers in the image.
          * @param extent The number of data elements in each dimension of the base level.
          */
         Image(VkFilter filter,
@@ -30,9 +29,8 @@ namespace fe {
               VkSampleCountFlagBits samples,
               VkImageLayout layout,
               VkImageUsageFlags usage,
+              VkImageViewType viewType,
               VkFormat format,
-              uint32_t mipLevels,
-              uint32_t arrayLayers,
               const VkExtent3D& extent);
         ~Image() override;
 
@@ -52,11 +50,10 @@ namespace fe {
         VkFormat getFormat() const { return format; }
         VkSampleCountFlagBits getSamples() const { return samples; }
         VkImageUsageFlags getUsage() const { return usage; }
-        uint32_t getMipLevels() const { return mipLevels; }
-        uint32_t getArrayLevels() const { return arrayLayers; }
         VkFilter getFilter() const { return filter; }
         VkSamplerAddressMode getAddressMode() const { return addressMode; }
         VkImageLayout getLayout() const { return layout; }
+        VkImageViewType getViewType() const { return viewType; }
         const VkImage& getImage() const { return image; }
         const VkDeviceMemory& getMemory() const { return memory; }
         const VkSampler& getSampler() const { return sampler; }
@@ -67,7 +64,7 @@ namespace fe {
 
         operator const VkImage&() const { return image; }
 
-        static uint32_t getMipLevels(const VkExtent3D& extent);
+        static uint32_t GetMipLevels(const VkExtent3D& extent);
 
         /**
          * Find a format in the candidates list that fits the tiling and features required.
@@ -113,12 +110,10 @@ namespace fe {
         VkSampleCountFlagBits samples;
         VkImageUsageFlags usage;
         VkFormat format{ VK_FORMAT_UNDEFINED };
-        uint32_t mipLevels{ 0 };
-        uint32_t arrayLayers{ 0 };
 
         VkFilter filter;
         VkSamplerAddressMode addressMode;
-
+        VkImageViewType viewType;
         VkImageLayout layout;
 
         VkImage image{ VK_NULL_HANDLE };

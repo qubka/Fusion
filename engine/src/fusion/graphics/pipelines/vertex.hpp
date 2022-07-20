@@ -39,6 +39,7 @@ namespace fe {
             ~Layout() = default;
 
             Component operator[](uint32_t index) const { return components[index]; }
+            ITERATABLE(Component, components);
 
             uint32_t getSize() const { return components.size(); }
             uint32_t getBinding() const { return binding; }

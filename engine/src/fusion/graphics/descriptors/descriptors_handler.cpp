@@ -9,10 +9,10 @@
 using namespace fe;
 
 DescriptorsHandler::DescriptorsHandler(const Pipeline& pipeline)
-    : shader{&pipeline.getShader()}
-    , pushDescriptors{pipeline.isPushDescriptors()}
-    , descriptorSet{std::make_unique<DescriptorSet>(pipeline)}
-    , changed{true} {
+        : shader{&pipeline.getShader()}
+        , pushDescriptors{pipeline.isPushDescriptors()}
+        , descriptorSet{std::make_unique<DescriptorSet>(pipeline)}
+        , changed{true} {
 }
 
 void DescriptorsHandler::push(const std::string& descriptorName, UniformHandler& uniformHandler, const std::optional<OffsetSize>& offsetSize) {

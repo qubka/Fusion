@@ -5,7 +5,7 @@
 
 namespace fe {
     class ImageDepth;
-    class Image2d;
+    class Texture2d;
     class RenderArea;
 
     /**
@@ -83,7 +83,7 @@ namespace fe {
          * @param stage The stage to get values from, if not provided the pipelines stage will be used.
          * @return The image that is found.
          */
-        const Image2d* getImage(size_t index, const std::optional<uint32_t>& stage = std::nullopt) const;
+        const Texture2d* getImage(size_t index, const std::optional<uint32_t>& stage = std::nullopt) const;
 
         /**
          * Gets the render stage viewport.
