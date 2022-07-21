@@ -115,7 +115,7 @@ namespace fe {
         operator bool() const { return buffer != VK_NULL_HANDLE; }
         operator const VkBuffer&() const { return buffer; }
 
-        static uint32_t FindMemoryType(uint32_t typeFilter, const VkMemoryPropertyFlags& requiredProperties);
+        static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags requiredProperties);
         static void InsertBufferMemoryBarrier(const CommandBuffer& commandBuffer, const VkBuffer& buffer, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask, VkDeviceSize offset = 0, VkDeviceSize size = VK_WHOLE_SIZE);
 
         static std::unique_ptr<Buffer> StageToDeviceBuffer(VkBufferUsageFlags usage, VkDeviceSize size, const void* data);

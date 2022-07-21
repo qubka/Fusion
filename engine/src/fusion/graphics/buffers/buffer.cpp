@@ -146,7 +146,7 @@ VkDeviceSize Buffer::GetAlignment(VkDeviceSize instanceSize, VkDeviceSize minOff
     return instanceSize;
 }
 
-uint32_t Buffer::FindMemoryType(uint32_t typeFilter, const VkMemoryPropertyFlags& requiredProperties) {
+uint32_t Buffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags requiredProperties) {
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
     auto memoryProperties = physicalDevice.getMemoryProperties();
 
@@ -161,7 +161,7 @@ uint32_t Buffer::FindMemoryType(uint32_t typeFilter, const VkMemoryPropertyFlags
     throw std::runtime_error("Failed to find a valid memory type for buffer");
 }
 
-void Buffer::InsertBufferMemoryBarrier(const CommandBuffer& commandBuffer, const VkBuffer & buffer, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask,
+void Buffer::InsertBufferMemoryBarrier(const CommandBuffer& commandBuffer, const VkBuffer& buffer, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask,
                                        VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask, VkDeviceSize offset, VkDeviceSize size) {
     VkBufferMemoryBarrier bufferMemoryBarrier = {};
     bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -179,7 +179,7 @@ std::unique_ptr<Buffer> Buffer::StageToDeviceBuffer(VkBufferUsageFlags usage, Vk
     Buffer stagingBuffer{size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, data};
     auto deviceBuffer = std::make_unique<Buffer>(size, usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    CommandBuffer commandBuffer;
+    CommandBuffer commandBuffer{true};
 
     VkBufferCopy copyRegion = {};
     copyRegion.size = stagingBuffer.getSize();
@@ -193,7 +193,7 @@ std::unique_ptr<Buffer> Buffer::StageToDeviceBuffer(VkBufferUsageFlags usage, Vk
 std::unique_ptr<Buffer> Buffer::DeviceToStageBuffer(const Buffer& deviceBuffer) {
     auto stagingBuffer = std::make_unique<Buffer>(deviceBuffer, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-    CommandBuffer commandBuffer;
+    CommandBuffer commandBuffer{true};
 
     VkBufferCopy copyRegion = {};
     copyRegion.size = stagingBuffer->getSize();

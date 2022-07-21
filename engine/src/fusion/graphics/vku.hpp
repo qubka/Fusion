@@ -424,6 +424,29 @@ namespace vku {
         }
         throw std::runtime_error("Such format not exist in the table");
     }
+
+    static void BlitRGBToBGRSurface(uint8_t* dst, const uint8_t* src, const glm::uvec2& size) {
+        for(auto i = 0; i < size.y; ++i) {
+            for (auto j = 0; j < size.x; ++j) {
+                *dst++ = src[2];
+                *dst++ = src[1];
+                *dst++ = src[0];
+                src += 3;
+            }
+        }
+    }
+
+    static void BlitRGBAToBGRASurface(uint8_t* dst, const uint8_t* src, const glm::uvec2& size) {
+        for(auto i = 0; i < size.y; ++i) {
+            for (auto j = 0; j < size.x; ++j) {
+                *dst++ = src[2];
+                *dst++ = src[1];
+                *dst++ = src[0];
+                *dst++ = src[3];
+                src += 4;
+            }
+        }
+    }
 }
 
 #ifdef FUSION_DEBUG

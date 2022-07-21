@@ -4,8 +4,8 @@
 
 namespace fe {
     class Bitmap : public BitmapFactory<Bitmap> {
-        friend class StbLoader;
-        friend class GliLoader;
+        friend class StbToolbox;
+        friend class GliToolbox;
     public:
         Bitmap() = default;
         explicit Bitmap(const fs::path& filepath);

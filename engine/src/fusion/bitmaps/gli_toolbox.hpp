@@ -3,7 +3,7 @@
 #include "bitmap.hpp"
 
 namespace fe {
-    class GliLoader : public Bitmap::Registrar<GliLoader> {
+    class GliToolbox : public Bitmap::Registrar<GliToolbox> {
         //inline static const bool Registered = Register(".ktx", ".kmg", ".dds");
     public:
         static void Load(Bitmap& bitmap, const fs::path& filepath);

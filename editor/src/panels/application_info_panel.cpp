@@ -40,7 +40,7 @@ void ApplicationInfoPanel::onImGui() {
                     ImGui::TextUnformatted("Windows");
                     if (ImGui::BeginTable("##windows", 11, flags)) {
                         ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
-                        ImGui::TableSetupColumn("Title", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Title", ImGuiTableColumnFlags_WidthStretch);
                         ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed);
                         ImGui::TableSetupColumn("Borderless", ImGuiTableColumnFlags_WidthFixed);
                         ImGui::TableSetupColumn("Resizable", ImGuiTableColumnFlags_WidthFixed);
@@ -98,7 +98,7 @@ void ApplicationInfoPanel::onImGui() {
                     ImGui::TextUnformatted("Monitors");
                     if (ImGui::BeginTable("##monitors", 5, flags)) {
                         ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
-                        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
                         ImGui::TableSetupColumn("Primary", ImGuiTableColumnFlags_WidthFixed);
                         ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed);
                         ImGui::TableSetupColumn("Content Scale", ImGuiTableColumnFlags_WidthFixed);
@@ -143,7 +143,7 @@ void ApplicationInfoPanel::onImGui() {
                     if (ImGui::BeginTable("##joysticks", 7, flags)) {
                         ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
                         ImGui::TableSetupColumn("Port", ImGuiTableColumnFlags_WidthFixed);
-                        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
                         ImGui::TableSetupColumn("Connected", ImGuiTableColumnFlags_WidthFixed);
                         ImGui::TableSetupColumn("Axis Count", ImGuiTableColumnFlags_WidthFixed);
                         ImGui::TableSetupColumn("Button Count", ImGuiTableColumnFlags_WidthFixed);
@@ -192,7 +192,7 @@ void ApplicationInfoPanel::onImGui() {
                     ImGui::TextUnformatted("Cursors");
                     if (ImGui::BeginTable("##cursors", 4, flags)) {
                         ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
-                        ImGui::TableSetupColumn("Path", ImGuiTableColumnFlags_WidthFixed);
+                        ImGui::TableSetupColumn("Path", ImGuiTableColumnFlags_WidthStretch);
                         ImGui::TableSetupColumn("Hotspot", ImGuiTableColumnFlags_WidthFixed);
                         ImGui::TableSetupColumn("Standard", ImGuiTableColumnFlags_WidthFixed);
                         ImGui::TableHeadersRow();

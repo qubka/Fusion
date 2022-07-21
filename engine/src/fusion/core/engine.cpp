@@ -11,8 +11,8 @@
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/input/input.hpp"
 #include "fusion/utils/string.hpp"
-#include "fusion/bitmaps/gli_loader.hpp"
-#include "fusion/bitmaps/stb_loader.hpp"
+#include "fusion/bitmaps/gli_toolbox.hpp"
+#include "fusion/bitmaps/stb_toolbox.hpp"
 
 using namespace fe;
 
@@ -47,8 +47,8 @@ void Engine::init() {
     SceneManager::Register(Module::Stage::Normal);
     Graphics::Register(Module::Stage::Render);
 
-    StbLoader::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
-    GliLoader::Register(".ktx", ".kmg", ".dds");
+    StbToolbox::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
+    GliToolbox::Register(".ktx", ".kmg", ".dds");
 
     sortModules();
 }

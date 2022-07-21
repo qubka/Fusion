@@ -120,8 +120,9 @@ bool Graphics::beginFrame(FrameInfo& info) {
     }
 #endif
 
-    if (!commandBuffer.isRunning())
-        commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    assert(!commandBuffer.isRunning());
+
+    commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
     FUSION_PROFILE_GPU("Begin Frame");
 
@@ -221,10 +222,15 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
 #endif
 
     const auto& size = DeviceManager::Get()->getWindow(id)->getSize();
+    auto& swapchain = swapchains[id];
+    VkFormat format = swapchain->getSurfaceFormat().format;
 
     VkImage dstImage;
     VkDeviceMemory dstImageMemory;
-    auto supportsBlit = Image::CopyImage(swapchains[id]->getActiveImage(), dstImage, dstImageMemory, surfaces[id]->getFormat().format, { size.x, size.y, 1}, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
+
+    CommandBuffer commandBuffer{true};
+    bool supportsBlit = Image::CopyImage(commandBuffer, swapchain->getActiveImage(), dstImage, dstImageMemory, format, { size.x, size.y, 1}, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
+    commandBuffer.submitIdle();
 
     // Get layout of the image (including row pitch)
     VkImageSubresource imageSubresource = {};
@@ -237,9 +243,26 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
 
     Bitmap bitmap{std::make_unique<uint8_t[]>(dstSubresourceLayout.size), size};
 
+    // If source is BGR (destination is always RGB) and we can't use blit (which does automatic conversion), we'll have to manually swizzle color components
+    bool colorSwizzle = false;
+
+    // Check if source is BGR
+    // Note: Not complete, only contains most common and basic BGR surface formats for demonstration purposes
+    if (!supportsBlit) {
+        static std::vector<VkFormat> BGR_FORMATS = {
+                VK_FORMAT_B8G8R8A8_SRGB,
+                VK_FORMAT_B8G8R8A8_UNORM,
+                VK_FORMAT_B8G8R8A8_SNORM
+        };
+        colorSwizzle = std::find(BGR_FORMATS.begin(), BGR_FORMATS.end(), format) != BGR_FORMATS.end();
+    }
+
     void* data;
     vkMapMemory(logicalDevice, dstImageMemory, dstSubresourceLayout.offset, dstSubresourceLayout.size, 0, &data);
-    std::memcpy(bitmap.getData<void>(), data, static_cast<size_t>(dstSubresourceLayout.size));
+    if (colorSwizzle)
+        vku::BlitRGBAToBGRASurface(bitmap.getData<uint8_t>(), static_cast<const uint8_t*>(data), size);
+    else
+        std::memcpy(bitmap.getData<void>(), data, dstSubresourceLayout.size);
     vkUnmapMemory(logicalDevice, dstImageMemory);
 
     // Frees temp image and memory

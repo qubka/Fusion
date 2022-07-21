@@ -3,6 +3,7 @@
 #include <volk/volk.h>
 
 namespace fe {
+    class LogicalDevice;
     // Setup and functions for the VK_EXT_debug_marker_extension
     // Extension spec can be found at https://github.com/KhronosGroup/Vulkan-Docs/blob/1.0-VK_EXT_debug_marker/doc/specs/vulkan/appendices/VK_EXT_debug_marker.txt
     // Note that the extension will only be present if run from an offline debugging application
@@ -10,7 +11,7 @@ namespace fe {
     // See VulkanExampleBase::createInstance and VulkanExampleBase::createDevice (base/vulkanexamplebase.cpp)
     class DebugMarker {
     public:
-        explicit DebugMarker(const VkDevice& device);
+        DebugMarker();
         ~DebugMarker() = default;
         NONCOPYABLE(DebugMarker);
 
@@ -50,7 +51,7 @@ namespace fe {
         void setEventName(VkEvent event, const std::string& name);
 
     private:
-        const VkDevice& device;
+        const LogicalDevice& logicalDevice;
 
         PFN_vkDebugMarkerSetObjectTagEXT pfnDebugMarkerSetObjectTag{ VK_NULL_HANDLE };
         PFN_vkDebugMarkerSetObjectNameEXT pfnDebugMarkerSetObjectName{ VK_NULL_HANDLE };

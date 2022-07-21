@@ -42,7 +42,7 @@ namespace fe {
          * @param fence A optional fence that is signaled once the command buffer has completed.
          * @param submitPipelineStages Bitmask specifying pipeline stage.
          */
-        void submit(const VkSemaphore& waitSemaphore = VK_NULL_HANDLE, const VkSemaphore& signalSemaphore = VK_NULL_HANDLE, const VkFence& fence = VK_NULL_HANDLE,
+        void submit(VkSemaphore waitSemaphore = VK_NULL_HANDLE, VkSemaphore signalSemaphore = VK_NULL_HANDLE, VkFence fence = VK_NULL_HANDLE,
                     VkPipelineStageFlags submitPipelineStages = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
 
         // Create a short lived command buffer which is immediately executed and released

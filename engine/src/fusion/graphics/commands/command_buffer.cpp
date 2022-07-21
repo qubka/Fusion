@@ -68,7 +68,7 @@ void CommandBuffer::submitIdle() {
 	vkDestroyFence(logicalDevice, fence, nullptr);
 }
 
-void CommandBuffer::submit(const VkSemaphore& waitSemaphore, const VkSemaphore& signalSemaphore, const VkFence& fence, VkPipelineStageFlags submitPipelineStages) {
+void CommandBuffer::submit(VkSemaphore waitSemaphore, VkSemaphore signalSemaphore, VkFence fence, VkPipelineStageFlags submitPipelineStages) {
 	auto queueSelected = getQueue();
 
 	if (running)

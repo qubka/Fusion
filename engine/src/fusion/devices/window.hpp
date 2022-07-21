@@ -301,7 +301,7 @@ namespace fe {
          * @param surface Where to store the handle of the surface.
          * @return `VK_SUCCESS` if successful, or a Vulkan error code if an [error](@ref error_handling) occurred.
          */
-        virtual VkResult createSurface(const VkInstance& instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const = 0;
+        virtual VkResult createSurface(VkInstance instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const = 0;
 
     protected:
         /**

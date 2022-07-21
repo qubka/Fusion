@@ -196,7 +196,7 @@ std::string String::Demangle(const std::string& str) {
     if(str.empty())
         return {};
 
-#if defined(FUSION_PLATFORM_WINDOWS)
+#if FUSION_PLATFORM_WINDOWS
     char undecorated_name[1024];
     if(!UnDecorateSymbolName(str.c_str(), undecorated_name, sizeof(undecorated_name), UNDNAME_COMPLETE)) {
         return str;

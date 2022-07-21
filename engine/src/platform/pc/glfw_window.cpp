@@ -231,7 +231,7 @@ void Window::setMouseScroll(const glm::vec2& scroll) {
     mouseScroll = scroll;
 }
 
-VkResult Window::createSurface(const VkInstance& instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const {
+VkResult Window::createSurface(VkInstance instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const {
     return glfwCreateWindowSurface(instance, window, allocator, surface);
 }
 

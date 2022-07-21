@@ -1,27 +1,28 @@
 #include "debug.hpp"
+#include "logical_device.hpp"
 
 #include "fusion/graphics/graphics.hpp"
 
 using namespace fe;
 
-DebugMarker::DebugMarker(const VkDevice& device) : device{device} {
-    pfnDebugMarkerSetObjectTag = reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetDeviceProcAddr(device, "vkDebugMarkerSetObjectTagEXT"));
+DebugMarker::DebugMarker() : logicalDevice{Graphics::Get()->getLogicalDevice()} {
+    pfnDebugMarkerSetObjectTag = reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetDeviceProcAddr(logicalDevice, "vkDebugMarkerSetObjectTagEXT"));
     if (!pfnDebugMarkerSetObjectTag) {
         LOG_ERROR << "vkDebugMarkerSetObjectTagEXT not exist!";
     }
-    pfnDebugMarkerSetObjectName = reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetDeviceProcAddr(device, "vkDebugMarkerSetObjectNameEXT"));
+    pfnDebugMarkerSetObjectName = reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetDeviceProcAddr(logicalDevice, "vkDebugMarkerSetObjectNameEXT"));
     if (!pfnDebugMarkerSetObjectName) {
         LOG_ERROR << "vkDebugMarkerSetObjectNameEXT not exist!";
     }
-    pfnCmdDebugMarkerBegin = reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetDeviceProcAddr(device, "vkCmdDebugMarkerBeginEXT"));
+    pfnCmdDebugMarkerBegin = reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetDeviceProcAddr(logicalDevice, "vkCmdDebugMarkerBeginEXT"));
     if (!pfnCmdDebugMarkerBegin) {
         LOG_ERROR << "vkCmdDebugMarkerBeginEXT not exist!";
     }
-    pfnCmdDebugMarkerEnd = reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetDeviceProcAddr(device, "vkCmdDebugMarkerEndEXT"));
+    pfnCmdDebugMarkerEnd = reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetDeviceProcAddr(logicalDevice, "vkCmdDebugMarkerEndEXT"));
     if (!pfnCmdDebugMarkerEnd) {
         LOG_ERROR << "vkCmdDebugMarkerEndEXT not exist!";
     }
-    pfnCmdDebugMarkerInsert = reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetDeviceProcAddr(device, "vkCmdDebugMarkerInsertEXT"));
+    pfnCmdDebugMarkerInsert = reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetDeviceProcAddr(logicalDevice, "vkCmdDebugMarkerInsertEXT"));
     if (!pfnCmdDebugMarkerInsert) {
         LOG_ERROR << "vkCmdDebugMarkerInsertEXT not exist!";
     }
@@ -35,7 +36,7 @@ void DebugMarker::setObjectName(uint64_t object, VkDebugReportObjectTypeEXT obje
         nameInfo.objectType = objectType;
         nameInfo.object = object;
         nameInfo.pObjectName = name.data();
-        pfnDebugMarkerSetObjectName(device, &nameInfo);
+        pfnDebugMarkerSetObjectName(logicalDevice, &nameInfo);
     }
 }
 
@@ -49,7 +50,7 @@ void DebugMarker::setObjectTag(uint64_t object, VkDebugReportObjectTypeEXT objec
         tagInfo.tagName = name;
         tagInfo.tagSize = tagSize;
         tagInfo.pTag = tag;
-        pfnDebugMarkerSetObjectTag(device, &tagInfo);
+        pfnDebugMarkerSetObjectTag(logicalDevice, &tagInfo);
     }
 }
 
