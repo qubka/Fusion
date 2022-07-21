@@ -1,4 +1,4 @@
-#include "stb_loader.hpp"
+#include "stb_toolbox.hpp"
 
 #include "fusion/filesystem/file_system.hpp"
 
@@ -10,7 +10,7 @@
 
 using namespace fe;
 
-void StbLoader::Load(Bitmap& bitmap, const fs::path& filepath) {
+void StbToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
     std::unique_ptr<uint8_t[]> pixels;
     int width, height, channels;
     int desired_channels = STBI_rgb_alpha;
@@ -39,7 +39,7 @@ void StbLoader::Load(Bitmap& bitmap, const fs::path& filepath) {
     bitmap.hdr = hdr;
 }
 
-void StbLoader::Write(const Bitmap& bitmap, const fs::path& filepath) {
+void StbToolbox::Write(const Bitmap& bitmap, const fs::path& filepath) {
     std::string extension{ FileSystem::GetExtension(filepath) };
     if (extension == ".jpg" || extension == ".jpeg") {
         stbi_write_jpg(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getComponents()), bitmap.getData<uint8_t>(), 8);

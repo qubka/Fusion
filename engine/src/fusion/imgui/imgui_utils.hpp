@@ -41,22 +41,22 @@ namespace ImGuiUtils {
 
     void Tooltip(const std::string& text);
 
-    void Tooltip(Texture2d* texture, const glm::vec2& size, bool flipImage = false);
-    void Tooltip(Texture2d* texture, const glm::vec2& size, const std::string& text, bool flipImage = false);
-    void Tooltip(Texture2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
+    void Tooltip(Texture2d* texture, const ImVec2& size, bool flipImage = false);
+    void Tooltip(Texture2d* texture, const ImVec2& size, const std::string& text, bool flipImage = false);
+    void Tooltip(Texture2dArray* texture, uint32_t index, const ImVec2& size, bool flipImage = false);
 
-    void Image(Texture2d* texture, const glm::vec2& size, bool flipImage = false);
-    void Image(TextureCube* texture, const glm::vec2& size, bool flipImage = false);
-    void Image(Texture2dArray* texture, uint32_t index, const glm::vec2& size, bool flipImage = false);
-    void Image(uint32_t* texture_id, const glm::vec2& size, bool flipImage = false);
+    void Image(Texture2d* texture, const ImVec2& size, bool flipImage = false);
+    void Image(TextureCube* texture, const ImVec2& size, bool flipImage = false);
+    void Image(Texture2dArray* texture, uint32_t index, const ImVec2& size, bool flipImage = false);
+    void Image(uint32_t* texture_id, const ImVec2& size, bool flipImage = false);
 
     void SetTheme(Theme theme);
 
-    bool BufferingBar(const char* str_id, float value, const glm::vec2& size_arg, uint32_t bg_col, uint32_t fg_col);
-    bool Spinner(const char* str_id, float radius, int thickness, uint32_t color);
+    bool BufferingBar(const std::string& name, float value, ImVec2 size, uint32_t bgColor, uint32_t fgColor);
+    bool Spinner(const std::string& name, float radius, int thickness, uint32_t color);
 
-    bool ToggleRoundButton(const char* str_id, bool& value);
-    bool ToggleButton(const char* str_id, bool& value, bool text_style = false); // if text true, select text on active
+    bool ToggleRoundButton(const std::string& name, bool& value);
+    bool ToggleButton(const std::string& name, bool& value, bool text_style = false); // if text true, select text on active
 
     void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, float yOffset, uint32_t colEven, uint32_t colOdd);
 
@@ -225,13 +225,13 @@ namespace ImGuiUtils {
         ImVec2 buttonSize{ lineHeight + 3.0f, lineHeight };
 
         ImGui::PushMultiItemsWidths(L, ImGui::GetColumnWidth() - L * lineHeight); // ImGui::CalcItemWidth()
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
 
        if constexpr(L > 0) {
             ImVec4 color{ 0.8f, 0.1f, 0.15f, 1.0f };
             ImGui::PushStyleColor(ImGuiCol_Button, color);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("X", buttonSize)) {
                 value.x = reset;
@@ -250,8 +250,8 @@ namespace ImGuiUtils {
 
             ImVec4 color{ 0.2f, 0.7f, 0.2f, 1.0f };
             ImGui::PushStyleColor(ImGuiCol_Button, color);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("Y", buttonSize)) {
                 value.y = reset;
@@ -270,8 +270,8 @@ namespace ImGuiUtils {
 
             ImVec4 color{ 0.1f, 0.25f, 0.8f, 1.0f };
             ImGui::PushStyleColor(ImGuiCol_Button, color);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("Z", buttonSize)) {
                 value.z = reset;
@@ -290,8 +290,8 @@ namespace ImGuiUtils {
 
             ImVec4 color{ 0.8f, 0.2f, 0.8f, 1.0f };
             ImGui::PushStyleColor(ImGuiCol_Button, color);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("W", buttonSize)) {
                 value.w = reset;
@@ -456,12 +456,12 @@ static inline ImVec4& operator/=(ImVec4& lhs, const float rhs) {
     return lhs;
 }
 
-static inline std::ostream& operator<<(std::ostream& ostream, const ImVec2 a) {
-    ostream << "{ " << a.x << ", " << a.y << " }";
+static inline std::ostream& operator<<(std::ostream& ostream, const ImVec2& v) {
+    ostream << "{ " << v.x << ", " << v.y << " }";
     return ostream;
 }
 
-static inline std::ostream& operator<<(std::ostream& ostream, const ImVec4 a) {
-    ostream << "{ " << a.x << ", " << a.y << ", " << a.z << ", " << a.w << " }";
+static inline std::ostream& operator<<(std::ostream& ostream, const ImVec4& v) {
+    ostream << "{ " << v.x << ", " << v.y << ", " << v.z << ", " << v.w << " }";
     return ostream;
 }

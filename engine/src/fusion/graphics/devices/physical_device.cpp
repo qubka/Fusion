@@ -54,7 +54,7 @@ VkPhysicalDevice PhysicalDevice::ChoosePhysicalDevice(const std::vector<VkPhysic
     return nullptr;
 }
 
-uint32_t PhysicalDevice::ScorePhysicalDevice(const VkPhysicalDevice& device) {
+uint32_t PhysicalDevice::ScorePhysicalDevice(VkPhysicalDevice device) {
     uint32_t score = 0;
 
     // Checks if the requested extensions are supported

@@ -19,7 +19,7 @@ namespace fe {
          * @param fence A optional fence that is signaled once the previous command buffer has completed.
          * @return Result of the image acquisition.
          */
-        VkResult acquireNextImage(const VkSemaphore& presentCompleteSemaphore = VK_NULL_HANDLE, VkFence fence = VK_NULL_HANDLE);
+        VkResult acquireNextImage(VkSemaphore presentCompleteSemaphore = VK_NULL_HANDLE, VkFence fence = VK_NULL_HANDLE);
 
         /**
          * Queue an image for presentation using the internal acquired image for queue presentation.
@@ -27,7 +27,7 @@ namespace fe {
          * @param waitSemaphore A optional semaphore that is waited on before the image is presented.
          * @return Result of the queue presentation.
          */
-        VkResult queuePresent(const VkQueue& presentQueue, const VkSemaphore& waitSemaphore = VK_NULL_HANDLE);
+        VkResult queuePresent(VkQueue presentQueue, VkSemaphore waitSemaphore = VK_NULL_HANDLE);
 
         bool isSameExtent(const VkExtent2D& extent2D) { return extent.width == extent2D.width && extent.height == extent2D.height; }
 

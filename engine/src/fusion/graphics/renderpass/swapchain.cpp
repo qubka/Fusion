@@ -104,7 +104,7 @@ Swapchain::~Swapchain() {
 	}
 }
 
-VkResult Swapchain::acquireNextImage(const VkSemaphore& presentCompleteSemaphore, VkFence fence) {
+VkResult Swapchain::acquireNextImage(VkSemaphore presentCompleteSemaphore, VkFence fence) {
 	if (fence != VK_NULL_HANDLE)
 		VK_CHECK(vkWaitForFences(logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
 
@@ -117,7 +117,7 @@ VkResult Swapchain::acquireNextImage(const VkSemaphore& presentCompleteSemaphore
     return result;
 }
 
-VkResult Swapchain::queuePresent(const VkQueue& presentQueue, const VkSemaphore& waitSemaphore) {
+VkResult Swapchain::queuePresent(VkQueue presentQueue, VkSemaphore waitSemaphore) {
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     presentInfo.swapchainCount = 1;

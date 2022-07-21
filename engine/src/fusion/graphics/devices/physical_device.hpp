@@ -29,7 +29,7 @@ namespace fe {
 
     private:
         static VkPhysicalDevice ChoosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices);
-        static uint32_t ScorePhysicalDevice(const VkPhysicalDevice& device);
+        static uint32_t ScorePhysicalDevice(VkPhysicalDevice device);
 
         VkSampleCountFlagBits getMaxUsableSampleCount() const;
         void findQueueFamilyIndices();
