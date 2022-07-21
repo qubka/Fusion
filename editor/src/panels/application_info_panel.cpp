@@ -118,8 +118,8 @@ void ApplicationInfoPanel::onImGui() {
                             if (primary) {
                                 ImVec4 color{ 0.2f, 0.7f, 0.2f, 1.0f };
                                 ImGui::PushStyleColor(ImGuiCol_Button, color);
-                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
                             }
                             ImGui::SmallButton(primary ? "Yes" : "No");
                             if (primary)
@@ -167,8 +167,8 @@ void ApplicationInfoPanel::onImGui() {
                             if (connected) {
                                 ImVec4 color{ 0.2f, 0.7f, 0.2f, 1.0f };
                                 ImGui::PushStyleColor(ImGuiCol_Button, color);
-                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+                                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+                                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
                             }
                             ImGui::SmallButton(connected ? "Yes" : "No");
                             if (connected)

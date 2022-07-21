@@ -97,7 +97,6 @@ namespace glm {
         }
 
         vec<3, T, Q> dest { current - change };
-
         vec<3, T, Q> temp { (currentVelocity + omega * change) * deltaTime };
 
         currentVelocity = (currentVelocity - omega * temp) * exp;
@@ -147,30 +146,16 @@ namespace glm {
         row[1] = normalize(targetUpDir);
         row[2] = normalize(targetDir);
 
-        mat<4, 4, T, Q> output {
+        return mat<4, 4, T, Q>{
             row[0].x,  row[0].y,  row[0].z,  0,
             row[1].x,  row[1].y,  row[1].z,  0,
             row[2].x,  row[2].y,  row[2].z,  0,
             0,         0,         0,		 1
         };
-        return output;
     }
 
     template<typename T, qualifier Q>
     GLM_FUNC_QUALIFIER GLM_CONSTEXPR T cross(const vec<2, T, Q>& x, const vec<2, T, Q>& y)  {
         return x.x * y.y - x.y * y.x;
-    }
-
-    template<typename T, qualifier Q>
-    GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<2, T, Q> worldToScreen(const vec<3, T, Q>& worldCoord, const mat<4, 4, T, Q>& mvp, const vec<2, T, Q>& size, const vec<2, T, Q>& offset = vec<2, T, Q>{0, 0}) {
-        glm::vec4 trans{ mvp * glm::vec4{worldCoord, 1} };
-        trans *= 0.5f / trans.w;
-        trans += glm::vec4{0.5f, 0.5f, 0.0f, 0.0f};
-        trans.y = 1.f - trans.y;
-        trans.x *= size.x;
-        trans.y *= size.y;
-        trans.x += offset.x;
-        trans.y += offset.y;
-        return { trans.x, trans.y };
     }
 }

@@ -16,7 +16,7 @@ namespace fe {
          * @param queueType The queue to run this command buffer on.
          * @param bufferLevel The buffer level.
          */
-        explicit CommandBuffer(bool begin = true, VkQueueFlagBits queueType = VK_QUEUE_GRAPHICS_BIT, VkCommandBufferLevel bufferLevel = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+        explicit CommandBuffer(bool begin = false, VkQueueFlagBits queueType = VK_QUEUE_GRAPHICS_BIT, VkCommandBufferLevel bufferLevel = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
         ~CommandBuffer();
 
         /**
@@ -40,10 +40,15 @@ namespace fe {
          * @param waitSemaphore A optional semaphore that will waited upon before the command buffer is executed.
          * @param signalSemaphore A optional that is signaled once the command buffer has been executed.
          * @param fence A optional fence that is signaled once the command buffer has completed.
-         * @param submitPipelineStages
+         * @param submitPipelineStages Bitmask specifying pipeline stage.
          */
         void submit(const VkSemaphore& waitSemaphore = VK_NULL_HANDLE, const VkSemaphore& signalSemaphore = VK_NULL_HANDLE, const VkFence& fence = VK_NULL_HANDLE,
                     VkPipelineStageFlags submitPipelineStages = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+
+        // Create a short lived command buffer which is immediately executed and released
+        // This function is intended for initialization only. It incurs a queue and device
+        // flush and may impact performance if used in non-setup code.
+        static void SubmitBuffer(const std::function<void(CommandBuffer& commandBuffer)>& function);
 
         operator bool() const { return commandBuffer != VK_NULL_HANDLE; }
         operator const VkCommandBuffer&() const { return commandBuffer; }

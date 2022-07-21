@@ -46,7 +46,6 @@ void SceneViewPanel::onImGui() {
 
     ImGuizmo::SetDrawlist();
 
-    // TODO:: Refactor
     ImVec2 viewportOffset{ ImGui::GetCursorPos() };
     ImVec2 viewportSize{ ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin() - viewportOffset * 0.5f };
     ImVec2 viewportPos{ ImGui::GetWindowPos() + viewportOffset };
@@ -54,29 +53,27 @@ void SceneViewPanel::onImGui() {
     viewportSize.x -= static_cast<int>(viewportSize.x) % 2 != 0 ? 1.0f : 0.0f;
     viewportSize.y -= static_cast<int>(viewportSize.y) % 2 != 0 ? 1.0f : 0.0f;
 
-    float aspect = static_cast<float>(viewportSize.x) / static_cast<float>(viewportSize.y);
+    float aspect = viewportSize.x / viewportSize.y;
     camera->setAspectRatio(aspect);
 
-    editor->setSceneViewPanelPosition({ viewportPos.x, viewportPos.y});
+    editor->setSceneViewPanelPosition(viewportPos);
 
     bool halfRes = editor->getSettings().halfRes;
 
     if (halfRes)
         viewportSize *= 0.5f;
 
-    //resize({sceneViewSize.x, sceneViewSize.y});
+    //resize(sceneViewSize);
 
     if (halfRes)
         viewportSize *= 2.0f;
 
-    //static uint32_t id = 1; // custom image
-    //ImGuiUtils::Image(&id, { viewportSize.x, viewportSize.y }, true);
-    ImGuiUtils::Image((Texture2d*)Graphics::Get()->getAttachment("scene"), { viewportSize.x, viewportSize.y }, true);
+    ImGuiUtils::Image((Texture2d*)Graphics::Get()->getAttachment("scene"), viewportSize, true);
 
     ImVec2 windowSize{ ImGui::GetWindowSize() };
 
     ImVec2& minBound = viewportPos;
-    ImVec2  maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+    ImVec2  maxBound{ minBound + windowSize };
 
     bool updateCamera = ImGui::IsMouseHoveringRect(minBound, maxBound); // || Input::Get().GetMouseMode() == MouseMode::Captured;
 
@@ -92,9 +89,7 @@ void SceneViewPanel::onImGui() {
 
     auto input = Input::Get();
     if (updateCamera && editor->isSceneActive() && !ImGuizmo::IsUsing() && input->getMouseButton(MouseButton::ButtonLeft)) {
-        auto clickPos = input->getMousePosition() - glm::vec2{viewportPos.x, viewportPos.y};
-
-        Ray ray = camera->screenPointToRay(clickPos, { viewportSize.x, viewportSize.y });
+        Ray ray = camera->screenPointToRay(input->getMousePosition() - viewportPos, viewportSize);
         //editor->selectObject(ray);
     }
 
@@ -105,7 +100,7 @@ void SceneViewPanel::onImGui() {
         ImGui::EndDragDropTarget();
     }
 
-    drawGizmos(scene->getRegistry(), *camera, { viewportSize.x, viewportSize.y}, { viewportOffset.x, viewportOffset.y});
+    drawGizmos(scene->getRegistry(), *camera, viewportSize, viewportOffset);
 
     ImGui::PopStyleVar();
     ImGui::End();
@@ -224,7 +219,7 @@ void SceneViewPanel::drawToolBar() {
         if (ImGuiUtils::ToggleButton(ICON_MDI_ANGLE_RIGHT "2D", selected)) {
             if (!ortho) {
                 camera.setOrthographic(true);
-                camera.lookAt(glm::vec3{ 0, 1, 0 }, vec3::zero, vec3::up);
+                camera.lookAt(vec3::up, vec3::zero, vec3::up);
             }
         }
     }
@@ -246,7 +241,7 @@ void SceneViewPanel::drawToolBar() {
             auto& camera = *editor->getCamera();
             bool ortho = camera.isOrthographic();
 
-            ImGui::Dummy({200.0f, 0.0f});  // fix resize
+            ImGui::Dummy(ImVec2{200.0f, 0.0f});  // fix resize
             ImGui::TextUnformatted(" Scene camera");
             ImGui::Separator();
 

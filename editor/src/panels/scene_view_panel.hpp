@@ -40,8 +40,8 @@ namespace fe {
 
                     ImVec4 color{0.7f, 0.7f, 0.7f, 1.0f};
                     ImGui::PushStyleColor(ImGuiCol_Button, color);
-                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
 
                     std::string icon{ ICON_MDI_CUBE_OUTLINE };
                     editor->getComponentIcon(typeId, icon);

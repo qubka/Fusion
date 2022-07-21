@@ -6,7 +6,7 @@ namespace std::filesystem {
     template<class Archive> string save_minimal(const Archive&, const path& p) { return p.string(); }
     template<class Archive> void load_minimal(const Archive&, path& p, const string& in) { p = in; };
 }
-CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(std::filesystem::path,cereal::specialization::non_member_load_save_minimal);
+CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(std::filesystem::path, cereal::specialization::non_member_load_save_minimal);
 
 namespace cereal {
     template<class Archive> void serialize(Archive& archive, glm::vec2& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y)); }

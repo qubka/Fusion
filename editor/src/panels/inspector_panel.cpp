@@ -15,17 +15,17 @@ namespace ImGui {
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
-        glm::vec3 position = transform.getLocalPosition();
+        glm::vec3 position{ transform.getLocalPosition() };
         if (ImGuiUtils::PropertyControl("Position", position)) {
             transform.setLocalPosition(position);
         }
 
-        glm::vec3 rotation = glm::degrees(glm::eulerAngles(transform.getLocalOrientation()));
+        glm::vec3 rotation{ glm::degrees(glm::eulerAngles(transform.getLocalOrientation())) };
         if (ImGuiUtils::PropertyControl("Rotation", rotation, -180.0f, 180.0f)) {
             transform.setLocalOrientation(glm::radians(rotation));
         }
 
-        glm::vec3 scale = transform.getLocalScale();
+        glm::vec3 scale{ transform.getLocalScale() };
         if (ImGuiUtils::PropertyControl("Scale", scale, 0.01f, FLT_MAX, 1.0f, 0.01f)) {
             transform.setLocalScale(scale);
         }
@@ -143,8 +143,8 @@ void InspectorPanel::onImGui() {
 
         ImVec4 color{0.7f, 0.7f, 0.7f, 0.0f};
         ImGui::PushStyleColor(ImGuiCol_Button, color);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
 
         if (ImGui::Button(ICON_MDI_TUNE))
             ImGui::OpenPopup("SetDebugMode");
@@ -178,6 +178,7 @@ void InspectorPanel::onImGui() {
                 }
 
                 ImGui::Text("Children : %d", hierarchyComponent->children);
+
                 ImGui::Indent(24.0f);
 
                 auto child = hierarchyComponent->first;

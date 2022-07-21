@@ -21,7 +21,7 @@ void ProjectSettingsPanel::onImGui() {
         auto window = DeviceManager::Get()->getWindow(0);
 
         ImGui::Columns(2);
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 2, 2 });
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
         auto& projectSettings = editor->getProjectSettings();
         ImGuiUtils::PropertyText("Project Version", projectSettings.projectVersion, ImGuiUtils::PropertyFlag::ReadOnly);
         ImGuiUtils::PropertyText("Project Name", projectSettings.projectName, ImGuiUtils::PropertyFlag::ReadOnly);

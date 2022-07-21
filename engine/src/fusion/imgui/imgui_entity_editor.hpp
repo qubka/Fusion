@@ -44,9 +44,9 @@ namespace ImGui {
 
         std::map<ComponentTypeID, ComponentInfo> componentInfos;
 
-        bool entityHasComponent(Registry& registry, EntityType& entity, ComponentTypeID type_id) {
-            const auto storage_it = registry.storage(type_id);
-            return storage_it != registry.storage().end() && storage_it->second.contains(entity);
+        bool entityHasComponent(Registry& registry, EntityType& entity, ComponentTypeID type) {
+            const auto storage = registry.storage(type);
+            return storage != registry.storage().end() && storage->second.contains(entity);
         }
 
     public:
@@ -92,8 +92,8 @@ namespace ImGui {
 
                         ImVec4 color{ 0.7f, 0.7f, 0.7f, 0.0f };
                         ImGui::PushStyleColor(ImGuiCol_Button, color);
-                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
 
                         if (ImGui::Button((ICON_MDI_TUNE "##" + label).c_str()))
                             ImGui::OpenPopup(("Remove Component" + label).c_str());
@@ -123,18 +123,20 @@ namespace ImGui {
                 }
 
                 if (!hasNot.empty()) {
-                    if (ImGui::Button(ICON_MDI_PLUS_BOX_OUTLINE " Add Component", ImVec2{ ImGui::GetContentRegionAvail().x, 0.0f })) {
+                    float xAvail = ImGui::GetContentRegionAvail().x;
+
+                    if (ImGui::Button(ICON_MDI_PLUS_BOX_OUTLINE " Add Component", ImVec2{xAvail, 0.0f})) {
                         ImGui::OpenPopup("addComponent");
                     }
 
                     if (ImGui::BeginPopup("addComponent", ImGuiWindowFlags_AlwaysAutoResize)) {
-                        ImGui::Dummy({200.0f, 0.0f}); // fix resize
+                        ImGui::Dummy(ImVec2{200.0f, 0.0f}); // fix resize
                         ImGui::Separator();
 
                         ImGui::TextUnformatted(ICON_MDI_MAGNIFY);
                         ImGui::SameLine();
 
-                        float filterSize = ImGui::GetContentRegionAvail().x - style.IndentSpacing;
+                        float filterSize = xAvail - style.IndentSpacing;
                         filterSize = std::min(200.0f, filterSize);
                         componentFilter.Draw("##ComponentFilter", filterSize);
 

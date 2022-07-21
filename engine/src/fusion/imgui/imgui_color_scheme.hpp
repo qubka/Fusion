@@ -2,8 +2,8 @@
 
 #include <imgui/imgui.h>
 
-namespace fe {
-    class ImGuiColorScheme {
+namespace ImGui {
+    class ColorScheme {
     public:
         static void SetColors(uint32_t backGroundColor, uint32_t textColor, uint32_t mainColor, uint32_t mainAccentColor, uint32_t highlightColor) {
             BackGroundColor = backGroundColor;
@@ -92,22 +92,22 @@ namespace fe {
 
     private:
         // 0xRRGGBBAA
-        inline static uint32_t BackGroundColor   = 0x25213100;
-        inline static uint32_t TextColor         = 0xF4F1DE00;
-        inline static uint32_t MainColor         = 0xDA115E00;
-        inline static uint32_t MainAccentColor   = 0x79235900;
-        inline static uint32_t HighlightColor    = 0xC7EF0000;
+        inline static uint32_t BackGroundColor  = 0x25213100;
+        inline static uint32_t TextColor        = 0xF4F1DE00;
+        inline static uint32_t MainColor        = 0xDA115E00;
+        inline static uint32_t MainAccentColor  = 0x79235900;
+        inline static uint32_t HighlightColor   = 0xC7EF0000;
 
-        inline static uint32_t Black			 = 0x00000000;
-        inline static uint32_t White			 = 0xFFFFFF00;
+        inline static uint32_t Black			= 0x00000000;
+        inline static uint32_t White			= 0xFFFFFF00;
 
-        inline static uint32_t AlphaTransparent	 = 0x00;
-        inline static uint32_t Alpha20			 = 0x33;
-        inline static uint32_t Alpha40			 = 0x66;
-        inline static uint32_t Alpha50			 = 0x80;
-        inline static uint32_t Alpha60			 = 0x99;
-        inline static uint32_t Alpha80			 = 0xCC;
-        inline static uint32_t Alpha90			 = 0xE6;
-        inline static uint32_t AlphaFull		 = 0xFF;
+        inline static uint32_t AlphaTransparent	= 0x00;
+        inline static uint32_t Alpha20			= 0x33;
+        inline static uint32_t Alpha40			= 0x66;
+        inline static uint32_t Alpha50			= 0x80;
+        inline static uint32_t Alpha60			= 0x99;
+        inline static uint32_t Alpha80			= 0xCC;
+        inline static uint32_t Alpha90			= 0xE6;
+        inline static uint32_t AlphaFull		= 0xFF;
     };
 }

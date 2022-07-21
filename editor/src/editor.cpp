@@ -567,8 +567,8 @@ void Editor::drawMenuBar() {
 
         ImVec4 color{0.1f, 0.2f, 0.7f, 0.0f};
         ImGui::PushStyleColor(ImGuiCol_Button, color);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
 
         if (editorState == EditorState::Next)
             editorState = EditorState::Paused;

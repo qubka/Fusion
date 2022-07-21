@@ -13,7 +13,7 @@ namespace vku {
 
     /// Scale a value by mip level, but do not reduce to zero.
     inline uint32_t mipScale(uint32_t value, uint32_t mipLevel) {
-        return std::max(value >> mipLevel, static_cast<uint32_t>(1));
+        return std::max(value >> mipLevel, 1U);
     }*/
 
     inline VkViewport viewport(float x, float y, float width, float height, float minDepth = 0, float maxDepth = 1) {
@@ -396,7 +396,7 @@ namespace vku {
             case VK_FORMAT_D24_UNORM_S8_UINT:
                 return BlockParams{ 1, 1, 4 };
             case VK_FORMAT_D32_SFLOAT_S8_UINT:
-                return BlockParams{ 0, 0, 0 };
+                return BlockParams{ 1, 1, 4 };
             case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
                 return BlockParams{ 4, 4, 8 };
             case VK_FORMAT_BC1_RGB_SRGB_BLOCK:

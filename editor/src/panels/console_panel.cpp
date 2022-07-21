@@ -149,7 +149,7 @@ void ConsolePanel::renderHeader() {
         ImGui::SameLine();
         ImGui::PushFont(io.Fonts->Fonts[1]);
         ImGui::SetCursorPosX(ImGui::GetFontSize() * 4.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 0.0f, style.FramePadding.y});
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0.0f, style.FramePadding.y});
         ImGui::TextUnformatted("Search...");
         ImGui::PopStyleVar();
         ImGui::PopFont();

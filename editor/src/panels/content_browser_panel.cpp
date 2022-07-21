@@ -194,7 +194,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
     if (dirInfo->parent == nullptr)
         nodeFlags |= ImGuiTreeNodeFlags_Framed;
 
-    const ImColor TreeLineColor{128, 128, 128, 128};
+    const ImColor treeLineColor{128, 128, 128, 128};
     const float smallOffsetX = 6.0f;
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
@@ -248,7 +248,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
 
         const char* folderIcon = ((isOpened && isContains) || currentDirectory == dirInfo) ? ICON_MDI_FOLDER_OPEN : ICON_MDI_FOLDER;
         ImGui::SameLine();
-        //ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColorScheme::GetIconColor());
+        //ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorScheme::GetIconColor());
         ImGui::Text("%s ", folderIcon);
         //ImGui::PopStyleColor();
         ImGui::SameLine();
@@ -284,14 +284,14 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
                     const float midpoint = (childRect.Min.y + childRect.Max.y) * 0.5f;
                     drawList->AddLine(ImVec2{verticalLineStart.x, midpoint},
                                       ImVec2{verticalLineStart.x + horizontalTreeLineSize, midpoint},
-                                      TreeLineColor);
+                                      treeLineColor);
                     verticalLineEnd.y = midpoint;
 
                     ImGui::Unindent(10.0f);
                 }
             }
 
-            drawList->AddLine(verticalLineStart, verticalLineEnd, TreeLineColor);
+            drawList->AddLine(verticalLineStart, verticalLineEnd, treeLineColor);
 
             ImGui::TreePop();
         }
@@ -381,8 +381,8 @@ void ContentBrowserPanel::drawBottom() {
 
         ImVec4 color{0.1f, 0.2f, 0.7f, 0.0f};
         ImGui::PushStyleColor(ImGuiCol_Button, color);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiColorScheme::Hovered(color));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiColorScheme::Active(color));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
 
         for (auto& directory : breadCrumbData) {
             if (ImGui::SmallButton(directory->name.c_str())) {

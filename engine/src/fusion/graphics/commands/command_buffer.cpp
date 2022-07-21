@@ -108,3 +108,9 @@ VkQueue CommandBuffer::getQueue() const {
             return nullptr;
 	}
 }
+
+void CommandBuffer::SubmitBuffer(const std::function<void(CommandBuffer&)>& function) {
+    CommandBuffer commandBuffer{true};
+    function(commandBuffer);
+    commandBuffer.submitIdle();
+}

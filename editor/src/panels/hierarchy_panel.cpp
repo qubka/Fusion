@@ -112,7 +112,7 @@ void HierarchyPanel::onImGui() {
             ImGui::SameLine();
             ImGui::PushFont(io.Fonts->Fonts[1]);
             ImGui::SetCursorPosX(ImGui::GetFontSize() * 4.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 0.0f, style.FramePadding.y });
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0.0f, style.FramePadding.y});
             ImGui::TextUnformatted("Search...");
             ImGui::PopStyleVar();
             ImGui::PopFont();
@@ -255,7 +255,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             editor->getComponentIcon(typeid(CameraComponent), icon);
         }
 
-        //ImGui::PushStyleColor(ImGuiCol_Text, ImGuiColorScheme::GetIconColor());
+        //ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorScheme::GetIconColor());
         // ImGui::BeginGroup();
         bool nodeOpen = ImGui::TreeNodeEx((void*) (intptr_t) entt::to_integral(node), nodeFlags, "%s", icon.c_str());
         {
@@ -418,7 +418,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             return;
         }
 
-        const ImColor TreeLineColor{128, 128, 128, 128};
+        const ImColor treeLineColor{128, 128, 128, 128};
         const float smallOffsetX = 6.0f;
         ImDrawList* drawList = ImGui::GetWindowDrawList();
 
@@ -445,16 +445,16 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
 
                 ImGui::Unindent(10.0f);
 
-                ImRect childRect{ currentPos, currentPos + ImVec2{0.0f, ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y} };
+                ImRect childRect{currentPos, currentPos + ImVec2{0.0f, ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y}};
 
                 const float midpoint = (childRect.Min.y + childRect.Max.y) * 0.5f;
                 drawList->AddLine(ImVec2{verticalLineStart.x, midpoint},
-                                  ImVec2{verticalLineStart.x + horizontalTreeLineSize, midpoint}, TreeLineColor);
+                                  ImVec2{verticalLineStart.x + horizontalTreeLineSize, midpoint}, treeLineColor);
                 verticalLineEnd.y = midpoint;
             }
         }
 
-        drawList->AddLine(verticalLineStart, verticalLineEnd, TreeLineColor);
+        drawList->AddLine(verticalLineStart, verticalLineEnd, treeLineColor);
 
         ImGui::TreePop();
         ImGui::PopID();
