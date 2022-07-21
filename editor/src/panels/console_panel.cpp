@@ -159,7 +159,7 @@ void ConsolePanel::renderHeader() {
 void ConsolePanel::renderMessages() {
     ImGui::BeginChild("ScrollRegion", ImVec2{0, 0}, false, ImGuiWindowFlags_HorizontalScrollbar);
     {
-        // ImGuiUtils::AlternatingRowsBackground();
+        //ImGuiUtils::AlternatingRowsBackground();
 
         auto messageStart = MessageBuffer.begin() + MessageBufferBegin;
         if (*messageStart) {// If contains old message here
