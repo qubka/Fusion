@@ -271,22 +271,13 @@ void Image(Texture2dArray* texture, uint32_t index, const glm::vec2& size, bool 
     ImGui::Image(texture, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
 }
 
-struct Image { static void Callback(const ImDrawList* parent_list, const ImDrawCmd* cmd) {} };
-
-void Image(uint32_t* texture_id, const glm::vec2& size, bool flipImage) {
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    draw_list->AddCallback(Image::Callback, texture_id);
-    ImGui::Image(nullptr, ImVec2{size.x, size.y}, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
-    draw_list->AddCallback(nullptr, nullptr);
-}
-
 bool BufferingBar(const char* str_id, float value, const glm::vec2& size_arg, uint32_t bg_col, uint32_t fg_col) {
     ImGuiContext* g = ImGui::GetCurrentContext();
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
     const ImGuiStyle& style = ImGui::GetStyle();
     const ImGuiID id = ImGui::GetID(str_id);
 
-    ImVec2 pos = ImGui::GetCursorPos();
+    ImVec2 pos{ ImGui::GetCursorPos() };
     ImVec2 size{ size_arg.x, size_arg.y };
     size.x -= style.FramePadding.x * 2;
 
@@ -300,8 +291,8 @@ bool BufferingBar(const char* str_id, float value, const glm::vec2& size_arg, ui
     const float circleEnd = size.x;
     const float circleWidth = circleEnd - circleStart;
 
-    draw_list->AddRectFilled(bb.Min, ImVec2{pos.x + circleStart, bb.Max.y}, bg_col);
-    draw_list->AddRectFilled(bb.Min, ImVec2{pos.x + circleStart * value, bb.Max.y}, fg_col);
+    drawList->AddRectFilled(bb.Min, ImVec2{pos.x + circleStart, bb.Max.y}, bg_col);
+    drawList->AddRectFilled(bb.Min, ImVec2{pos.x + circleStart * value, bb.Max.y}, fg_col);
 
     const float t = static_cast<float>(g->Time);
     const float r = size.y * 0.5f;
@@ -315,9 +306,9 @@ bool BufferingBar(const char* str_id, float value, const glm::vec2& size_arg, ui
     const float o2 = (circleWidth + r) * (t + b - speed * std::round((t + b) / speed)) / speed;
     const float o3 = (circleWidth + r) * (t + c - speed * std::round((t + c) / speed)) / speed;
 
-    draw_list->AddCircleFilled(ImVec2{pos.x + circleEnd - o1, bb.Min.y + r}, r, bg_col);
-    draw_list->AddCircleFilled(ImVec2{pos.x + circleEnd - o2, bb.Min.y + r}, r, bg_col);
-    draw_list->AddCircleFilled(ImVec2{pos.x + circleEnd - o3, bb.Min.y + r}, r, bg_col);
+    drawList->AddCircleFilled(ImVec2{pos.x + circleEnd - o1, bb.Min.y + r}, r, bg_col);
+    drawList->AddCircleFilled(ImVec2{pos.x + circleEnd - o2, bb.Min.y + r}, r, bg_col);
+    drawList->AddCircleFilled(ImVec2{pos.x + circleEnd - o3, bb.Min.y + r}, r, bg_col);
 
     return true;
 }
@@ -326,9 +317,9 @@ bool Spinner(const char* str_id, float radius, int thickness, uint32_t color) {
     ImGuiContext* g = ImGui::GetCurrentContext();
     const ImGuiStyle& style = g->Style;
     const ImGuiID id = ImGui::GetID(str_id);
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-    ImVec2 pos = ImGui::GetCursorPos();
+    ImVec2 pos{ ImGui::GetCursorPos() };
     ImVec2 size{ radius * 2, (radius + style.FramePadding.y) * 2 };
 
     const ImRect bb{pos, ImVec2{pos.x + size.x, pos.y + size.y}};
@@ -337,23 +328,23 @@ bool Spinner(const char* str_id, float radius, int thickness, uint32_t color) {
         return false;
 
     // Render
-    draw_list->PathClear();
+    drawList->PathClear();
 
     const int num_segments = 30;
     float start = abs(ImSin(static_cast<float>(g->Time) * 1.8f) * static_cast<float>(num_segments - 5));
 
-    const float a_min = IM_PI * 2.0f * (start / static_cast<float>(num_segments));
-    const float a_max = IM_PI * 2.0f * (static_cast<float>(num_segments) - 3.0f) / static_cast<float>(num_segments);
+    const float min = IM_PI * 2.0f * (start / static_cast<float>(num_segments));
+    const float max = IM_PI * 2.0f * (static_cast<float>(num_segments) - 3.0f) / static_cast<float>(num_segments);
 
-    const ImVec2 centre = ImVec2{pos.x + radius, pos.y + radius + style.FramePadding.y};
+    const ImVec2 centre{pos.x + radius, pos.y + radius + style.FramePadding.y};
 
     for (int i = 0; i < num_segments; i++) {
-        const float a = a_min + (static_cast<float>(i) / static_cast<float>(num_segments)) * (a_max - a_min);
-        draw_list->PathLineTo(ImVec2{centre.x + ImCos(a + static_cast<float>(g->Time) * 8) * radius,
-                                     centre.y + ImSin(a + static_cast<float>(g->Time) * 8) * radius});
+        const float a = min + (static_cast<float>(i) / static_cast<float>(num_segments)) * (max - min);
+        drawList->PathLineTo(ImVec2{centre.x + ImCos(a + static_cast<float>(g->Time) * 8) * radius,
+                                    centre.y + ImSin(a + static_cast<float>(g->Time) * 8) * radius});
     }
 
-    draw_list->PathStroke(color, false, static_cast<float>(thickness));
+    drawList->PathStroke(color, false, static_cast<float>(thickness));
 
     return true;
 }
@@ -362,8 +353,8 @@ bool Spinner(const char* str_id, float radius, int thickness, uint32_t color) {
 bool ToggleRoundButton(const char* str_id, bool& value) {
     bool updated = false;
 
-    ImVec2 p = ImGui::GetCursorScreenPos();
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 p{ ImGui::GetCursorScreenPos() };
 
     float height = ImGui::GetFrameHeight();
     float width = height * 1.55f;
@@ -389,8 +380,8 @@ bool ToggleRoundButton(const char* str_id, bool& value) {
     :
         ImGui::GetColorU32(ImLerp(ImGui::GetStyleColorVec4(ImGuiCol_Button), ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered), t));
 
-    draw_list->AddRectFilled(p, ImVec2{p.x + width, p.y + height}, col, height * 0.5f);
-    draw_list->AddCircleFilled(ImVec2{p.x + radius + t * (width - radius * 2.0f), p.y + radius}, radius - 1.5f, IM_COL32(255, 255, 255, 255));
+    drawList->AddRectFilled(p, ImVec2{p.x + width, p.y + height}, col, height * 0.5f);
+    drawList->AddCircleFilled(ImVec2{p.x + radius + t * (width - radius * 2.0f), p.y + radius}, radius - 1.5f, IM_COL32(255, 255, 255, 255));
 
     return updated;
 }
@@ -420,26 +411,26 @@ bool ToggleButton(const char* str_id, bool& value, bool text_style) {
     return updated;
 }
 
-void DrawRowsBackground(int row_count, float line_height, float x1, float x2, float y_offset, uint32_t col_even, uint32_t col_odd) {
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    float y0 = ImGui::GetCursorScreenPos().y + std::round(y_offset);
+void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, float yOffset, uint32_t colEven, uint32_t colOdd) {
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    float y0 = ImGui::GetCursorScreenPos().y + std::round(yOffset);
 
     ImGuiListClipper clipper;
-    clipper.Begin(row_count, line_height);
+    clipper.Begin(rowCount, lineHeight);
     while (clipper.Step()) {
         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-            ImU32 col = (i & 1) ? col_odd : col_even;
+            ImU32 col = (i & 1) ? colOdd : colEven;
             if ((col & IM_COL32_A_MASK) == 0)
                 continue;
-            float y1 = y0 + (line_height * static_cast<float>(i));
-            float y2 = y1 + line_height;
-            draw_list->AddRectFilled(ImVec2{ x1, y1 }, ImVec2{ x2, y2 }, col);
+            float y1 = y0 + (lineHeight * static_cast<float>(i));
+            float y2 = y1 + lineHeight;
+            drawList->AddRectFilled(ImVec2{x1, y1}, ImVec2{x2, y2}, col);
         }
     }
 }
 
 void DrawItemActivityOutline(float rounding, bool drawWhenInactive, const ImColor& colourWhenActive) {
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     ImRect rect{ImGui::GetItemRectMin(), ImGui::GetItemRectMax()};
     rect.Min.x -= 1.0f;
@@ -448,12 +439,12 @@ void DrawItemActivityOutline(float rounding, bool drawWhenInactive, const ImColo
     rect.Max.y += 1.0f;
 
     if (ImGui::IsItemHovered() && !ImGui::IsItemActive()) {
-        draw_list->AddRect(rect.Min, rect.Max, ImColor{60, 60, 60}, rounding, 0, 1.5f);
+        drawList->AddRect(rect.Min, rect.Max, ImColor{60, 60, 60}, rounding, 0, 1.5f);
     }
     if (ImGui::IsItemActive()) {
-        draw_list->AddRect(rect.Min, rect.Max, colourWhenActive, rounding, 0, 1.0f);
+        drawList->AddRect(rect.Min, rect.Max, colourWhenActive, rounding, 0, 1.0f);
     } else if (!ImGui::IsItemHovered() && drawWhenInactive) {
-        draw_list->AddRect(rect.Min, rect.Max, ImColor{50, 50, 50}, rounding, 0, 1.0f);
+        drawList->AddRect(rect.Min, rect.Max, ImColor{50, 50, 50}, rounding, 0, 1.0f);
     }
 }
 
@@ -480,9 +471,9 @@ bool InputText(const std::string& name, std::string& currentText) {
 
 // from https://github.com/ocornut/imgui/issues/2668
 void AlternatingRowsBackground(float lineHeight) {
-    const ImU32 im_color = ImGui::GetColorU32(ImGuiCol_TableRowBgAlt);
+    const ImU32 color = ImGui::GetColorU32(ImGuiCol_TableRowBgAlt);
 
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
     ImGuiStyle& style = ImGui::GetStyle();
 
     if (lineHeight < 0) {
@@ -491,33 +482,33 @@ void AlternatingRowsBackground(float lineHeight) {
 
     lineHeight += style.ItemSpacing.y;
 
-    float scroll_offset_h = ImGui::GetScrollX();
-    float scroll_offset_v = ImGui::GetScrollY();
-    float scrolled_out_lines = std::floor(scroll_offset_v / lineHeight);
-    scroll_offset_v -= lineHeight * scrolled_out_lines;
+    float xScroll = ImGui::GetScrollX();
+    float yScroll = ImGui::GetScrollY();
+    float scrolledOutLines = floorf(yScroll / lineHeight);
+    yScroll -= lineHeight * scrolledOutLines;
 
-    ImVec2 clip_rect_min{ImGui::GetWindowPos()};
-    ImVec2 clip_rect_max{clip_rect_min.x + ImGui::GetWindowWidth(), clip_rect_min.y + ImGui::GetWindowHeight()};
+    ImVec2 clipRectMin{ImGui::GetWindowPos()};
+    ImVec2 clipRectMax{clipRectMin.x + ImGui::GetWindowWidth(), clipRectMin.y + ImGui::GetWindowHeight()};
 
     if (ImGui::GetScrollMaxX() > 0) {
-        clip_rect_max.y -= style.ScrollbarSize;
+        clipRectMax.y -= style.ScrollbarSize;
     }
 
-    draw_list->PushClipRect(clip_rect_min, clip_rect_max);
+    drawList->PushClipRect(clipRectMin, clipRectMax);
 
-    const float y_min = clip_rect_min.y - scroll_offset_v + ImGui::GetCursorPosY();
-    const float y_max = clip_rect_max.y - scroll_offset_v + lineHeight;
-    const float x_min = clip_rect_min.x + scroll_offset_h + ImGui::GetWindowContentRegionMin().x;
-    const float x_max = clip_rect_min.x + scroll_offset_h + ImGui::GetWindowContentRegionMax().x;
+    const float yMin = clipRectMin.y - yScroll + ImGui::GetCursorPosY();
+    const float yMax = clipRectMax.y - yScroll + lineHeight;
+    const float xMin = clipRectMin.x + xScroll + ImGui::GetWindowContentRegionMin().x;
+    const float xMax = clipRectMin.x + xScroll + ImGui::GetWindowContentRegionMax().x;
 
-    bool is_odd = (static_cast<int>(scrolled_out_lines) % 2) == 0;
-    for (float y = y_min; y < y_max; y += lineHeight, is_odd = !is_odd) {
-        if (is_odd) {
-            draw_list->AddRectFilled({ x_min, y - style.ItemSpacing.y }, { x_max, y + lineHeight }, im_color);
+    bool odd = (static_cast<int>(scrolledOutLines) % 2) == 0;
+    for (float y = yMin; y < yMax; y += lineHeight, odd = !odd) {
+        if (odd) {
+            drawList->AddRectFilled({ xMin, y - style.ItemSpacing.y }, { xMax, y + lineHeight }, color);
         }
     }
 
-    draw_list->PopClipRect();
+    drawList->PopClipRect();
 }
 
 void SetTheme(Theme theme) {

@@ -58,7 +58,7 @@ namespace ImGuiUtils {
     bool ToggleRoundButton(const char* str_id, bool& value);
     bool ToggleButton(const char* str_id, bool& value, bool text_style = false); // if text true, select text on active
 
-    void DrawRowsBackground(int row_count, float line_height, float x1, float x2, float y_offset, uint32_t col_even, uint32_t col_odd);
+    void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, float yOffset, uint32_t colEven, uint32_t colOdd);
 
     void DrawItemActivityOutline(float rounding = 0.0f, bool drawWhenInactive = false, const ImColor& colorWhenActive = ImColor{80, 80, 80});
     bool InputText(const std::string& name, std::string& currentText);
