@@ -18,6 +18,7 @@ Texture2dArray::Texture2dArray(fs::path filepath, VkFilter filter, VkSamplerAddr
                   VK_SAMPLE_COUNT_1_BIT,
                   VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                   VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
                   VK_IMAGE_VIEW_TYPE_2D_ARRAY,
                   VK_FORMAT_R8G8B8A8_UNORM,
                   1,
@@ -42,6 +43,7 @@ Texture2dArray::Texture2dArray(const glm::uvec2& extent, uint32_t arrayLayers, V
                   VK_SAMPLE_COUNT_1_BIT,
                   layout,
                   usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
                   VK_IMAGE_VIEW_TYPE_2D_ARRAY,
                   format,
                   1,
@@ -61,6 +63,7 @@ Texture2dArray::Texture2dArray(const std::unique_ptr<Bitmap>& bitmap, uint32_t a
                   VK_SAMPLE_COUNT_1_BIT,
                   layout,
                   usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
                   VK_IMAGE_VIEW_TYPE_2D_ARRAY,
                   format,
                   1,
@@ -103,8 +106,8 @@ void Texture2dArray::load() {
 
     CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
     CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
-    CreateImageView(image, view, viewType, format, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
-    TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
+    CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
+    TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
 
     Buffer bufferStaging{tex2DArray.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, tex2DArray.data()};
 
@@ -120,7 +123,7 @@ void Texture2dArray::load() {
             VkBufferImageCopy region = {};
             region.bufferRowLength = 0;
             region.bufferImageHeight = 0;
-            region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            region.imageSubresource.aspectMask = aspect;
             region.imageSubresource.mipLevel = level;
             region.imageSubresource.baseArrayLayer = layer;
             region.imageSubresource.layerCount = 1;
@@ -143,6 +146,8 @@ void Texture2dArray::load() {
     if (mipmap) {
         CreateMipmaps(image, extent, format, layout, mipLevels, 0, arrayLayers);
     } else {
-        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
+        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
     }
+
+    updateDescriptor();
 }

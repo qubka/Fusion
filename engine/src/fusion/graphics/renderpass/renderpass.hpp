@@ -4,7 +4,7 @@
 
 namespace fe {
     class LogicalDevice;
-    class ImageDepth;
+    class TextureDepth;
     class RenderStage;
 
     class Renderpass {

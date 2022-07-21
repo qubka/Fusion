@@ -71,11 +71,11 @@ PipelineGraphics::~PipelineGraphics() {
 	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, nullptr);
 }
 
-const ImageDepth* PipelineGraphics::getDepthStencil(const std::optional<uint32_t>& stage) const {
+const TextureDepth* PipelineGraphics::getDepthStencil(const std::optional<uint32_t>& stage) const {
 	return Graphics::Get()->getRenderStage(stage ? *stage : this->stage.first)->getDepthStencil();
 }
 
-const Texture2d* PipelineGraphics::getImage(size_t index, const std::optional<uint32_t>& stage) const {
+const Texture2d* PipelineGraphics::getTexture(size_t index, const std::optional<uint32_t>& stage) const {
 	return Graphics::Get()->getRenderStage(stage ? *stage : this->stage.first)->getFramebuffers()->getAttachment(index);
 }
 

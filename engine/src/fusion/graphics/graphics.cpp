@@ -7,7 +7,7 @@
 #include "fusion/graphics/renderpass/framebuffers.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
 #include "fusion/graphics/commands/command_pool.hpp"
-#include "fusion/graphics/textures/image_depth.hpp"
+#include "fusion/graphics/textures/texture_depth.hpp"
 #include "fusion/graphics/render_stage.hpp"
 #include "fusion/graphics/renderer.hpp"
 #include "fusion/graphics/subrender.hpp"
@@ -137,12 +137,12 @@ bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
         return false;
     }
 
-    auto& renderArea = renderStage.getRenderArea();
+    const auto& renderArea = renderStage.getRenderArea();
 
-    VkViewport viewport = vku::viewport(renderArea.extent);
+    VkViewport viewport{ vku::viewport(renderArea.extent) };
     vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 
-    VkRect2D scissor = vku::rect2D(renderArea.extent, renderArea.offset);
+    VkRect2D scissor{ vku::rect2D(renderArea.extent, renderArea.offset) };
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
     auto clearValues = renderStage.getClearValues();

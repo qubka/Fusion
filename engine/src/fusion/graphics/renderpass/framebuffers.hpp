@@ -5,14 +5,14 @@
 namespace fe {
     class Swapchain;
     class LogicalDevice;
-    class ImageDepth;
+    class TextureDepth;
     class Renderpass;
     class RenderStage;
     class Texture2d;
 
     class Framebuffers {
     public:
-        Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& swapchain, const RenderStage& renderStage, const Renderpass& renderPass, const ImageDepth& depthStencil,
+        Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& swapchain, const RenderStage& renderStage, const Renderpass& renderPass, const TextureDepth& depthStencil,
             const glm::uvec2& extent, VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT);
         ~Framebuffers();
         NONCOPYABLE(Framebuffers);

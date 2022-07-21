@@ -9,7 +9,6 @@ layout (location = 2) in vec4 inColor;
 layout (push_constant) uniform PushObject {
 	vec2 scale;
 	vec2 translate;
-	uint texture;
 } push;
 
 layout (location = 0) out vec2 outUV;

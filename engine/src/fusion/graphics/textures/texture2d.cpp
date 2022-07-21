@@ -18,6 +18,7 @@ Texture2d::Texture2d(fs::path filepath, VkFilter filter, VkSamplerAddressMode ad
                   VK_SAMPLE_COUNT_1_BIT,
                   VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                   VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
                   VK_IMAGE_VIEW_TYPE_2D,
                   VK_FORMAT_R8G8B8A8_UNORM,
                   1,
@@ -38,6 +39,7 @@ Texture2d::Texture2d(const glm::uvec2& extent, VkFormat format, VkImageLayout la
                   samples,
                   layout,
                   usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
                   VK_IMAGE_VIEW_TYPE_2D,
                   format,
                   1,
@@ -56,7 +58,9 @@ Texture2d::Texture2d(const std::unique_ptr<Bitmap>& bitmap, VkFormat format, VkI
                   addressMode,
                   samples,
                   layout,
-                  usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_VIEW_TYPE_2D,
+                  usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
+                  VK_IMAGE_VIEW_TYPE_2D,
                   format,
                   1,
                   1,
@@ -100,8 +104,8 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
 
         CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
         CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
-        CreateImageView(image, view, viewType, format, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
-        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
+        CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
+        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
 
         Buffer bufferStaging{tex.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, tex.data()};
         CopyBufferToImage(bufferStaging, image, extent, arrayLayers, 0);
@@ -109,7 +113,7 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
         if (mipmap) {
             CreateMipmaps(image, extent, format, layout, mipLevels, 0, arrayLayers);
         } else {
-            TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
+            TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
         }
     } else {
         if (loadFromFile) {
@@ -125,8 +129,8 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
 
         CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
         CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
-        CreateImageView(image, view, viewType, format, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
-        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
+        CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
+        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
 
         Buffer bufferStaging{loadBitmap->getLength(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, loadBitmap->getData<void>()};
         CopyBufferToImage(bufferStaging, image, extent, arrayLayers, 0);
@@ -134,7 +138,9 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
         if (mipmap) {
             CreateMipmaps(image, extent, format, layout, mipLevels, 0, arrayLayers);
         } else {
-            TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
+            TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
         }
     }
+
+    updateDescriptor();
 }

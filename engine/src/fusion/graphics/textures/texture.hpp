@@ -41,12 +41,13 @@ namespace fe {
          * @param samples The number of samples per texel.
          * @param layout The layout that the image subresources accessible from.
          * @param usage The intended usage of the image.
+         * @param aspect The value specifying which aspects of an image are included in a view.
          * @param viewType The value specifying the type of the image view.
          * @param format The format and type of the texel blocks that will be contained in the image.
          * @param mipLevels The number of levels of detail available for minified sampling of the image.
          * @param arrayLayers The number of layers in the image.
          * @param extent The number of data elements in each dimension of the base level.
-         * @param components
+         * @param components The amount of components for the provided format.
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
@@ -56,6 +57,7 @@ namespace fe {
                 VkSampleCountFlagBits samples,
                 VkImageLayout layout,
                 VkImageUsageFlags usage,
+                VkImageAspectFlags aspect,
                 VkImageViewType viewType,
                 VkFormat format,
                 uint32_t mipLevels,
@@ -72,12 +74,13 @@ namespace fe {
          * @param samples The number of samples per texel.
          * @param layout The layout that the image subresources accessible from.
          * @param usage The intended usage of the image.
+         * @param aspect The value specifying which aspects of an image are included in a view.
          * @param viewType The value specifying the type of the image view.
          * @param format The format and type of the texel blocks that will be contained in the image.
          * @param mipLevels The number of levels of detail available for minified sampling of the image.
          * @param arrayLayers The number of layers in the image.
          * @param extent The number of data elements in each dimension of the base level.
-         * @param components
+         * @param components The amount of components for the provided format.
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
@@ -86,6 +89,7 @@ namespace fe {
                 VkSampleCountFlagBits samples,
                 VkImageLayout layout,
                 VkImageUsageFlags usage,
+                VkImageAspectFlags aspect,
                 VkImageViewType viewType,
                 VkFormat format,
                 uint32_t mipLevels,
@@ -103,12 +107,13 @@ namespace fe {
          * @param samples The number of samples per texel.
          * @param layout The layout that the image subresources accessible from.
          * @param usage The intended usage of the image.
+         * @param aspect The value specifying which aspects of an image are included in a view.
          * @param viewType The value specifying the type of the image view.
          * @param format The format and type of the texel blocks that will be contained in the image.
          * @param mipLevels The number of levels of detail available for minified sampling of the image.
          * @param arrayLayers The number of layers in the image.
          * @param extent The number of data elements in each dimension of the base level.
-         * @param components
+         * @param components The amount of components for the provided format.
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
@@ -118,6 +123,7 @@ namespace fe {
                 VkSampleCountFlagBits samples,
                 VkImageLayout layout,
                 VkImageUsageFlags usage,
+                VkImageAspectFlags aspect,
                 VkImageViewType viewType,
                 VkFormat format,
                 uint32_t mipLevels,
@@ -129,14 +135,26 @@ namespace fe {
 
         ~Texture() override = default;
 
+        WriteDescriptorSet getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const override;
+        const VkDescriptorImageInfo& getDescriptor() const { return descriptor; }
+
         uint32_t getMipLevels() const { return mipLevels; }
         uint32_t getArrayLevels() const { return arrayLayers; }
         const fs::path& getPath() const { return path; };
+
         TextureType getType() const { return type; }
         void setType(TextureType textureType) { type = textureType; }
 
+        /** @brief Update image descriptor from current sampler, view and image layout */
+        void updateDescriptor() {
+            descriptor.sampler = sampler;
+            descriptor.imageView = view;
+            descriptor.imageLayout = layout;
+        }
+
     protected:
         fs::path path;
+        VkDescriptorImageInfo descriptor = {};
         TextureType type{ TextureType::None };
         uint32_t mipLevels{ 0 };
         uint32_t arrayLayers{ 0 };

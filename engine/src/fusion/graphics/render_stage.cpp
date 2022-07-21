@@ -2,7 +2,7 @@
 #include "graphics.hpp"
 
 #include "fusion/devices/device_manager.hpp"
-#include "fusion/graphics/textures/image_depth.hpp"
+#include "fusion/graphics/textures/texture_depth.hpp"
 #include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/graphics/renderpass/framebuffers.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
@@ -76,7 +76,7 @@ void RenderStage::rebuild(size_t id, const Swapchain& swapchain) {
 	auto msaaSamples = physicalDevice.getMsaaSamples();
 
 	if (depthAttachment)
-		depthStencil = std::make_unique<ImageDepth>(renderArea.extent, depthAttachment->multisampled ? msaaSamples : VK_SAMPLE_COUNT_1_BIT);
+		depthStencil = std::make_unique<TextureDepth>(renderArea.extent, depthAttachment->multisampled ? msaaSamples : VK_SAMPLE_COUNT_1_BIT);
 
 	if (!renderpass)
 		renderpass = std::make_unique<Renderpass>(logicalDevice, *this, depthStencil ? depthStencil->getFormat() : VK_FORMAT_UNDEFINED, swapchain.getSurfaceFormat().format, msaaSamples);

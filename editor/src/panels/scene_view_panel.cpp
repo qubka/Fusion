@@ -47,9 +47,9 @@ void SceneViewPanel::onImGui() {
     ImGuizmo::SetDrawlist();
 
     // TODO:: Refactor
-    ImVec2 viewportOffset = ImGui::GetCursorPos();
-    ImVec2 viewportSize = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin() - viewportOffset * 0.5f; // - offset * 0.5f;
-    ImVec2 viewportPos = ImGui::GetWindowPos() + viewportOffset;
+    ImVec2 viewportOffset{ ImGui::GetCursorPos() };
+    ImVec2 viewportSize{ ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin() - viewportOffset * 0.5f };
+    ImVec2 viewportPos{ ImGui::GetWindowPos() + viewportOffset };
 
     viewportSize.x -= static_cast<int>(viewportSize.x) % 2 != 0 ? 1.0f : 0.0f;
     viewportSize.y -= static_cast<int>(viewportSize.y) % 2 != 0 ? 1.0f : 0.0f;
@@ -69,10 +69,11 @@ void SceneViewPanel::onImGui() {
     if (halfRes)
         viewportSize *= 2.0f;
 
-    static uint32_t id = 1; // custom image
-    ImGuiUtils::Image(&id, { viewportSize.x, viewportSize.y }, true);
+    //static uint32_t id = 1; // custom image
+    //ImGuiUtils::Image(&id, { viewportSize.x, viewportSize.y }, true);
+    ImGuiUtils::Image((Texture2d*)Graphics::Get()->getAttachment("scene"), { viewportSize.x, viewportSize.y }, true);
 
-    auto windowSize = ImGui::GetWindowSize();
+    ImVec2 windowSize{ ImGui::GetWindowSize() };
 
     ImVec2& minBound = viewportPos;
     ImVec2  maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };

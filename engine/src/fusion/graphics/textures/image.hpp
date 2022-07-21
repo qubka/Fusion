@@ -20,6 +20,7 @@ namespace fe {
          * @param samples The number of samples per texel.
          * @param layout The layout that the image subresources accessible from.
          * @param usage The intended usage of the image.
+         * @param aspect The value specifying which aspects of an image are included in a view.
          * @param viewType The value specifying the type of the image view.
          * @param format The format and type of the texel blocks that will be contained in the image.
          * @param extent The number of data elements in each dimension of the base level.
@@ -29,12 +30,12 @@ namespace fe {
               VkSampleCountFlagBits samples,
               VkImageLayout layout,
               VkImageUsageFlags usage,
+              VkImageAspectFlags aspect,
               VkImageViewType viewType,
               VkFormat format,
               const VkExtent3D& extent);
         ~Image() override;
 
-        WriteDescriptorSet getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const override;
         static VkDescriptorSetLayoutBinding GetDescriptorSetLayout(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stage, uint32_t count);
 
         /**
@@ -53,6 +54,7 @@ namespace fe {
         VkFilter getFilter() const { return filter; }
         VkSamplerAddressMode getAddressMode() const { return addressMode; }
         VkImageLayout getLayout() const { return layout; }
+        VkImageAspectFlags getAspect() const { return aspect; }
         VkImageViewType getViewType() const { return viewType; }
         const VkImage& getImage() const { return image; }
         const VkDeviceMemory& getMemory() const { return memory; }
@@ -114,6 +116,7 @@ namespace fe {
         VkFilter filter;
         VkSamplerAddressMode addressMode;
         VkImageViewType viewType;
+        VkImageAspectFlags aspect;
         VkImageLayout layout;
 
         VkImage image{ VK_NULL_HANDLE };

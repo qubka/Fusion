@@ -18,6 +18,7 @@ TextureCube::TextureCube(fs::path filepath, VkFilter filter, VkSamplerAddressMod
                   VK_SAMPLE_COUNT_1_BIT,
                   VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                   VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
                   VK_IMAGE_VIEW_TYPE_CUBE,
                   VK_FORMAT_R8G8B8A8_UNORM,
                   1,
@@ -41,6 +42,7 @@ TextureCube::TextureCube(const glm::uvec2& extent, VkFormat format, VkImageLayou
                   samples,
                   layout,
                   usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
                   VK_IMAGE_VIEW_TYPE_CUBE,
                   format,
                   1,
@@ -59,6 +61,7 @@ TextureCube::TextureCube(const std::unique_ptr<Bitmap>& bitmap, VkFormat format,
                   samples,
                   layout,
                   usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
                   VK_IMAGE_VIEW_TYPE_CUBE,
                   format,
                   1,
@@ -120,8 +123,8 @@ void TextureCube::load() {
 
     CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
     CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
-    CreateImageView(image, view, viewType, format, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
-    TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
+    CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
+    TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
 
     Buffer bufferStaging{texCube.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, texCube.data()};
 
@@ -137,7 +140,7 @@ void TextureCube::load() {
             VkBufferImageCopy region = {};
             region.bufferRowLength = 0;
             region.bufferImageHeight = 0;
-            region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            region.imageSubresource.aspectMask = aspect;
             region.imageSubresource.mipLevel = level;
             region.imageSubresource.baseArrayLayer = layer;
             region.imageSubresource.layerCount = 1;
@@ -160,6 +163,8 @@ void TextureCube::load() {
     if (mipmap) {
         CreateMipmaps(image, extent, format, layout, mipLevels, 0, arrayLayers);
     } else {
-        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, 0, arrayLayers, 0);
+        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
     }
+
+    updateDescriptor();
 }

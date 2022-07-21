@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fusion/graphics/textures/image_depth.hpp"
+#include "fusion/graphics/textures/texture_depth.hpp"
 #include "fusion/graphics/renderpass/framebuffers.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
 #include "fusion/graphics/renderpass/swapchain.hpp"
@@ -8,7 +8,7 @@
 
 namespace fe {
     struct Attachment {
-        enum class Type { Image, Depth, Swapchain };
+        enum class Type { Image, Depth, Swapchain, /*DepthArray*/ };
         uint32_t binding{ 0 };
         std::string name;
         Type type{ Type:: Image };
@@ -75,7 +75,7 @@ namespace fe {
         bool isOutOfDate() const { return outOfDate; }
 
         const Renderpass* getRenderpass() const { return renderpass.get(); }
-        const ImageDepth* getDepthStencil() const { return depthStencil.get(); }
+        const TextureDepth* getDepthStencil() const { return depthStencil.get(); }
         const Framebuffers* getFramebuffers() const { return framebuffers.get(); }
         const std::vector<VkClearValue>& getClearValues() const { return clearValues; }
         uint32_t getAttachmentCount(uint32_t subpass) const { return subpassAttachmentCount[subpass]; }
@@ -90,7 +90,7 @@ namespace fe {
         Viewport viewport;
 
         std::unique_ptr<Renderpass> renderpass;
-        std::unique_ptr<ImageDepth> depthStencil;
+        std::unique_ptr<TextureDepth> depthStencil;
         std::unique_ptr<Framebuffers> framebuffers;
 
         std::unordered_map<std::string, const Descriptor*> descriptors;

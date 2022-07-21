@@ -172,8 +172,8 @@ void HierarchyPanel::onImGui() {
                 if (const ImGuiPayload* payload = ImGui::GetDragDropPayload(); payload && payload->IsDataType("SCENE_HIERARCHY_ITEM")) {
                     auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
                     if (hierarchySystem->getParent(entity) != entt::null) {
-                        ImVec2 minSpace = ImGui::GetWindowContentRegionMin();
-                        ImVec2 maxSpace = ImGui::GetWindowContentRegionMax();
+                        ImVec2 minSpace{ ImGui::GetWindowContentRegionMin() };
+                        ImVec2 maxSpace{ ImGui::GetWindowContentRegionMax() };
 
                         float yScroll = ImGui::GetScrollY();
                         float yOffset = std::max(45.0f, yScroll); // Dont include search bar
@@ -242,7 +242,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         }
 
         if (isDoubleClicked)
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 1.0f, 2.0f });
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{1.0f, 2.0f});
 
         if (hadRecentDroppedEntity == node) {
             ImGui::SetNextItemOpen(true);
@@ -418,11 +418,11 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             return;
         }
 
-        const ImColor TreeLineColor = ImColor{128, 128, 128, 128};
+        const ImColor TreeLineColor{128, 128, 128, 128};
         const float smallOffsetX = 6.0f;
         ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-        ImVec2 verticalLineStart = ImGui::GetCursorScreenPos();
+        ImVec2 verticalLineStart{ ImGui::GetCursorScreenPos() };
         verticalLineStart.x += smallOffsetX; // to nicely line up with the arrow symbol
         ImVec2 verticalLineEnd = verticalLineStart;
 
@@ -432,7 +432,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
                 auto hierarchy = registry.try_get<HierarchyComponent>(child);
 
                 float horizontalTreeLineSize = 16.0f;
-                auto currentPos = ImGui::GetCursorScreenPos();
+                ImVec2 currentPos{ ImGui::GetCursorScreenPos() };
                 ImGui::Indent(10.0f);
 
                 if (hierarchy && hierarchy->children > 0) {

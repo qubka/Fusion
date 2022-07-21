@@ -29,7 +29,7 @@ void ContentBrowserPanel::onImGui() {
     auto flags = ImGuiWindowFlags_NoCollapse;
     ImGui::Begin(title.c_str(), &active, flags);
     {
-        auto windowSize = ImGui::GetWindowSize();
+        ImVec2 windowSize{ ImGui::GetWindowSize() };
         bool vertical = windowSize.y > windowSize.x;
 
         if (!vertical) {
@@ -194,7 +194,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
     if (dirInfo->parent == nullptr)
         nodeFlags |= ImGuiTreeNodeFlags_Framed;
 
-    const ImColor TreeLineColor = ImColor{128, 128, 128, 128};
+    const ImColor TreeLineColor{128, 128, 128, 128};
     const float smallOffsetX = 6.0f;
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
@@ -261,7 +261,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
 
             for (auto& file : dirInfo->children) {
                 if (file->isDirectory) {
-                    auto currentPos = ImGui::GetCursorScreenPos();
+                    ImVec2 currentPos{ ImGui::GetCursorScreenPos() };
 
                     ImGui::Indent(10.0f);
 

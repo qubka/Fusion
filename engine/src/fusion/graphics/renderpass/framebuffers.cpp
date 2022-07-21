@@ -1,7 +1,7 @@
 #include "framebuffers.hpp"
 
 #include "fusion/graphics/render_stage.hpp"
-#include "fusion/graphics/textures/image_depth.hpp"
+#include "fusion/graphics/textures/texture_depth.hpp"
 #include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
 #include "fusion/graphics/renderpass/swapchain.hpp"
@@ -9,7 +9,7 @@
 
 using namespace fe;
 
-Framebuffers::Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& swapchain, const RenderStage& renderStage, const Renderpass& renderPass, const ImageDepth& depthStencil,
+Framebuffers::Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& swapchain, const RenderStage& renderStage, const Renderpass& renderPass, const TextureDepth& depthStencil,
 	const glm::uvec2& extent, VkSampleCountFlagBits samples) :
 	logicalDevice{logicalDevice} {
 	for (const auto& attachment : renderStage.getAttachments()) {

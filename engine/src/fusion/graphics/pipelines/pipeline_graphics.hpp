@@ -4,7 +4,7 @@
 #include "vertex.hpp"
 
 namespace fe {
-    class ImageDepth;
+    class TextureDepth;
     class Texture2d;
     class RenderArea;
 
@@ -75,7 +75,7 @@ namespace fe {
          * @param stage The stage to get values from, if not provided the pipelines stage will be used.
          * @return The depth stencil that is found.
          */
-        const ImageDepth* getDepthStencil(const std::optional<uint32_t>& stage = std::nullopt) const;
+        const TextureDepth* getDepthStencil(const std::optional<uint32_t>& stage = std::nullopt) const;
 
         /**
          * Gets a image used in a stage by the index given to it in the renderpass.
@@ -83,7 +83,7 @@ namespace fe {
          * @param stage The stage to get values from, if not provided the pipelines stage will be used.
          * @return The image that is found.
          */
-        const Texture2d* getImage(size_t index, const std::optional<uint32_t>& stage = std::nullopt) const;
+        const Texture2d* getTexture(size_t index, const std::optional<uint32_t>& stage = std::nullopt) const;
 
         /**
          * Gets the render stage viewport.

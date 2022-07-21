@@ -56,6 +56,8 @@ namespace fe {
         const Surface* getSurface(size_t id) const { return surfaces[id].get(); }
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
 
+        const size_t getCurrentFrame(size_t id) const { return perSurfaceBuffers[id]->currentFrame; }
+
         /**
          * Takes a screenshot of the current image of the display and saves it into a image file.
          * @param filepath The file to save the screenshot as.

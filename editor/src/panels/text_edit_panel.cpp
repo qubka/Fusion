@@ -17,7 +17,7 @@ TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()>&& callback
     // T
     std::string extension{ FileSystem::GetExtension(path) };
     /*if (extension == "lua") {
-        auto lang = ImGui::TextEditor::LanguageDefinition::Lua();
+        const auto& lang = ImGui::TextEditor::LanguageDefinition::Lua();
         textEditor.SetLanguageDefinition(lang);
 
         auto& customIdentifiers = LuaManager::GetIdentifiers();
@@ -31,10 +31,10 @@ TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()>&& callback
 
         textEditor.SetCustomIdentifiers(identifiers);
     }*/ if (extension == "cpp") {
-        auto lang = ImGui::TextEditor::LanguageDefinition::CPlusPlus();
+        const auto& lang = ImGui::TextEditor::LanguageDefinition::CPlusPlus();
         textEditor.SetLanguageDefinition(lang);
     } else if (extension == "glsl" || extension == "vert" || extension == "frag" || extension == "comp" || extension == "tesc" || extension == "tese" || extension == "geom") {
-        auto lang = ImGui::TextEditor::LanguageDefinition::GLSL();
+        const auto& lang = ImGui::TextEditor::LanguageDefinition::GLSL();
         textEditor.SetLanguageDefinition(lang);
     }
 

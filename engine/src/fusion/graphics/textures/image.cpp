@@ -10,7 +10,7 @@ using namespace fe;
 constexpr static float ANISOTROPY = 16.0f;
 
 Image::Image(VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, VkImageLayout layout,
-             VkImageUsageFlags usage, VkImageViewType viewType, VkFormat format, const VkExtent3D& extent)
+             VkImageUsageFlags usage, VkImageAspectFlags aspect, VkImageViewType viewType, VkFormat format, const VkExtent3D& extent)
 		: extent{extent}
 		, samples{samples}
 		, usage{usage}
@@ -18,6 +18,7 @@ Image::Image(VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFla
 		, filter{filter}
         , addressMode{addressMode}
         , viewType{viewType}
+        , aspect{aspect}
         , layout{layout} {
 }
 
@@ -28,23 +29,6 @@ Image::~Image() {
 	vkDestroySampler(logicalDevice, sampler, nullptr);
 	vkFreeMemory(logicalDevice, memory, nullptr);
 	vkDestroyImage(logicalDevice, image, nullptr);
-}
-
-WriteDescriptorSet Image::getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const {
-	VkDescriptorImageInfo imageInfo = {};
-	imageInfo.sampler = sampler;
-	imageInfo.imageView = view;
-	imageInfo.imageLayout = layout;
-
-	VkWriteDescriptorSet descriptorWrite = {};
-	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	descriptorWrite.dstSet = VK_NULL_HANDLE; // Will be set in the descriptor handler.
-	descriptorWrite.dstBinding = binding;
-	descriptorWrite.dstArrayElement = 0;
-	descriptorWrite.descriptorCount = 1;
-	descriptorWrite.descriptorType = descriptorType;
-	//descriptorWrite.pImageInfo = &imageInfo;
-	return {descriptorWrite, imageInfo};
 }
 
 VkDescriptorSetLayoutBinding Image::GetDescriptorSetLayout(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stage, uint32_t count) {
@@ -66,7 +50,7 @@ std::unique_ptr<Bitmap> Image::getBitmap(uint32_t mipLevel, uint32_t arrayLayer)
     CopyImage(image, dstImage, dstImageMemory, format, {size.x, size.y, 1}, layout, mipLevel, arrayLayer);
 
     VkImageSubresource dstImageSubresource = {};
-    dstImageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    dstImageSubresource.aspectMask = aspect;
     dstImageSubresource.mipLevel = 0;
     dstImageSubresource.arrayLayer = 0;
 
