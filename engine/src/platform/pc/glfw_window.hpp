@@ -75,7 +75,7 @@ namespace glfw {
         const fe::Monitor* getCurrentMonitor() const override;
         void* getNativeWindow() const override { return window; }
 
-        VkResult createSurface(VkInstance const& instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const override;
+        VkResult createSurface(VkInstance instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const override;
 
     protected:
         void onUpdate() override;

@@ -14,7 +14,7 @@ SyncObject::~SyncObject() {
     destroy(logicalDevice);
 }
 
-void SyncObject::init(const VkDevice& logicalDevice) {
+void SyncObject::init(VkDevice device) {
     VkSemaphoreCreateInfo semaphoreCreateInfo = {};
     semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -22,15 +22,15 @@ void SyncObject::init(const VkDevice& logicalDevice) {
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    VK_CHECK(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &imageAvailableSemaphore));
-    VK_CHECK(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &renderFinishedSemaphore));
-    VK_CHECK(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &inFlightFence));
+    VK_CHECK(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &imageAvailableSemaphore));
+    VK_CHECK(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &renderFinishedSemaphore));
+    VK_CHECK(vkCreateFence(device, &fenceCreateInfo, nullptr, &inFlightFence));
 }
 
-void SyncObject::destroy(const VkDevice& logicalDevice) {
-    vkDestroySemaphore(logicalDevice, renderFinishedSemaphore, nullptr);
-    vkDestroySemaphore(logicalDevice, imageAvailableSemaphore, nullptr);
-    vkDestroyFence(logicalDevice, inFlightFence, nullptr);
+void SyncObject::destroy(VkDevice device) {
+    vkDestroySemaphore(device, renderFinishedSemaphore, nullptr);
+    vkDestroySemaphore(device, imageAvailableSemaphore, nullptr);
+    vkDestroyFence(device, inFlightFence, nullptr);
     imageInFlight = VK_NULL_HANDLE;
 }
 

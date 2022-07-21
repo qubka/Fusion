@@ -161,7 +161,7 @@ uint32_t Buffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags requi
     throw std::runtime_error("Failed to find a valid memory type for buffer");
 }
 
-void Buffer::InsertBufferMemoryBarrier(const CommandBuffer& commandBuffer, const VkBuffer& buffer, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask,
+void Buffer::InsertBufferMemoryBarrier(VkCommandBuffer commandBuffer, VkBuffer buffer, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask,
                                        VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask, VkDeviceSize offset, VkDeviceSize size) {
     VkBufferMemoryBarrier bufferMemoryBarrier = {};
     bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;

@@ -12,14 +12,14 @@ namespace fe {
         const VkSemaphore& getRenderFinishedSemaphore() const { return renderFinishedSemaphore; }
         const VkFence& getInFlightFence() const { return inFlightFence; }
         const VkFence& getImageInFlightFence() const { return imageInFlight; }
-        void setImageInFlight(const VkFence& fence) { imageInFlight = fence; }
+        void setImageInFlight(VkFence fence) { imageInFlight = fence; }
         void setImageInUse() { imageInFlight = inFlightFence; }
 
         void reset();
 
     private:
-        void init(const VkDevice& logicalDevice);
-        void destroy(const VkDevice& logicalDevice);
+        void init(VkDevice device);
+        void destroy(VkDevice device);
 
         VkSemaphore imageAvailableSemaphore{ VK_NULL_HANDLE };
         VkSemaphore renderFinishedSemaphore{ VK_NULL_HANDLE };
