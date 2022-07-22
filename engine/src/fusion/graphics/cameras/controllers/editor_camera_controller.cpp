@@ -104,6 +104,14 @@ void EditorCameraController::handleKeyboard(Camera& camera, float dt) {
             velocity -= camera.getUpDirection() * cameraSpeed;
         }
 
+        if (Input::Get()->getKey(Key::Q)) {
+            velocity -= camera.getForwardDirection() * cameraSpeed;
+        }
+
+        if (Input::Get()->getKey(Key::E)) {
+            velocity += camera.getForwardDirection() * cameraSpeed;
+        }
+
         if (glm::length(velocity) > FLT_EPSILON) {
             glm::vec3 position = camera.getEyePoint();
             position += velocity * dt;

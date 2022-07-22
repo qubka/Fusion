@@ -86,12 +86,10 @@ void Graphics::onUpdate() {
         for (auto& renderStage : renderer->renderStages) {
             renderStage->update(id, *swapchain);
 
-            if (!beginRenderpass(info, *renderStage))
-                break;
-
-            nextSubpasses(info, *renderStage, stage);
-
-            endRenderpass(info);
+            if (beginRenderpass(info, *renderStage)) {
+                nextSubpasses(info, *renderStage, stage);
+                endRenderpass(info);
+            }
 
             stage.first++;
         }
@@ -135,6 +133,7 @@ bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
 
     if (renderStage.isOutOfDate()) {
         LOG_WARNING << "Render stage is out of date!";
+        recreatePass(info, renderStage);
         return false;
     }
 
@@ -331,6 +330,20 @@ void Graphics::recreateAttachmentsMap() {
 
     for (const auto& renderStage : renderer->renderStages)
         attachments.insert(renderStage->descriptors.begin(), renderStage->descriptors.end());
+}
+
+void Graphics::recreatePass(FrameInfo& info, RenderStage& renderStage) {
+    // Swapchain should recreate in the begin or the end frame stage
+    if (renderStage.hasSwapchain())
+        return;
+
+    UNPACK_FRAME_INFO(info);
+
+    auto graphicsQueue = logicalDevice.getGraphicsQueue();
+    VK_CHECK(vkQueueWaitIdle(graphicsQueue));
+
+    renderStage.rebuild(id, swapchain);
+    recreateAttachmentsMap();
 }
 
 void Graphics::onWindowCreate(Window* window, bool create) {

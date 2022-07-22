@@ -56,7 +56,7 @@ namespace fe {
         const Surface* getSurface(size_t id) const { return surfaces[id].get(); }
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
 
-        const size_t getCurrentFrame(size_t id) const { return perSurfaceBuffers[id]->currentFrame; }
+        size_t getCurrentFrame(size_t id) const { return perSurfaceBuffers[id]->currentFrame; }
 
         /**
          * Takes a screenshot of the current image of the display and saves it into a image file.
@@ -94,6 +94,7 @@ namespace fe {
         void resetRenderStages();
         void recreateSwapchain(size_t id);
         void recreateAttachmentsMap();
+        void recreatePass(FrameInfo& info, RenderStage& renderStage);
 
         void onWindowCreate(Window* window, bool create);
 

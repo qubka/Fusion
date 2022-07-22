@@ -8,7 +8,7 @@
 
 namespace fe {
     struct Attachment {
-        enum class Type { Image, Depth, Swapchain, /*DepthArray*/ };
+        enum class Type { Image, Depth, Swapchain };
         uint32_t binding{ 0 };
         std::string name;
         Type type{ Type:: Image };
@@ -38,6 +38,13 @@ namespace fe {
         glm::vec2 scale{ 1.0f };
         std::optional<glm::uvec2> size;
         glm::ivec2 offset{ 0 };
+
+        bool operator==(const Viewport& rhs) const {
+            return scale == rhs.scale && offset == rhs.offset && size == rhs.size;
+        }
+        bool operator!=(const Viewport& rhs) const {
+            return !operator==(rhs);
+        }
     };
 
     class RenderStage {
@@ -60,7 +67,7 @@ namespace fe {
         const std::vector<SubpassType>& getSubpasses() const { return subpasses; }
 
         Viewport& getViewport() { return viewport; }
-        void setViewport(const Viewport& port) { viewport = port; }
+        bool setViewport(const Viewport& port) const;
 
         /**
          * Gets the render stage viewport.
@@ -87,7 +94,7 @@ namespace fe {
         std::vector<Attachment> attachments;
         std::vector<SubpassType> subpasses;
 
-        Viewport viewport;
+        mutable Viewport viewport;
 
         std::unique_ptr<Renderpass> renderpass;
         std::unique_ptr<TextureDepth> depthStencil;

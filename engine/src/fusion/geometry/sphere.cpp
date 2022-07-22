@@ -215,7 +215,7 @@ Sphere Sphere::CalculateBoundingSphere(const glm::vec3* points, size_t size) {
         return {};
 
     // compute minimal and maximal bounds
-    glm::vec3 min(points[0]), max(points[0]);
+    glm::vec3 min{points[0]}, max{points[0]};
     for (size_t i = 1; i < size; ++i) {
         if (points[i].x < min.x)
             min.x = points[i].x;

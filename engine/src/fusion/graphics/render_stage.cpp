@@ -126,3 +126,11 @@ const Descriptor* RenderStage::getDescriptor(const std::string& name) const {
 const VkFramebuffer& RenderStage::getActiveFramebuffer(uint32_t activeSwapchainImage) const {
 	return framebuffers->getFramebuffer(activeSwapchainImage);
 }
+
+bool RenderStage::setViewport(const Viewport& port) const {
+    if (viewport == port)
+        return false;
+
+    viewport = port;
+    return true;
+}
