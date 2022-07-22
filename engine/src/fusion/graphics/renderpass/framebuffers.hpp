@@ -19,8 +19,8 @@ namespace fe {
 
         const Texture2d* getAttachment(size_t index) const { return imageAttachments[index].get(); }
 
-        const VkFramebuffer& getFramebuffer(size_t index) const { return framebuffers[index < framebuffers.size() ? index : 0]; }
-        const VkFramebuffer& operator[](size_t index) const { return framebuffers[index < framebuffers.size() ? index : 0]; }
+        const VkFramebuffer& getFramebuffer(size_t index) const { return index < framebuffers.size() ? framebuffers[index] : framebuffers.front(); }
+        const VkFramebuffer& operator[](size_t index) const { return index < framebuffers.size() ? framebuffers[index] : framebuffers.front(); }
 
         const std::vector<std::unique_ptr<Texture2d>>& getImageAttachments() const { return imageAttachments; }
         const std::vector<VkFramebuffer>& getFramebuffers() const { return framebuffers; }

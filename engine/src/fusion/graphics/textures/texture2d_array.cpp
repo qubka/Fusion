@@ -75,8 +75,10 @@ Texture2dArray::Texture2dArray(const std::unique_ptr<Bitmap>& bitmap, uint32_t a
 }
 
 void Texture2dArray::setPixels(const float* pixels, uint32_t arrayLayer) {
+    CommandBuffer commandBuffer{true};
 	Buffer bufferStaging{extent.width * extent.height * components * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels};
-	CopyBufferToImage(bufferStaging, image, extent, 1, arrayLayer);
+	CopyBufferToImage(commandBuffer, bufferStaging, image, extent, 1, arrayLayer);
+    commandBuffer.submitIdle();
 }
 
 void Texture2dArray::load() {
@@ -88,7 +90,7 @@ void Texture2dArray::load() {
         texture = std::make_unique<gli::texture2d_array>(gli::load(reinterpret_cast<const char*>(data), size));
     });
 #if FUSION_DEBUG
-    LOG_DEBUG << "Image2dArray: " << path << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Texture2dArray: " << path << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 
     const gli::texture2d_array& tex2DArray = *texture;
@@ -104,10 +106,12 @@ void Texture2dArray::load() {
     if (extent.width == 0 || extent.height == 0)
         throw std::runtime_error("Width or height is empty");
 
+    CommandBuffer commandBuffer{true};
+
     CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
     CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
     CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
-    TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
+    TransitionImageLayout(commandBuffer, image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
 
     Buffer bufferStaging{tex2DArray.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, tex2DArray.data()};
 
@@ -139,15 +143,15 @@ void Texture2dArray::load() {
         }
     }
 
-    CommandBuffer commandBuffer;
     vkCmdCopyBufferToImage(commandBuffer, bufferStaging, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, bufferCopyRegions.size(), bufferCopyRegions.data());
-    commandBuffer.submitIdle();
 
     if (mipmap) {
-        CreateMipmaps(image, extent, format, layout, mipLevels, 0, arrayLayers);
+        CreateMipmaps(commandBuffer, image, extent, format, layout, mipLevels, 0, arrayLayers);
     } else {
-        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
+        TransitionImageLayout(commandBuffer, image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
     }
+
+    commandBuffer.submitIdle();
 
     updateDescriptor();
 }

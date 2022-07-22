@@ -71,11 +71,15 @@ Texture2d::Texture2d(const std::unique_ptr<Bitmap>& bitmap, VkFormat format, VkI
 }
 
 void Texture2d::setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer) {
+    CommandBuffer commandBuffer{true};
     Buffer bufferStaging{extent.width * extent.height * components * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels};
-    CopyBufferToImage(bufferStaging, image, extent, layerCount, baseArrayLayer);
+    CopyBufferToImage(commandBuffer, bufferStaging, image, extent, layerCount, baseArrayLayer);
+    commandBuffer.submitIdle();
 }
 
 void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
+    CommandBuffer commandBuffer{true};
+
     bool loadFromFile = !path.empty() && !loadBitmap;
     // That is fast loading approach
     if (loadFromFile && FileFormat::IsTextureStorageFile(path)) {
@@ -87,7 +91,7 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
             texture = std::make_unique<gli::texture2d>(gli::load(reinterpret_cast<const char*>(data), size));
         });
 #if FUSION_DEBUG
-        LOG_DEBUG << "Image2dArray: " << path << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+        LOG_DEBUG << "Texture2d " << path << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
         const gli::texture2d& tex = *texture;
         if (tex.empty())
@@ -105,15 +109,15 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
         CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
         CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
         CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
-        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
+        TransitionImageLayout(commandBuffer, image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
 
         Buffer bufferStaging{tex.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, tex.data()};
-        CopyBufferToImage(bufferStaging, image, extent, arrayLayers, 0);
+        CopyBufferToImage(commandBuffer, bufferStaging, image, extent, arrayLayers, 0);
 
         if (mipmap) {
-            CreateMipmaps(image, extent, format, layout, mipLevels, 0, arrayLayers);
+            CreateMipmaps(commandBuffer, image, extent, format, layout, mipLevels, 0, arrayLayers);
         } else {
-            TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
+            TransitionImageLayout(commandBuffer, image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
         }
     } else {
         if (loadFromFile) {
@@ -130,17 +134,19 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
         CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
         CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
         CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
-        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
+        TransitionImageLayout(commandBuffer, image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
 
         Buffer bufferStaging{loadBitmap->getLength(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, loadBitmap->getData<void>()};
-        CopyBufferToImage(bufferStaging, image, extent, arrayLayers, 0);
+        CopyBufferToImage(commandBuffer, bufferStaging, image, extent, arrayLayers, 0);
 
         if (mipmap) {
-            CreateMipmaps(image, extent, format, layout, mipLevels, 0, arrayLayers);
+            CreateMipmaps(commandBuffer, image, extent, format, layout, mipLevels, 0, arrayLayers);
         } else {
-            TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
+            TransitionImageLayout(commandBuffer, image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
         }
     }
+
+    commandBuffer.submitIdle();
 
     updateDescriptor();
 }

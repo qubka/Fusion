@@ -39,6 +39,8 @@ void DefaultApplication::onStart() {
     //FileSystem::Get()->addSearchPath(executablePath, executablePath.string());
     fs::path shaderPath{ executablePath / "engine" / "assets" / "shaders" };
     vfs->mount("EngineShaders", shaderPath);
+    fs::path modelPath{ executablePath / "engine" / "assets" / "models" };
+    vfs->mount("EngineModels", modelPath);
 
     deserialise();
 

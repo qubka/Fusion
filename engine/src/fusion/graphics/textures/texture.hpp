@@ -135,6 +135,8 @@ namespace fe {
 
         ~Texture() override = default;
 
+        void transitionImage(const CommandBuffer& commandBuffer, VkImageLayout newLayout);
+
         WriteDescriptorSet getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const override;
         const VkDescriptorImageInfo& getDescriptor() const { return descriptor; }
 

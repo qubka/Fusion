@@ -5,6 +5,7 @@
 #include "fusion/grid/grid_subrender.hpp"
 #include "fusion/skybox/atmosphere_subrender.hpp"
 #include "fusion/skybox/skybox_subrender.hpp"
+#include "fusion/models/model_subrender.hpp"
 
 namespace fe {
     class EditorRenderer : public Renderer {
@@ -16,7 +17,8 @@ namespace fe {
             };
             std::vector<SubpassType> renderpassSubpasses0 = {
                     {0, {0, 1}},
-                    {1, {0, 1}}
+                    {1, {0, 1}},
+                    {2, {0, 1}},
             };
 
             addRenderStage(std::make_unique<RenderStage>(renderpassAttachments0, renderpassSubpasses0));
@@ -37,7 +39,9 @@ namespace fe {
         void onStart() override {
             //addSubrender<AtmosphereSubrender>({ 0, 0});
             addSubrender<SkyboxSubrender>({ 0, 0})->setEnabled(false);
-            addSubrender<GridSubrender>({0, 1});
+            addSubrender<ModelSubrender>({0, 1});
+            addSubrender<GridSubrender>({0, 2});
+
             addSubrender<ImGuiSubrender>({1, 0});
         }
 

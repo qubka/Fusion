@@ -61,9 +61,6 @@ namespace fe {
         const VkSampler& getSampler() const { return sampler; }
         const VkImageView& getView() const { return view; }
 
-        VkImage& getImage() { return image; }
-        VkDeviceMemory& getMemory() { return memory; }
-
         operator const VkImage&() const { return image; }
 
         static uint32_t GetMipLevels(const VkExtent3D& extent);
@@ -91,21 +88,92 @@ namespace fe {
          */
         static bool HasStencil(VkFormat format);
 
-        static void CreateImage(VkImage& image, VkDeviceMemory& memory, const VkExtent3D& extent, VkFormat format, VkSampleCountFlagBits samples,
-            VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, uint32_t mipLevels, uint32_t arrayLayers, VkImageType type);
-        static void CreateImageSampler(VkSampler& sampler, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, uint32_t mipLevels);
-        static void CreateImageView(const VkImage& image, VkImageView& imageView, VkImageViewType type, VkFormat format, VkImageAspectFlags imageAspect,
-            uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer);
-        static void CreateMipmaps(const VkImage& image, const VkExtent3D& extent, VkFormat format, VkImageLayout dstImageLayout, uint32_t mipLevels,
-            uint32_t baseArrayLayer, uint32_t layerCount);
-        static void TransitionImageLayout(const VkImage& image, VkFormat format, VkImageLayout srcImageLayout, VkImageLayout dstImageLayout,
-            VkImageAspectFlags imageAspect, uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer);
-        static void InsertImageMemoryBarrier(const CommandBuffer& commandBuffer, const VkImage& image, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask,
-            VkImageLayout oldImageLayout, VkImageLayout newImageLayout, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask,
-            VkImageAspectFlags imageAspect, uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer);
-        static void CopyBufferToImage(const VkBuffer& buffer, const VkImage& image, const VkExtent3D& extent, uint32_t layerCount, uint32_t baseArrayLayer);
-        static bool CopyImage(const VkImage& srcImage, VkImage& dstImage, VkDeviceMemory& dstImageMemory, VkFormat srcFormat, const VkExtent3D& extent,
-            VkImageLayout srcImageLayout, uint32_t mipLevel, uint32_t arrayLayer);
+        static void CreateImage(
+                VkImage& image,
+                VkDeviceMemory& memory,
+                const VkExtent3D& extent,
+                VkFormat format,
+                VkSampleCountFlagBits samples,
+                VkImageTiling tiling,
+                VkImageUsageFlags usage,
+                VkMemoryPropertyFlags properties,
+                uint32_t mipLevels,
+                uint32_t arrayLayers,
+                VkImageType imageType);
+
+        static void CreateImageSampler(
+                VkSampler& sampler,
+                VkFilter filter,
+                VkSamplerAddressMode addressMode,
+                bool anisotropic,
+                uint32_t mipLevels);
+
+        static void CreateImageView(
+                const VkImage& image,
+                VkImageView& imageView,
+                VkImageViewType viewType,
+                VkFormat format,
+                VkImageAspectFlags imageAspect,
+                uint32_t mipLevels,
+                uint32_t baseMipLevel,
+                uint32_t layerCount,
+                uint32_t baseArrayLayer);
+
+        static void CreateMipmaps(
+                VkCommandBuffer commandBuffer,
+                const VkImage& image,
+                const VkExtent3D& extent,
+                VkFormat format,
+                VkImageLayout dstImageLayout,
+                uint32_t mipLevels,
+                uint32_t baseArrayLayer,
+                uint32_t layerCount);
+
+        static void TransitionImageLayout(
+                VkCommandBuffer commandBuffer,
+                const VkImage& image,
+                VkFormat format,
+                VkImageLayout srcImageLayout,
+                VkImageLayout dstImageLayout,
+                VkImageAspectFlags imageAspect,
+                uint32_t mipLevels,
+                uint32_t baseMipLevel,
+                uint32_t layerCount,
+                uint32_t baseArrayLayer);
+
+        static void InsertImageMemoryBarrier(
+                VkCommandBuffer commandBuffer,
+                const VkImage& image,
+                VkAccessFlags srcAccessMask,
+                VkAccessFlags dstAccessMask,
+                VkImageLayout oldImageLayout,
+                VkImageLayout newImageLayout,
+                VkPipelineStageFlags srcStageMask,
+                VkPipelineStageFlags dstStageMask,
+                VkImageAspectFlags imageAspect,
+                uint32_t mipLevels,
+                uint32_t baseMipLevel,
+                uint32_t layerCount,
+                uint32_t baseArrayLayer);
+
+        static void CopyBufferToImage(
+                VkCommandBuffer commandBuffer,
+                const VkBuffer& buffer,
+                const VkImage& image,
+                const VkExtent3D& extent,
+                uint32_t layerCount,
+                uint32_t baseArrayLayer);
+
+        static bool CopyImage(
+                VkCommandBuffer commandBuffer,
+                const VkImage& srcImage,
+                VkImage& dstImage,
+                VkDeviceMemory& dstImageMemory,
+                VkFormat srcFormat,
+                const VkExtent3D& extent,
+                VkImageLayout srcImageLayout,
+                uint32_t mipLevel,
+                uint32_t arrayLayer);
 
     protected:
         VkExtent3D extent;

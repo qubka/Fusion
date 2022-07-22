@@ -15,7 +15,6 @@ namespace fe {
     struct EditorSettings {
         bool fullScreenOnPlay{ false };
         bool fullScreenSceneView{ false };
-        bool halfRes{ false };
         bool showImGuiDemo{ false };
         bool showGizmos{ true };
         bool snapGizmos{ false };

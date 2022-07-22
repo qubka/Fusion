@@ -39,8 +39,7 @@ namespace fe {
                 return system ? static_cast<T*>(system.get()) : nullptr;
             }
 
-            //throw std::runtime_error("System Holder does not have requested Subrender");
-            return nullptr;
+            throw std::runtime_error("System Holder does not have requested System");
         }
 
         /**

@@ -38,8 +38,7 @@ namespace fe {
             if (auto it = subrenders.find(typeId); it != subrenders.end() && it->second)
                 return static_cast<T*>(it->second.get());
 
-            //throw std::runtime_error("Subrender Holder does not have requested Subrender");
-            return nullptr;
+            throw std::runtime_error("Subrender Holder does not have requested Subrender");
         }
 
         /**
