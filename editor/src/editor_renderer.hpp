@@ -11,17 +11,25 @@ namespace fe {
     public:
         EditorRenderer() {
             std::vector<Attachment> renderpassAttachments0 = {
-                    {0, "depth", Attachment::Type::Depth, false},
-                    {1, "swapchain", Attachment::Type::Swapchain},
-                    {2, "scene", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM, {0.27f, 0.27f, 0.27f, 1.0f}},
+                    {0, "depth", Attachment::Type::Depth},
+                    {1, "scene", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM, {0.27f, 0.27f, 0.27f, 1.0f}}
             };
             std::vector<SubpassType> renderpassSubpasses0 = {
-                    {0, {0, 2}},
-                    {1, {0, 2}},
-                    {2, {0, 1}}
+                    {0, {0, 1}},
+                    {1, {0, 1}}
             };
 
             addRenderStage(std::make_unique<RenderStage>(renderpassAttachments0, renderpassSubpasses0));
+
+            std::vector<Attachment> renderpassAttachments1 = {
+                    {0, "depth", Attachment::Type::Depth},
+                    {1, "swapchain", Attachment::Type::Swapchain},
+            };
+            std::vector<SubpassType> renderpassSubpasses1 = {
+                    {0, {0, 1}}
+            };
+
+            addRenderStage(std::make_unique<RenderStage>(renderpassAttachments1, renderpassSubpasses1));
         }
         ~EditorRenderer() override = default;
 
@@ -30,7 +38,7 @@ namespace fe {
             //addSubrender<AtmosphereSubrender>({ 0, 0});
             addSubrender<SkyboxSubrender>({ 0, 0})->setEnabled(false);
             addSubrender<GridSubrender>({0, 1});
-            addSubrender<ImGuiSubrender>({0, 2});
+            addSubrender<ImGuiSubrender>({1, 0});
         }
 
         void onUpdate() override {

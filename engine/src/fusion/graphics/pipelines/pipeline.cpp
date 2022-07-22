@@ -4,6 +4,6 @@
 
 using namespace fe;
 
-void Pipeline::bindPipeline(const fe::CommandBuffer& commandBuffer) const {
+void Pipeline::bindPipeline(const CommandBuffer& commandBuffer) const {
     vkCmdBindPipeline(commandBuffer, getPipelineBindPoint(), getPipeline());
 }

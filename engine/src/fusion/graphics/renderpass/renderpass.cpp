@@ -17,9 +17,9 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 		attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; // We don't care about initial layout of the attachment.
 
-		switch (attachment.type) {
+        switch (attachment.type) {
             case Attachment::Type::Image:
-                attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
                 attachmentDescription.format = attachment.format;
                 break;
             case Attachment::Type::Depth:
@@ -60,7 +60,7 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 
 			VkAttachmentReference attachmentReference = {};
 			attachmentReference.attachment = attachment->binding;
-			attachmentReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            attachmentReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			subpassColorAttachments.push_back(attachmentReference);
 		}
 
