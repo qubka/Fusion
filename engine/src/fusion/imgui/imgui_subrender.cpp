@@ -107,26 +107,83 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer) {
     if (!drawData || drawData->CmdListsCount == 0)
         return;
 
-    // Update push constants
-    ImGuiIO& io = ImGui::GetIO();
-    pushObject.push("scale", glm::vec2{ 2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y });
-    pushObject.push("translate", glm::vec2{ -1.0f });
-    pushObject.push("texture", 1);
+    // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
+    ImVec2 size{ drawData->DisplaySize * drawData->FramebufferScale };
+    if (size.x <= 0 || size.y <= 0)
+        return;
 
     // Updates descriptors
-    descriptorSet.push("PushObject", pushObject);
-    descriptorSet.push("fontSampler", reinterpret_cast<const Texture2d*>(ImGui::GetIO().Fonts[0].TexID));
-    descriptorSet.push("sceneSampler", reinterpret_cast<const Texture2d*>(Graphics::Get()->getAttachment("scene")));
+    {
+        for (int i = 0; i < drawData->CmdListsCount; i++) {
+            const ImDrawList* cmdLists = drawData->CmdLists[i];
+            for (const auto& cmd : cmdLists->CmdBuffer) {
+                if (auto texture = reinterpret_cast<Texture*>(cmd.TextureId)) {
+                    /*VkImageAspectFlags aspect = texture->getAspect();
+                    if (texture->getLayout() == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+                       texture->transitionImage(commandBuffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+                    }*/
+                    descriptorImageInfos[cmd.TextureId] = &texture->getDescriptor();
+                }
+            }
+        }
+    }
 
-    if (!descriptorSet.update(pipeline))
-        return;
+    size_t frameIndex = Graphics::Get()->getCurrentFrame(0);
+
+    // Create descriptors
+    {
+        const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
+
+        descriptorSetHasUpdated[frameIndex].clear();
+
+        for (int i = 0; i < drawData->CmdListsCount; i++) {
+            const ImDrawList* cmdLists = drawData->CmdLists[i];
+            for (const auto& cmd: cmdLists->CmdBuffer) {
+                if (cmd.TextureId) {
+                    auto& descriptor = descriptorSets[frameIndex][cmd.TextureId];
+                    if (!descriptor) {
+                        VkDescriptorSet set;
+                        VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
+                        descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+                        descriptorSetAllocateInfo.descriptorPool = pipeline.getDescriptorPool();
+                        descriptorSetAllocateInfo.descriptorSetCount = 1;
+                        descriptorSetAllocateInfo.pSetLayouts = &pipeline.getDescriptorSetLayout();
+                        descriptorSetAllocateInfo.pNext = nullptr;
+                        vkAllocateDescriptorSets(logicalDevice, &descriptorSetAllocateInfo, &set);
+                        descriptor = set;
+                    }
+                    auto& updated = descriptorSetHasUpdated[frameIndex][cmd.TextureId];
+                    if (!updated) {
+                        auto& set = descriptorSets[frameIndex][cmd.TextureId];
+                        VkWriteDescriptorSet descriptorWrites = {};
+                        descriptorWrites.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                        descriptorWrites.dstSet = set;
+                        descriptorWrites.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                        descriptorWrites.pImageInfo = (VkDescriptorImageInfo*) descriptorImageInfos[cmd.TextureId];
+                        descriptorWrites.descriptorCount = 1;
+                        descriptorWrites.dstBinding = 0;
+                        vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrites, 0, nullptr);
+                        updated = true;
+                    }
+                }
+            }
+        }
+    }
 
     // Draws the canvas
     pipeline.bindPipeline(commandBuffer);
-    pushObject.bindPush(commandBuffer, pipeline);
-    descriptorSet.bindDescriptor(commandBuffer, pipeline);
 
-    canvasObject.cmdRender(commandBuffer, pipeline, descriptorSet, pushObject);
+    // Setup scale and translation:
+    // Our visible imgui space lies from draw_data->DisplayPps (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom right). DisplayPos is (0,0) for single viewport apps.
+    {
+        glm::vec2 scale{ 2.0f / glm::vec2{drawData->DisplaySize} };
+        glm::vec2 translate{ -1.0f - glm::vec2{drawData->DisplayPos} * scale };
+
+        vkCmdPushConstants(commandBuffer, pipeline.getPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::vec2), glm::value_ptr(scale));
+        vkCmdPushConstants(commandBuffer, pipeline.getPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, sizeof(glm::vec2), sizeof(glm::vec2), glm::value_ptr(translate));
+    }
+
+    canvasObject.cmdRender(commandBuffer, pipeline, descriptorSets[frameIndex]);
 }
 
 void ImGuiSubrender::onMouseButton(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods) {
@@ -156,8 +213,7 @@ void ImGuiSubrender::onMouseEnter(bool entered) {
         currentWindow = window;
         io.AddMousePosEvent(lastValidMousePos.x, lastValidMousePos.y);
     } else if (currentWindow == window) {
-        const auto& mouse = io.MousePos;
-        lastValidMousePos = { mouse.x, mouse.y };
+        lastValidMousePos = io.MousePos;
         currentWindow = nullptr;
         io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
     }
@@ -248,10 +304,9 @@ void ImGuiSubrender::setupKeyCodes() {
 }
 
 void ImGuiSubrender::setupStyle() {
-    ImGuiIO& io = ImGui::GetIO();
-
     ImGui::StyleColorsDark();
 
+    ImGuiIO& io = ImGui::GetIO();
     io.FontGlobalScale = fontScale;
 
     ImFontConfig config;
@@ -273,18 +328,18 @@ void ImGuiSubrender::setupStyle() {
     rebuildFont();
 
     io.Fonts->TexGlyphPadding = 1;
-    for (int n = 0; n < io.Fonts->ConfigData.Size; n++) {
-        io.Fonts->ConfigData[n].RasterizerMultiply = 1.0f;
+    for (int i = 0; i < io.Fonts->ConfigData.Size; i++) {
+        io.Fonts->ConfigData[i].RasterizerMultiply = 1.0f;
     }
 
     ImGuiStyle& style = ImGui::GetStyle();
 
-    style.WindowPadding = ImVec2{ 5, 5 };
-    style.FramePadding = ImVec2{ 4, 4 };
-    style.ItemSpacing = ImVec2{ 6, 2 };
-    style.ItemInnerSpacing = ImVec2{ 2, 2 };
+    style.WindowPadding = ImVec2{5, 5};
+    style.FramePadding = ImVec2{4, 4};
+    style.ItemSpacing = ImVec2{6, 2};
+    style.ItemInnerSpacing = ImVec2{2, 2};
     style.IndentSpacing = 6.0f;
-    style.TouchExtraPadding = ImVec2{ 4, 4 };
+    style.TouchExtraPadding = ImVec2{4, 4};
 
     style.ScrollbarSize = 10;
 
@@ -300,7 +355,7 @@ void ImGuiSubrender::setupStyle() {
     style.FrameRounding = roundingAmount;
     style.ScrollbarRounding = roundingAmount;
     style.GrabRounding = roundingAmount;
-    style.WindowMinSize = ImVec2{ 200.0f, 200.0f };
+    style.WindowMinSize = ImVec2{200.0f, 200.0f};
 
 #ifdef IMGUI_HAS_DOCK
     style.TabBorderSize = 1.0f;
@@ -312,8 +367,8 @@ void ImGuiSubrender::setupStyle() {
     }
 #endif
 
-    //ImGuiColorScheme::SetColors(0x252131FF /* Background */, 0xF4F1DEFF /* Text */, 0xDA115EFF /* MainColor */, 0x792359FF /* MainAccent */, 0xC7EF00FF /* Highlight */ );
-    //ImGuiColorScheme::ApplyTheme();
+    //ImGui::ColorScheme::SetColors(0x252131FF /* Background */, 0xF4F1DEFF /* Text */, 0xDA115EFF /* MainColor */, 0x792359FF /* MainAccent */, 0xC7EF00FF /* Highlight */ );
+    //ImGui::ColorScheme::ApplyTheme();
     ImGuiUtils::SetTheme(ImGuiUtils::Theme::ClassicDark);
 }
 
@@ -335,14 +390,12 @@ void ImGuiSubrender::addIconFont() {
 void ImGuiSubrender::rebuildFont() {
     ImGuiIO& io = ImGui::GetIO();
 
-    //io.Fonts->Build();
-
     uint8_t* fontBuffer;
     int texWidth, texHeight;
     io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
     auto bitmap = std::make_unique<Bitmap>(glm::uvec2{texWidth, texHeight});
     std::memcpy(bitmap->getData<void>(), fontBuffer, bitmap->getLength());
-    auto& font = fontImages.emplace_back(std::make_unique<Texture2d>(std::move(bitmap)));
+    auto& font = fontTextures.emplace_back(std::make_unique<Texture2d>(std::move(bitmap)));
 
     io.Fonts->SetTexID((ImTextureID)(font.get()));
 }

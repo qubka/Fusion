@@ -2,6 +2,7 @@
 
 #include "fusion/imgui/imgui_object.hpp"
 
+#include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/subrender.hpp"
 #include "fusion/graphics/pipelines/pipeline_graphics.hpp"
 #include "fusion/graphics/buffers/push_handler.hpp"
@@ -13,6 +14,7 @@ namespace fe {
     class Window;
     class Texture2d;
     class ImGuiSubrender final : public Subrender {
+        typedef void* ImTextureID;
     public:
         explicit ImGuiSubrender(const Pipeline::Stage& pipelineStage);
         ~ImGuiSubrender() override;
@@ -49,7 +51,11 @@ namespace fe {
 
         ImGuiObject canvasObject;
 
-        std::vector<std::unique_ptr<Texture2d>> fontImages;
+        std::vector<std::unique_ptr<Texture2d>> fontTextures;
+
+        std::array<std::map<ImTextureID, VkDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptorSets;
+        std::map<ImTextureID, const VkDescriptorImageInfo*> descriptorImageInfos;
+        std::array<std::map<ImTextureID, bool>, MAX_FRAMES_IN_FLIGHT> descriptorSetHasUpdated;
 
         float fontSize;
         float fontScale;

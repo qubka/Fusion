@@ -1,19 +1,20 @@
 #include "imgui_object.hpp"
 
+#include "fusion/graphics/vku.hpp"
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/descriptors/descriptors_handler.hpp"
 #include "fusion/graphics/buffers/push_handler.hpp"
 #include "fusion/graphics/buffers/uniform_handler.hpp"
-#include "fusion/graphics/vku.hpp"
+#include "fusion/imgui/imgui_utils.hpp"
 
 #include <volk/volk.h>
 #include <imgui/imgui.h>
 
 using namespace fe;
 
-void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, DescriptorsHandler& descriptorSet, PushHandler& pushObject) {
+void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, std::map<ImTextureID, VkDescriptorSet>& descriptorSets) {
     ImDrawData* drawData = ImGui::GetDrawData();
 
     // Note: Alignment is done inside buffer creation
@@ -68,29 +69,52 @@ void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& 
     // Bind and draw current buffers
     VkBuffer vertexBuffers[1] = { *vertexBuffer };
     VkDeviceSize offsets[1] = { 0 };
-
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
     vkCmdBindIndexBuffer(commandBuffer, *indexBuffer, 0, sizeof(ImDrawIdx) == 2 ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32);
 
-    int32_t vertexOffset = 0;
-    int32_t indexOffset = 0;
+    // Render command lists
+    // (Because we merged all buffers into a single one, we maintain our own offset into them)
+    uint32_t vertexOffset = 0;
+    uint32_t indexOffset = 0;
 
+    // Will project scissor/clipping rectangles into framebuffer space
+    ImVec2 size{ drawData->DisplaySize * drawData->FramebufferScale };
+    ImVec2 clipOff{ drawData->DisplayPos };         // (0,0) unless using multi-viewports
+    ImVec2 clipScale{ drawData->FramebufferScale }; // (1,1) unless using retina display which are often (2,2)
+
+    VkDescriptorSet lastSet = VK_NULL_HANDLE;
     for (int i = 0; i < drawData->CmdListsCount; i++) {
         const ImDrawList* cmdLists = drawData->CmdLists[i];
         for (const auto& cmd : cmdLists->CmdBuffer) {
-            VkRect2D scissor = vku::rect2D(
-                    glm::uvec2{cmd.ClipRect.z - cmd.ClipRect.x, cmd.ClipRect.w - cmd.ClipRect.y}, // extent
-                    glm::ivec2{std::max(static_cast<int>((cmd.ClipRect.x)), 0), std::max(static_cast<int>((cmd.ClipRect.y)), 0)} // offset
-            );
+            if (cmd.TextureId) {
+                auto& descSet = descriptorSets[cmd.TextureId];
+                if (lastSet != descSet) {
+                    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, &descSet, 0, nullptr);
+                    lastSet = descSet;
+                }
+            }
+
+            // Project scissor/clipping rectangles into framebuffer space
+            glm::vec2 clipRectMin{ (cmd.ClipRect.x - clipOff.x) * clipScale.x, (cmd.ClipRect.y - clipOff.y) * clipScale.y };
+            glm::vec2 clipRectMax{ (cmd.ClipRect.z - clipOff.x) * clipScale.x, (cmd.ClipRect.w - clipOff.y) * clipScale.y };
+
+            // Clamp to viewport as vkCmdSetScissor() won't accept values that are off bounds
+            if (clipRectMin.x < 0.0f) clipRectMin.x = 0.0f;
+            if (clipRectMin.y < 0.0f) clipRectMin.y = 0.0f;
+            if (clipRectMax.x > size.x) clipRectMax.x = size.x;
+            if (clipRectMax.y > size.y) clipRectMax.y = size.y;
+            if (clipRectMax.x < clipRectMin.x || clipRectMax.y < clipRectMin.y)
+                continue;
+
+            // Apply scissor/clipping rectangle
+            VkRect2D scissor{ vku::rect2D(clipRectMax - clipRectMin, clipRectMin) };
             vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-            vkCmdDrawIndexed(commandBuffer, cmd.ElemCount, 1, indexOffset, vertexOffset, 0);
 
-            pushObject.push("texture", cmd.UserCallbackData ? *(int32_t*)(cmd.UserCallbackData) : 0);
-            pushObject.bindPush(commandBuffer, pipeline);
-
-            indexOffset += static_cast<int32_t>(cmd.ElemCount);
+            // Draw buffer
+            vkCmdDrawIndexed(commandBuffer, cmd.ElemCount, 1, cmd.IdxOffset + indexOffset, cmd.VtxOffset + vertexOffset, 0);
         }
 
+        indexOffset += cmdLists->IdxBuffer.Size;
         vertexOffset += cmdLists->VtxBuffer.Size;
     }
 }
