@@ -22,7 +22,7 @@ namespace fe {
         bool has() const {
             const auto& typeId = typeid(T);
 
-            return indexes.find(typeId) != indexes.end();
+            return indexed.find(typeId) != indexed.end();
         }
 
         /**
@@ -34,7 +34,7 @@ namespace fe {
         T* get() const {
             const auto& typeId = typeid(T);
 
-            if (auto it = indexes.find(typeId); it != indexes.end()) {
+            if (auto it = indexed.find(typeId); it != indexed.end()) {
                 auto& system = systems[it->second];
                 return system ? static_cast<T*>(system.get()) : nullptr;
             }
@@ -55,7 +55,7 @@ namespace fe {
             const auto& typeId = typeid(T);
 
             // Then, add the System
-            indexes.emplace(typeId, systems.size());
+            indexed.emplace(typeId, systems.size());
             systems.push_back(std::move(system));
         }
 
@@ -68,9 +68,9 @@ namespace fe {
             const auto& typeId = typeid(T);
 
             // Then, remove the System
-            if (auto it = indexes.find(typeId); it != indexes.end()) {
+            if (auto it = indexed.find(typeId); it != indexed.end()) {
                 systems.erase(systems.begin() + it->second);
-                indexes.erase(it);
+                indexed.erase(it);
             }
         }
 
@@ -92,9 +92,9 @@ namespace fe {
         }
 
     private:
-        /// List of all Indexes of data stored
-        std::unordered_map<std::type_index, size_t> indexes;
         /// List of all Systems in insertion order
         std::vector<std::unique_ptr<System>> systems;
+        /// Map of all indexed Systems in hash map
+        std::unordered_map<std::type_index, size_t> indexed;
     };
 }

@@ -51,7 +51,7 @@ SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& pipelineStage)
             {-1.f, -1.f,  1.f},
     };
 
-    std::vector<uint16_t> indices {
+    std::vector<uint8_t> indices {
             2,  1,  0,		3,  2,  0,  //front
             6,  5,  4,		7,  6,  4,  //right
             10, 9,  8,		11, 10, 8,  //back
@@ -61,7 +61,7 @@ SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& pipelineStage)
     };
 
     vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(glm::vec3) * vertices.size(), vertices.data());
-    indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint16_t) * indices.size(), indices.data());
+    indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint8_t) * indices.size(), indices.data());
 
     skyboxSampler = std::make_unique<TextureCube>("engine/assets/textures/cubemap_vulkan.ktx");
 }
@@ -97,6 +97,6 @@ void SkyboxSubrender::onRender(const CommandBuffer& commandBuffer) {
     VkBuffer vertexBuffers[1] = { *vertexBuffer };
     VkDeviceSize offsets[1] = { 0 };
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT8_EXT);
     vkCmdDrawIndexed(commandBuffer, 36, 1, 0, 0, 0);
 }

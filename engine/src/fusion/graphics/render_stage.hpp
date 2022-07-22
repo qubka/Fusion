@@ -67,7 +67,10 @@ namespace fe {
         const std::vector<SubpassType>& getSubpasses() const { return subpasses; }
 
         Viewport& getViewport() { return viewport; }
-        bool setViewport(const Viewport& port) const;
+        bool setViewport(const Viewport& port);
+
+        Camera* getOverrideCamera() const { return overrideCamera; }
+        void setOverrideCamera(Camera* camera) { overrideCamera = camera; }
 
         /**
          * Gets the render stage viewport.
@@ -94,7 +97,8 @@ namespace fe {
         std::vector<Attachment> attachments;
         std::vector<SubpassType> subpasses;
 
-        mutable Viewport viewport;
+        Viewport viewport;
+        Camera* overrideCamera{ nullptr };
 
         std::unique_ptr<Renderpass> renderpass;
         std::unique_ptr<TextureDepth> depthStencil;

@@ -96,6 +96,7 @@ void ImGuiSubrender::onUpdate() {
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
 
+    // TODO: Rework that callback
     Engine::Get()->getApp()->onImGui();
 
     ImGui::Render();

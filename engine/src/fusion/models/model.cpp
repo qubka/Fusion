@@ -1,6 +1,8 @@
 #include "model.hpp"
+#include "mesh.hpp"
 
 #include "fusion/graphics/textures/texture2d.hpp"
+#include "fusion/filesystem/virtual_file_system.hpp"
 
 #include <assimp/Importer.hpp>
 #include <assimp/Exporter.hpp>
@@ -10,13 +12,29 @@
 
 using namespace fe;
 
+Model::Model(const fs::path& filepath, const Vertex::Layout& layout) : layout{layout} {
+    fs::path path{ VirtualFileSystem::Get()->resolvePhysicalPath(filepath) };
+
+    Assimp::Importer import;
+    const aiScene* scene = import.ReadFile(path.string(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+        LOG_ERROR << "Failed to load model at: " << path << " - " << import.GetErrorString();
+        return;
+    }
+
+    directory = path.parent_path();
+    processNode(scene, scene->mRootNode);
+    radius = std::max(glm::length(minExtents), glm::length(maxExtents));
+}
+
 void Model::processNode(const aiScene* scene, const aiNode* node) {
-    for (size_t i = 0; i< node->mNumMeshes; i++) {
+    for (uint32_t i = 0; i< node->mNumMeshes; i++) {
         const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         processMesh(scene, mesh);
     }
 
-    for (size_t i = 0; i< node->mNumChildren; i++) {
+    for (uint32_t i = 0; i< node->mNumChildren; i++) {
         processNode(scene, node->mChildren[i]);
     }
 }
@@ -65,13 +83,13 @@ void Model::processMesh(const aiScene* scene, const aiMesh* mesh) {
         }*/
     }
 
-    //meshes.push_back(std::make_unique<Mesh>(std::move(vertices), std::move(indices), std::move(textures)));
+    meshes.push_back(std::make_unique<Mesh>(std::move(vertices), std::move(indices)/*, std::move(textures)*/));
 }
 
 std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* material, int type) {
     auto textureType = static_cast<aiTextureType>(type);
     std::vector<std::shared_ptr<Texture2d>> textures;
-    for (size_t i = 0; i < material->GetTextureCount(textureType); i++) {
+    for (uint32_t i = 0; i < material->GetTextureCount(textureType); i++) {
         aiString str;
         if (material->GetTexture(textureType, i, &str) == AI_SUCCESS) {
             fs::path path{ directory / str.C_Str() };
@@ -89,7 +107,7 @@ std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* ma
             // if texture hasn't been loaded already, load it
             if (!skip) {
                 if (!fs::exists(path)) {
-                    std::cerr << "ERROR: Could load texture from path: " << path << std::endl;
+                    LOG_ERROR << "Could load texture from path: " << path << std::endl;
                     continue;
                 }
 
@@ -102,7 +120,6 @@ std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* ma
             LOG_ERROR << "Could not get texture from material";
         }
     }
-
     return textures;
 }
 
@@ -118,7 +135,7 @@ void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scen
     const aiVector3D& biTangent = mesh->HasTangentsAndBitangents() ? mesh->mBitangents[i] : zero;
 
     std::vector<float> vertexBuffer;
-    glm::vec3 scaledPos{ pos.x, -pos.y, pos.z };
+    glm::vec3 scaledPos{ pos.x, pos.y, pos.z };
     scaledPos *= scale;
     scaledPos += center;
 
@@ -183,10 +200,10 @@ void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scen
                 break;
             case Component::RGBA:
                 uint32_t result =
-                        (static_cast<uint8_t>(UINT8_MAX) << 24) +
-                        (static_cast<uint8_t>(color.b * UINT8_MAX) << 16) +
-                        (static_cast<uint8_t>(color.g * UINT8_MAX) << 8)  +
-                         static_cast<uint8_t>(color.r * UINT8_MAX);
+                        (static_cast<uint32_t>(255) << 24) |
+                        (static_cast<uint32_t>(color.b * 255) << 16) |
+                        (static_cast<uint32_t>(color.g * 255) << 8)  |
+                        (static_cast<uint32_t>(color.r * 255) << 0);
                 vertexBuffer.push_back(static_cast<float>(result));
                 break;
         };
@@ -197,3 +214,64 @@ void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scen
     maxExtents = glm::max(scaledPos, maxExtents);
     minExtents = glm::min(scaledPos, minExtents);
 }
+
+void Model::cmdRender(const CommandBuffer& commandBuffer) const {
+    for (auto& mesh : meshes) {
+        mesh->cmdRender(commandBuffer);
+    }
+}
+
+/*aiScene Model::GenerateScene(const Mesh& mesh) {
+    aiScene scene;
+    scene.mRootNode = new aiNode{};
+
+    scene.mMaterials = new aiMaterial*[1];
+    scene.mNumMaterials = 1;
+    scene.mMaterials[0] = new aiMaterial{};
+
+    scene.mMeshes = new aiMesh*[1];
+    scene.mNumMeshes = 1;
+    scene.mMeshes[0] = new aiMesh{};
+    scene.mMeshes[0]->mMaterialIndex = 0;
+
+    scene.mRootNode->mMeshes = new unsigned int[1];
+    scene.mRootNode->mNumMeshes = 1;
+    scene.mRootNode->mMeshes[0] = 0;
+
+    auto pMesh = scene.mMeshes[0];
+
+    const auto& vertices = mesh->verticies;
+    size_t numVertices = vertices.size();
+
+    pMesh->mVertices = new aiVector3D[numVertices];
+    pMesh->mNumVertices = numVertices;
+
+    pMesh->mNormals = new aiVector3D[numVertices];
+
+    pMesh->mTextureCoords[0] = new aiVector3D[numVertices];
+    pMesh->mNumUVComponents[0] = numVertices;
+
+    for (size_t i = 0; i < numVertices; i++) {
+        const auto& v = vertices[i];
+        pMesh->mVertices[i] = {v.position.x, v.position.y, v.position.z};
+        pMesh->mNormals[i] = {v.normal.x, v.normal.y, v.normal.z};
+        pMesh->mTextureCoords[0][i] = {v.texture.x, v.texture.y, 0};
+    }
+
+    const auto& indices = mesh->indices;
+    size_t numFaces = indices.size() / 3;
+
+    pMesh->mFaces = new aiFace[numFaces];
+    pMesh->mNumFaces = numFaces;
+
+    for (size_t i = 0, j = 0; i < numFaces; i++, j += 3) {
+        aiFace& face = pMesh->mFaces[i];
+        face.mIndices = new unsigned int[3];
+        face.mNumIndices = 3;
+        face.mIndices[0] = indices[j+0];
+        face.mIndices[1] = indices[j+1];
+        face.mIndices[2] = indices[j+2];
+    }
+
+    return scene;
+}*/

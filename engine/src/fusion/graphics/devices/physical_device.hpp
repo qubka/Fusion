@@ -39,9 +39,11 @@ namespace fe {
         const Instance& instance;
 
         VkPhysicalDevice physicalDevice{ VK_NULL_HANDLE };
-        VkPhysicalDeviceProperties properties{};
-        VkPhysicalDeviceFeatures features{};
-        VkPhysicalDeviceMemoryProperties memoryProperties{};
+
+        VkPhysicalDeviceProperties properties = {};
+        VkPhysicalDeviceFeatures features = {};
+        VkPhysicalDeviceMemoryProperties memoryProperties = {};
+
         VkSampleCountFlagBits msaaSamples{ VK_SAMPLE_COUNT_1_BIT };
         VkQueueFlags supportedQueues{};
         uint32_t graphicsFamily{ VK_QUEUE_FAMILY_IGNORED };

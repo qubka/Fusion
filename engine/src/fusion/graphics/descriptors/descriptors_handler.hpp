@@ -17,7 +17,7 @@ namespace fe {
         DescriptorsHandler() = default;
         explicit DescriptorsHandler(const Pipeline& pipeline);
 
-        template<typename T>
+        template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Descriptor*>>>
         void push(const std::string& descriptorName, const T* descriptor, const std::optional<OffsetSize>& offsetSize = std::nullopt) {
             if (!shader)
                 return;
@@ -68,7 +68,7 @@ namespace fe {
             changed = true;
         }
 
-        template<typename T>
+        template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Descriptor*>>>
         void push(const std::string& descriptorName, const T* descriptor, WriteDescriptorSet writeDescriptorSet) {
             if (!shader)
                 return;

@@ -69,18 +69,6 @@ namespace fe {
         void clearEntities();
 
         /**
-         * Gets the current camera object.
-         * @return The current camera.
-         */
-        Camera* getCamera() const { return camera.get(); }
-
-        /**
-         * Sets the current camera to a new camera.
-         * @param cam The new camera.
-         */
-        void setCamera(const std::shared_ptr<Camera>& cam) { camera = cam; }
-
-        /**
          * Gets the name of the scene.
          * @return The scene name.
          */
@@ -186,7 +174,6 @@ namespace fe {
         std::string name;
         entt::registry registry;
         SystemHolder systems;
-        std::shared_ptr<Camera> camera;
         bool started{ false };
         bool runtime{ false };
     };

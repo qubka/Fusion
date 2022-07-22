@@ -15,6 +15,15 @@ namespace ImGuiUtils {
 using namespace fe;
 using namespace std::string_literals;
 
+void TextCentered(const std::string& text, std::optional<float> offsetY) {
+    ImVec2 windowSize{ ImGui::GetWindowSize() };
+    ImGui::SetCursorPosX((windowSize.x - ImGui::CalcTextSize(text.c_str()).x) * 0.5f);
+    if (offsetY) {
+        ImGui::SetCursorPosY(*offsetY + windowSize.y * 0.5f);
+    }
+    ImGui::TextUnformatted(text.c_str());
+}
+
 void PropertyText(const std::string& name, const std::string& value) {
     //ImGui::AlignTextToFramePadding();
     ImGui::TextUnformatted(name.c_str());
@@ -271,7 +280,7 @@ void Image(Texture2dArray* texture, uint32_t index, const ImVec2& size, bool fli
     ImGui::Image(texture, size, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
 }
 
-bool BufferingBar(const std::string& name, float value, ImVec2 size, uint32_t bgColor, uint32_t fgColor) {
+bool BufferingBar(const std::string& name, float value, ImVec2 size, ImU32 bgColor, ImU32 fgColor) {
     ImGuiContext* g = ImGui::GetCurrentContext();
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     const ImGuiStyle& style = ImGui::GetStyle();
@@ -312,7 +321,7 @@ bool BufferingBar(const std::string& name, float value, ImVec2 size, uint32_t bg
     return true;
 }
 
-bool Spinner(const std::string& name, float radius, int thickness, uint32_t color) {
+bool Spinner(const std::string& name, float radius, int thickness, ImU32 color) {
     ImGuiContext* g = ImGui::GetCurrentContext();
     const ImGuiStyle& style = g->Style;
     const ImGuiID id = ImGui::GetID(name.c_str());
@@ -410,7 +419,7 @@ bool ToggleButton(const std::string& name, bool& value, bool text_style) {
     return updated;
 }
 
-void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, float yOffset, uint32_t colEven, uint32_t colOdd) {
+void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, float yOffset, ImU32 colEven, ImU32 colOdd) {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     float y0 = ImGui::GetCursorScreenPos().y + std::round(yOffset);
 
@@ -428,7 +437,7 @@ void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, floa
     }
 }
 
-void DrawItemActivityOutline(float rounding, bool drawWhenInactive, const ImColor& colourWhenActive) {
+void DrawItemActivityOutline(float rounding, bool drawWhenInactive, ImU32 colourWhenActive) {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     ImRect rect{ ImGui::GetItemRectMin(), ImGui::GetItemRectMax() };
@@ -438,12 +447,12 @@ void DrawItemActivityOutline(float rounding, bool drawWhenInactive, const ImColo
     rect.Max.y += 1.0f;
 
     if (ImGui::IsItemHovered() && !ImGui::IsItemActive()) {
-        drawList->AddRect(rect.Min, rect.Max, ImColor{60, 60, 60}, rounding, 0, 1.5f);
+        drawList->AddRect(rect.Min, rect.Max, IM_COL32(60, 60, 60, 255), rounding, 0, 1.5f);
     }
     if (ImGui::IsItemActive()) {
         drawList->AddRect(rect.Min, rect.Max, colourWhenActive, rounding, 0, 1.0f);
     } else if (!ImGui::IsItemHovered() && drawWhenInactive) {
-        drawList->AddRect(rect.Min, rect.Max, ImColor{50, 50, 50}, rounding, 0, 1.0f);
+        drawList->AddRect(rect.Min, rect.Max, IM_COL32(50, 50, 50, 255), rounding, 0, 1.0f);
     }
 }
 

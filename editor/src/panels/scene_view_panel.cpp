@@ -58,24 +58,18 @@ void SceneViewPanel::onImGui() {
 
     editor->setSceneViewPanelPosition(viewportPos);
 
-    bool halfRes = editor->getSettings().halfRes;
-
-    if (halfRes)
-        viewportSize *= 0.5f;
-
-    //resize(sceneViewSize);
-
-    if (halfRes)
-        viewportSize *= 2.0f;
-
-    ImGuiUtils::Image((Texture2d*)Graphics::Get()->getAttachment("scene"), viewportSize, true);
+    auto renderStage = Graphics::Get()->getRenderStage(0);
+    renderStage->setOverrideCamera(camera);
+    if (!renderStage->setViewport({glm::vec2{1.0f, 1.0f}, glm::uvec2{viewportSize.x, viewportSize.y}, glm::ivec2{0, 0}})) {
+        ImGuiUtils::Image((Texture2d*)Graphics::Get()->getAttachment("scene"), viewportSize, true);
+    }
 
     ImVec2 windowSize{ ImGui::GetWindowSize() };
 
     ImVec2& minBound = viewportPos;
     ImVec2  maxBound{ minBound + windowSize };
 
-    bool updateCamera = ImGui::IsMouseHoveringRect(minBound, maxBound); // || Input::Get().GetMouseMode() == MouseMode::Captured;
+    bool updateCamera = ImGui::IsMouseHoveringRect(minBound, maxBound); // || Input::Get().getMouseMode() == MouseMode::Captured;
 
     editor->setSceneActive(ImGui::IsWindowFocused() && !ImGuizmo::IsUsing() && updateCamera);
 
@@ -219,7 +213,7 @@ void SceneViewPanel::drawToolBar() {
         if (ImGuiUtils::ToggleButton(ICON_MDI_ANGLE_RIGHT "2D", selected)) {
             if (!ortho) {
                 camera.setOrthographic(true);
-                camera.lookAt(vec3::up, vec3::zero, vec3::up);
+                camera.lookAt(glm::vec3{0, 10, 0}, vec3::zero, vec3::up);
             }
         }
     }
@@ -229,12 +223,10 @@ void SceneViewPanel::drawToolBar() {
 
     // TODO: Edit if needed
     float xAvail = ImGui::GetContentRegionAvail().x;
-    ImGui::SameLine(xAvail > 500.0f ? xAvail - 120.0f : 0.0f);
+    ImGui::SameLine(xAvail > 500.0f ? xAvail - 130.0f : 0.0f);
 
-    if (ImGui::Button(ICON_MDI_CAMERA_WIRELESS " " ICON_MDI_CHEVRON_DOWN)) {
+    if (ImGui::Button(ICON_MDI_CAMERA_WIRELESS " " ICON_MDI_CHEVRON_DOWN))
         ImGui::OpenPopup("CameraPopup");
-    }
-
     if (ImGui::BeginPopup("CameraPopup", ImGuiWindowFlags_AlwaysAutoResize)) {
         {
             // Editor Camera Settings
@@ -250,7 +242,7 @@ void SceneViewPanel::drawToolBar() {
             ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
 
             float fov = camera.getFov();
-            if (ImGuiUtils::Property("Fov", fov, 1.0f, 120.0f, 1.0f, ortho ? ImGuiUtils::PropertyFlag::ReadOnly :  ImGuiUtils::PropertyFlag::None)) {
+            if (ImGuiUtils::Property("Fov", fov, 1.0f, 120.0f, 1.0f, ortho ? ImGuiUtils::PropertyFlag::ReadOnly : ImGuiUtils::PropertyFlag::None)) {
                 camera.setFov(fov);
             }
 
@@ -275,7 +267,7 @@ void SceneViewPanel::drawToolBar() {
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
     ImGui::SameLine();
 
-    if (ImGui::Button("Gizmos " ICON_MDI_CHEVRON_DOWN))
+    if (ImGui::Button(ICON_MDI_SHAPE_OUTLINE " Gizmos " ICON_MDI_CHEVRON_DOWN))
         ImGui::OpenPopup("GizmosPopup");
     if (ImGui::BeginPopup("GizmosPopup", ImGuiWindowFlags_AlwaysAutoResize)) {
         {

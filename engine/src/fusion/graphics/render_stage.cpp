@@ -127,7 +127,7 @@ const VkFramebuffer& RenderStage::getActiveFramebuffer(uint32_t activeSwapchainI
 	return framebuffers->getFramebuffer(activeSwapchainImage);
 }
 
-bool RenderStage::setViewport(const Viewport& port) const {
+bool RenderStage::setViewport(const Viewport& port) {
     if (viewport == port)
         return false;
 

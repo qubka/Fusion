@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-bool Mesh::cmdRender(const CommandBuffer& commandBuffer, uint32_t instances) {
+bool Mesh::cmdRender(const CommandBuffer& commandBuffer, uint32_t instances) const {
     if (vertexBuffer && indexBuffer) {
         VkBuffer vertexBuffers[1] = { *vertexBuffer };
         VkDeviceSize offsets[1] = { 0 };
@@ -19,25 +19,4 @@ bool Mesh::cmdRender(const CommandBuffer& commandBuffer, uint32_t instances) {
         return false;
     }
     return true;
-}
-
-std::vector<uint32_t> Mesh::getIndices() {
-    auto indexStaging = Buffer::DeviceToStageBuffer(*indexBuffer);
-
-    indexStaging->map();
-    std::vector<uint32_t> indices(indexCount);
-    indexStaging->extract(indices.data());
-    indexStaging->unmap();
-
-    return indices;
-}
-
-void Mesh::setIndices(const std::vector<uint32_t>& indices) {
-    indexBuffer = nullptr;
-    indexCount = static_cast<uint32_t>(indices.size());
-
-    if (indices.empty())
-        return;
-
-    indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint32_t) * indices.size(), indices.data());
 }

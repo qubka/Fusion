@@ -72,7 +72,7 @@ entt::entity Scene::createEntity(std::string name) {
     if (name.empty())
         name = "Empty Entity";
 
-    size_t i = 0;
+    uint32_t i = 0;
     auto view = registry.view<NameComponent>();
     for (auto [e, str] : view.each()) {
         if (String::Contains(str, name)) {

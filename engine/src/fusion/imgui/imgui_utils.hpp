@@ -32,35 +32,37 @@ namespace ImGuiUtils {
 
     enum class PropertyFlag : uint8_t {
         None = 0,
-        ColorProperty = 1,
-        ReadOnly = 2,
+        ReadOnly = 1,
+        ColorValue = 2,
         DragValue = 4, //! default in edit mode
         SliderValue = 8,
     };
     BITMASK_DEFINE_MAX_ELEMENT(PropertyFlag, SliderValue);
 
-    void Tooltip(const std::string& text);
+    void TextCentered(const std::string& text, std::optional<float> offsetY = std::nullopt);
 
+    void Tooltip(const std::string& text);
     void Tooltip(Texture2d* texture, const ImVec2& size, bool flipImage = false);
     void Tooltip(Texture2d* texture, const ImVec2& size, const std::string& text, bool flipImage = false);
-    void Tooltip(Texture2dArray* texture, uint32_t index, const ImVec2& size, bool flipImage = false);
 
+    void Tooltip(Texture2dArray* texture, uint32_t index, const ImVec2& size, bool flipImage = false);
     void Image(Texture2d* texture, const ImVec2& size, bool flipImage = false);
     void Image(TextureCube* texture, const ImVec2& size, bool flipImage = false);
     void Image(Texture2dArray* texture, uint32_t index, const ImVec2& size, bool flipImage = false);
+
     void Image(uint32_t* texture_id, const ImVec2& size, bool flipImage = false);
 
     void SetTheme(Theme theme);
+    bool BufferingBar(const std::string& name, float value, ImVec2 size, ImU32 bgColor, ImU32 fgColor);
 
-    bool BufferingBar(const std::string& name, float value, ImVec2 size, uint32_t bgColor, uint32_t fgColor);
-    bool Spinner(const std::string& name, float radius, int thickness, uint32_t color);
-
+    bool Spinner(const std::string& name, float radius, int thickness, ImU32 color);
     bool ToggleRoundButton(const std::string& name, bool& value);
+
     bool ToggleButton(const std::string& name, bool& value, bool text_style = false); // if text true, select text on active
 
-    void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, float yOffset, uint32_t colEven, uint32_t colOdd);
+    void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, float yOffset, ImU32 colEven, ImU32 colOdd);
+    void DrawItemActivityOutline(float rounding = 0.0f, bool drawWhenInactive = false, ImU32 colorWhenActive = IM_COL32(80, 80, 80, 255));
 
-    void DrawItemActivityOutline(float rounding = 0.0f, bool drawWhenInactive = false, const ImColor& colorWhenActive = ImColor{80, 80, 80});
     bool InputText(const std::string& name, std::string& currentText);
 
     void AlternatingRowsBackground(float lineHeight = -1.0f);
@@ -131,7 +133,7 @@ namespace ImGuiUtils {
 
         if (flags & PropertyFlag::ReadOnly) {
             ImGui::Text(ImGui::DataTypeGetInfo(GetDataType<T>())->PrintFmt, value);
-        } if (flags & PropertyFlag::SliderValue) {
+        } else if (flags & PropertyFlag::SliderValue) {
             std::string id{ "##" + name };
             if (ImGui::SliderScalar(id.c_str(), GetDataType<T>(), &value, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
                 updated = true;
@@ -182,8 +184,18 @@ namespace ImGuiUtils {
         ImGui::PushItemWidth(-1);
 
         if (flags & PropertyFlag::ReadOnly) {
-            ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").c_str());
-        } else if (flags & PropertyFlag::ColorProperty) {
+            if (flags & PropertyFlag::ColorValue) {
+                std::string id{ "##" + name };
+                glm::vec<L, T, Q> copy{ value };
+                if constexpr (L == 3) {
+                    ImGui::ColorEdit3(id.c_str(), glm::value_ptr(copy), ImGuiColorEditFlags_NoInputs);
+                } else if constexpr (L == 4) {
+                    ImGui::ColorEdit4(id.c_str(), glm::value_ptr(copy), ImGuiColorEditFlags_NoInputs);
+                }
+            } else {
+                ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").c_str());
+            }
+        } else if (flags & PropertyFlag::ColorValue) {
             std::string id{ "##" + name };
             if constexpr (L == 3) {
                 if (ImGui::ColorEdit3(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs))
@@ -192,7 +204,7 @@ namespace ImGuiUtils {
                 if (ImGui::ColorEdit4(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs))
                     updated = true;
             }
-        } if (flags & PropertyFlag::SliderValue) {
+        } else if (flags & PropertyFlag::SliderValue) {
             std::string id{ "##" + name };
             if (ImGui::SliderScalarN(id.c_str(), GetDataType<T>(), glm::value_ptr(value), L, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
                 updated = true;

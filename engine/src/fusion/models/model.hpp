@@ -10,11 +10,21 @@ class aiMaterial;
 namespace fe {
     class Mesh;
     class Texture2d;
+    class CommandBuffer;
 
     class Model {
     public:
-        Model();
-        ~Model();
+        Model(const fs::path& filepath, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::RGBA}});
+        ~Model() = default;
+
+        void cmdRender(const CommandBuffer& commandBuffer) const;
+
+        const glm::vec3& getMinExtents() const { return minExtents; }
+        const glm::vec3& getMaxExtents() const { return maxExtents; }
+        float getWidth() const { return maxExtents.x - minExtents.x; }
+        float getHeight() const { return maxExtents.y - minExtents.y; }
+        float getDepth() const { return maxExtents.z - minExtents.z; }
+        float getRadius() const { return radius; }
 
     private:
         fs::path directory;
@@ -27,13 +37,14 @@ namespace fe {
         glm::vec3 scale{ 1.0f };
         glm::vec3 center{ 0.0f };
         glm::vec2 uvScale{ 1.0f };
+        float radius{ 0.0 };
 
         void processNode(const aiScene* scene, const aiNode* node);
         void processMesh(const aiScene* scene, const aiMesh* mesh);
         std::vector<std::shared_ptr<Texture2d>> loadTextures(const aiMaterial* material, int type);
         void appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* pScene, const aiMesh* mesh, uint32_t vertexIndex);
 
-        static aiScene GenerateScene(const std::unique_ptr<Mesh>& mesh);
+        //static aiScene GenerateScene(const Mesh& mesh);
 
         template<typename T>
         void appendOutput(std::vector<uint8_t>& outputBuffer, const T& t) {

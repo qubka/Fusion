@@ -45,7 +45,7 @@ namespace fe {
          */
         void setRenderer(std::unique_ptr<Renderer>&& ptr) { renderer = std::move(ptr); }
 
-        const RenderStage* getRenderStage(size_t index) const;
+        RenderStage* getRenderStage(size_t index) const;
         const Descriptor* getAttachment(const std::string& name) const;
 
         const PhysicalDevice& getPhysicalDevice() const { return physicalDevice; }

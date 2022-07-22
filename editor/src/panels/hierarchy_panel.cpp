@@ -418,7 +418,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             return;
         }
 
-        const ImColor treeLineColor{128, 128, 128, 128};
+        const ImU32 treeLineColor = IM_COL32(128, 128, 128, 128);
         const float smallOffsetX = 6.0f;
         ImDrawList* drawList = ImGui::GetWindowDrawList();
 

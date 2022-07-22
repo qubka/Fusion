@@ -44,7 +44,7 @@ namespace ImGui {
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
-        ImGuiUtils::Property("Is Primary", camera.primary);
+        /*ImGuiUtils::Property("Is Primary", camera.primary);
 
         auto& sceneCamera = camera.camera;
 
@@ -66,7 +66,7 @@ namespace ImGui {
         float farClip = sceneCamera.getFarClip();
         if (ImGuiUtils::Property("Far Clip", farClip, 10.0f, 10000.0f)) {
             sceneCamera.setFarClip(farClip);
-        }
+        }*/
 
         ImGui::Columns(1);
         ImGui::Separator();

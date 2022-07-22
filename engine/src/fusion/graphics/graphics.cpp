@@ -248,7 +248,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     // Check if source is BGR
     // Note: Not complete, only contains most common and basic BGR surface formats for demonstration purposes
     if (!supportsBlit) {
-        static std::vector<VkFormat> BGR_FORMATS = {
+        static const std::vector<VkFormat> BGR_FORMATS = {
                 VK_FORMAT_B8G8R8A8_SRGB,
                 VK_FORMAT_B8G8R8A8_UNORM,
                 VK_FORMAT_B8G8R8A8_SNORM
@@ -276,7 +276,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
 #endif
 }
 
-const RenderStage* Graphics::getRenderStage(size_t index) const {
+RenderStage* Graphics::getRenderStage(size_t index) const {
     return renderer ? renderer->getRenderStage(index) : nullptr;
 }
 

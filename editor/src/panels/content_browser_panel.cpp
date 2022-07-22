@@ -194,7 +194,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
     if (dirInfo->parent == nullptr)
         nodeFlags |= ImGuiTreeNodeFlags_Framed;
 
-    const ImColor treeLineColor{128, 128, 128, 128};
+    const ImU32 treeLineColor = IM_COL32(128, 128, 128, 128);
     const float smallOffsetX = 6.0f;
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
