@@ -48,8 +48,8 @@ void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& 
     }
 
     // Upload data
-    auto vtxDst = reinterpret_cast<ImDrawVert*>(vertexBuffer->getMappedMemory());
-    auto idxDst = reinterpret_cast<ImDrawIdx*>(indexBuffer->getMappedMemory());
+    auto vtxDst = static_cast<ImDrawVert*>(vertexBuffer->getMappedMemory());
+    auto idxDst = static_cast<ImDrawIdx*>(indexBuffer->getMappedMemory());
 
     for (int i = 0; i < drawData->CmdListsCount; i++) {
         const ImDrawList* cmdList = drawData->CmdLists[i];

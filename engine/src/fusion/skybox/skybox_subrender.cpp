@@ -76,8 +76,7 @@ void SkyboxSubrender::onRender(const CommandBuffer& commandBuffer, const Camera*
     if (!scene)
         return;
 
-    //auto camera = scene->getCamera();
-    Camera* camera = nullptr;
+    const Camera* camera = overrideCamera ? overrideCamera : scene->getCamera();
     if (!camera)
         return;
 
@@ -100,6 +99,6 @@ void SkyboxSubrender::onRender(const CommandBuffer& commandBuffer, const Camera*
     VkBuffer vertexBuffers[1] = { *vertexBuffer };
     VkDeviceSize offsets[1] = { 0 };
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT8_EXT);
+    vkCmdBindIndexBuffer(commandBuffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT16);
     vkCmdDrawIndexed(commandBuffer, 36, 1, 0, 0, 0);
 }

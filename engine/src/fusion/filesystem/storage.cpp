@@ -101,7 +101,7 @@ FileStorage::FileStorage(const fs::path& filepath) {
     assert(asset);
     size = AAsset_getLength(asset);
     assert(size > 0);
-    mapped = reinterpret_cast<uint8_t*>(AAsset_getBuffer(asset));
+    mapped = static_cast<uint8_t*>(AAsset_getBuffer(asset));
 #elif FUSION_PLATFORM_WINDOWS
     file = CreateFileA(filepath.string().c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     if (file == INVALID_HANDLE_VALUE) {
@@ -110,13 +110,13 @@ FileStorage::FileStorage(const fs::path& filepath) {
     {
         DWORD dwFileSizeHigh;
         size = GetFileSize(file, &dwFileSizeHigh);
-        size += ((reinterpret_cast<size_t>(dwFileSizeHigh)) << 32);
+        size += ((static_cast<size_t>(dwFileSizeHigh)) << 32);
     }
     mapFile = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, NULL);
     if (mapFile == INVALID_HANDLE_VALUE) {
         throw std::runtime_error("Failed to create mapping");
     }
-    mapped = reinterpret_cast<uint8_t*>(MapViewOfFile(mapFile, FILE_MAP_READ, 0, 0, 0));
+    mapped = static_cast<uint8_t*>(MapViewOfFile(mapFile, FILE_MAP_READ, 0, 0, 0));
 #endif
 }
 

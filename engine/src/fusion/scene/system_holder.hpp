@@ -37,7 +37,7 @@ namespace fe {
                 return p.first == type_id<T>;
             });
             if (it != systems.end() && it->second) {
-                return reinterpret_cast<T*>(it->second.get());
+                return static_cast<T*>(it->second.get());
             }
             throw std::runtime_error("System Holder does not have requested system");
         }

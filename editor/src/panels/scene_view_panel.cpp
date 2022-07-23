@@ -59,7 +59,7 @@ void SceneViewPanel::onImGui() {
     camera->setAspectRatio(aspect);
 
     auto renderStage = Graphics::Get()->getRenderStage(0);
-    //renderStage->setOverrideCamera(camera);
+    renderStage->setOverrideCamera(camera);
     if (!renderStage->setViewport({glm::vec2{1.0f, 1.0f}, glm::uvec2{viewportSize.x, viewportSize.y}, glm::ivec2{0, 0}})) {
         ImGuiUtils::Image((Texture2d*)renderStage->getDescriptor("scene_image"), viewportSize, true);
     } else {
@@ -91,7 +91,7 @@ void SceneViewPanel::onImGui() {
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM", ImGuiDragDropFlags_AcceptNoDrawDefaultRect)) {
-            editor->fileOpenCallback(reinterpret_cast<const char*>(payload->Data));
+            editor->fileOpenCallback(static_cast<const char*>(payload->Data));
         }
         ImGui::EndDragDropTarget();
     }

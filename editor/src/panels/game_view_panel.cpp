@@ -39,14 +39,7 @@ void GameViewPanel::onImGui() {
     viewportSize.x -= static_cast<int>(viewportSize.x) % 2 != 0 ? 1.0f : 0.0f;
     viewportSize.y -= static_cast<int>(viewportSize.y) % 2 != 0 ? 1.0f : 0.0f;
 
-    CameraComponent* camera = nullptr; {
-        auto& registry = scene->getRegistry();
-        auto cameraView = registry.view<CameraComponent>();
-        if (!cameraView.empty()) {
-            camera = &registry.get<CameraComponent>(cameraView.front());
-        }
-    }
-
+    auto camera = scene->getCamera();
     if (!camera) {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
         drawList->AddRectFilled(viewportPos, viewportPos + viewportSize, IM_COL32(0, 0, 0, 255));
@@ -77,7 +70,7 @@ void GameViewPanel::onImGui() {
     }
 
     float aspect = viewportSize.x / viewportSize.y;
-    camera->setAspectRatio(aspect);
+    //camera->setAspectRatio(aspect);
 
     //ImGuiUtils::Image(m_GameViewTexture.get(), glm::vec2(sceneViewSize.x, sceneViewSize.y));
 

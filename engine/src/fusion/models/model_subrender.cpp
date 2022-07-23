@@ -18,6 +18,11 @@ ModelSubrender::~ModelSubrender() {
 }
 
 void ModelSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
+    auto scene = SceneManager::Get()->getScene();
+    if (!scene)
+        return;
+
+    const Camera* camera = overrideCamera ? overrideCamera : scene->getCamera();
     if (!camera)
         return;
 

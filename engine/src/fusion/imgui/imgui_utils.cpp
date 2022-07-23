@@ -197,7 +197,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            value = reinterpret_cast<const char*>(payload->Data);
+            value = static_cast<const char*>(payload->Data);
             updated = true;
         }
         ImGui::EndDragDropTarget();

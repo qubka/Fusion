@@ -69,6 +69,12 @@ namespace fe {
         void clearEntities();
 
         /**
+         * Gets the primary camera.
+         * @return The camera ptr.
+         */
+        const Camera* getCamera() const;
+
+        /**
          * Gets the name of the scene.
          * @return The scene name.
          */

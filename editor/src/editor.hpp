@@ -66,7 +66,7 @@ namespace fe {
         void removePanel(EditorPanel* panel);
         EditorPanel* getPanel(const std::string& name);
 
-        Camera* getCamera() { return editorCamera.get(); }
+        std::shared_ptr<Camera> getCamera() { return editorCamera; }
 
         EditorSettings& getSettings() { return editorSettings; }
         EditorState& getState() { return editorState; }

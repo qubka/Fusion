@@ -34,7 +34,7 @@ namespace fe {
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Subrender*>>>
         T* get() const {
             if (auto it = subrenders.find(type_id<T>); it != subrenders.end() && it->second) {
-                return reinterpret_cast<T*>(it->second.get());
+                return static_cast<T*>(it->second.get());
             }
             throw std::runtime_error("Subrender Holder does not have requested subrender");
         }
@@ -58,11 +58,11 @@ namespace fe {
 
             if (auto it = subrenders.find(type); it != subrenders.end() && it->second) {
                 // Then, get the existed subrender
-                return reinterpret_cast<T*>(it->second.get());
+                return static_cast<T*>(it->second.get());
             } else {
                 // Then, add the subrender
                 subrenders[type] = std::move(subrender);
-                return reinterpret_cast<T*>(subrenders[type].get());
+                return static_cast<T*>(subrenders[type].get());
             }
         }
 

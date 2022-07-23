@@ -224,7 +224,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                fs::path file = fs::current_path() / fs::path{reinterpret_cast<const char*>(payload->Data)};
+                fs::path file = fs::current_path() / fs::path{static_cast<const char*>(payload->Data)};
                 fs::path move = fs::current_path() / (dirInfo->parent ? root / dirInfo->path : root);
                 if (moveFile(file, move)) {
                     LOG_INFO << "Moved File: \"" << file << "\" to \"" << move << "\"";
@@ -347,7 +347,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
     if (folder)
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                fs::path file = fs::current_path() / fs::path{reinterpret_cast<const char*>(payload->Data)};
+                fs::path file = fs::current_path() / fs::path{static_cast<const char*>(payload->Data)};
                 fs::path move = fs::current_path() / (parent ? root / path : root);
                 if (moveFile(file, move)) {
                     LOG_INFO << "Moved File: \"" << file << "\" to \"" << move << "\"";

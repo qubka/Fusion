@@ -93,7 +93,7 @@ void Buffer::copy(const void* data, VkDeviceSize size, VkDeviceSize offset) {
     if (size == VK_WHOLE_SIZE) {
         std::memcpy(mapped, data, this->size);
     } else {
-        std::memcpy(reinterpret_cast<int8_t*>(mapped) + offset, data, size);
+        std::memcpy(static_cast<int8_t*>(mapped) + offset, data, size);
     }
 }
 
@@ -103,7 +103,7 @@ int Buffer::compare(const void* data, VkDeviceSize size, VkDeviceSize offset) {
     if (size == VK_WHOLE_SIZE) {
         return std::memcmp(mapped, data, this->size);
     } else {
-        return std::memcmp(reinterpret_cast<int8_t*>(mapped) + offset, data, size);
+        return std::memcmp(static_cast<int8_t*>(mapped) + offset, data, size);
     }
 }
 
@@ -113,7 +113,7 @@ void Buffer::extract(void* data, VkDeviceSize size, VkDeviceSize offset) {
     if (size == VK_WHOLE_SIZE) {
         std::memcpy(data, mapped, this->size);
     } else {
-        std::memcpy(data, reinterpret_cast<int8_t*>(mapped) + offset, size);
+        std::memcpy(data, static_cast<int8_t*>(mapped) + offset, size);
     }
 }
 

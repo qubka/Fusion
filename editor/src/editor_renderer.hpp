@@ -47,8 +47,8 @@ namespace fe {
     private:
         void onStart() override {
             //addSubrender<AtmosphereSubrender>({0, 0});
-            addSubrender<SkyboxSubrender>({0, 0});
-            addSubrender<ModelSubrender>({0, 1});
+            addSubrender<ModelSubrender>({0, 0});
+            addSubrender<SkyboxSubrender>({0, 1});
             addSubrender<GridSubrender>({0, 2});
 
             addSubrender<ModelSubrender>({1, 0});

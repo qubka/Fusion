@@ -172,7 +172,7 @@ bool FileSystem::WriteBytes(const fs::path& filepath, const void* buffer, size_t
 
     if (!fsFile) {
         std::ofstream os{filepath, std::ios::binary};
-        os.write(reinterpret_cast<const char*>(buffer), size);
+        os.write(static_cast<const char*>(buffer), size);
         return true;
     }
 
@@ -309,7 +309,7 @@ std::string FileSystem::ReadText(const fs::path& filepath) {
 
 bool FileSystem::WriteBytes(const fs::path& filepath, const void* buffer, size_t size) {
     std::ofstream os{filepath, std::ios::binary};
-    os.write(reinterpret_cast<const char*>(buffer), size);
+    os.write(static_cast<const char*>(buffer), size);
     return true;
 }
 

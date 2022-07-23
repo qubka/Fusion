@@ -64,6 +64,15 @@ void Scene::clearEntities() {
     registry.destroy(registry.data(), registry.data() + registry.size());
 }
 
+const Camera* Scene::getCamera() const {
+    auto cameraView = registry.view<CameraComponent>();
+    if (!cameraView.empty()) {
+        return static_cast<const Camera*>(&registry.get<CameraComponent>(cameraView.front()));
+    } else {
+        return nullptr;
+    }
+}
+
 entt::entity Scene::createEntity(std::string name) {
     auto entity = registry.create();
     registry.emplace<IdComponent>(entity);

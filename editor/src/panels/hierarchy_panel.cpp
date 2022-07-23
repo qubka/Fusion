@@ -153,7 +153,7 @@ void HierarchyPanel::onImGui() {
             {
                 if (ImGui::BeginDragDropTarget()) {
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
-                        auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
+                        auto entity = *static_cast<entt::entity*>(payload->Data);
                         hierarchySystem->removeParent(entity);
                         LOG_INFO << "Unparent";
                     }
@@ -170,7 +170,7 @@ void HierarchyPanel::onImGui() {
                 });
 
                 if (const ImGuiPayload* payload = ImGui::GetDragDropPayload(); payload && payload->IsDataType("SCENE_HIERARCHY_ITEM")) {
-                    auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
+                    auto entity = *static_cast<entt::entity*>(payload->Data);
                     if (hierarchySystem->getParent(entity) != entt::null) {
                         ImVec2 minSpace{ ImGui::GetWindowContentRegionMin() };
                         ImVec2 maxSpace{ ImGui::GetWindowContentRegionMax() };
@@ -184,7 +184,7 @@ void HierarchyPanel::onImGui() {
 
                         if (ImGui::BeginDragDropTargetCustom(ImRect{ minSpace, maxSpace }, ImGui::GetID("Panel Hierarchy"))) {
                             if (const ImGuiPayload* customPayload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
-                                entity = *reinterpret_cast<entt::entity*>(customPayload->Data);
+                                entity = *static_cast<entt::entity*>(customPayload->Data);
                                 hierarchySystem->removeParent(entity);
                                 LOG_INFO << "Unparent";
                             }
@@ -350,7 +350,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         if (const ImGuiPayload* payload = ImGui::GetDragDropPayload(); payload && payload->IsDataType("SCENE_HIERARCHY_ITEM")) {
             bool acceptable;
 
-            auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
+            auto entity = *static_cast<entt::entity*>(payload->Data);
             auto hierarchy = registry.try_get<HierarchyComponent>(entity);
             if (hierarchy) {
                 acceptable = entity != node && (!hierarchySystem->isParent(entity, node)) && (hierarchy->parent != node);

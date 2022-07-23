@@ -22,7 +22,7 @@ void onComponentUpdate<RigidBodyComponent>(entt::registry& registry, entt::entit
     if (!active) return;
     auto& rigidbody = registry.get<RigidBodyComponent>(entity);
     if (rigidbody.type == RigidBodyComponent::BodyType::Dynamic) {
-        if (auto rigid = reinterpret_cast<PxRigidDynamic*>(rigidbody.runtimeBody)) {
+        if (auto rigid = static_cast<PxRigidDynamic*>(rigidbody.runtimeBody)) {
             rigid->setMass(rigidbody.mass);
             rigid->setLinearDamping(rigidbody.linearDrag);
             rigid->setAngularDamping(rigidbody.angularDrag);
@@ -41,7 +41,7 @@ template<>
 void onComponentDestroy<RigidBodyComponent>(entt::registry& registry, entt::entity entity) {
     if (!active) return;
     auto& rigidbody = registry.get<RigidBodyComponent>(entity);
-    if (auto body = reinterpret_cast<PxRigidActor*>(rigidbody.runtimeBody)) {
+    if (auto body = static_cast<PxRigidActor*>(rigidbody.runtimeBody)) {
         scene->removeActor(*body);
     }
 }
@@ -50,7 +50,7 @@ template<>
 void onComponentUpdate<BoxColliderComponent>(entt::registry& registry, entt::entity entity) {
     if (!active) return;
     auto& collider = registry.get<BoxColliderComponent>(entity);
-    if (auto shape = reinterpret_cast<PxShape*>(collider.runtimeShape)) {
+    if (auto shape = static_cast<PxShape*>(collider.runtimeShape)) {
         auto& transform = registry.get<TransformComponent>(entity);
         glm::vec3 halfExtent{ collider.extent / 2.0f * transform.scale };
         shape->setGeometry(PxBoxGeometry(PxVec3{ halfExtent.x, halfExtent.y, halfExtent.z }));
@@ -63,7 +63,7 @@ template<>
 void onComponentUpdate<SphereColliderComponent>(entt::registry& registry, entt::entity entity) {
     if (!active) return;
     auto& collider = registry.get<SphereColliderComponent>(entity);
-    if (auto shape = reinterpret_cast<PxShape*>(collider.runtimeShape)) {
+    if (auto shape = static_cast<PxShape*>(collider.runtimeShape)) {
         auto& transform = registry.get<TransformComponent>(entity);
         float scalar = glm::max(transform.scale.x, transform.scale.y, transform.scale.z);
         float radius = collider.radius * scalar;
@@ -77,7 +77,7 @@ template<>
 void onComponentUpdate<CapsuleColliderComponent>(entt::registry& registry, entt::entity entity) {
     if (!active) return;
     auto& collider = registry.get<CapsuleColliderComponent>(entity);
-    if (auto shape = reinterpret_cast<PxShape*>(collider.runtimeShape)) {
+    if (auto shape = static_cast<PxShape*>(collider.runtimeShape)) {
         auto& transform = registry.get<TransformComponent>(entity);
         float scalar = glm::max(transform.scale.x, transform.scale.y, transform.scale.z);
         float radius = collider.radius * scalar;
@@ -92,7 +92,7 @@ template<>
 void onComponentUpdate<PhysicsMaterialComponent>(entt::registry& registry, entt::entity entity) {
     if (!active) return;
     auto& material = registry.get<PhysicsMaterialComponent>(entity);
-    if (auto mat = reinterpret_cast<PxMaterial*>(material.runtimeMaterial)) {
+    if (auto mat = static_cast<PxMaterial*>(material.runtimeMaterial)) {
         mat->setDynamicFriction(material.dynamicFriction);
         mat->setStaticFriction(material.staticFriction);
         mat->setRestitution(material.restitution);
