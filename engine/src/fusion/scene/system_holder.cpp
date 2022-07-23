@@ -3,6 +3,5 @@
 using namespace fe;
 
 void SystemHolder::clear() {
-    indexes.clear();
     systems.clear();
 }

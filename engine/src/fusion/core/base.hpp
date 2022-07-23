@@ -34,6 +34,13 @@
                          [[nodiscard]] std::vector<t>::const_reverse_iterator rbegin() const { return o.rbegin(); } \
                          [[nodiscard]] std::vector<t>::const_reverse_iterator rend() const { return o.rend(); } \
 
+namespace fe {
+    using type_index = uint32_t;
+    /// https://mikejsavage.co.uk/blog/cpp-tricks-type-id.html
+    inline type_index type_id_seq = 0;
+    template<typename T> inline const type_index type_id = type_id_seq++;
+}
+
 /// https://github.com/steinwurf/platform
 
 // Here we create a number of defines to make it easy to choose between

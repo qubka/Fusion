@@ -51,6 +51,7 @@ namespace fe {
          */
         virtual void onImGui() = 0;
 
+    private:
         std::string name;
         Version version{ 0, 1, 0, 0 };
         bool started{ false };

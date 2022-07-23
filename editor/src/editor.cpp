@@ -21,6 +21,7 @@
 #include "panels/hierarchy_panel.hpp"
 #include "panels/inspector_panel.hpp"
 #include "panels/scene_view_panel.hpp"
+#include "panels/game_view_panel.hpp"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
@@ -41,27 +42,27 @@ void Editor::onStart() {
     Graphics::Get()->setRenderer(std::make_unique<EditorRenderer>());
 
     const auto& size = DeviceManager::Get()->getWindow(0)->getSize();
-    editorCamera = std::make_shared<Camera>();
+    editorCamera = std::make_unique<Camera>();
     //editorCamera->setAspectRatio(size.x / size.y);
     //editorCamera = std::make_shared<EditorCamera>();
 
-    componentIconMap[typeid(TransformComponent)] = ICON_MDI_AXIS_ARROW;
-    componentIconMap[typeid(ModelComponent)] = ICON_MDI_SHAPE;
-    //componentIconMap[typeid(MeshComponent)] = ICON_MDI_SHAPE;
-    componentIconMap[typeid(CameraComponent)] = ICON_MDI_CAMERA;
-    /*componentIconMap[typeid(RigidBodyComponent)] = ICON_MDI_CUBE_OUTLINE;
-    componentIconMap[typeid(PhysicsMaterialComponent)] = ICON_FA_TENCENT_WEIBO;
-    componentIconMap[typeid(BoxColliderComponent)] = ICON_FA_SQUARE_O;
-    componentIconMap[typeid(SphereColliderComponent)] = ICON_FA_CIRCLE_O;
-    componentIconMap[typeid(CapsuleColliderComponent)] = ICON_FA_TOGGLE_OFF;
-    componentIconMap[typeid(MaterialComponent)] = ICON_MDI_MATERIAL_UI;
-    componentIconMap[typeid(PointLightComponent)] = ICON_MDI_LIGHTBULB;
-    componentIconMap[typeid(DirectionalLightComponent)] = ICON_MDI_SPOTLIGHT_BEAM;
-    componentIconMap[typeid(SoundComponent)] = ICON_MDI_VOLUME_HIGH;
-    componentIconMap[typeid(SpriteComponent)] = ICON_MDI_IMAGE;
-    componentIconMap[typeid(LuaScriptComponent)] = ICON_MDI_SCRIPT;
-    componentIconMap[typeid(EnvironmentComponent)] = ICON_MDI_EARTH;*/
-    componentIconMap[typeid(Editor)] = ICON_MDI_SQUARE;
+    componentIconMap[type_id<TransformComponent>] = ICON_MDI_AXIS_ARROW;
+    componentIconMap[type_id<ModelComponent>] = ICON_MDI_SHAPE;
+    //componentIconMap[type_id<MeshComponent>] = ICON_MDI_SHAPE;
+    componentIconMap[type_id<CameraComponent>] = ICON_MDI_CAMERA;
+    /*componentIconMap[type_id<RigidBodyComponent>] = ICON_MDI_CUBE_OUTLINE;
+    componentIconMap[type_id<PhysicsMaterialComponent>] = ICON_FA_TENCENT_WEIBO;
+    componentIconMap[type_id<BoxColliderComponent>] = ICON_FA_SQUARE_O;
+    componentIconMap[type_id<SphereColliderComponent>] = ICON_FA_CIRCLE_O;
+    componentIconMap[type_id<CapsuleColliderComponent>] = ICON_FA_TOGGLE_OFF;
+    componentIconMap[type_id<MaterialComponent>] = ICON_MDI_MATERIAL_UI;
+    componentIconMap[type_id<PointLightComponent>] = ICON_MDI_LIGHTBULB;
+    componentIconMap[type_id<DirectionalLightComponent>] = ICON_MDI_SPOTLIGHT_BEAM;
+    componentIconMap[type_id<SoundComponent>] = ICON_MDI_VOLUME_HIGH;
+    componentIconMap[type_id<SpriteComponent>] = ICON_MDI_IMAGE;
+    componentIconMap[type_id<LuaScriptComponent>] = ICON_MDI_SCRIPT;
+    componentIconMap[type_id<EnvironmentComponent>] = ICON_MDI_EARTH;*/
+    componentIconMap[type_id<Editor>] = ICON_MDI_SQUARE;
 
     panels.push_back(std::make_unique<ApplicationInfoPanel>(this));
     panels.push_back(std::make_unique<ConsolePanel>(this));
@@ -70,6 +71,7 @@ void Editor::onStart() {
     panels.push_back(std::make_unique<HierarchyPanel>(this));
     panels.push_back(std::make_unique<InspectorPanel>(this));
     panels.push_back(std::make_unique<SceneViewPanel>(this));
+    panels.push_back(std::make_unique<GameViewPanel>(this));
 
     editorSettings.showImGuiDemo = false;
 }
@@ -77,15 +79,14 @@ void Editor::onStart() {
 void Editor::onUpdate() {
     auto scene = SceneManager::Get()->getScene();
     if (scene) {
-        scene->setCamera(editorCamera);
+        //scene->setCamera(editorCamera);
     }
-
 
     if (sceneViewActive && scene) {
         auto input = Input::Get();
 
         {
-            editorCameraController.update(*editorCamera);
+            //editorCameraController.update(*editorCamera);
 
             if (input->getKeyDown(Key::F)) {
                 auto& registry = scene->getRegistry();
@@ -586,11 +587,11 @@ void Editor::drawMenuBar() {
                 selectedEntity = entt::null;
 
                 if (selected) {
-                    //ImGui::SetWindowFocus("###game");
+                    ImGui::SetWindowFocus("###game");
                     //cacheScene();
                     //Application::Get().GetCurrentScene()->OnInit();
                 } else {
-                    //ImGui::SetWindowFocus("###scene");
+                    ImGui::SetWindowFocus("###scene");
                     //loadCachedScene();
                 }
             }
@@ -799,7 +800,7 @@ void Editor::fileOpenCallback(const fs::path& path) {
     } else if (FileFormat::IsTextureFile(path)) {
     }
 
-    LOG_DEBUG << "File opened: " << path;
+    LOG_DEBUG << "File opened: \"" << path << "\"";
 }
 
 void Editor::projectOpenCallback(const fs::path& path) {
@@ -813,7 +814,7 @@ void Editor::projectOpenCallback(const fs::path& path) {
         panel->onNewProject();
     }
 
-    LOG_DEBUG << "Project opened: " << path;
+    LOG_DEBUG << "Project opened: \"" << path << "\"";
 }
 
 void Editor::newProjectOpenCallback(const fs::path& path) {
@@ -824,7 +825,7 @@ void Editor::newProjectOpenCallback(const fs::path& path) {
         panel->onNewProject();
     }
 
-    LOG_DEBUG << "New project opened: " << path;
+    LOG_DEBUG << "New project opened: \"" << path << "\"";
 }
 
 void Editor::newProjectLocationCallback(const fs::path& path) {
@@ -833,7 +834,7 @@ void Editor::newProjectLocationCallback(const fs::path& path) {
     reopenNewProjectPopup = true;
     locationPopupOpened = false;
 
-    LOG_DEBUG << "New Project opened: " << path;
+    LOG_DEBUG << "New Project opened: \"" << path << "\"";
 }
 
 void Editor::removePanel(EditorPanel* panel) {

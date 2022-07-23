@@ -20,7 +20,7 @@ public:
 		auto directory = fs::path(includerName).parent_path();
 		auto fileLoaded = FileSystem::ReadText(directory / headerName);
 		if (fileLoaded.empty()) {
-            LOG_ERROR << "Shader Include could not be loaded: " << headerName;
+            LOG_ERROR << "Shader Include could not be loaded: \"" << headerName << "\"";
 			return nullptr;
 		}
 
@@ -33,7 +33,7 @@ public:
 	IncludeResult* includeSystem(const char* headerName, const char* includerName, size_t inclusionDepth) override {
 		auto fileLoaded = FileSystem::ReadText(headerName);
 		if (fileLoaded.empty()) {
-            LOG_ERROR << "Shader Include could not be loaded: " << headerName;
+            LOG_ERROR << "Shader Include could not be loaded: \"" << headerName << "\"";
 			return nullptr;
 		}
 
@@ -318,14 +318,14 @@ VkShaderModule Shader::createShaderModule(const fs::path& moduleName, const std:
 	std::string str;
 
 	if (!shader.preprocess(&resources, defaultVersion, ENoProfile, false, false, messages, &str, includer)) {
-        LOG_DEBUG << shader.getInfoLog();
-        LOG_DEBUG << shader.getInfoDebugLog();
+        LOG_DEBUG << "\"" << shader.getInfoLog() << "\"";
+        LOG_DEBUG << "\"" << shader.getInfoDebugLog() << "\"";
         LOG_ERROR << "SPRIV shader preprocess failed!";
 	}
 
 	if (!shader.parse(&resources, defaultVersion, true, messages, includer)) {
-        LOG_DEBUG << shader.getInfoLog();
-        LOG_DEBUG << shader.getInfoDebugLog();
+        LOG_DEBUG << "\"" << shader.getInfoLog() << "\"";
+        LOG_DEBUG << "\"" << shader.getInfoDebugLog() << "\"";
         LOG_ERROR << "SPRIV shader parse failed!";
 	}
 

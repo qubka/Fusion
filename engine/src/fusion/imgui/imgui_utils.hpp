@@ -15,7 +15,7 @@ namespace fe {
 using namespace fe;
 
 namespace ImGuiUtils {
-    enum class Theme {
+    enum class Theme : uint8_t {
         Black,
         Dark,
         Dracula,

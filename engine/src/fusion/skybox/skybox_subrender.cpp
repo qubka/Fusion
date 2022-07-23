@@ -9,9 +9,9 @@
 
 using namespace fe;
 
-SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& pipelineStage)
-        : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"EngineShaders/sky/skybox.vert", "EngineShaders/sky/skybox.frag"}, {{{Vertex::Component::Position}}}} {
+SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& stage)
+        : Subrender{stage}
+        , pipeline{stage, {"EngineShaders/sky/skybox.vert", "EngineShaders/sky/skybox.frag"}, {{{Vertex::Component::Position}}}} {
 
     std::vector<glm::vec3> vertices {
             //front
@@ -51,7 +51,10 @@ SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& pipelineStage)
             {-1.f, -1.f,  1.f},
     };
 
-    std::vector<uint8_t> indices {
+    vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(glm::vec3) * vertices.size(), vertices.data());
+
+
+    std::vector<uint16_t> indices {
             2,  1,  0,		3,  2,  0,  //front
             6,  5,  4,		7,  6,  4,  //right
             10, 9,  8,		11, 10, 8,  //back
@@ -60,8 +63,7 @@ SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& pipelineStage)
             22, 21, 20,		23, 22, 20  //bottom
     };
 
-    vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(glm::vec3) * vertices.size(), vertices.data());
-    indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint8_t) * indices.size(), indices.data());
+    indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint16_t) * indices.size(), indices.data());
 
     skyboxSampler = std::make_unique<TextureCube>("engine/assets/textures/cubemap_vulkan.ktx");
 }
@@ -74,7 +76,8 @@ void SkyboxSubrender::onRender(const CommandBuffer& commandBuffer) {
     if (!scene)
         return;
 
-    auto camera = scene->getCamera();
+    //auto camera = scene->getCamera();
+    Camera* camera = nullptr;
     if (!camera)
         return;
 

@@ -12,8 +12,8 @@ namespace fe {
     public:
         EditorRenderer() {
             std::vector<Attachment> renderpassAttachments0 = {
-                    {0, "depth", Attachment::Type::Depth},
-                    {1, "scene", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM, {0.27f, 0.27f, 0.27f, 1.0f}}
+                    {0, "scene_depth", Attachment::Type::Depth},
+                    {1, "scene_image", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM, {0.27f, 0.27f, 0.27f, 1.0f}}
             };
             std::vector<SubpassType> renderpassSubpasses0 = {
                     {0, {0, 1}},
@@ -24,25 +24,36 @@ namespace fe {
             addRenderStage(std::make_unique<RenderStage>(renderpassAttachments0, renderpassSubpasses0));
 
             std::vector<Attachment> renderpassAttachments1 = {
-                    {0, "depth", Attachment::Type::Depth},
-                    {1, "swapchain", Attachment::Type::Swapchain},
+                    {0, "game_depth", Attachment::Type::Depth},
+                    {1, "game_image", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM}
             };
             std::vector<SubpassType> renderpassSubpasses1 = {
-                    {0, {0, 1}}
+                    {0, {0, 1}},
             };
 
             addRenderStage(std::make_unique<RenderStage>(renderpassAttachments1, renderpassSubpasses1));
+
+            std::vector<Attachment> renderpassAttachments2 = {
+                    {0, "swapchain", Attachment::Type::Swapchain},
+            };
+            std::vector<SubpassType> renderpassSubpasses2 = {
+                    {0, {0}}
+            };
+
+            addRenderStage(std::make_unique<RenderStage>(renderpassAttachments2, renderpassSubpasses2));
         }
         ~EditorRenderer() override = default;
 
     private:
         void onStart() override {
-            //addSubrender<AtmosphereSubrender>({ 0, 0});
-            addSubrender<SkyboxSubrender>({ 0, 0})->setEnabled(false);
+            //addSubrender<AtmosphereSubrender>({0, 0});
+            addSubrender<SkyboxSubrender>({0, 0});
             addSubrender<ModelSubrender>({0, 1});
             addSubrender<GridSubrender>({0, 2});
 
-            addSubrender<ImGuiSubrender>({1, 0});
+            addSubrender<ModelSubrender>({1, 0});
+
+            addSubrender<ImGuiSubrender>({2, 0});
         }
 
         void onUpdate() override {

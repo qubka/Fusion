@@ -21,10 +21,10 @@ DefaultApplication::DefaultApplication(std::string name) : Application{std::move
     executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path();
 #endif
 
-    LOG_INFO << "Working directory: " << executablePath;
+    LOG_INFO << "Working directory: \"" << executablePath << "\"";
     fs::current_path(executablePath);
 
-    projectSettings.projectVersion = version.string();
+    projectSettings.projectVersion = getVersion().string();
 }
 
 DefaultApplication::~DefaultApplication() {
@@ -79,7 +79,7 @@ void DefaultApplication::openNewProject(const fs::path& path, const std::string&
     }
 
     // Set Default values
-    projectSettings.projectVersion = version.string();
+    projectSettings.projectVersion = getVersion().string();
     projectSettings.title = name;
     if (auto window = DeviceManager::Get()->getWindow(0)) {
         window->setTitle(name);
@@ -162,7 +162,7 @@ void DefaultApplication::serialise() {
     fs::path projectPath{ projectSettings.projectRoot / (projectSettings.projectName + ".fsproj") };
     FileSystem::WriteText(projectPath, ss.str());
 
-    LOG_INFO << "Serialising application: " << projectPath;
+    LOG_INFO << "Serialising application: \"" << projectPath << "\"";
 }
 
 void DefaultApplication::deserialise() {
@@ -173,7 +173,7 @@ void DefaultApplication::deserialise() {
 
     fs::path projectPath{ projectSettings.projectRoot / (projectSettings.projectName + ".fsproj") };
     if (!fs::exists(projectPath)) {
-        LOG_INFO << "No saved Project file found: " << projectPath;
+        LOG_INFO << "No saved Project file found: \"" << projectPath << "\"";
         return;
     }
 
@@ -186,7 +186,7 @@ void DefaultApplication::deserialise() {
     }
     catch (...) {
         projectSettings = {};
-        projectSettings.projectVersion = version.string();
+        projectSettings.projectVersion = getVersion().string();
 
         SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
 
@@ -196,7 +196,7 @@ void DefaultApplication::deserialise() {
 
     projectLoaded = true;
 
-    LOG_INFO << "Deserialise application: " << projectPath;
+    LOG_INFO << "Deserialise application: \"" << projectPath << "\"";
 }
 
 void DefaultApplication::mountPaths() const {

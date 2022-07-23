@@ -19,7 +19,7 @@ Model::Model(const fs::path& filepath, const Vertex::Layout& layout) : layout{la
     const aiScene* scene = import.ReadFile(path.string(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        LOG_ERROR << "Failed to load model at: " << path << " - " << import.GetErrorString();
+        LOG_ERROR << "Failed to load model at: \"" << path << "\" - " << import.GetErrorString();
         return;
     }
 
@@ -107,7 +107,7 @@ std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* ma
             // if texture hasn't been loaded already, load it
             if (!skip) {
                 if (!fs::exists(path)) {
-                    LOG_ERROR << "Could load texture from path: " << path << std::endl;
+                    LOG_ERROR << "Could load texture from path: \"" << path << "\"";
                     continue;
                 }
 

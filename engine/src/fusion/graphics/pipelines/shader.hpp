@@ -122,7 +122,7 @@ namespace fe {
         class UniformBlock {
             friend class Shader;
         public:
-            enum class Type { None, Uniform, Storage, Push };
+            enum class Type : uint8_t { None, Uniform, Storage, Push };
 
             explicit UniformBlock(int32_t binding = -1, int32_t size = -1, VkShaderStageFlags stageFlags = 0, Type type = Type::Uniform)
                     : binding{binding}

@@ -77,7 +77,7 @@ namespace ImGui {
 #define REG_COMPONENT(ComponentType, ComponentName)            \
 {                                                              \
     std::string name;                                          \
-    editor->getComponentIcon(typeid(ComponentType), name);     \
+    editor->getComponentIcon(type_id<ComponentType>, name);    \
     name += "\t";                                              \
     name += (ComponentName);                                   \
     enttEditor.registerComponent<ComponentType>(name.c_str()); \

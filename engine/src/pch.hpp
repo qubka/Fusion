@@ -24,7 +24,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <optional>
-#include <typeindex>
 #include <list>
 #include <mutex>
 #include <numeric>

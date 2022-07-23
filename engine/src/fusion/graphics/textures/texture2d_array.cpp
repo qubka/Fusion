@@ -90,7 +90,7 @@ void Texture2dArray::load() {
         texture = std::make_unique<gli::texture2d_array>(gli::load(reinterpret_cast<const char*>(data), size));
     });
 #if FUSION_DEBUG
-    LOG_DEBUG << "Texture2dArray: " << path << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Texture2dArray: \"" << path << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 
     const gli::texture2d_array& tex2DArray = *texture;

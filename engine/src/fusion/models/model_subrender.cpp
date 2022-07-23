@@ -8,8 +8,8 @@
 
 using namespace fe;
 
-ModelSubrender::ModelSubrender(const Pipeline::Stage& pipelineStage) : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"EngineShaders/model/models.vert", "EngineShaders/model/models.frag"}, {{{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::RGBA}}}} {
+ModelSubrender::ModelSubrender(const Pipeline::Stage& stage) : Subrender{stage}
+        , pipeline{stage, {"EngineShaders/model/models.vert", "EngineShaders/model/models.frag"}, {{{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::RGBA}}}} {
     cubeModel = std::make_unique<Model>("EngineModels/cube.obj");
 }
 
@@ -22,7 +22,8 @@ void ModelSubrender::onRender(const CommandBuffer& commandBuffer) {
     if (!scene)
         return;
 
-    auto camera = scene->getCamera();
+    //auto camera = scene->getCamera();
+    Camera* camera = nullptr;
     if (!camera)
         return;
 

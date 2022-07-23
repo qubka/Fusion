@@ -8,9 +8,9 @@
 
 using namespace fe;
 
-AtmosphereSubrender::AtmosphereSubrender(const Pipeline::Stage& pipelineStage)
-        : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"EngineShaders/sky/atmosphere.vert", "EngineShaders/sky/atmosphere.frag"}, {{{Vertex::Component::Position2}}}} {
+AtmosphereSubrender::AtmosphereSubrender(const Pipeline::Stage& stage)
+        : Subrender{stage}
+        , pipeline{stage, {"EngineShaders/sky/atmosphere.vert", "EngineShaders/sky/atmosphere.frag"}, {{{Vertex::Component::Position2}}}} {
 
     std::array<glm::vec2, 6> vertices{{
         {-1, 1}, {-1, -1}, {1, 1},
@@ -29,7 +29,8 @@ void AtmosphereSubrender::onRender(const CommandBuffer& commandBuffer) {
     if (!scene)
         return;
 
-    auto camera = scene->getCamera();
+    //auto camera = scene->getCamera();
+    Camera* camera = nullptr;
     if (!camera)
         return;
 

@@ -77,7 +77,7 @@ namespace fe {
          * Gets the engine attached modules.
          * @return The modules map.
          */
-        const std::unordered_map<std::type_index, std::unique_ptr<Module>>& getModules() const { return modules; }
+        const std::unordered_map<type_index, std::unique_ptr<Module>>& getModules() const { return modules; }
 
     private:
         static Engine* Instance;
@@ -110,8 +110,8 @@ namespace fe {
         std::unique_ptr<Application> application;
         std::unique_ptr<DeviceManager> devices;
 
-        std::unordered_map<std::type_index, std::unique_ptr<Module>> modules;
-        std::unordered_map<Module::Stage, std::vector<std::type_index>> moduleStages;
+        std::unordered_map<type_index, std::unique_ptr<Module>> modules;
+        std::unordered_map<Module::Stage, std::vector<type_index>> stages;
 
         bool running{ false };
 

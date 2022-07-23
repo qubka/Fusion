@@ -35,7 +35,7 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, uint32_t desiredDeviceI
 
     findQueueFamilyIndices();
 
-    LOG_DEBUG << "Selected Physical Device: " << properties.deviceID << ' ' << properties.deviceName;
+    LOG_DEBUG << "Selected Physical Device: [" << properties.deviceID << "] \"" << properties.deviceName << "\"";
 }
 
 VkPhysicalDevice PhysicalDevice::ChoosePhysicalDevice(const std::vector<VkPhysicalDevice>& devices) {
@@ -216,7 +216,7 @@ void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalD
             ss << " \"" << physicalDeviceProperties.vendorID << '"';
     }
 
-    ss << ' ' << std::quoted(physicalDeviceProperties.deviceName) << '\n';
+    ss << " \"" << physicalDeviceProperties.deviceName << "\"\n";
 
     uint32_t supportedVersion[3] = {
         VK_VERSION_MAJOR(physicalDeviceProperties.apiVersion),

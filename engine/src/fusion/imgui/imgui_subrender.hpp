@@ -16,7 +16,7 @@ namespace fe {
     class ImGuiSubrender final : public Subrender {
         typedef void* ImTextureID;
     public:
-        explicit ImGuiSubrender(const Pipeline::Stage& pipelineStage);
+        explicit ImGuiSubrender(const Pipeline::Stage& stage);
         ~ImGuiSubrender() override;
 
     private:
@@ -53,9 +53,9 @@ namespace fe {
 
         std::vector<std::unique_ptr<Texture2d>> fontTextures;
 
-        std::array<std::map<ImTextureID, VkDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptorSets;
-        std::map<ImTextureID, const VkDescriptorImageInfo*> descriptorImageInfos;
-        std::array<std::map<ImTextureID, bool>, MAX_FRAMES_IN_FLIGHT> descriptorSetHasUpdated;
+        std::array<std::unordered_map<ImTextureID, VkDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptorSets;
+        std::unordered_map<ImTextureID, const VkDescriptorImageInfo*> descriptorImageInfos;
+        std::array<std::unordered_map<ImTextureID, bool>, MAX_FRAMES_IN_FLIGHT> descriptorSetHasUpdated;
 
         float fontSize;
         float fontScale;

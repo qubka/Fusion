@@ -252,7 +252,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         std::string icon{ ICON_MDI_CUBE_OUTLINE };
 
         if (registry.any_of<CameraComponent>(node)) {
-            editor->getComponentIcon(typeid(CameraComponent), icon);
+            editor->getComponentIcon(type_id<CameraComponent>, icon);
         }
 
         //ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorScheme::GetIconColor());

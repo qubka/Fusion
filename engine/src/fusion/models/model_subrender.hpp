@@ -9,7 +9,7 @@ namespace fe {
     class Model;
     class ModelSubrender final : public Subrender {
     public:
-        explicit ModelSubrender(const Pipeline::Stage& pipelineStage);
+        explicit ModelSubrender(const Pipeline::Stage& stage);
         ~ModelSubrender() override;
 
     private:

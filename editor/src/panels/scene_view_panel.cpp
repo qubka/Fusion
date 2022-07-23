@@ -12,9 +12,9 @@
 using namespace fe;
 
 SceneViewPanel::SceneViewPanel(Editor* editor) : EditorPanel{ICON_MDI_GAMEPAD_VARIANT " Scene###scene", "Scene", editor} {
-    //showComponentGizmoMap[typeid(LightComponent)] = true;
-    //showComponentGizmoMap[typeid(CameraComponent)] = true;
-    //showComponentGizmoMap[typeid(SoundComponent).] = true;
+    //showComponentGizmosMap[type_id<LightComponent>] = true;
+    showComponentGizmosMap[type_id<CameraComponent>] = true;
+    //showComponentGizmosMap[type_id<SoundComponent>] = true;
 }
 
 SceneViewPanel::~SceneViewPanel() {
@@ -37,15 +37,6 @@ void SceneViewPanel::onImGui() {
         drawToolBar();
     }
 
-    auto camera = editor->getCamera();
-    if (!camera) {
-        ImGui::PopStyleVar();
-        ImGui::End();
-        return;
-    }
-
-    ImGuizmo::SetDrawlist();
-
     ImVec2 viewportOffset{ ImGui::GetCursorPos() };
     ImVec2 viewportSize{ ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin() - viewportOffset * 0.5f };
     ImVec2 viewportPos{ ImGui::GetWindowPos() + viewportOffset };
@@ -53,37 +44,48 @@ void SceneViewPanel::onImGui() {
     viewportSize.x -= static_cast<int>(viewportSize.x) % 2 != 0 ? 1.0f : 0.0f;
     viewportSize.y -= static_cast<int>(viewportSize.y) % 2 != 0 ? 1.0f : 0.0f;
 
+    auto camera = editor->getCamera();
+    if (!camera) {
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+        drawList->AddRectFilled(viewportPos, viewportPos + viewportSize, IM_COL32(0, 0, 0, 255));
+        ImGui::PopStyleVar();
+        ImGui::End();
+        return;
+    }
+
+    ImGuizmo::SetDrawlist();
+
     float aspect = viewportSize.x / viewportSize.y;
     camera->setAspectRatio(aspect);
 
-    editor->setSceneViewPanelPosition(viewportPos);
-
     auto renderStage = Graphics::Get()->getRenderStage(0);
-    renderStage->setOverrideCamera(camera);
+    //renderStage->setOverrideCamera(camera);
     if (!renderStage->setViewport({glm::vec2{1.0f, 1.0f}, glm::uvec2{viewportSize.x, viewportSize.y}, glm::ivec2{0, 0}})) {
-        ImGuiUtils::Image((Texture2d*)Graphics::Get()->getAttachment("scene"), viewportSize, true);
+        ImGuiUtils::Image((Texture2d*)renderStage->getDescriptor("scene_image"), viewportSize, true);
+    } else {
+        // If attachment rebuilding, draw rectangle instead
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+        auto& clearColor = renderStage->getAttachment("scene_image")->clearColor;
+        drawList->AddRectFilled(viewportPos, viewportPos + viewportSize, ImColor{clearColor.r, clearColor.g, clearColor.b , clearColor.a});
     }
 
-    ImVec2 windowSize{ ImGui::GetWindowSize() };
-
     ImVec2& minBound = viewportPos;
-    ImVec2  maxBound{ minBound + windowSize };
+    ImVec2  maxBound{ minBound + ImGui::GetWindowSize() };
 
-    bool updateCamera = ImGui::IsMouseHoveringRect(minBound, maxBound); // || Input::Get().getMouseMode() == MouseMode::Captured;
+    bool viewportHovered = ImGui::IsMouseHoveringRect(minBound, maxBound); // || Input::Get().getMouseMode() == MouseMode::Captured;
+    bool viewportFocused = ImGui::IsWindowFocused();
 
-    editor->setSceneActive(ImGui::IsWindowFocused() && !ImGuizmo::IsUsing() && updateCamera);
+    editor->setSceneActive(viewportFocused && viewportHovered && !ImGuizmo::IsUsing());
+    editor->setSceneViewActive(viewportHovered);
 
     ImGuizmo::SetRect(viewportPos.x, viewportPos.y, viewportSize.x, viewportSize.y);
-
-    editor->setSceneViewActive(updateCamera);
 
     ImGui::GetWindowDrawList()->PushClipRect(viewportPos, { viewportSize.x + viewportPos.x, viewportSize.y + viewportPos.y - 2.0f });
 
     editor->onImGuizmo();
 
-    auto input = Input::Get();
-    if (updateCamera && editor->isSceneActive() && !ImGuizmo::IsUsing() && input->getMouseButton(MouseButton::ButtonLeft)) {
-        Ray ray = camera->screenPointToRay(input->getMousePosition() - viewportPos, viewportSize);
+    if (editor->isSceneActive() && Input::Get()->getMouseButton(MouseButton::ButtonLeft)) {
+        Ray ray = camera->screenPointToRay(Input::Get()->getMousePosition() - viewportPos, viewportSize);
         //editor->selectObject(ray);
     }
 
@@ -274,9 +276,9 @@ void SceneViewPanel::drawToolBar() {
             ImGui::Checkbox("Selected Gizmos", &editor->getSettings().showGizmos);
 
             ImGui::Separator();
-            ImGui::Checkbox("Camera", &showComponentGizmosMap[typeid(CameraComponent)]);
-            //ImGui::Checkbox("Light", &showComponentGizmosMap[typeid(LightComponent)]);
-            //ImGui::Checkbox("Audio", &showComponentGizmosMap[typeid(SoundComponent)]);
+            ImGui::Checkbox("Camera", &showComponentGizmosMap[type_id<CameraComponent>]);
+            //ImGui::Checkbox("Light", &showComponentGizmosMap[type_id<LightComponent>]);
+            //ImGui::Checkbox("Audio", &showComponentGizmosMap[type_id<SoundComponent>]);
 
             /*ImGui::Separator();
 
@@ -445,8 +447,10 @@ void SceneViewPanel::drawToolBar() {
     ImGui::Unindent();
 }
 
+#define DRAW_COMPONENT(ComponentType) drawComponentGizmos<ComponentType>(registry, camera, coord, offset, #ComponentType);
+
 void SceneViewPanel::drawGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset) {
-    //showComponentGizmos<LightComponent>(registry, camera, coord, offset);
-    showComponentGizmos<CameraComponent>(registry, camera, coord, offset);
-    //showComponentGizmos<SoundComponent>(registry, camera, coord, offset);
+    //DRAW_COMPONENT(LightComponent);
+    DRAW_COMPONENT(CameraComponent);
+    //DRAW_COMPONENT(SoundComponent);
 }

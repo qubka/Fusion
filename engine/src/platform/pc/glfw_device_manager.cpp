@@ -133,7 +133,7 @@ namespace glfw {
         auto manager = reinterpret_cast<glfw::DeviceManager*>(DeviceManager::Get());
         auto& monitors = manager->monitors;
 
-        LOG_VERBOSE << "MonitorEvent: name: [" << glfwGetMonitorName(monitor) << "] - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
+        LOG_VERBOSE << "MonitorEvent: \"" << glfwGetMonitorName(monitor) << "\" - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
 
         if (action == GLFW_CONNECTED) {
             auto& it = monitors.emplace_back(std::make_unique<Monitor>(monitor));
@@ -154,7 +154,7 @@ namespace glfw {
         auto manager = reinterpret_cast<glfw::DeviceManager*>(DeviceManager::Get());
         auto& joysticks = manager->joysticks;
 
-        LOG_VERBOSE << "JoystickEvent: id: [" << jid << "] | name: [" << glfwGetJoystickName(jid) << "] - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
+        LOG_VERBOSE << "JoystickEvent: [" << jid << "] \"" << glfwGetJoystickName(jid) << "\" - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
 
         if (action == GLFW_CONNECTED) {
             auto& it = joysticks.emplace_back(std::make_unique<Joystick>(jid));
@@ -203,7 +203,7 @@ namespace glfw {
     void DeviceManager::CheckGlfw(int result) {
         if (result == GLFW_TRUE) return;
         auto failure = StringifyResultGlfw(result);
-        LOG_ERROR << "GLFW error: " << failure << ", " << result;
+        LOG_ERROR << "GLFW error: [" << result << "] \"" << failure << "\"";
         throw std::runtime_error("GLFW error: " + failure);
     }
 }

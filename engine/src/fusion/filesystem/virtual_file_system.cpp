@@ -7,7 +7,7 @@ fs::path VirtualFileSystem::resolvePhysicalPath(const fs::path& path) {
     if (auto it = mountPoints.find(*path.begin()); it != mountPoints.end()) {
         return it->second / strip_root(path);
     }
-    LOG_WARNING << "Physical path: " << path << " was not found";
+    LOG_WARNING << "Physical path: \"" << path << "\" was not found";
     return {};
 }
 

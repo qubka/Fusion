@@ -6,7 +6,7 @@ namespace fe {
     /**
      * @brief Defines the purpose of a texture
      */
-    enum class TextureType {
+    enum class TextureType : uint8_t {
         None = 0,
         Diffuse = 1,
         Specular = 2,

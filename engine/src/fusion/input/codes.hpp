@@ -201,7 +201,7 @@ namespace fe {
         ButtonTriangle          = ButtonY
     };
 
-    enum class GamepadAxis {
+    enum class GamepadAxis : uint8_t {
         LeftX                   = 0,
         LeftY                   = 1,
         RightX                  = 2,

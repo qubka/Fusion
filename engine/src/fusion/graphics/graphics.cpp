@@ -272,7 +272,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     bitmap.write(filepath);
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Screenshot " << filepath << " created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Screenshot \"" << filepath << "\" created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 }
 

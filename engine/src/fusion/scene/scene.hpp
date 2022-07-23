@@ -18,9 +18,9 @@ namespace fe {
         ~Scene() = default;
 
         /**
-         * Checks whether a System exists or not.
-         * @tparam T The System type.
-         * @return If the System exists.
+         * Checks whether a system exists or not.
+         * @tparam T The system type.
+         * @return If the system exists.
          */
         template<typename T>
         bool hasSystem() const {
@@ -28,9 +28,9 @@ namespace fe {
         }
 
         /**
-         * Gets a System.
-         * @tparam T The System type.
-         * @return The System.
+         * Gets a system.
+         * @tparam T The system type.
+         * @return The system.
          */
         template<typename T>
         T* getSystem() const {
@@ -38,11 +38,11 @@ namespace fe {
         }
 
         /**
-         * Adds a System.
-         * @tparam T The System type.
+         * Adds a system.
+         * @tparam T The system type.
          * @tparam Args The constructor arg types.
          * @param args The constructor args.
-         * @return The System.
+         * @return The system.
          */
         template<typename T, typename... Args>
         void addSystem(Args&&...args) {
@@ -50,8 +50,8 @@ namespace fe {
         }
 
         /**
-         * Removes a System.
-         * @tparam T The System type.
+         * Removes a system.
+         * @tparam T The system type.
          */
         template<typename T>
         void removeSystem() {
@@ -59,12 +59,12 @@ namespace fe {
         }
 
         /**
-         * Removes all Systems.
+         * Removes all systems.
          */
         void clearSystems();
 
         /**
-         * Removes all Entities.
+         * Removes all entities.
          */
         void clearEntities();
 

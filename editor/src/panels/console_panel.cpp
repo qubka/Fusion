@@ -3,7 +3,7 @@
 using namespace fe;
 using namespace std::string_literals;
 
-bitmask::bitmask<MessageLevel> ConsolePanel::MessageBufferRenderFilter = MessageLevel::None;
+bitmask::bitmask<MessageLevel> ConsolePanel::MessageBufferRenderFilter = MessageLevel::Fatal | MessageLevel::Error | MessageLevel::Warning | MessageLevel::Info | MessageLevel::Debug | MessageLevel::Verbose;
 int32_t ConsolePanel::MessageID = 0;
 int16_t ConsolePanel::MessageBufferCapacity = 200;
 int16_t ConsolePanel::MessageBufferSize = 0;

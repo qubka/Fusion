@@ -35,7 +35,7 @@ namespace fe {
     };
 
     struct RigidBodyComponent {
-        enum class BodyType { Static = 0, Dynamic = 1 };
+        enum class BodyType uint8_t { Static = 0, Dynamic = 1 };
         BodyType type{ BodyType::Static };
         //Layer layer;
         float mass{ 1.0f };
@@ -115,7 +115,7 @@ namespace fe {
     };
 
     struct PhysicsMaterialComponent {
-        enum class CombineMode { Average = 0, Minimum, Multiply, Maximum };
+        enum class CombineMode uint8_t { Average = 0, Minimum, Multiply, Maximum };
 
         float dynamicFriction{ 0.5f };
         float staticFriction{ 0.5f };

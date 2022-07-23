@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    enum class CursorHotspot {
+    enum class CursorHotspot : uint8_t {
         UpperLeft = 0,
         UpperRight,
         BottomLeft,
@@ -9,7 +9,7 @@ namespace fe {
         Centered
     };
 
-    enum class CursorStandard {
+    enum class CursorStandard : uint8_t {
         None = 0,
         Arrow = 1,
         IBeam = 2,

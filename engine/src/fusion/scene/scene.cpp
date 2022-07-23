@@ -24,7 +24,7 @@ void Scene::onStart() {
         system->setEnabled(true);
     });
 
-    LOG_DEBUG << "Scene : " << name << " created first time";
+    LOG_DEBUG << "Scene : \"" << name << "\" created first time";
 }
 
 void Scene::onUpdate() {
@@ -42,7 +42,7 @@ void Scene::onPlay() {
             system->onPlay();
     });
 
-    LOG_DEBUG << "Scene : " << name << " started runtime";
+    LOG_DEBUG << "Scene : \"" << name << "\" started runtime";
 }
 
 void Scene::onStop() {
@@ -53,7 +53,7 @@ void Scene::onStop() {
 
     runtime = false;
 
-    LOG_DEBUG << "Scene : " << name << " stopped runtime";
+    LOG_DEBUG << "Scene : \"" << name << "\" stopped runtime";
 }
 
 void Scene::clearSystems() {
@@ -134,7 +134,7 @@ void Scene::serialise(fs::path filepath, bool binary) {
             entt::snapshot{ registry }.entities(output).component<ALL_COMPONENTS>(output);
         }
 
-        LOG_INFO << "Serialise scene as binary: " << filepath;
+        LOG_INFO << "Serialise scene as binary: \"" << filepath << "\"";
     } else {
         if (filepath.empty())
             filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
@@ -149,7 +149,7 @@ void Scene::serialise(fs::path filepath, bool binary) {
 
         FileSystem::WriteText(filepath, ss.str());
 
-        LOG_INFO << "Serialise scene: " << filepath;
+        LOG_INFO << "Serialise scene: \"" << filepath << "\"";
     }
 }
 
@@ -163,7 +163,7 @@ void Scene::deserialise(fs::path filepath, bool binary) {
             filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
 
         if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
-            LOG_ERROR << "No saved scene file found: " << filepath;
+            LOG_ERROR << "No saved scene file found: \"" << filepath << "\"";
             return;
         }
 
@@ -174,16 +174,16 @@ void Scene::deserialise(fs::path filepath, bool binary) {
             entt::snapshot_loader{ registry }.entities(input).component<ALL_COMPONENTS>(input);
         }
         catch (...) {
-            LOG_ERROR << "Failed to load scene: " << filepath;
+            LOG_ERROR << "Failed to load scene: \"" << filepath << "\"";
         }
 
-        LOG_INFO << "Deserialise scene as binary: " << filepath;
+        LOG_INFO << "Deserialise scene as binary: \"" << filepath << "\"";
     } else {
         if (filepath.empty())
             filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
 
         if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
-            LOG_ERROR << "No saved scene file found: " << filepath;
+            LOG_ERROR << "No saved scene file found: \"" << filepath << "\"";
             return;
         }
 
@@ -195,10 +195,10 @@ void Scene::deserialise(fs::path filepath, bool binary) {
             entt::snapshot_loader{ registry }.entities(input).component<ALL_COMPONENTS>(input);
         }
         catch (...) {
-            LOG_ERROR << "Failed to load scene: " << filepath;
+            LOG_ERROR << "Failed to load scene: \"" << filepath << "\"";
         }
 
-        LOG_INFO << "Deserialise scene: " << filepath;
+        LOG_INFO << "Deserialise scene: \"" << filepath << "\"";
     }
 
     systems.each([&](auto system) {

@@ -10,7 +10,7 @@ namespace fe {
     class TextureCube;
     class SkyboxSubrender final : public Subrender {
     public:
-        explicit SkyboxSubrender(const Pipeline::Stage& pipelineStage);
+        explicit SkyboxSubrender(const Pipeline::Stage& stage);
         ~SkyboxSubrender() override;
 
     private:

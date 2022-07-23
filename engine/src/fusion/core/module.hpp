@@ -9,10 +9,11 @@ namespace fe {
     public:
         struct TCreateValue {
             std::function<std::unique_ptr<Base>()> create;
+            std::string name;
             typename Base::Stage stage;
-            std::vector<std::type_index> requires;
+            std::vector<type_index> requires;
         };
-        using TRegistryMap = std::unordered_map<std::type_index, TCreateValue>;
+        using TRegistryMap = std::unordered_map<type_index, TCreateValue>;
 
         //ModuleFactory() = default;
         virtual ~ModuleFactory() = default;
@@ -25,10 +26,10 @@ namespace fe {
         template<typename ... Args>
         class Requires {
         public:
-            std::vector<std::type_index> get() const {
-                std::vector<std::type_index> requires;
+            std::vector<type_index> get() const {
+                std::vector<type_index> requires;
                 requires.reserve(sizeof...(Args));
-                (requires.emplace_back(typeid(Args)), ...);
+                (requires.emplace_back(type_id<Args>), ...);
                 return requires;
             }
         };
@@ -44,15 +45,17 @@ namespace fe {
 
             /**
              * Creates a new module singleton instance and registers into the module registry map.
+             * @param name Module name string for debugging purpose.
              * @tparam Args Modules that will be initialized before this module.
              * @return A dummy value in static initialization.
              */
             template<typename ... Args>
-            static bool Register(typename Base::Stage stage, Requires<Args...>&& requires = {}) {
-                ModuleFactory::Registry()[typeid(T)] = { []() {
-                    ModuleInstance = new T();
-                    return std::unique_ptr<Base>(ModuleInstance);
-                }, stage, requires.get() };
+            static bool Register(std::string&& name, typename Base::Stage stage, Requires<Args...>&& requires = {}) {
+                ModuleFactory::Registry()[type_id<T>] = { []() {
+                        ModuleInstance = new T();
+                        return std::unique_ptr<Base>(ModuleInstance);
+                    }, std::move(name), stage, requires.get()
+                };
                 return true;
             }
 
@@ -70,9 +73,7 @@ namespace fe {
         /**
          * @brief Represents the stage where the module will be updated in the engine.
          */
-        enum class Stage { Never, Pre, Normal, Post, Render };
-
-        using StageIndex = std::pair<Stage, std::type_index>;
+        enum class Stage : uint8_t { Never, Pre, Normal, Post, Render };
 
         Module() = default;
         ~Module() override = default;
@@ -89,6 +90,7 @@ namespace fe {
          */
         virtual void onUpdate() {};
 
+    private:
         bool started{ false };
     };
 }

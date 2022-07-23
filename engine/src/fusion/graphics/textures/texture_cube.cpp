@@ -104,7 +104,7 @@ void TextureCube::load() {
         texture = std::make_unique<gli::texture_cube>(gli::load(reinterpret_cast<const char*>(data), size));
     });
 #if FUSION_DEBUG
-    LOG_DEBUG << "TextureCube: " << path << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "TextureCube: \"" << path << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 
     const gli::texture_cube& texCube = *texture;

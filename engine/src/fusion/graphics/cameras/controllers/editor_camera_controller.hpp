@@ -16,6 +16,6 @@ namespace fe {
         void handleKeyboard(Camera& camera, float dt);
         void handleScroll(Camera& camera, float dt);
 
-        glm::vec2 storedCursorPos{ FLT_MAX };
+        glm::vec2 storedCursorPos{ -FLT_MAX };
     };
 }

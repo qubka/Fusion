@@ -8,7 +8,7 @@
 
 namespace fe {
     struct Attachment {
-        enum class Type { Image, Depth, Swapchain };
+        enum class Type : uint8_t { Image, Depth, Swapchain };
         uint32_t binding{ 0 };
         std::string name;
         Type type{ Type:: Image };
@@ -69,8 +69,8 @@ namespace fe {
         Viewport& getViewport() { return viewport; }
         bool setViewport(const Viewport& port);
 
-        Camera* getOverrideCamera() const { return overrideCamera; }
-        void setOverrideCamera(Camera* camera) { overrideCamera = camera; }
+        //Camera* getOverrideCamera() const { return overrideCamera; }
+        //void setOverrideCamera(Camera* camera) { overrideCamera = camera; }
 
         /**
          * Gets the render stage viewport.
@@ -98,7 +98,7 @@ namespace fe {
         std::vector<SubpassType> subpasses;
 
         Viewport viewport;
-        Camera* overrideCamera{ nullptr };
+       // Camera* overrideCamera{ nullptr };
 
         std::unique_ptr<Renderpass> renderpass;
         std::unique_ptr<TextureDepth> depthStencil;

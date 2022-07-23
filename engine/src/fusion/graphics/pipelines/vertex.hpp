@@ -8,7 +8,7 @@ namespace fe {
         /**
          * @brief Vertex layout components.
          */
-        enum class Component {
+        enum class Component : uint8_t {
             /** Model + Layout */
             Position,
             Normal,

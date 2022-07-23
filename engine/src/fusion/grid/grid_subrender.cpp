@@ -8,9 +8,9 @@
 
 using namespace fe;
 
-GridSubrender::GridSubrender(const Pipeline::Stage& pipelineStage)
-        : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"EngineShaders/grid/grid.vert", "EngineShaders/grid/grid.frag"}, {{{Vertex::Component::Position2}}}} {
+GridSubrender::GridSubrender(const Pipeline::Stage& stage)
+        : Subrender{stage}
+        , pipeline{stage, {"EngineShaders/grid/grid.vert", "EngineShaders/grid/grid.frag"}, {{{Vertex::Component::Position2}}}} {
 
     std::array<glm::vec2, 6> vertices{{
         {-1, 1}, {-1, -1}, {1, 1},
@@ -28,7 +28,8 @@ void GridSubrender::onRender(const CommandBuffer& commandBuffer) {
     if (!scene)
         return;
 
-    auto camera = scene->getCamera();
+    //auto camera = scene->getCamera();
+    Camera* camera = nullptr;
     if (!camera)
         return;
 

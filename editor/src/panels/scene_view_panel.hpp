@@ -23,9 +23,8 @@ namespace fe {
         void drawToolBar();
 
         template<typename T>
-        void showComponentGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset) {
-            const auto& typeId = typeid(T);
-            if (showComponentGizmosMap[typeId]) {
+        void drawComponentGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset, const std::string& text) {
+            if (showComponentGizmosMap[type_id<T>]) {
                 auto group = registry.group<T>(entt::get<TransformComponent>);
                 for (auto entity : group) {
                     const auto& [component, transform] = group.template get<T, TransformComponent>(entity);
@@ -35,8 +34,8 @@ namespace fe {
                         continue;
 
                     float shift = ImGui::GetFontSize() * 0.5f;
-                    glm::vec2 screenPos = camera.worldToScreen(pos, coord) + offset;
-                    ImGui::SetCursorPos(ImVec2{screenPos.x - shift, screenPos.y - shift});
+                    glm::vec2 screenPos = camera.worldToScreen(pos, coord) + offset - shift;
+                    ImGui::SetCursorPos(screenPos);
 
                     ImVec4 color{0.7f, 0.7f, 0.7f, 1.0f};
                     ImGui::PushStyleColor(ImGuiCol_Button, color);
@@ -44,7 +43,7 @@ namespace fe {
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
 
                     std::string icon{ ICON_MDI_CUBE_OUTLINE };
-                    editor->getComponentIcon(typeId, icon);
+                    editor->getComponentIcon(type_id<T>, icon);
 
                     if (ImGui::Button(icon.c_str())) {
                         editor->setSelected(entity);
@@ -52,13 +51,11 @@ namespace fe {
 
                     ImGui::PopStyleColor(3);
 
-                    ImGuiUtils::Tooltip(String::Demangle(typeId.name()));
+                    ImGuiUtils::Tooltip(text);
                 }
             }
         }
 
-
-        std::unique_ptr<Texture2d> sceneTexture;
-        std::unordered_map<std::type_index, bool> showComponentGizmosMap;
+        std::unordered_map<type_index, bool> showComponentGizmosMap;
     };
 }

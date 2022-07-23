@@ -8,7 +8,7 @@ void SubrenderHolder::clear() {
 }
 
 void SubrenderHolder::updateAll() {
-    for (auto& [typeId, subrender] : subrenders) {
+    for (auto& [typ, subrender] : subrenders) {
         if (subrender->isEnabled()) {
             subrender->onUpdate();
         }
@@ -16,12 +16,12 @@ void SubrenderHolder::updateAll() {
 }
 
 void SubrenderHolder::renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer) {
-	for (const auto& [stageIndex, typeId] : stages) {
-		if (stageIndex.first != stage) {
+	for (const auto& [stageId, type] : stages) {
+		if (stageId != stage) {
 			continue;
 		}
 
-		if (auto& subrender = subrenders[typeId]) {
+		if (auto& subrender = subrenders[type]) {
 			if (subrender->isEnabled()) {
 				subrender->onRender(commandBuffer);
 			}

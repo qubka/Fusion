@@ -29,7 +29,7 @@ void StbToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
     }
 
     if (!pixels || width == 0 || height == 0) {
-        LOG_ERROR << "Failed to load bitmap file: " << filepath;
+        LOG_ERROR << "Failed to load bitmap file: \"" << filepath << "\"";
         return;
     }
 
@@ -52,6 +52,6 @@ void StbToolbox::Write(const Bitmap& bitmap, const fs::path& filepath) {
     } else if (extension == ".hdr") {
         stbi_write_hdr(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getComponents()), bitmap.getData<float>());
     } else {
-        LOG_ERROR << "Unknown extension format: " << extension << " to write data in!";
+        LOG_ERROR << "Unknown extension format: \"" << extension << "\" to write data in!";
     }
 }

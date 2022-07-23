@@ -91,7 +91,7 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
             texture = std::make_unique<gli::texture2d>(gli::load(reinterpret_cast<const char*>(data), size));
         });
 #if FUSION_DEBUG
-        LOG_DEBUG << "Texture2d " << path << " loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+        LOG_DEBUG << "Texture2d \"" << path << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
         const gli::texture2d& tex = *texture;
         if (tex.empty())

@@ -22,7 +22,7 @@ bool FileSystem::addSearchPath(const fs::path& path, const std::string& mount, b
         return false;
 
     if (PHYSFS_mount(path.c_str(), mount.empty() ? nullptr : mount.c_str(), append) == 0) {
-        LOG_WARNING << "Failed to mount path " << path << ", "  << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_WARNING << "Failed to mount path \"" << path << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         return false;
     }
 
@@ -37,7 +37,7 @@ bool FileSystem::removeSearchPath(const fs::path& path) {
         return false;
 
     if (PHYSFS_unmount(path.string().c_str()) == 0) {
-        LOG_WARNING << "Failed to unmount path " << path << ", "  << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_WARNING << "Failed to unmount path \"" << path << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         return false;
     }
 
@@ -48,7 +48,7 @@ bool FileSystem::removeSearchPath(const fs::path& path) {
 void FileSystem::clearSearchPath() {
     for (const auto& searchPath : searchPaths) {
         if (PHYSFS_unmount(searchPath.string().c_str()) == 0) {
-            LOG_WARNING << "Failed to unmount path " << searchPath << ", "  << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+            LOG_WARNING << "Failed to unmount path \"" << searchPath << "\" - "  << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         }
     }
 
@@ -63,7 +63,7 @@ bool FileSystem::ExistsInPath(const fs::path& path) {
 
 bool FileSystem::CreateDirectoryInPath(const fs::path& path) {
     if (PHYSFS_mkdir(path.string().c_str()) == 0) {
-        LOG_WARNING << "Failed to create directory: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_WARNING << "Failed to create directory: \"" << path << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         return false;
     }
     return true;
@@ -71,7 +71,7 @@ bool FileSystem::CreateDirectoryInPath(const fs::path& path) {
 
 bool FileSystem::SetWriteDirectoryInPath(const fs::path& path) {
     if (PHYSFS_setWriteDir(path.string().c_str()) == 0) {
-        LOG_WARNING << "Failed to set directory to write: " << path << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_WARNING << "Failed to set directory to write: \"" << path << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         return false;
     }
     return true;
@@ -82,14 +82,14 @@ void FileSystem::Read(const fs::path& filepath, const FileSystem::SimpleHandler&
 
     if (!fsFile) {
         if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
-            LOG_ERROR << "Failed to open file: " << filepath << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+            LOG_ERROR << "Failed to open file: \"" << filepath << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
             return;
         }
 
         auto storage = Storage::readFile(filepath);
         handler(storage->getData(), storage->getSize());
 
-        LOG_INFO << "Reading text with default filesystem implementation: " << filepath;
+        LOG_INFO << "Reading text with default filesystem implementation: \"" << filepath << "\"";
 
         return;
     }
@@ -99,7 +99,7 @@ void FileSystem::Read(const fs::path& filepath, const FileSystem::SimpleHandler&
     PHYSFS_readBytes(fsFile, data.data(), static_cast<PHYSFS_uint64>(size));
 
     if (PHYSFS_close(fsFile) == 0) {
-        LOG_ERROR << "Failed to close file: " << filepath << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_ERROR << "Failed to close file: \"" << filepath << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
 
     handler(data.data(), data.size());
@@ -110,7 +110,7 @@ std::vector<uint8_t> FileSystem::ReadBytes(const fs::path& filepath) {
 
     if (!fsFile) {
         if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
-            LOG_ERROR << "Failed to open file: " << filepath << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+            LOG_ERROR << "Failed to open file: \"" << filepath << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
             return {};
         }
 
@@ -128,7 +128,7 @@ std::vector<uint8_t> FileSystem::ReadBytes(const fs::path& filepath) {
     PHYSFS_readBytes(fsFile, data.data(), static_cast<PHYSFS_uint64>(size));
 
     if (PHYSFS_close(fsFile) == 0) {
-        LOG_ERROR << "Failed to close file: " << filepath << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_ERROR << "Failed to close file: \"" << filepath << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
 
     return data;
@@ -161,7 +161,7 @@ std::string FileSystem::ReadText(const fs::path& filepath) {
     PHYSFS_readBytes(fsFile, data.data(), static_cast<PHYSFS_uint64>(size));
 
     if (PHYSFS_close(fsFile) == 0) {
-        LOG_ERROR << "Failed to close file: " << filepath << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_ERROR << "Failed to close file: \"" << filepath << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
 
     return { data.begin(), data.end() };
@@ -180,12 +180,12 @@ bool FileSystem::WriteBytes(const fs::path& filepath, const void* buffer, size_t
 
     auto written = PHYSFS_writeBytes(fsFile, buffer, size);
     if(written != size)
-        LOG_ERROR << "Failed to write in file: " << filepath << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_ERROR << "Failed to write in file: \"" << filepath << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     else
         ret = written;
 
     if (PHYSFS_close(fsFile) == 0) {
-        LOG_ERROR << "Failed to close file: " << filepath << ", " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        LOG_ERROR << "Failed to close file: \"" << filepath << "\" - " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     }
 
     return ret;

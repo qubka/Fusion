@@ -3,8 +3,10 @@
 struct PHYSFS_File;
 
 namespace fe {
-    enum class FileMode {
-        Read, Write, Append
+    enum class FileMode : uint8_t {
+        Read,
+        Write,
+        Append
     };
 
     class BaseFileStream {

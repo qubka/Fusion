@@ -40,12 +40,12 @@ Engine::~Engine() {
 }
 
 void Engine::init() {
-    Time::Register(Module::Stage::Pre);
-    FileSystem::Register(Module::Stage::Never);
-    VirtualFileSystem::Register(Module::Stage::Never);
-    Input::Register(Module::Stage::Normal);
-    SceneManager::Register(Module::Stage::Normal);
-    Graphics::Register(Module::Stage::Render);
+    Time::Register("Time", Module::Stage::Pre);
+    FileSystem::Register("FileSystem", Module::Stage::Never);
+    VirtualFileSystem::Register("VirtualFileSystem", Module::Stage::Never);
+    Input::Register("Input", Module::Stage::Normal);
+    SceneManager::Register("SceneManager", Module::Stage::Normal);
+    Graphics::Register("Graphics", Module::Stage::Render);
 
     StbToolbox::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
     GliToolbox::Register(".ktx", ".kmg", ".dds");
@@ -98,27 +98,27 @@ void Engine::startup() {
 }
 
 void Engine::updateStage(Module::Stage stage) {
-    for (const auto& moduleId : moduleStages[stage])
-        modules[moduleId]->onUpdate();
+    for (const auto& module : stages[stage])
+        modules[module]->onUpdate();
 }
 
 void Engine::sortModules() {
     // Use the table to sort the modules for each stage depending on the number of mentions
     // in the list of requirements specified in the registration of each module
-    std::unordered_map<Module::Stage, std::unordered_map<std::type_index, size_t>> dependencies;
+    std::unordered_map<Module::Stage, std::unordered_map<type_index, size_t>> dependencies;
 
     // Create all registered modules
     for (const auto& [type, module] : Module::Registry()) {
         modules.emplace(type, module.create());
-        moduleStages[module.stage].push_back(type);
+        stages[module.stage].push_back(type);
         for (const auto& require: module.requires) {
             dependencies[module.stage][require]++;
         }
-        LOG_DEBUG << "Module: " << String::Demangle(type.name()) << " was registered for the " << me::enum_name(module.stage) << " stage";
+        LOG_DEBUG << "Module: \"" << module.name << "\" was registered for the \"" << me::enum_name(module.stage) << "\" stage";
     }
 
     // Sort by dependency count
-    for (auto& [stage, mods] : moduleStages) {
+    for (auto& [stage, mods] : stages) {
         auto& deps = dependencies[stage];
         std::sort(mods.begin(), mods.end(), [&deps](const auto& a, const auto& b) {
             return deps[a] > deps[b];

@@ -14,7 +14,7 @@ namespace fe {
     }
 
 #if PHYSFS
-    enum class FileType {
+    enum class FileType : uint8_t {
         Regular,      /**< a normal file */
         Directory,    /**< a directory */
         Symlink,      /**< a symlink */

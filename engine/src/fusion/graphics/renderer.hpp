@@ -18,9 +18,9 @@ namespace fe {
         NONCOPYABLE(Renderer);
 
         /**
-         * Checks whether a Subrender exists or not.
-         * @tparam T The Subrender type.
-         * @return If the Subrender has the System.
+         * Checks whether a subrender exists or not.
+         * @tparam T The subrender type.
+         * @return If the subrender has the System.
          */
          template<typename T>
          bool hasSubrender() const  {
@@ -28,9 +28,9 @@ namespace fe {
          }
 
          /**
-          * Gets a Subrender.
-          * @tparam T The Subrender type.
-          * @return The Subrender.
+          * Gets a subrender.
+          * @tparam T The subrender type.
+          * @return The subrender.
           */
         template<typename T>
         T* getSubrender() const {
@@ -38,20 +38,20 @@ namespace fe {
         }
 
         /**
-         * Adds a Subrender.
-         * @tparam T The Subrender type.
+         * Adds a subrender.
+         * @tparam T The subrender type.
          * @tparam Args The constructor arg types.
-         * @param pipelineStage The Subrender pipeline stage.
+         * @param stage The subrender pipeline stage.
          * @param args The constructor arguments.
          */
         template<typename T, typename... Args>
-        T* addSubrender(const Pipeline::Stage& pipelineStage, Args&&...args) {
-            return subrenderHolder.add<T>(pipelineStage, std::make_unique<T>(pipelineStage, std::forward<Args>(args)...));
+        T* addSubrender(const Pipeline::Stage& stage, Args&&...args) {
+            return subrenderHolder.add<T>(stage, std::make_unique<T>(stage, std::forward<Args>(args)...));
         }
 
         /**
-         * Removes a Subrender.
-         * @tparam T The Subrender type.
+         * Removes a subrender.
+         * @tparam T The subrender type.
          */
         template<typename T>
         void removeSubrender() {
@@ -59,7 +59,7 @@ namespace fe {
         }
 
         /**
-         * Clears all Subrenders.
+         * Clears all subrenders.
          */
         void clearSubrenders() {
             subrenderHolder.clear();

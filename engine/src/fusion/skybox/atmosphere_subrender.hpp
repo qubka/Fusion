@@ -9,7 +9,7 @@ namespace fe {
     class Buffer;
     class AtmosphereSubrender final : public Subrender {
     public:
-        explicit AtmosphereSubrender(const Pipeline::Stage& pipelineStage);
+        explicit AtmosphereSubrender(const Pipeline::Stage& stage);
         ~AtmosphereSubrender() override;
 
     private:

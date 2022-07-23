@@ -22,6 +22,11 @@ namespace fe {
         float snapBound{ 0.1f };
         uint32_t gizmosOperation{ UINT32_MAX };
         bool showGrid{ true };
+        bool showStats{ false };
+        bool muteAudio{ false };
+        bool freeAspect{ true };
+        float fixedAspect{ 1.0f };
+        float aspectRatio{ 1.0f };
         ImGuiUtils::Theme theme{ ImGuiUtils::Theme::ClassicDark };
 
         /*f
@@ -32,13 +37,12 @@ namespace fe {
         bool showImGuiDemo{ true };
         bool view2D{ false };
         bool sleepOutofFocus{ true };
-        bool freeAspect{ true };
+
         float imGuizmoScale{ 0.25f };
-        float fixedAspect{ 1.0f };
-        float aspectRatio{ 1.0f };*/
+        */
     };
 
-    enum class EditorState {
+    enum class EditorState : uint8_t {
         Paused,
         Play,
         Next,
@@ -63,7 +67,6 @@ namespace fe {
         EditorPanel* getPanel(const std::string& name);
 
         Camera* getCamera() { return editorCamera.get(); }
-        //const EditorCameraController& getEditorCameraController() { return editorCameraController; }
 
         EditorSettings& getSettings() { return editorSettings; }
         EditorState& getState() { return editorState; }
@@ -73,12 +76,11 @@ namespace fe {
 
         void setCopiedEntity(entt::entity entity, bool cut = false) { copiedEntity = entity; cutCopyEntity = cut; }
         entt::entity getCopiedEntity() const { return copiedEntity; }
-
         bool getCutCopyEntity() const { return cutCopyEntity; }
 
-        const std::unordered_map<std::type_index, std::string>& getComponentIconMap() const { return componentIconMap; }
-        bool getComponentIcon(const std::type_index& index, std::string& out) const {
-            if (auto icon = componentIconMap.find(index); icon != componentIconMap.end()) {
+        const std::unordered_map<type_index, std::string>& getComponentIconMap() const { return componentIconMap; }
+        bool getComponentIcon(type_index type, std::string& out) const {
+            if (auto icon = componentIconMap.find(type); icon != componentIconMap.end()) {
                 out = icon->second;
                 return true;
             }
@@ -89,8 +91,6 @@ namespace fe {
         void setSceneActive(bool flag) { sceneActive = flag; }
         bool isSceneViewActive() const { return sceneViewActive; }
         void setSceneViewActive(bool flag) { sceneViewActive = flag; }
-        const glm::vec2& getSceneViewPanelPosition() { return sceneViewPanelPosition; }
-        void setSceneViewPanelPosition(const glm::vec2& pos) { sceneViewPanelPosition = pos; }
 
         //void focusCamera(const glm::vec3& point, float distance, float speed = 1.0f);
 
@@ -108,7 +108,7 @@ namespace fe {
         EditorState editorState{ EditorState::Paused };
 
         EditorCameraController editorCameraController;
-        std::shared_ptr<Camera> editorCamera;
+        std::unique_ptr<Camera> editorCamera;
         float currentSceneAspectRatio{ 0.0f };
         float cameraTransitionStartTime{ 0.0f };
         float cameraTransitionSpeed{ 0.0f };
@@ -118,7 +118,7 @@ namespace fe {
 
         FileBrowserPanel fileBrowserPanel{ this };
         std::vector<std::unique_ptr<EditorPanel>> panels;
-        std::unordered_map<std::type_index, std::string> componentIconMap;
+        std::unordered_map<type_index, std::string> componentIconMap;
 
         entt::entity selectedEntity{ entt::null };
         entt::entity copiedEntity{ entt::null };
@@ -127,10 +127,9 @@ namespace fe {
         bool reopenNewProjectPopup{ false };
         bool newProjectPopupOpen{ false };
         bool locationPopupOpened{ false };
-        fs::path projectLocation{ };
+        fs::path projectLocation;
 
         bool sceneActive{ false };
         bool sceneViewActive{ false };
-        glm::vec2 sceneViewPanelPosition{ 0.0f };
     };
 }

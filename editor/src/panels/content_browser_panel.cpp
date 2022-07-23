@@ -216,7 +216,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
 
         nodeFlags |= ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
 
-        bool isOpened = ImGui::TreeNodeEx(reinterpret_cast<void*>((intptr_t)dirInfo.get()), nodeFlags, "");
+        bool isOpened = ImGui::TreeNodeEx((void*)(intptr_t)dirInfo.get(), nodeFlags, "");
 
         if (ImGui::IsItemClicked() && !isLocked) {
             changeDirectory(dirInfo);
@@ -227,7 +227,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
                 fs::path file = fs::current_path() / fs::path{reinterpret_cast<const char*>(payload->Data)};
                 fs::path move = fs::current_path() / (dirInfo->parent ? root / dirInfo->path : root);
                 if (moveFile(file, move)) {
-                    LOG_INFO << "Moved File: " << file << " to " << move;
+                    LOG_INFO << "Moved File: \"" << file << "\" to \"" << move << "\"";
                     refresh();
                 }
             }
@@ -350,7 +350,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
                 fs::path file = fs::current_path() / fs::path{reinterpret_cast<const char*>(payload->Data)};
                 fs::path move = fs::current_path() / (parent ? root / path : root);
                 if (moveFile(file, move)) {
-                    LOG_INFO << "Moved File: " << file << " to " << move;
+                    LOG_INFO << "Moved File: \"" << file << "\" to \"" << move << "\"";
                     refresh();
                     return true;
                 }
