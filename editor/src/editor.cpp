@@ -839,7 +839,7 @@ void Editor::removePanel(EditorPanel* panel) {
     }
 }
 
-void Editor::openTextFile(const fs::path& filepath, std::function<void()>&& callback) {
+void Editor::openTextFile(const fs::path& filepath, const std::function<void()>& callback) {
     for (const auto& [i, p] : enumerate(panels)) {
         if (p->getName() == "TextEdit") {
             panels.erase(panels.begin() + i);
@@ -847,7 +847,7 @@ void Editor::openTextFile(const fs::path& filepath, std::function<void()>&& call
         }
     }
 
-    panels.emplace_back(std::make_unique<TextEditPanel>(filepath, std::move(callback), this));
+    panels.emplace_back(std::make_unique<TextEditPanel>(filepath, callback, this));
 }
 
 EditorPanel* Editor::getPanel(const std::string& name) {

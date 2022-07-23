@@ -79,8 +79,8 @@ namespace fe {
          * @tparam Func The function type.
          * @param func The function to pass each system into.
          */
-        template<typename Func>
-        void each(Func&& func) {
+        template<typename F>
+        void each(const F& func) {
             for (const auto& [type, system] : systems) {
                 func(system.get());
             }

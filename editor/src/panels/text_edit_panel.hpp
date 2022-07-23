@@ -7,13 +7,13 @@
 namespace fe {
     class TextEditPanel : public EditorPanel {
     public:
-        TextEditPanel(fs::path filepath, std::function<void()>&& callback, Editor* editor);
+        TextEditPanel(fs::path filepath, const std::function<void()>& callback, Editor* editor);
         ~TextEditPanel() override;
 
         void onImGui() override;
         void onClose();
 
-        void setOnSaveCallback(std::function<void()>&& func) { callback = std::move(func); }
+        void setOnSaveCallback(const std::function<void()>& func) { callback = func; }
         void setErrors(const std::map<int, std::string>& errors);
 
     private:

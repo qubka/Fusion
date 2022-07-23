@@ -62,7 +62,7 @@ namespace fe {
         void newProjectOpenCallback(const fs::path& path);
         void newProjectLocationCallback(const fs::path& path);
 
-        void openTextFile(const fs::path& filepath, std::function<void()>&& callback);
+        void openTextFile(const fs::path& filepath, const std::function<void()>& callback);
         void removePanel(EditorPanel* panel);
         EditorPanel* getPanel(const std::string& name);
 

@@ -7,9 +7,9 @@
 
 using namespace fe;
 
-TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()>&& callback, Editor* editor)
+TextEditPanel::TextEditPanel(fs::path filepath, const std::function<void()>& callback, Editor* editor)
         : path{std::move(filepath)}
-        , callback{std::move(callback)}
+        , callback{callback}
         , EditorPanel{ICON_MDI_NOTE_TEXT "Text Editor###textedit", "TextEdit", editor}
 {
     textEditor.SetCustomIdentifiers({});

@@ -35,7 +35,7 @@ namespace fe {
          */
         class Layout {
         public:
-            Layout(std::vector<Component>&& components, uint32_t binding = 0) : components{std::move(components)}, binding{binding} {}
+            Layout(std::vector<Component> components, uint32_t binding = 0) : components{std::move(components)}, binding{binding} {}
             ~Layout() = default;
 
             Component operator[](uint32_t index) const { return components[index]; }
@@ -77,7 +77,7 @@ namespace fe {
         class Input {
         public:
             Input() = default;
-            Input(std::vector<Component>&& components) {
+            Input(std::vector<Component> components) {
                 append({std::move(components)});
             }
             explicit Input(const std::vector<Layout>& vertexLayouts) {
