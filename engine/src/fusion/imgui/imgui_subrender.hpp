@@ -21,7 +21,7 @@ namespace fe {
 
     private:
         void onUpdate() override;
-        void onRender(const CommandBuffer& commandBuffer) override;
+        void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         void setupEvents(bool connect);
         void setupKeyCodes();

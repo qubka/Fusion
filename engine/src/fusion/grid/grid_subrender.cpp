@@ -23,13 +23,7 @@ GridSubrender::GridSubrender(const Pipeline::Stage& stage)
 GridSubrender::~GridSubrender() {
 }
 
-void GridSubrender::onRender(const CommandBuffer& commandBuffer) {
-    auto scene = SceneManager::Get()->getScene();
-    if (!scene)
-        return;
-
-    //auto camera = scene->getCamera();
-    Camera* camera = nullptr;
+void GridSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
     if (!camera)
         return;
 

@@ -3,6 +3,7 @@
 #include "fusion/graphics/pipelines/pipeline.hpp"
 
 namespace fe {
+    class Camera;
     /**
      * @brief Represents a render pipeline that is used to render a type of pipeline.
      */
@@ -40,8 +41,9 @@ namespace fe {
         /**
          * Runs the render pipeline in the current renderpass.
          * @param commandBuffer The command buffer to record render command into.
+         * @param overrideCamera The optional camera for rendering.
          */
-        virtual void onRender(const CommandBuffer& commandBuffer) = 0;
+        virtual void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) = 0;
 
         /**
          * @brief Called when the renderer is enabled.

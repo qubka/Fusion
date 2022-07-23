@@ -102,7 +102,7 @@ void ImGuiSubrender::onUpdate() {
     ImGui::Render();
 }
 
-void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer) {
+void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
     // Update vertex and index buffer containing the imGui elements when required
     ImDrawData* drawData = ImGui::GetDrawData();
     if (!drawData || drawData->CmdListsCount == 0)

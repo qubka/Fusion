@@ -71,7 +71,7 @@ SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& stage)
 SkyboxSubrender::~SkyboxSubrender() {
 }
 
-void SkyboxSubrender::onRender(const CommandBuffer& commandBuffer) {
+void SkyboxSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
     auto scene = SceneManager::Get()->getScene();
     if (!scene)
         return;

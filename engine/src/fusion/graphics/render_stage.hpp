@@ -47,6 +47,8 @@ namespace fe {
         }
     };
 
+    class Camera;
+
     class RenderStage {
         friend class Graphics;
     public:
@@ -69,8 +71,8 @@ namespace fe {
         Viewport& getViewport() { return viewport; }
         bool setViewport(const Viewport& port);
 
-        //Camera* getOverrideCamera() const { return overrideCamera; }
-        //void setOverrideCamera(Camera* camera) { overrideCamera = camera; }
+        Camera* getOverrideCamera() const { return overrideCamera.get(); }
+        void setOverrideCamera(const std::shared_ptr<Camera>& camera) { overrideCamera = camera; }
 
         /**
          * Gets the render stage viewport.
@@ -98,7 +100,7 @@ namespace fe {
         std::vector<SubpassType> subpasses;
 
         Viewport viewport;
-       // Camera* overrideCamera{ nullptr };
+        std::shared_ptr<Camera> overrideCamera;
 
         std::unique_ptr<Renderpass> renderpass;
         std::unique_ptr<TextureDepth> depthStencil;

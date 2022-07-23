@@ -102,8 +102,9 @@ namespace fe {
          * Iterates through all subrenders for rendering.
          * @param stage The subrender stage.
          * @param commandBuffer The command buffer to record render command into.
+         * @param overrideCamera The optional camera for rendering.
          */
-        void renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer);
+        void renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer, const Camera* overrideCamera = nullptr);
 
         /// List of all subrenders
         std::unordered_map<type_index, std::unique_ptr<Subrender>> subrenders;

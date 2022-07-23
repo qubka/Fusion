@@ -42,9 +42,7 @@ void Editor::onStart() {
     Graphics::Get()->setRenderer(std::make_unique<EditorRenderer>());
 
     const auto& size = DeviceManager::Get()->getWindow(0)->getSize();
-    editorCamera = std::make_unique<Camera>();
-    //editorCamera->setAspectRatio(size.x / size.y);
-    //editorCamera = std::make_shared<EditorCamera>();
+    editorCamera = std::make_shared<Camera>();
 
     componentIconMap[type_id<TransformComponent>] = ICON_MDI_AXIS_ARROW;
     componentIconMap[type_id<ModelComponent>] = ICON_MDI_SHAPE;
@@ -78,23 +76,18 @@ void Editor::onStart() {
 
 void Editor::onUpdate() {
     auto scene = SceneManager::Get()->getScene();
-    if (scene) {
-        //scene->setCamera(editorCamera);
-    }
-
     if (sceneViewActive && scene) {
         auto input = Input::Get();
 
-        {
-            //editorCameraController.update(*editorCamera);
+        if (editorCamera)
+            editorCameraController.update(*editorCamera);
 
-            if (input->getKeyDown(Key::F)) {
-                auto& registry = scene->getRegistry();
-                if (registry.valid(selectedEntity)) {
-                    /*auto transform = registry.try_get<TransformComponent>(selectedEntity);
-                    if (transform)
-                        FocusCamera(transform->GetWorldPosition(), 2.0f, 2.0f);*/
-                }
+        if (input->getKeyDown(Key::F)) {
+            auto& registry = scene->getRegistry();
+            if (registry.valid(selectedEntity)) {
+                /*auto transform = registry.try_get<TransformComponent>(selectedEntity);
+                if (transform)
+                    FocusCamera(transform->GetWorldPosition(), 2.0f, 2.0f);*/
             }
         }
 

@@ -108,7 +108,7 @@ namespace fe {
         EditorState editorState{ EditorState::Paused };
 
         EditorCameraController editorCameraController;
-        std::unique_ptr<Camera> editorCamera;
+        std::shared_ptr<Camera> editorCamera;
         float currentSceneAspectRatio{ 0.0f };
         float cameraTransitionStartTime{ 0.0f };
         float cameraTransitionSpeed{ 0.0f };

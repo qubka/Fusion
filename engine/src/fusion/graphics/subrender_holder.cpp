@@ -15,7 +15,7 @@ void SubrenderHolder::updateAll() {
     }
 }
 
-void SubrenderHolder::renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer) {
+void SubrenderHolder::renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
 	for (const auto& [stageId, type] : stages) {
 		if (stageId != stage) {
 			continue;
@@ -23,7 +23,7 @@ void SubrenderHolder::renderStage(const Pipeline::Stage& stage, const CommandBuf
 
 		if (auto& subrender = subrenders[type]) {
 			if (subrender->isEnabled()) {
-				subrender->onRender(commandBuffer);
+				subrender->onRender(commandBuffer, overrideCamera);
 			}
 		}
 	}

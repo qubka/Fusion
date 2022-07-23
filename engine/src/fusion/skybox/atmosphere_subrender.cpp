@@ -24,13 +24,7 @@ AtmosphereSubrender::~AtmosphereSubrender() {
 
 }
 
-void AtmosphereSubrender::onRender(const CommandBuffer& commandBuffer) {
-    auto scene = SceneManager::Get()->getScene();
-    if (!scene)
-        return;
-
-    //auto camera = scene->getCamera();
-    Camera* camera = nullptr;
+void AtmosphereSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
     if (!camera)
         return;
 
