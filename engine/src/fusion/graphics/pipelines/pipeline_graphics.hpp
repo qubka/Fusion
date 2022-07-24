@@ -69,7 +69,7 @@ namespace fe {
                          float lineWidth = 1.0f,
                          bool transparencyEnabled = true,
                          bool pushDescriptors = false);
-        ~PipelineGraphics();
+        ~PipelineGraphics() override;
 
         /**
          * Gets the depth stencil used in a stage.

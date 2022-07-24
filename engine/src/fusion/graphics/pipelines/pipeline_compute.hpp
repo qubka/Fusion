@@ -15,7 +15,7 @@ namespace fe {
          * @param pushDescriptors If no actual descriptor sets are allocated but instead pushed.
          */
         explicit PipelineCompute(fs::path shaderStage, std::vector<Shader::Define> defines = {}, bool pushDescriptors = false);
-        ~PipelineCompute();
+        ~PipelineCompute() override;
 
         void cmdRender(const CommandBuffer& commandBuffer, const glm::uvec2& extent) const;
 
