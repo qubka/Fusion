@@ -6,7 +6,7 @@ layout(binding = 0) uniform UniformObject {
 	mat4 modelView;
 	float alpha;
 
-	vec4 colour;
+	vec4 color;
 } object;
 
 layout(location = 0) in vec2 inPosition;

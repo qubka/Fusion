@@ -9,5 +9,7 @@ namespace fe {
         Resource() = default;
         virtual ~Resource() = default;
         NONCOPYBLE(Resource);
+
+        virtual type_index getTypeIndex() const = 0;
     };
 }

@@ -21,8 +21,8 @@ namespace fe {
                 auto newSize = outputScale * glm::vec2{size};
                 output = std::make_unique<Texture2d>(newSize, VK_FORMAT_R8G8B8A8_UNORM);
 
-                filterBlurVertical.setAttachment("writeColour", output.get());
-                filterBlurHorizontal.setAttachment("writeColour", output.get());
+                filterBlurVertical.setAttachment("writeColor", output.get());
+                filterBlurHorizontal.setAttachment("writeColor", output.get());
 
                 lastSize = size;
             }

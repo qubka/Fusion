@@ -55,7 +55,7 @@ vec3 specularContribution(vec3 diffuse, vec3 L, vec3 V, vec3 N, vec3 F0, float m
 	float dotNV = clamp(dot(N, V), 0.0f, 1.0f);
 	float dotNL = clamp(dot(N, L), 0.0f, 1.0f);
 
-	vec3 colour = vec3(0.0f);
+	vec3 color = vec3(0.0f);
 
 	if (dotNL > 0.0f) {
 		// D = Normal distribution (Distribution of the microfacets)
@@ -66,10 +66,10 @@ vec3 specularContribution(vec3 diffuse, vec3 L, vec3 V, vec3 N, vec3 F0, float m
 		vec3 F = F_Schlick(dotNV, F0);		
 		vec3 spec = D * F * G / (4.0f * dotNL * dotNV + 0.001f);
 		vec3 kD = (vec3(1.0f) - F) * (1.0f - metallic);			
-		colour += (kD * diffuse / PI + spec) * dotNL;
+		color += (kD * diffuse / PI + spec) * dotNL;
 	}
 
-	return colour;
+	return color;
 }
 
 /*float shadowFactor(vec4 shadowCoords) {

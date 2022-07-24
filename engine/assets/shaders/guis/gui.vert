@@ -8,7 +8,7 @@ layout(binding = 0) uniform UniformObject {
 
 	float aspectRatio;
 
-	vec4 colourOffset;
+	vec4 colorOffset;
 	vec2 atlasOffset;
 	vec2 atlasScale;
 	float atlasRows;

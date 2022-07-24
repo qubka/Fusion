@@ -4,9 +4,9 @@
 
 layout(local_size_x = 16, local_size_y = 16) in;
 
-layout(binding = 0, rgba32f) uniform writeonly imageCube outColour;
+layout(binding = 0, rgba32f) uniform writeonly imageCube outColor;
 
-layout(binding = 1) uniform samplerCube samplerColour;
+layout(binding = 1) uniform samplerCube samplerColor;
 
 const float PI = 3.1415926535897932384626433832795f;
 const float deltaPhi = (2.0f * PI) / 180.0f;
@@ -24,7 +24,7 @@ vec3 cubeDir(vec2 texCoord, uint side) {
 }
 
 void main() {
-	vec2 uv = (gl_GlobalInvocationID.xy + vec2(0.5f)) / vec2(imageSize(outColour).xy);
+	vec2 uv = (gl_GlobalInvocationID.xy + vec2(0.5f)) / vec2(imageSize(outColor).xy);
 
 	for (uint i = 0; i != 6; ++i) {
 		vec3 N = normalize(cubeDir(uv, i));
@@ -35,18 +35,18 @@ void main() {
 		const float TWO_PI = PI * 2.0f;
 		const float HALF_PI = PI * 0.5f;
 
-		vec3 colour = vec3(0.0f);
+		vec3 color = vec3(0.0f);
 		uint sampleCount = 0u;
 
 		for (float phi = 0.0f; phi < TWO_PI; phi += deltaPhi) {
 			for (float theta = 0.0f; theta < HALF_PI; theta += deltaTheta) {
 				vec3 tempVec = cos(phi) * right + sin(phi) * up;
 				vec3 sampleVector = cos(theta) * N + sin(theta) * tempVec;
-				colour += texture(samplerColour, sampleVector).rgb * cos(theta) * sin(theta);
+				color += texture(samplerColor, sampleVector).rgb * cos(theta) * sin(theta);
 				sampleCount++;
 			}
 		}
 
-		imageStore(outColour, ivec3(gl_GlobalInvocationID.xy, i), vec4(PI * colour / float(sampleCount), 1.0f));
+		imageStore(outColor, ivec3(gl_GlobalInvocationID.xy, i), vec4(PI * color / float(sampleCount), 1.0f));
 	}
 }

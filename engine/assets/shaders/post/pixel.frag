@@ -6,20 +6,20 @@ layout(push_constant) uniform PushScene {
 	float pixelSize;
 } scene;
 
-layout(binding = 0, rgba8) uniform writeonly image2D writeColour;
+layout(binding = 0, rgba8) uniform writeonly image2D writeColor;
 
-layout(binding = 1) uniform sampler2D samplerColour;
+layout(binding = 1) uniform sampler2D samplerColor;
 
 layout(location = 0) in vec2 inUV;
 
 void main() {
-	vec2 sizeColour = textureSize(samplerColour, 0);
+	vec2 sizeColor = textureSize(samplerColor, 0);
 
-	float dx = scene.pixelSize * (1.0f / sizeColour.x);
-	float dy = scene.pixelSize * (sizeColour.x / sizeColour.y) * (1.0f / sizeColour.y);
+	float dx = scene.pixelSize * (1.0f / sizeColor.x);
+	float dy = scene.pixelSize * (sizeColor.x / sizeColor.y) * (1.0f / sizeColor.y);
 	vec2 coord = vec2(dx * floor(inUV.x / dx), dy * floor(inUV.y / dy));
 
-	vec4 colour = vec4(texture(samplerColour, coord).rgb, 1.0f);
+	vec4 color = vec4(texture(samplerColor, coord).rgb, 1.0f);
 
-	imageStore(writeColour, ivec2(inUV * imageSize(writeColour)), colour);
+	imageStore(writeColor, ivec2(inUV * imageSize(writeColor)), color);
 }

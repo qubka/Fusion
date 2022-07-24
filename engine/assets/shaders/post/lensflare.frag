@@ -8,9 +8,9 @@ layout(push_constant) uniform PushScene {
 	float worldHeight;
 } scene;
 
-layout(binding = 0, rgba8) uniform writeonly image2D writeColour;
+layout(binding = 0, rgba8) uniform writeonly image2D writeColor;
 
-layout(binding = 1) uniform sampler2D samplerColour;
+layout(binding = 1) uniform sampler2D samplerColor;
 layout(binding = 2) uniform sampler2D samplerMaterial;
 
 layout(location = 0) in vec2 inUV;
@@ -61,9 +61,9 @@ void main() {
 	flare *= clamp(scene.worldHeight + 10.0f, 0.0f, 1.0f);
 
 	// Adds a bit of darkining around the edge of the screen.
-//  colour = colour * 1.3f - vec3(length(uvd) * 0.05f);
+//  color = color * 1.3f - vec3(length(uvd) * 0.05f);
 
-	vec4 colour = texture(samplerColour, inUV) + vec4(flare, 0.0f);
+	vec4 color = texture(samplerColor, inUV) + vec4(flare, 0.0f);
 
-	imageStore(writeColour, ivec2(inUV * imageSize(writeColour)), colour);
+	imageStore(writeColor, ivec2(inUV * imageSize(writeColor)), color);
 }

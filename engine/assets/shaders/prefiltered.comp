@@ -8,9 +8,9 @@ layout(push_constant) uniform PushObject {
 	float roughness;
 } object;
 
-layout(binding = 0, rgba32f) uniform writeonly imageCube outColour;
+layout(binding = 0, rgba32f) uniform writeonly imageCube outColor;
 
-layout(binding = 1) uniform samplerCube samplerColour;
+layout(binding = 1) uniform samplerCube samplerColor;
 
 const float PI = 3.1415926535897932384626433832795f;
 const uint samples = 32u;
@@ -76,7 +76,7 @@ float D_GGX(float dotNH, float roughness) {
 vec3 prefilterEnvMap(samplerCube envmap, vec3 R, float roughness) {
 	vec3 N = R;
 	vec3 V = R;
-	vec3 colour = vec3(0.0f);
+	vec3 color = vec3(0.0f);
 	float totalWeight = 0.0f;
 	float envMapDim = float(textureSize(envmap, 0).s);
 
@@ -100,20 +100,20 @@ vec3 prefilterEnvMap(samplerCube envmap, vec3 R, float roughness) {
 			float omegaP = 4.0f * PI / (6.0f * envMapDim * envMapDim);
 			// Biased (+1.0) mip level for better result
 			float mipLevel = roughness == 0.0f ? 0.0f : max(0.5f * log2(omegaS / omegaP) + 1.0f, 0.0f);
-			colour += textureLod(envmap, L, mipLevel).rgb * dotNL;
+			color += textureLod(envmap, L, mipLevel).rgb * dotNL;
 			totalWeight += dotNL;
 
 		}
 	}
 
-	return (colour / totalWeight);
+	return (color / totalWeight);
 }
 
 void main() {
-	vec2 uv = (gl_GlobalInvocationID.xy + vec2(0.5f)) / vec2(imageSize(outColour).xy);
+	vec2 uv = (gl_GlobalInvocationID.xy + vec2(0.5f)) / vec2(imageSize(outColor).xy);
 
 	for (uint i = 0; i != 6; ++i) {
 		vec3 R = normalize(cubeDir(uv, i));
-		imageStore(outColour, ivec3(gl_GlobalInvocationID.xy, i), vec4(prefilterEnvMap(samplerColour, R, object.roughness), 1.0f));
+		imageStore(outColor, ivec3(gl_GlobalInvocationID.xy, i), vec4(prefilterEnvMap(samplerColor, R, object.roughness), 1.0f));
 	}
 }

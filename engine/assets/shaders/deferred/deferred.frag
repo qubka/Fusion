@@ -10,13 +10,13 @@ layout(binding = 0) uniform UniformScene {
 
 	int lightsCount;
 
-	vec4 fogColour;
+	vec4 fogColor;
 	float fogDensity;
 	float fogGradient;
 } scene;
 
 struct Light {
-	vec4 colour;
+	vec4 color;
 	vec3 position;
 	float radius;
 };
@@ -36,7 +36,7 @@ layout(binding = 9) uniform samplerCube samplerPrefiltered;
 
 layout(location = 0) in vec2 inUV;
 
-layout(location = 0) out vec4 outColour;
+layout(location = 0) out vec4 outColor;
 
 //#include <Shaders/Noise.glsl>
 #include "Lighting.glsl"
@@ -68,7 +68,7 @@ void main() {
 			vec3 L = light.position - worldPosition;
 			float Dl = length(L);
 			L /= Dl;
-			Lo += attenuation(Dl, light.radius) * light.colour.rgb * specularContribution(diffuse.rgb, L, V, N, F0, metallic, roughness);
+			Lo += attenuation(Dl, light.radius) * light.color.rgb * specularContribution(diffuse.rgb, L, V, N, F0, metallic, roughness);
 		}
 	
 		vec2 brdf = texture(samplerBRDF, vec2(max(dot(N, V), 0.0f), roughness)).rg;
@@ -88,18 +88,18 @@ void main() {
 		kD *= 1.0f - metallic;	  
 		vec3 ambient = (kD * albedo + specular);
 	
-		outColour = vec4(ambient + Lo, 1.0f);
+		outColor = vec4(ambient + Lo, 1.0f);
 
 		// Shadow mapping
 		//vec4 shadowCoords = scene.shadowSpace * vec4(worldPosition, 1.0f);
-		//outColour *= shadowFactor(shadowCoords);
+		//outColor *= shadowFactor(shadowCoords);
 	} else {
-		outColour = vec4(diffuse.rgb, 1.0f);
+		outColor = vec4(diffuse.rgb, 1.0f);
 	}
 
 	if (!ignoreFog && normal != vec3(0.0f)) {
 		float fogFactor = exp(-pow(length(screenPosition.xyz) * scene.fogDensity, scene.fogGradient));
 		fogFactor = clamp(fogFactor, 0.0f, 1.0f);
-		outColour = mix(scene.fogColour, outColour, fogFactor);
+		outColor = mix(scene.fogColor, outColor, fogFactor);
 	}
 }

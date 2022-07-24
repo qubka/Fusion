@@ -4,7 +4,7 @@
 
 layout(local_size_x = 16, local_size_y = 16) in;
 
-layout(binding = 0, rg16f) uniform writeonly image2D outColour;
+layout(binding = 0, rg16f) uniform writeonly image2D outColor;
 
 const float PI = 3.1415926535897932384626433832795f;
 const uint NUM_SAMPLES = 1024u;
@@ -85,6 +85,6 @@ vec2 BRDF(float NoV, float roughness) {
 }
 
 void main() {
-	vec2 uv = (gl_GlobalInvocationID.xy + vec2(0.5f)) / vec2(imageSize(outColour).xy);
-	imageStore(outColour, ivec2(gl_GlobalInvocationID.xy), vec4(BRDF(uv.x, 1.0f - uv.y), 0.0f, 1.0f));
+	vec2 uv = (gl_GlobalInvocationID.xy + vec2(0.5f)) / vec2(imageSize(outColor).xy);
+	imageStore(outColor, ivec2(gl_GlobalInvocationID.xy), vec4(BRDF(uv.x, 1.0f - uv.y), 0.0f, 1.0f));
 }

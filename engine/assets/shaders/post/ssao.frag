@@ -14,7 +14,7 @@ layout(binding = 0) uniform UniformScene {
 	vec3 cameraPosition;
 } scene;
 
-layout(binding = 0, rgba8) uniform writeonly image2D writeColour;
+layout(binding = 0, rgba8) uniform writeonly image2D writeColor;
 
 layout(binding = 1) uniform sampler2D samplerPosition;
 layout(binding = 2) uniform sampler2D samplerNormal;
@@ -63,7 +63,7 @@ void main() {
 	}
 
 	occlusion = 1.0f - (occlusion / float(SSAO_KERNEL_SIZE));
-	vec4 colour = vec4(texture(samplerNoise, inUV).rgb, 1.0f); // occlusion, occlusion, occlusion
+	vec4 color = vec4(texture(samplerNoise, inUV).rgb, 1.0f); // occlusion, occlusion, occlusion
 	
-	imageStore(writeColour, ivec2(inUV * imageSize(writeColour)), colour);
+	imageStore(writeColor, ivec2(inUV * imageSize(writeColor)), color);
 }

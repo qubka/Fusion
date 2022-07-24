@@ -2,9 +2,9 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout(binding = 0, rgba8) uniform writeonly image2D writeColour;
+layout(binding = 0, rgba8) uniform writeonly image2D writeColor;
 
-layout(binding = 1) uniform sampler2D samplerColour;
+layout(binding = 1) uniform sampler2D samplerColor;
 
 layout(location = 0) in vec2 inUV;
 
@@ -22,8 +22,8 @@ vec3 uncharted2(vec3 hdr) {
 }
 
 void main() {
-	vec3 textureColour = texture(samplerColour, inUV).rgb;
-	vec4 colour = vec4(pow(uncharted2(textureColour), vec3(inverseGamma)), 1.0f);
+	vec3 textureColor = texture(samplerColor, inUV).rgb;
+	vec4 color = vec4(pow(uncharted2(textureColor), vec3(inverseGamma)), 1.0f);
 	
-	imageStore(writeColour, ivec2(inUV * imageSize(writeColour)), colour);
+	imageStore(writeColor, ivec2(inUV * imageSize(writeColor)), color);
 }

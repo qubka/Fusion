@@ -130,7 +130,7 @@ namespace fe {
          * Sets the scene entity registry.
          * @param camera The new entity registry.
          */
-        //void setRegistry(entt::registry&& reg) { registry = std::move(reg) ; }
+        //void setRegistry(entt::registry&& registry) { this->registry = std::move(registry) ; }
 
         template<typename T>
         auto getAllEntitiesWith() { return registry.view<T>(); }

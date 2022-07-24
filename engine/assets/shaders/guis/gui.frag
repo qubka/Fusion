@@ -8,18 +8,18 @@ layout(binding = 0) uniform UniformObject {
 	
 	float aspectRatio;
 
-	vec4 colourOffset;
+	vec4 colorOffset;
 	vec2 atlasOffset;
 	vec2 atlasScale;
 	float atlasRows;
 	vec4 ninePatches;
 } object;
 
-layout(binding = 2) uniform sampler2D samplerColour;
+layout(binding = 2) uniform sampler2D samplerColor;
 
 layout(location = 0) in vec2 inUV;
 
-layout(location = 0) out vec4 outColour;
+layout(location = 0) out vec4 outColor;
 
 float map(float value, float originalMin, float originalMax, float newMin, float newMax) {
 	return (value - originalMin) / (originalMax - originalMin) * (newMax - newMin) + newMin;
@@ -44,16 +44,16 @@ void main() {
 		    processAxis(inUV.y, object.ninePatches.y, object.ninePatches.y)
 		);
 
-		outColour = texture(samplerColour, newUV);
+		outColor = texture(samplerColor, newUV);
 	} else {
-		outColour = texture(samplerColour, inUV);
+		outColor = texture(samplerColor, inUV);
 	}
 
-	outColour *= object.colourOffset;
-	outColour.a *= object.alpha;
+	outColor *= object.colorOffset;
+	outColor.a *= object.alpha;
 
-	if (outColour.a < 0.05f) {
-		outColour = vec4(0.0f);
+	if (outColor.a < 0.05f) {
+		outColor = vec4(0.0f);
 		discard;
 	}
 }

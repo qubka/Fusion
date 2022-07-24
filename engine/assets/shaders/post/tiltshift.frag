@@ -9,9 +9,9 @@ layout(push_constant) uniform PushScene {
 	float steps;
 } scene;
 
-layout(binding = 0, rgba8) uniform writeonly image2D writeColour;
+layout(binding = 0, rgba8) uniform writeonly image2D writeColor;
 
-layout(binding = 1) uniform sampler2D samplerColour;
+layout(binding = 1) uniform sampler2D samplerColor;
 
 layout(location = 0) in vec2 inUV;
 
@@ -22,7 +22,7 @@ void main() {
 	float offsetMax = (float(scene.steps - 1.0f)) / 2.0f;
 		
 	// This is the accumulation of color from the surrounding pixels in the texture.
-	vec4 colour = vec4(0.0f);
+	vec4 color = vec4(0.0f);
 
 	// From minimum offset to maximum offset.
 	for (float offsetX = offsetMin; offsetX <= offsetMax; ++offsetX) {
@@ -35,12 +35,12 @@ void main() {
 			tempUv.y += offsetY * amount * scene.stepSize;
 
 			// Accumulate the sample
-			colour += texture(samplerColour, tempUv);
+			color += texture(samplerColor, tempUv);
 		}
 	}
 		
 	// Because we are doing an average, we divide by the amount (x AND y, hence steps * steps).
-	colour /= float(scene.steps * scene.steps);
+	color /= float(scene.steps * scene.steps);
 
-	imageStore(writeColour, ivec2(inUV * imageSize(writeColour)), colour);
+	imageStore(writeColor, ivec2(inUV * imageSize(writeColor)), color);
 }

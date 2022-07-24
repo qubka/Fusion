@@ -11,13 +11,13 @@ layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec2 inUV;
 
 layout(location = 3) in mat4 inModelMatrix;
-layout(location = 7) in vec4 inColourOffset;
+layout(location = 7) in vec4 inColorOffset;
 layout(location = 8) in vec4 inOffsets;
 layout(location = 9) in vec3 inBlend;
 
 layout(location = 0) out vec2 outCoords1;
 layout(location = 1) out vec2 outCoords2;
-layout(location = 2) out vec4 outColourOffset;
+layout(location = 2) out vec4 outColorOffset;
 layout(location = 3) out float outBlendFactor;
 layout(location = 4) out float outTransparency;
 
@@ -32,7 +32,7 @@ void main() {
 
 	vec2 uv = inUV / inBlend.z;
 
-	outColourOffset = inColourOffset;
+	outColorOffset = inColorOffset;
 	outCoords1 = uv + inOffsets.xy;
 	outCoords2 = uv + inOffsets.zw;
 	outBlendFactor = inBlend.x;

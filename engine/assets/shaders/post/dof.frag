@@ -13,10 +13,10 @@ layout(push_constant) uniform PushScene {
 	float farTransition;
 } scene;
 
-layout(binding = 0, rgba8) uniform writeonly image2D writeColour;
+layout(binding = 0, rgba8) uniform writeonly image2D writeColor;
 
 layout(binding = 1) uniform sampler2D samplerDepth;
-layout(binding = 2) uniform sampler2D samplerColour;
+layout(binding = 2) uniform sampler2D samplerColor;
 layout(binding = 3) uniform sampler2D samplerBlured;
 
 layout(location = 0) in vec2 inUV;
@@ -28,7 +28,7 @@ float linearDepth(float depth) {
 
 void main() {
 	float depth = linearDepth(texture(samplerDepth, inUV).r);
-	vec3 textureColour = texture(samplerColour, inUV).rgb;
+	vec3 textureColor = texture(samplerColor, inUV).rgb;
 	vec3 textureBlured = texture(samplerBlured, inUV).rgb;
 
 	float nearEnd = scene.nearField + scene.nearTransition;
@@ -36,8 +36,8 @@ void main() {
 
 	float nearVisibility = smoothstep(scene.nearField * scene.focusPoint, nearEnd * scene.focusPoint, depth);
 	float farVisibility = 1.0f - smoothstep(farStart * scene.focusPoint, scene.farField * scene.focusPoint, depth);
-	vec4 colour = vec4(mix(textureBlured, textureColour, nearVisibility), 1.0f);
-	colour.rgb = mix(textureBlured, colour.rgb, farVisibility);
+	vec4 color = vec4(mix(textureBlured, textureColor, nearVisibility), 1.0f);
+	color.rgb = mix(textureBlured, color.rgb, farVisibility);
 
-	imageStore(writeColour, ivec2(inUV * imageSize(writeColour)), colour);
+	imageStore(writeColor, ivec2(inUV * imageSize(writeColor)), color);
 }

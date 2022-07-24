@@ -10,9 +10,9 @@ layout(binding = 0) uniform UniformScene {
 layout(location = 0) in vec3 inPosition;
 
 layout(location = 3) in mat4 inModelMatrix;
-layout(location = 7) in vec4 inColour;
+layout(location = 7) in vec4 inColor;
 
-layout(location = 0) out vec4 outColour;
+layout(location = 0) out vec4 outColor;
 
 out gl_PerVertex {
 	vec4 gl_Position;
@@ -23,5 +23,5 @@ void main() {
 
 	gl_Position = scene.projection * scene.view * worldPosition;
 
-	outColour = inColour;
+	outColor = inColor;
 }

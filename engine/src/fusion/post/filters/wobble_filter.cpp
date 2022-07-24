@@ -17,7 +17,7 @@ void WobbleFilter::onRender(const CommandBuffer& commandBuffer, const Camera* ov
 
     // Updates descriptors
     descriptorSet.push("PushScene", pushScene);
-    pushConditional("writeColour", "samplerColour", "resolved", "diffuse");
+    pushConditional("writeColor", "samplerColor", "resolved", "diffuse");
 
     if (!descriptorSet.update(pipeline))
         return;

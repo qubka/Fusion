@@ -8,17 +8,17 @@ layout(push_constant) uniform PushScene {
 	float opacity;
 } scene;
 
-layout(binding = 0, rgba8) uniform writeonly image2D writeColour;
+layout(binding = 0, rgba8) uniform writeonly image2D writeColor;
 
-layout(binding = 1) uniform sampler2D samplerColour;
+layout(binding = 1) uniform sampler2D samplerColor;
 
 layout(location = 0) in vec2 inUV;
 
 void main() {
-	vec4 textureColour = texture(samplerColour, inUV);
-	vec4 colour = textureColour;
-	colour.rgb *= 1.0f - smoothstep(scene.innerRadius, scene.outerRadius, length(inUV - 0.5f));
-	colour = mix(textureColour, colour, scene.opacity);
+	vec4 textureColor = texture(samplerColor, inUV);
+	vec4 color = textureColor;
+	color.rgb *= 1.0f - smoothstep(scene.innerRadius, scene.outerRadius, length(inUV - 0.5f));
+	color = mix(textureColor, color, scene.opacity);
 	
-	imageStore(writeColour, ivec2(inUV * imageSize(writeColour)), colour);
+	imageStore(writeColor, ivec2(inUV * imageSize(writeColor)), color);
 }

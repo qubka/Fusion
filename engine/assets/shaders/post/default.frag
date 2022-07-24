@@ -2,16 +2,16 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout(binding = 0, rgba8) uniform writeonly image2D writeColour;
+layout(binding = 0, rgba8) uniform writeonly image2D writeColor;
 
-layout(binding = 1) uniform sampler2D samplerColour;
+layout(binding = 1) uniform sampler2D samplerColor;
 
 layout(location = 0) in vec2 inUV;
 
-layout(location = 0) out vec4 outColour;
+layout(location = 0) out vec4 outColor;
 
 void main() {
-	outColour = texture(samplerColour, inUV);
+	outColor = texture(samplerColor, inUV);
 
-	imageStore(writeColour, ivec2(inUV * imageSize(writeColour)), outColour);
+	imageStore(writeColor, ivec2(inUV * imageSize(writeColor)), outColor);
 }
