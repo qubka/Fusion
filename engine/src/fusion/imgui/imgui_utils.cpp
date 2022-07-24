@@ -437,7 +437,7 @@ void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, floa
     }
 }
 
-void DrawItemActivityOutline(float rounding, bool drawWhenInactive, ImU32 colourWhenActive) {
+void DrawItemActivityOutline(float rounding, bool drawWhenInactive, ImU32 colorWhenActive) {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     ImRect rect{ ImGui::GetItemRectMin(), ImGui::GetItemRectMax() };
@@ -450,7 +450,7 @@ void DrawItemActivityOutline(float rounding, bool drawWhenInactive, ImU32 colour
         drawList->AddRect(rect.Min, rect.Max, IM_COL32(60, 60, 60, 255), rounding, 0, 1.5f);
     }
     if (ImGui::IsItemActive()) {
-        drawList->AddRect(rect.Min, rect.Max, colourWhenActive, rounding, 0, 1.0f);
+        drawList->AddRect(rect.Min, rect.Max, colorWhenActive, rounding, 0, 1.0f);
     } else if (!ImGui::IsItemHovered() && drawWhenInactive) {
         drawList->AddRect(rect.Min, rect.Max, IM_COL32(50, 50, 50, 255), rounding, 0, 1.0f);
     }
