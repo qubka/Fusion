@@ -118,7 +118,7 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
         for (int i = 0; i < drawData->CmdListsCount; i++) {
             const ImDrawList* cmdLists = drawData->CmdLists[i];
             for (const auto& cmd : cmdLists->CmdBuffer) {
-                if (auto texture = reinterpret_cast<Texture*>(cmd.TextureId)) {
+                if (auto texture = static_cast<Texture*>(cmd.TextureId)) {
                     /*VkImageAspectFlags aspect = texture->getAspect();
                     if (texture->getLayout() == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
                        texture->transitionImage(commandBuffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -402,11 +402,11 @@ void ImGuiSubrender::rebuildFont() {
 }
 
 const char* ImGuiSubrender::GetClipboardText(void* userData) {
-    return reinterpret_cast<Window*>(userData)->getClipboard();
+    return static_cast<Window*>(userData)->getClipboard();
 }
 
 void ImGuiSubrender::SetClipboardText(void* userData, const char* text) {
-    reinterpret_cast<Window*>(userData)->setClipboard(text);
+    static_cast<Window*>(userData)->setClipboard(text);
 }
 
 int ImGuiSubrender::KeyToImGuiKey(Key key) {

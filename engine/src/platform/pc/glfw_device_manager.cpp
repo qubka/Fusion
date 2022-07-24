@@ -63,15 +63,15 @@ void DeviceManager::onUpdate() {
     glfwPollEvents();
 
     for (auto& window : windows) {
-        reinterpret_cast<Window*>(window.get())->onUpdate();
+        dynamic_cast<Window*>(window.get())->onUpdate();
     }
 
     for (auto& monitor : monitors) {
-        reinterpret_cast<Monitor*>(monitor.get())->onUpdate();
+        dynamic_cast<Monitor*>(monitor.get())->onUpdate();
     }
 
     for (auto& joystick : joysticks) {
-        reinterpret_cast<Joystick*>(joystick.get())->onUpdate();
+        dynamic_cast<Joystick*>(joystick.get())->onUpdate();
     }
 }
 
@@ -130,7 +130,7 @@ namespace glfw {
     }
 
     void DeviceManager::MonitorCallback(GLFWmonitor* monitor, int action) {
-        auto manager = reinterpret_cast<glfw::DeviceManager*>(DeviceManager::Get());
+        auto manager = static_cast<glfw::DeviceManager*>(DeviceManager::Get());
         auto& monitors = manager->monitors;
 
         LOG_VERBOSE << "MonitorEvent: \"" << glfwGetMonitorName(monitor) << "\" - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
@@ -151,7 +151,7 @@ namespace glfw {
 
     #if GLFW_VERSION_MINOR >= 2
     void DeviceManager::JoystickCallback(int jid, int action) {
-        auto manager = reinterpret_cast<glfw::DeviceManager*>(DeviceManager::Get());
+        auto manager = static_cast<glfw::DeviceManager*>(DeviceManager::Get());
         auto& joysticks = manager->joysticks;
 
         LOG_VERBOSE << "JoystickEvent: [" << jid << "] \"" << glfwGetJoystickName(jid) << "\" - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
