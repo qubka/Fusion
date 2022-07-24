@@ -23,6 +23,7 @@ namespace fe {
             auto it = std::find_if(systems.begin(), systems.end(), [](const auto& p) {
                 return p.first == type_id<T>;
             });
+
             return it != systems.end() && it->second;
         }
 
@@ -36,10 +37,12 @@ namespace fe {
             auto it = std::find_if(systems.begin(), systems.end(), [](const auto& p) {
                 return p.first == type_id<T>;
             });
+
             if (it != systems.end() && it->second) {
                 return static_cast<T*>(it->second.get());
+            } else {
+                throw std::runtime_error("System Holder does not have requested system");
             }
-            throw std::runtime_error("System Holder does not have requested system");
         }
 
         /**
@@ -49,8 +52,16 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
         void add(std::unique_ptr<T>&& system) {
-            // Then, add the system
-            systems.emplace_back(type_id<T>, std::move(system));
+            auto it = std::find_if(systems.begin(), systems.end(), [](const auto& p) {
+                return p.first == type_id<T>;
+            });
+
+            if (it == systems.end()) {
+                // Then, add the system
+                systems.emplace_back(type_id<T>, std::move(system));
+            } else {
+                throw std::runtime_error("System Holder already have requested system");
+            }
         }
 
         /**
@@ -59,13 +70,15 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
         void remove() {
-            // Then, remove the System.
-            for (auto it = systems.begin(); it != systems.end();) {
-                if (it->first == type_id<T>) {
-                    it = systems.erase(it);
-                } else {
-                    ++it;
-                }
+            auto it = std::find_if(systems.begin(), systems.end(), [](const auto& p) {
+                return p.first == type_id<T>;
+            });
+
+            if (it != systems.end()) {
+                // Then, remove the system
+                systems.erase(it);
+            } else {
+                throw std::runtime_error("System Holder does not requested system to remove");
             }
         }
 

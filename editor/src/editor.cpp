@@ -173,10 +173,10 @@ void Editor::onUpdate() {
 }
 
 void Editor::onImGuizmo() {
-    if (selectedEntity == entt::null || editorSettings.gizmosOperation == 4)
+    if (selectedEntity == entt::null || editorSettings.gizmosOperation == UINT32_MAX)
         return;
 
-    if (editorSettings.showGizmos) {
+    if (editorSettings.showGizmos && editorCamera) {
         ImGuizmo::SetDrawlist();
         ImGuizmo::SetOrthographic(editorCamera->isOrthographic());
 
@@ -326,16 +326,16 @@ void Editor::beginDockSpace(bool gameFullScreen) {
         }
     }
 
-    /*if (!ImGui::DockBuilderGetNode(dockspaceID)) {
+    if (!ImGui::DockBuilderGetNode(dockspaceID)) {
         ImGui::DockBuilderRemoveNode(dockspaceID); // Clear out existing layout
         ImGui::DockBuilderAddNode(dockspaceID); // Add empty node
         ImGui::DockBuilderSetNodeSize(dockspaceID, ImGui::GetIO().DisplaySize * ImGui::GetIO().DisplayFramebufferScale);
 
-        ImGuiID dock_main_id = dockspaceID;
+        ImGuiID DockMain = dockspaceID;
 
-        ImGuiID DockBottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.3f, nullptr, &dock_main_id);
-        ImGuiID DockLeft = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.2f, nullptr, &dock_main_id);
-        ImGuiID DockRight = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.20f, nullptr, &dock_main_id);
+        ImGuiID DockBottom = ImGui::DockBuilderSplitNode(DockMain, ImGuiDir_Down, 0.3f, nullptr, &DockMain);
+        ImGuiID DockLeft = ImGui::DockBuilderSplitNode(DockMain, ImGuiDir_Left, 0.2f, nullptr, &DockMain);
+        ImGuiID DockRight = ImGui::DockBuilderSplitNode(DockMain, ImGuiDir_Right, 0.20f, nullptr, &DockMain);
 
         ImGuiID DockLeftChild = ImGui::DockBuilderSplitNode(DockLeft, ImGuiDir_Down, 0.875f, nullptr, &DockLeft);
         ImGuiID DockRightChild = ImGui::DockBuilderSplitNode(DockRight, ImGuiDir_Down, 0.875f, nullptr, &DockRight);
@@ -346,26 +346,26 @@ void Editor::beginDockSpace(bool gameFullScreen) {
         ImGuiID DockingBottomLeftChild = ImGui::DockBuilderSplitNode(DockLeft, ImGuiDir_Down, 0.4f, nullptr, &DockLeft);
         ImGuiID DockingBottomRightChild = ImGui::DockBuilderSplitNode(DockRight, ImGuiDir_Down, 0.4f, nullptr, &DockRight);
 
-        ImGuiID DockMiddle = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.8f, nullptr, &dock_main_id);
+        ImGuiID DockMiddle = ImGui::DockBuilderSplitNode(DockMain, ImGuiDir_Right, 0.8f, nullptr, &DockMain);
         ImGuiID DockBottomMiddle = ImGui::DockBuilderSplitNode(DockMiddle, ImGuiDir_Down, 0.3f, nullptr, &DockMiddle);
         ImGuiID DockMiddleLeft = ImGui::DockBuilderSplitNode(DockMiddle, ImGuiDir_Left, 0.5f, nullptr, &DockMiddle);
         ImGuiID DockMiddleRight = ImGui::DockBuilderSplitNode(DockMiddle, ImGuiDir_Right, 0.5f, nullptr, &DockMiddle);
 
-        //ImGui::DockBuilderDockWindow("###game", DockMiddleRight);
-        //ImGui::DockBuilderDockWindow("###scene", DockMiddleLeft);
-        //ImGui::DockBuilderDockWindow("###inspector", DockRight);
+        ImGui::DockBuilderDockWindow("###game", DockMiddleRight);
+        ImGui::DockBuilderDockWindow("###scene", DockMiddleLeft);
+        ImGui::DockBuilderDockWindow("###inspector", DockRight);
         ImGui::DockBuilderDockWindow("###console", DockBottomMiddle);
-        //ImGui::DockBuilderDockWindow("###profiler", DockingBottomLeftChild);
+        ImGui::DockBuilderDockWindow("###profiler", DockingBottomLeftChild);
         ImGui::DockBuilderDockWindow("###content", DockingBottomLeftChild);
-        //ImGui::DockBuilderDockWindow("Dear ImGui Demo", DockLeft);
-        //ImGui::DockBuilderDockWindow("GraphicsInfo", DockLeft);
-        ImGui::DockBuilderDockWindow("##appinfo", DockLeft);
-        //ImGui::DockBuilderDockWindow("###hierarchy", DockLeft);
-        //ImGui::DockBuilderDockWindow("###textEdit", DockMiddle);
-        //ImGui::DockBuilderDockWindow("###scenesettings", DockLeft);
+        ImGui::DockBuilderDockWindow("Dear ImGui Demo", DockLeft);
+        ImGui::DockBuilderDockWindow("###projectsettings", DockingBottomRightChild);
+        ImGui::DockBuilderDockWindow("###hierarchy", DockLeft);
+        ImGui::DockBuilderDockWindow("###textedit", DockMiddle);
+        ImGui::DockBuilderDockWindow("###editorsettings", DockingBottomRightChild);
+        ImGui::DockBuilderDockWindow("###appinfo", DockingBottomRightChild);
 
         ImGui::DockBuilderFinish(dockspaceID);
-    }*/
+    }
 
     // Dockspace
     ImGuiIO& io = ImGui::GetIO();
@@ -559,11 +559,6 @@ void Editor::drawMenuBar() {
 
         ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (1.5f * (ImGui::GetFontSize() + style.ItemSpacing.x)));
 
-        ImVec4 color{0.1f, 0.2f, 0.7f, 0.0f};
-        ImGui::PushStyleColor(ImGuiCol_Button, color);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
-
         if (editorState == EditorState::Next)
             editorState = EditorState::Paused;
 
@@ -613,8 +608,6 @@ void Editor::drawMenuBar() {
         ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - size.x - style.ItemSpacing.x * 2.0f);
 
         ImGui::Text("%.2f ms (%.i FPS)", Time::DeltaTime().asMilliseconds(), Time::FramesPerSecond());
-
-        ImGui::PopStyleColor(3);
 
         //_____________________________________________________________________________________//
 

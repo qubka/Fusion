@@ -281,17 +281,6 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             ImGui::PopStyleVar();
         }
 
-#if 0
-        ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 22.0f);
-            ImVec4{0.7f, 0.7f, 0.7f, 0.0f}
-            ImGui::PushStyleColor(ImGuiCol_Button, color);
-            if (ImGui::Button(active ? ICON_MDI_EYE : ICON_MDI_EYE_OFF)) {
-                auto& activeComponent = registry.get_or_emplace<ActiveComponent>(node);
-                activeComponent.active = !active;
-            }
-            ImGui::PopStyleColor();
-#endif
-
         if (!active)
             ImGui::PopStyleColor();
 

@@ -39,8 +39,8 @@ void GameViewPanel::onImGui() {
     viewportSize.x -= static_cast<int>(viewportSize.x) % 2 != 0 ? 1.0f : 0.0f;
     viewportSize.y -= static_cast<int>(viewportSize.y) % 2 != 0 ? 1.0f : 0.0f;
 
-    auto camera = scene->getCamera();
-    if (!camera) {
+    auto camera = scene->getCameraEntity();
+    if (camera == entt::null) {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
         drawList->AddRectFilled(viewportPos, viewportPos + viewportSize, IM_COL32(0, 0, 0, 255));
         ImGuiUtils::TextCentered(ICON_MDI_CAMERA_OFF " No Cameras Rendering", 0.0f);
@@ -71,8 +71,12 @@ void GameViewPanel::onImGui() {
 
     float aspect = viewportSize.x / viewportSize.y;
     //camera->setAspectRatio(aspect);
+    scene->getRegistry().get<CameraComponent>(camera).setAspectRatio(aspect);
 
-    //ImGuiUtils::Image(m_GameViewTexture.get(), glm::vec2(sceneViewSize.x, sceneViewSize.y));
+    auto renderStage = Graphics::Get()->getRenderStage(1);
+    if (!renderStage->setViewport({glm::vec2{1.0f, 1.0f}, glm::uvec2{viewportSize.x, viewportSize.y}, glm::ivec2{0, 0}})) {
+        ImGuiUtils::Image((Texture2d*)renderStage->getDescriptor("game_image"), viewportSize, true);
+    }
 
     ImVec2& minBound = viewportPos;
     ImVec2  maxBound{ minBound + ImGui::GetWindowSize() };
@@ -97,7 +101,7 @@ void GameViewPanel::onImGui() {
         }
 
         ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
-        if (ImGui::Begin("Example: Simple overlay", &open,
+        if (ImGui::Begin("Stats overlay", &open,
                          (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoDocking |
                          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize |
                          ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |

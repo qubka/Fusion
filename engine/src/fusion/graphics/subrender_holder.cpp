@@ -8,9 +8,11 @@ void SubrenderHolder::clear() {
 }
 
 void SubrenderHolder::updateAll() {
-    for (auto& [typ, subrender] : subrenders) {
-        if (subrender->isEnabled()) {
-            subrender->onUpdate();
+    for (auto& [type, subrender] : subrenders) {
+        for (auto& i : subrender) {
+            if (i->isEnabled()) {
+                i->onUpdate();
+            }
         }
     }
 }
@@ -21,10 +23,8 @@ void SubrenderHolder::renderStage(const Pipeline::Stage& stage, const CommandBuf
 			continue;
 		}
 
-		if (auto& subrender = subrenders[type]) {
-			if (subrender->isEnabled()) {
-				subrender->onRender(commandBuffer, overrideCamera);
-			}
-		}
+        if (auto& subrender = subrenders[type.first][type.second]) {
+            subrender->onRender(commandBuffer, overrideCamera);
+        }
 	}
 }

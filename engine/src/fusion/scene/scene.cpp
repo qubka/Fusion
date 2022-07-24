@@ -7,6 +7,7 @@
 #include "fusion/filesystem/virtual_file_system.hpp"
 
 #include "fusion/scene/systems/hierarchy_system.hpp"
+#include "fusion/scene/systems/camera_system.hpp"
 
 #include <entt/entt.hpp>
 #include <cereal/types/polymorphic.hpp>
@@ -17,6 +18,7 @@ using namespace fe;
 
 Scene::Scene(std::string name) : name{std::move(name)} {
     addSystem<HierarchySystem>();
+    addSystem<CameraSystem>();
 }
 
 void Scene::onStart() {
@@ -70,6 +72,15 @@ const Camera* Scene::getCamera() const {
         return static_cast<const Camera*>(&registry.get<CameraComponent>(cameraView.front()));
     } else {
         return nullptr;
+    }
+}
+
+entt::entity Scene::getCameraEntity() const {
+    auto cameraView = registry.view<CameraComponent>();
+    if (!cameraView.empty()) {
+        return cameraView.front();
+    } else {
+        return entt::null;
     }
 }
 

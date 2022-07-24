@@ -37,7 +37,7 @@ namespace fe {
                     glm::vec2 screenPos = camera.worldToScreen(pos, coord) + offset - shift;
                     ImGui::SetCursorPos(screenPos);
 
-                    ImVec4 color{0.7f, 0.7f, 0.7f, 1.0f};
+                    ImVec4 color{0.7f, 0.7f, 0.7f, 0.0f};
                     ImGui::PushStyleColor(ImGuiCol_Button, color);
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));

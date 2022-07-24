@@ -24,6 +24,7 @@ namespace fe {
         bool showGrid{ true };
         bool showStats{ false };
         bool muteAudio{ false };
+        bool view2D{ false };
         bool freeAspect{ true };
         float fixedAspect{ 1.0f };
         float aspectRatio{ 1.0f };
@@ -34,10 +35,7 @@ namespace fe {
         uint32_t physics2DDebugFlags{ 0 };
         uint32_t physics3DDebugFlags{ 0 };
         bool showViewSelected{ false };
-        bool showImGuiDemo{ true };
-        bool view2D{ false };
         bool sleepOutofFocus{ true };
-
         float imGuizmoScale{ 0.25f };
         */
     };

@@ -58,7 +58,7 @@ public:
     bool isFast() const override { return true; }
 
 private:
-    std::vector<uint8_t> buffer;
+    ByteArray buffer;
 };
 
 #if FUSION_PLATFORM_ANDROID || FUSION_PLATFORM_WINDOWS
@@ -90,7 +90,7 @@ private:
     HANDLE file{ INVALID_HANDLE_VALUE };
     HANDLE mapFile{ INVALID_HANDLE_VALUE };
 #else
-    std::vector<uint8_t> buffer;
+    ByteArray buffer;
 #endif
 };
 
@@ -155,9 +155,8 @@ StoragePointer Storage::readFile(const fs::path& filepath) {
     fileSize = is.tellg();
     is.seekg(0, std::ios::beg);
 
-    std::vector<uint8_t> fileData;
+    ByteArray fileData;
     fileData.reserve(fileSize);
-
     fileData.insert(fileData.begin(), std::istream_iterator<uint8_t>(is), std::istream_iterator<uint8_t>());
 
     return std::make_shared<MemoryStorage>(fileData.size(), fileData.data());

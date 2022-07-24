@@ -441,7 +441,7 @@ void Shader::createReflection() {
 
 	// TODO: This is a AMD workaround that works on NVidia too...
 	// We don't know the total usages of descriptor types by the pipeline.
-	descriptorPools.resize(6);
+	descriptorPools.resize(7);
 	descriptorPools[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	descriptorPools[0].descriptorCount = 4096;
 	descriptorPools[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -454,6 +454,8 @@ void Shader::createReflection() {
 	descriptorPools[4].descriptorCount = 2048;
 	descriptorPools[5].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 	descriptorPools[5].descriptorCount = 2048;
+    descriptorPools[6].type = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+	descriptorPools[6].descriptorCount = 512;
 
 	// Sort descriptors by binding.
 	std::sort(descriptorSetLayouts.begin(), descriptorSetLayouts.end(), [](const VkDescriptorSetLayoutBinding& l, const VkDescriptorSetLayoutBinding& r) {

@@ -289,8 +289,8 @@ void PipelineGraphics::createPipeline() {
 		for (const auto& attribute : vertexInput.getAttributeDescriptions()) {
 			/*bool shaderContains = false;
 
-			for (const auto& [shaderAttributeName, shaderAttribute] : shader->GetAttributes()) {
-				if (attribute.location + lastAttribute == shaderAttribute->GetLocation()) {
+			for (const auto& [shaderAttributeName, shaderAttribute] : shader->getAttributes()) {
+				if (attribute.location + lastAttribute == shaderAttribute->getLocation()) {
 					shaderContains = true;
 					break;
 				}

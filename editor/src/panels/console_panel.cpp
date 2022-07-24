@@ -12,7 +12,7 @@ std::vector<std::unique_ptr<ConsolePanel::Message>> ConsolePanel::MessageBuffer 
 bool ConsolePanel::AllowScrollingToBottom = true;
 bool ConsolePanel::RequestScrollToBottom = false;
 
-ConsolePanel::ConsolePanel(Editor* editor) : EditorPanel{ICON_MDI_VIEW_LIST " Console##console", "Console", editor} {
+ConsolePanel::ConsolePanel(Editor* editor) : EditorPanel{ICON_MDI_VIEW_LIST " Console###console", "Console", editor} {
     Log::GetConsoleAppender().OnMessage().connect<&ConsolePanel::OnMessage>();
 }
 

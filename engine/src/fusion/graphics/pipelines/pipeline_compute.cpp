@@ -62,6 +62,12 @@ void PipelineCompute::createShaderProgram() {
 	shaderStageCreateInfo.module = shaderModule;
 	shaderStageCreateInfo.pName = "main";
 
+    /*const VkSpecializationMapEntry specializationMap = { 0, 0, sizeof(uint32_t) };
+    const uint32_t specializationData[] = { numMipTailLevels };
+    const VkSpecializationInfo specializationInfo = { 1, &specializationMap, sizeof(specializationData), specializationData };
+
+    shaderStageCreateInfo.pSpecializationInfo = specializationInfo;*/
+
 	shader.createReflection();
 }
 

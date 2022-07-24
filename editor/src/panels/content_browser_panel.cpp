@@ -13,7 +13,7 @@
 
 using namespace fe;
 
-ContentBrowserPanel::ContentBrowserPanel(Editor* editor) : EditorPanel{ICON_MDI_ARCHIVE " Content Browser##content", "ContentBrowser", editor} {
+ContentBrowserPanel::ContentBrowserPanel(Editor* editor) : EditorPanel{ICON_MDI_ARCHIVE " Content Browser###content", "ContentBrowser", editor} {
     root = editor->getProjectSettings().projectRoot / "assets";
 
     auto base = processDirectory(root, nullptr);

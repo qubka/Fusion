@@ -62,11 +62,6 @@ void SceneViewPanel::onImGui() {
     renderStage->setOverrideCamera(camera);
     if (!renderStage->setViewport({glm::vec2{1.0f, 1.0f}, glm::uvec2{viewportSize.x, viewportSize.y}, glm::ivec2{0, 0}})) {
         ImGuiUtils::Image((Texture2d*)renderStage->getDescriptor("scene_image"), viewportSize, true);
-    } else {
-        // If attachment rebuilding, draw rectangle instead
-        ImDrawList* drawList = ImGui::GetWindowDrawList();
-        auto& clearColor = renderStage->getAttachment("scene_image")->clearColor;
-        drawList->AddRectFilled(viewportPos, viewportPos + viewportSize, ImColor{clearColor.r, clearColor.g, clearColor.b , clearColor.a});
     }
 
     ImVec2& minBound = viewportPos;

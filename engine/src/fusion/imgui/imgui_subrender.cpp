@@ -119,10 +119,6 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
             const ImDrawList* cmdLists = drawData->CmdLists[i];
             for (const auto& cmd : cmdLists->CmdBuffer) {
                 if (auto texture = static_cast<Texture*>(cmd.TextureId)) {
-                    /*VkImageAspectFlags aspect = texture->getAspect();
-                    if (texture->getLayout() == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
-                       texture->transitionImage(commandBuffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-                    }*/
                     descriptorImageInfos[cmd.TextureId] = &texture->getDescriptor();
                 }
             }

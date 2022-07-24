@@ -6,6 +6,7 @@
 #include "fusion/skybox/atmosphere_subrender.hpp"
 #include "fusion/skybox/skybox_subrender.hpp"
 #include "fusion/models/model_subrender.hpp"
+#include "fusion/pbr/tonemap_subrender.hpp"
 
 namespace fe {
     class EditorRenderer : public Renderer {
@@ -29,6 +30,7 @@ namespace fe {
             };
             std::vector<SubpassType> renderpassSubpasses1 = {
                     {0, {0, 1}},
+                    {1, {0, 1}},
             };
 
             addRenderStage(std::make_unique<RenderStage>(renderpassAttachments1, renderpassSubpasses1));
@@ -52,6 +54,7 @@ namespace fe {
             addSubrender<GridSubrender>({0, 2});
 
             addSubrender<ModelSubrender>({1, 0});
+            addSubrender<TonemapSubrender>({1, 1});
 
             addSubrender<ImGuiSubrender>({2, 0});
         }

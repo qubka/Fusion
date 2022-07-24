@@ -23,7 +23,7 @@ namespace fe {
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Subrender*>>>
         bool has() const {
             auto it = subrenders.find(type_id<T>);
-            return it != subrenders.end() && it->second;
+            return it != subrenders.end() && !it->second.empty();
         }
 
         /**
@@ -32,9 +32,17 @@ namespace fe {
          * @return The subrender.
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Subrender*>>>
-        T* get() const {
-            if (auto it = subrenders.find(type_id<T>); it != subrenders.end() && it->second) {
-                return static_cast<T*>(it->second.get());
+       T* get() const {
+            /*if (auto it = subrenders.find(type_id<T>); it != subrenders.end() && it->second && !it->second.empty()) {
+                std::vector<T*> result;
+                result.reserve(it->second.size());
+                for (auto& system : it->second) {
+                    result.push_back(static_cast<T*>(system.get()));
+                }
+                return result;
+            }*/
+            if (auto it = subrenders.find(type_id<T>); it != subrenders.end() && !it->second.empty()) {
+                return static_cast<T*>(it->second.front().get());
             }
             throw std::runtime_error("Subrender Holder does not have requested subrender");
         }
@@ -48,22 +56,15 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Subrender*>>>
         T* add(const Pipeline::Stage& stage, std::unique_ptr<T>&& subrender) {
-            // Remove previous subrender, if it exists
-            //remove<T>();
-
             const auto& type = type_id<T>;
+            auto& storage = subrenders[type];
 
             // Insert the stage value
-            stages.insert({ stage, type });
+            stages.insert({ stage, { type, static_cast<uint32_t>(storage.size()) } });
 
-            if (auto it = subrenders.find(type); it != subrenders.end() && it->second) {
-                // Then, get the existed subrender
-                return static_cast<T*>(it->second.get());
-            } else {
-                // Then, add the subrender
-                subrenders[type] = std::move(subrender);
-                return static_cast<T*>(subrenders[type].get());
-            }
+            // Then, add the subrender
+            auto& it = storage.emplace_back(std::move(subrender));
+            return static_cast<T*>(it.get());
         }
 
         /**
@@ -94,6 +95,11 @@ namespace fe {
 
     private:
         /**
+         * Represents position in the subrenders structure, first value being the subrenderer type and second for subrenderer id in the array.
+         */
+        using SubrenderIndex = std::pair<type_index, uint32_t>;
+
+        /**
          * Iterates through all subrenders for updating stages.
          */
         void updateAll();
@@ -107,8 +113,8 @@ namespace fe {
         void renderStage(const Pipeline::Stage& stage, const CommandBuffer& commandBuffer, const Camera* overrideCamera = nullptr);
 
         /// List of all subrenders
-        std::unordered_map<type_index, std::unique_ptr<Subrender>> subrenders;
+        std::unordered_map<type_index, std::vector<std::unique_ptr<Subrender>>> subrenders;
         /// List of subrender stages
-        std::multimap<Pipeline::Stage, type_index> stages;
+        std::multimap<Pipeline::Stage, SubrenderIndex> stages;
     };
 }

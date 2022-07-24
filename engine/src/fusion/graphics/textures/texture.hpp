@@ -163,6 +163,5 @@ namespace fe {
         uint8_t components{ 0 };
         bool anisotropic{ false };
         bool mipmap{ false };
-        //bool loaded{ false };
     };
 }
