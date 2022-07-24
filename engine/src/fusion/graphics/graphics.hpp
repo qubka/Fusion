@@ -11,6 +11,7 @@
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/renderer.hpp"
 #include "fusion/graphics/vku.hpp"
+#include "fusion/utils/elapsed_time.hpp"
 
 #define MAX_FRAMES_IN_FLIGHT 2
 
@@ -52,7 +53,7 @@ namespace fe {
         const LogicalDevice& getLogicalDevice() const { return logicalDevice; }
         const VkPipelineCache& getPipelineCache() const { return pipelineCache; }
 
-        const CommandPool* getCommandPool();
+        const std::shared_ptr<CommandPool>& getCommandPool(const std::thread::id& threadId = std::this_thread::get_id());
         const Surface* getSurface(size_t id) const { return surfaces[id].get(); }
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
 
@@ -105,7 +106,8 @@ namespace fe {
 
         std::unordered_map<std::string, const Descriptor*> attachments;
 
-        std::unique_ptr<CommandPool> commandPool;
+        std::map<std::thread::id, std::shared_ptr<CommandPool>> commandPools;
+        ElapsedTime elapsedPurge; /// Timer used to remove unused command pools.
         std::unique_ptr<Renderer> renderer;
 
         std::vector<std::unique_ptr<Surface>> surfaces;

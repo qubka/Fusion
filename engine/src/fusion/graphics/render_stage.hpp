@@ -7,6 +7,17 @@
 #include "fusion/graphics/vku.hpp"
 
 namespace fe {
+
+    /**
+	 * A new attachment that represents a object in the render pipeline.
+	 * @param binding The index the attachment is bound to in the renderpass.
+	 * @param name The unique name given to the object for all renderpasses.
+	 * @param type The attachment type this represents.
+	 * @param multisampled If this attachment is multisampled.
+	 * @param format The format that will be created (only applies to type ATTACHMENT_IMAGE).
+	 * @param layout The layout that the image subresources accessible from (only applies to type ATTACHMENT_IMAGE).
+	 * @param clearColour The colour to clear to before rendering to it.
+	 */
     struct Attachment {
         enum class Type : uint8_t { Image, Depth, Swapchain };
         uint32_t binding{ 0 };
@@ -14,6 +25,7 @@ namespace fe {
         Type type{ Type:: Image };
         bool multisampled{ false };
         VkFormat format{ VK_FORMAT_R8G8B8A8_UNORM };
+        //VkImageLayout layout{ VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }; // VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
         glm::vec4 clearColor{ 0.0f, 0.0f, 0.0f, 1.0f };
     };
 
@@ -25,6 +37,8 @@ namespace fe {
     struct RenderArea {
         glm::uvec2 extent{ 0 };
         glm::ivec2 offset{ 0 };
+
+        float getAspectRatio() const { return static_cast<float>(extent.x) / static_cast<float>(extent.y); }
 
         bool operator==(const RenderArea& rhs) const {
             return extent == rhs.extent && offset == rhs.offset;
@@ -68,7 +82,7 @@ namespace fe {
         const std::vector<Attachment>& getAttachments() const { return attachments; }
         const std::vector<SubpassType>& getSubpasses() const { return subpasses; }
 
-        Viewport& getViewport() { return viewport; }
+        const Viewport& getViewport() { return viewport; }
         bool setViewport(const Viewport& port);
 
         Camera* getOverrideCamera() const { return overrideCamera.get(); }

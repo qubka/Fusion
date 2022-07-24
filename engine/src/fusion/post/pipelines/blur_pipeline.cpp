@@ -28,10 +28,10 @@ namespace fe {
             }
         }
 
-        filterBlurVertical.SetDirection({0.0f, blur});
-        filterBlurHorizontal.SetDirection({blur, 0.0f});
+        filterBlurVertical.setDirection({0.0f, blur});
+        filterBlurHorizontal.setDirection({blur, 0.0f});
 
-        filterBlurVertical.Render(commandBuffer);
-        filterBlurHorizontal.Render(commandBuffer);
+        filterBlurVertical.onRender(commandBuffer, overrideCamera);
+        filterBlurHorizontal.onRender(commandBuffer, overrideCamera);
     }
 }

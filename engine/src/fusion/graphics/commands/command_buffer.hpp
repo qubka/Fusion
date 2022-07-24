@@ -61,6 +61,8 @@ namespace fe {
     private:
         const LogicalDevice& logicalDevice;
 
+        std::shared_ptr<CommandPool> commandPool;
+
         VkQueueFlagBits queueType;
         VkCommandBuffer commandBuffer{ VK_NULL_HANDLE };
         bool running{ false };

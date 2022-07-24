@@ -21,6 +21,6 @@ void PixelFilter::onRender(const CommandBuffer& commandBuffer, const Camera* ove
     pipeline.bindPipeline(commandBuffer);
 
     descriptorSet.bindDescriptor(commandBuffer, pipeline);
-    pushScene.BindPush(commandBuffer, pipeline);
+    pushScene.bindPush(commandBuffer, pipeline);
     vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 }

@@ -5,8 +5,7 @@
 #include "fusion/grid/grid_subrender.hpp"
 #include "fusion/skybox/atmosphere_subrender.hpp"
 #include "fusion/skybox/skybox_subrender.hpp"
-#include "fusion/models/model_subrender.hpp"
-#include "fusion/pbr/tonemap_subrender.hpp"
+//#include "fusion/models/model_subrender.hpp"
 
 namespace fe {
     class EditorRenderer : public Renderer {
@@ -19,7 +18,6 @@ namespace fe {
             std::vector<SubpassType> renderpassSubpasses0 = {
                     {0, {0, 1}},
                     {1, {0, 1}},
-                    {2, {0, 1}},
             };
 
             addRenderStage(std::make_unique<RenderStage>(renderpassAttachments0, renderpassSubpasses0));
@@ -30,7 +28,6 @@ namespace fe {
             };
             std::vector<SubpassType> renderpassSubpasses1 = {
                     {0, {0, 1}},
-                    {1, {0, 1}},
             };
 
             addRenderStage(std::make_unique<RenderStage>(renderpassAttachments1, renderpassSubpasses1));
@@ -49,12 +46,11 @@ namespace fe {
     private:
         void onStart() override {
             //addSubrender<AtmosphereSubrender>({0, 0});
-            addSubrender<ModelSubrender>({0, 0});
-            addSubrender<SkyboxSubrender>({0, 1});
-            addSubrender<GridSubrender>({0, 2});
+            //addSubrender<ModelSubrender>({0, 0});
+            addSubrender<SkyboxSubrender>({0, 0});
+            addSubrender<GridSubrender>({0, 1});
 
-            addSubrender<ModelSubrender>({1, 0});
-            addSubrender<TonemapSubrender>({1, 1});
+            addSubrender<SkyboxSubrender>({1, 0});
 
             addSubrender<ImGuiSubrender>({2, 0});
         }

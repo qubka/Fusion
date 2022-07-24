@@ -23,7 +23,7 @@
 
 using namespace fe;
 
-Graphics::Graphics() {
+Graphics::Graphics() : elapsedPurge{5s} {
     /*for (auto& window : DeviceManager::Get()->getWindows()) {
         onWindowCreate(window.get(), true);
     }*/
@@ -45,8 +45,8 @@ Graphics::~Graphics() {
     glslang::FinalizeProcess();
 
     perSurfaceBuffers.clear();
+    commandPools.clear();
 
-    commandPool = nullptr;
     renderer = nullptr;
 }
 
@@ -95,6 +95,17 @@ void Graphics::onUpdate() {
         }
 
         endFrame(info);
+    }
+
+    // Purges unused command pools.
+    if (elapsedPurge.getElapsed() != 0) {
+        for (auto it = commandPools.begin(); it != commandPools.end();) {
+            if ((*it).second.use_count() <= 1) {
+                it = commandPools.erase(it);
+                continue;
+            }
+            ++it;
+        }
     }
 }
 
@@ -359,9 +370,10 @@ void Graphics::onWindowCreate(Window* window, bool create) {
     }
 }
 
-const CommandPool* Graphics::getCommandPool() {
-    if (!commandPool) commandPool = std::make_unique<CommandPool>();
-    return commandPool.get();
+const std::shared_ptr<CommandPool>& Graphics::getCommandPool(const std::thread::id& threadId) {
+    if (auto it = commandPools.find(threadId); it != commandPools.end())
+        return it->second;
+    return commandPools.emplace(threadId, std::make_shared<CommandPool>(threadId)).first->second;
 }
 
 Graphics::PerSurfaceBuffers::PerSurfaceBuffers() {

@@ -17,7 +17,7 @@ CrtFilter::CrtFilter(const Pipeline::Stage& pipelineStage, const glm::vec4& scre
 void CrtFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
     // Updates uniforms.
     pushScene.push("screenColor", screenColor);
-    pushScene.push("curveAmountX", curveAmountX * pipeline.getRenderArea().GetAspectRatio());
+    pushScene.push("curveAmountX", curveAmountX * pipeline.getRenderArea().getAspectRatio());
     pushScene.push("curveAmountY", curveAmountY);
     pushScene.push("scanLineSize", scanLineSize);
     pushScene.push("scanIntensity", scanIntensity);

@@ -8,7 +8,7 @@ namespace fe {
     public:
         Resource() = default;
         virtual ~Resource() = default;
-        NONCOPYBLE(Resource);
+        NONCOPYABLE(Resource);
 
         virtual type_index getTypeIndex() const = 0;
     };

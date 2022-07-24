@@ -4,7 +4,7 @@
 
 using namespace fe;
 
-CommandPool::CommandPool() {
+CommandPool::CommandPool(const std::thread::id& threadId) : threadId{threadId} {
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 	auto graphicsFamily = physicalDevice.getGraphicsFamily();

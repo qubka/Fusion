@@ -7,8 +7,8 @@ using namespace fe;
 
 CommandBuffer::CommandBuffer(bool begin, VkQueueFlagBits queueType, VkCommandBufferLevel bufferLevel)
         : logicalDevice{Graphics::Get()->getLogicalDevice()}
+        , commandPool{Graphics::Get()->getCommandPool()}
         , queueType{queueType} {
-    auto commandPool = Graphics::Get()->getCommandPool();
 	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	commandBufferAllocateInfo.commandPool = *commandPool;
@@ -21,7 +21,6 @@ CommandBuffer::CommandBuffer(bool begin, VkQueueFlagBits queueType, VkCommandBuf
 }
 
 CommandBuffer::~CommandBuffer() {
-    auto commandPool = Graphics::Get()->getCommandPool();
 	vkFreeCommandBuffers(logicalDevice, *commandPool, 1, &commandBuffer);
 }
 
