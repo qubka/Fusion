@@ -10,8 +10,8 @@ layout(binding = 0) uniform UniformScene {
 
 layout(binding = 1) uniform UniformObject {
 	mat4 transform;
-	vec4 baseColour;
-	vec4 fogColour;
+	vec4 baseColor;
+	vec4 fogColor;
 	vec2 fogLimits;
 	float blendFactor;
 } object;

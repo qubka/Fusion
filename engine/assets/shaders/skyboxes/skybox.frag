@@ -4,13 +4,13 @@
 
 layout(binding = 1) uniform UniformObject {
 	mat4 transform;
-	vec4 baseColour;
-	vec4 fogColour;
+	vec4 baseColor;
+	vec4 fogColor;
 	vec2 fogLimits;
 	float blendFactor;
 } object;
 
-layout(binding = 2) uniform samplerCube samplerColour;
+layout(binding = 2) uniform samplerCube samplerColor;
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inUVW;
@@ -21,14 +21,14 @@ layout(location = 2) out vec4 outNormal;
 layout(location = 3) out vec4 outMaterial;
 
 void main() {
-	vec3 cubemapColour = texture(samplerColour, inUVW).rgb;
-	vec3 colour = mix(object.baseColour.rgb, cubemapColour, object.blendFactor);
+	vec3 cubemapColor = texture(samplerColor, inUVW).rgb;
+	vec3 color = mix(object.baseColor.rgb, cubemapColor, object.blendFactor);
 
 	float fadeFactor = 1.0f - smoothstep(object.fogLimits.x, object.fogLimits.y, inPosition.y);
-	colour = mix(colour, object.fogColour.rgb, fadeFactor);
+	color = mix(color, object.fogColor.rgb, fadeFactor);
 	
 	outPosition = vec4(inPosition, 1.0f);
-	outDiffuse = vec4(colour, 1.0f);
+	outDiffuse = vec4(color, 1.0f);
 	outNormal = vec4(0.0f);
 	outMaterial = vec4(0.0f);
 }
