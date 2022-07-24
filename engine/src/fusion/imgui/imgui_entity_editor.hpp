@@ -39,12 +39,12 @@ namespace ImGui {
         };
 
     private:
-        using ComponentTypeID = ENTT_ID_TYPE;
+        using ComponentType = ENTT_ID_TYPE;
         ImGuiTextFilter componentFilter;
 
-        std::map<ComponentTypeID, ComponentInfo> componentInfos;
+        std::map<ComponentType, ComponentInfo> componentInfos;
 
-        bool entityHasComponent(Registry& registry, EntityType& entity, ComponentTypeID type) {
+        bool entityHasComponent(Registry& registry, EntityType& entity, ComponentType type) {
             const auto storage = registry.storage(type);
             return storage != registry.storage().end() && storage->second.contains(entity);
         }
@@ -78,7 +78,7 @@ namespace ImGui {
         void Render(Registry& registry, EntityType& entity) {
             if (entity != entt::null) {
                 ImGuiStyle& style = ImGui::GetStyle();
-                std::map<ComponentTypeID, ComponentInfo> hasNot;
+                std::map<ComponentType, ComponentInfo> hasNot;
                 for (auto& [component, info] : componentInfos) {
                     if (entityHasComponent(registry, entity, component)) {
                         ImGui::PushID(component);
