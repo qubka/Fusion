@@ -14,10 +14,10 @@ namespace fe {
 
         fs::path resolvePhysicalPath(const fs::path& path);
 
-        std::vector<uint8_t> readBytes(const fs::path& path);
+        void readBytes(const fs::path& path, const std::function<void(std::span<const uint8_t>)>& handler);
         std::string readText(const fs::path& path);
-        bool writeBytes(const fs::path& path, uint8_t* buffer, size_t size);
-        bool writeText(const fs::path& path, const std::string& text);
+        bool writeBytes(const fs::path& path, std::span<const uint8_t> buffer);
+        bool writeText(const fs::path& path, std::string_view text);
 
         const std::unordered_map<fs::path, fs::path>& getMounted() { return mountPoints; };
 
