@@ -32,7 +32,7 @@ namespace fe {
         auto task = std::make_shared<std::packaged_task<return_type()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
         auto result = task->get_future();
         {
-            std::unique_lock<std::mutex> lock(queueMutex);
+            std::unique_lock<std::mutex> lock{queueMutex};
 
             if (stop)
                 throw std::runtime_error("Enqueue called on a stopped ThreadPool");

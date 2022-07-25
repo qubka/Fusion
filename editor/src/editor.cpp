@@ -535,7 +535,7 @@ void Editor::drawMenuBar() {
         if (ImGui::BeginMenu("About")) {
             auto version = Engine::Get()->getVersion();
 
-            ImGui::Text("Version : %s", version.string().c_str());
+            ImGui::Text("Version : %s", version.toString().c_str());
             ImGui::Separator();
 
             if (ImGui::MenuItem(ICON_MDI_PROJECTOR_SCREEN " Screenshot")) {

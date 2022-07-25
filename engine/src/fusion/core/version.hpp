@@ -36,9 +36,9 @@ namespace fe {
         bool operator>(const Version& other)  const { return (operator uint32_t()) > (other.operator uint32_t()); }
         bool operator<(const Version& other)  const { return (operator uint32_t()) < (other.operator uint32_t()); }
 
-        std::string string() const {
+        std::string toString() const {
             std::stringstream ss;
-            ss << static_cast<long>(variant) << "." <<  static_cast<long>(major) << "." <<  static_cast<long>(minor) << "." <<  static_cast<long>(patch);
+            ss << static_cast<long>(variant) << "." << static_cast<long>(major) << "." << static_cast<long>(minor) << "." << static_cast<long>(patch);
             return ss.str();
         }
 

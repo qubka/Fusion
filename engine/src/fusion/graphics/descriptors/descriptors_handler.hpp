@@ -23,14 +23,11 @@ namespace fe {
                 return;
 
             // Finds the local value given to the descriptor name
-            auto it = descriptors.find(descriptorName);
-
-            if (it != descriptors.end()) {
+            if (auto it = descriptors.find(descriptorName); it != descriptors.end()) {
                 // If the descriptor and size have not changed then the write is not modified
                 if (it->second.descriptor == descriptor && it->second.offsetSize == offsetSize) {
                     return;
                 }
-
                 descriptors.erase(it);
             }
 

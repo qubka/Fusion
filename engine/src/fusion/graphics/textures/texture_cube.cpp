@@ -123,13 +123,13 @@ void TextureCube::load() {
     if (arrayLayers != 6)
         throw std::runtime_error("Invalid amount of layers");
 
-    CommandBuffer commandBuffer{true};
 
     CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
     CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
     CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
-    TransitionImageLayout(commandBuffer, image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
 
+    CommandBuffer commandBuffer{true};
+    TransitionImageLayout(commandBuffer, image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
     Buffer bufferStaging{texCube.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, texCube.data()};
 
     // Setup buffer copy regions for each layer including all of it's miplevels

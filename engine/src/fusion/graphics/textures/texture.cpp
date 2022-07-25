@@ -91,30 +91,6 @@ Texture::Texture(const std::unique_ptr<Bitmap>& bitmap, VkFilter filter, VkSampl
     updateDescriptor();
 }
 
-/*void Texture::transitionImage(const CommandBuffer& commandBuffer, VkImageLayout newLayout) {
-    if (newLayout != layout) {
-        TransitionImageLayout(commandBuffer, image, format, layout, newLayout, aspect, mipLevels, 0, arrayLayers, 0);
-        Image::InsertImageMemoryBarrier(
-                commandBuffer,
-                image,
-                VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-                VK_ACCESS_SHADER_READ_BIT,
-                VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                aspect,
-                mipLevels,
-                0,
-                arrayLayers,
-                0);
-        VkImageLayout oldLayout = layout;
-        layout = newLayout;
-        updateDescriptor();
-        layout = oldLayout;
-    }
-}*/
-
 WriteDescriptorSet Texture::getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const {
     VkWriteDescriptorSet descriptorWrite = {};
     descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

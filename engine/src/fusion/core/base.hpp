@@ -34,6 +34,12 @@
                          [[nodiscard]] std::vector<t>::const_reverse_iterator rbegin() const { return o.rbegin(); } \
                          [[nodiscard]] std::vector<t>::const_reverse_iterator rend() const { return o.rend(); } \
 
+#include <uuid.h>
+
+namespace fe {
+    static uuids::uuid_random_generator uuid_random_generator{ Random::engine() };
+}
+
 namespace fe {
     using type_index = uint32_t;
     /// https://mikejsavage.co.uk/blog/cpp-tricks-type-id.html

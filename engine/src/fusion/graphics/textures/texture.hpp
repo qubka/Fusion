@@ -2,7 +2,9 @@
 
 #include "image.hpp"
 
-#include "fusion/resources/resource.hpp"
+#include "fusion/assets/asset.hpp"
+
+#include <cereal/cereal.hpp>
 
 namespace fe {
     /**
@@ -33,7 +35,7 @@ namespace fe {
         Transmission = 21,
     };
 
-    class Texture : public Image, public Resource {
+    class Texture : public Image, public Asset {
     public:
         /**
          * Creates a new image.
@@ -154,9 +156,27 @@ namespace fe {
             descriptor.imageLayout = layout;
         }
 
+        /*std::string toString() const override {
+            std::stringstream ss;
+            ss << path << me::enum_name(type) << mipLevels << arrayLayers << components << anisotropic << mipmap;
+            return ss.str();
+        }*/
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("Path", path),
+                    cereal::make_nvp("Type", type),
+                    cereal::make_nvp("Mip Levels", mipLevels),
+                    cereal::make_nvp("Array Layers", arrayLayers),
+                    cereal::make_nvp("Components", components),
+                    cereal::make_nvp("Anisotropic", anisotropic),
+                    cereal::make_nvp("Mipmap", mipmap));
+        }
+
     protected:
-        fs::path path;
         VkDescriptorImageInfo descriptor = {};
+
+        fs::path path;
         TextureType type{ TextureType::None };
         uint32_t mipLevels{ 0 };
         uint32_t arrayLayers{ 0 };

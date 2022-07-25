@@ -16,9 +16,9 @@ namespace fe {
             UV,
             Tangent,
             Bitangent,
-            /** Layout only */
             Position2,
             RGBA,
+            /** Layout only */
             DummyFloat,
             DummyInt,
             DummyUint,
@@ -35,7 +35,11 @@ namespace fe {
          */
         class Layout {
         public:
-            Layout(std::vector<Component> components, uint32_t binding = 0) : components{std::move(components)}, binding{binding} {}
+            Layout(std::vector<Component> components, uint32_t binding = 0) : components{std::move(components)}, binding{binding} {
+                for (const auto& component : this->components) {
+                    stride += ComponentSize(component);
+                }
+            }
             ~Layout() = default;
 
             Component operator[](uint32_t index) const { return components[index]; }
@@ -43,14 +47,7 @@ namespace fe {
 
             uint32_t getSize() const { return components.size(); }
             uint32_t getBinding() const { return binding; }
-
-            uint32_t getStride() const {
-                uint32_t res = 0;
-                for (const auto& component : components) {
-                    res += ComponentSize(component);
-                }
-                return res;
-            }
+            uint32_t getStride() const { return stride; }
 
             uint32_t getOffset(uint32_t index) const {
                 uint32_t res = 0;
@@ -67,6 +64,7 @@ namespace fe {
 
         private:
             uint32_t binding{ 0 };
+            uint32_t stride{ 0 };
             /** @brief Components used to generate vertices from */
             std::vector<Component> components;
         };
@@ -102,6 +100,7 @@ namespace fe {
 
                 auto componentsSize = vertexLayout.getSize();
                 attributeDescriptions.reserve(attributeDescriptions.size() + componentsSize);
+
                 auto attributeIndexOffset = static_cast<uint32_t>(attributeDescriptions.size());
 
                 for (uint32_t i = 0; i < componentsSize; ++i) {

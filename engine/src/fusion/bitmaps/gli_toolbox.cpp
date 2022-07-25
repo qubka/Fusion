@@ -2,7 +2,7 @@
 
 #include "fusion/filesystem/file_system.hpp"
 
-#include <gli/gli/gli.hpp>
+#include <gli/gli.hpp>
 
 using namespace fe;
 

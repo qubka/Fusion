@@ -1,6 +1,4 @@
 #include "engine.hpp"
-
-#include <utility>
 #include "module.hpp"
 #include "time.hpp"
 
@@ -9,8 +7,9 @@
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
+#include "fusion/assets/asset_manager.hpp"
 #include "fusion/input/input.hpp"
-#include "fusion/utils/string.hpp"
+
 #include "fusion/bitmaps/gli_toolbox.hpp"
 #include "fusion/bitmaps/stb_toolbox.hpp"
 
@@ -25,7 +24,7 @@ Engine::Engine(CommandLineArgs args)
 
     Log::Init();
 
-    LOG_INFO << "Version: " << version.string();
+    LOG_INFO << "Version: " << version.toString();
     LOG_INFO << "Git: [" << GIT_COMMIT_HASH << "]:(" << GIT_TAG << ") - " << GIT_COMMIT_SUBJECT << " on " << GIT_BRANCH << " at " << GIT_COMMIT_DATE;
     LOG_INFO << "Compiled on: " << FUSION_COMPILED_SYSTEM << " from: " << FUSION_COMPILED_GENERATOR << " with: " << FUSION_COMPILED_COMPILER;
 
@@ -45,6 +44,7 @@ void Engine::init() {
     VirtualFileSystem::Register("VirtualFileSystem", Module::Stage::Never);
     Input::Register("Input", Module::Stage::Normal);
     SceneManager::Register("SceneManager", Module::Stage::Normal);
+    AssetManager::Register("AssetManager", Module::Stage::Post);
     Graphics::Register("Graphics", Module::Stage::Render);
 
     StbToolbox::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");

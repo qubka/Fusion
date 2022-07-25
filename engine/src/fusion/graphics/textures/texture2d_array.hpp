@@ -58,7 +58,8 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        explicit Texture2dArray(const std::unique_ptr<Bitmap>& bitmap, uint32_t arrayLayers,
+        explicit Texture2dArray(const std::unique_ptr<Bitmap>& bitmap,
+                                uint32_t arrayLayers,
                                 VkFormat format = VK_FORMAT_R8G8B8A8_UNORM,
                                 VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                                 VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
@@ -75,6 +76,7 @@ namespace fe {
         void setPixels(const float* pixels, uint32_t arrayLayer);
 
         type_index getTypeIndex() const override { return type_id<Texture2dArray>; }
+
 
         void load();
     };

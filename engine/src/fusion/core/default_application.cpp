@@ -24,7 +24,7 @@ DefaultApplication::DefaultApplication(std::string name) : Application{std::move
     LOG_INFO << "Working directory: \"" << executablePath << "\"";
     fs::current_path(executablePath);
 
-    projectSettings.projectVersion = getVersion().string();
+    projectSettings.projectVersion = getVersion().toString();
 }
 
 DefaultApplication::~DefaultApplication() {
@@ -80,7 +80,7 @@ void DefaultApplication::openNewProject(const fs::path& path, std::string_view n
     }
 
     // Set Default values
-    projectSettings.projectVersion = getVersion().string();
+    projectSettings.projectVersion = getVersion().toString();
     projectSettings.title = name;
     if (auto window = DeviceManager::Get()->getWindow(0)) {
         window->setTitle(name);
@@ -187,7 +187,7 @@ void DefaultApplication::deserialise() {
     }
     catch (...) {
         projectSettings = {};
-        projectSettings.projectVersion = getVersion().string();
+        projectSettings.projectVersion = getVersion().toString();
 
         SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
 

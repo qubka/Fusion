@@ -1,13 +1,10 @@
 #pragma once
 
 #include <cereal/cereal.hpp>
-#include <uuid.h>
 
 namespace fe {
     struct IdComponent {
-        uuids::uuid uuid;
-
-        IdComponent();
+        uuids::uuid uuid{ uuid_random_generator() };
 
         template<typename Archive>
         void save(Archive& archive) const {

@@ -150,6 +150,15 @@ endif()
 list(APPEND ALL_SYSTEM_LIBS freetype)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
+# random
+#╒◖═════════════════════════════════════════════════════════════════════◗╕
+#find_package(random 0.0.0 QUIET)
+if(NOT random_FOUND)
+    add_subdirectory(random)
+endif()
+list(APPEND ALL_SYSTEM_LIBS effolkronium_random)
+#╘◖═════════════════════════════════════════════════════════════════════◗╛
+
 # glslang
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 ##find_package(glslang 11.6.0 QUIET)
