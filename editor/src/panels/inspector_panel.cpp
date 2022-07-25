@@ -80,7 +80,7 @@ namespace ImGui {
     editor->getComponentIcon(type_id<ComponentType>, name);    \
     name += "\t";                                              \
     name += (ComponentName);                                   \
-    enttEditor.registerComponent<ComponentType>(name.c_str()); \
+    enttEditor.registerComponent<ComponentType>(name); \
 }
 
 InspectorPanel::InspectorPanel(Editor* editor) : EditorPanel(ICON_MDI_INFORMATION " Inspector###inspector", "Inspector", editor) {

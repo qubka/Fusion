@@ -119,7 +119,7 @@ namespace vku {
         }
     }
 
-    inline void CheckVk(const std::string& filename, uint32_t line, VkResult result) {
+    inline void CheckVk(std::string_view filename, uint32_t line, VkResult result) {
         if (result != VK_SUCCESS) {
             auto failure = StringifyResultVk(result);
             LOG_ERROR << "Vulkan error (\"" << filename << "\": " << line << ") - " << failure;

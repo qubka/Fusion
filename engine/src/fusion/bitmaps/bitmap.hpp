@@ -18,6 +18,7 @@ namespace fe {
         void write(const fs::path& filepath) const;
 
         operator bool() const { return data.operator bool(); }
+        operator std::span<const uint8_t>() const { return { getData<uint8_t>(), getLength() }; }
 
         int getWidth() const { return static_cast<int>(size.x); }
         int getHeight() const { return static_cast<int>(size.y); }
@@ -43,8 +44,6 @@ namespace fe {
         glm::uvec2 size{ 0 };
         uint8_t components{ 4 };
         bool hdr{ false };
-
-        void* native;
 
     private:
         static size_t CalculateLength(const glm::uvec2& size, uint8_t components = 4, bool hdr = false);

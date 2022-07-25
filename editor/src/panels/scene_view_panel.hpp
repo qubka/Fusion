@@ -23,7 +23,7 @@ namespace fe {
         void drawToolBar();
 
         template<typename T>
-        void drawComponentGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset, const std::string& text) {
+        void drawComponentGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset, std::string_view text) {
             if (showComponentGizmosMap[type_id<T>]) {
                 auto group = registry.group<T>(entt::get<TransformComponent>);
                 for (auto entity : group) {

@@ -11,16 +11,16 @@ using namespace fe;
 
 std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> UTF8_TO_UTF16_CONVERTER;
 
-std::string String::ConvertUtf8(const std::wstring& string) {
-    return UTF8_TO_UTF16_CONVERTER.to_bytes(string.data(), string.data() + string.length());
+std::string String::ConvertUtf8(std::wstring_view str) {
+    return UTF8_TO_UTF16_CONVERTER.to_bytes(str.data(), str.data() + str.length());
 }
 
 char String::ConvertUtf8(wchar_t c) {
     return UTF8_TO_UTF16_CONVERTER.to_bytes(c)[0];
 }
 
-std::wstring String::ConvertUtf16(const std::string& string) {
-    return UTF8_TO_UTF16_CONVERTER.from_bytes(string.data(), string.data() + string.length());
+std::wstring String::ConvertUtf16(std::string_view str) {
+    return UTF8_TO_UTF16_CONVERTER.from_bytes(str.data(), str.data() + str.length());
 }
 
 wchar_t String::ConvertUtf16(char c) {
@@ -45,25 +45,25 @@ std::vector<std::string> String::Split(const std::string& str, char sep) {
     return tokens;
 }
 
-std::string String::Join(const std::vector<std::string>& strings, const std::string& separator) {
+std::string String::Join(std::span<const std::string> strings, std::string_view separator) {
     switch (strings.size()) {
         case 0: return {};
         case 1: return strings.front();
         default:
             std::ostringstream os;
-            std::copy(strings.begin(), strings.end() - 1, std::ostream_iterator<std::string>(os, separator.c_str()));
+            std::copy(strings.begin(), strings.end() - 1, std::ostream_iterator<std::string>(os, separator.data()));
             os << *strings.rbegin();
             return os.str();
     }
 }
 
-bool String::StartsWith(const std::string& str, const std::string& token) {
+bool String::StartsWith(std::string_view str, std::string_view token) {
     if (str.length() < token.length())
         return false;
     return str.compare(0, token.length(), token) == 0;
 }
 
-bool String::Contains(const std::string& str, const std::string& token) noexcept {
+bool String::Contains(std::string_view str, std::string_view token) noexcept {
     return str.find(token) != std::string::npos;
 }
 
@@ -71,18 +71,18 @@ bool String::IsWhitespace(char c) noexcept {
     return c == ' ' || c == '\n' || c == '\r' || c == '\t';
 }
 
-bool String::IsNumber(const std::string& str) noexcept {
+bool String::IsNumber(std::string_view str) noexcept {
     return std::all_of(str.cbegin(), str.cend(), [](auto c) {
         return (c >= '0' && c <= '9') || c == '.' || c == '-';
     });
 }
 
-size_t String::FindCharPos(const std::string& str, char c) noexcept {
+size_t String::FindCharPos(std::string_view str, char c) noexcept {
     auto res = str.find(c);
     return res == std::string::npos ? -1 : res;
 }
 
-std::string String::Trim(const std::string& str, const std::string& whitespace) {
+std::string_view String::Trim(std::string_view str, std::string_view whitespace) {
     auto strBegin = str.find_first_not_of(whitespace);
     if (strBegin == std::string::npos)
         return "";
@@ -92,7 +92,7 @@ std::string String::Trim(const std::string& str, const std::string& whitespace) 
     return str.substr(strBegin, strRange);
 }
 
-std::string String::Extract(const std::string& str, const std::string& start, const std::string& stop) {
+std::string_view String::Extract(std::string_view str, std::string_view start, std::string_view stop) {
     auto strBegin = str.find(start);
     if (strBegin != std::string::npos)
         strBegin += start.length();
@@ -122,7 +122,7 @@ std::string String::RemoveLast(std::string str, char token) {
     return str;
 }
 
-std::string String::ReplaceAll(std::string str, const std::string& token, const std::string& to) {
+std::string String::ReplaceAll(std::string str, std::string_view token, std::string_view to) {
     auto pos = str.find(token);
     while (pos != std::string::npos) {
         str.replace(pos, token.length(), to);
@@ -132,7 +132,7 @@ std::string String::ReplaceAll(std::string str, const std::string& token, const 
     return str;
 }
 
-std::string String::ReplaceFirst(std::string str, const std::string& token, const std::string& to) {
+std::string String::ReplaceFirst(std::string str, std::string_view token, std::string_view to) {
     const auto startPos = str.find(token);
     if (startPos == std::string::npos)
         return str;

@@ -41,7 +41,9 @@ void Model::processNode(const aiScene* scene, const aiNode* node) {
 
 void Model::processMesh(const aiScene* scene, const aiMesh* mesh) {
     std::vector<uint8_t> vertices;
+    vertices.reserve(mesh->mNumVertices);
     std::vector<uint32_t> indices;
+    indices.reserve(mesh->mNumFaces * 3);
     std::vector<std::shared_ptr<Texture2d>> textures;
 
     for (uint32_t i = 0; i < mesh->mNumVertices; i++) {
@@ -83,7 +85,7 @@ void Model::processMesh(const aiScene* scene, const aiMesh* mesh) {
         }*/
     }
 
-    meshes.push_back(std::make_unique<Mesh>(std::move(vertices), std::move(indices)/*, std::move(textures)*/));
+    meshes.push_back(std::make_unique<Mesh>(vertices, indices/*, std::move(textures)*/));
 }
 
 std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* material, int type) {

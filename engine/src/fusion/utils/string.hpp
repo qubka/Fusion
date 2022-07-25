@@ -16,7 +16,7 @@ namespace fe {
          * @param str The string to convert.
          * @return The converted string.
          */
-        static std::string ConvertUtf8(const std::wstring& str);
+        static std::string ConvertUtf8(std::wstring_view str);
 
         /**
          * Converts a CTF16 (wide) char to a UTF8 char.
@@ -30,7 +30,7 @@ namespace fe {
          * @param str The string.
          * @return The converted string.
          */
-        static std::wstring ConvertUtf16(const std::string& str);
+        static std::wstring ConvertUtf16(std::string_view str);
 
         /**
          * Converts a CTF8 char to a UTF16 (wide) char.
@@ -61,7 +61,7 @@ namespace fe {
          * @return A string that consists of the elements of values delimited by the separator string.
          * @link https://programming-idioms.org/idiom/53/join-a-list-of-strings/1552/cpp
          */
-        static std::string Join(const std::vector<std::string>& strings, const std::string& separator);
+        static std::string Join(std::span<const std::string> strings, std::string_view separator);
 
         /**
          * Gets if a string starts with a token.
@@ -69,7 +69,7 @@ namespace fe {
          * @param token The token.
          * @return If a string starts with the token.
          */
-        static bool StartsWith(const std::string& str, const std::string& token);
+        static bool StartsWith(std::string_view str, std::string_view token);
 
         /**
          * Gets if a string contains a token.
@@ -77,7 +77,7 @@ namespace fe {
          * @param token The token.
          * @return If a string contains the token.
          */
-        static bool Contains(const std::string& str, const std::string& token) noexcept;
+        static bool Contains(std::string_view str, std::string_view token) noexcept;
 
         /**
          * Gets if a character is a whitespace.
@@ -91,7 +91,7 @@ namespace fe {
          * @param str The string.
          * @return If a string is a number.
          */
-        static bool IsNumber(const std::string& str) noexcept;
+        static bool IsNumber(std::string_view str) noexcept;
 
         /**
          * Gets the first char index in the string.
@@ -99,7 +99,7 @@ namespace fe {
          * @param c The char to look for.
          * @return The char index.
          */
-        static size_t FindCharPos(const std::string& str, char c) noexcept;
+        static size_t FindCharPos(std::string_view str, char c) noexcept;
 
         /**
          * Trims the left and right side of a string of whitespace.
@@ -107,7 +107,7 @@ namespace fe {
          * @param whitespace The whitespace type.
          * @return The trimmed string.
          */
-        static std::string Trim(const std::string& str, const std::string& whitespace = " \t\n\r");
+        static std::string_view Trim(std::string_view str, std::string_view whitespace = " \t\n\r");
 
         /**
          * Extract string between the left and right side of a string of delimiter.
@@ -116,7 +116,7 @@ namespace fe {
          * @param stop The stop delimiter.
          * @return The extracted string.
          */
-        static std::string Extract(const std::string& str, const std::string& start, const std::string& stop);
+        static std::string_view Extract(std::string_view str, std::string_view start, std::string_view stop);
 
         /**
          * Removes all tokens from a string.
@@ -141,7 +141,7 @@ namespace fe {
          * @param to The string to replace the tokens with.
          * @return The string with the tokens replaced.
          */
-        static std::string ReplaceAll(std::string str, const std::string& token, const std::string& to);
+        static std::string ReplaceAll(std::string str, std::string_view token, std::string_view to);
 
         /**
          * Replaces the first token from a string.
@@ -150,7 +150,7 @@ namespace fe {
          * @param to The string to replace the tokens with.
          * @return The string with the tokens replaced.
          */
-        static std::string ReplaceFirst(std::string str, const std::string& token, const std::string& to);
+        static std::string ReplaceFirst(std::string str, std::string_view token, std::string_view to);
 
         /**
          * Fixes all tokens return line tokens from a string.

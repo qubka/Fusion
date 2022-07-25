@@ -80,7 +80,7 @@ namespace fe {
          * @tparam format The format to put the time into.
          * @return The date time as a string.
          */
-        static std::string Get(const std::string& format = "%Y-%m-%d %H:%M:%S") {
+        static std::string Get(std::string_view format = "%Y-%m-%d %H:%M:%S") {
             auto now = std::chrono::system_clock::now();
             auto timeT = std::chrono::system_clock::to_time_t(now);
             std::stringstream ss;

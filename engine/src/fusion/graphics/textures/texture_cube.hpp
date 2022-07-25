@@ -83,6 +83,8 @@ namespace fe {
          */
         void setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer);
 
+        type_index getTypeIndex() const override { return type_id<TextureCube>; }
+
         void load();
     };
 }

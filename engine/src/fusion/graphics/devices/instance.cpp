@@ -239,7 +239,7 @@ void Instance::createDebugMessenger() {
 #endif
 }
 
-void Instance::LogVulkanLayers(const std::vector<VkLayerProperties>& layerProperties) {
+void Instance::LogVulkanLayers(std::span<const VkLayerProperties> layerProperties) {
 	std::stringstream ss;
 	
 	ss << "Instance Layers: ";

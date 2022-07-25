@@ -21,7 +21,7 @@ namespace fe {
          * Sets the application's name, for driver support.
          * @param name The application's name.
          */
-        void setName(const std::string& str) { name = str; }
+        void setName(std::string_view str) { name = str; }
 
         /**
          * Gets the application's version.

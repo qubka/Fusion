@@ -12,19 +12,19 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         const glm::vec4& getScreenColor() const { return screenColor; }
-        void setScreenColor(const glm::vec4& screenColor) { this->screenColor = screenColor; }
+        void setScreenColor(const glm::vec4& value) { screenColor = value; }
 
         float getCurveAmountX() const { return curveAmountX; }
-        void setCurveAmountX(float curveAmountX) { this->curveAmountX = curveAmountX; }
+        void setCurveAmountX(float value) { curveAmountX = value; }
 
         float getCurveAmountY() const { return curveAmountY; }
-        void setCurveAmountY(float curveAmountY) { this->curveAmountY = curveAmountY; }
+        void setCurveAmountY(float value) { curveAmountY = value; }
 
         float hetScanLineSize() const { return scanLineSize; }
-        void setScanLineSize(float scanLineSize) { this->scanLineSize = scanLineSize; }
+        void setScanLineSize(float value) { scanLineSize = value; }
 
         float hetScanIntensity() const { return scanIntensity; }
-        void setScanIntensity(float scanIntensity) { this->scanIntensity = scanIntensity; }
+        void setScanIntensity(float value) { scanIntensity = value; }
 
     private:
         PushHandler pushScene;

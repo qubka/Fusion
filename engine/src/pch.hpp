@@ -34,6 +34,13 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
+#if LIBUUID_CPP20_OR_GREATER
+#include <span>
+#else
+#define TCB_SPAN_NAMESPACE_NAME std
+#include <tcb/span.hpp>
+#endif
+
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtc/matrix_transform.hpp>

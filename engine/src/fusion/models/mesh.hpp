@@ -14,7 +14,7 @@ namespace fe {
             setVertices(vertices);
         }
         template<typename V, typename I, typename = std::enable_if_t<std::is_integral_v<I>>>
-        explicit Mesh(const std::vector<V>& vertices, const std::vector<I>& indices = {}) {
+        explicit Mesh(const std::vector<V>& vertices, const std::vector<I>& indices) {
             setVertices(vertices);
             setIndices(indices);
         }

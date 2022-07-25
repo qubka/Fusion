@@ -168,10 +168,10 @@ void Window::setPosition(const glm::ivec2& pos) {
     glfwSetWindowPos(window, position.x, position.y);
 }
 
-void Window::setTitle(const std::string& str) {
+void Window::setTitle(std::string_view str) {
     title = str;
     glfwSetWindowTitle(window, title.c_str());
-    onTitleChange.publish(str);
+    onTitleChange.publish(title);
 }
 
 void Window::setCursorHidden(bool hidden) {
@@ -189,7 +189,7 @@ void Window::setCursor(const fe::Cursor* cursor) {
     glfwSetCursor(window, cursor ? static_cast<GLFWcursor*>(cursor->getNativeCursor()) : nullptr);
 }
 
-void Window::setIcons(const std::vector<fs::path>& filepaths) {
+void Window::setIcons(std::span<const fs::path> filepaths) {
     std::vector<std::unique_ptr<fe::Bitmap>> bitmaps;
     bitmaps.reserve(filepaths.size());
 
@@ -444,14 +444,7 @@ namespace glfw {
 
         LOG_VERBOSE << "FileDropEvent: " << count;
 
-        std::vector<fs::path> result;
-        result.reserve(count);
-
-        for (int i = 0; i < count; ++i) {
-            result.emplace_back(paths[i]);
-        }
-
-        window.onFileDrop.publish(result);
+        window.onFileDrop.publish({ paths, static_cast<size_t>(count) });
     }
     #endif
 

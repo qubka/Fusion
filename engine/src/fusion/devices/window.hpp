@@ -182,7 +182,7 @@ namespace fe {
          * Sets the window title.
          * @param size The new size in pixels.
          */
-        virtual void setTitle(const std::string& str) = 0;
+        virtual void setTitle(std::string_view str) = 0;
 
         /**
          * Gets the contents of the clipboard as a string.
@@ -192,9 +192,9 @@ namespace fe {
 
         /**
          * Sets the clipboard to the specified string.
-         * @param string The string to set as the clipboard.
+         * @param str The content to set as the clipboard.
          */
-        virtual void setClipboard(const char* string) = 0;
+        virtual void setClipboard(std::string_view str) = 0;
 
         /**
          * Gets if the window is selected.
@@ -224,7 +224,7 @@ namespace fe {
          * Sets window icon images.
          * @param filepaths The new icon files.
          */
-        virtual void setIcons(const std::vector<fs::path>& filepaths) = 0;
+        virtual void setIcons(std::span<const fs::path> filepaths) = 0;
 
         /**
          * Gets the current state of a key.
@@ -511,7 +511,7 @@ namespace fe {
         entt::sigh<void(Key)> onKeyRelease{};
         entt::sigh<void(Key)> onKeyHold{};
         entt::sigh<void(uint32_t)> onCharInput{};
-        entt::sigh<void(const std::vector<fs::path> &)> onFileDrop{};
+        entt::sigh<void(std::span<const char*>)> onFileDrop{};
         entt::sigh<void(const glm::vec2 &)> onContentScale{};
         entt::sigh<void(bool)> onMaximize{};
     };

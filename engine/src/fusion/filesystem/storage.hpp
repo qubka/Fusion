@@ -14,12 +14,14 @@ namespace fe {
         Storage() = default;
         virtual ~Storage() = default;
 
-        virtual const uint8_t* getData() const = 0;
-        virtual size_t getSize() const = 0;
+        operator bool() const { return data(); }
+        operator std::span<const uint8_t>() const { return { data(), size() }; }
+
+        virtual const uint8_t* data() const = 0;
+        virtual size_t size() const = 0;
         virtual bool isFast() const = 0;
 
-        static StoragePointer create(size_t size, uint8_t* data);
-        static StoragePointer readFile(const fs::path& filename);
-        StoragePointer createView(size_t size = 0, size_t offset = 0) const;
+        static StoragePointer Create(std::span<const uint8_t> buffer);
+        static StoragePointer ReadFile(const fs::path& filename);
     };
 }

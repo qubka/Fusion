@@ -60,17 +60,18 @@ void DefaultApplication::onStart() {
     // Sets icons to window
     fs::path iconPath{ executablePath / "engine" / "assets" / "icons" };
     vfs->mount("EngineIcons", iconPath);
-    window->setIcons({
+    std::vector<fs::path> iconPaths {
         iconPath / "icon-16.png", iconPath / "icon-24.png", iconPath / "icon-32.png",
         iconPath / "icon-48.png", iconPath / "icon-64.png", iconPath / "icon-96.png",
         iconPath / "icon-128.png", iconPath / "icon-192.png", iconPath / "icon-256.png"
-    });
+    };
+    window->setIcons(iconPaths);
 
     // Win32 : Sets up a console window and redirects standard output to it
     showConsole();
 }
 
-void DefaultApplication::openNewProject(const fs::path& path, const std::string& name) {
+void DefaultApplication::openNewProject(const fs::path& path, std::string_view name) {
     projectSettings.projectRoot = path / name;
     projectSettings.projectName = name;
 

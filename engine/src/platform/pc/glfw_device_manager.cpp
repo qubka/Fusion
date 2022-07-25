@@ -105,8 +105,8 @@ bool DeviceManager::isRawMouseMotionSupported() const {
     return glfwRawMouseMotionSupported() == GLFW_TRUE;
 }
 
-void DeviceManager::updateGamepadMappings(const std::string& mappings) {
-    glfwUpdateGamepadMappings(mappings.c_str());
+void DeviceManager::updateGamepadMappings(std::string_view mappings) {
+    glfwUpdateGamepadMappings(mappings.data());
 }
 
 fe::Window* DeviceManager::createWindow(const fe::WindowInfo& windowInfo) {

@@ -11,7 +11,7 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         float getWobbleSpeed() const { return wobbleSpeed; }
-        void setWobbleSpeed(float speed) { wobbleSpeed = speed; }
+        void setWobbleSpeed(float value) { wobbleSpeed = value; }
 
     private:
         PushHandler pushScene;

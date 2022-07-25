@@ -61,7 +61,7 @@ namespace fe {
         * The parser supports the full format of the gamecontrollerdb.txt source file including empty lines and comments.
         * @param mappings The string containing the gamepad mappings.
         */
-        virtual void updateGamepadMappings(const std::string& mappings) = 0;
+        virtual void updateGamepadMappings(std::string_view mappings) = 0;
 
         virtual Window* createWindow(const WindowInfo& windowInfo) = 0;
         void destroyWindow(const Window* window) {

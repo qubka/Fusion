@@ -28,7 +28,7 @@ DebugMarker::DebugMarker() : logicalDevice{Graphics::Get()->getLogicalDevice()} 
     }
 }
 
-void DebugMarker::setObjectName(uint64_t object, VkDebugReportObjectTypeEXT objectType, const std::string& name) {
+void DebugMarker::setObjectName(uint64_t object, VkDebugReportObjectTypeEXT objectType, std::string_view name) {
     // Check for valid function pointer (may not be present if not running in a debugging application)
     if (pfnDebugMarkerSetObjectName) {
         VkDebugMarkerObjectNameInfoEXT nameInfo = {};
@@ -54,24 +54,24 @@ void DebugMarker::setObjectTag(uint64_t object, VkDebugReportObjectTypeEXT objec
     }
 }
 
-void DebugMarker::beginRegion(VkCommandBuffer commandBuffer, const std::string& markerName, const glm::vec4& color) {
+void DebugMarker::beginRegion(VkCommandBuffer commandBuffer, std::string_view markerName, const glm::vec4& color) {
     // Check for valid function pointer (may not be present if not running in a debugging application)
     if (pfnCmdDebugMarkerBegin) {
         VkDebugMarkerMarkerInfoEXT markerInfo = {};
         markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
         std::memcpy(markerInfo.color, glm::value_ptr(color), sizeof(glm::vec4));
-        markerInfo.pMarkerName = markerName.c_str();
+        markerInfo.pMarkerName = markerName.data();
         pfnCmdDebugMarkerBegin(commandBuffer, &markerInfo);
     }
 }
 
-void DebugMarker::insert(VkCommandBuffer commandBuffer, const std::string& markerName, const glm::vec4& color) {
+void DebugMarker::insert(VkCommandBuffer commandBuffer, std::string_view markerName, const glm::vec4& color) {
     // Check for valid function pointer (may not be present if not running in a debugging application)
     if (pfnCmdDebugMarkerInsert) {
         VkDebugMarkerMarkerInfoEXT markerInfo = {};
         markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
         std::memcpy(markerInfo.color, glm::value_ptr(color), sizeof(glm::vec4));
-        markerInfo.pMarkerName = markerName.c_str();
+        markerInfo.pMarkerName = markerName.data();
         pfnCmdDebugMarkerInsert(commandBuffer, &markerInfo);
     }
 }
@@ -83,66 +83,66 @@ void DebugMarker::endRegion(VkCommandBuffer commandBuffer) {
     }
 }
 
-void DebugMarker::setCommandBufferName(VkCommandBuffer commandBuffer, const std::string& name) {
+void DebugMarker::setCommandBufferName(VkCommandBuffer commandBuffer, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(commandBuffer), VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, name);
 }
 
-void DebugMarker::setQueueName(VkQueue queue, const std::string& name) {
+void DebugMarker::setQueueName(VkQueue queue, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(queue), VK_DEBUG_REPORT_OBJECT_TYPE_QUEUE_EXT, name);
 }
 
-void DebugMarker::setImageName(VkImage image, const std::string& name) {
+void DebugMarker::setImageName(VkImage image, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(image), VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, name);
 }
 
-void DebugMarker::setSamplerName(VkSampler sampler, const std::string& name) {
+void DebugMarker::setSamplerName(VkSampler sampler, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(sampler), VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, name);
 }
 
-void DebugMarker::setBufferName(VkBuffer buffer, const std::string& name) {
+void DebugMarker::setBufferName(VkBuffer buffer, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(buffer), VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, name);
 }
 
-void DebugMarker::setDeviceMemoryName(VkDeviceMemory memory, const std::string& name) {
+void DebugMarker::setDeviceMemoryName(VkDeviceMemory memory, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(memory), VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_MEMORY_EXT, name);
 }
 
-void DebugMarker::setShaderModuleName(VkShaderModule shaderModule, const std::string& name) {
+void DebugMarker::setShaderModuleName(VkShaderModule shaderModule, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(shaderModule), VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, name);
 }
 
-void DebugMarker::setPipelineName(VkPipeline pipeline, const std::string& name) {
+void DebugMarker::setPipelineName(VkPipeline pipeline, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(pipeline), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, name);
 }
 
-void DebugMarker::setPipelineLayoutName(VkPipelineLayout pipelineLayout, const std::string& name) {
+void DebugMarker::setPipelineLayoutName(VkPipelineLayout pipelineLayout, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(pipelineLayout), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_LAYOUT_EXT, name);
 }
 
-void DebugMarker::setRenderPassName(VkRenderPass renderPass, const std::string& name) {
+void DebugMarker::setRenderPassName(VkRenderPass renderPass, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(renderPass), VK_DEBUG_REPORT_OBJECT_TYPE_RENDER_PASS_EXT, name);
 }
 
-void DebugMarker::setFramebufferName(VkFramebuffer framebuffer, const std::string& name) {
+void DebugMarker::setFramebufferName(VkFramebuffer framebuffer, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(framebuffer), VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT, name);
 }
 
-void DebugMarker::setDescriptorSetLayoutName(VkDescriptorSetLayout descriptorSetLayout, const std::string& name) {
+void DebugMarker::setDescriptorSetLayoutName(VkDescriptorSetLayout descriptorSetLayout, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(descriptorSetLayout), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT_EXT, name);
 }
 
-void DebugMarker::setDescriptorSetName(VkDescriptorSet descriptorSet, const std::string& name) {
+void DebugMarker::setDescriptorSetName(VkDescriptorSet descriptorSet, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(descriptorSet), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_EXT, name);
 }
 
-void DebugMarker::setSemaphoreName(VkSemaphore semaphore, const std::string& name) {
+void DebugMarker::setSemaphoreName(VkSemaphore semaphore, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(semaphore), VK_DEBUG_REPORT_OBJECT_TYPE_SEMAPHORE_EXT, name);
 }
 
-void DebugMarker::setFenceName(VkFence fence, const std::string& name) {
+void DebugMarker::setFenceName(VkFence fence, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(fence), VK_DEBUG_REPORT_OBJECT_TYPE_FENCE_EXT, name);
 }
 
-void DebugMarker::setEventName(VkEvent event, const std::string& name) {
+void DebugMarker::setEventName(VkEvent event, std::string_view name) {
     setObjectName(reinterpret_cast<uint64_t>(event), VK_DEBUG_REPORT_OBJECT_TYPE_EVENT_EXT, name);
 }

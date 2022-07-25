@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-PostFilter::PostFilter(const Pipeline::Stage& pipelineStage, const std::vector<std::filesystem::path>& shaderStages, const std::vector<Shader::Define>& defines) 
+PostFilter::PostFilter(const Pipeline::Stage& pipelineStage, const std::vector<fs::path>& shaderStages, const std::vector<Shader::Define>& defines)
         : Subrender{pipelineStage}
         , pipeline{pipelineStage, shaderStages, {}, defines, PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None} {
 }

@@ -87,8 +87,8 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
         auto debugStart = DateTime::Now();
 #endif
         std::unique_ptr<gli::texture2d> texture;
-        FileSystem::Read(path, [&texture](const uint8_t* data, size_t size) {
-            texture = std::make_unique<gli::texture2d>(gli::load(reinterpret_cast<const char*>(data), size));
+        FileSystem::ReadBytes(path, [&texture](std::span<const uint8_t> buffer) {
+            texture = std::make_unique<gli::texture2d>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
         });
 #if FUSION_DEBUG
         LOG_DEBUG << "Texture2d \"" << path << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";

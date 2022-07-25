@@ -11,13 +11,13 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         float getInnerRadius() const { return innerRadius; }
-        void setInnerRadius(float radius) { innerRadius = radius; }
+        void setInnerRadius(float value) { innerRadius = value; }
 
         float getOuterRadius() const { return outerRadius; }
-        void setOuterRadius(float radius) { outerRadius = radius; }
+        void setOuterRadius(float value) { outerRadius = value; }
 
         float getOpacity() const { return opacity; }
-        void setOpacity(float opacity) { this->opacity = opacity; }
+        void setOpacity(float value) { opacity = value; }
 
     private:
         PushHandler pushScene;

@@ -206,17 +206,13 @@ Sphere Sphere::transformed(const glm::mat4& transform) const {
     };
 }
 
-Sphere Sphere::CalculateBoundingSphere(const std::vector<glm::vec3>& points) {
-    return CalculateBoundingSphere(points.data(), points.size());
-}
-
-Sphere Sphere::CalculateBoundingSphere(const glm::vec3* points, size_t size) {
-    if (!size)
+Sphere Sphere::CalculateBoundingSphere(std::span<const glm::vec3> points) {
+    if (points.empty())
         return {};
 
     // compute minimal and maximal bounds
     glm::vec3 min{points[0]}, max{points[0]};
-    for (size_t i = 1; i < size; ++i) {
+    for (size_t i = 1; i < points.size(); ++i) {
         if (points[i].x < min.x)
             min.x = points[i].x;
         else if (points[i].x > max.x)
@@ -233,7 +229,7 @@ Sphere Sphere::CalculateBoundingSphere(const glm::vec3* points, size_t size) {
     // compute center and radius
     glm::vec3 center {0.5f * (min + max)};
     float maxDistance = glm::distance2(center, points[0]);
-    for (size_t i = 1; i < size; ++i) {
+    for (size_t i = 1; i < points.size(); ++i) {
         float dist = glm::distance2(center, points[i]);
         if (dist > maxDistance)
             maxDistance = dist;

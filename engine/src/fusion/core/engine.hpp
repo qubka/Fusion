@@ -60,7 +60,7 @@ namespace fe {
          * Sets the current application to the engine.
          * @param app The new application.
          */
-        void setApp(std::unique_ptr<Application>&& application) { this->application = std::move(application); }
+        void setApp(std::unique_ptr<Application>&& app) { application = std::move(app); }
 
         /**
          * Gets if the engine is running.

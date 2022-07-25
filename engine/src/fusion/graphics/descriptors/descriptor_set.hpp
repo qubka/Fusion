@@ -10,7 +10,7 @@ namespace fe {
         explicit DescriptorSet(const Pipeline& pipeline);
         ~DescriptorSet();
 
-        static void update(const std::vector<VkWriteDescriptorSet>& descriptorWrites);
+        static void update(std::span<const VkWriteDescriptorSet> descriptorWrites);
 
         void bindDescriptor(const CommandBuffer& commandBuffer) const;
 

@@ -2,6 +2,8 @@
 
 #include "image.hpp"
 
+#include "fusion/resources/resource.hpp"
+
 namespace fe {
     /**
      * @brief Defines the purpose of a texture
@@ -31,7 +33,7 @@ namespace fe {
         Transmission = 21,
     };
 
-    class Texture : public Image {
+    class Texture : public Image, public Resource {
     public:
         /**
          * Creates a new image.
@@ -134,8 +136,6 @@ namespace fe {
                 bool mipmap);
 
         ~Texture() override = default;
-
-        void transitionImage(const CommandBuffer& commandBuffer, VkImageLayout newLayout);
 
         WriteDescriptorSet getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const override;
         const VkDescriptorImageInfo& getDescriptor() const { return descriptor; }

@@ -15,36 +15,38 @@ namespace ImGuiUtils {
 using namespace fe;
 using namespace std::string_literals;
 
-void TextCentered(const std::string& text, std::optional<float> offsetY) {
+void TextCentered(std::string_view text, std::optional<float> offsetY) {
     ImVec2 windowSize{ ImGui::GetWindowSize() };
-    ImGui::SetCursorPosX((windowSize.x - ImGui::CalcTextSize(text.c_str()).x) * 0.5f);
+    ImGui::SetCursorPosX((windowSize.x - ImGui::CalcTextSize(text.data()).x) * 0.5f);
     if (offsetY) {
         ImGui::SetCursorPosY(*offsetY + windowSize.y * 0.5f);
     }
-    ImGui::TextUnformatted(text.c_str());
+    ImGui::TextUnformatted(text.data());
 }
 
-void PropertyText(const std::string& name, const std::string& value) {
+void PropertyText(std::string_view name, std::string_view value) {
     //ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted(name.c_str());
+    ImGui::TextUnformatted(name.data());
     ImGui::NextColumn();
     ImGui::PushItemWidth(-1);
 
     {
-        ImGui::TextUnformatted(value.c_str());
+        ImGui::TextUnformatted(value.data());
     }
 
     ImGui::PopItemWidth();
     ImGui::NextColumn();
 }
 
-bool PropertyText(const std::string& name, std::string& value, const Flags& flags) {
+bool PropertyText(std::string_view name, std::string& value, const Flags& flags) {
     bool updated = false;
 
     //ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted(name.c_str());
+    ImGui::TextUnformatted(name.data());
     ImGui::NextColumn();
     ImGui::PushItemWidth(-1);
+
+    ImGui::PushID(name.data());
 
     if (flags & PropertyFlag::ReadOnly) {
         ImGui::TextUnformatted(value.c_str());
@@ -52,12 +54,13 @@ bool PropertyText(const std::string& name, std::string& value, const Flags& flag
         char buffer[256];
         std::memset(buffer, 0, sizeof(buffer));
         std::strncpy(buffer, value.c_str(), sizeof(buffer));
-        std::string id{ "##" + name };
-        if (ImGui::InputText(id.c_str(), buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
+        if (ImGui::InputText("", buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
             value = std::string{buffer};
             updated = true;
         }
     }
+
+    ImGui::PopID();
 
     ImGui::PopItemWidth();
     ImGui::NextColumn();
@@ -65,18 +68,19 @@ bool PropertyText(const std::string& name, std::string& value, const Flags& flag
     return updated;
 }
 
-bool PropertyDropdown(const std::string& name, std::string* options, int32_t optionCount, int32_t* selected) {
+bool PropertyDropdown(std::string_view name, std::string* options, int32_t optionCount, int32_t* selected) {
     bool updated = false;
 
     //ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted(name.c_str());
+    ImGui::TextUnformatted(name.data());
     ImGui::NextColumn();
     ImGui::PushItemWidth(-1);
 
+    ImGui::PushID(name.data());
+
     const char* current = options[*selected].c_str();
 
-    std::string id{ "##" + name };
-    if (ImGui::BeginCombo(id.c_str(), current)) {
+    if (ImGui::BeginCombo("", current)) {
         for (int i = 0; i < optionCount; i++) {
             const bool is_selected = (current == options[i]);
             if (ImGui::Selectable(options[i].c_str(), is_selected)) {
@@ -90,6 +94,8 @@ bool PropertyDropdown(const std::string& name, std::string* options, int32_t opt
         ImGui::EndCombo();
     }
 
+    ImGui::PopID();
+
     DrawItemActivityOutline(2.5f);
 
     ImGui::PopItemWidth();
@@ -98,7 +104,7 @@ bool PropertyDropdown(const std::string& name, std::string* options, int32_t opt
     return updated;
 }
 
-bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value, std::vector<fs::path>& files, fs::path& selected, ImGuiTextFilter& filter) {
+bool PropertyFile(std::string_view name, const fs::path& path, fs::path& value, std::vector<fs::path>& files, fs::path& selected, ImGuiTextFilter& filter) {
     bool updated = false;
 
     if (files.empty()) {
@@ -106,7 +112,7 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
         //LOG_WARNING << "Folder seems to be empty!";
     }
 
-    ImGui::TextUnformatted(name.c_str());
+    ImGui::TextUnformatted(name.data());
     ImGui::NextColumn();
 
     float yPadding = ImGui::GetStyle().FramePadding.y;
@@ -217,12 +223,12 @@ bool PropertyFile(const std::string& name, const fs::path& path, fs::path& value
     return updated;
 }
 
-void Tooltip(const std::string& text) {
+void Tooltip(std::string_view text) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
 
     if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
-        ImGui::TextUnformatted(text.c_str());
+        ImGui::TextUnformatted(text.data());
         ImGui::EndTooltip();
     }
 
@@ -241,14 +247,14 @@ void Tooltip(Texture2d* texture, const ImVec2& size, bool flipImage) {
     ImGui::PopStyleVar();
 }
 
-void Tooltip(Texture2d* texture, const ImVec2& size, const std::string& text, bool flipImage) {
+void Tooltip(Texture2d* texture, const ImVec2& size, std::string_view text, bool flipImage) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
 
     if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
 
         ImGui::Image(texture, size, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
-        ImGui::TextUnformatted(text.c_str());
+        ImGui::TextUnformatted(text.data());
         ImGui::EndTooltip();
     }
 
@@ -280,11 +286,11 @@ void Image(Texture2dArray* texture, uint32_t index, const ImVec2& size, bool fli
     ImGui::Image(texture, size, ImVec2{0.0f, flipImage ? 1.0f : 0.0f}, ImVec2{1.0f, flipImage ? 0.0f : 1.0f});
 }
 
-bool BufferingBar(const std::string& name, float value, ImVec2 size, ImU32 bgColor, ImU32 fgColor) {
+bool BufferingBar(std::string_view name, float value, ImVec2 size, ImU32 bgColor, ImU32 fgColor) {
     ImGuiContext* g = ImGui::GetCurrentContext();
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     const ImGuiStyle& style = ImGui::GetStyle();
-    const ImGuiID id = ImGui::GetID(name.c_str());
+    const ImGuiID id = ImGui::GetID(name.data());
 
     ImVec2 pos{ ImGui::GetCursorPos() };
     size.x -= style.FramePadding.x * 2;
@@ -321,10 +327,10 @@ bool BufferingBar(const std::string& name, float value, ImVec2 size, ImU32 bgCol
     return true;
 }
 
-bool Spinner(const std::string& name, float radius, int thickness, ImU32 color) {
+bool Spinner(std::string_view name, float radius, int thickness, ImU32 color) {
     ImGuiContext* g = ImGui::GetCurrentContext();
     const ImGuiStyle& style = g->Style;
-    const ImGuiID id = ImGui::GetID(name.c_str());
+    const ImGuiID id = ImGui::GetID(name.data());
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     ImVec2 pos{ ImGui::GetCursorPos() };
@@ -358,7 +364,7 @@ bool Spinner(const std::string& name, float radius, int thickness, ImU32 color) 
 }
 
 // https://gist.github.com/moebiussurfing/c1110be8bb3f6776311512b63523a0a3
-bool ToggleRoundButton(const std::string& name, bool& value) {
+bool ToggleRoundButton(std::string_view name, bool& value) {
     bool updated = false;
 
     ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -368,7 +374,7 @@ bool ToggleRoundButton(const std::string& name, bool& value) {
     float width = height * 1.55f;
     float radius = height * 0.50f;
 
-    ImGui::InvisibleButton(name.c_str(), ImVec2{width, height});
+    ImGui::InvisibleButton(name.data(), ImVec2{width, height});
     if (ImGui::IsItemClicked()) {
         value = !value;
         updated = true;
@@ -378,7 +384,7 @@ bool ToggleRoundButton(const std::string& name, bool& value) {
 
     ImGuiContext* g = ImGui::GetCurrentContext();
     float ANIM_SPEED = 0.08f;
-    if (g->LastActiveId == g->CurrentWindow->GetID(name.c_str())) {
+    if (g->LastActiveId == g->CurrentWindow->GetID(name.data())) {
         float t_anim = ImSaturate(g->LastActiveIdTimer / ANIM_SPEED);
         t = value ? (t_anim) : (1.0f - t_anim);
     }
@@ -394,7 +400,7 @@ bool ToggleRoundButton(const std::string& name, bool& value) {
     return updated;
 }
 
-bool ToggleButton(const std::string& name, bool& value, bool text_style) {
+bool ToggleButton(std::string_view name, bool& value, bool text_style) {
     bool updated = false;
     if (value) {
         if (text_style) {
@@ -405,13 +411,13 @@ bool ToggleButton(const std::string& name, bool& value, bool text_style) {
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
         }
-        if (ImGui::Button(name.c_str())) {
+        if (ImGui::Button(name.data())) {
             value = !value;
             updated = true;
         }
         ImGui::PopStyleColor(text_style ? 1 : 3);
     } else {
-        if (ImGui::Button(name.c_str())) {
+        if (ImGui::Button(name.data())) {
             value = true;
             updated = true;
         }
@@ -456,7 +462,7 @@ void DrawItemActivityOutline(float rounding, bool drawWhenInactive, ImU32 colorW
     }
 }
 
-bool InputText(const std::string& name, std::string& currentText) {
+bool InputText(std::string_view name, std::string& currentText) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
     ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
 
@@ -464,7 +470,7 @@ bool InputText(const std::string& name, std::string& currentText) {
     std::memset(buffer, 0, 256);
     std::strncpy(buffer, currentText.c_str(), sizeof(buffer));
 
-    bool updated = ImGui::InputText(name.c_str(), buffer, 256);
+    bool updated = ImGui::InputText(name.data(), buffer, 256);
 
     DrawItemActivityOutline(2.0f, false);
 

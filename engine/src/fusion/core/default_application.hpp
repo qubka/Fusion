@@ -37,7 +37,7 @@ namespace fe {
         void onImGui() override {};
 
     public:
-        void openNewProject(const fs::path& path, const std::string& name = "New Project");
+        void openNewProject(const fs::path& path, std::string_view name = "New Project");
         void openProject(const fs::path& path);
         //void onViewportResize(const glm::uvec2& size);
 

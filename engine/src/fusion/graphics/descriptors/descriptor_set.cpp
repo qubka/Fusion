@@ -25,7 +25,7 @@ DescriptorSet::~DescriptorSet() {
 	VK_CHECK(vkFreeDescriptorSets(logicalDevice, descriptorPool, 1, &descriptorSet));
 }
 
-void DescriptorSet::update(const std::vector<VkWriteDescriptorSet>& descriptorWrites) {
+void DescriptorSet::update(std::span<const VkWriteDescriptorSet> descriptorWrites) {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
 	vkUpdateDescriptorSets(logicalDevice, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);

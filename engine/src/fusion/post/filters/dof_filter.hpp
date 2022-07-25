@@ -12,22 +12,22 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         const BlurPipeline* getPipelineBlur() const { return pipelineBlur; }
-        void setPipelineBlur(BlurPipeline* pipelineBlur) { this->pipelineBlur = pipelineBlur; }
+        void setPipelineBlur(BlurPipeline* pipeline) { pipelineBlur = pipeline; }
 
         float getFocusPoint() const { return focusPoint; }
-        void setFocusPoint(float focusPoint) { this->focusPoint = focusPoint; }
+        void setFocusPoint(float value) { focusPoint = value; }
 
         float getNearField() const { return nearField; }
-        void setNearField(float nearField) { this->nearField = nearField; }
+        void setNearField(float value) { nearField = value; }
 
         float getNearTransition() const { return nearTransition; }
-        void setNearTransition(float nearTransition) { this->nearTransition = nearTransition; }
+        void setNearTransition(float value) { nearTransition = value; }
 
         float getFarField() const { return farField; }
-        void setFarField(float farField) { this->farField = farField; }
+        void setFarField(float value) { farField = value; }
 
         float getFarTransition() const { return farTransition; }
-        void setFarTransition(float farTransition) { this->farTransition = farTransition; }
+        void setFarTransition(float value) { farTransition = value; }
 
     private:
         PushHandler pushScene;

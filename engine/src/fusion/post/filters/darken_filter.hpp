@@ -11,7 +11,7 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         float getFactor() const { return factor; }
-        void setFactor(float factor) { this->factor = factor; }
+        void setFactor(float value) { factor = value; }
 
     private:
         PushHandler pushScene;

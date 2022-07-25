@@ -11,7 +11,7 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         float getStrength() const { return strength; }
-        void setStrength(float strength) { this->strength = strength; }
+        void setStrength(float value) { strength = value; }
 
     private:
         PushHandler pushScene;

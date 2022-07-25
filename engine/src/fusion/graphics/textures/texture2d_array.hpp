@@ -74,6 +74,8 @@ namespace fe {
          */
         void setPixels(const float* pixels, uint32_t arrayLayer);
 
+        type_index getTypeIndex() const override { return type_id<Texture2dArray>; }
+
         void load();
     };
 }

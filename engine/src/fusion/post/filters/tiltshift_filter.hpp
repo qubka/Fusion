@@ -11,16 +11,16 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         float getBlurAmount() const { return blurAmount; }
-        void setBlurAmount(float blurAmount) { this->blurAmount = blurAmount; }
+        void setBlurAmount(float value) { blurAmount = value; }
 
         float getCentre() const { return centre; }
-        void setCentre(float centre) { this->centre = centre; }
+        void setCentre(float value) { centre = value; }
 
         float getStepSize() const { return stepSize; }
-        void setStepSize(float stepSize) { this->stepSize = stepSize; }
+        void setStepSize(float value) { stepSize = value; }
 
         float getSteps() const { return steps; }
-        void setSteps(float steps) { this->steps = steps; }
+        void setSteps(float value) { steps = value; }
 
     private:
         PushHandler pushScene;

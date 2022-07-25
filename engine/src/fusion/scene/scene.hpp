@@ -90,7 +90,7 @@ namespace fe {
          * Sets the name to the scene.
          * @param str The scene name.
          */
-        void setName(const std::string& str) { name = str; }
+        void setName(std::string_view str) { name = str; }
 
         /**
          * Gets if the scene is in runtime.

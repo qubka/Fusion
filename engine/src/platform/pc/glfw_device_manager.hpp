@@ -16,7 +16,7 @@ namespace glfw {
 
         std::vector<const char*> getRequiredInstanceExtensions() const override;
         bool isRawMouseMotionSupported() const override;
-        void updateGamepadMappings(const std::string& mappings) override;
+        void updateGamepadMappings(std::string_view mappings) override;
 
         fe::Window* createWindow(const fe::WindowInfo& windowInfo) override;
         fe::Cursor* createCursor(fs::path filepath, fe::CursorHotspot hotspot) override;

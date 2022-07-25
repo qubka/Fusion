@@ -59,9 +59,9 @@ namespace ImGui {
         }
 
         template<class Component>
-        ComponentInfo& registerComponent(const std::string& name, typename ComponentInfo::Callback widget) {
+        ComponentInfo& registerComponent(std::string name, typename ComponentInfo::Callback widget) {
             return registerComponent<Component>(ComponentInfo{
-                    name,
+                    std::move(name),
                     widget,
                     ComponentAddAction<Component, EntityType>,
                     ComponentRemoveAction<Component, EntityType>,
@@ -69,8 +69,8 @@ namespace ImGui {
         }
 
         template<class Component>
-        ComponentInfo& registerComponent(const std::string& name) {
-            return registerComponent<Component>(name, ComponentEditorWidget<Component, EntityType>);
+        ComponentInfo& registerComponent(std::string name) {
+            return registerComponent<Component>(std::move(name), ComponentEditorWidget<Component, EntityType>);
         }
 
         // calls all the ImGui functions

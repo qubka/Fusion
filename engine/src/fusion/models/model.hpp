@@ -55,11 +55,11 @@ namespace fe {
         }
 
         template<typename T>
-        void appendOutput(std::vector<uint8_t>& outputBuffer, const std::vector<T>& v) {
+        void appendOutput(std::vector<uint8_t>& outputBuffer, std::span<T> t) {
             auto offset = outputBuffer.size();
-            auto copySize = v.size() * sizeof(T);
+            auto copySize = t.size() * sizeof(T);
             outputBuffer.resize(offset + copySize);
-            std:: memcpy(outputBuffer.data() + offset, v.data(), copySize);
+            std:: memcpy(outputBuffer.data() + offset, t.data(), copySize);
         }
     };
 }

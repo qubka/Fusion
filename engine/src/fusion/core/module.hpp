@@ -9,7 +9,7 @@ namespace fe {
     public:
         struct TCreateValue {
             std::function<std::unique_ptr<Base>()> create;
-            std::string name;
+            std::string_view name;
             typename Base::Stage stage;
             std::vector<type_index> requires;
         };
@@ -50,11 +50,11 @@ namespace fe {
              * @return A dummy value in static initialization.
              */
             template<typename ... Args>
-            static bool Register(std::string&& name, typename Base::Stage stage, Requires<Args...>&& requires = {}) {
+            static bool Register(std::string_view name, typename Base::Stage stage, Requires<Args...>&& requires = {}) {
                 ModuleFactory::Registry()[type_id<T>] = { []() {
                         ModuleInstance = new T();
                         return std::unique_ptr<Base>(ModuleInstance);
-                    }, std::move(name), stage, requires.get()
+                    }, name, stage, requires.get()
                 };
                 return true;
             }

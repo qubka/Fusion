@@ -10,8 +10,8 @@ namespace fe {
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
-        float GetPixelSize() const { return pixelSize; }
-        void SetPixelSize(float pixelSize) { this->pixelSize = pixelSize; }
+        float getPixelSize() const { return pixelSize; }
+        void setPixelSize(float size) { pixelSize = size; }
 
     private:
         PushHandler pushScene;

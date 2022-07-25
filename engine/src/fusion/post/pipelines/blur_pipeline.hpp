@@ -13,11 +13,11 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         float getInputScale() const { return inputScale; }
-        void setInputScale(float scale) { inputScale = scale; }
+        void setInputScale(float value) { inputScale = value; }
         float getOutputScale() const { return outputScale; }
-        void setOutputScale(float scale) { outputScale = scale; }
+        void setOutputScale(float value) { outputScale = value; }
         float getBlur() const { return blur; }
-        void setBlur(float blurr) { blur = blurr; }
+        void setBlur(float value) { blur = value; }
 
         const Texture2d* getOutput() const { return output.get(); }
 

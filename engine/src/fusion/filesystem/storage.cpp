@@ -1,7 +1,5 @@
 #include "storage.hpp"
 
-#include <utility>
-
 using namespace fe;
 
 #if FUSION_PLATFORM_WINDOWS
@@ -17,44 +15,34 @@ void setAssetManager(AAssetManager* assetManager) {
 
 class ViewStorage : public Storage {
 public:
-    ViewStorage(StoragePointer owner, size_t size, const uint8_t* data)
+    ViewStorage(StoragePointer owner, std::span<const uint8_t> buffer)
         : owner{std::move(owner)}
-        , size{size}
-        , data{data} {}
-    const uint8_t* getData() const override { return data; }
-    size_t getSize() const override { return size; }
+        , buffer{buffer} {
+    }
+
+    const uint8_t* data() const override { return buffer.data(); }
+    size_t size() const override { return buffer.size(); }
     bool isFast() const override { return owner->isFast(); }
 
 private:
-    const StoragePointer owner;
-    const size_t size;
-    const uint8_t* data;
+    StoragePointer owner;
+    std::span<const uint8_t> buffer;
 };
-
-StoragePointer Storage::createView(size_t viewSize, size_t offset) const {
-    auto selfSize = getSize();
-    if (viewSize == 0) {
-        viewSize = selfSize;
-    }
-    if ((viewSize + offset) > selfSize) {
-        return {};
-        //TODO: Disable te exception for now and return an empty storage instead.
-        //throw std::runtime_error("Invalid mapping range");
-    }
-    return std::make_shared<ViewStorage>(shared_from_this(), viewSize, getData() + offset);
-}
 
 class MemoryStorage : public Storage {
 public:
-    explicit MemoryStorage(size_t size, const uint8_t* data = nullptr) {
-        buffer.resize(size);
-        if (data) {
-            std::memcpy(buffer.data(), data, size);
+    explicit MemoryStorage(std::span<const uint8_t> data)
+        : buffer(data.size()) {
+        if (data.data()) {
+            std::memcpy(buffer.data(), data.data(), data.size());
         }
     }
+    explicit MemoryStorage(ByteArray&& byteArray)
+        : buffer{std::move(byteArray)} {
+    }
 
-    const uint8_t* getData() const override { return buffer.data(); }
-    size_t getSize() const override { return buffer.size(); }
+    const uint8_t* data() const override { return buffer.data(); }
+    size_t size() const override { return buffer.size(); }
     bool isFast() const override { return true; }
 
 private:
@@ -70,27 +58,27 @@ private:
 #if MAPPED_FILES
 class FileStorage : public Storage {
 public:
-    static StoragePointer create(const fs::path& filepath, size_t size, const uint8_t* data);
     explicit FileStorage(const fs::path& filepath);
     ~FileStorage() override;
     // Prevent copying
     FileStorage(const FileStorage& other) = delete;
     FileStorage& operator=(const FileStorage& other) = delete;
 
-    const uint8_t* getData() const override { return mapped; }
-    size_t getSize() const override { return size; }
+    const uint8_t* data() const override { return buffer.data(); }
+    size_t size() const override { return buffer.size(); }
     bool isFast() const override { return false; }
 
+    static StoragePointer Create(std::span<const uint8_t> buffer);
+
 private:
-    size_t size{ 0 };
-    uint8_t* mapped{ nullptr };
+    std::span<const uint8_t> buffer;
 #if FUSION_PLATFORM_ANDROID
     AAsset* asset{ nullptr };
 #elif FUSION_PLATFORM_WINDOWS
     HANDLE file{ INVALID_HANDLE_VALUE };
     HANDLE mapFile{ INVALID_HANDLE_VALUE };
 #else
-    ByteArray buffer;
+    //ByteArray buffer;
 #endif
 };
 
@@ -98,25 +86,29 @@ FileStorage::FileStorage(const fs::path& filepath) {
 #if FUSION_PLATFORM_ANDROID
     // Load shader from compressed asset
     asset = AAssetManager_open(assetManager, filepath.string().c_str(), AASSET_MODE_BUFFER);
-    assert(asset);
-    size = AAsset_getLength(asset);
-    assert(size > 0);
-    mapped = static_cast<uint8_t*>(AAsset_getBuffer(asset));
+    if (!asset) {
+        throw std::runtime_error("File " + filepath.string() + " could not be opened");
+    }
+    buffer = { static_cast<uint8_t*>(AAsset_getBuffer(asset)), AAsset_getLength(asset) };
+    if (!buffer.data()) {
+        throw std::runtime_error("File " + filepath.string() + " is invalid");
+    }
 #elif FUSION_PLATFORM_WINDOWS
     file = CreateFileA(filepath.string().c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     if (file == INVALID_HANDLE_VALUE) {
-        throw std::runtime_error("Failed to open file");
+        throw std::runtime_error("File " + filepath.string() + " could not be opened");
     }
-    {
-        DWORD dwFileSizeHigh;
-        size = GetFileSize(file, &dwFileSizeHigh);
-        size += ((static_cast<size_t>(dwFileSizeHigh)) << 32);
-    }
+    DWORD dwFileSizeHigh;
+    size_t size = GetFileSize(file, &dwFileSizeHigh);
+    size += ((static_cast<size_t>(dwFileSizeHigh)) << 32);
     mapFile = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, NULL);
     if (mapFile == INVALID_HANDLE_VALUE) {
-        throw std::runtime_error("Failed to create mapping");
+        throw std::runtime_error("File " + filepath.string() + " could not be mapped");
     }
-    mapped = static_cast<uint8_t*>(MapViewOfFile(mapFile, FILE_MAP_READ, 0, 0, 0));
+    buffer = { static_cast<uint8_t*>(MapViewOfFile(mapFile, FILE_MAP_READ, 0, 0, 0)), size };
+    if (!buffer.data()) {
+        throw std::runtime_error("File " + filepath.string() + " is invalid");
+    }
 #endif
 }
 
@@ -124,18 +116,18 @@ FileStorage::~FileStorage() {
 #if FUSION_PLATFORM_ANDROID
     AAsset_close(asset);
 #elif FUSION_PLATFORM_WINDOWS
-    UnmapViewOfFile(mapped);
+    UnmapViewOfFile(buffer.data());
     CloseHandle(mapFile);
     CloseHandle(file);
 #endif
 }
 #endif
 
-StoragePointer Storage::create(size_t size, uint8_t* data)  {
-    return std::make_shared<MemoryStorage>(size, data);
+StoragePointer Storage::Create(std::span<const uint8_t> buffer)  {
+    return std::make_shared<MemoryStorage>(buffer);
 }
 
-StoragePointer Storage::readFile(const fs::path& filepath) {
+StoragePointer Storage::ReadFile(const fs::path& filepath) {
 #if MAPPED_FILES
     return std::make_shared<FileStorage>(filepath);
 #else
@@ -150,15 +142,15 @@ StoragePointer Storage::readFile(const fs::path& filepath) {
     // Stop eating new lines in binary mode!!!
     is.unsetf(std::ios::skipws);
 
-    std::streampos fileSize;
+    std::streampos size;
     is.seekg(0, std::ios::end);
-    fileSize = is.tellg();
+    size = is.tellg();
     is.seekg(0, std::ios::beg);
 
-    ByteArray fileData;
-    fileData.reserve(fileSize);
-    fileData.insert(fileData.begin(), std::istream_iterator<uint8_t>(is), std::istream_iterator<uint8_t>());
+    ByteArray buffer;
+    buffer.reserve(size);
+    buffer.insert(buffer.begin(), std::istream_iterator<uint8_t>(is), std::istream_iterator<uint8_t>());
 
-    return std::make_shared<MemoryStorage>(fileData.size(), fileData.data());
+    return std::make_shared<MemoryStorage>(std::move(buffer));
 #endif
 }

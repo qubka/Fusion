@@ -80,7 +80,7 @@ namespace fe {
             Input(std::vector<Component> components) {
                 append({std::move(components)});
             }
-            explicit Input(const std::vector<Layout>& vertexLayouts) {
+            explicit Input(std::span<const Layout> vertexLayouts) {
                 for (const auto& layout : vertexLayouts) {
                     append(layout);
                 }

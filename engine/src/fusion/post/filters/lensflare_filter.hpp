@@ -14,7 +14,7 @@ namespace fe {
         void setSunPosition(const glm::vec3& sunPosition, const glm::vec2& screenSize);
 
         float getSunHeight() const { return sunHeight; }
-        void setSunHeight(float height) { sunHeight = height; }
+        void setSunHeight(float value) { sunHeight = value; }
 
     private:
         PushHandler pushScene;

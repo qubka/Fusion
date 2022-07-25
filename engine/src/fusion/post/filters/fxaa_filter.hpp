@@ -11,7 +11,7 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         float getSpanMax() const { return spanMax; }
-        void setSpanMax(float span) { spanMax = span; }
+        void setSpanMax(float value) { spanMax = value; }
 
     private:
         PushHandler pushScene;

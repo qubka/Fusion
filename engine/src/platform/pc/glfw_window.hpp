@@ -47,10 +47,10 @@ namespace glfw {
         void setPosition(const glm::ivec2& pos) override;
 
         const std::string& getTitle() const override { return title; }
-        void setTitle(const std::string& str) override;
+        void setTitle(std::string_view str) override;
 
         const char* getClipboard() const override { return glfwGetClipboardString(window); }
-        void setClipboard(const char* string) override { glfwSetClipboardString(window, string); }
+        void setClipboard(std::string_view str) override { glfwSetClipboardString(window, str.data()); }
 
         bool isSelected() const override { return selected; }
 
@@ -58,7 +58,7 @@ namespace glfw {
         void setCursorHidden(bool hidden) override;
 
         void setCursor(const fe::Cursor* cursor) override;
-        void setIcons(const std::vector<fs::path>& filepaths) override;
+        void setIcons(std::span<const fs::path> filepaths) override;
 
         fe::InputAction getKey(fe::Key key) const override;
         fe::InputAction getMouseButton(fe::MouseButton button) const override;

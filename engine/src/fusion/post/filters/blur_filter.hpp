@@ -17,7 +17,7 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         const glm::vec2& getDirection() const { return direction; }
-        void setDirection(const glm::vec2& direction) { this->direction = direction; }
+        void setDirection(const glm::vec2& dir) { direction = dir; }
 
     private:
         std::vector<Shader::Define> getDefines(const Type &type);

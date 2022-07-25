@@ -95,7 +95,7 @@ entt::entity Scene::createEntity(std::string name) {
     uint32_t i = 0;
     auto view = registry.view<NameComponent>();
     for (auto [e, str] : view.each()) {
-        if (String::Contains(str, name)) {
+        if (str.name.find(name) != std::string::npos) {
             i++;
         }
     }

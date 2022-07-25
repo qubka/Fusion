@@ -46,7 +46,7 @@ namespace fe {
         void createDebugMessenger();
 
         static bool CheckValidationLayerSupport();
-        static void LogVulkanLayers(const std::vector<VkLayerProperties>& layerProperties);
+        static void LogVulkanLayers(std::span<const VkLayerProperties> layerProperties);
 
         bool enableValidationLayers{ false };
 

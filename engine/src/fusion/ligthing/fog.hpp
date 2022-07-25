@@ -17,19 +17,19 @@ namespace fe {
         explicit Fog(const glm::vec4& color = {0.0f, 0.0f, 0.0f, 1.0f}, float density = 0.0f, float gradient = -1.0f, float lowerLimit = 0.0f, float upperLimit = 0.0f);
 
         const glm::vec4& getColor() const { return color; }
-        void setColor(const glm::vec4& color) { this->color = color; }
+        void setColor(const glm::vec4& value) { color = value; }
 
         float getDensity() const { return density; }
-        void setDensity(float density) { this->density = density; }
+        void setDensity(float value) { density = value; }
 
         float getGradient() const { return gradient; }
-        void setGradient(float gradient) { this->gradient = gradient; }
+        void setGradient(float value) { gradient = value; }
 
         float getLowerLimit() const { return lowerLimit; }
-        void setLowerLimit(float lowerLimit) { this->lowerLimit = lowerLimit; }
+        void setLowerLimit(float value) { lowerLimit = value; }
 
         float getUpperLimit() const { return upperLimit; }
-        void setUpperLimit(float upperLimit) { this->upperLimit = upperLimit; }
+        void setUpperLimit(float value) { upperLimit = value; }
 
     private:
         glm::vec4 color;

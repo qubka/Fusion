@@ -221,7 +221,7 @@ void ApplicationInfoPanel::onImGui() {
             }
 
             if (ImGui::TreeNode("File System")) {
-                auto fs = FileSystem::Get();
+                /*auto fs = FileSystem::Get();
                 if (!fs->getSearchPath().empty()) {
                     if (ImGui::BeginTable("##search_paths", 1, flags)) {
                         ImGui::TableSetupColumn("Search Path", ImGuiTableColumnFlags_WidthStretch);
@@ -236,7 +236,7 @@ void ApplicationInfoPanel::onImGui() {
                         ImGui::EndTable();
                     }
                     ImGui::NewLine();
-                }
+                }*/
                 ImGui::TreePop();
             }
 
