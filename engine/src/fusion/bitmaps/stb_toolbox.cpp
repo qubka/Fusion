@@ -37,7 +37,7 @@ void StbToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
 
     bitmap.data = std::move(pixels);
     bitmap.size = { width, height };
-    bitmap.components = static_cast<uint8_t>(channels);
+    bitmap.components = static_cast<uint8_t>(desired_channels);
     bitmap.hdr = hdr;
 }
 

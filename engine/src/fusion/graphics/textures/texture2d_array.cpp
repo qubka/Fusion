@@ -75,10 +75,8 @@ Texture2dArray::Texture2dArray(const std::unique_ptr<Bitmap>& bitmap, uint32_t a
 }
 
 void Texture2dArray::setPixels(const float* pixels, uint32_t arrayLayer) {
-    CommandBuffer commandBuffer{true};
 	Buffer bufferStaging{extent.width * extent.height * components * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels};
-	CopyBufferToImage(commandBuffer, bufferStaging, image, extent, 1, arrayLayer);
-    commandBuffer.submitIdle();
+	CopyBufferToImage(bufferStaging, image, extent, 1, arrayLayer);
 }
 
 void Texture2dArray::load() {
@@ -110,8 +108,7 @@ void Texture2dArray::load() {
     CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
     CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
 
-    CommandBuffer commandBuffer{true};
-    TransitionImageLayout(commandBuffer, image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
+    TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
     Buffer bufferStaging{tex2DArray.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, tex2DArray.data()};
 
     // Setup buffer copy regions for each layer including all of it's miplevels
@@ -142,15 +139,15 @@ void Texture2dArray::load() {
         }
     }
 
+    CommandBuffer commandBuffer{true};
     vkCmdCopyBufferToImage(commandBuffer, bufferStaging, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, bufferCopyRegions.size(), bufferCopyRegions.data());
+    commandBuffer.submitIdle();
 
     if (mipmap) {
-        CreateMipmaps(commandBuffer, image, extent, format, layout, mipLevels, 0, arrayLayers);
+        CreateMipmaps(image, extent, format, layout, mipLevels, 0, arrayLayers);
     } else {
-        TransitionImageLayout(commandBuffer, image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
+        TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layout, aspect, mipLevels, 0, arrayLayers, 0);
     }
-
-    commandBuffer.submitIdle();
 
     updateDescriptor();
 }

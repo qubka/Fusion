@@ -156,11 +156,11 @@ namespace fe {
             descriptor.imageLayout = layout;
         }
 
-        /*std::string toString() const override {
+        std::string toString() const override {
             std::stringstream ss;
             ss << path << me::enum_name(type) << mipLevels << arrayLayers << components << anisotropic << mipmap;
             return ss.str();
-        }*/
+        }
 
         template<typename Archive>
         void serialize(Archive& archive) {
