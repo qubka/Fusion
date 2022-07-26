@@ -1,5 +1,4 @@
 #include "model.hpp"
-#include "mesh.hpp"
 
 #include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
@@ -41,7 +40,7 @@ void Model::processNode(const aiScene* scene, const aiNode* node) {
 
 void Model::processMesh(const aiScene* scene, const aiMesh* mesh) {
     std::vector<uint8_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+    vertices.reserve(mesh->mNumVertices * layout.getStride());
     std::vector<uint32_t> indices;
     indices.reserve(mesh->mNumFaces * 3);
     std::vector<std::shared_ptr<Texture2d>> textures;
@@ -85,7 +84,7 @@ void Model::processMesh(const aiScene* scene, const aiMesh* mesh) {
         }*/
     }
 
-    meshes.push_back(std::make_unique<Mesh>(vertices, indices/*, std::move(textures)*/));
+   meshes.push_back(std::make_unique<Mesh>(vertices, indices/*, std::move(textures)*/));
 }
 
 std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* material, int type) {
@@ -144,7 +143,7 @@ void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scen
     using Component = Vertex::Component;
 
     // preallocate float buffer with approximate size
-    vertexBuffer.reserve(layout.getSize() * 4);
+    vertexBuffer.reserve(layout.getStride() / sizeof(float));
     for (const auto& component : layout) {
         switch (component) {
             case Component::Position2:
@@ -211,7 +210,7 @@ void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scen
         };
     }
 
-    appendOutput(outputBuffer, vertexBuffer);
+    appendOutput<float>(outputBuffer, vertexBuffer);
 
     maxExtents = glm::max(scaledPos, maxExtents);
     minExtents = glm::min(scaledPos, minExtents);

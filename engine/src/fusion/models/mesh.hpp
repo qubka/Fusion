@@ -26,6 +26,12 @@ namespace fe {
         const Buffer* getIndexBuffer() const { return indexBuffer.get(); }
         uint32_t getVertexCount() const { return vertexCount; }
         uint32_t getIndexCount() const { return indexCount; }
+        /*const glm::vec3& getMinExtents() const { return minExtents; }
+        const glm::vec3& getMaxExtents() const { return maxExtents; }
+        float getWidth() const { return maxExtents.x - minExtents.x; }
+        float getHeight() const { return maxExtents.y - minExtents.y; }
+        float getDepth() const { return maxExtents.z - minExtents.z; }
+        float getRadius() const { return radius; }*/
         VkIndexType getIndexType() const { return indexType; }
 
         template<typename T>
@@ -90,5 +96,8 @@ namespace fe {
         uint32_t vertexCount{ 0 };
         uint32_t indexCount{ 0 };
         VkIndexType indexType{ VK_INDEX_TYPE_NONE_KHR };
+        /*glm::vec3 minExtents{ FLT_MAX };
+        glm::vec3 maxExtents{ -FLT_MAX };
+        float radius{ 0.0 };*/
     };
 }

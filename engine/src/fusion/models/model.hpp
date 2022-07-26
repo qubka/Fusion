@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mesh.hpp"
+
 #include "fusion/graphics/pipelines/vertex.hpp"
 
 class aiScene;
@@ -8,13 +10,13 @@ class aiMesh;
 class aiMaterial;
 
 namespace fe {
-    class Mesh;
+    //class Mesh;
     class Texture2d;
     class CommandBuffer;
 
     class Model {
     public:
-        Model(const fs::path& filepath, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::RGBA}});
+        explicit Model(const fs::path& filepath, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::UV}});
         ~Model() = default;
 
         void cmdRender(const CommandBuffer& commandBuffer) const;
@@ -32,11 +34,12 @@ namespace fe {
         std::vector<std::shared_ptr<Texture2d>> texturesLoaded;
         Vertex::Layout layout;
 
-        glm::vec3 minExtents{ FLT_MAX };
-        glm::vec3 maxExtents{ -FLT_MAX };
         glm::vec3 scale{ 1.0f };
         glm::vec3 center{ 0.0f };
         glm::vec2 uvScale{ 1.0f };
+
+        glm::vec3 minExtents{ FLT_MAX };
+        glm::vec3 maxExtents{ -FLT_MAX };
         float radius{ 0.0 };
 
         void processNode(const aiScene* scene, const aiNode* node);
@@ -46,20 +49,20 @@ namespace fe {
 
         //static aiScene GenerateScene(const Mesh& mesh);
 
-        template<typename T>
+        /*template<typename T>
         void appendOutput(std::vector<uint8_t>& outputBuffer, const T& t) {
             auto offset = outputBuffer.size();
             auto copySize = sizeof(T);
             outputBuffer.resize(offset + copySize);
             std::memcpy(outputBuffer.data() + offset, &t, copySize);
-        }
+        }*/
 
         template<typename T>
-        void appendOutput(std::vector<uint8_t>& outputBuffer, std::span<T> t) {
+        void appendOutput(std::vector<uint8_t>& outputBuffer, std::span<const T> t) {
             auto offset = outputBuffer.size();
             auto copySize = t.size() * sizeof(T);
             outputBuffer.resize(offset + copySize);
-            std:: memcpy(outputBuffer.data() + offset, t.data(), copySize);
+            std::memcpy(outputBuffer.data() + offset, t.data(), copySize);
         }
     };
 }
