@@ -103,3 +103,7 @@
 	path = external/imgui_entt_entity_editor
 	url = https://github.com/Green-Sky/imgui_entt_entity_editor
 	ignore = all
+[submodule "external/random"]
+	path = external/random
+	url = https://github.com/effolkronium/random
+	ignore = all

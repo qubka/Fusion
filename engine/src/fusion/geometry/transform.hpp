@@ -24,6 +24,7 @@ namespace fe {
         const glm::mat4& getParentMatrix() const { return parentMatrix; }
         const glm::mat4& getWorldMatrix() const;
         const glm::mat4& getLocalMatrix() const;
+        const glm::mat3& getNormalMatrix() const;
 
         glm::vec3 getWorldPosition() const { return worldMatrix[3]; }
         glm::quat getWorldOrientation() const { return glm::toQuat(worldMatrix); }
@@ -69,6 +70,7 @@ namespace fe {
         glm::mat4 parentMatrix{ 1.0f };
         mutable glm::mat4 localMatrix{ 1.0f };
         mutable glm::mat4 worldMatrix{ 1.0f };
+        mutable glm::mat3 normalMatrix{ 1.0f };
 
         mutable bool dirty{ false };
     };

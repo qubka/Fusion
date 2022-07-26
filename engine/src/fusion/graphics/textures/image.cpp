@@ -303,7 +303,8 @@ void Image::TransitionImageLayout(VkCommandBuffer commandBuffer, const VkImage& 
             imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
             break;
         default:
-            throw std::runtime_error("Unsupported image layout transition source");
+            //throw std::runtime_error("Unsupported image layout transition source");
+            break;
 	}
 
 	// Destination access mask controls the dependency for the new image layout.
@@ -327,7 +328,8 @@ void Image::TransitionImageLayout(VkCommandBuffer commandBuffer, const VkImage& 
             imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
             break;
         default:
-            throw std::runtime_error("Unsupported image layout transition destination");
+            //throw std::runtime_error("Unsupported image layout transition destination");
+            break;
 	}
 
 	vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);

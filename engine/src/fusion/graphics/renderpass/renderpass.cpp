@@ -19,7 +19,7 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 
         switch (attachment.type) {
             case Attachment::Type::Image:
-                attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+                attachmentDescription.finalLayout = attachment.layout;
                 attachmentDescription.format = attachment.format;
                 break;
             case Attachment::Type::Depth:

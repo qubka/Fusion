@@ -546,9 +546,8 @@ void Shader::loadAttribute(const glslang::TProgram& program, VkShaderStageFlags 
 	if (reflection.name.empty())
 		return;
 
-    if (attributes.find(reflection.name) != attributes.end()) {
+    if (attributes.find(reflection.name) != attributes.end())
         return;
-    }
 
 	auto& qualifier = reflection.getType()->getQualifier();
 	attributes.emplace(reflection.name, Attribute{ static_cast<int32_t>(qualifier.layoutSet), static_cast<int32_t>(qualifier.layoutLocation), computeSize(reflection.getType()), reflection.glDefineType });

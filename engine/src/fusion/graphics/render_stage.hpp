@@ -25,7 +25,7 @@ namespace fe {
         Type type{ Type:: Image };
         bool multisampled{ false };
         VkFormat format{ VK_FORMAT_R8G8B8A8_UNORM };
-        //VkImageLayout layout{ VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }; // VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+        VkImageLayout layout{ VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
         glm::vec4 clearColor{ 0.0f, 0.0f, 0.0f, 1.0f };
     };
 

@@ -30,7 +30,6 @@
 #include <numeric>
 #include <random>
 #include <iterator>
-
 #include <filesystem>
 namespace fs = std::filesystem;
 
@@ -41,6 +40,7 @@ namespace fs = std::filesystem;
 #include <tcb/span.hpp>
 #endif
 
+// Math
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -54,10 +54,17 @@ namespace fs = std::filesystem;
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+// Customization
 #include <magic_enum.hpp>
 namespace me = magic_enum;
 
+#include <effolkronium/random.hpp>
+
+// get base random alias which is auto seeded and has static API and internal state
+using Random = effolkronium::random_static;
+
 #include <bitmask/bitmask.hpp>
 
+// Engine
 #include "fusion/core/base.hpp"
 #include "fusion/core/log.hpp"
