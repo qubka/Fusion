@@ -118,7 +118,6 @@ namespace fe {
                 uint32_t baseArrayLayer);
 
         static void CreateMipmaps(
-                VkCommandBuffer commandBuffer,
                 const VkImage& image,
                 const VkExtent3D& extent,
                 VkFormat format,
@@ -128,7 +127,6 @@ namespace fe {
                 uint32_t layerCount);
 
         static void TransitionImageLayout(
-                VkCommandBuffer commandBuffer,
                 const VkImage& image,
                 VkFormat format,
                 VkImageLayout srcImageLayout,
@@ -155,7 +153,6 @@ namespace fe {
                 uint32_t baseArrayLayer);
 
         static void CopyBufferToImage(
-                VkCommandBuffer commandBuffer,
                 const VkBuffer& buffer,
                 const VkImage& image,
                 const VkExtent3D& extent,
@@ -163,7 +160,6 @@ namespace fe {
                 uint32_t baseArrayLayer);
 
         static bool CopyImage(
-                VkCommandBuffer commandBuffer,
                 const VkImage& srcImage,
                 VkImage& dstImage,
                 VkDeviceMemory& dstImageMemory,
