@@ -2,18 +2,16 @@
 
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
-#include "fusion/graphics/commands/command_buffer.hpp"
 
 using namespace fe;
 
 Texture::Texture(fs::path path, VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples,
-                 VkImageLayout layout, VkImageUsageFlags usage, VkImageAspectFlags aspect, VkImageViewType viewType, VkFormat format, uint32_t mipLevels,
-                 uint32_t arrayLayers, const VkExtent3D& extent, uint8_t components, bool anisotropic, bool mipmap)
+                 VkImageLayout layout, VkImageUsageFlags usage, VkImageAspectFlags aspect, VkImageViewType viewType,
+                 VkFormat format, uint32_t mipLevels, uint32_t arrayLayers, const VkExtent3D& extent, bool anisotropic, bool mipmap)
         : Image{filter, addressMode, samples, layout, usage, aspect, viewType, format, extent}
         , path{std::move(path)}
         , mipLevels{mipLevels}
         , arrayLayers{arrayLayers}
-        , components{components}
         , anisotropic{anisotropic}
         , mipmap{mipmap} {
 
@@ -21,11 +19,10 @@ Texture::Texture(fs::path path, VkFilter filter, VkSamplerAddressMode addressMod
 
 Texture::Texture(VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, VkImageLayout layout,
                  VkImageUsageFlags usage, VkImageAspectFlags aspect, VkImageViewType viewType, VkFormat format, uint32_t mipLevels, uint32_t arrayLayers,
-                 const VkExtent3D& extent, uint8_t components, bool anisotropic, bool mipmap)
+                 const VkExtent3D& extent, bool anisotropic, bool mipmap)
         : Image{filter, addressMode, samples, layout, usage, aspect, viewType, format, extent}
         , mipLevels{mipLevels}
         , arrayLayers{arrayLayers}
-        , components{components}
         , anisotropic{anisotropic}
         , mipmap{mipmap} {
     if (extent.width == 0 || extent.width == 0)
@@ -49,14 +46,12 @@ Texture::Texture(VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCoun
     updateDescriptor();
 }
 
-Texture::Texture(const std::unique_ptr<Bitmap>& bitmap, VkFilter filter, VkSamplerAddressMode addressMode,
-                 VkSampleCountFlagBits samples, VkImageLayout layout, VkImageUsageFlags usage,  VkImageAspectFlags aspect,
-                 VkImageViewType viewType, VkFormat format, uint32_t mipLevels, uint32_t arrayLayers,
-                 const VkExtent3D& extent, uint8_t components, bool anisotropic, bool mipmap)
+Texture::Texture(const std::unique_ptr<Bitmap>& bitmap, VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples,
+                 VkImageLayout layout, VkImageUsageFlags usage,  VkImageAspectFlags aspect, VkImageViewType viewType, VkFormat format,
+                 uint32_t mipLevels, uint32_t arrayLayers, const VkExtent3D& extent, bool anisotropic, bool mipmap)
         : Image{filter, addressMode, samples, layout, usage, aspect, viewType, format, extent}
         , mipLevels{mipLevels}
         , arrayLayers{arrayLayers}
-        , components{components}
         , anisotropic{anisotropic}
         , mipmap{mipmap} {
     if (extent.width == 0 || extent.height == 0)

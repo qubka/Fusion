@@ -2,6 +2,8 @@
 
 #include "bitmap_factory.hpp"
 
+#include "fusion/utils/vulkan.hpp"
+
 namespace fe {
     class Bitmap : public BitmapFactory<Bitmap> {
         friend class StbToolbox;
@@ -9,8 +11,8 @@ namespace fe {
     public:
         Bitmap() = default;
         explicit Bitmap(const fs::path& filepath);
-        explicit Bitmap(const glm::uvec2& size, uint8_t channels = 4, bool hdr = false);
-        Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, uint8_t channels = 4, bool hdr = false);
+        explicit Bitmap(const glm::uvec2& size, VkFormat format = VK_FORMAT_R8G8B8A8_UNORM);
+        Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, VkFormat format = VK_FORMAT_R8G8B8A8_UNORM);
         ~Bitmap() override = default;
         NONCOPYABLE(Bitmap);
 
@@ -18,16 +20,16 @@ namespace fe {
         void write(const fs::path& filepath) const;
 
         operator bool() const { return data.operator bool(); }
-        operator std::span<const uint8_t>() const { return { getData<uint8_t>(), getLength() }; }
+
+        template<typename T>
+        operator std::span<const T>() const { return { getData<T>(), getLength() }; }
 
         int getWidth() const { return static_cast<int>(size.x); }
         int getHeight() const { return static_cast<int>(size.y); }
         const glm::uvec2& getSize() const { return size; }
-        glm::uvec3 getExtent() const { return {size.x, size.y, 1}; }
-        uint8_t getComponents() const { return components; }
-        uint8_t getBytesPerPixel() const { return components * (hdr ? sizeof(float) : sizeof(uint8_t)); }
-        uint32_t getPitch() const { return size.x * getBytesPerPixel(); }
-        size_t getLength() const { return size.x * size.y * getBytesPerPixel(); }
+        glm::uvec3 getExtent() const { return { size.x, size.y, 1 }; }
+        VkFormat getFormat() const { return format; }
+        size_t getLength() const { return size.x * size.y * vku::get_format_params(format).bytes; }
         const fs::path& getPath() const { return path; }
 
         template<typename T>
@@ -35,17 +37,12 @@ namespace fe {
         template<typename T>
         const T* getData() const { return reinterpret_cast<const T*>(data.get()); }
 
-        bool isEmpty() const { return !data || size.x == 0 || size.y == 0; }
-        bool isHDR() const { return hdr; }
+        bool isEmpty() const { return !data || (size.x == 0 && size.y == 0); }
 
     private:
         std::unique_ptr<uint8_t[]> data;
-        fs::path path;
         glm::uvec2 size{ 0 };
-        uint8_t components{ 4 };
-        bool hdr{ false };
-
-    private:
-        static size_t CalculateLength(const glm::uvec2& size, uint8_t components = 4, bool hdr = false);
+        VkFormat format{ VK_FORMAT_UNDEFINED };
+        fs::path path;
     };
 }

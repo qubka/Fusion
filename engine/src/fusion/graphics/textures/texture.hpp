@@ -51,7 +51,6 @@ namespace fe {
          * @param mipLevels The number of levels of detail available for minified sampling of the image.
          * @param arrayLayers The number of layers in the image.
          * @param extent The number of data elements in each dimension of the base level.
-         * @param components The amount of components for the provided format.
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
@@ -67,7 +66,6 @@ namespace fe {
                 uint32_t mipLevels,
                 uint32_t arrayLayers,
                 const VkExtent3D& extent,
-                uint8_t components,
                 bool anisotropic,
                 bool mipmap);
 
@@ -84,7 +82,6 @@ namespace fe {
          * @param mipLevels The number of levels of detail available for minified sampling of the image.
          * @param arrayLayers The number of layers in the image.
          * @param extent The number of data elements in each dimension of the base level.
-         * @param components The amount of components for the provided format.
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
@@ -99,7 +96,6 @@ namespace fe {
                 uint32_t mipLevels,
                 uint32_t arrayLayers,
                 const VkExtent3D& extent,
-                uint8_t components,
                 bool anisotropic,
                 bool mipmap);
 
@@ -117,7 +113,6 @@ namespace fe {
          * @param mipLevels The number of levels of detail available for minified sampling of the image.
          * @param arrayLayers The number of layers in the image.
          * @param extent The number of data elements in each dimension of the base level.
-         * @param components The amount of components for the provided format.
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
@@ -133,7 +128,6 @@ namespace fe {
                 uint32_t mipLevels,
                 uint32_t arrayLayers,
                 const VkExtent3D& extent,
-                uint8_t components,
                 bool anisotropic,
                 bool mipmap);
 
@@ -158,7 +152,7 @@ namespace fe {
 
         std::string toString() const override {
             std::stringstream ss;
-            ss << path << me::enum_name(type) << mipLevels << arrayLayers << components << anisotropic << mipmap;
+            ss << path << me::enum_name(type) << mipLevels << arrayLayers << anisotropic << mipmap;
             return ss.str();
         }
 
@@ -168,7 +162,6 @@ namespace fe {
                     cereal::make_nvp("Type", type),
                     cereal::make_nvp("Mip Levels", mipLevels),
                     cereal::make_nvp("Array Layers", arrayLayers),
-                    cereal::make_nvp("Components", components),
                     cereal::make_nvp("Anisotropic", anisotropic),
                     cereal::make_nvp("Mipmap", mipmap));
         }
@@ -180,7 +173,6 @@ namespace fe {
         TextureType type{ TextureType::None };
         uint32_t mipLevels{ 0 };
         uint32_t arrayLayers{ 0 };
-        uint8_t components{ 0 };
         bool anisotropic{ false };
         bool mipmap{ false };
     };

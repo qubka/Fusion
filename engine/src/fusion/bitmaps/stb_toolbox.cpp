@@ -37,22 +37,35 @@ void StbToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
 
     bitmap.data = std::move(pixels);
     bitmap.size = { width, height };
-    bitmap.components = static_cast<uint8_t>(desired_channels);
-    bitmap.hdr = hdr;
+    int components = std::max(channels, desired_channels);
+    switch (components) {
+        case STBI_grey:
+            bitmap.format = VK_FORMAT_R8_UNORM;
+            break;
+        case STBI_grey_alpha:
+            bitmap.format = VK_FORMAT_R8G8_UNORM;
+            break;
+        case STBI_rgb:
+            bitmap.format = VK_FORMAT_R8G8B8_UNORM;
+            break;
+        case STBI_rgb_alpha:
+            bitmap.format = VK_FORMAT_R8G8B8A8_UNORM;
+            break;
+    }
 }
 
 void StbToolbox::Write(const Bitmap& bitmap, const fs::path& filepath) {
     std::string extension{ FileSystem::GetExtension(filepath) };
     if (extension == ".jpg" || extension == ".jpeg") {
-        stbi_write_jpg(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getComponents()), bitmap.getData<uint8_t>(), 8);
+        stbi_write_jpg(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<uint8_t>(), 8);
     } else if (extension == ".bmp") {
-        stbi_write_bmp(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getComponents()), bitmap.getData<uint8_t>());
+        stbi_write_bmp(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<uint8_t>());
     } else if (extension == ".png") {
-        stbi_write_png(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getComponents()), bitmap.getData<uint8_t>(), 0);
+        stbi_write_png(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<uint8_t>(), 0);
     } else if (extension == ".tga") {
-        stbi_write_tga(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getComponents()), bitmap.getData<uint8_t>());
+        stbi_write_tga(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<uint8_t>());
     } else if (extension == ".hdr") {
-        stbi_write_hdr(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(bitmap.getComponents()), bitmap.getData<float>());
+        stbi_write_hdr(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<float>());
     } else {
         LOG_ERROR << "Unknown extension format: \"" << extension << "\" to write data in!";
     }

@@ -4,7 +4,7 @@
 #include "fusion/graphics/devices/logical_device.hpp"
 #include "fusion/graphics/devices/surface.hpp"
 #include "fusion/graphics/textures/image.hpp"
-#include "fusion/graphics/vku.hpp"
+#include "fusion/utils/vulkan.hpp"
 
 using namespace fe;
 

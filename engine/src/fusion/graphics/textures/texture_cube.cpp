@@ -1,7 +1,7 @@
 #include "texture_cube.hpp"
 
 #include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/graphics/vku.hpp"
+#include "fusion/utils/vulkan.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/filesystem/file_format.hpp"
@@ -24,7 +24,6 @@ TextureCube::TextureCube(fs::path filepath, VkFilter filter, VkSamplerAddressMod
                   1,
                   6,
                   { 0, 0, 1 },
-                  0,
                   anisotropic,
                   mipmap} {
     if (!FileFormat::IsTextureStorageFile(path))
@@ -48,7 +47,6 @@ TextureCube::TextureCube(const glm::uvec2& extent, VkFormat format, VkImageLayou
                   1,
                   6,
                   { extent.x, extent.y, 1 },
-                  vku::getBlockParams(format).bytes,
                   anisotropic,
                   mipmap} {
 }
@@ -67,16 +65,16 @@ TextureCube::TextureCube(const std::unique_ptr<Bitmap>& bitmap, VkFormat format,
                   1,
                   6,
                   vku::uvec3_cast(bitmap->getExtent()),
-                  bitmap->getComponents(),
                   anisotropic,
                   mipmap} {
 }
 
 std::unique_ptr<Bitmap> TextureCube::getBitmap(uint32_t mipLevel) const {
 	auto size = glm::uvec2{extent.width, extent.height} >> mipLevel;
+    uint8_t components = vku::get_format_params(format).bytes;
 
 	auto sizeSide = size.x * size.y * components;
-	auto bitmap = std::make_unique<Bitmap>(glm::uvec2{size.x, size.y * arrayLayers}, components);
+	auto bitmap = std::make_unique<Bitmap>(glm::uvec2{size.x, size.y * arrayLayers}, format);
 	auto offset = bitmap->getData<uint8_t>();
 
 	for (uint32_t i = 0; i < 6; i++) {
@@ -89,6 +87,7 @@ std::unique_ptr<Bitmap> TextureCube::getBitmap(uint32_t mipLevel) const {
 }
 
 void TextureCube::setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer) {
+    uint8_t components = vku::get_format_params(format).bytes;
 	Buffer bufferStaging{extent.width * extent.height * components * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels};
 	CopyBufferToImage(bufferStaging, image, extent, layerCount, baseArrayLayer);
 }
@@ -113,7 +112,7 @@ void TextureCube::load() {
     extent.height = static_cast<uint32_t>(texCube.extent().y);
     // arrayLayers = 6
     mipLevels = static_cast<uint32_t>(texCube.levels());
-    components = static_cast<uint8_t>(component_count(texCube.format()));
+    format = vku::convert_format(texCube.format());
 
     if (extent.width == 0 || extent.height == 0)
         throw std::runtime_error("Width or height is empty");
@@ -121,8 +120,7 @@ void TextureCube::load() {
     if (arrayLayers != 6)
         throw std::runtime_error("Invalid amount of layers");
 
-
-    CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
+    CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, vku::convert_type(texCube.target()));
     CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
     CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
 

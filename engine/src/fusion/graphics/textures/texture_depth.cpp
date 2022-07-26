@@ -22,7 +22,6 @@ TextureDepth::TextureDepth(const glm::uvec2& extent, VkSampleCountFlagBits sampl
                   1,
                   1,
                   { extent.x, extent.y, 1 },
-                  1,
                   false,
                   false} {
 	if (format == VK_FORMAT_UNDEFINED)

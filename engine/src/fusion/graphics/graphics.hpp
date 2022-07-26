@@ -10,8 +10,8 @@
 #include "fusion/graphics/renderpass/sync_object.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/renderer.hpp"
-#include "fusion/graphics/vku.hpp"
 #include "fusion/utils/elapsed_time.hpp"
+#include "fusion/utils/vulkan.hpp"
 
 #define MAX_FRAMES_IN_FLIGHT 2
 

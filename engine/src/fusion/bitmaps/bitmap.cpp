@@ -10,17 +10,15 @@ Bitmap::Bitmap(const fs::path& filepath) {
     load(filepath);
 }
 
-Bitmap::Bitmap(const glm::uvec2& size, uint8_t components, bool hdr)
+Bitmap::Bitmap(const glm::uvec2& size, VkFormat format)
         : size{size}
-        , components{components}
-        , hdr{hdr}
-        , data{std::make_unique<uint8_t[]>(CalculateLength(size, components, hdr))} {
+        , format{format}
+        , data{std::make_unique<uint8_t[]>(size.x * size.y * vku::get_format_params(format).bytes)} {
 }
 
-Bitmap::Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, uint8_t components, bool hdr)
+Bitmap::Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, VkFormat format)
         : size{size}
-        , components{components}
-        , hdr{hdr}
+        , format{format}
         , data{std::move(data)} {
 }
 
@@ -60,8 +58,4 @@ void Bitmap::write(const fs::path& filepath) const {
 #if FUSION_DEBUG
     LOG_DEBUG << "Bitmap: \"" << filepath << "\" written in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
-}
-
-size_t Bitmap::CalculateLength(const glm::uvec2& size, uint8_t components, bool hdr) {
-    return size.x * size.y * components * (hdr ? sizeof(float) : sizeof(uint8_t));
 }

@@ -1,6 +1,7 @@
 #include "gli_toolbox.hpp"
 
 #include "fusion/filesystem/file_system.hpp"
+#include "fusion/utils/vulkan.hpp"
 
 #include <gli/gli.hpp>
 
@@ -23,8 +24,7 @@ void GliToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
 
     bitmap.data = std::move(pixels);
     bitmap.size = tex.extent();
-    bitmap.components = static_cast<uint8_t>(component_count(tex.format()));
-    bitmap.hdr = false;
+    bitmap.format = vku::convert_format(tex.format());
 }
 
 void GliToolbox::Write(const Bitmap& bitmap, const fs::path& filepath) {

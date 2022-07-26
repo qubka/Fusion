@@ -240,7 +240,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     VkImage dstImage;
     VkDeviceMemory dstImageMemory;
 
-    bool supportsBlit = Image::CopyImage(swapchain->getActiveImage(), dstImage, dstImageMemory, format, { size.x, size.y, 1}, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
+    bool supportsBlit = Image::CopyImage(swapchain->getActiveImage(), dstImage, dstImageMemory, format, VK_FORMAT_R8G8B8A8_UNORM, { size.x, size.y, 1}, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
 
     // Get layout of the image (including row pitch)
     VkImageSubresource imageSubresource = {};

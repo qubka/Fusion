@@ -164,6 +164,7 @@ namespace fe {
                 VkImage& dstImage,
                 VkDeviceMemory& dstImageMemory,
                 VkFormat srcFormat,
+                VkFormat dstFormat,
                 const VkExtent3D& extent,
                 VkImageLayout srcImageLayout,
                 uint32_t mipLevel,

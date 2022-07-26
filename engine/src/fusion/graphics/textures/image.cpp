@@ -38,7 +38,7 @@ std::unique_ptr<Bitmap> Image::getBitmap(uint32_t mipLevel, uint32_t arrayLayer)
     VkImage dstImage;
     VkDeviceMemory dstImageMemory;
 
-    CopyImage(image, dstImage, dstImageMemory, format, {size.x, size.y, 1}, layout, mipLevel, arrayLayer);
+    CopyImage(image, dstImage, dstImageMemory, format, format, {size.x, size.y, 1}, layout, mipLevel, arrayLayer);
 
     VkImageSubresource dstImageSubresource = {};
     dstImageSubresource.aspectMask = aspect;
@@ -48,7 +48,7 @@ std::unique_ptr<Bitmap> Image::getBitmap(uint32_t mipLevel, uint32_t arrayLayer)
     VkSubresourceLayout dstSubresourceLayout;
     vkGetImageSubresourceLayout(logicalDevice, dstImage, &dstImageSubresource, &dstSubresourceLayout);
 
-    auto bitmap = std::make_unique<Bitmap>(std::make_unique<uint8_t[]>(dstSubresourceLayout.size), size);
+    auto bitmap = std::make_unique<Bitmap>(std::make_unique<uint8_t[]>(dstSubresourceLayout.size), size, format);
 
     void* data;
     vkMapMemory(logicalDevice, dstImageMemory, dstSubresourceLayout.offset, dstSubresourceLayout.size, 0, &data);
@@ -379,7 +379,7 @@ void Image::CopyBufferToImage(const VkBuffer& buffer, const VkImage& image, cons
     commandBuffer.submitIdle();
 }
 
-bool Image::CopyImage(const VkImage& srcImage, VkImage& dstImage, VkDeviceMemory& dstImageMemory, VkFormat srcFormat,
+bool Image::CopyImage(const VkImage& srcImage, VkImage& dstImage, VkDeviceMemory& dstImageMemory, VkFormat srcFormat, VkFormat dstFormat,
                       const VkExtent3D& extent, VkImageLayout srcImageLayout, uint32_t mipLevel, uint32_t arrayLayer) {
     CommandBuffer commandBuffer{true};
 
@@ -406,7 +406,7 @@ bool Image::CopyImage(const VkImage& srcImage, VkImage& dstImage, VkDeviceMemory
 		supportsBlit = false;
 	}
 
-	CreateImage(dstImage, dstImageMemory, extent, VK_FORMAT_R8G8B8A8_UNORM, VK_SAMPLE_COUNT_1_BIT, VK_IMAGE_TILING_LINEAR,
+	CreateImage(dstImage, dstImageMemory, extent, dstFormat, VK_SAMPLE_COUNT_1_BIT, VK_IMAGE_TILING_LINEAR,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 1, 1, VK_IMAGE_TYPE_2D);
 
 	// Transition destination image to transfer destination layout.

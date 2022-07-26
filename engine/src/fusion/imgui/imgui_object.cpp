@@ -1,6 +1,6 @@
 #include "imgui_object.hpp"
 
-#include "fusion/graphics/vku.hpp"
+#include "fusion/utils/vulkan.hpp"
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"

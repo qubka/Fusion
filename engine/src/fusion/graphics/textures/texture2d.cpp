@@ -1,7 +1,7 @@
 #include "texture2d.hpp"
 
 #include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/graphics/vku.hpp"
+#include "fusion/utils/vulkan.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/filesystem/file_format.hpp"
@@ -24,7 +24,6 @@ Texture2d::Texture2d(fs::path filepath, VkFilter filter, VkSamplerAddressMode ad
                   1,
                   1,
                   { 0, 0, 1 },
-                  0,
                   anisotropic,
                   mipmap} {
     if (load) {
@@ -45,7 +44,6 @@ Texture2d::Texture2d(const glm::uvec2& extent, VkFormat format, VkImageLayout la
                   1,
                   1,
                   { extent.x, extent.y, 1 },
-                  vku::getBlockParams(format).bytes,
                   anisotropic,
                   mipmap}
     {
@@ -65,12 +63,12 @@ Texture2d::Texture2d(const std::unique_ptr<Bitmap>& bitmap, VkFormat format, VkI
                   1,
                   1,
                   vku::uvec3_cast(bitmap->getExtent()),
-                  bitmap->getComponents(),
                   anisotropic,
                   mipmap} {
 }
 
 void Texture2d::setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer) {
+    uint8_t components = vku::get_format_params(format).bytes;
     Buffer bufferStaging{extent.width * extent.height * components * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels};
     CopyBufferToImage(bufferStaging, image, extent, layerCount, baseArrayLayer);
 }
@@ -98,12 +96,12 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
         extent.height = static_cast<uint32_t>(tex.extent().y);
         // arrayLayers = 1
         mipLevels = static_cast<uint32_t>(tex.levels());
-        components = static_cast<uint8_t>(component_count(tex.format()));
+        format = vku::convert_format(tex.format());
 
         if (extent.width == 0 || extent.height == 0)
             throw std::runtime_error("Width or height is empty");
 
-        CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, VK_IMAGE_TYPE_2D);
+        CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, vku::convert_type(tex.target()));
         CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
         CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
 
@@ -114,7 +112,7 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
         if (loadFromFile) {
             loadBitmap = std::make_unique<Bitmap>(path);
             extent =  vku::uvec3_cast(loadBitmap->getExtent());
-            components = loadBitmap->getComponents();
+            format = loadBitmap->getFormat();
         }
 
         if (extent.width == 0 || extent.height == 0)

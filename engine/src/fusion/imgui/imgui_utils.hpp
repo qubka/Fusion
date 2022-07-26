@@ -39,11 +39,11 @@ namespace ImGuiUtils {
     };
     BITMASK_DEFINE_MAX_ELEMENT(PropertyFlag, SliderValue);
 
-    void TextCentered(std::string_view text, std::optional<float> offsetY = std::nullopt);
+    void TextCentered(const char* text, std::optional<float> offsetY = std::nullopt);
 
-    void Tooltip(std::string_view text);
+    void Tooltip(const char* text);
     void Tooltip(Texture2d* texture, const ImVec2& size, bool flipImage = false);
-    void Tooltip(Texture2d* texture, const ImVec2& size, std::string_view text, bool flipImage = false);
+    void Tooltip(Texture2d* texture, const ImVec2& size, const char* text, bool flipImage = false);
 
     void Tooltip(Texture2dArray* texture, uint32_t index, const ImVec2& size, bool flipImage = false);
     void Image(Texture2d* texture, const ImVec2& size, bool flipImage = false);
@@ -53,17 +53,17 @@ namespace ImGuiUtils {
     void Image(uint32_t* texture_id, const ImVec2& size, bool flipImage = false);
 
     void SetTheme(Theme theme);
-    bool BufferingBar(std::string_view name, float value, ImVec2 size, ImU32 bgColor, ImU32 fgColor);
+    bool BufferingBar(const char* name, float value, ImVec2 size, ImU32 bgColor, ImU32 fgColor);
 
-    bool Spinner(std::string_view name, float radius, int thickness, ImU32 color);
-    bool ToggleRoundButton(std::string_view name, bool& value);
+    bool Spinner(const char* name, float radius, int thickness, ImU32 color);
+    bool ToggleRoundButton(const char* name, bool& value);
 
-    bool ToggleButton(std::string_view name, bool& value, bool text_style = false); // if text true, select text on active
+    bool ToggleButton(const char* name, bool& value, bool text_style = false); // if text true, select text on active
 
     void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, float yOffset, ImU32 colEven, ImU32 colOdd);
     void DrawItemActivityOutline(float rounding = 0.0f, bool drawWhenInactive = false, ImU32 colorWhenActive = IM_COL32(80, 80, 80, 255));
 
-    bool InputText(std::string_view name, std::string& currentText);
+    bool InputText(const char* name, std::string& currentText);
 
     void AlternatingRowsBackground(float lineHeight = -1.0f);
 
@@ -97,19 +97,19 @@ namespace ImGuiUtils {
 
     using Flags = bitmask::bitmask<PropertyFlag>;
 
-    void PropertyText(std::string_view name, std::string_view value);
-    bool PropertyText(std::string_view name, std::string& value, const Flags& flags = PropertyFlag::None);
+    void PropertyText(const char* name, const char* text);
+    bool PropertyText(const char* name, std::string& value, const Flags& flags = PropertyFlag::None);
 
     template<typename T, typename = std::enable_if_t<std::is_same_v<T, bool>>>
-    bool Property(std::string_view name, T& value, const Flags& flags = PropertyFlag::None) {
+    bool Property(const char* name, T& value, const Flags& flags = PropertyFlag::None) {
         bool updated = false;
 
         //ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted(name.data());
+        ImGui::TextUnformatted(name);
         ImGui::NextColumn();
         ImGui::PushItemWidth(-1);
 
-        ImGui::PushID(name.data());
+        ImGui::PushID(name);
 
         if (flags & PropertyFlag::ReadOnly) {
             ImGui::TextUnformatted(value ? glm::detail::LabelTrue : glm::detail::LabelFalse);
@@ -127,14 +127,14 @@ namespace ImGuiUtils {
     }
 
     template<typename T, typename = std::enable_if_t<!std::is_same_v<T, bool>>>
-    bool Property(std::string_view name, T& value, const T min = 0, const T max = 0, float speed = 1.0f, const Flags& flags = PropertyFlag::None) {
+    bool Property(const char* name, T& value, const T min = 0, const T max = 0, float speed = 1.0f, const Flags& flags = PropertyFlag::None) {
         bool updated = false;
 
-        ImGui::TextUnformatted(name.data());
+        ImGui::TextUnformatted(name);
         ImGui::NextColumn();
         ImGui::PushItemWidth(-1);
 
-        ImGui::PushID(name.data());
+        ImGui::PushID(name);
 
         if (flags & PropertyFlag::ReadOnly) {
             ImGui::Text(ImGui::DataTypeGetInfo(GetDataType<T>())->PrintFmt, value);
@@ -155,18 +155,18 @@ namespace ImGuiUtils {
     }
 
     template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<std::is_same_v<T, bool>>>
-    bool Property(std::string_view name, glm::vec<L, T, Q>& value, const Flags& flags = PropertyFlag::None) {
+    bool Property(const char* name, glm::vec<L, T, Q>& value, const Flags& flags = PropertyFlag::None) {
         bool updated = false;
 
         //ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted(name.data());
+        ImGui::TextUnformatted(name);
         ImGui::NextColumn();
         ImGui::PushItemWidth(-1);
 
-        ImGui::PushID(name.data());
+        ImGui::PushID(name);
 
         if (flags & PropertyFlag::ReadOnly) {
-            ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").c_str());
+            ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").data());
         } else {
             for (int i = 0; i < L; i++) {
                 std::string id{ "##" + std::to_string(i) };
@@ -184,15 +184,15 @@ namespace ImGuiUtils {
     }
 
     template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<!std::is_same_v<T, bool>>>
-    bool Property(std::string_view name, glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, float speed = 1.0f, const Flags& flags = PropertyFlag::None) {
+    bool Property(const char* name, glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, float speed = 1.0f, const Flags& flags = PropertyFlag::None) {
         bool updated = false;
 
         ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted(name.data());
+        ImGui::TextUnformatted(name);
         ImGui::NextColumn();
         ImGui::PushItemWidth(-1);
 
-        ImGui::PushID(name.data());
+        ImGui::PushID(name);
 
         if (flags & PropertyFlag::ReadOnly) {
             if (flags & PropertyFlag::ColorValue) {
@@ -203,7 +203,7 @@ namespace ImGuiUtils {
                     ImGui::ColorEdit4("", glm::value_ptr(copy), ImGuiColorEditFlags_NoInputs);
                 }
             } else {
-                ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").c_str());
+                ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").data());
             }
         } else if (flags & PropertyFlag::ColorValue) {
             if constexpr (L == 3) {
@@ -230,13 +230,13 @@ namespace ImGuiUtils {
     }
 
     template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<!std::is_same_v<T, bool>>>
-    bool PropertyControl(std::string_view name, glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, T reset = 0, float speed = 1.0f, const Flags& flags = PropertyFlag::None) {
+    bool PropertyControl(const char* name, glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, T reset = 0, float speed = 1.0f, const Flags& flags = PropertyFlag::None) {
         bool updated = false;
 
         ImGuiIO& io = ImGui::GetIO();
 
         //ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted(name.data());
+        ImGui::TextUnformatted(name);
         ImGui::NextColumn();
 
         ImGuiDataType_ dataType = GetDataType<T>();
@@ -246,7 +246,7 @@ namespace ImGuiUtils {
         ImGui::PushMultiItemsWidths(L, ImGui::GetColumnWidth() - L * lineHeight); // ImGui::CalcItemWidth()
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
 
-        ImGui::PushID(name.data());
+        ImGui::PushID(name);
 
         if constexpr(L > 0) {
             ImVec4 color{ 0.8f, 0.1f, 0.15f, 1.0f };
@@ -335,17 +335,17 @@ namespace ImGuiUtils {
         return updated;
     }
 
-    bool PropertyDropdown(std::string_view name, std::string* options, int32_t optionCount, int32_t* selected);
+    bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t& selected);
     template<typename E, typename = std::enable_if_t<std::is_enum_v<E>>>
-    bool PropertyDropdown(std::string_view name, E& value, const Flags& flags = PropertyFlag::None) {
+    bool PropertyDropdown(const char* name, E& value, const Flags& flags = PropertyFlag::None) {
         bool updated = false;
 
         //ImGui::AlignTextToFramePadding();
-        ImGui::TextUnformatted(name.data());
+        ImGui::TextUnformatted(name);
         ImGui::NextColumn();
         ImGui::PushItemWidth(-1);
 
-        ImGui::PushID(name.data());
+        ImGui::PushID(name);
 
         constexpr auto entries = me::enum_entries<E>();
         const char* current = entries[me::enum_index(value).value_or(0)].second.data();
@@ -377,7 +377,7 @@ namespace ImGuiUtils {
         return updated;
     }
 
-    bool PropertyFile(std::string_view name, const fs::path& path, fs::path& value, std::vector<fs::path>& files, fs::path& selected, ImGuiTextFilter& filter);
+    bool PropertyFile(const char* name, const fs::path& path, fs::path& value, std::vector<fs::path>& files, fs::path& selected, ImGuiTextFilter& filter);
 };
 
 static inline ImVec2 operator*(const ImVec2& lhs, const float rhs) {
