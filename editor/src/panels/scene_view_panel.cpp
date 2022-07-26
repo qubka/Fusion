@@ -12,7 +12,7 @@
 using namespace fe;
 
 SceneViewPanel::SceneViewPanel(Editor* editor) : EditorPanel{ICON_MDI_GAMEPAD_VARIANT " Scene###scene", "Scene", editor} {
-    //showComponentGizmosMap[type_id<LightComponent>] = true;
+    showComponentGizmosMap[type_id<LightComponent>] = true;
     showComponentGizmosMap[type_id<CameraComponent>] = true;
     //showComponentGizmosMap[type_id<SoundComponent>] = true;
 }
@@ -272,7 +272,7 @@ void SceneViewPanel::drawToolBar() {
 
             ImGui::Separator();
             ImGui::Checkbox("Camera", &showComponentGizmosMap[type_id<CameraComponent>]);
-            //ImGui::Checkbox("Light", &showComponentGizmosMap[type_id<LightComponent>]);
+            ImGui::Checkbox("Light", &showComponentGizmosMap[type_id<LightComponent>]);
             //ImGui::Checkbox("Audio", &showComponentGizmosMap[type_id<SoundComponent>]);
 
             /*ImGui::Separator();
@@ -445,7 +445,7 @@ void SceneViewPanel::drawToolBar() {
 #define DRAW_COMPONENT(ComponentType) drawComponentGizmos<ComponentType>(registry, camera, coord, offset, #ComponentType);
 
 void SceneViewPanel::drawGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset) {
-    //DRAW_COMPONENT(LightComponent);
+    DRAW_COMPONENT(LightComponent);
     DRAW_COMPONENT(CameraComponent);
     //DRAW_COMPONENT(SoundComponent);
 }

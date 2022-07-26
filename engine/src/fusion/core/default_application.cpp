@@ -41,6 +41,8 @@ void DefaultApplication::onStart() {
     vfs->mount("EngineShaders", shaderPath);
     fs::path modelPath{ executablePath / "engine" / "assets" / "models" };
     vfs->mount("EngineModels", modelPath);
+    fs::path texturePath{ executablePath / "engine" / "assets" / "textures" };
+    vfs->mount("EngineTextures", texturePath);
 
     deserialise();
 

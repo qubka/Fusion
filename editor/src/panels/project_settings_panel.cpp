@@ -25,7 +25,7 @@ void ProjectSettingsPanel::onImGui() {
         auto& projectSettings = editor->getProjectSettings();
         ImGuiUtils::PropertyText("Project Version", projectSettings.projectVersion, ImGuiUtils::PropertyFlag::ReadOnly);
         ImGuiUtils::PropertyText("Project Name", projectSettings.projectName, ImGuiUtils::PropertyFlag::ReadOnly);
-        ImGuiUtils::PropertyText("Project Root", projectSettings.projectRoot.string());
+        ImGuiUtils::PropertyText("Project Root", projectSettings.projectRoot.string().c_str());
         if (ImGuiUtils::PropertyText("Title", projectSettings.title))
             window->setTitle(projectSettings.title);
         ImGuiUtils::Property("Window Width", (int&) projectSettings.size.x, 0, 0, 1, ImGuiUtils::PropertyFlag::ReadOnly);

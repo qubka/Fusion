@@ -37,7 +37,8 @@
 #include <uuid.h>
 
 namespace fe {
-    static uuids::uuid_random_generator uuid_random_generator{ Random::engine() };
+    // TODO: Rework
+    inline static uuids::uuid_random_generator uuid_random_generator{ Random::engine() };
 }
 
 namespace fe {

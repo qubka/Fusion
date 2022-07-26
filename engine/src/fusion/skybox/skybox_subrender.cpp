@@ -65,7 +65,7 @@ SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& stage)
 
     indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint16_t) * indices.size(), indices.data());
 
-    skyboxSampler = std::make_unique<TextureCube>("engine/assets/textures/cubemap_vulkan.ktx");
+    skyboxSampler = std::make_unique<TextureCube>("engine/assets/textures/skybox.ktx");
 }
 
 SkyboxSubrender::~SkyboxSubrender() {

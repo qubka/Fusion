@@ -333,7 +333,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
         }
     }
 
-    ImGuiUtils::Tooltip(name);
+    ImGuiUtils::Tooltip(name.c_str());
 
     if (isDoubleClicked) {
         if (folder) {
