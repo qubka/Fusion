@@ -4,7 +4,15 @@
 
 // regards to http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
 
-layout (location = 0) in vec2 inPosition;
+// Grid position are in xy clipped space
+const vec2 gridPlane[6] = vec2[](
+    vec2(-1.0, 1.0),
+    vec2(-1.0, -1.0),
+    vec2(1.0, 1.0),
+    vec2(1.0, -1.0),
+    vec2(1.0, 1.0),
+    vec2(-1.0, -1.0)
+);
 
 layout (push_constant) uniform PushObject {
     mat4 projection;
@@ -14,10 +22,6 @@ layout (push_constant) uniform PushObject {
 layout (location = 0) out vec3 outNearPoint;
 layout (location = 1) out vec3 outFarPoint;
 
-out gl_PerVertex {
-    vec4 gl_Position;
-};
-
 vec3 UnprojectPoint(float x, float y, float z) {
     mat4 viewInv = inverse(push.view);
     mat4 projInv = inverse(push.projection);
@@ -26,7 +30,8 @@ vec3 UnprojectPoint(float x, float y, float z) {
 }
 
 void main() {
-    outNearPoint = UnprojectPoint(inPosition.x, inPosition.y, 0.0).xyz; // unprojecting on the near plane
-    outFarPoint = UnprojectPoint(inPosition.x, inPosition.y, 1.0).xyz; // unprojecting on the far plane
-    gl_Position = vec4(inPosition, 0.0, 1.0); // using directly the clipped coordinates
+    vec2 position = gridPlane[gl_VertexIndex];
+    outNearPoint = UnprojectPoint(position.x, position.y, 0.0).xyz; // unprojecting on the near plane
+    outFarPoint = UnprojectPoint(position.x, position.y, 1.0).xyz; // unprojecting on the far plane
+    gl_Position = vec4(position, 0.0, 1.0); // using directly the clipped coordinates
 }

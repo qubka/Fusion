@@ -88,7 +88,7 @@ namespace fe {
 #endif
         bool beginFrame(FrameInfo& info);
         bool beginRenderpass(FrameInfo& info, RenderStage& renderStage);
-        void nextSubpasses(FrameInfo& info, RenderStage& renderStage, Pipeline::Stage& stage);
+        void nextSubpasses(FrameInfo& info, RenderStage& renderStage, Pipeline::Stage& pipelineStage);
         void endRenderpass(FrameInfo& info);
         void endFrame(FrameInfo& info);
 

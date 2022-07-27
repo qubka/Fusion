@@ -6,7 +6,6 @@
 #include "fusion/graphics/buffers/push_handler.hpp"
 
 namespace fe {
-    class Buffer;
     class AtmosphereSubrender final : public Subrender {
     public:
         explicit AtmosphereSubrender(const Pipeline::Stage& pipelineStage);
@@ -19,7 +18,5 @@ namespace fe {
         PipelineGraphics pipeline;
         DescriptorsHandler descriptorSet;
         PushHandler pushObject;
-
-        std::unique_ptr<Buffer> vertexBuffer;
     };
 }

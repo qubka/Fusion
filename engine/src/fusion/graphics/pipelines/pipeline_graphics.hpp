@@ -53,7 +53,7 @@ namespace fe {
          */
         PipelineGraphics(Stage stage,
                          std::vector<fs::path> shaderStages,
-                         std::vector<Vertex::Input> vertexInputs,
+                         std::vector<Vertex::Input> vertexInputs = {},
                          std::vector<Shader::Define> defines = {},
                          Mode mode = Mode::Polygon,
                          Depth depth = Depth::ReadWrite,

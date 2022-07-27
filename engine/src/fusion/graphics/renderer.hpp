@@ -41,12 +41,12 @@ namespace fe {
          * Adds a subrender.
          * @tparam T The subrender type.
          * @tparam Args The constructor arg types.
-         * @param stage The subrender pipeline stage.
+         * @param pipelineStage The subrender pipeline stage.
          * @param args The constructor arguments.
          */
         template<typename T, typename... Args>
-        T* addSubrender(const Pipeline::Stage& stage, Args&&...args) {
-            return subrenderHolder.add<T>(stage, std::make_unique<T>(stage, std::forward<Args>(args)...));
+        T* addSubrender(const Pipeline::Stage& pipelineStage, Args&&...args) {
+            return subrenderHolder.add<T>(pipelineStage, std::make_unique<T>(pipelineStage, std::forward<Args>(args)...));
         }
 
         /**

@@ -16,7 +16,7 @@ namespace fe {
 
     class Model {
     public:
-        explicit Model(const fs::path& filepath, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::UV}});
+        explicit Model(const fs::path& filepath, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}});
         ~Model() = default;
 
         void cmdRender(const CommandBuffer& commandBuffer) const;

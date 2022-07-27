@@ -170,7 +170,7 @@ bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
     return true;
 }
 
-void Graphics::nextSubpasses(FrameInfo& info, RenderStage& renderStage, Pipeline::Stage& stage) {
+void Graphics::nextSubpasses(FrameInfo& info, RenderStage& renderStage, Pipeline::Stage& pipelineStage) {
     UNPACK_FRAME_INFO(info);
 
     auto lastBinding = renderStage.getSubpasses().back().binding;
@@ -178,10 +178,10 @@ void Graphics::nextSubpasses(FrameInfo& info, RenderStage& renderStage, Pipeline
     for (const auto& subpass : renderStage.getSubpasses()) {
         FUSION_PROFILE_GPU("Begin Subpass");
 
-        stage.second = subpass.binding;
+        pipelineStage.second = subpass.binding;
 
         // Renders subpass subrender pipelines
-        renderer->subrenderHolder.renderStage(stage, commandBuffer, renderStage.getOverrideCamera());
+        renderer->subrenderHolder.renderStage(pipelineStage, commandBuffer, renderStage.getOverrideCamera());
 
         if (subpass.binding != lastBinding)
             vkCmdNextSubpass(commandBuffer, VK_SUBPASS_CONTENTS_INLINE);

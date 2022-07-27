@@ -72,6 +72,26 @@ namespace ImGui {
         ImGui::Separator();
         ImGui::PopStyleVar();
     }
+
+    template<>
+    void ComponentEditorWidget<LightComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& light = registry.get<LightComponent>(entity);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        if (ImGuiUtils::Property("Color", light.color, 0.0f, 0.0f, 1.0f, ImGuiUtils::PropertyFlag::ColorValue)) {
+        }
+
+        if (ImGuiUtils::Property("Radius", light.radius)) {
+        }
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
 }
 
 #define REG_COMPONENT(ComponentType, ComponentName)            \
@@ -87,6 +107,7 @@ InspectorPanel::InspectorPanel(Editor* editor) : EditorPanel(ICON_MDI_INFORMATIO
     REG_COMPONENT(TransformComponent, "Transform");
     REG_COMPONENT(ModelComponent, "Model");
     REG_COMPONENT(CameraComponent, "Camera");
+    REG_COMPONENT(LightComponent, "Light");
 }
 
 InspectorPanel::~InspectorPanel() {

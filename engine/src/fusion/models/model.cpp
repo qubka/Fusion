@@ -157,7 +157,7 @@ void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scen
                 break;
             case Component::Normal:
                 vertexBuffer.push_back(normal.x);
-                vertexBuffer.push_back(-normal.y);
+                vertexBuffer.push_back(normal.y);
                 vertexBuffer.push_back(normal.z);
                 break;
             case Component::UV:

@@ -48,6 +48,7 @@ void Editor::onStart() {
     componentIconMap[type_id<ModelComponent>] = ICON_MDI_SHAPE;
     //componentIconMap[type_id<MeshComponent>] = ICON_MDI_SHAPE;
     componentIconMap[type_id<CameraComponent>] = ICON_MDI_CAMERA;
+    componentIconMap[type_id<LightComponent>] = ICON_MDI_LIGHTBULB;
     /*componentIconMap[type_id<RigidBodyComponent>] = ICON_MDI_CUBE_OUTLINE;
     componentIconMap[type_id<PhysicsMaterialComponent>] = ICON_FA_TENCENT_WEIBO;
     componentIconMap[type_id<BoxColliderComponent>] = ICON_FA_SQUARE_O;

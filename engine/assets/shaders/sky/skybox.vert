@@ -11,10 +11,6 @@ layout (push_constant) uniform PushObject {
 	mat4 view;
 } push;
 
-out gl_PerVertex {
-	vec4 gl_Position;
-};
-
 void main() {
 	outUV = inPosition;
 	gl_Position = push.projection * push.view * vec4(inPosition, 1.0);
