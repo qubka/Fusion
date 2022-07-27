@@ -40,16 +40,16 @@ void StbToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
     int components = std::max(channels, desired_channels);
     switch (components) {
         case STBI_grey:
-            bitmap.format = VK_FORMAT_R8_UNORM;
+            bitmap.format = hdr ? VK_FORMAT_R16_UNORM : VK_FORMAT_R8_UNORM;
             break;
         case STBI_grey_alpha:
-            bitmap.format = VK_FORMAT_R8G8_UNORM;
+            bitmap.format = hdr ? VK_FORMAT_R16G16_UNORM : VK_FORMAT_R8G8_UNORM;
             break;
         case STBI_rgb:
-            bitmap.format = VK_FORMAT_R8G8B8_UNORM;
+            bitmap.format = hdr ? VK_FORMAT_R16G16B16_UNORM : VK_FORMAT_R8G8B8_UNORM;
             break;
         case STBI_rgb_alpha:
-            bitmap.format = VK_FORMAT_R8G8B8A8_UNORM;
+            bitmap.format = hdr ? VK_FORMAT_R16G16B16A16_UNORM : VK_FORMAT_R8G8B8A8_UNORM;
             break;
     }
 }
@@ -65,7 +65,7 @@ void StbToolbox::Write(const Bitmap& bitmap, const fs::path& filepath) {
     } else if (extension == ".tga") {
         stbi_write_tga(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<uint8_t>());
     } else if (extension == ".hdr") {
-        stbi_write_hdr(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<float>());
+        stbi_write_hdr(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes / sizeof(float)), bitmap.getData<float>());
     } else {
         LOG_ERROR << "Unknown extension format: \"" << extension << "\" to write data in!";
     }
