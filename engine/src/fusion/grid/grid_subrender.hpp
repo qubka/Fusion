@@ -9,7 +9,7 @@ namespace fe {
     class Buffer;
     class GridSubrender final : public Subrender {
     public:
-        explicit GridSubrender(const Pipeline::Stage& stage);
+        explicit GridSubrender(const Pipeline::Stage& pipelineStage);
         ~GridSubrender() override;
 
     private:

@@ -16,7 +16,7 @@ namespace fe {
     class ImGuiSubrender final : public Subrender {
         typedef void* ImTextureID;
     public:
-        explicit ImGuiSubrender(const Pipeline::Stage& stage);
+        explicit ImGuiSubrender(const Pipeline::Stage& pipelineStage);
         ~ImGuiSubrender() override;
 
     private:

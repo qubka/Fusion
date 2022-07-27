@@ -65,7 +65,7 @@ VkDescriptorSetLayoutBinding Image::GetDescriptorSetLayout(uint32_t binding, VkD
     VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = {};
     descriptorSetLayoutBinding.binding = binding;
     descriptorSetLayoutBinding.descriptorType = descriptorType;
-    descriptorSetLayoutBinding.descriptorCount = 1;
+    descriptorSetLayoutBinding.descriptorCount = count;
     descriptorSetLayoutBinding.stageFlags = stage;
     descriptorSetLayoutBinding.pImmutableSamplers = nullptr;
     return descriptorSetLayoutBinding;

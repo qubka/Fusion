@@ -9,9 +9,9 @@
 
 using namespace fe;
 
-SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& stage)
-        : Subrender{stage}
-        , pipeline{stage, {"EngineShaders/sky/skybox.vert", "EngineShaders/sky/skybox.frag"}, {{{Vertex::Component::Position}}}} {
+SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& pipelineStage)
+        : Subrender{pipelineStage}
+        , pipeline{pipelineStage, {"EngineShaders/sky/skybox.vert", "EngineShaders/sky/skybox.frag"}, {{{Vertex::Component::Position}}}} {
 
     std::vector<glm::vec3> vertices {
             //front
@@ -65,7 +65,7 @@ SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& stage)
 
     indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint16_t) * indices.size(), indices.data());
 
-    skyboxSampler = std::make_unique<TextureCube>("engine/assets/textures/skybox.ktx");
+    skyboxSampler = std::make_unique<TextureCube>("engine/assets/textures/cubemap_vulkan.ktx");
 }
 
 SkyboxSubrender::~SkyboxSubrender() {
