@@ -77,7 +77,6 @@ namespace fe {
 
         type_index getTypeIndex() const override { return type_id<Texture2dArray>; }
 
-
         void load();
     };
 }
