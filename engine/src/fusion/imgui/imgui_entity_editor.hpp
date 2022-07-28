@@ -3,7 +3,6 @@
 #include "material_design_icons.hpp"
 #include "imgui_utils.hpp"
 
-#include <entt/entt.hpp>
 #include <imgui/imgui.h>
 
 /** @link https://github.com/Green-Sky/imgui_entt_entity_editor_demo **/

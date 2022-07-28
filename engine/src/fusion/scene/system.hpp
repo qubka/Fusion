@@ -1,7 +1,5 @@
 #pragma once
 
-#include <entt/entity/registry.hpp>
-
 namespace fe {
     class System {
         friend class Scene;

@@ -54,17 +54,27 @@ namespace fs = std::filesystem;
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+// Serialzation
+#include <cereal/cereal.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+
 // Customization
 #include <magic_enum.hpp>
 namespace me = magic_enum;
-
 #include <effolkronium/random.hpp>
-
 // get base random alias which is auto seeded and has static API and internal state
 using Random = effolkronium::random_static;
-
 #include <bitmask/bitmask.hpp>
 
+// Graphics
+#include <volk/volk.h>
+
+// ECS
+#include <entt/entt.hpp>
+
 // Engine
-#include "fusion/core/base.hpp"
-#include "fusion/core/log.hpp"
+#include "fusion/fusion.hpp"

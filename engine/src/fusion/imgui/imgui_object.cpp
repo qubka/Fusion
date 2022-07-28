@@ -6,7 +6,6 @@
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/imgui/imgui_utils.hpp"
 
-#include <volk/volk.h>
 #include <imgui/imgui.h>
 
 using namespace fe;

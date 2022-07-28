@@ -1,9 +1,5 @@
 #pragma once
 
-#include "fusion/input/codes.hpp"
-
-#include <entt/signal/sigh.hpp>
-
 namespace fe {
     /**
      * @brief Class used to describe the gamepad input state.

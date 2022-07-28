@@ -4,8 +4,6 @@
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Appenders/ColorConsoleAppender.h>
 
-#include <entt/signal/sigh.hpp>
-
 namespace plog {
     template<class Formatter>
     class EventConsoleAppender : public ColorConsoleAppender<Formatter> {

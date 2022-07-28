@@ -1,6 +1,7 @@
 #include "mesh_importer.hpp"
 
 #include "fusion/graphics/textures/texture2d.hpp"
+#include "fusion/assets/asset_manager.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/scene/components.hpp"
@@ -22,7 +23,7 @@ static inline glm::mat4 mat4_cast(const aiMatrix4x4 &m) { return glm::transpose(
 static inline glm::mat4 mat4_cast(const aiMatrix3x3 &m) { return glm::transpose(glm::make_mat3(&m.a1)); }
 
 MeshImporter::MeshImporter(const fs::path& filepath, const Vertex::Layout& layout) : layout{layout} {
-    fs::path path{ VirtualFileSystem::Get()->resolvePhysicalPath(filepath) };
+    path = VirtualFileSystem::Get()->resolvePhysicalPath(filepath);
 
     Assimp::Importer import;
 
@@ -54,7 +55,7 @@ MeshImporter::MeshImporter(const fs::path& filepath, const Vertex::Layout& layou
 void MeshImporter::processNode(const aiScene* scene, const aiNode* node) {
     for (uint32_t i = 0; i < node->mNumMeshes; i++) {
         const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        processMesh(scene, node, mesh);
+        processMesh(scene, node, mesh, i);
     }
 
     for (uint32_t i = 0; i < scene->mNumCameras; i++) {
@@ -76,7 +77,8 @@ void MeshImporter::processNode(const aiScene* scene, const aiNode* node) {
     }
 }
 
-void MeshImporter::processMesh(const aiScene* scene, const aiNode* node, const aiMesh* mesh) {
+void MeshImporter::processMesh(const aiScene* scene, const aiNode* node, const aiMesh* mesh, uint32_t index) {
+    auto assetManager = AssetManager::Get();
     auto currentScene = SceneManager::Get()->getScene();
     auto& registry = currentScene->getRegistry();
 
@@ -99,6 +101,7 @@ void MeshImporter::processMesh(const aiScene* scene, const aiNode* node, const a
     for (uint32_t i = 0; i < mesh->mNumVertices; i++) {
         appendVertex(vertices, scene, mesh, i);
     }
+    radius = std::max(glm::length(minExtents), glm::length(maxExtents));
 
     for (uint32_t i = 0; i < mesh->mNumFaces; i++) {
         const aiFace& face = mesh->mFaces[i];
@@ -135,16 +138,40 @@ void MeshImporter::processMesh(const aiScene* scene, const aiNode* node, const a
         }*/
     }
 
+    std::string name{ mesh->mName.C_Str() + ":"s + std::to_string(index) };
+    Mesh tempMesh{path, name, minExtents, maxExtents, radius, 1, 1, layout};
+
+    std::stringstream ss;
+    {
+        cereal::BinaryOutputArchive output{ss};
+        output(tempMesh);
+    }
+
+    auto meshPtr = assetManager->find<Mesh>(ss.str());
+
     if (it != hierarchy.end()) {
-        registry.emplace<MeshComponent>(it->second, std::make_shared<Mesh>(std::move(vertices), std::move(indices), layout));
+        if (meshPtr) {
+            registry.emplace<MeshComponent>(it->second, meshPtr);
+        } else {
+            meshPtr = std::make_shared<Mesh>(path, name, vertices, indices, layout);
+            assetManager->add(meshPtr);
+            registry.emplace<MeshComponent>(it->second, meshPtr);
+        }
     } else {
-        auto entity = currentScene->createEntity(mesh->mName.C_Str());
+        auto entity = currentScene->createEntity(name);
 
         auto& transform = registry.emplace<TransformComponent>(entity);
         transform.setLocalPosition(vec3_cast(position));
         transform.setLocalOrientation(quat_cast(rotation));
         transform.setLocalScale(vec3_cast(scaling));
-        registry.emplace<MeshComponent>(entity, std::make_shared<Mesh>(std::move(vertices), std::move(indices), layout));
+
+        if (meshPtr) {
+            registry.emplace<MeshComponent>(entity, meshPtr);
+        } else {
+            meshPtr = std::make_shared<Mesh>(path, name, vertices, indices, layout);
+            assetManager->add(meshPtr);
+            registry.emplace<MeshComponent>(it->second, meshPtr);
+        }
 
         if (node->mParent) {
             if (auto it2 = hierarchy.find(node->mParent); it2 != hierarchy.end()) {
@@ -335,6 +362,9 @@ void MeshImporter::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScen
                 break;
         };
     }
+
+    maxExtents = glm::max(vec3_cast(pos), maxExtents);
+    minExtents = glm::min(vec3_cast(pos), minExtents);
 
     appendOutput<float>(outputBuffer, vertexBuffer);
 }

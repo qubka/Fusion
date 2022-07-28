@@ -2,9 +2,6 @@
 
 #include "fusion/scene/system_holder.hpp"
 
-#include <entt/entity/registry.hpp>
-#include <cereal/cereal.hpp>
-
 namespace fe {
     class Camera;
     class Scene {

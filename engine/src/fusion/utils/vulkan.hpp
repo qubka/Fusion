@@ -1,7 +1,5 @@
 #pragma once
 
-#include <volk/volk.h>
-
 #include <gli/format.hpp>
 #include <gli/target.hpp>
 

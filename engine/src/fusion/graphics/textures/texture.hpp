@@ -4,8 +4,6 @@
 
 #include "fusion/assets/asset.hpp"
 
-#include <cereal/cereal.hpp>
-
 namespace fe {
     /**
      * @brief Defines the purpose of a texture
@@ -148,12 +146,6 @@ namespace fe {
             descriptor.sampler = sampler;
             descriptor.imageView = view;
             descriptor.imageLayout = layout;
-        }
-
-        std::string toString() const override {
-            std::stringstream ss;
-            ss << path << me::enum_name(type) << mipLevels << arrayLayers << anisotropic << mipmap;
-            return ss.str();
         }
 
         template<typename Archive>

@@ -4,8 +4,6 @@
 
 #include "fusion/graphics/pipelines/vertex.hpp"
 
-#include <entt/entity/entity.hpp>
-
 class aiScene;
 class aiNode;
 class aiMesh;
@@ -22,7 +20,7 @@ namespace fe {
 
     private:
         void processNode(const aiScene* scene, const aiNode* node);
-        void processMesh(const aiScene* scene, const aiNode* node, const aiMesh* mesh);
+        void processMesh(const aiScene* scene, const aiNode* node, const aiMesh* mesh, uint32_t index);
         void processLight(const aiScene* scene, const aiNode* node, const aiLight* light);
         void processCamera(const aiScene* scene, const aiNode* node, const aiCamera* camera);
 
@@ -47,11 +45,16 @@ namespace fe {
             std::memcpy(outputBuffer.data() + offset, t.data(), copySize);
         }
 
+        fs::path path;
         fs::path directory;
 
         std::unordered_map<const aiNode*, entt::entity> hierarchy;
         //std::vector<std::unique_ptr<Mesh>> meshes;
         std::vector<std::shared_ptr<Texture2d>> texturesLoaded;
         Vertex::Layout layout;
+
+        glm::vec3 minExtents{ FLT_MAX };
+        glm::vec3 maxExtents{ -FLT_MAX };
+        float radius{ 0.0f };
     };
 }

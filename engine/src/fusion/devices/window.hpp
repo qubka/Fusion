@@ -1,10 +1,5 @@
 #pragma once
 
-#include "fusion/input/codes.hpp"
-
-#include <volk/volk.h>
-#include <entt/signal/sigh.hpp>
-
 namespace fe {
     /**
      * @brief Class used to represent a initial window information.

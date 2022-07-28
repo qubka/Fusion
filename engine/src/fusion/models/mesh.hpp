@@ -1,26 +1,39 @@
 #pragma once
 
-#include <volk/volk.h>
-#include <meshoptimizer/src/meshoptimizer.h>
-
+#include "fusion/assets/asset.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/pipelines/vertex.hpp"
+#include "fusion/utils/cereal_extention.hpp"
 
 namespace fe {
-    class Mesh {
+    class Mesh : public Asset {
     public:
         Mesh() = default;
-        explicit Mesh(const std::vector<uint8_t>& vertices, const Vertex::Layout& layout) : layout{layout} {
-            setVertices(vertices);
+        explicit Mesh(fs::path path, std::string name, const glm::vec3& minExtents, const glm::vec3& maxExtents, float radius, uint32_t vertexCount, uint32_t indexCount, const Vertex::Layout& layout)
+                : path{std::move(path)}
+                , name{std::move(name)}
+                , layout{layout}
+                , vertexCount{vertexCount}
+                , indexCount{indexCount}
+                , minExtents{minExtents}
+                , maxExtents{maxExtents}
+                , radius{radius} {
         }
+
         template< typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-        explicit Mesh(std::vector<uint8_t>&& vertices, std::vector<T>&& indices, const Vertex::Layout& layout) : layout{layout} {
+        explicit Mesh(fs::path path, std::string name, const std::vector<uint8_t>& vertices, const std::vector<T>& indices, const Vertex::Layout& layout)
+                : path{std::move(path)}
+                , name{std::move(name)}
+                , layout{layout} {
             setVertices(vertices);
             setIndices(indices);
         }
-        template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-        explicit Mesh(std::vector<uint8_t>&& vertices, std::vector<T>&& indices, const Vertex::Layout& layout, float optimiseThreshold) : layout{layout} {
+        /*template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+        explicit Mesh(fs::path path, std::string name, std::vector<uint8_t>&& vertices, std::vector<T>&& indices, const Vertex::Layout& layout, float optimiseThreshold)
+                : path{std::move(path)}
+                , name{std::move(name)}
+                , layout{layout} {
             size_t vertexCount = vertices.size() / layout.getStride();
             size_t indexCount = indices.size();
             size_t targetIndexCount = static_cast<size_t>(indices.size() * optimiseThreshold);
@@ -58,7 +71,7 @@ namespace fe {
 
             setVertices(vertices);
             setIndices(indices);
-        }
+        }*/
         ~Mesh() = default;
 
         bool cmdRender(const CommandBuffer& commandBuffer, uint32_t instances = 1) const;
@@ -69,6 +82,12 @@ namespace fe {
         uint32_t getIndexCount() const { return indexCount; }
         const Vertex::Layout& getVertexLayout() const { return layout; }
         VkIndexType getIndexType() const { return indexType; }
+        const glm::vec3& getMinExtents() const { return minExtents; }
+        const glm::vec3& getMaxExtents() const { return maxExtents; }
+        float getWidth() const { return maxExtents.x - minExtents.x; }
+        float getHeight() const { return maxExtents.y - minExtents.y; }
+        float getDepth() const { return maxExtents.z - minExtents.z; }
+        float getRadius() const { return radius; }
 
         std::vector<uint8_t> getVertices() const {
             auto vertexStaging = Buffer::DeviceToStageBuffer(*vertexBuffer);
@@ -89,6 +108,13 @@ namespace fe {
                 return;
 
             vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, vertices.size(), vertices.data());
+
+            for (size_t i = 0; i < vertices.size(); i += layout.getStride()) {
+                const auto& position = *reinterpret_cast<const glm::vec3*>(&vertices[i]);
+                minExtents = glm::min(position, minExtents);
+                maxExtents = glm::min(position, maxExtents);
+            }
+            radius = std::max(glm::length(minExtents), glm::length(maxExtents));
         }
 
         template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
@@ -124,12 +150,32 @@ namespace fe {
             }
         }
 
+        type_index getTypeIndex() const override { return type_id<Mesh>; }
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("Name", name),
+                    cereal::make_nvp("Path", path),
+                    cereal::make_nvp("Vertex", vertexCount),
+                    cereal::make_nvp("Index", indexCount),
+                    cereal::make_nvp("Min", glm::ivec3{minExtents}),
+                    cereal::make_nvp("Max", glm::ivec3{maxExtents}),
+                    cereal::make_nvp("Radius", static_cast<int>(radius)));
+        }
+
     private:
         std::unique_ptr<Buffer> vertexBuffer;
         std::unique_ptr<Buffer> indexBuffer;
         uint32_t vertexCount{ 0 };
         uint32_t indexCount{ 0 };
+
         VkIndexType indexType{ VK_INDEX_TYPE_NONE_KHR };
         Vertex::Layout layout;
+
+        fs::path path;
+        std::string name;
+        glm::vec3 minExtents{ FLT_MAX };
+        glm::vec3 maxExtents{ -FLT_MAX };
+        float radius{ 0.0f };
     };
 }
