@@ -7,9 +7,6 @@
 #include "fusion/geometry/frustum.hpp"
 #include "fusion/graphics/cameras/camera.hpp"
 
-#include <volk/volk.h>
-#include <entt/entt.hpp>
-
 namespace fe {
     class SceneViewPanel : public EditorPanel {
     public:

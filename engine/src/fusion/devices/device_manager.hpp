@@ -5,10 +5,7 @@
 #include "joystick.hpp"
 #include "cursor.hpp"
 
-#include "fusion/input/codes.hpp"
-
 #include <GLFW/glfw3.h>
-#include <entt/signal/sigh.hpp>
 
 namespace fe {
     /**

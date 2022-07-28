@@ -2,7 +2,6 @@
 #include "file_system.hpp"
 
 #include "fusion/imgui/material_design_icons.hpp"
-#include "fusion/utils/string.hpp"
 
 using namespace fe;
 

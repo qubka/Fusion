@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fusion/post/post_filter.hpp"
-#include "fusion/utils/future.hpp"
 #include "fusion/graphics/buffers/uniform_handler.hpp"
 
 namespace fe {

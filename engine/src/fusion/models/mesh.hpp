@@ -4,7 +4,6 @@
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/pipelines/vertex.hpp"
-#include "fusion/utils/cereal_extention.hpp"
 
 namespace fe {
     class Mesh : public Asset {

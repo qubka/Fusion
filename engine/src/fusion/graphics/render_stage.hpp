@@ -4,7 +4,6 @@
 #include "fusion/graphics/renderpass/framebuffers.hpp"
 #include "fusion/graphics/renderpass/renderpass.hpp"
 #include "fusion/graphics/renderpass/swapchain.hpp"
-#include "fusion/utils/vulkan.hpp"
 
 namespace fe {
 

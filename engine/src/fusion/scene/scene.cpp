@@ -2,18 +2,12 @@
 #include "system.hpp"
 #include "components.hpp"
 
-#include "fusion/utils/string.hpp"
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
 
 #include "fusion/scene/systems/hierarchy_system.hpp"
 #include "fusion/scene/systems/camera_system.hpp"
 #include "fusion/models/mesh_importer.hpp"
-
-#include <entt/entt.hpp>
-#include <cereal/types/polymorphic.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/json.hpp>
 
 using namespace fe;
 

@@ -2,27 +2,26 @@
 
 using namespace fe;
 
-std::shared_ptr<Asset> AssetManager::find(type_index type, const std::string& data) const {
+std::shared_ptr<Asset> AssetManager::find(type_index type, const std::string& serialize) const {
     if (auto it = assets.find(type); it != assets.end()) {
-        if (auto it1 = it->second.find(data); it1 != it->second.end()) {
+        if (auto it1 = it->second.find(serialize); it1 != it->second.end()) {
             return it1->second;
         }
     }
     return nullptr;
 }
 
-void AssetManager::add(const std::shared_ptr<Asset>& asset) {
+void AssetManager::add(const std::shared_ptr<Asset>& asset, const std::string& serialize) {
     auto type = asset->getTypeIndex();
-    auto data = asset->toString();
-    if (find(type, data))
+    if (find(type, serialize))
         return;
 
-    assets[type].emplace(data, asset);
+    assets[type].emplace(serialize, asset);
 }
 
 void AssetManager::remove(const std::shared_ptr<Asset>& asset) {
     auto type = asset->getTypeIndex();
-    auto data = asset->toString();
+    auto data = "";
 
     if (auto it = assets.find(type); it != assets.end()) {
         if (auto it1 = it->second.find(data); it1 != it->second.end()) {

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "fusion/utils/glm_extention.hpp"
-
 namespace fe {
     class Transform {
     public:

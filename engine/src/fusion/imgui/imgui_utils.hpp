@@ -1,7 +1,6 @@
 #pragma once
 
 #include "imgui_color_scheme.hpp"
-#include "fusion/utils/string.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>

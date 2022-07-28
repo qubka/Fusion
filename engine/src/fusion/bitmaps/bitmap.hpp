@@ -2,8 +2,6 @@
 
 #include "bitmap_factory.hpp"
 
-#include "fusion/utils/vulkan.hpp"
-
 namespace fe {
     class Bitmap : public BitmapFactory<Bitmap> {
         friend class StbToolbox;

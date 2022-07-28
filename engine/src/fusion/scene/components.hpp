@@ -1,8 +1,5 @@
 #pragma once
 
-#include "fusion/utils/cereal_extention.hpp"
-#include "fusion/utils/glm_extention.hpp"
-
 #include <cereal/cereal.hpp>
 
 #include "components/id_component.hpp"

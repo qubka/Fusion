@@ -138,7 +138,7 @@ void MeshImporter::processMesh(const aiScene* scene, const aiNode* node, const a
         }*/
     }
 
-    std::string name{ mesh->mName.C_Str() + ":"s + std::to_string(index) };
+    /*std::string name{ mesh->mName.C_Str() + ":"s + std::to_string(index) };
     Mesh tempMesh{path, name, minExtents, maxExtents, radius, 1, 1, layout};
 
     std::stringstream ss;
@@ -180,7 +180,7 @@ void MeshImporter::processMesh(const aiScene* scene, const aiNode* node, const a
         }
 
         hierarchy.emplace(node, entity);
-    }
+    }*/
 }
 
 void MeshImporter::processLight(const aiScene* scene, const aiNode* node, const aiLight* light) {

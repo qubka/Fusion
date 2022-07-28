@@ -1,7 +1,5 @@
 #pragma once
 
-#include <volk/volk.h>
-
 namespace fe {
     class LogicalDevice;
     // Setup and functions for the VK_EXT_debug_marker_extension

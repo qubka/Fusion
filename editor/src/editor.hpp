@@ -1,12 +1,10 @@
 #pragma once
 
 #include "fusion/core/default_application.hpp"
+#include "fusion/graphics/cameras/controllers/editor_camera_controller.hpp"
 
 #include "panels/editor_panel.hpp"
 #include "panels/file_browser_panel.hpp"
-#include "fusion/graphics/cameras/controllers/editor_camera_controller.hpp"
-
-#include <entt/entity/entity.hpp>
 
 namespace fe {
     class Camera;

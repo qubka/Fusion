@@ -8,7 +8,6 @@
 #include "fusion/graphics/buffers/uniform_handler.hpp"
 #include "fusion/graphics/pipelines/pipeline_graphics.hpp"
 #include "fusion/graphics/descriptors/descriptors_handler.hpp"
-#include "fusion/input/codes.hpp"
 
 namespace fe {
     class Window;

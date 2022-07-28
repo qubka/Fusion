@@ -6,8 +6,6 @@
 #include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
 
-#include <cereal/archives/json.hpp>
-
 #if FUSION_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif

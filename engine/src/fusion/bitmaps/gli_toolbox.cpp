@@ -1,7 +1,6 @@
 #include "gli_toolbox.hpp"
 
 #include "fusion/filesystem/file_system.hpp"
-#include "fusion/utils/vulkan.hpp"
 
 #include <gli/gli.hpp>
 

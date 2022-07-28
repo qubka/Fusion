@@ -2,13 +2,9 @@
 
 #include "application.hpp"
 
-#include "fusion/utils/cereal_extention.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/filesystem/file_system.hpp"
-
-#include <cereal/cereal.hpp>
-#include <cereal/types/vector.hpp>
 
 namespace fe {
     struct ProjectSettings {

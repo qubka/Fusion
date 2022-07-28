@@ -1,7 +1,5 @@
 #pragma once
 
-#include "fusion/core/module.hpp"
-
 namespace fe {
     /** https://github.com/anthony-y/tiny-vfs */
     class VirtualFileSystem : public Module::Registrar<VirtualFileSystem> {

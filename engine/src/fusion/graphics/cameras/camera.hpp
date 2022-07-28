@@ -2,7 +2,6 @@
 
 #include "fusion/geometry/frustum.hpp"
 #include "fusion/geometry/ray.hpp"
-#include "fusion/utils/glm_extention.hpp"
 
 namespace fe {
     class Camera {

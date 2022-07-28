@@ -6,7 +6,6 @@
 #include "fusion/graphics/textures/image.hpp"
 #include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/graphics/textures/texture_cube.hpp"
-#include "fusion/utils/string.hpp"
 #include "fusion/filesystem/file_system.hpp"
 
 #include <SPIRV/GlslangToSpv.h>

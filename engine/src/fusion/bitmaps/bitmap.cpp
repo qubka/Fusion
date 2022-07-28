@@ -1,8 +1,6 @@
 #include "bitmap.hpp"
 
 #include "fusion/filesystem/file_system.hpp"
-#include "fusion/utils/string.hpp"
-#include "fusion/utils/date_time.hpp"
 
 using namespace fe;
 

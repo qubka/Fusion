@@ -2,8 +2,6 @@
 
 #include "codes.hpp"
 
-#include "fusion/core/module.hpp"
-
 namespace fe {
     // if you want use individual inputs, not called init here, use BaseInput's classes
     class Input : public Module::Registrar<Input>{

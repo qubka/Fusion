@@ -1,6 +1,5 @@
 #pragma once
 
-#include "fusion/core/module.hpp"
 #include "fusion/scene/scene.hpp"
 
 namespace fe {

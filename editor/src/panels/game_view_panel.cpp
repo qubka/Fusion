@@ -1,7 +1,6 @@
 #include "game_view_panel.hpp"
 #include "editor.hpp"
 
-#include "fusion/core/time.hpp"
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/scene/components/camera_component.hpp"

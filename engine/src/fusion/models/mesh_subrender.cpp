@@ -4,7 +4,6 @@
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/scene/components.hpp"
 #include "fusion/scene/scene.hpp"
-#include "fusion/core/time.hpp"
 
 using namespace fe;
 

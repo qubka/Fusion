@@ -11,9 +11,6 @@
 #include "fusion/graphics/render_stage.hpp"
 #include "fusion/graphics/renderer.hpp"
 #include "fusion/graphics/subrender.hpp"
-#include "fusion/utils/enumerate.hpp"
-#include "fusion/utils/date_time.hpp"
-#include "fusion/utils/string.hpp"
 
 #include <glslang/Public/ShaderLang.h>
 

@@ -1,7 +1,6 @@
 #include "texture2d.hpp"
 
 #include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/utils/vulkan.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/filesystem/file_format.hpp"

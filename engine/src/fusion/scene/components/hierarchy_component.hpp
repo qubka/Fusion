@@ -1,8 +1,5 @@
 #pragma once
 
-#include <entt/entity/registry.hpp>
-#include <entt/entity/entity.hpp>
-
 namespace fe {
     struct HierarchyComponent {
         uint32_t children{ 0 }; //! the number of children for the given entity.

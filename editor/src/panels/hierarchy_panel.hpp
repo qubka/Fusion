@@ -2,9 +2,6 @@
 
 #include "editor_panel.hpp"
 
-#include <entt/entity/entity.hpp>
-#include <entt/entity/registry.hpp>
-
 namespace fe {
     class HierarchyPanel : public EditorPanel {
     public:

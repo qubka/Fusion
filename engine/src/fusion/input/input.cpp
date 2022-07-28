@@ -1,7 +1,5 @@
 #include "input.hpp"
 
-#include "fusion/core/time.hpp"
-#include "fusion/utils/glm_extention.hpp"
 #include "fusion/devices/device_manager.hpp"
 
 #define MOUSE_BUTTONS 1024

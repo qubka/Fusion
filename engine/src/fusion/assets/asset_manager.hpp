@@ -2,10 +2,6 @@
 
 #include "asset.hpp"
 
-#include "fusion/core/module.hpp"
-#include "fusion/utils/elapsed_time.hpp"
-#include "fusion/utils/thread_pool.hpp"
-
 namespace fe {
     /**
      * @brief Module used for managing assets.
@@ -15,7 +11,7 @@ namespace fe {
         AssetManager() = default;
         ~AssetManager() override = default;
 
-        std::shared_ptr<Asset> find(type_index type, const std::string& data) const;
+        std::shared_ptr<Asset> find(type_index type, const std::string& serialize) const;
 
         template<typename T>
         std::shared_ptr<T> find(const std::string& data) const {
@@ -27,7 +23,7 @@ namespace fe {
             return nullptr;
         }
 
-        void add(const std::shared_ptr<Asset>& asset);
+        void add(const std::shared_ptr<Asset>& asset, const std::string& serialize);
         void remove(const std::shared_ptr<Asset>& asset);
 
         /**
