@@ -2,7 +2,6 @@
 
 #include <entt/entity/registry.hpp>
 #include <entt/entity/entity.hpp>
-#include <cereal/cereal.hpp>
 
 namespace fe {
     struct HierarchyComponent {

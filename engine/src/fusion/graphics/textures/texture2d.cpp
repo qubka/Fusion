@@ -74,7 +74,6 @@ void Texture2d::setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t b
 }
 
 void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
-
     bool loadFromFile = !path.empty() && !loadBitmap;
     // That is fast loading approach
     if (loadFromFile && FileFormat::IsTextureStorageFile(path)) {

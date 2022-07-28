@@ -3,6 +3,8 @@
 #include "fusion/utils/cereal_extention.hpp"
 #include "fusion/utils/glm_extention.hpp"
 
+#include <cereal/cereal.hpp>
+
 #include "components/id_component.hpp"
 #include "components/name_component.hpp"
 #include "components/active_component.hpp"

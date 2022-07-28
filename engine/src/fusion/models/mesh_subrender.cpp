@@ -12,12 +12,12 @@ static const uint32_t MAX_LIGHTS = 32; // TODO: Make configurable.
 
 MeshSubrender::MeshSubrender(const Pipeline::Stage& pipelineStage)
         : Subrender{pipelineStage}                                                                          // TODO: Should be same as in Model class
-        , pipeline{pipelineStage, {"EngineShaders/simple/main.vert", "EngineShaders/simple/main.frag"}, {{{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}}}, {},
-                   PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::ReadWrite, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE}
+        , pipeline{pipelineStage, {"EngineShaders/simple/simple.vert", "EngineShaders/simple/simple.frag"}, {{{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}}}, {},
+                   PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::ReadWrite, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_FRONT_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE}
         , descriptorSet{pipeline} {
 }
 
-void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
+/*void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
     auto scene = SceneManager::Get()->getScene();
     if (!scene)
         return;
@@ -73,10 +73,9 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
 
         mesh.mesh->cmdRender(commandBuffer);
     }
-}
+}*/
 
-/*
- * void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
+void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
     auto scene = SceneManager::Get()->getScene();
     if (!scene)
         return;
@@ -135,4 +134,3 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
         mesh.mesh->cmdRender(commandBuffer);
     }
 }
- */

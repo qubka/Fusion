@@ -9,7 +9,7 @@
 #include <cereal/archives/json.hpp>
 
 #if FUSION_PLATFORM_WINDOWS
-#include <windows.h>
+#include <Windows.h>
 #endif
 
 using namespace fe;

@@ -87,7 +87,7 @@ namespace glm {
 
         vec<3, T, Q> change {current - target};
 
-        // Clamp maximum speed
+        // Clamp maximum speed.
         float maxChange = maxSpeed * smoothTime;
 
         float maxChangeSq = maxChange * maxChange;
@@ -103,7 +103,7 @@ namespace glm {
 
         vec<3, T, Q> output { dest + (change + temp) * exp };
 
-        // Prevent overshooting
+        // Prevent overshooting.
         vec<3, T, Q> origMinusCurrent {target - current};
         vec<3, T, Q> outMinusOrig {output - target};
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cereal/cereal.hpp>
-
 namespace fe {
     struct LightComponent {
         glm::vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };

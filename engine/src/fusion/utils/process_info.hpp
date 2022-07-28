@@ -1,7 +1,7 @@
 #pragma once
 
 #if FUSION_PLATFORM_WINDOWS
-#include <windows.h>
+#include <Windows.h>
 #elif FUSION_PLATFORM_LINUX
 #include <unistd.h>
 #endif

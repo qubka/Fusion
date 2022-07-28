@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cereal/cereal.hpp>
-
 namespace fe {
     struct NameComponent {
         std::string name;

@@ -2,8 +2,6 @@
 
 //#include "fusion/mesh/model.hpp"
 
-#include <cereal/cereal.hpp>
-
 namespace fe {
     class Mesh;
     struct MeshComponent {

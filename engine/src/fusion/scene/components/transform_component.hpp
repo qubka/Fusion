@@ -2,8 +2,6 @@
 
 #include "fusion/geometry/transform.hpp"
 
-#include <cereal/cereal.hpp>
-
 namespace fe {
     struct TransformComponent : public Transform {
 

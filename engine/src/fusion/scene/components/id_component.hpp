@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cereal/cereal.hpp>
-
 namespace fe {
     struct IdComponent {
         uuids::uuid uuid{ uuid_random_generator() };

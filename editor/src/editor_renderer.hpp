@@ -23,8 +23,8 @@ namespace fe {
             std::vector<SubpassType> renderpassSubpasses0 = {
                     //{0, {0, 1, 2, 3, 4}},
                     {0, {0, 1}},
-                    //{1, {0, 1}},
-                    //{2, {0, 1}},
+                    {1, {0, 1}},
+                    {2, {0, 1}},
                     //{3, {0, 1}},
             };
 
@@ -55,10 +55,10 @@ namespace fe {
         void onStart() override {
             //addSubrender<AtmosphereSubrender>({0, 0});
             addSubrender<MeshSubrender>({0, 0});
-            //addSubrender<LightSubrender>({0, 1});
+            addSubrender<LightSubrender>({0, 1});
             //addSubrender<DeferredSubrender>({0, 1});
             //addSubrender<SkyboxSubrender>({0, 2});
-            //addSubrender<GridSubrender>({0, 3});
+            addSubrender<GridSubrender>({0, 2});
 
             addSubrender<SkyboxSubrender>({1, 0});
 

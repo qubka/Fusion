@@ -1,10 +1,5 @@
 #pragma once
 
-#include <map>
-#include <set>
-#include <functional>
-#include <string>
-
 #include "material_design_icons.hpp"
 #include "imgui_utils.hpp"
 
@@ -79,7 +74,7 @@ namespace ImGui {
             if (entity != entt::null) {
                 ImGuiStyle& style = ImGui::GetStyle();
                 std::map<ComponentType, ComponentInfo> hasNot;
-                for (auto& [component, info] : componentInfos) {
+                for (const auto& [component, info] : componentInfos) {
                     if (entityHasComponent(registry, entity, component)) {
                         ImGui::PushID(component);
 
@@ -140,7 +135,7 @@ namespace ImGui {
                         filterSize = std::min(200.0f, filterSize);
                         componentFilter.Draw("##ComponentFilter", filterSize);
 
-                        for (auto& [component, info] : hasNot) {
+                        for (const auto& [component, info] : hasNot) {
                             bool show = true;
                             if (componentFilter.IsActive()) {
                                 if (!componentFilter.PassFilter(info.name.c_str())) {

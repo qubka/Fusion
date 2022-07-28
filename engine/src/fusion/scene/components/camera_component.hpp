@@ -2,8 +2,6 @@
 
 #include "fusion/graphics/cameras/camera.hpp"
 
-#include <cereal/cereal.hpp>
-
 namespace fe {
     struct CameraComponent : Camera {
         template<typename Archive>

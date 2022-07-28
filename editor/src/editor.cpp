@@ -214,22 +214,25 @@ void Editor::onImGuizmo() {
             if (ImGuizmo::IsUsing()) {
                 model = glm::inverse(transform->getParentMatrix()) * model;
 
-                glm::vec3 position, rotation, scale;
-                glm::decompose(model, position, rotation, scale);
+                glm::vec3 position, scale;
+                glm::quat orientation;
+                glm::vec3 skew;
+                glm::vec4 perspective;
+                glm::decompose(model, scale, orientation, position, skew, perspective);
 
                 switch (gizmosType) {
                     case ImGuizmo::TRANSLATE:
                         transform->setLocalPosition(position);
                         break;
                     case ImGuizmo::ROTATE:
-                        transform->setLocalOrientation(rotation);
+                        transform->setLocalOrientation(orientation);
                         break;
                     case ImGuizmo::SCALE:
                         transform->setLocalScale(scale);
                         break;
                     default:
                         transform->setLocalPosition(position);
-                        transform->setLocalOrientation(rotation);
+                        transform->setLocalOrientation(orientation);
                         transform->setLocalScale(scale);
                         break;
                 }

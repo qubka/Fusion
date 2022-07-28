@@ -3,6 +3,7 @@
 #include "mesh.hpp"
 
 #include "fusion/graphics/pipelines/vertex.hpp"
+
 #include <entt/entity/entity.hpp>
 
 class aiScene;

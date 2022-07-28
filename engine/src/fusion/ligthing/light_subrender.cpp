@@ -3,13 +3,13 @@
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/scene/components.hpp"
-#include "fusion/scene/scene.hpp"
 
 using namespace fe;
 
 LightSubrender::LightSubrender(const Pipeline::Stage& pipelineStage)
         : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"EngineShaders/simple/light.vert", "EngineShaders/simple/light.frag"}}
+        , pipeline{pipelineStage, {"EngineShaders/simple/light.vert", "EngineShaders/simple/light.frag"}, {}, {},
+                   PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::ReadWrite, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE}
         , descriptorSet{pipeline} {
 }
 

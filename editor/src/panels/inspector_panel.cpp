@@ -21,7 +21,7 @@ namespace ImGui {
         }
 
         glm::vec3 rotation{ glm::degrees(glm::eulerAngles(transform.getLocalOrientation())) };
-        if (ImGuiUtils::PropertyControl("Rotation", rotation, -359.9f, 359.9f)) {
+        if (ImGuiUtils::PropertyControl("Rotation", rotation)) {
             transform.setLocalOrientation(glm::radians(rotation));
         }
 

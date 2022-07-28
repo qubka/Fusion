@@ -1,7 +1,7 @@
 #include "string.hpp"
 
 #ifdef FUSION_PLATFORM_WINDOWS
-#include <windows.h>
+#include <Windows.h>
 #include <DbgHelp.h>
 #else
 #include <cxxabi.h> // __cxa_demangle()

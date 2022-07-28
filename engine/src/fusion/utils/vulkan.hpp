@@ -1,8 +1,9 @@
 #pragma once
 
-#include "volk.h"
-#include "gli/format.hpp"
-#include "gli/target.hpp"
+#include <volk/volk.h>
+
+#include <gli/format.hpp>
+#include <gli/target.hpp>
 
 namespace vku {
     template<typename T> static constexpr T numMipmapLevels(T width, T height) {

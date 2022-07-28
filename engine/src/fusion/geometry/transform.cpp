@@ -78,7 +78,7 @@ void Transform::setWorldMatrix(const glm::mat4& mat) {
         calcMatrices();
     parentMatrix = mat;
     worldMatrix = parentMatrix * localMatrix;
-    normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
+    normalMatrix = glm::inverseTranspose(glm::mat3{localMatrix});
 }
 
 void Transform::setLocalTransform(const glm::mat4& localMat) {
@@ -87,7 +87,7 @@ void Transform::setLocalTransform(const glm::mat4& localMat) {
     applyTransform();
 
     worldMatrix = parentMatrix * localMatrix;
-    normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
+    normalMatrix = glm::inverseTranspose(glm::mat3{localMatrix});
 }
 
 void Transform::setLocalPosition(const glm::vec3& localPos) {
