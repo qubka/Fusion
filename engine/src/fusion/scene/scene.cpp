@@ -27,7 +27,7 @@ void Scene::onStart() {
         system->setEnabled(true);
     });
 
-    MeshImporter meshImporter{"EngineModels/vulkanscenemodels.dae"};
+    MeshImporter meshImporter{"EngineModels/untitled.fbx"};
 
     LOG_DEBUG << "Scene : \"" << name << "\" created first time";
 }
@@ -106,8 +106,6 @@ entt::entity Scene::createEntity(std::string name) {
         name += " (" + std::to_string(i) + ")";
 
     registry.emplace<NameComponent>(entity, name);
-
-
 
     return entity;
 }

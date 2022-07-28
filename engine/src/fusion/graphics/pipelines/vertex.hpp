@@ -45,6 +45,10 @@ namespace fe {
             Component operator[](uint32_t index) const { return components[index]; }
             ITERATABLE(Component, components);
 
+            bool contains(Component component) const {
+                return std::find(components.begin(), components.end(), component) != components.end();
+            }
+
             uint32_t getSize() const { return components.size(); }
             uint32_t getBinding() const { return binding; }
             uint32_t getStride() const { return stride; }

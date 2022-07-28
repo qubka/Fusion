@@ -20,10 +20,10 @@ namespace fe {
        MeshImporter(const fs::path& filepath, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}});
 
     private:
-        void processNode(const aiScene* scene, aiNode* node);
-        void processMesh(const aiScene* scene, aiNode* node, const aiMesh* mesh);
-        void processLight(const aiScene* scene, aiNode* node, const aiLight* light);
-        void processCamera(const aiScene* scene, aiNode* node, const aiCamera* camera);
+        void processNode(const aiScene* scene, const aiNode* node);
+        void processMesh(const aiScene* scene, const aiNode* node, const aiMesh* mesh);
+        void processLight(const aiScene* scene, const aiNode* node, const aiLight* light);
+        void processCamera(const aiScene* scene, const aiNode* node, const aiCamera* camera);
 
         std::vector<std::shared_ptr<Texture2d>> loadTextures(const aiMaterial* material, int type);
         void appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t vertexIndex);

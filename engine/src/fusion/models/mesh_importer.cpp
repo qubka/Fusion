@@ -26,7 +26,15 @@ MeshImporter::MeshImporter(const fs::path& filepath, const Vertex::Layout& layou
 
     Assimp::Importer import;
 
-    int defaultFlags = aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals; //aiProcess_FixInfacingNormals | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_RemoveRedundantMaterials | aiProcess_ImproveCacheLocality
+    int defaultFlags = aiProcess_Triangulate;
+    if (layout.contains(Vertex::Component::Normal)) {
+        defaultFlags |= aiProcess_GenSmoothNormals;
+    }
+    if (layout.contains(Vertex::Component::Tangent) || layout.contains(Vertex::Component::Bitangent)) {
+        defaultFlags |= aiProcess_CalcTangentSpace;
+    }
+
+    //aiProcess_FixInfacingNormals | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_RemoveRedundantMaterials | aiProcess_ImproveCacheLocality
     const aiScene* scene = import.ReadFile(path.string(), defaultFlags);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         LOG_ERROR << "Failed to load model at: \"" << path << "\" - " << import.GetErrorString();
@@ -43,7 +51,7 @@ MeshImporter::MeshImporter(const fs::path& filepath, const Vertex::Layout& layou
     processNode(scene, root);
 }
 
-void MeshImporter::processNode(const aiScene* scene, aiNode* node) {
+void MeshImporter::processNode(const aiScene* scene, const aiNode* node) {
     for (uint32_t i = 0; i < node->mNumMeshes; i++) {
         const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         processMesh(scene, node, mesh);
@@ -68,7 +76,7 @@ void MeshImporter::processNode(const aiScene* scene, aiNode* node) {
     }
 }
 
-void MeshImporter::processMesh(const aiScene* scene, aiNode* node, const aiMesh* mesh) {
+void MeshImporter::processMesh(const aiScene* scene, const aiNode* node, const aiMesh* mesh) {
     auto currentScene = SceneManager::Get()->getScene();
     auto& registry = currentScene->getRegistry();
 
@@ -79,7 +87,7 @@ void MeshImporter::processMesh(const aiScene* scene, aiNode* node, const aiMesh*
         return;
     } else {
         node->mTransformation.Decompose(scaling, rotation, position);
-        node->mTransformation = aiMatrix4x4{};
+        //node->mTransformation = aiMatrix4x4{};
     }
 
     std::vector<uint8_t> vertices;
@@ -148,7 +156,7 @@ void MeshImporter::processMesh(const aiScene* scene, aiNode* node, const aiMesh*
     }
 }
 
-void MeshImporter::processLight(const aiScene* scene, aiNode* node, const aiLight* light) {
+void MeshImporter::processLight(const aiScene* scene, const aiNode* node, const aiLight* light) {
     auto currentScene = SceneManager::Get()->getScene();
     auto& registry = currentScene->getRegistry();
 
@@ -178,7 +186,7 @@ void MeshImporter::processLight(const aiScene* scene, aiNode* node, const aiLigh
     }
 }
 
-void MeshImporter::processCamera(const aiScene* scene, aiNode* node, const aiCamera* camera) {
+void MeshImporter::processCamera(const aiScene* scene, const aiNode* node, const aiCamera* camera) {
     auto currentScene = SceneManager::Get()->getScene();
     auto& registry = currentScene->getRegistry();
 
