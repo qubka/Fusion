@@ -250,6 +250,7 @@ std::vector<std::shared_ptr<Texture2d>> MeshImporter::loadTextures(const aiMater
             LOG_ERROR << "Could not get texture from material";
         }
     }
+
     return textures;
 }
 

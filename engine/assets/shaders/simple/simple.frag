@@ -11,7 +11,7 @@ layout (location = 0) out vec4 outColor;
 layout (binding = 0) uniform UniformObject {
     mat4 projection;
     mat4 view;
-    vec3 cameraPosition;
+    vec3 cameraPos;
     uint lightsCount;
     vec4 ambientLightColor;
 } ubo;
@@ -56,7 +56,7 @@ void main() {
         diffuse += lightDiffuse * (diff * materialDiffuse) * attenuation;
 
         // specualr
-        vec3 viewDir = normalize(ubo.cameraPosition - inPosition);
+        vec3 viewDir = normalize(ubo.cameraPos - inPosition);
         vec3 refrectDir = reflect(-lightDir, inNormal);
         float spec = pow(max(dot(viewDir, refrectDir), 0.0), materialShininess);
         specular += lightSpecular * (spec * materialSpecular) * attenuation;
@@ -70,7 +70,7 @@ void main() {
     vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
     vec3 specularLight = vec3(0.0);
 
-    vec3 viewDirection = normalize(ubo.cameraPosition - inPosition);
+    vec3 viewDirection = normalize(ubo.cameraPos - inPosition);
 
     for (uint i = 0; i < ubo.lightsCount; i++) {
         PointLight light = bufferLights.lights[i];

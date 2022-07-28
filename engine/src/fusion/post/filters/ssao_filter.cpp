@@ -30,7 +30,7 @@ void SsaoFilter::onRender(const CommandBuffer& commandBuffer, const Camera* over
     uniformScene.push("kernel", *kernel.data(), sizeof(glm::vec3) * SSAO_KERNEL_SIZE);
     uniformScene.push("projection", camera->getProjectionMatrix());
     uniformScene.push("view", camera->getViewMatrix());
-    uniformScene.push("cameraPosition", camera->getEyePoint());
+    uniformScene.push("cameraPos", camera->getEyePoint());
 
     // Updates descriptors.
     descriptorSet.push("UniformScene", uniformScene);

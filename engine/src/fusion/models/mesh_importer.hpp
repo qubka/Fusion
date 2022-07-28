@@ -18,7 +18,7 @@ namespace fe {
     class Texture2d;
     class MeshImporter {
     public:
-       MeshImporter(const fs::path& filepath, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}});
+       explicit MeshImporter(const fs::path& filepath, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}});
 
     private:
         void processNode(const aiScene* scene, const aiNode* node);

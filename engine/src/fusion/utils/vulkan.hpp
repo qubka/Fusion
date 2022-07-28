@@ -6,7 +6,7 @@
 #include <gli/target.hpp>
 
 namespace vku {
-    template<typename T> static constexpr T numMipmapLevels(T width, T height) {
+    /*template<typename T> static constexpr T numMipmapLevels(T width, T height) {
         T levels = 1;
         while((width|height) >> levels) {
             ++levels;
@@ -17,7 +17,7 @@ namespace vku {
     /// Scale a value by mip level, but do not reduce to zero.
     inline uint32_t mipScale(uint32_t value, uint32_t mipLevel) {
         return std::max(value >> mipLevel, 1U);
-    }
+    }*/
 
     inline VkViewport viewport(float x, float y, float width, float height, float minDepth = 0, float maxDepth = 1) {
         return { x, y, width, height, minDepth, maxDepth };

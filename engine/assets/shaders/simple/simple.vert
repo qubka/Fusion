@@ -14,7 +14,7 @@ layout (location = 2) out vec3 outNormal;
 layout (binding = 0) uniform UniformObject {
     mat4 projection;
     mat4 view;
-    vec3 cameraPosition;
+    vec3 cameraPos;
     uint lightsCount;
     vec4 ambientLightColor;
 } ubo;
