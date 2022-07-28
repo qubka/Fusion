@@ -16,12 +16,12 @@ namespace ImGui {
         ImGui::Separator();
 
         glm::vec3 position{ transform.getLocalPosition() };
-        if (ImGuiUtils::PropertyControl("Position", position)) {
+        if (ImGuiUtils::PropertyControl("Position", position, 0.0f, 0.0f, 0.0f, 0.01f)) {
             transform.setLocalPosition(position);
         }
 
         glm::vec3 rotation{ glm::degrees(glm::eulerAngles(transform.getLocalOrientation())) };
-        if (ImGuiUtils::PropertyControl("Rotation", rotation, -180.0f, 180.0f)) {
+        if (ImGuiUtils::PropertyControl("Rotation", rotation, -359.9f, 359.9f)) {
             transform.setLocalOrientation(glm::radians(rotation));
         }
 

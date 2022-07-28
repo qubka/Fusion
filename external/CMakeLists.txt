@@ -159,6 +159,15 @@ endif()
 list(APPEND ALL_SYSTEM_LIBS effolkronium_random)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
+# meshoptimizer
+#╒◖═════════════════════════════════════════════════════════════════════◗╕
+find_package(meshoptimizer 0.17 QUIET)
+if(NOT meshoptimizer_FOUND)
+    add_subdirectory(meshoptimizer)
+endif()
+list(APPEND ALL_SYSTEM_LIBS meshoptimizer)
+#╘◖═════════════════════════════════════════════════════════════════════◗╛
+
 # glslang
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 ##find_package(glslang 11.6.0 QUIET)

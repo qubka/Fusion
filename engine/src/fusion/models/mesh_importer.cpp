@@ -26,7 +26,7 @@ MeshImporter::MeshImporter(const fs::path& filepath, const Vertex::Layout& layou
 
     Assimp::Importer import;
 
-    int defaultFlags = aiProcess_Triangulate;
+    int defaultFlags = aiProcess_FlipWindingOrder | aiProcess_Triangulate;
     if (layout.contains(Vertex::Component::Normal)) {
         defaultFlags |= aiProcess_GenSmoothNormals;
     }
@@ -273,16 +273,16 @@ void MeshImporter::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScen
         switch (component) {
             case Component::Position2:
                 vertexBuffer.push_back(pos.x);
-                vertexBuffer.push_back(pos.y);
+                vertexBuffer.push_back(-pos.y);
                 break;
             case Component::Position:
                 vertexBuffer.push_back(pos.x);
-                vertexBuffer.push_back(pos.y);
+                vertexBuffer.push_back(-pos.y);
                 vertexBuffer.push_back(pos.z);
                 break;
             case Component::Normal:
                 vertexBuffer.push_back(normal.x);
-                vertexBuffer.push_back(normal.y);
+                vertexBuffer.push_back(-normal.y);
                 vertexBuffer.push_back(normal.z);
                 break;
             case Component::UV:

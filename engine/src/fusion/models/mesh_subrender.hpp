@@ -26,6 +26,8 @@ namespace fe {
         PipelineGraphics pipeline;
         DescriptorsHandler descriptorSet;
         UniformHandler uniformObject;
+        UniformHandler uniformMat;
+        UniformHandler uniformLight;
         StorageHandler storageLights;
         PushHandler pushObject;
     };
