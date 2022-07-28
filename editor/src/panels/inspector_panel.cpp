@@ -105,7 +105,7 @@ namespace ImGui {
 
 InspectorPanel::InspectorPanel(Editor* editor) : EditorPanel(ICON_MDI_INFORMATION " Inspector###inspector", "Inspector", editor) {
     REG_COMPONENT(TransformComponent, "Transform");
-    REG_COMPONENT(ModelComponent, "Model");
+    REG_COMPONENT(MeshComponent, "Mesh");
     REG_COMPONENT(CameraComponent, "Camera");
     REG_COMPONENT(LightComponent, "Light");
 }

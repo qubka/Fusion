@@ -8,6 +8,7 @@
 
 #include "fusion/scene/systems/hierarchy_system.hpp"
 #include "fusion/scene/systems/camera_system.hpp"
+#include "fusion/models/mesh_importer.hpp"
 
 #include <entt/entt.hpp>
 #include <cereal/types/polymorphic.hpp>
@@ -25,6 +26,8 @@ void Scene::onStart() {
     systems.each([&](auto system) {
         system->setEnabled(true);
     });
+
+    MeshImporter meshImporter{"EngineModels/vulkanscenemodels.dae"};
 
     LOG_DEBUG << "Scene : \"" << name << "\" created first time";
 }
@@ -103,6 +106,8 @@ entt::entity Scene::createEntity(std::string name) {
         name += " (" + std::to_string(i) + ")";
 
     registry.emplace<NameComponent>(entity, name);
+
+
 
     return entity;
 }

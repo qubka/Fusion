@@ -35,7 +35,7 @@ namespace fe {
          */
         class Layout {
         public:
-            Layout(std::vector<Component> components, uint32_t binding = 0) : components{std::move(components)}, binding{binding} {
+            Layout(const std::initializer_list<Component>& components, uint32_t binding = 0) : components{components}, binding{binding} {
                 for (const auto& component : this->components) {
                     stride += ComponentSize(component);
                 }
@@ -75,10 +75,7 @@ namespace fe {
         class Input {
         public:
             Input() = default;
-            Input(std::vector<Component> components) {
-                append({std::move(components)});
-            }
-            explicit Input(std::span<const Layout> vertexLayouts) {
+            Input(const std::initializer_list<Layout>& vertexLayouts) {
                 for (const auto& layout : vertexLayouts) {
                     append(layout);
                 }

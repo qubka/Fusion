@@ -8,10 +8,10 @@
 #include "fusion/graphics/buffers/storage_handler.hpp"
 
 namespace fe {
-    class ModelSubrender final : public Subrender {
+    class MeshSubrender final : public Subrender {
     public:
-        explicit ModelSubrender(const Pipeline::Stage& pipelineStage);
-        ~ModelSubrender() override = default;
+        explicit MeshSubrender(const Pipeline::Stage& pipelineStage);
+        ~MeshSubrender() override = default;
 
     private:
         struct PointLight {

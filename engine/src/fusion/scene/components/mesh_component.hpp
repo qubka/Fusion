@@ -1,15 +1,13 @@
 #pragma once
 
-//#include "fusion/models/model.hpp"
+//#include "fusion/mesh/model.hpp"
 
 #include <cereal/cereal.hpp>
 
 namespace fe {
-    class Model;
-    struct ModelComponent {
-        ModelComponent();
-
-        std::shared_ptr<Model> model;
+    class Mesh;
+    struct MeshComponent {
+        std::shared_ptr<Mesh> mesh;
 
         /*Model& operator*() { return *model; }
         const Model& operator*() const { return *model; }

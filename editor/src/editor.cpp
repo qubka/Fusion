@@ -45,8 +45,8 @@ void Editor::onStart() {
     editorCamera = std::make_shared<Camera>();
 
     componentIconMap[type_id<TransformComponent>] = ICON_MDI_AXIS_ARROW;
-    componentIconMap[type_id<ModelComponent>] = ICON_MDI_SHAPE;
-    //componentIconMap[type_id<MeshComponent>] = ICON_MDI_SHAPE;
+    //componentIconMap[type_id<ModelComponent>] = ICON_MDI_SHAPE;
+    componentIconMap[type_id<MeshComponent>] = ICON_MDI_SHAPE;
     componentIconMap[type_id<CameraComponent>] = ICON_MDI_CAMERA;
     componentIconMap[type_id<LightComponent>] = ICON_MDI_LIGHTBULB;
     /*componentIconMap[type_id<RigidBodyComponent>] = ICON_MDI_CUBE_OUTLINE;

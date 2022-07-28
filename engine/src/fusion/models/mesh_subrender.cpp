@@ -1,5 +1,5 @@
-#include "model_subrender.hpp"
-#include "model.hpp"
+#include "mesh_subrender.hpp"
+#include "mesh.hpp"
 
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/scene/components.hpp"
@@ -9,14 +9,14 @@ using namespace fe;
 
 static const uint32_t MAX_LIGHTS = 32; // TODO: Make configurable.
 
-ModelSubrender::ModelSubrender(const Pipeline::Stage& pipelineStage)
+MeshSubrender::MeshSubrender(const Pipeline::Stage& pipelineStage)
         : Subrender{pipelineStage}                                                                          // TODO: Should be same as in Model class
-        , pipeline{pipelineStage, {"EngineShaders/simple/simple.vert", "EngineShaders/simple/simple.frag"}, {{{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}}}}
+        , pipeline{pipelineStage, {"EngineShaders/simple/main.vert", "EngineShaders/simple/main.frag"}, {{{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}}}}
         , descriptorSet{pipeline} {
 }
 
-void ModelSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
-    /*auto scene = SceneManager::Get()->getScene();
+void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
+    auto scene = SceneManager::Get()->getScene();
     if (!scene)
         return;
 
@@ -63,14 +63,14 @@ void ModelSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
     descriptorSet.bindDescriptor(commandBuffer, pipeline);
     //pushObject.bindPush(commandBuffer, pipeline);
 
-    auto modelView = scene->getRegistry().view<TransformComponent, MeshComponent>();
+    auto meshView = scene->getRegistry().view<TransformComponent, MeshComponent>();
 
-    for (const auto& [entity, transform, model] : modelView.each()) {
+    for (const auto& [entity, transform, mesh] : meshView.each()) {
         pushObject.push("model", transform.getWorldMatrix());
         pushObject.push("normal", transform.getNormalMatrix());
         descriptorSet.push("PushObject", pushObject);
         pushObject.bindPush(commandBuffer, pipeline);
 
-        model.model->cmdRender(commandBuffer);
-    }*/
+        mesh.mesh->cmdRender(commandBuffer);
+    }
 }

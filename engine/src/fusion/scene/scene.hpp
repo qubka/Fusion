@@ -106,6 +106,18 @@ namespace fe {
         entt::entity createEntity(std::string name = "");
 
         /**
+         * Creates an entity with components.
+         * @param name Name string.
+         * @return The Entity handle that you can use to access the entity.
+         */
+        template<typename ... Args>
+        entt::entity createEntity(const std::string& name) {
+            auto entity = createEntity(name);
+            (registry.emplace_or_replace<Args>(entity), ...);
+            return entity;
+        }
+
+        /**
          * Destroys an entity.
          * @param entity The Entity handle of the entity to destroy.
          */

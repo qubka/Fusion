@@ -9,10 +9,10 @@
 #include "components/hierarchy_component.hpp"
 #include "components/transform_component.hpp"
 #include "components/camera_component.hpp"
-#include "components/model_component.hpp"
+#include "components/mesh_component.hpp"
 #include "components/light_component.hpp"
 
-#define ALL_COMPONENTS IdComponent, NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, ModelComponent, LightComponent
+#define ALL_COMPONENTS IdComponent, NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent
 
 namespace fe {
     /*struct PointLightComponent {

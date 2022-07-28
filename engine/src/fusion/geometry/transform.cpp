@@ -8,7 +8,7 @@ Transform::Transform(const glm::mat4& local) {
     localOrientation = rotation;
     localMatrix = local;
     worldMatrix = local;
-    normalMatrix = glm::inverseTranspose(glm::mat3{localMatrix});
+    normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
 }
 
 Transform::Transform(const glm::mat4& parent, const glm::mat4& local) {
@@ -18,11 +18,13 @@ Transform::Transform(const glm::mat4& parent, const glm::mat4& local) {
     parentMatrix = parent;
     localMatrix = local;
     worldMatrix = parent * local;
-    normalMatrix = glm::inverseTranspose(glm::mat3{localMatrix});
+    normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
 }
 
-Transform::Transform(const glm::vec3& position) {
+Transform::Transform(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale) {
     setLocalPosition(position);
+    setLocalOrientation(rotation);
+    setLocalScale(scale);
 }
 
 void Transform::calcMatrices() const {
@@ -42,7 +44,7 @@ void Transform::calcMatrices() const {
     };
 
     worldMatrix = parentMatrix * localMatrix;
-    normalMatrix = glm::inverseTranspose(glm::mat3{localMatrix});
+    normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
     dirty = false;
 }
 
@@ -76,7 +78,7 @@ void Transform::setWorldMatrix(const glm::mat4& mat) {
         calcMatrices();
     parentMatrix = mat;
     worldMatrix = parentMatrix * localMatrix;
-    normalMatrix = glm::inverseTranspose(glm::mat3{localMatrix});
+    normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
 }
 
 void Transform::setLocalTransform(const glm::mat4& localMat) {
@@ -85,7 +87,7 @@ void Transform::setLocalTransform(const glm::mat4& localMat) {
     applyTransform();
 
     worldMatrix = parentMatrix * localMatrix;
-    normalMatrix = glm::inverseTranspose(glm::mat3{localMatrix});
+    normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
 }
 
 void Transform::setLocalPosition(const glm::vec3& localPos) {

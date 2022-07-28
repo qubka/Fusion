@@ -1,20 +1,61 @@
 #pragma once
 
 #include <volk/volk.h>
+#include <meshoptimizer/src/meshoptimizer.h>
 
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/graphics/pipelines/vertex.hpp"
 
 namespace fe {
     class Mesh {
     public:
         Mesh() = default;
-        template<typename T>
-        explicit Mesh(const std::vector<T>& vertices) {
+        explicit Mesh(const std::vector<uint8_t>& vertices, const Vertex::Layout& layout) : layout{layout} {
             setVertices(vertices);
         }
-        template<typename V, typename I, typename = std::enable_if_t<std::is_integral_v<I>>>
-        explicit Mesh(const std::vector<V>& vertices, const std::vector<I>& indices) {
+        template< typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+        explicit Mesh(std::vector<uint8_t>&& vertices, std::vector<T>&& indices, const Vertex::Layout& layout) : layout{layout} {
+            setVertices(vertices);
+            setIndices(indices);
+        }
+        template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+        explicit Mesh(std::vector<uint8_t>&& vertices, std::vector<T>&& indices, const Vertex::Layout& layout, float optimiseThreshold) : layout{layout} {
+            size_t vertexCount = vertices.size() / layout.getStride();
+            size_t indexCount = indices.size();
+            size_t targetIndexCount = static_cast<size_t>(indices.size() * optimiseThreshold);
+
+            float targetError = 1e-3f;
+            float resultError;
+            uint32_t options = 0;
+
+            LOG_DEBUG << "Mesh Optimizer";
+            LOG_DEBUG << "Before : " << indexCount << " indices " << vertexCount << " vertices";
+
+            auto newIndexCount = meshopt_simplify<T>(
+                    indices.data(),
+                    indices.data(),
+                    indices.size(),
+                    (const float*)vertices.data(),
+                    vertexCount,
+                    layout.getStride(),
+                    targetIndexCount,
+                    targetError,
+                    options,
+                    &resultError
+            );
+
+            auto newVertexCount = meshopt_optimizeVertexFetch<T>( // return vertices (not vertex attribute values)
+                    vertices.data(),
+                    indices.data(),
+                    newIndexCount, // total new indices (not faces)
+                    vertices.data(),
+                    vertexCount, // total vertices (not vertex attribute values)
+                    layout.getStride() // vertex stride
+            );
+
+            LOG_DEBUG << "After : " << newIndexCount << " indices , " << newVertexCount << " vertices";
+
             setVertices(vertices);
             setIndices(indices);
         }
@@ -26,35 +67,28 @@ namespace fe {
         const Buffer* getIndexBuffer() const { return indexBuffer.get(); }
         uint32_t getVertexCount() const { return vertexCount; }
         uint32_t getIndexCount() const { return indexCount; }
-        /*const glm::vec3& getMinExtents() const { return minExtents; }
-        const glm::vec3& getMaxExtents() const { return maxExtents; }
-        float getWidth() const { return maxExtents.x - minExtents.x; }
-        float getHeight() const { return maxExtents.y - minExtents.y; }
-        float getDepth() const { return maxExtents.z - minExtents.z; }
-        float getRadius() const { return radius; }*/
+        const Vertex::Layout& getVertexLayout() const { return layout; }
         VkIndexType getIndexType() const { return indexType; }
 
-        template<typename T>
-        std::vector<T> getVertices() const {
+        std::vector<uint8_t> getVertices() const {
             auto vertexStaging = Buffer::DeviceToStageBuffer(*vertexBuffer);
 
             vertexStaging->map();
-            std::vector<T> vertices(vertexCount);
+            std::vector<uint8_t> vertices(vertexCount * layout.getStride());
             vertexStaging->extract(vertices.data());
             vertexStaging->unmap();
 
             return vertices;
         }
 
-        template<typename T>
-        void setVertices(const std::vector<T>& vertices) {
+        void setVertices(const std::vector<uint8_t>& vertices) {
             vertexBuffer = nullptr;
-            vertexCount = static_cast<uint32_t>(vertices.size());
+            vertexCount = static_cast<uint32_t>(vertices.size() / layout.getStride());
 
             if (vertices.empty())
                 return;
 
-            vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(T) * vertices.size(), vertices.data());
+            vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, vertices.size(), vertices.data());
         }
 
         template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
@@ -96,8 +130,6 @@ namespace fe {
         uint32_t vertexCount{ 0 };
         uint32_t indexCount{ 0 };
         VkIndexType indexType{ VK_INDEX_TYPE_NONE_KHR };
-        /*glm::vec3 minExtents{ FLT_MAX };
-        glm::vec3 maxExtents{ -FLT_MAX };
-        float radius{ 0.0 };*/
+        Vertex::Layout layout;
     };
 }

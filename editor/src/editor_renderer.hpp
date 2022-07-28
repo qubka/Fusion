@@ -5,7 +5,7 @@
 #include "fusion/grid/grid_subrender.hpp"
 #include "fusion/skybox/atmosphere_subrender.hpp"
 #include "fusion/skybox/skybox_subrender.hpp"
-#include "fusion/models/model_subrender.hpp"
+#include "fusion/models/mesh_subrender.hpp"
 #include "fusion/ligthing/light_subrender.hpp"
 
 namespace fe {
@@ -54,7 +54,7 @@ namespace fe {
     private:
         void onStart() override {
             //addSubrender<AtmosphereSubrender>({0, 0});
-            addSubrender<ModelSubrender>({0, 0});
+            addSubrender<MeshSubrender>({ 0, 0});
             addSubrender<LightSubrender>({0, 1});
             //addSubrender<DeferredSubrender>({0, 1});
             addSubrender<SkyboxSubrender>({0, 2});

@@ -9,7 +9,7 @@ namespace fe {
 
         Transform() = default;
         explicit Transform(const glm::mat4& local);
-        explicit Transform(const glm::vec3& position);
+        explicit Transform(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale);
         Transform(const glm::mat4& parent, const glm::mat4& local);
         ~Transform() = default;
 
