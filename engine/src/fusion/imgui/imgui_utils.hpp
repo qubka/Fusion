@@ -1,5 +1,8 @@
 #pragma once
 
+#include "fusion/assets/asset_manager.hpp"
+
+#include "material_design_icons.hpp"
 #include "imgui_color_scheme.hpp"
 
 #include <imgui/imgui.h>
@@ -376,7 +379,122 @@ namespace ImGuiUtils {
         return updated;
     }
 
-    bool PropertyFile(const char* name, const fs::path& path, fs::path& value, std::vector<fs::path>& files, fs::path& selected, ImGuiTextFilter& filter);
+    template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Asset*>>>
+    bool PropertyAsset(const char* name, std::shared_ptr<Asset>& value, std::shared_ptr<Asset>& selected, ImGuiTextFilter& filter) {
+        bool updated = false;
+
+        ImGui::TextUnformatted(name);
+        ImGui::NextColumn();
+
+        float yPadding = ImGui::GetStyle().FramePadding.y;
+        float lineHeight = ImGui::GetFontSize() + yPadding * 2.0f;
+
+        ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{4, 4});
+
+        if (ImGui::BeginPopup("AssetExplorer", ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Dummy(ImVec2{200.0f, 0.0f});  // fix resize
+            ImGui::TextUnformatted(ICON_MDI_TABLE_SEARCH);
+            ImGui::SameLine();
+
+            ImGuiIO& io = ImGui::GetIO();
+
+            {
+                ImGui::PushFont(io.Fonts->Fonts[1]);
+                ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+                ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
+                filter.Draw("###FileFilter");
+                DrawItemActivityOutline(2.0f, false);
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+                ImGui::PopFont();
+            }
+
+            if (!filter.IsActive()) {
+                ImGui::SameLine();
+                ImGui::PushFont(io.Fonts->Fonts[1]);
+                ImGui::SetCursorPosX(ImGui::GetFontSize() * 2.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0.0f, yPadding});
+                ImGui::TextUnformatted("Search...");
+                ImGui::PopStyleVar();
+                ImGui::PopFont();
+            }
+
+            ImGui::Separator();
+
+            ImGui::BeginChild("AssetExplorer", ImVec2{300.0f, 500.0f});
+
+            for (auto& [data, asset] : AssetManager::Get()->getAsset<T>()) {
+                if (filter.IsActive() && !filter.PassFilter(asset->getName().c_str()))
+                    continue;
+
+                if (ImGui::Selectable(asset->getName().c_str(), selected == asset, ImGuiSelectableFlags_AllowDoubleClick)) {
+                    selected = asset;
+                    if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                        value = asset;
+                        updated = true;
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
+            }
+
+            ImGui::EndChild();
+            ImGui::Separator();
+
+            if (selected) {
+                ImGui::TextUnformatted(selected->getName().c_str());
+            }
+
+            ImGui::EndPopup();
+        }
+
+        ImVec2 buttonSize{ ImGui::GetContentRegionAvail().x - lineHeight, lineHeight };
+
+        if (!value) {
+            if (ImGui::Button("...", buttonSize)) {
+                filter.Clear();
+                selected.reset();
+                //files = FileSystem::GetFilesInPath("", true);
+                ImGui::OpenPopup("AssetExplorer");
+            }
+        } else {
+            if (ImGui::Button(value->getName().c_str(), buttonSize)) {
+                //contentBrowserPanel.selectFile(value);
+                // TODO: Finish
+            }
+        }
+
+        ImGui::PopItemWidth();
+
+        if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            value.reset();
+            updated = true;
+        }
+
+        /*if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                value = static_cast<const char*>(payload->Data);
+                updated = true;
+            }
+            ImGui::EndDragDropTarget();
+        }*/
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(ICON_MDI_FILE_SEARCH)) {
+            filter.Clear();
+            selected.reset();
+            ImGui::OpenPopup("AssetExplorer");
+        }
+
+        ImGui::PopItemWidth();
+
+        ImGui::PopStyleVar();
+
+        ImGui::NextColumn();
+
+        return updated;
+    }
 };
 
 static inline ImVec2 operator*(const ImVec2& lhs, const float rhs) {

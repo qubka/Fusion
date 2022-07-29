@@ -136,7 +136,9 @@ namespace fe {
 
         uint32_t getMipLevels() const { return mipLevels; }
         uint32_t getArrayLevels() const { return arrayLayers; }
-        const fs::path& getPath() const { return path; };
+
+        const std::string& getName() const override { return name; };
+        const fs::path& getPath() const override { return path; };
 
         TextureType getType() const { return type; }
         void setType(TextureType textureType) { type = textureType; }
@@ -162,6 +164,7 @@ namespace fe {
         VkDescriptorImageInfo descriptor = {};
 
         fs::path path;
+        std::string name;
         TextureType type{ TextureType::None };
         uint32_t mipLevels{ 0 };
         uint32_t arrayLayers{ 0 };

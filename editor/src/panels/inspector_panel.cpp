@@ -2,6 +2,7 @@
 #include "editor.hpp"
 
 #include "fusion/scene/components.hpp"
+#include "fusion/models/mesh.hpp"
 
 using namespace fe;
 
@@ -74,6 +75,47 @@ namespace ImGui {
     }
 
     template<>
+    void ComponentEditorWidget<MeshComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& mesh = registry.get<MeshComponent>(entity).runtime;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        static ImGuiTextFilter filter;
+        static std::shared_ptr<Asset> selected;
+        std::shared_ptr<Asset> current = mesh;
+        if (ImGuiUtils::PropertyAsset<Mesh>("Mesh Filter", current, selected, filter)) {
+            if (current) {
+                mesh = std::dynamic_pointer_cast<Mesh>(current);
+            } else {
+                mesh.reset();
+            }
+        }
+        if (mesh) {
+            ImGui::NewLine();
+            ImGui::Separator();
+            ImGuiUtils::PropertyText("Name", mesh->getName().c_str());
+            ImGuiUtils::PropertyText("Path", mesh->getPath().string().c_str());
+            uint32_t vertexCount = mesh->getVertexCount();
+            ImGuiUtils::Property("Vertex", vertexCount, 0U, 0U, 1.0f, ImGuiUtils::PropertyFlag::ReadOnly);
+            uint32_t indexCount = mesh->getIndexCount();
+            ImGuiUtils::Property("Index", indexCount, 0U, 0U, 1.0f, ImGuiUtils::PropertyFlag::ReadOnly);
+            glm::vec3 min{ mesh->getMinExtents() };
+            ImGuiUtils::Property("Min", min, 0.0f, 0.0f, 0.0f, ImGuiUtils::PropertyFlag::ReadOnly);
+            glm::vec3 max{ mesh->getMaxExtents() };
+            ImGuiUtils::Property("Max", max, 0.0f, 0.0f, 0.0f, ImGuiUtils::PropertyFlag::ReadOnly);
+            float radius = mesh->getRadius();
+            ImGuiUtils::Property("Radius", radius, 0.0f, 0.0f, 0.0f, ImGuiUtils::PropertyFlag::ReadOnly);
+        }
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
+
+    template<>
     void ComponentEditorWidget<LightComponent>(entt::registry& registry, entt::registry::entity_type entity) {
         auto& light = registry.get<LightComponent>(entity);
 
@@ -85,7 +127,7 @@ namespace ImGui {
         if (ImGuiUtils::Property("Color", light.color, 0.0f, 0.0f, 1.0f, ImGuiUtils::PropertyFlag::ColorValue)) {
         }
 
-        if (ImGuiUtils::Property("Radius", light.radius)) {
+        if (ImGuiUtils::Property("Radius", light.radius, 0.0f, 0.0f, 0.05f)) {
         }
 
         ImGui::Columns(1);

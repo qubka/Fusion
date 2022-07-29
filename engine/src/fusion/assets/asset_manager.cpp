@@ -11,12 +11,14 @@ std::shared_ptr<Asset> AssetManager::find(type_index type, const std::string& se
     return nullptr;
 }
 
-void AssetManager::add(const std::shared_ptr<Asset>& asset, const std::string& serialize) {
+/*void AssetManager::add(const std::shared_ptr<Asset>& asset) {
     auto type = asset->getTypeIndex();
-    if (find(type, serialize))
+    auto data = "";
+
+    if (find(type, data))
         return;
 
-    assets[type].emplace(serialize, asset);
+    assets[type].emplace(data, asset);
 }
 
 void AssetManager::remove(const std::shared_ptr<Asset>& asset) {
@@ -30,10 +32,10 @@ void AssetManager::remove(const std::shared_ptr<Asset>& asset) {
                 assets.erase(it);
         }
     }
-}
+}*/
 
 void AssetManager::onUpdate() {
-    if (elapsedPurge.getElapsed() != 0) {
+    /*if (elapsedPurge.getElapsed() != 0) {
         for (auto it = assets.begin(); it != assets.end();) {
             for (auto it1 = it->second.begin(); it1 != it->second.end();) {
                 if ((*it1).second.use_count() <= 1) {
@@ -50,5 +52,5 @@ void AssetManager::onUpdate() {
 
             ++it;
         }
-    }
+    }*/
 }

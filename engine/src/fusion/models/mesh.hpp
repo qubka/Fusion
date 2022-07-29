@@ -8,8 +8,8 @@
 namespace fe {
     class Mesh : public Asset {
     public:
-        Mesh() = default;
-        explicit Mesh(fs::path path, std::string name, const glm::vec3& minExtents, const glm::vec3& maxExtents, float radius, uint32_t vertexCount, uint32_t indexCount, const Vertex::Layout& layout)
+        //Mesh() : layout{} {}
+        /*explicit Mesh(fs::path path, std::string name, const glm::vec3& minExtents, const glm::vec3& maxExtents, float radius, uint32_t vertexCount, uint32_t indexCount, const Vertex::Layout& layout)
                 : path{std::move(path)}
                 , name{std::move(name)}
                 , layout{layout}
@@ -18,7 +18,7 @@ namespace fe {
                 , minExtents{minExtents}
                 , maxExtents{maxExtents}
                 , radius{radius} {
-        }
+        }*/
 
         template< typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
         explicit Mesh(fs::path path, std::string name, const std::vector<uint8_t>& vertices, const std::vector<T>& indices, const Vertex::Layout& layout)
@@ -111,7 +111,7 @@ namespace fe {
             for (size_t i = 0; i < vertices.size(); i += layout.getStride()) {
                 const auto& position = *reinterpret_cast<const glm::vec3*>(&vertices[i]);
                 minExtents = glm::min(position, minExtents);
-                maxExtents = glm::min(position, maxExtents);
+                maxExtents = glm::max(position, maxExtents);
             }
             radius = std::max(glm::length(minExtents), glm::length(maxExtents));
         }
@@ -149,6 +149,8 @@ namespace fe {
             }
         }
 
+        const std::string& getName() const override { return name; }
+        const fs::path& getPath() const override { return path; }
         type_index getTypeIndex() const override { return type_id<Mesh>; }
 
         template<typename Archive>

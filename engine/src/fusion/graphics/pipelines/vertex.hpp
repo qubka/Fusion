@@ -16,6 +16,7 @@ namespace fe {
             Bitangent,
             Position2,
             RGBA,
+
             /** Layout only */
             DummyFloat,
             DummyInt,
@@ -33,7 +34,12 @@ namespace fe {
          */
         class Layout {
         public:
-            Layout(const std::initializer_list<Component>& components, uint32_t binding = 0) : components{components}, binding{binding} {
+            Layout(const std::initializer_list<Component>& components) : components{components} {
+                for (const auto& component : this->components) {
+                    stride += ComponentSize(component);
+                }
+            }
+            explicit Layout(std::vector<Component> components, uint32_t binding = 0) : components{std::move(components)}, binding{binding} {
                 for (const auto& component : this->components) {
                     stride += ComponentSize(component);
                 }
@@ -52,8 +58,8 @@ namespace fe {
             uint32_t getStride() const { return stride; }
 
             uint32_t getOffset(uint32_t index) const {
-                uint32_t res = 0;
                 assert(index < components.size());
+                uint32_t res = 0;
                 for (uint32_t i = 0; i < index; ++i) {
                     res += ComponentSize(components[i]);
                 }

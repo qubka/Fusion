@@ -40,4 +40,21 @@ namespace cereal {
 
     template<class Archive> void serialize(Archive& archive, glm::quat& q) { archive(make_nvp("x", q.x), make_nvp("y", q.y), make_nvp("z", q.z), make_nvp("w", q.w)); }
     template<class Archive> void serialize(Archive& archive, glm::dquat& q) { archive(make_nvp("x", q.x), make_nvp("y", q.y), make_nvp("z", q.z), make_nvp("w", q.w)); }
+
+    template<class Archive>
+    std::string to_string(Archive& archive) {
+        std::stringstream ss;
+        cereal::JSONOutputArchive output{ss};
+        output(archive);
+        return ss.str();
+    }
+
+    template<typename T, typename... Args>
+    std::string to_string(Args... args) {
+        auto ptr = std::make_unique<T>(std::forward<Args>(args)...);
+        std::stringstream ss;
+        cereal::JSONOutputArchive output{ss, cereal::JSONOutputArchive::Options::NoIndent()};
+        output(*ptr);
+        return ss.str();
+    }
 }

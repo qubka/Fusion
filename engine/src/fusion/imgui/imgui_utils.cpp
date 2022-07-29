@@ -4,10 +4,6 @@
 #include "fusion/graphics/textures/texture2d_array.hpp"
 #include "fusion/graphics/textures/texture_cube.hpp"
 
-#include "fusion/filesystem/file_system.hpp"
-#include "fusion/filesystem/file_format.hpp"
-#include "fusion/imgui/material_design_icons.hpp"
-
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
@@ -104,7 +100,7 @@ bool PropertyDropdown(const char* name,std::span<const char*> options, int32_t& 
     return updated;
 }
 
-bool PropertyFile(const char* name, const fs::path& path, fs::path& value, std::vector<fs::path>& files, fs::path& selected, ImGuiTextFilter& filter) {
+/*bool PropertyFile(const char* name, const fs::path& path, fs::path& value, std::vector<fs::path>& files, fs::path& selected, ImGuiTextFilter& filter) {
     bool updated = false;
 
     if (files.empty()) {
@@ -221,7 +217,7 @@ bool PropertyFile(const char* name, const fs::path& path, fs::path& value, std::
     ImGui::PopStyleVar();
 
     return updated;
-}
+}*/
 
 void Tooltip(const char* text) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});

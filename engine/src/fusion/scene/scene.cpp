@@ -7,7 +7,7 @@
 
 #include "fusion/scene/systems/hierarchy_system.hpp"
 #include "fusion/scene/systems/camera_system.hpp"
-#include "fusion/models/mesh_importer.hpp"
+#include "fusion/models/model.hpp"
 
 using namespace fe;
 
@@ -21,7 +21,36 @@ void Scene::onStart() {
         system->setEnabled(true);
     });
 
-    MeshImporter meshImporter{"EngineModels/untitled.fbx"};
+    Model meshImporter{"EngineModels/vulkanscenemodels.dae", {Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}};
+
+    /*auto hierarchySystem = getSystem<HierarchySystem>();
+
+    std::function<void(const std::shared_ptr<SceneObject>&)> func = [&](const std::shared_ptr<SceneObject>& object) {
+        auto entity = createEntity(object->name);
+        registry.emplace<TransformComponent>(entity, object->position, object->oritentation, object->scale);
+
+        for (auto& child : object->children) {
+            auto childEntity = createEntity(child->name);
+            registry.emplace<TransformComponent>(childEntity, child->position, child->oritentation, child->scale);
+
+            if (child->meshes.size() == 1) {
+                registry.emplace<MeshComponent>(childEntity, child->meshes[0]);
+            } else {
+                for (auto& mesh: child->meshes) {
+                    auto meshChildEntity = createEntity(mesh->getName());
+                    registry.emplace<TransformComponent>(meshChildEntity);
+                    registry.emplace<MeshComponent>(meshChildEntity, mesh);
+                    hierarchySystem->assignChild(childEntity, meshChildEntity);
+                }
+            }
+
+            hierarchySystem->assignChild(entity, childEntity);
+
+            func(child);
+        }
+    };
+
+    func(meshImporter.getRoot());*/
 
     LOG_DEBUG << "Scene : \"" << name << "\" created first time";
 }

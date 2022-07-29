@@ -22,7 +22,7 @@ namespace fe {
         template<typename T>
         class Registrar {
         public:
-            template<typename ...Args>
+            template<typename ... Args>
             static bool Register(Args&& ... names) {
                 for (std::string&& name : { names... })
                     BitmapFactory::Registry()[name] = std::make_pair(&T::Load, &T::Write);

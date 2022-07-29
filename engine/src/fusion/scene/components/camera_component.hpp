@@ -3,7 +3,7 @@
 #include "fusion/graphics/cameras/camera.hpp"
 
 namespace fe {
-    struct CameraComponent : Camera {
+    struct CameraComponent : public Camera {
         template<typename Archive>
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("Fov Degrees", fovDegrees),

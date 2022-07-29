@@ -5,7 +5,7 @@
 namespace fe {
     class Mesh;
     struct MeshComponent {
-        std::shared_ptr<Mesh> mesh;
+        std::shared_ptr<Mesh> runtime;
 
         /*Model& operator*() { return *model; }
         const Model& operator*() const { return *model; }

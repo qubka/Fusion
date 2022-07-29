@@ -30,6 +30,38 @@ void ApplicationInfoPanel::onImGui() {
                 ImGui::TreePop();
             }*/
 
+            if (ImGui::TreeNode("Asset Manager")) {
+                auto manager = AssetManager::Get();
+
+                if (!manager->getAssets().empty()) {
+                    for (const auto& [id, type] : manager->getAssets()) {
+                        std::string table{ "##" + std::to_string(id) };
+                        if (ImGui::BeginTable(table.c_str(), 3, flags)) {
+                            ImGui::TableSetupColumn("Data", ImGuiTableColumnFlags_WidthStretch);
+                            ImGui::TableSetupColumn("Asset", ImGuiTableColumnFlags_WidthFixed);
+                            ImGui::TableSetupColumn("Count", ImGuiTableColumnFlags_WidthFixed);
+                            ImGui::TableHeadersRow();
+
+                            for (const auto& [data, asset] : type) {
+                                ImGui::TableNextRow();
+
+                                ImGui::TableSetColumnIndex(0);
+                                ImGui::TextUnformatted(data.c_str());
+
+                                ImGui::TableSetColumnIndex(1);
+                                ImGui::TextUnformatted(asset->getName().c_str());
+
+                                ImGui::TableSetColumnIndex(2);
+                                ImGui::Text("%ld", asset.use_count());
+                            }
+                            ImGui::EndTable();
+                        }
+                        ImGui::NewLine();
+                    }
+                }
+                ImGui::TreePop();
+            }
+
             if (ImGui::TreeNode("Device Manager")) {
                 auto manager = DeviceManager::Get();
 

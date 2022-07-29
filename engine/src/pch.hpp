@@ -33,7 +33,7 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-#if LIBUUID_CPP20_OR_GREATER
+#if __cplusplus >= 202002L
 #include <span>
 #else
 #define TCB_SPAN_NAMESPACE_NAME std
