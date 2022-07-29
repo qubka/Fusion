@@ -11,7 +11,7 @@ namespace fe {
         const char* icon;
         bool isDirectory;
 
-        explicit DirectoryInfo(fs::path filepath);
+        explicit DirectoryInfo(const fs::path& filepath);
     };
 
     class ContentBrowserPanel : public EditorPanel {

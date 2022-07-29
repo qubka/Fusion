@@ -476,8 +476,8 @@ bool ContentBrowserPanel::moveFile(const fs::path& filepath, const fs::path& mov
     return fs::exists(movepath / filepath.filename());
 }
 
-DirectoryInfo::DirectoryInfo(fs::path filepath) : path{std::move(filepath)} {
-    name = path.filename().string();
-    icon = FileFormat::GetIcon(path);
-    isDirectory = fs::is_directory(path);
+DirectoryInfo::DirectoryInfo(const fs::path& filepath) {
+    name = filepath.filename().string();
+    icon = FileFormat::GetIcon(filepath);
+    isDirectory = fs::is_directory(filepath);
 }
