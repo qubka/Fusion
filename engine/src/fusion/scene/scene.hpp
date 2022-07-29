@@ -11,7 +11,7 @@ namespace fe {
          * Creates a new scene.
          * @param name The scenes name.
          */
-        explicit Scene(std::string name);
+        explicit Scene(const std::string& name);
         ~Scene() = default;
 
         /**

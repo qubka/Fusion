@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fusion/assets/asset_manager.hpp"
+#include "fusion/assets/asset_registry.hpp"
 
 #include "material_design_icons.hpp"
 #include "imgui_color_scheme.hpp"

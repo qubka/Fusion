@@ -71,7 +71,7 @@ namespace fe {
             }
         }
 
-        virtual Cursor* createCursor(fs::path filepath, fe::CursorHotspot hotspot) = 0;
+        virtual Cursor* createCursor(const fs::path& filepath, fe::CursorHotspot hotspot) = 0;
         void destroyCursor(const Cursor* cursor) {
             auto it = std::find_if(cursors.begin(), cursors.end(), [cursor](const auto& c) {
                 return cursor == c.get();

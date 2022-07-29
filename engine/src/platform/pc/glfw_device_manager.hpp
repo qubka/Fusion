@@ -19,7 +19,7 @@ namespace glfw {
         void updateGamepadMappings(std::string_view mappings) override;
 
         fe::Window* createWindow(const fe::WindowInfo& windowInfo) override;
-        fe::Cursor* createCursor(fs::path filepath, fe::CursorHotspot hotspot) override;
+        fe::Cursor* createCursor(const fs::path& filepath, fe::CursorHotspot hotspot) override;
 
     protected:
         void onUpdate() override;

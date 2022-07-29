@@ -13,7 +13,7 @@ namespace fe {
     class EditorPanel {
         friend class Editor;
     public:
-        EditorPanel(std::string title, std::string name, Editor* editor) : title{std::move(title)}, name{std::move(name)}, editor{editor} {};
+        EditorPanel(const std::string& title, const std::string& name, Editor* editor) : title{title}, name{name}, editor{editor} {};
         virtual ~EditorPanel() = default;
 
         const std::string& getTitle() const { return title; }

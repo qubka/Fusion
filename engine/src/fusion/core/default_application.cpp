@@ -12,7 +12,7 @@
 
 using namespace fe;
 
-DefaultApplication::DefaultApplication(std::string name) : Application{std::move(name)} {
+DefaultApplication::DefaultApplication(const std::string& name) : Application{name} {
 #if FUSION_PLATFORM_MAC
     executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path().parent_path().parent_path().parent_path();
 #else

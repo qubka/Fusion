@@ -7,8 +7,8 @@
 
 using namespace fe;
 
-TextEditPanel::TextEditPanel(fs::path filepath, const std::function<void()>& callback, Editor* editor)
-        : path{std::move(filepath)}
+TextEditPanel::TextEditPanel(const fs::path& filepath, const std::function<void()>& callback, Editor* editor)
+        : path{filepath}
         , callback{callback}
         , EditorPanel{ICON_MDI_NOTE_TEXT "Text Editor###textedit", "TextEdit", editor}
 {

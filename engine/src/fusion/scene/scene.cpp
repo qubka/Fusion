@@ -11,7 +11,7 @@
 
 using namespace fe;
 
-Scene::Scene(std::string name) : name{std::move(name)} {
+Scene::Scene(const std::string& name) : name{name} {
     addSystem<HierarchySystem>();
     addSystem<CameraSystem>();
 }

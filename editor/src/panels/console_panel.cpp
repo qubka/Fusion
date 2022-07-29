@@ -196,10 +196,10 @@ void ConsolePanel::renderMessages() {
     ImGui::EndChild();
 }
 
-ConsolePanel::Message::Message(std::string message, MessageLevel level, std::string source)
-        : message{std::move(message)}
+ConsolePanel::Message::Message(const std::string& message, MessageLevel level, const std::string& source)
+        : message{message}
         , level{level}
-        , source{std::move(source)}
+        , source{source}
         , messageID{MessageID++} {
 }
 

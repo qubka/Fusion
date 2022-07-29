@@ -7,7 +7,7 @@
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
-#include "fusion/assets/asset_manager.hpp"
+#include "fusion/assets/asset_registry.hpp"
 #include "fusion/input/input.hpp"
 
 #include "fusion/bitmaps/gli_toolbox.hpp"
@@ -17,8 +17,8 @@ using namespace fe;
 
 Engine* Engine::Instance = nullptr;
 
-Engine::Engine(CommandLineArgs args)
-        : commandLineArgs{std::move(args)}
+Engine::Engine(const CommandLineArgs& args)
+        : commandLineArgs{args}
         , version{FUSION_VERSION_VARIANT, FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
     Instance = this;
 

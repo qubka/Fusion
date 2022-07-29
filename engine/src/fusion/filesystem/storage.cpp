@@ -15,8 +15,8 @@ void setAssetManager(AAssetManager* assetManager) {
 
 class ViewStorage : public Storage {
 public:
-    ViewStorage(StoragePointer owner, std::span<const uint8_t> buffer)
-        : owner{std::move(owner)}
+    ViewStorage(const StoragePointer& owner, std::span<const uint8_t> buffer)
+        : owner{owner}
         , buffer{buffer} {
     }
 

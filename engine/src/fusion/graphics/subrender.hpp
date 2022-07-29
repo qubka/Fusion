@@ -15,7 +15,7 @@ namespace fe {
          * Creates a new render pipeline.
          * @param stage The stage this renderer will be used in.
          */
-        explicit Subrender(Pipeline::Stage stage) : stage{std::move(stage)} { }
+        explicit Subrender(const Pipeline::Stage& stage) : stage{stage} { }
         virtual ~Subrender() = default;
         NONCOPYABLE(Subrender);
 

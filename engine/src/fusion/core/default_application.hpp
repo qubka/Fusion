@@ -24,7 +24,7 @@ namespace fe {
 
     class DefaultApplication : public Application {
     public:
-        explicit DefaultApplication(std::string name);
+        explicit DefaultApplication(const std::string& name);
         ~DefaultApplication() override;
 
     protected:

@@ -115,8 +115,8 @@ fe::Window* DeviceManager::createWindow(const fe::WindowInfo& windowInfo) {
     return it.get();
 }
 
-fe::Cursor* DeviceManager::createCursor(fs::path filepath, fe::CursorHotspot hotspot) {
-    auto& it = cursors.emplace_back(std::make_unique<glfw::Cursor>(std::move(filepath), hotspot));
+fe::Cursor* DeviceManager::createCursor(const fs::path& filepath, fe::CursorHotspot hotspot) {
+    auto& it = cursors.emplace_back(std::make_unique<glfw::Cursor>(filepath, hotspot));
     onCursorCreate.publish(it.get(), true);
     return it.get();
 }

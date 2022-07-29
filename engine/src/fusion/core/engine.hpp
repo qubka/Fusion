@@ -15,7 +15,7 @@ namespace fe {
          * Carries out the setup for basic engine components and the engine. Call {@link Engine#Run} after creating a instance.
          * @param args The arguments passed to main.
          */
-        explicit Engine(CommandLineArgs args);
+        explicit Engine(const CommandLineArgs& args);
         ~Engine();
         NONCOPYABLE(Engine);
 
