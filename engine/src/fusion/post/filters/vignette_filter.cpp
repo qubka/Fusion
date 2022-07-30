@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-VignetteFilter::VignetteFilter(const Pipeline::Stage& pipelineStage, float innerRadius, float outerRadius, float opacity)
+VignetteFilter::VignetteFilter(Pipeline::Stage pipelineStage, float innerRadius, float outerRadius, float opacity)
         : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/vignette.frag"}}
         , innerRadius{innerRadius}
         , outerRadius{outerRadius}

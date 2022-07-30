@@ -21,7 +21,7 @@ namespace fe {
         CommandLineParser();
         ~CommandLineParser() = default;
 
-        void add(std::string_view name, std::vector<std::string> commands, bool hasValue, std::string help = "");
+        void add(std::string_view name, std::vector<std::string>&& commands, bool hasValue, std::string&& help = "");
         void parse(const CommandLineArgs& arguments);
 
         void printHelp();

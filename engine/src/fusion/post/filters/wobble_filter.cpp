@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-WobbleFilter::WobbleFilter(const Pipeline::Stage& pipelineStage, float wobbleSpeed)
+WobbleFilter::WobbleFilter(Pipeline::Stage pipelineStage, float wobbleSpeed)
         : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/wobble.frag"}}
         , wobbleSpeed{wobbleSpeed}
         , wobbleAmount{0.0f} {

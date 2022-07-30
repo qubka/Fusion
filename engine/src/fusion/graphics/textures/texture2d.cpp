@@ -10,8 +10,8 @@
 
 using namespace fe;
 
-Texture2d::Texture2d(fs::path filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
-        : Texture{std::move(filepath),
+Texture2d::Texture2d(const fs::path& filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
+        : Texture{filepath,
                   filter,
                   addressMode,
                   VK_SAMPLE_COUNT_1_BIT,

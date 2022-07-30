@@ -5,7 +5,7 @@
 #include "fusion/graphics/textures/texture2d.hpp"
 
 namespace fe {
-    BlurPipeline::BlurPipeline(const Pipeline::Stage& pipelineStage, float blur, const BlurFilter::Type &blurType, bool toScreen, float inputScale, float outputScale)
+    BlurPipeline::BlurPipeline(Pipeline::Stage pipelineStage, float blur, const BlurFilter::Type &blurType, bool toScreen, float inputScale, float outputScale)
             : PostPipeline{pipelineStage}
             , filterBlurVertical{pipelineStage, {0.0f, blur}, blurType}
             , filterBlurHorizontal{pipelineStage, {blur, 0.0f}, blurType}

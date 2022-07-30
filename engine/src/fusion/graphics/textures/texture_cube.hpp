@@ -17,7 +17,7 @@ namespace fe {
          * @param mipmap If mapmaps will be generated.
          * @param load If this resource will be loaded immediately, otherwise {@link ImageCube#Load} can be called later.
          */
-        explicit TextureCube(fs::path filepath,
+        explicit TextureCube(const fs::path& filepath,
                              VkFilter filter = VK_FILTER_LINEAR,
                              VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
                              bool anisotropic = true,
@@ -83,7 +83,7 @@ namespace fe {
          */
         void setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer);
 
-        type_index getTypeIndex() const override { return type_id<TextureCube>; }
+        type_index getType() const override { return type_id<TextureCube>; }
 
         void load();
     };

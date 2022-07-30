@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-NegativeFilter::NegativeFilter(const Pipeline::Stage& pipelineStage)
+NegativeFilter::NegativeFilter(Pipeline::Stage pipelineStage)
         : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/negative.frag"}} {
 }
 

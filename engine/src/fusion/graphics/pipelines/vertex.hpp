@@ -39,7 +39,7 @@ namespace fe {
                     stride += ComponentSize(component);
                 }
             }
-            explicit Layout(std::vector<Component> components, uint32_t binding = 0) : components{std::move(components)}, binding{binding} {
+            explicit Layout(std::vector<Component>&& components, uint32_t binding = 0) : components{std::move(components)}, binding{binding} {
                 for (const auto& component : this->components) {
                     stride += ComponentSize(component);
                 }
@@ -88,7 +88,7 @@ namespace fe {
                     append(layout);
                 }
             }
-            explicit Input(std::vector<VkVertexInputBindingDescription> bindingDescriptions = {}, std::vector<VkVertexInputAttributeDescription> attributeDescriptions = {})
+            explicit Input(std::vector<VkVertexInputBindingDescription>&& bindingDescriptions = {}, std::vector<VkVertexInputAttributeDescription>&& attributeDescriptions = {})
                     : bindingDescriptions{std::move(bindingDescriptions)}
                     , attributeDescriptions{std::move(attributeDescriptions)} {
             }

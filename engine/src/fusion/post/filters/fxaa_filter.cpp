@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-FxaaFilter::FxaaFilter(const Pipeline::Stage& pipelineStage, float spanMax)
+FxaaFilter::FxaaFilter(Pipeline::Stage pipelineStage, float spanMax)
         : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/fxaa.frag"}}
         , spanMax{spanMax} {
 }

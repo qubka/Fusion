@@ -8,7 +8,7 @@
 namespace fe {
     class AtmosphereSubrender final : public Subrender {
     public:
-        explicit AtmosphereSubrender(const Pipeline::Stage& pipelineStage);
+        explicit AtmosphereSubrender(Pipeline::Stage pipelineStage);
         ~AtmosphereSubrender() override;
 
     private:

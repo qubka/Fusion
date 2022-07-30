@@ -17,7 +17,7 @@ namespace fe {
          * @param shaderStages The pipelines shader stages.
          * @param defines A list of names that will be added as a define.
          */
-        PostFilter(const Pipeline::Stage& pipelineStage, const std::vector<fs::path>& shaderStages, const std::vector<Shader::Define>& defines = {});
+        explicit PostFilter(Pipeline::Stage pipelineStage, std::vector<fs::path>&& shaderStages, std::vector<Shader::Define>&& defines = {});
         virtual ~PostFilter() = default;
 
         void onUpdate() override {};

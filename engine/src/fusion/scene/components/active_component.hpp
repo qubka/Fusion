@@ -10,7 +10,7 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("Active", active));
+            archive(cereal::make_nvp("active", active));
         }
     };
 }

@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-PixelFilter::PixelFilter(const Pipeline::Stage& pipelineStage, float pixelSize)
+PixelFilter::PixelFilter(Pipeline::Stage pipelineStage, float pixelSize)
     : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/pixel.frag"}}, pixelSize{pixelSize} {
 }
 

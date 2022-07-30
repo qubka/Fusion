@@ -17,7 +17,7 @@ void SubrenderHolder::updateAll() {
     }
 }
 
-void SubrenderHolder::renderStage(const Pipeline::Stage& pipelineStage, const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
+void SubrenderHolder::renderStage(Pipeline::Stage pipelineStage, const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
 	for (const auto& [stageId, type] : stages) {
 		if (stageId != pipelineStage) {
 			continue;

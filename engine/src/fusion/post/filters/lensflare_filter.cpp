@@ -5,7 +5,7 @@
 
 using namespace fe;
 
-LensflareFilter::LensflareFilter(const Pipeline::Stage& pipelineStage)
+LensflareFilter::LensflareFilter(Pipeline::Stage pipelineStage)
     : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/lensflare.frag"}} {
 }
 

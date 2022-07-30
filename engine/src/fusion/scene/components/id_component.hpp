@@ -6,14 +6,14 @@ namespace fe {
 
         template<typename Archive>
         void save(Archive& archive) const {
-            archive(cereal::make_nvp("UUID", uuids::to_string(uuid)));
+            archive(cereal::make_nvp("uuid", uuids::to_string(uuid)));
         }
 
         template<typename Archive>
         void load(Archive& archive) {
             std::string str;
-            archive(cereal::make_nvp("UUID", str));
-            uuid = uuids::uuid::from_string(str).value();
+            archive(cereal::make_nvp("uuid", str));
+            uuid = uuids::uuid::from_string(str).value_or(uuid_random_generator());
         }
     };
 }

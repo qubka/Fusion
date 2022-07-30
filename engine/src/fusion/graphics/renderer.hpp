@@ -45,7 +45,7 @@ namespace fe {
          * @param args The constructor arguments.
          */
         template<typename T, typename... Args>
-        T* addSubrender(const Pipeline::Stage& pipelineStage, Args&&...args) {
+        T* addSubrender(Pipeline::Stage pipelineStage, Args&&...args) {
             return subrenderHolder.add<T>(pipelineStage, std::make_unique<T>(pipelineStage, std::forward<Args>(args)...));
         }
 

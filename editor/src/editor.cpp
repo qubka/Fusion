@@ -28,7 +28,7 @@
 
 using namespace fe;
 
-Editor::Editor(const std::string& name) : DefaultApplication{name} {
+Editor::Editor(std::string_view name) : DefaultApplication{name} {
 }
 
 Editor::~Editor() {

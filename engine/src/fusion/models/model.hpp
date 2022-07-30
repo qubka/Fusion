@@ -26,11 +26,9 @@ namespace fe {
     class Model : public Asset {
     public:
        // aiProcess_Triangulate by default
-       explicit Model(fs::path filepath, const Vertex::Layout& layout, uint32_t defaultFlags = 0);
+       explicit Model(const fs::path& filepath, uint32_t defaultFlags = 0, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}});
 
-        const std::string& getName() const override { return name; }
-        const fs::path& getPath() const override { return path; }
-        type_index getTypeIndex() const override { return type_id<Model>; }
+        type_index getType() const override { return type_id<Model>; }
 
         const std::shared_ptr<SceneObject>& getRoot() const { return root; }
         std::shared_ptr<Mesh> getMesh(const std::string& name) const {
@@ -64,9 +62,6 @@ namespace fe {
             outputBuffer.resize(offset + copySize);
             std::memcpy(outputBuffer.data() + offset, t.data(), copySize);
         }
-
-        fs::path path;
-        std::string name;
 
         fs::path directory;
         Vertex::Layout layout;

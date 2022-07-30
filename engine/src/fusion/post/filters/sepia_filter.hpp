@@ -5,7 +5,7 @@
 namespace fe {
     class SepiaFilter : public PostFilter {
     public:
-        explicit SepiaFilter(const Pipeline::Stage& pipelineStage);
+        explicit SepiaFilter(Pipeline::Stage pipelineStage);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
     };

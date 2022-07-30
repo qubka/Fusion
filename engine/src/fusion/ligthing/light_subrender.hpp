@@ -10,7 +10,7 @@
 namespace fe {
     class LightSubrender final : public Subrender {
     public:
-        explicit LightSubrender(const Pipeline::Stage& pipelineStage);
+        explicit LightSubrender(Pipeline::Stage pipelineStage);
         ~LightSubrender() override = default;
 
     private:

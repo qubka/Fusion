@@ -4,7 +4,7 @@
 
 using namespace fe;
 
-BlitFilter::BlitFilter(const Pipeline::Stage& pipelineStage)
+BlitFilter::BlitFilter(Pipeline::Stage pipelineStage)
         : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/blit.frag"}} {
 }
 

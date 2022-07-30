@@ -6,7 +6,7 @@
 namespace fe {
     class VignetteFilter : public PostFilter {
     public:
-        explicit VignetteFilter(const Pipeline::Stage& pipelineStage, float innerRadius = 0.15f, float outerRadius = 1.35f, float opacity = 0.85f);
+        explicit VignetteFilter(Pipeline::Stage pipelineStage, float innerRadius = 0.15f, float outerRadius = 1.35f, float opacity = 0.85f);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

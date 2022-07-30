@@ -6,7 +6,7 @@
 
 using namespace fe;
 
-PipelineCompute::PipelineCompute(fs::path shaderStage, std::vector<Shader::Define> defines, bool pushDescriptors)
+PipelineCompute::PipelineCompute(fs::path&& shaderStage, std::vector<Shader::Define>&& defines, bool pushDescriptors)
         : shader{}
         , shaderStage{std::move(shaderStage)}
         , defines{std::move(defines)}

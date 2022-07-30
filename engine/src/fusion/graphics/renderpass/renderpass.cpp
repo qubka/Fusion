@@ -65,7 +65,7 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 		}
 
 		// Subpass description.
-		subpasses.push_back(std::make_unique<SubpassDescription>(VK_PIPELINE_BIND_POINT_GRAPHICS, subpassColorAttachments, depthAttachment));
+		subpasses.push_back(std::make_unique<SubpassDescription>(VK_PIPELINE_BIND_POINT_GRAPHICS, std::move(subpassColorAttachments), depthAttachment));
 
 		// Subpass dependencies.
 		VkSubpassDependency subpassDependency = {};

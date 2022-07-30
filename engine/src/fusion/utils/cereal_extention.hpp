@@ -3,10 +3,16 @@
 #include <cereal/cereal.hpp>
 
 namespace std::filesystem {
-    template<class Archive> string save_minimal(const Archive&, const path& p) { return p.string(); }
-    template<class Archive> void load_minimal(const Archive&, path& p, const string& in) { p = in; };
+    template<class Archive> std::string save_minimal(const Archive&, const path& p) { return p.string(); }
+    template<class Archive> void load_minimal(const Archive&, path& p, const std::string& in) { p = in; };
 }
 CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(std::filesystem::path, cereal::specialization::non_member_load_save_minimal);
+
+/*namespace uuids {
+    template<class Archive> std::string save_minimal(const Archive&, const uuid& id) { return to_string(id); }
+    template<class Archive> void load_minimal(const Archive&, uuid& id, const std::string& in) { id = uuid::from_string(in).value_or(uuid_random_generator()); };
+}
+CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(uuids::uuid, cereal::specialization::non_member_load_save_minimal);*/
 
 namespace cereal {
     template<class Archive> void serialize(Archive& archive, glm::vec2& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y)); }

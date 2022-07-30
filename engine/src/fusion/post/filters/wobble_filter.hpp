@@ -6,7 +6,7 @@
 namespace fe {
     class WobbleFilter : public PostFilter {
     public:
-        explicit WobbleFilter(const Pipeline::Stage& pipelineStage, float wobbleSpeed = 2.0f);
+        explicit WobbleFilter(Pipeline::Stage pipelineStage, float wobbleSpeed = 2.0f);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

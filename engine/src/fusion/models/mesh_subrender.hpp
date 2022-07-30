@@ -10,7 +10,7 @@
 namespace fe {
     class MeshSubrender final : public Subrender {
     public:
-        explicit MeshSubrender(const Pipeline::Stage& pipelineStage);
+        explicit MeshSubrender(Pipeline::Stage pipelineStage);
         ~MeshSubrender() override = default;
 
     private:

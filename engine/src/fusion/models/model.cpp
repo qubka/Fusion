@@ -1,6 +1,6 @@
 #include "model.hpp"
 
-#include "fusion/assets/asset_manager.hpp"
+#include "fusion/assets/asset_registry.hpp"
 #include "fusion/graphics/textures/texture2d.hpp"
 #include "fusion/filesystem/virtual_file_system.hpp"
 
@@ -18,10 +18,8 @@ static inline const glm::quat& quat_cast(const aiQuaternion& q) { return *reinte
 static inline glm::mat4 mat4_cast(const aiMatrix4x4 &m) { return glm::transpose(glm::make_mat4(&m.a1)); }
 static inline glm::mat4 mat4_cast(const aiMatrix3x3 &m) { return glm::transpose(glm::make_mat3(&m.a1)); }
 
-Model::Model(fs::path filepath, const Vertex::Layout& layout, uint32_t defaultFlags) : path{std::move(filepath)}, layout{layout} {
-    fs::path modelPath{ VirtualFileSystem::Get()->resolvePhysicalPath(path) };
-
-    Assimp::Importer import;
+Model::Model(const fs::path& filepath, uint32_t defaultFlags, const Vertex::Layout& layout) : layout{layout} {
+    fs::path modelPath{ VirtualFileSystem::Get()->resolvePhysicalPath(filepath) };
 
     defaultFlags |= aiProcess_Triangulate;
     if (layout.contains(Vertex::Component::Normal)) {
@@ -31,18 +29,21 @@ Model::Model(fs::path filepath, const Vertex::Layout& layout, uint32_t defaultFl
         defaultFlags |= aiProcess_CalcTangentSpace;
     }
 
+    Assimp::Importer import;
     const aiScene* scene = import.ReadFile(modelPath.string(), defaultFlags);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         LOG_ERROR << "Failed to load model at: \"" << modelPath << "\" - " << import.GetErrorString();
         return;
     }
 
-    directory = modelPath.parent_path();
+    path = filepath;
     name = modelPath.filename().replace_extension().string();
+    directory = modelPath.parent_path();
 
     root = std::make_shared<SceneObject>();
-
     processNode(scene, scene->mRootNode, root);
+
+    AssetRegistry::Get()->add(std::shared_ptr<Model>(this), filepath);
 }
 
 void Model::processNode(const aiScene* scene, const aiNode* node, std::shared_ptr<SceneObject>& targetParent) {
@@ -127,8 +128,10 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, std::shared_
 
         std::string name{ node->mName.C_Str() + ":"s + std::to_string(index) };
 
-        auto& it = parent->meshes.emplace_back(std::make_shared<Mesh>(path, name, vertices, indices, layout));
-        meshesLoaded.emplace(name, it); // mesh tree for fast search by name
+        auto meshp = std::make_shared<Mesh>(path, name, vertices, indices, layout);
+        parent->meshes.push_back(meshp);
+        meshesLoaded.emplace(name, meshp); // mesh tree for fast search by name
+        AssetRegistry::Get()->add(meshp, path / name);
     }
 }
 
@@ -154,10 +157,11 @@ std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* ma
                     continue;
                 }
 
-                auto texture = std::make_shared<Texture2d>(path.string());
+                auto texture = std::make_shared<Texture2d>(path);
                 textures.push_back(texture);
-                texture->setType(static_cast<TextureType>(textureType));
+                //texture->setType(static_cast<TextureType>(textureType));
                 texturesLoaded.emplace(path, texture); // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+                //AssetRegistry::Get()->add(texture, path);
             }
         } else {
             LOG_ERROR << "Could not get texture from material";

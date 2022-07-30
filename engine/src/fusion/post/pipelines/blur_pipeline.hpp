@@ -7,7 +7,7 @@ namespace fe {
     class Texture2d;
     class BlurPipeline : public PostPipeline {
     public:
-        explicit BlurPipeline(const Pipeline::Stage& pipelineStage, float blur = 2.0f, const BlurFilter::Type& blurType = BlurFilter::Type::_9, bool toScreen = false, float inputScale = 0.5f, float outputScale = 1.0f);
+        explicit BlurPipeline(Pipeline::Stage pipelineStage, float blur = 2.0f, const BlurFilter::Type& blurType = BlurFilter::Type::_9, bool toScreen = false, float inputScale = 0.5f, float outputScale = 1.0f);
 
         void onUpdate() override {}
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;

@@ -5,7 +5,7 @@
 namespace fe {
     class DefaultFilter : public PostFilter {
     public:
-        explicit DefaultFilter(const Pipeline::Stage& pipelineStage, bool lastFilter = false);
+        explicit DefaultFilter(Pipeline::Stage pipelineStage, bool lastFilter = false);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

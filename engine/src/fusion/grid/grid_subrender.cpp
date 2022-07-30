@@ -7,7 +7,7 @@
 
 using namespace fe;
 
-GridSubrender::GridSubrender(const Pipeline::Stage& pipelineStage)
+GridSubrender::GridSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
         , pipeline{pipelineStage, {"EngineShaders/grid/grid.vert", "EngineShaders/grid/grid.frag"}} {
 }

@@ -65,7 +65,7 @@ namespace fe {
     class RenderStage {
         friend class Graphics;
     public:
-        explicit RenderStage(std::vector<Attachment> images = {}, std::vector<SubpassType> subpasses = {}, const Viewport& viewport = {});
+        explicit RenderStage(std::vector<Attachment>&& images = {}, std::vector<SubpassType>&& subpasses = {}, const Viewport& viewport = {});
         ~RenderStage() = default;
         NONCOPYABLE(RenderStage);
 

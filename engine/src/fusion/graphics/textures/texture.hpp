@@ -52,7 +52,7 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        Texture(fs::path path,
+        Texture(const fs::path& filepath,
                 VkFilter filter,
                 VkSamplerAddressMode addressMode,
                 VkSampleCountFlagBits samples,
@@ -137,11 +137,8 @@ namespace fe {
         uint32_t getMipLevels() const { return mipLevels; }
         uint32_t getArrayLevels() const { return arrayLayers; }
 
-        const std::string& getName() const override { return name; };
-        const fs::path& getPath() const override { return path; };
-
-        TextureType getType() const { return type; }
-        void setType(TextureType textureType) { type = textureType; }
+        //TextureType getType() const { return type; }
+        //void setType(TextureType textureType) { type = textureType; }
 
         /** @brief Update image descriptor from current sampler, view and image layout */
         void updateDescriptor() {
@@ -150,21 +147,9 @@ namespace fe {
             descriptor.imageLayout = layout;
         }
 
-        template<typename Archive>
-        void serialize(Archive& archive) {
-            archive(cereal::make_nvp("Path", path),
-                    cereal::make_nvp("Type", type),
-                    cereal::make_nvp("Mip Levels", mipLevels),
-                    cereal::make_nvp("Array Layers", arrayLayers),
-                    cereal::make_nvp("Anisotropic", anisotropic),
-                    cereal::make_nvp("Mipmap", mipmap));
-        }
-
     protected:
         VkDescriptorImageInfo descriptor = {};
 
-        fs::path path;
-        std::string name;
         TextureType type{ TextureType::None };
         uint32_t mipLevels{ 0 };
         uint32_t arrayLayers{ 0 };

@@ -6,7 +6,7 @@
 namespace fe {
     class PixelFilter : public PostFilter {
     public:
-        explicit PixelFilter(const Pipeline::Stage& pipelineStage, float pixelSize = 2.0f);
+        explicit PixelFilter(Pipeline::Stage pipelineStage, float pixelSize = 2.0f);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

@@ -19,7 +19,7 @@
 
 using namespace fe;
 
-ImGuiSubrender::ImGuiSubrender(const Pipeline::Stage& pipelineStage)
+ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
         , pipeline{pipelineStage, {"EngineShaders/imgui/imgui.vert", "EngineShaders/imgui/imgui.frag"}, {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}}, {}
         , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE/*, VK_FRONT_FACE_CLOCKWISE, PipelineGraphics::Blend::SrcAlphaOneMinusSrcAlpha

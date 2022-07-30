@@ -47,7 +47,7 @@ namespace fe {
 
     class Editor : public DefaultApplication {
     public:
-        explicit Editor(const std::string& name);
+        explicit Editor(std::string_view name);
         ~Editor() override;
 
         void openFile();

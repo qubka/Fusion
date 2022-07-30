@@ -6,7 +6,7 @@
 namespace fe {
     class CrtFilter : public PostFilter {
     public:
-        explicit CrtFilter(const Pipeline::Stage& pipelineStage, const glm::vec4& screenColor = {0.5f, 1.0f, 0.5f, 1.0f}, float curveAmountX = 0.1f,
+        explicit CrtFilter(Pipeline::Stage pipelineStage, const glm::vec4& screenColor = {0.5f, 1.0f, 0.5f, 1.0f}, float curveAmountX = 0.1f,
             float curveAmountY = 0.1f, float scanLineSize = 1000.0f, float scanIntensity = 0.1f);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;

@@ -12,7 +12,7 @@ namespace fe {
             _13 = 13
         };
 
-        explicit BlurFilter(const Pipeline::Stage& pipelineStage, const glm::vec2& direction, Type type = Type::_9);
+        explicit BlurFilter(Pipeline::Stage pipelineStage, const glm::vec2& direction, Type type = Type::_9);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

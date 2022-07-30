@@ -11,7 +11,7 @@
 
 using namespace fe;
 
-Scene::Scene(const std::string& name) : name{name} {
+Scene::Scene(std::string_view name) : name{name} {
     addSystem<HierarchySystem>();
     addSystem<CameraSystem>();
 }
@@ -21,9 +21,9 @@ void Scene::onStart() {
         system->setEnabled(true);
     });
 
-    Model meshImporter{"EngineModels/vulkanscenemodels.dae", {Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}};
+    Model meshImporter{"EngineModels/vulkanscenemodels.dae"};
 
-    /*auto hierarchySystem = getSystem<HierarchySystem>();
+    auto hierarchySystem = getSystem<HierarchySystem>();
 
     std::function<void(const std::shared_ptr<SceneObject>&)> func = [&](const std::shared_ptr<SceneObject>& object) {
         auto entity = createEntity(object->name);
@@ -50,7 +50,7 @@ void Scene::onStart() {
         }
     };
 
-    func(meshImporter.getRoot());*/
+    func(meshImporter.getRoot());
 
     LOG_DEBUG << "Scene : \"" << name << "\" created first time";
 }

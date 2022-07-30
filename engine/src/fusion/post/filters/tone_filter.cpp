@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-ToneFilter::ToneFilter(const Pipeline::Stage& pipelineStage)
+ToneFilter::ToneFilter(Pipeline::Stage pipelineStage)
         : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/tone.frag"}} {
 }
 

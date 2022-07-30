@@ -7,7 +7,7 @@ namespace fe {
         friend class Engine;
         friend class ImGuiSubrender;
     public:
-        Application(std::string name) : name{std::move(name)} { }
+        explicit Application(std::string_view name) : name{name} { }
         virtual ~Application() = default;
         NONCOPYABLE(Application);
 

@@ -424,7 +424,7 @@ namespace ImGuiUtils {
 
             ImGui::BeginChild("AssetExplorer", ImVec2{300.0f, 500.0f});
 
-            for (auto& [data, asset] : AssetManager::Get()->getAsset<T>()) {
+            for (auto& [path, asset] : AssetRegistry::Get()->getAsset<T>()) {
                 if (filter.IsActive() && !filter.PassFilter(asset->getName().c_str()))
                     continue;
 

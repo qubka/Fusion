@@ -37,7 +37,7 @@ CommandLineParser::CommandLineParser() {
     add("benchmarkframes", { "-bfs", "--benchmarkframes" }, true, "Only render the given number of frames");
 }
 
-void CommandLineParser::add(std::string_view name, std::vector<std::string> commands, bool hasValue, std::string help) {
+void CommandLineParser::add(std::string_view name, std::vector<std::string>&& commands, bool hasValue, std::string&& help) {
     options.emplace(name, CommandLineOption{std::move(commands), "", std::move(help), hasValue, false});
 }
 

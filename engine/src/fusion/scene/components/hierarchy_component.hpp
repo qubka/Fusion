@@ -10,11 +10,11 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("Children", children),
-                    cereal::make_nvp("Parent", parent),
-                    cereal::make_nvp("First", first),
-                    cereal::make_nvp("Prev", prev),
-                    cereal::make_nvp("Next", next));
+            archive(cereal::make_nvp("children", children),
+                    cereal::make_nvp("parent", parent),
+                    cereal::make_nvp("first", first),
+                    cereal::make_nvp("prev", prev),
+                    cereal::make_nvp("next", next));
         }
     };
 }

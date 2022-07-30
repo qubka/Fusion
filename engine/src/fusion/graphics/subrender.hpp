@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "fusion/graphics/pipelines/pipeline.hpp"
 
 namespace fe {
@@ -15,11 +17,11 @@ namespace fe {
          * Creates a new render pipeline.
          * @param stage The stage this renderer will be used in.
          */
-        explicit Subrender(const Pipeline::Stage& stage) : stage{stage} { }
+        explicit Subrender(Pipeline::Stage stage) : stage{std::move(stage)} { }
         virtual ~Subrender() = default;
         NONCOPYABLE(Subrender);
 
-        const Pipeline::Stage& getStage() const { return stage; }
+        Pipeline::Stage getStage() const { return stage; }
 
         bool isEnabled() const { return enabled; }
         void setEnabled(bool flag) {

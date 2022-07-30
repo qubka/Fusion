@@ -11,7 +11,7 @@ namespace fe {
          * Creates a new scene.
          * @param name The scenes name.
          */
-        explicit Scene(const std::string& name);
+        explicit Scene(std::string_view name);
         ~Scene() = default;
 
         /**
@@ -149,14 +149,14 @@ namespace fe {
 
         template<typename Archive>
         void save(Archive& archive) const {
-            //archive(cereal::make_nvp("Version", sceneVersion));
-            archive(cereal::make_nvp("Scene Name", name));
+            //archive(cereal::make_nvp("version", sceneVersion));
+            archive(cereal::make_nvp("name", name));
         }
 
         template<typename Archive>
         void load(Archive& archive) {
-            //archive(cereal::make_nvp("Version", sceneSerialisationVersion));
-            archive(cereal::make_nvp("Scene Name", name));
+            //archive(cereal::make_nvp("version", sceneSerialisationVersion));
+            archive(cereal::make_nvp("name", name));
         }
 
     protected:

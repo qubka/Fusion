@@ -6,7 +6,7 @@
 namespace fe {
     class LensflareFilter : public PostFilter {
     public:
-        explicit LensflareFilter(const Pipeline::Stage& pipelineStage);
+        explicit LensflareFilter(Pipeline::Stage pipelineStage);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

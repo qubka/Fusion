@@ -2,9 +2,9 @@
 
 using namespace fe;
 
-PostFilter::PostFilter(const Pipeline::Stage& pipelineStage, const std::vector<fs::path>& shaderStages, const std::vector<Shader::Define>& defines)
+PostFilter::PostFilter(Pipeline::Stage pipelineStage, std::vector<fs::path>&& shaderStages, std::vector<Shader::Define>&& defines)
         : Subrender{pipelineStage}
-        , pipeline{pipelineStage, shaderStages, {}, defines, PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None} {
+        , pipeline{pipelineStage, std::move(shaderStages), {}, std::move(defines), PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None} {
 }
 
 const Descriptor* PostFilter::getAttachment(const std::string& descriptorName, const Descriptor* descriptor) const {

@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-EmbossFilter::EmbossFilter(const Pipeline::Stage& pipelineStage)
+EmbossFilter::EmbossFilter(Pipeline::Stage pipelineStage)
         : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/emboss.frag"}} {
 }
 

@@ -6,7 +6,7 @@
 namespace fe {
     class GrainFilter : public PostFilter {
     public:
-        explicit GrainFilter(const Pipeline::Stage& pipelineStage, float strength = 2.3f);
+        explicit GrainFilter(Pipeline::Stage pipelineStage, float strength = 2.3f);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

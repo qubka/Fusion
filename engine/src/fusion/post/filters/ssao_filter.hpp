@@ -6,7 +6,7 @@
 namespace fe {
     class SsaoFilter : public PostFilter {
     public:
-        explicit SsaoFilter(const Pipeline::Stage& pipelineStage);
+        explicit SsaoFilter(Pipeline::Stage pipelineStage);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

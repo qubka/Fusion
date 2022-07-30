@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-GreyFilter::GreyFilter(const Pipeline::Stage& pipelineStage)
+GreyFilter::GreyFilter(Pipeline::Stage pipelineStage)
         : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/grey.frag"}} {
 }
 

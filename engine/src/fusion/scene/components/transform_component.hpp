@@ -11,9 +11,9 @@ namespace fe {
 
         template<typename Archive>
         void save(Archive& archive) const {
-            archive(cereal::make_nvp("Position", getLocalPosition()),
-                    cereal::make_nvp("Orientation", getWorldOrientation()),
-                    cereal::make_nvp("Scale", getLocalScale()));
+            archive(cereal::make_nvp("position", getLocalPosition()),
+                    cereal::make_nvp("orientation", getWorldOrientation()),
+                    cereal::make_nvp("scale", getLocalScale()));
         }
 
         template<typename Archive>
@@ -21,9 +21,9 @@ namespace fe {
             glm::vec3 position;
             glm::quat orientation;
             glm::vec3 scale;
-            archive(cereal::make_nvp("Position", position),
-                    cereal::make_nvp("Orientation", orientation),
-                    cereal::make_nvp("Scale", scale));
+            archive(cereal::make_nvp("position", position),
+                    cereal::make_nvp("orientation", orientation),
+                    cereal::make_nvp("scale", scale));
             setLocalPosition(position);
             setLocalOrientation(orientation);
             setLocalScale(scale);

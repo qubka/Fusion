@@ -7,7 +7,7 @@
 
 using namespace fe;
 
-AtmosphereSubrender::AtmosphereSubrender(const Pipeline::Stage& pipelineStage)
+AtmosphereSubrender::AtmosphereSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
         , pipeline{pipelineStage, {"EngineShaders/sky/atmosphere.vert", "EngineShaders/sky/atmosphere.frag"}} {
 }

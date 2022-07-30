@@ -17,7 +17,7 @@ namespace fe {
          * @param mipmap If mapmaps will be generated.
          * @param load If this resource will be loaded immediately, otherwise {@link Texture2d#Load} can be called later.
          */
-        explicit Texture2d(fs::path filepath,
+        explicit Texture2d(const fs::path& filepath,
                            VkFilter filter = VK_FILTER_LINEAR,
                            VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT,
                            bool anisotropic = true,
@@ -76,7 +76,7 @@ namespace fe {
          */
         void setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer);
 
-        type_index getTypeIndex() const override { return type_id<Texture2d>; }
+        type_index getType() const override { return type_id<Texture2d>; }
 
         void load(std::unique_ptr<Bitmap> loadBitmap = nullptr);
     };

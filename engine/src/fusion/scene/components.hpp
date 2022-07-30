@@ -30,7 +30,7 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("Name", name));
+            archive(cereal::make_nvp("name", name));
         }
     };
 
@@ -60,8 +60,8 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("Extent", extent),
-                    cereal::make_nvp("Trigger", trigger));
+            archive(cereal::make_nvp("extent", extent),
+                    cereal::make_nvp("trigger", trigger));
         }
     };
 
@@ -75,8 +75,8 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("Radius", radius),
-                    cereal::make_nvp("Trigger", trigger));
+            archive(cereal::make_nvp("radius", radius),
+                    cereal::make_nvp("trigger", trigger));
         }
     };
 
@@ -91,9 +91,9 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("Radius", radius),
-                    cereal::make_nvp("Radius", radius),
-                    cereal::make_nvp("Trigger", trigger));
+            archive(cereal::make_nvp("radius", radius),
+                    cereal::make_nvp("radius", radius),
+                    cereal::make_nvp("trigger", trigger));
         }
     };
 
@@ -108,9 +108,9 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("Convex", convex),
-                    cereal::make_nvp("Trigger", trigger),
-                    cereal::make_nvp("Override Mesh", overrideMesh));
+            archive(cereal::make_nvp("convex", convex),
+                    cereal::make_nvp("trigger", trigger),
+                    cereal::make_nvp("override mesh", overrideMesh));
         }
     };
 

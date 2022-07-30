@@ -1,9 +1,11 @@
 #pragma once
 
-//#include "fusion/mesh/model.hpp"
+#include "fusion/assets/asset_registry.hpp"
+
+#include "fusion/models/mesh.hpp"
+#include "fusion/models/model.hpp"
 
 namespace fe {
-    class Mesh;
     struct MeshComponent {
         std::shared_ptr<Mesh> runtime;
 
@@ -15,8 +17,26 @@ namespace fe {
         //bool castShadows{ false };
 
         template<typename Archive>
-        void serialize(Archive& archive) {
-            //archive(cereal::make_nvp("Path", path));
+        void load(Archive& archive) {
+            fs::path name;
+            std::string path;
+            archive(cereal::make_nvp("path", path),
+                    cereal::make_nvp("name", name));
+
+            if (auto model = AssetRegistry::Get()->find<Model>(path)) {
+                runtime = model->getMesh(name);
+            }
+        }
+
+        template<typename Archive>
+        void save(Archive& archive) const {
+            if (runtime) {
+                archive(cereal::make_nvp("path", runtime->getPath()),
+                        cereal::make_nvp("name", runtime->getName()));
+            } else {
+                archive(cereal::make_nvp("path", ""),
+                        cereal::make_nvp("name", ""));
+            }
         }
     };
 }

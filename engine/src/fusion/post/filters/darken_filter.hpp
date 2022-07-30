@@ -6,7 +6,7 @@
 namespace fe {
     class DarkenFilter : public PostFilter {
     public:
-        explicit DarkenFilter(const Pipeline::Stage& pipelineStage, float factor = 0.5f);
+        explicit DarkenFilter(Pipeline::Stage pipelineStage, float factor = 0.5f);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

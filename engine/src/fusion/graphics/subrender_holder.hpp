@@ -55,7 +55,7 @@ namespace fe {
          * @return The added renderer.
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Subrender*>>>
-        T* add(const Pipeline::Stage& pipelineStage, std::unique_ptr<T>&& subrender) {
+        T* add(Pipeline::Stage pipelineStage, std::unique_ptr<T>&& subrender) {
             const auto& type = type_id<T>;
             auto& storage = subrenders[type];
 
@@ -110,7 +110,7 @@ namespace fe {
          * @param commandBuffer The command buffer to record render command into.
          * @param overrideCamera The optional camera for rendering.
          */
-        void renderStage(const Pipeline::Stage& pipelineStage, const CommandBuffer& commandBuffer, const Camera* overrideCamera = nullptr);
+        void renderStage(Pipeline::Stage pipelineStage, const CommandBuffer& commandBuffer, const Camera* overrideCamera = nullptr);
 
         /// List of all subrenders
         std::unordered_map<type_index, std::vector<std::unique_ptr<Subrender>>> subrenders;

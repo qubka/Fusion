@@ -10,7 +10,7 @@
 
 using namespace fe;
 
-RenderStage::RenderStage(std::vector<Attachment> images, std::vector<SubpassType> subpasses, const Viewport& viewport)
+RenderStage::RenderStage(std::vector<Attachment>&& images, std::vector<SubpassType>&& subpasses, const Viewport& viewport)
         : attachments{std::move(images)}
         , subpasses{std::move(subpasses)}
         , viewport{viewport}

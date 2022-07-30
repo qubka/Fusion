@@ -8,22 +8,9 @@
 namespace fe {
     class Mesh : public Asset {
     public:
-        //Mesh() : layout{} {}
-        /*explicit Mesh(fs::path path, std::string name, const glm::vec3& minExtents, const glm::vec3& maxExtents, float radius, uint32_t vertexCount, uint32_t indexCount, const Vertex::Layout& layout)
-                : path{std::move(path)}
-                , name{std::move(name)}
-                , layout{layout}
-                , vertexCount{vertexCount}
-                , indexCount{indexCount}
-                , minExtents{minExtents}
-                , maxExtents{maxExtents}
-                , radius{radius} {
-        }*/
-
         template< typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-        explicit Mesh(fs::path path, std::string name, const std::vector<uint8_t>& vertices, const std::vector<T>& indices, const Vertex::Layout& layout)
-                : path{std::move(path)}
-                , name{std::move(name)}
+        explicit Mesh(const fs::path& path, const std::string& name, const std::vector<uint8_t>& vertices, const std::vector<T>& indices, const Vertex::Layout& layout)
+                : Asset{path, name}
                 , layout{layout} {
             setVertices(vertices);
             setIndices(indices);
@@ -71,7 +58,7 @@ namespace fe {
             setVertices(vertices);
             setIndices(indices);
         }*/
-        ~Mesh() = default;
+        ~Mesh() override = default;
 
         bool cmdRender(const CommandBuffer& commandBuffer, uint32_t instances = 1) const;
 
@@ -149,20 +136,7 @@ namespace fe {
             }
         }
 
-        const std::string& getName() const override { return name; }
-        const fs::path& getPath() const override { return path; }
-        type_index getTypeIndex() const override { return type_id<Mesh>; }
-
-        template<typename Archive>
-        void serialize(Archive& archive) {
-            archive(cereal::make_nvp("Name", name),
-                    cereal::make_nvp("Path", path),
-                    cereal::make_nvp("Vertex", vertexCount),
-                    cereal::make_nvp("Index", indexCount),
-                    cereal::make_nvp("Min", glm::ivec3{minExtents}),
-                    cereal::make_nvp("Max", glm::ivec3{maxExtents}),
-                    cereal::make_nvp("Radius", static_cast<int>(radius)));
-        }
+        type_index getType() const override { return type_id<Mesh>; }
 
     private:
         std::unique_ptr<Buffer> vertexBuffer;
@@ -173,8 +147,6 @@ namespace fe {
         VkIndexType indexType{ VK_INDEX_TYPE_NONE_KHR };
         Vertex::Layout layout;
 
-        fs::path path;
-        std::string name;
         glm::vec3 minExtents{ FLT_MAX };
         glm::vec3 maxExtents{ -FLT_MAX };
         float radius{ 0.0f };

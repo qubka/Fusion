@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-SepiaFilter::SepiaFilter(const Pipeline::Stage& pipelineStage)
+SepiaFilter::SepiaFilter(Pipeline::Stage pipelineStage)
         : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/sepia.frag"}} {
 }
 

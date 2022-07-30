@@ -30,7 +30,7 @@ namespace fe {
                     {3, {0, 1}},
             };
 
-            addRenderStage(std::make_unique<RenderStage>(renderpassAttachments0, renderpassSubpasses0));
+            addRenderStage(std::make_unique<RenderStage>(std::move(renderpassAttachments0), std::move(renderpassSubpasses0)));
 
             std::vector<Attachment> renderpassAttachments1 = {
                     {0, "game_depth", Attachment::Type::Depth},
@@ -40,7 +40,7 @@ namespace fe {
                     {0, {0, 1}},
             };
 
-            addRenderStage(std::make_unique<RenderStage>(renderpassAttachments1, renderpassSubpasses1));
+            addRenderStage(std::make_unique<RenderStage>(std::move(renderpassAttachments1), std::move(renderpassSubpasses1)));
 
             std::vector<Attachment> renderpassAttachments2 = {
                     {0, "swapchain", Attachment::Type::Swapchain},
@@ -49,7 +49,7 @@ namespace fe {
                     {0, {0}}
             };
 
-            addRenderStage(std::make_unique<RenderStage>(renderpassAttachments2, renderpassSubpasses2));
+            addRenderStage(std::make_unique<RenderStage>(std::move(renderpassAttachments2), std::move(renderpassSubpasses2)));
         }
         ~EditorRenderer() override = default;
 

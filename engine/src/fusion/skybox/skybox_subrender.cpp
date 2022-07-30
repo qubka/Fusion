@@ -9,7 +9,7 @@
 
 using namespace fe;
 
-SkyboxSubrender::SkyboxSubrender(const Pipeline::Stage& pipelineStage)
+SkyboxSubrender::SkyboxSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
         , pipeline{pipelineStage, {"EngineShaders/sky/skybox.vert", "EngineShaders/sky/skybox.frag"}, {{{Vertex::Component::Position}}}} {
 

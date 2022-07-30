@@ -6,7 +6,7 @@
 namespace fe {
     class TiltshiftFilter : public PostFilter {
     public:
-        explicit TiltshiftFilter(const Pipeline::Stage& pipelineStage, float blurAmount = 1.0f, float centre = 1.1f, float stepSize = 0.004f, float steps = 3.0f);
+        explicit TiltshiftFilter(Pipeline::Stage pipelineStage, float blurAmount = 1.0f, float centre = 1.1f, float stepSize = 0.004f, float steps = 3.0f);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

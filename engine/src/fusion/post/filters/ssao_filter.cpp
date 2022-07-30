@@ -10,7 +10,7 @@ static const uint32_t SSAO_NOISE_DIM = 4;
 static const uint32_t SSAO_KERNEL_SIZE = 64;
 static const float SSAO_RADIUS = 0.5f;
 
-SsaoFilter::SsaoFilter(const Pipeline::Stage& pipelineStage) :
+SsaoFilter::SsaoFilter(Pipeline::Stage pipelineStage) :
     PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/ssao.frag"}, getDefines()}
     //, noise{Resources::Get()->getThreadPool().enqueue(computeNoise, SSAO_NOISE_DIM)}
     , kernel(SSAO_KERNEL_SIZE) {

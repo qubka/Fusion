@@ -6,7 +6,7 @@
 namespace fe {
     class DofFilter : public PostFilter {
     public:
-        explicit DofFilter(const Pipeline::Stage& pipelineStage, BlurPipeline* pipelineBlur, float focusPoint = 8.24f, float nearField = 0.3f,
+        explicit DofFilter(Pipeline::Stage pipelineStage, BlurPipeline* pipelineBlur, float focusPoint = 8.24f, float nearField = 0.3f,
             float nearTransition = 0.125f, float farField = 8.0f, float farTransition = 3.0f);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;

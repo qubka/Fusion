@@ -17,8 +17,8 @@ using namespace fe;
 
 Engine* Engine::Instance = nullptr;
 
-Engine::Engine(const CommandLineArgs& args)
-        : commandLineArgs{args}
+Engine::Engine(CommandLineArgs&& args)
+        : commandLineArgs{std::move(args)}
         , version{FUSION_VERSION_VARIANT, FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
     Instance = this;
 
@@ -44,7 +44,7 @@ void Engine::init() {
     VirtualFileSystem::Register("VirtualFileSystem", Module::Stage::Never);
     Input::Register("Input", Module::Stage::Normal);
     SceneManager::Register("SceneManager", Module::Stage::Normal);
-    AssetManager::Register("AssetManager", Module::Stage::Post);
+    AssetRegistry::Register("AssetRegistry", Module::Stage::Post);
     Graphics::Register("Graphics", Module::Stage::Render);
 
     StbToolbox::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");

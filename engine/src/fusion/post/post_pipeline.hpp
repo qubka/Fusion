@@ -13,7 +13,7 @@ namespace fe {
          * Creates a new post pipeline.
          * @param pipelineStage The pipelines graphics stage.
          */
-        explicit PostPipeline(const Pipeline::Stage& pipelineStage) : Subrender{pipelineStage} {}
+        explicit PostPipeline(Pipeline::Stage pipelineStage) : Subrender{pipelineStage} {}
         virtual ~PostPipeline() = default;
     };
 }

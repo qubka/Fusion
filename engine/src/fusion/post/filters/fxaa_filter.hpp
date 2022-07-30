@@ -6,7 +6,7 @@
 namespace fe {
     class FxaaFilter : public PostFilter {
     public:
-        explicit FxaaFilter(const Pipeline::Stage& pipelineStage, float spanMax = 8.0f);
+        explicit FxaaFilter(Pipeline::Stage pipelineStage, float spanMax = 8.0f);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 

@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-DefaultFilter::DefaultFilter(const Pipeline::Stage& pipelineStage, bool lastFilter)
+DefaultFilter::DefaultFilter(Pipeline::Stage pipelineStage, bool lastFilter)
         : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/default.frag"}}
         , lastFilter{lastFilter} {
 }

@@ -5,7 +5,7 @@
 namespace fe {
     class ToneFilter : public PostFilter {
     public:
-        explicit ToneFilter(const Pipeline::Stage& pipelineStage);
+        explicit ToneFilter(Pipeline::Stage pipelineStage);
 
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
     };
