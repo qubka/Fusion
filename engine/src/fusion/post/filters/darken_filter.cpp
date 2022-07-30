@@ -3,7 +3,7 @@
 using namespace fe;
 
 DarkenFilter::DarkenFilter(Pipeline::Stage pipelineStage, float factor)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/darken.frag"}}
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/darken.frag"}}
         , factor{factor} {
 }
 

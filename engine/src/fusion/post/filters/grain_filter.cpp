@@ -3,7 +3,7 @@
 using namespace fe;
 
 GrainFilter::GrainFilter(Pipeline::Stage pipelineStage, float strength)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/grain.frag"}}
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/grain.frag"}}
         , strength{strength} {
 }
 

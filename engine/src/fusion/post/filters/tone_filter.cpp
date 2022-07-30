@@ -3,7 +3,7 @@
 using namespace fe;
 
 ToneFilter::ToneFilter(Pipeline::Stage pipelineStage)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/tone.frag"}} {
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/tone.frag"}} {
 }
 
 void ToneFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {

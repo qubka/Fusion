@@ -5,7 +5,7 @@
 using namespace fe;
 
 BlitFilter::BlitFilter(Pipeline::Stage pipelineStage)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/blit.frag"}} {
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/blit.frag"}} {
 }
 
 void BlitFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {

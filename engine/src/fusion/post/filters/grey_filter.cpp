@@ -3,7 +3,7 @@
 using namespace fe;
 
 GreyFilter::GreyFilter(Pipeline::Stage pipelineStage)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/grey.frag"}} {
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/grey.frag"}} {
 }
 
 void GreyFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {

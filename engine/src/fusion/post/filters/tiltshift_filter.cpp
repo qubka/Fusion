@@ -3,7 +3,7 @@
 using namespace fe;
 
 TiltshiftFilter::TiltshiftFilter(Pipeline::Stage pipelineStage, float blurAmount, float centre, float stepSize, float steps)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/tiltshift.frag"}}
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/tiltshift.frag"}}
         , blurAmount{blurAmount}
         , centre{centre}
         , stepSize{stepSize}

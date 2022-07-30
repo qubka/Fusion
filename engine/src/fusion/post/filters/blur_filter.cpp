@@ -5,7 +5,7 @@
 using namespace fe;
 
 BlurFilter::BlurFilter(Pipeline::Stage pipelineStage, const glm::vec2& direction, Type type)
-    : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/blur.frag"}, getDefines(type)}
+    : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/blur.frag"}, getDefines(type)}
     , type{type}
     , direction{direction} {
 }

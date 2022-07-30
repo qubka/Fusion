@@ -3,7 +3,7 @@
 using namespace fe;
 
 VignetteFilter::VignetteFilter(Pipeline::Stage pipelineStage, float innerRadius, float outerRadius, float opacity)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/vignette.frag"}}
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/vignette.frag"}}
         , innerRadius{innerRadius}
         , outerRadius{outerRadius}
         , opacity{opacity} {

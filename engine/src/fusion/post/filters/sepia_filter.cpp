@@ -3,7 +3,7 @@
 using namespace fe;
 
 SepiaFilter::SepiaFilter(Pipeline::Stage pipelineStage)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/sepia.frag"}} {
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/sepia.frag"}} {
 }
 
 void SepiaFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {

@@ -5,7 +5,7 @@
 using namespace fe;
 
 CrtFilter::CrtFilter(Pipeline::Stage pipelineStage, const glm::vec4& screenColor, float curveAmountX, float curveAmountY, float scanLineSize, float scanIntensity)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/crt.frag"}}
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/crt.frag"}}
         , screenColor{screenColor}
         , curveAmountX{curveAmountX}
         , curveAmountY{curveAmountY}

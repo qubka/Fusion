@@ -3,7 +3,7 @@
 using namespace fe;
 
 PixelFilter::PixelFilter(Pipeline::Stage pipelineStage, float pixelSize)
-    : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/pixel.frag"}}, pixelSize{pixelSize} {
+    : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/pixel.frag"}}, pixelSize{pixelSize} {
 }
 
 void PixelFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {

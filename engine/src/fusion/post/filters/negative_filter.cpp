@@ -3,7 +3,7 @@
 using namespace fe;
 
 NegativeFilter::NegativeFilter(Pipeline::Stage pipelineStage)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/negative.frag"}} {
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/negative.frag"}} {
 }
 
 void NegativeFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
