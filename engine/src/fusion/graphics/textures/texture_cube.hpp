@@ -81,7 +81,7 @@ namespace fe {
          * @param layerCount The amount of layers contained in the pixels.
          * @param baseArrayLayer The first layer to copy into.
          */
-        void setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer);
+        void setPixels(const std::byte* pixels, uint32_t layerCount, uint32_t baseArrayLayer);
 
         type_index getType() const override { return type_id<TextureCube>; }
 

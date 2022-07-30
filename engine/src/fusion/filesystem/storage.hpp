@@ -15,13 +15,13 @@ namespace fe {
         virtual ~Storage() = default;
 
         operator bool() const { return data(); }
-        operator std::span<const uint8_t>() const { return { data(), size() }; }
+        operator std::span<const std::byte>() const { return { data(), size() }; }
 
-        virtual const uint8_t* data() const = 0;
+        virtual const std::byte* data() const = 0;
         virtual size_t size() const = 0;
         virtual bool isFast() const = 0;
 
-        static StoragePointer Create(std::span<const uint8_t> buffer);
+        static StoragePointer Create(std::span<const std::byte> buffer);
         static StoragePointer ReadFile(const fs::path& filename);
     };
 }

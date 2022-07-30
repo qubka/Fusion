@@ -11,22 +11,22 @@
 using namespace fe;
 
 void StbToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
-    std::unique_ptr<uint8_t[]> pixels;
+    std::unique_ptr<std::byte[]> pixels;
     int width, height, channels;
     int desired_channels = STBI_rgb_alpha;
     bool hdr = false;
 
     std::string extension{ FileSystem::GetExtension(filepath) };
     if (extension == ".hdr") {
-        FileSystem::ReadBytes(filepath, [&](std::span<const uint8_t> buffer) {
-            pixels = std::unique_ptr<uint8_t[]>(reinterpret_cast<uint8_t*>(
-                    stbi_loadf_from_memory(buffer.data(), static_cast<int>(buffer.size()), &width, &height, &channels, desired_channels)));
+        FileSystem::ReadBytes(filepath, [&](std::span<const std::byte> buffer) {
+            pixels = std::unique_ptr<std::byte[]>(reinterpret_cast<std::byte*>(
+                    stbi_loadf_from_memory(reinterpret_cast<const stbi_uc*>(buffer.data()), static_cast<int>(buffer.size()), &width, &height, &channels, desired_channels)));
         });
         hdr = true;
     } else {
-        FileSystem::ReadBytes(filepath, [&](std::span<const uint8_t> buffer) {
-            pixels = std::unique_ptr<uint8_t[]>(
-                    stbi_load_from_memory(buffer.data(), static_cast<int>(buffer.size()), &width, &height, &channels, desired_channels));
+        FileSystem::ReadBytes(filepath, [&](std::span<const std::byte> buffer) {
+            pixels = std::unique_ptr<std::byte[]>(reinterpret_cast<std::byte*>(
+                    stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(buffer.data()), static_cast<int>(buffer.size()), &width, &height, &channels, desired_channels)));
         });
     }
 
@@ -57,13 +57,13 @@ void StbToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
 void StbToolbox::Write(const Bitmap& bitmap, const fs::path& filepath) {
     std::string extension{ FileSystem::GetExtension(filepath) };
     if (extension == ".jpg" || extension == ".jpeg") {
-        stbi_write_jpg(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<uint8_t>(), 8);
+        stbi_write_jpg(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<void>(), 8);
     } else if (extension == ".bmp") {
-        stbi_write_bmp(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<uint8_t>());
+        stbi_write_bmp(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<void>());
     } else if (extension == ".png") {
-        stbi_write_png(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<uint8_t>(), 0);
+        stbi_write_png(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<void>(), 0);
     } else if (extension == ".tga") {
-        stbi_write_tga(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<uint8_t>());
+        stbi_write_tga(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes), bitmap.getData<void>());
     } else if (extension == ".hdr") {
         stbi_write_hdr(filepath.string().c_str(), bitmap.getWidth(), bitmap.getHeight(), static_cast<int>(vku::get_format_params(bitmap.getFormat()).bytes / sizeof(float)), bitmap.getData<float>());
     } else {

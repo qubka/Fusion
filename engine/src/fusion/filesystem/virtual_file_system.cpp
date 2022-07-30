@@ -11,7 +11,7 @@ fs::path VirtualFileSystem::resolvePhysicalPath(const fs::path& path) {
     return {};
 }
 
-void VirtualFileSystem::readBytes(const fs::path& path, const std::function<void(std::span<const uint8_t>)>& handler) {
+void VirtualFileSystem::readBytes(const fs::path& path, const std::function<void(std::span<const std::byte>)>& handler) {
     FileSystem::ReadBytes(resolvePhysicalPath(path), handler);
 }
 
@@ -19,7 +19,7 @@ std::string VirtualFileSystem::readText(const fs::path& path) {
     return FileSystem::ReadText(resolvePhysicalPath(path));
 }
 
-bool VirtualFileSystem::writeBytes(const fs::path& path, std::span<const uint8_t> buffer) {
+bool VirtualFileSystem::writeBytes(const fs::path& path, std::span<const std::byte> buffer) {
     return FileSystem::WriteBytes(resolvePhysicalPath(path), buffer);
 }
 

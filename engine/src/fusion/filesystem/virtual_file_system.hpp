@@ -12,9 +12,9 @@ namespace fe {
 
         fs::path resolvePhysicalPath(const fs::path& path);
 
-        void readBytes(const fs::path& path, const std::function<void(std::span<const uint8_t>)>& handler);
+        void readBytes(const fs::path& path, const std::function<void(std::span<const std::byte>)>& handler);
         std::string readText(const fs::path& path);
-        bool writeBytes(const fs::path& path, std::span<const uint8_t> buffer);
+        bool writeBytes(const fs::path& path, std::span<const std::byte> buffer);
         bool writeText(const fs::path& path, std::string_view text);
 
         const std::unordered_map<fs::path, fs::path>& getMounted() { return mountPoints; };

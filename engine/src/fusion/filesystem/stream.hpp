@@ -3,7 +3,7 @@
 struct PHYSFS_File;
 
 namespace fe {
-    enum class FileMode : uint8_t {
+    enum class FileMode : unsigned char {
         Read,
         Write,
         Append

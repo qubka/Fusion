@@ -15,23 +15,23 @@ void setAssetManager(AAssetManager* assetManager) {
 
 class ViewStorage : public Storage {
 public:
-    ViewStorage(const StoragePointer& owner, std::span<const uint8_t> buffer)
+    ViewStorage(const StoragePointer& owner, std::span<const std::byte> buffer)
         : owner{owner}
         , buffer{buffer} {
     }
 
-    const uint8_t* data() const override { return buffer.data(); }
+    const std::byte* data() const override { return buffer.data(); }
     size_t size() const override { return buffer.size(); }
     bool isFast() const override { return owner->isFast(); }
 
 private:
     StoragePointer owner;
-    std::span<const uint8_t> buffer;
+    std::span<const std::byte> buffer;
 };
 
 class MemoryStorage : public Storage {
 public:
-    explicit MemoryStorage(std::span<const uint8_t> data)
+    explicit MemoryStorage(std::span<const std::byte> data)
         : buffer(data.size()) {
         if (data.data()) {
             std::memcpy(buffer.data(), data.data(), data.size());
@@ -41,7 +41,7 @@ public:
         : buffer{std::move(byteArray)} {
     }
 
-    const uint8_t* data() const override { return buffer.data(); }
+    const std::byte* data() const override { return reinterpret_cast<const std::byte*>(buffer.data()); }
     size_t size() const override { return buffer.size(); }
     bool isFast() const override { return true; }
 
@@ -64,14 +64,14 @@ public:
     FileStorage(const FileStorage& other) = delete;
     FileStorage& operator=(const FileStorage& other) = delete;
 
-    const uint8_t* data() const override { return buffer.data(); }
+    const std::byte* data() const override { return buffer.data(); }
     size_t size() const override { return buffer.size(); }
     bool isFast() const override { return false; }
 
-    static StoragePointer Create(std::span<const uint8_t> buffer);
+    static StoragePointer Create(std::span<const std::byte> buffer);
 
 private:
-    std::span<const uint8_t> buffer;
+    std::span<const std::byte> buffer;
 #if FUSION_PLATFORM_ANDROID
     AAsset* asset{ nullptr };
 #elif FUSION_PLATFORM_WINDOWS
@@ -89,7 +89,7 @@ FileStorage::FileStorage(const fs::path& filepath) {
     if (!asset) {
         throw std::runtime_error("File " + filepath.string() + " could not be opened");
     }
-    buffer = { static_cast<uint8_t*>(AAsset_getBuffer(asset)), AAsset_getLength(asset) };
+    buffer = { static_cast<std::byte*>(AAsset_getBuffer(asset)), AAsset_getLength(asset) };
     if (!buffer.data()) {
         throw std::runtime_error("File " + filepath.string() + " is invalid");
     }
@@ -105,7 +105,7 @@ FileStorage::FileStorage(const fs::path& filepath) {
     if (mapFile == INVALID_HANDLE_VALUE) {
         throw std::runtime_error("File " + filepath.string() + " could not be mapped");
     }
-    buffer = { static_cast<uint8_t*>(MapViewOfFile(mapFile, FILE_MAP_READ, 0, 0, 0)), size };
+    buffer = { static_cast<std::byte*>(MapViewOfFile(mapFile, FILE_MAP_READ, 0, 0, 0)), size };
     if (!buffer.data()) {
         throw std::runtime_error("File " + filepath.string() + " is invalid");
     }
@@ -123,7 +123,7 @@ FileStorage::~FileStorage() {
 }
 #endif
 
-StoragePointer Storage::Create(std::span<const uint8_t> buffer)  {
+StoragePointer Storage::Create(std::span<const std::byte> buffer)  {
     return std::make_shared<MemoryStorage>(buffer);
 }
 

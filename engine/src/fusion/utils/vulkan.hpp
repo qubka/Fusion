@@ -128,7 +128,7 @@ namespace vku {
         }
     }
 
-    inline void BlitRGBToBGRSurface(uint8_t* dst, const uint8_t* src, const glm::uvec2& size) {
+    inline void BlitRGBToBGRSurface(std::byte* dst, const std::byte* src, const glm::uvec2& size) {
         for(auto i = 0; i < size.y; ++i) {
             for (auto j = 0; j < size.x; ++j) {
                 *dst++ = src[2];
@@ -139,7 +139,7 @@ namespace vku {
         }
     }
 
-    inline void BlitRGBAToBGRASurface(uint8_t* dst, const uint8_t* src, const glm::uvec2& size) {
+    inline void BlitRGBAToBGRASurface(std::byte* dst, const std::byte* src, const glm::uvec2& size) {
         for(auto i = 0; i < size.y; ++i) {
             for (auto j = 0; j < size.x; ++j) {
                 *dst++ = src[2];

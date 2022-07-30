@@ -81,7 +81,7 @@ void Texture2dArray::load() {
     auto debugStart = DateTime::Now();
 #endif
     std::unique_ptr<gli::texture2d_array> texture;
-    FileSystem::ReadBytes(path, [&texture](std::span<const uint8_t> buffer) {
+    FileSystem::ReadBytes(path, [&texture](std::span<const std::byte> buffer) {
         texture = std::make_unique<gli::texture2d_array>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
     });
 #if FUSION_DEBUG

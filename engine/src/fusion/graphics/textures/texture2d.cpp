@@ -66,7 +66,7 @@ Texture2d::Texture2d(const std::unique_ptr<Bitmap>& bitmap, VkFormat format, VkI
                   mipmap} {
 }
 
-void Texture2d::setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer) {
+void Texture2d::setPixels(const std::byte* pixels, uint32_t layerCount, uint32_t baseArrayLayer) {
     uint8_t components = vku::get_format_params(format).bytes;
     Buffer bufferStaging{extent.width * extent.height * components * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels};
     CopyBufferToImage(bufferStaging, image, extent, layerCount, baseArrayLayer);
@@ -80,7 +80,7 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
         auto debugStart = DateTime::Now();
 #endif
         std::unique_ptr<gli::texture2d> texture;
-        FileSystem::ReadBytes(path, [&texture](std::span<const uint8_t> buffer) {
+        FileSystem::ReadBytes(path, [&texture](std::span<const std::byte> buffer) {
             texture = std::make_unique<gli::texture2d>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
         });
 #if FUSION_DEBUG

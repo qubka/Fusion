@@ -18,7 +18,7 @@ namespace fe {
 	 * @param clearColour The colour to clear to before rendering to it.
 	 */
     struct Attachment {
-        enum class Type : uint8_t { Image, Depth, Swapchain };
+        enum class Type : unsigned char { Image, Depth, Swapchain };
         uint32_t binding{ 0 };
         std::string name;
         Type type{ Type:: Image };

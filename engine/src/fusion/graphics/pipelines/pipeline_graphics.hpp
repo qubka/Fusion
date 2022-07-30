@@ -13,19 +13,19 @@ namespace fe {
      */
     class PipelineGraphics : public Pipeline {
     public:
-        enum class Mode : uint8_t {
+        enum class Mode : unsigned char {
             Polygon,
             MRT
         };
 
-        enum class Depth : uint8_t {
+        enum class Depth : unsigned char {
             None = 0,
             Read = 1,
             Write = 2,
             ReadWrite = Read | Write
         };
 
-        enum class Blend : uint8_t {
+        enum class Blend : unsigned char {
             None = 0,
             OneZero,
             ZeroSrcColor,

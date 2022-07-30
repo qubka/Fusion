@@ -74,7 +74,7 @@ std::unique_ptr<Bitmap> TextureCube::getBitmap(uint32_t mipLevel) const {
 
 	auto sizeSide = size.x * size.y * components;
 	auto bitmap = std::make_unique<Bitmap>(glm::uvec2{size.x, size.y * arrayLayers}, format);
-	auto offset = bitmap->getData<uint8_t>();
+	auto offset = bitmap->getData<std::byte>();
 
 	for (uint32_t i = 0; i < 6; i++) {
 		auto bitmapSide = Image::getBitmap(mipLevel, i);
@@ -85,7 +85,7 @@ std::unique_ptr<Bitmap> TextureCube::getBitmap(uint32_t mipLevel) const {
 	return bitmap;
 }
 
-void TextureCube::setPixels(const uint8_t* pixels, uint32_t layerCount, uint32_t baseArrayLayer) {
+void TextureCube::setPixels(const std::byte* pixels, uint32_t layerCount, uint32_t baseArrayLayer) {
     uint8_t components = vku::get_format_params(format).bytes;
 	Buffer bufferStaging{extent.width * extent.height * components * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels};
 	CopyBufferToImage(bufferStaging, image, extent, layerCount, baseArrayLayer);
@@ -96,7 +96,7 @@ void TextureCube::load() {
     auto debugStart = DateTime::Now();
 #endif
     std::unique_ptr<gli::texture_cube> texture;
-    FileSystem::ReadBytes(path, [&texture](std::span<const uint8_t> buffer) {
+    FileSystem::ReadBytes(path, [&texture](std::span<const std::byte> buffer) {
         texture = std::make_unique<gli::texture_cube>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
     });
 #if FUSION_DEBUG

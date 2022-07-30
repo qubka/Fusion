@@ -3,7 +3,7 @@
 namespace fe {
     class Transform {
     public:
-        enum class Space : uint8_t { Self, Parent, World };
+        enum class Space : unsigned char { Self, Parent, World };
 
         Transform() = default;
         explicit Transform(const glm::mat4& local);
