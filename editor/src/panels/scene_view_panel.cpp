@@ -72,6 +72,7 @@ void SceneViewPanel::onImGui() {
 
     editor->setSceneActive(viewportFocused && viewportHovered && !ImGuizmo::IsUsing());
     editor->setSceneViewActive(viewportHovered);
+    editor->setSceneViewSize(viewportSize);
 
     ImGuizmo::SetRect(viewportPos.x, viewportPos.y, viewportSize.x, viewportSize.y);
 

@@ -771,9 +771,13 @@ void Editor::openFile() {
 }
 
 void Editor::fileOpenCallback(const fs::path& path) {
+    fs::path virtualPath { strip_root(path) };
+
     if (FileFormat::IsTextFile(path)) {
         openTextFile(path, []{});
     } else if (FileFormat::IsModelFile(path)) {
+        //auto pos = clicked ? vec3::zero : editorCamera->screenToWorld(Input::Get()->getMousePosition(), sceneViewSize);
+        //SceneManager::Get()->getScene()->importMesh(path, pos);
     } else if (FileFormat::IsAudioFile(path)) {
     } else if (FileFormat::IsSceneFile(path)) {
         /*auto sceneManager = SceneManager::Get()->getScene();
@@ -788,7 +792,7 @@ void Editor::fileOpenCallback(const fs::path& path) {
     } else if (FileFormat::IsTextureFile(path)) {
     }
 
-    LOG_DEBUG << "File opened: \"" << path << "\"";
+    LOG_DEBUG << "File opened: \"" << virtualPath << "\"";
 }
 
 void Editor::projectOpenCallback(const fs::path& path) {

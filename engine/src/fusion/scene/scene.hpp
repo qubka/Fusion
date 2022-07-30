@@ -159,6 +159,8 @@ namespace fe {
             archive(cereal::make_nvp("name", name));
         }
 
+        void importMesh(const fs::path& filepath, const glm::vec3& position = vec3::zero);
+
     protected:
         /**
          * Called when the scene is created.

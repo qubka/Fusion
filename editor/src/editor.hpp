@@ -87,6 +87,7 @@ namespace fe {
         void setSceneActive(bool flag) { sceneActive = flag; }
         bool isSceneViewActive() const { return sceneViewActive; }
         void setSceneViewActive(bool flag) { sceneViewActive = flag; }
+        void setSceneViewSize(const glm::vec2& size) { sceneViewSize = size; }
 
         //void focusCamera(const glm::vec3& point, float distance, float speed = 1.0f);
 
@@ -127,5 +128,7 @@ namespace fe {
 
         bool sceneActive{ false };
         bool sceneViewActive{ false };
+        glm::vec2 sceneViewSize{ 0.0f };
+        //glm::vec2 gameViewSize{ 0.0f };
     };
 }

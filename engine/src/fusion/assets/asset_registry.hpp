@@ -44,6 +44,7 @@ namespace fe {
 
     private:
         void onUpdate() override;
+        void onFileChanged(const fs::path& path, FileStatus status);
 
         std::unordered_map<type_index, std::unordered_map<fs::path, std::shared_ptr<Asset>>> assets;
 

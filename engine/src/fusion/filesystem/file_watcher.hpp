@@ -2,28 +2,23 @@
 
 namespace fe {
     // Define available file changes
-    enum class FileStatus : uint8_t { Created, Modified, Erased };
+    enum class FileStatus : unsigned char { Created, Modified, Erased };
 
     class FileWatcher {
     public:
-        // Keep a record of files from the base directory and their last modification time
-        FileWatcher(const fs::path& watchPath, std::chrono::duration<int, std::milli> delay) : watchPath{watchPath}, delay{delay} {
-            for (auto& entry: fs::recursive_directory_iterator(watchPath)) {
+        explicit FileWatcher(const fs::path& watchPath, const std::function<void(const fs::path&, FileStatus)>& callback, const DateTime& interval = 1s) : watchPath{watchPath}, callback{callback}, elapsedUpdate{interval} {
+            for (const auto& entry: fs::recursive_directory_iterator(watchPath)) {
                 auto& file = entry.path();
                 paths[file] = fs::last_write_time(file);
             }
         }
 
-        // Monitor "path_to_watch" for changes and in case of a change execute the user supplied "action" function
-        void start(const std::function<void(const fs::path&, FileStatus)>& action) {
-            while (running) {
-                // Wait for "delay" milliseconds
-                std::this_thread::sleep_for(delay);
-
+        void update() {
+            if (elapsedUpdate.getElapsed() != 0) {
                 auto it = paths.begin();
                 while (it != paths.end()) {
                     if (!fs::exists(it->first)) {
-                        action(it->first, FileStatus::Erased);
+                        callback(it->first, FileStatus::Erased);
                         it = paths.erase(it);
                     } else {
                         it++;
@@ -31,19 +26,21 @@ namespace fe {
                 }
 
                 // Check if a file was created or modified
-                for (auto& entry: fs::recursive_directory_iterator(watchPath)) {
+                for (const auto& entry: fs::recursive_directory_iterator(watchPath)) {
                     auto& path = entry.path();
                     auto lastWriteTime = fs::last_write_time(path);
 
                     // File creation
-                    if (paths.find(path) == paths.end()) {
+                    auto it2 = paths.find(path);
+                    if (it2 == paths.end()) {
                         paths[path] = lastWriteTime;
-                        action(path, FileStatus::Created);
+                        callback(path, FileStatus::Created);
                         // File modification
                     } else {
-                        if (paths[path] != lastWriteTime) {
-                            paths[path] = lastWriteTime;
-                            action(path, FileStatus::Modified);
+                        auto& time = it2->second;
+                        if (time != lastWriteTime) {
+                            time = lastWriteTime;
+                            callback(path, FileStatus::Modified);
                         }
                     }
                 }
@@ -54,8 +51,9 @@ namespace fe {
 
     private:
         std::unordered_map<fs::path, fs::file_time_type> paths;
+        std::function<void(const fs::path&, FileStatus)> callback;
         fs::path watchPath;
-        std::chrono::duration<int, std::milli> delay{}; // Time interval at which we check the base folder for changes
-        bool running{ true };
+
+        ElapsedTime elapsedUpdate;
     };
 }
