@@ -25,11 +25,11 @@ std::string FileSystem::ReadText(const fs::path& filepath) {
 
     std::stringstream ss;
     std::string line;
+
     while (!is.eof()) {
         getline(is, line);
         ss << line << '\n';
     }
-
     return ss.str();
 }
 

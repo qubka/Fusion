@@ -8,7 +8,7 @@
 using namespace fe;
 
 DofFilter::DofFilter(Pipeline::Stage pipelineStage, BlurPipeline* pipelineBlur, float focusPoint, float nearField, float nearTransition, float farField, float farTransition)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/dof.frag"}}
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/dof.frag"}}
         , pipelineBlur{pipelineBlur}
         , focusPoint{focusPoint}
         , nearField{nearField}
