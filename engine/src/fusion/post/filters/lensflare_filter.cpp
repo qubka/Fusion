@@ -6,7 +6,7 @@
 using namespace fe;
 
 LensflareFilter::LensflareFilter(Pipeline::Stage pipelineStage)
-    : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/lensflare.frag"}} {
+    : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/lensflare.frag"}} {
 }
 
 void LensflareFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {

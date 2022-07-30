@@ -3,7 +3,7 @@
 using namespace fe;
 
 EmbossFilter::EmbossFilter(Pipeline::Stage pipelineStage)
-        : PostFilter{pipelineStage, {"EngineShaders/post/default.vert", "EngineShaders/post/emboss.frag"}} {
+        : PostFilter{pipelineStage, {"engine/assets/shaders/post/default.vert", "engine/assets/shaders/post/emboss.frag"}} {
 }
 
 void EmbossFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
