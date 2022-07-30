@@ -248,7 +248,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     VkSubresourceLayout dstSubresourceLayout;
     vkGetImageSubresourceLayout(logicalDevice, dstImage, &imageSubresource, &dstSubresourceLayout);
 
-    Bitmap bitmap{std::make_unique<uint8_t[]>(dstSubresourceLayout.size), size};
+    Bitmap bitmap{std::make_unique<std::byte[]>(dstSubresourceLayout.size), size};
 
     // If source is BGR (destination is always RGB) and we can't use blit (which does automatic conversion), we'll have to manually swizzle color components
     bool colorSwizzle = false;
@@ -267,7 +267,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     void* data;
     vkMapMemory(logicalDevice, dstImageMemory, dstSubresourceLayout.offset, dstSubresourceLayout.size, 0, &data);
     if (colorSwizzle)
-        vku::BlitRGBAToBGRASurface(bitmap.getData<uint8_t>(), static_cast<const uint8_t*>(data), size);
+        vku::BlitRGBAToBGRASurface(bitmap.getData<std::byte>(), static_cast<const std::byte*>(data), size);
     else
         std::memcpy(bitmap.getData<void>(), data, dstSubresourceLayout.size);
     vkUnmapMemory(logicalDevice, dstImageMemory);

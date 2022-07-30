@@ -17,7 +17,7 @@ namespace fe {
 using namespace fe;
 
 namespace ImGuiUtils {
-    enum class Theme : uint8_t {
+    enum class Theme : unsigned char {
         Black,
         Dark,
         Dracula,
@@ -32,7 +32,7 @@ namespace ImGuiUtils {
         Steam
     };
 
-    enum class PropertyFlag : uint8_t {
+    enum class PropertyFlag : unsigned char {
         None = 0,
         ReadOnly = 1,
         ColorValue = 2,

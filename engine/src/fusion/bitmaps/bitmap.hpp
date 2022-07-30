@@ -10,7 +10,7 @@ namespace fe {
         Bitmap() = default;
         explicit Bitmap(const fs::path& filepath);
         explicit Bitmap(const glm::uvec2& size, VkFormat format = VK_FORMAT_R8G8B8A8_UNORM);
-        Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, VkFormat format = VK_FORMAT_R8G8B8A8_UNORM);
+        Bitmap(std::unique_ptr<std::byte[]>&& data, const glm::uvec2& size, VkFormat format = VK_FORMAT_R8G8B8A8_UNORM);
         ~Bitmap() override = default;
         NONCOPYABLE(Bitmap);
 
@@ -38,7 +38,7 @@ namespace fe {
         bool isEmpty() const { return !data || (size.x == 0 && size.y == 0); }
 
     private:
-        std::unique_ptr<uint8_t[]> data;
+        std::unique_ptr<std::byte[]> data;
         glm::uvec2 size{ 0 };
         VkFormat format{ VK_FORMAT_UNDEFINED };
         fs::path path;

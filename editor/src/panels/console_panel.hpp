@@ -3,7 +3,7 @@
 #include "editor_panel.hpp"
 
 namespace fe {
-    enum class MessageLevel : uint8_t {
+    enum class MessageLevel : unsigned char {
         None = 0,
         Fatal = 1,
         Error = 2,

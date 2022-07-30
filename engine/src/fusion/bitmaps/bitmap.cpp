@@ -11,10 +11,10 @@ Bitmap::Bitmap(const fs::path& filepath) {
 Bitmap::Bitmap(const glm::uvec2& size, VkFormat format)
         : size{size}
         , format{format}
-        , data{std::make_unique<uint8_t[]>(size.x * size.y * vku::get_format_params(format).bytes)} {
+        , data{std::make_unique<std::byte[]>(size.x * size.y * vku::get_format_params(format).bytes)} {
 }
 
-Bitmap::Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, VkFormat format)
+Bitmap::Bitmap(std::unique_ptr<std::byte[]>&& data, const glm::uvec2& size, VkFormat format)
         : size{size}
         , format{format}
         , data{std::move(data)} {

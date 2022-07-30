@@ -43,9 +43,9 @@ void Engine::init() {
     FileSystem::Register("FileSystem", Module::Stage::Never);
     VirtualFileSystem::Register("VirtualFileSystem", Module::Stage::Never);
     Input::Register("Input", Module::Stage::Normal);
+    Graphics::Register("Graphics", Module::Stage::Render);
     SceneManager::Register("SceneManager", Module::Stage::Normal);
     AssetRegistry::Register("AssetRegistry", Module::Stage::Post);
-    Graphics::Register("Graphics", Module::Stage::Render);
 
     StbToolbox::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
     GliToolbox::Register(".ktx", ".kmg", ".dds");

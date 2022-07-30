@@ -11,7 +11,7 @@ FileSystem::FileSystem() {
 FileSystem::~FileSystem() {
 }
 
-void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(std::span<const uint8_t>)>& handler) {
+void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(std::span<const std::byte>)>& handler) {
     auto storage = Storage::ReadFile(filepath);
     handler(*storage);
 }
@@ -33,7 +33,7 @@ std::string FileSystem::ReadText(const fs::path& filepath) {
     return ss.str();
 }
 
-bool FileSystem::WriteBytes(const fs::path& filepath, std::span<const uint8_t> buffer) {
+bool FileSystem::WriteBytes(const fs::path& filepath, std::span<const std::byte> buffer) {
     std::ofstream os{filepath, std::ios::binary};
     os.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
     return true;

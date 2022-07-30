@@ -312,7 +312,7 @@ void ImGuiSubrender::setupStyle() {
     config.SizePixels = 12.0f;
 
     static const ImWchar ranges[] = { 0x0020, 0x00FF, 0x0400, 0x044F, 0, };
-    //std::vector<uint8_t> textFont = FileSystem::ReadBytes("fonts/PT Sans.ttf");
+    //std::vector<std::byte> textFont = FileSystem::ReadBytes("fonts/PT Sans.ttf");
 
     io.Fonts->AddFontFromMemoryCompressedTTF(RobotoRegular_compressed_data, RobotoRegular_compressed_size, fontSize, &config, ranges);
     addIconFont();
@@ -385,7 +385,7 @@ void ImGuiSubrender::addIconFont() {
 void ImGuiSubrender::rebuildFont() {
     ImGuiIO& io = ImGui::GetIO();
 
-    uint8_t* fontBuffer;
+    unsigned char* fontBuffer;
     int texWidth, texHeight;
     io.Fonts->GetTexDataAsRGBA32(&fontBuffer, &texWidth, &texHeight);
     auto bitmap = std::make_unique<Bitmap>(glm::uvec2{texWidth, texHeight});

@@ -12,7 +12,7 @@ Cursor::Cursor(fs::path filepath, fe::CursorHotspot hotspot) : path{std::move(fi
     GLFWimage image = {};
     image.width = bitmap.getWidth();
     image.height = bitmap.getHeight();
-    image.pixels = bitmap.getData<uint8_t>();
+    image.pixels = bitmap.getData<unsigned char>();
 
     switch (hotspot) {
         case fe::CursorHotspot::UpperLeft:

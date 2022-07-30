@@ -9,14 +9,14 @@ namespace fe {
     class Mesh : public Asset {
     public:
         template< typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-        explicit Mesh(const fs::path& path, const std::string& name, const std::vector<uint8_t>& vertices, const std::vector<T>& indices, const Vertex::Layout& layout)
+        explicit Mesh(const fs::path& path, const std::string& name, const std::vector<std::byte>& vertices, const std::vector<T>& indices, const Vertex::Layout& layout)
                 : Asset{path, name}
                 , layout{layout} {
             setVertices(vertices);
             setIndices(indices);
         }
         /*template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-        explicit Mesh(fs::path path, std::string name, std::vector<uint8_t>&& vertices, std::vector<T>&& indices, const Vertex::Layout& layout, float optimiseThreshold)
+        explicit Mesh(fs::path path, std::string name, std::vector<std::byte>&& vertices, std::vector<T>&& indices, const Vertex::Layout& layout, float optimiseThreshold)
                 : path{std::move(path)}
                 , name{std::move(name)}
                 , layout{layout} {
@@ -75,18 +75,18 @@ namespace fe {
         float getDepth() const { return maxExtents.z - minExtents.z; }
         float getRadius() const { return radius; }
 
-        std::vector<uint8_t> getVertices() const {
+        std::vector<std::byte> getVertices() const {
             auto vertexStaging = Buffer::DeviceToStageBuffer(*vertexBuffer);
 
             vertexStaging->map();
-            std::vector<uint8_t> vertices(vertexCount * layout.getStride());
+            std::vector<std::byte> vertices(vertexCount * layout.getStride());
             vertexStaging->extract(vertices.data());
             vertexStaging->unmap();
 
             return vertices;
         }
 
-        void setVertices(const std::vector<uint8_t>& vertices) {
+        void setVertices(const std::vector<std::byte>& vertices) {
             vertexBuffer = nullptr;
             vertexCount = static_cast<uint32_t>(vertices.size() / layout.getStride());
 

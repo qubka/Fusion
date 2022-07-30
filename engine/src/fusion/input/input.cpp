@@ -40,18 +40,18 @@ bool Input::getKeyUp(Key key) {
 }
 
 bool Input::getMouseButton(MouseButton button) {
-    auto buttonId = MOUSE_BUTTONS + static_cast<uint8_t>(button);
+    auto buttonId = MOUSE_BUTTONS + static_cast<size_t>(button);
     return keys[buttonId].pressed;
 }
 
 bool Input::getMouseButtonDown(MouseButton button) {
-    auto buttonId = MOUSE_BUTTONS + static_cast<uint8_t>(button);
+    auto buttonId = MOUSE_BUTTONS + static_cast<size_t>(button);
     auto& [press, frame] = keys[buttonId];
     return press && frame == Time::FrameCount();
 }
 
 bool Input::getMouseButtonUp(MouseButton button) {
-    auto buttonId = MOUSE_BUTTONS + static_cast<uint8_t>(button);
+    auto buttonId = MOUSE_BUTTONS + static_cast<size_t>(button);
     auto& [press, frame] = keys[buttonId];
     return !press && frame == Time::FrameCount();
 }
@@ -69,7 +69,7 @@ void Input::onMouseButton(MouseButton button, InputAction action, bitmask::bitma
     if (action == InputAction::Repeat)
         return;
 
-    auto buttonId = MOUSE_BUTTONS + static_cast<uint8_t>(button);
+    auto buttonId = MOUSE_BUTTONS + static_cast<size_t>(button);
     auto& [press, frame] = keys[buttonId];
     press = action == InputAction::Press;
     frame = Time::FrameCount();

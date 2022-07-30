@@ -1,14 +1,14 @@
 #pragma once
 
 namespace fe {
-    enum class InputAction : int8_t {
+    enum class InputAction : unsigned char {
         Release                 = 0,  /** The key or mouse button was released. */
         Press                   = 1,  /** The key or mouse button was pressed. */
         Repeat                  = 2,  /** The key was held down until it repeated. */
     };
     inline bool operator!(InputAction action) { return action == InputAction::Release; }
 
-    enum class InputMod : int8_t {
+    enum class InputMod : unsigned char {
         Shift                   = 1,  /** If this bit is set one or more Shift keys were held down. */
         Control                 = 2,  /** If this bit is set one or more Control keys were held down. */
         Alt                     = 4,  /** If this bit is set one or more Alt keys were held down. */
@@ -153,7 +153,7 @@ namespace fe {
         KeyLast                 = Menu
     };
 
-    enum class MouseButton : uint8_t {
+    enum class MouseButton : unsigned char {
         Button0                 = 0,
         Button1                 = 1,
         Button2                 = 2,
@@ -169,7 +169,7 @@ namespace fe {
         ButtonMiddle            = Button2,
     };
 
-    enum class JoystickHat : int8_t {
+    enum class JoystickHat : unsigned char {
         Centered                = 0,
         Up                      = 1,
         Right                   = 2,
@@ -178,7 +178,7 @@ namespace fe {
     };
     BITMASK_DEFINE_MAX_ELEMENT(JoystickHat, Left);
 
-    enum class GamepadButton : uint8_t {
+    enum class GamepadButton : unsigned char {
         ButtonA                 = 0,
         ButtonB                 = 1,
         ButtonX                 = 2,
@@ -201,7 +201,7 @@ namespace fe {
         ButtonTriangle          = ButtonY
     };
 
-    enum class GamepadAxis : uint8_t {
+    enum class GamepadAxis : unsigned char {
         LeftX                   = 0,
         LeftY                   = 1,
         RightX                  = 2,

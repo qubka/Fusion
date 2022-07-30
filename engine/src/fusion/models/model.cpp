@@ -81,7 +81,7 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, std::shared_
         uint32_t index = node->mMeshes[i];
         const aiMesh* mesh = scene->mMeshes[index];
 
-        std::vector<uint8_t> vertices;
+        std::vector<std::byte> vertices;
         vertices.reserve(mesh->mNumVertices * layout.getStride());
         std::vector<uint32_t> indices;
         indices.reserve(mesh->mNumFaces * 3);
@@ -171,7 +171,7 @@ std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* ma
     return textures;
 }
 
-void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t i) {
+void Model::appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t i) {
     aiVector3D zero{0.0f, 0.0f, 0.0f};
     aiColor3D color{0.0f, 0.0f, 0.0f};
     scene->mMaterials[mesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, color);

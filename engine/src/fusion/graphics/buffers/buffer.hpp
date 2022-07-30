@@ -8,7 +8,7 @@ namespace fe {
     */
     class CommandBuffer;
     struct Buffer {
-        enum class Status : uint8_t { Reset, Changed, Normal };
+        enum class Status : unsigned char { Reset, Changed, Normal };
 
         /**
          * Creates a new buffer with optional data.

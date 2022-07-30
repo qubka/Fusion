@@ -38,7 +38,7 @@ namespace fe {
         */
     };
 
-    enum class EditorState : uint8_t {
+    enum class EditorState : unsigned char {
         Paused,
         Play,
         Next,

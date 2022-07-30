@@ -43,12 +43,12 @@ namespace fe {
         //void processCamera(const aiScene* scene, const aiNode* node, const aiCamera* camera);
 
         std::vector<std::shared_ptr<Texture2d>> loadTextures(const aiMaterial* material, int type);
-        void appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t vertexIndex);
+        void appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t vertexIndex);
 
         //static aiScene GenerateScene(const Mesh& mesh);
 
         /*template<typename T>
-        void appendOutput(std::vector<uint8_t>& outputBuffer, const T& t) {
+        void appendOutput(std::vector<std::byte>& outputBuffer, const T& t) {
             auto offset = outputBuffer.size();
             auto copySize = sizeof(T);
             outputBuffer.resize(offset + copySize);
@@ -56,7 +56,7 @@ namespace fe {
         }*/
 
         template<typename T>
-        void appendOutput(std::vector<uint8_t>& outputBuffer, std::span<const T> t) {
+        void appendOutput(std::vector<std::byte>& outputBuffer, std::span<const T> t) {
             auto offset = outputBuffer.size();
             auto copySize = t.size() * sizeof(T);
             outputBuffer.resize(offset + copySize);
