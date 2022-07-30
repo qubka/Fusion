@@ -11,7 +11,7 @@ using namespace fe;
 
 SkyboxSubrender::SkyboxSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"EngineShaders/sky/skybox.vert", "EngineShaders/sky/skybox.frag"}, {{{Vertex::Component::Position}}}} {
+        , pipeline{pipelineStage, {"engine/assets/shaders/sky/skybox.vert", "engine/assets/shaders/sky/skybox.frag"}, {{{Vertex::Component::Position}}}} {
 
     std::vector<glm::vec3> vertices {
             //front

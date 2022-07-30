@@ -8,7 +8,7 @@ using namespace fe;
 
 LightSubrender::LightSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"EngineShaders/simple/light.vert", "EngineShaders/simple/light.frag"}, {}, {},
+        , pipeline{pipelineStage, {"engine/assets/shaders/simple/light.vert", "engine/assets/shaders/simple/light.frag"}, {}, {},
                    PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::ReadWrite, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE}
         , descriptorSet{pipeline} {
 }
