@@ -3,7 +3,6 @@
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/filesystem/file_system.hpp"
-#include "fusion/filesystem/virtual_file_system.hpp"
 
 using namespace fe;
 
@@ -269,7 +268,7 @@ void ApplicationInfoPanel::onImGui() {
                 ImGui::TreePop();
             }
 
-            if (ImGui::TreeNode("Virtual File System")) {
+            /*if (ImGui::TreeNode("Virtual File System")) {
                 auto vfs = VirtualFileSystem::Get();
                 if (!vfs->getMounted().empty()) {
                     if (ImGui::BeginTable("##mounted_paths", 2, flags)) {
@@ -291,7 +290,7 @@ void ApplicationInfoPanel::onImGui() {
                     ImGui::NewLine();
                 }
                 ImGui::TreePop();
-            }
+            }*/
 
             ImGui::Text("FPS : %5.2i", Time::FramesPerSecond());
             ImGui::Text("Frame Time : %5.2f ms", Time::DeltaTime().asMilliseconds());

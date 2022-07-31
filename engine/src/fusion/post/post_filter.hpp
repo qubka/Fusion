@@ -33,7 +33,7 @@ namespace fe {
 
     protected:
         /**
-         * Used instead of {@link DescriptorsHandler#Push} in instances where a writeColor is the same as samplerColor in a shader.
+         * Used instead of {@link DescriptorsHandler#push} in instances where a writeColor is the same as samplerColor in a shader.
          * By switching between what will be the input and output of each filter previous changes are available to the shader.
          * @param descriptorName1 The first descriptor in the shader.
          * @param descriptorName2 The second descriptor in the shader.

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "pipeline.hpp"
-#include "vertex.hpp"
+#include "fusion/graphics/pipelines/pipeline.hpp"
+#include "fusion/graphics/pipelines/vertex.hpp"
 
 namespace fe {
     class TextureDepth;

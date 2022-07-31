@@ -1,6 +1,6 @@
 #pragma once
 
-#include "texture.hpp"
+#include "fusion/graphics/textures/texture.hpp"
 
 namespace fe {
     /**

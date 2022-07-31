@@ -1,7 +1,6 @@
 #pragma once
 
-#include "storage_buffer.hpp"
-
+#include "fusion/graphics/buffers/storage_buffer.hpp"
 #include "fusion/graphics/pipelines/shader.hpp"
 
 namespace fe {

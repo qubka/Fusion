@@ -1,7 +1,6 @@
 #pragma once
 
-#include "image.hpp"
-
+#include "fusion/graphics/textures/image.hpp"
 #include "fusion/assets/asset.hpp"
 
 namespace fe {

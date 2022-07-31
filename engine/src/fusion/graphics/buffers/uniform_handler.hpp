@@ -1,7 +1,6 @@
 #pragma once
 
-#include "uniform_buffer.hpp"
-
+#include "fusion/graphics/buffers/uniform_buffer.hpp"
 #include "fusion/graphics/pipelines/shader.hpp"
 
 namespace fe {

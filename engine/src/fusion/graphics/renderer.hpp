@@ -1,7 +1,7 @@
 #pragma once
 
-#include "subrender_holder.hpp"
-#include "render_stage.hpp"
+#include "fusion/graphics/subrender_holder.hpp"
+#include "fusion/graphics/render_stage.hpp"
 
 namespace fe {
     /**

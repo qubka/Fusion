@@ -39,7 +39,7 @@ namespace fe {
 
         bool isLocked{ false };
         bool isInListView{ false };
-        bool updateBreadCrumbs{ false };
+        //bool updateBreadCrumbs{ false };
         bool updateNavigationPath{ true };
         int gridItemsPerRow{ 0 };
         float gridSize{ 128.0f };

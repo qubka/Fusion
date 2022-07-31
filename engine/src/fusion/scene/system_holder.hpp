@@ -1,6 +1,6 @@
 #pragma once
 
-#include "system.hpp"
+#include "fusion/scene/system.hpp"
 
 namespace fe {
     /**

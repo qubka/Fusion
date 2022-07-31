@@ -24,7 +24,7 @@ namespace fe {
             void onImGui();
 
             void increaseCount() { count++; }
-            int32_t getMessageID() const { return messageID; }
+            uint32_t getMessageID() const { return messageID; }
 
             static const char* GetLevelName(MessageLevel level);
             static const char* GetLevelIcon(MessageLevel level);
@@ -35,7 +35,7 @@ namespace fe {
             const MessageLevel level;
             const std::string source;
             uint32_t count{ 1 };
-            int32_t messageID;
+            uint32_t messageID;
         };
 
     public:
@@ -54,7 +54,7 @@ namespace fe {
         void renderMessages();
 
     private:
-        static int32_t MessageID;
+        static uint32_t MessageID;
         static int16_t MessageBufferCapacity;
         static int16_t MessageBufferSize;
         static int16_t MessageBufferBegin;

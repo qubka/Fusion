@@ -74,18 +74,18 @@ void TextEditPanel::onImGui() {
 
                 if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, !ro && textEditor.CanUndo()))
                     textEditor.Undo();
-                if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, !ro && textEditor.CanRedo()))
+                if (ImGui::MenuItem("Redo", "Ctrl+Y", nullptr, !ro && textEditor.CanRedo()))
                     textEditor.Redo();
 
                 ImGui::Separator();
 
-                if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, textEditor.HasSelection()))
+                if (ImGui::MenuItem("Copy", "Ctrl+C", nullptr, textEditor.HasSelection()))
                     textEditor.Copy();
-                if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, !ro && textEditor.HasSelection()))
+                if (ImGui::MenuItem("Cut", "Ctrl+X", nullptr, !ro && textEditor.HasSelection()))
                     textEditor.Cut();
                 if (ImGui::MenuItem("Delete", "Del", nullptr, !ro && textEditor.HasSelection()))
                     textEditor.Delete();
-                if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, !ro && ImGui::GetClipboardText() != nullptr))
+                if (ImGui::MenuItem("Paste", "Ctrl+V", nullptr, !ro && ImGui::GetClipboardText() != nullptr))
                     textEditor.Paste();
 
                 ImGui::Separator();

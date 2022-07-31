@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pipeline.hpp"
+#include "fusion/graphics/pipelines/pipeline.hpp"
 
 namespace fe {
     /**

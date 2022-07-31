@@ -35,6 +35,12 @@ namespace fe {
          */
         void setVersion(Version ver) { version = ver; }
 
+        /**
+         *
+         * @return
+         */
+        virtual const fs::path& getRootPath() const = 0;
+
     protected:
         /**
          * Run when switching to this app from another.
