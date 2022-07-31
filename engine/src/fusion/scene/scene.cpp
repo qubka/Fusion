@@ -98,8 +98,6 @@ entt::entity Scene::createEntity(std::string name) {
 
     registry.emplace<NameComponent>(entity, name);
 
-
-
     return entity;
 }
 
@@ -145,7 +143,6 @@ void Scene::serialise(fs::path filepath, bool binary) {
 
         std::ofstream os{filepath, std::ios::binary};
         {
-            // output finishes flushing its contents when it goes out of scope
             cereal::BinaryOutputArchive output{os};
             output(*this);
             entt::snapshot{ registry }.entities(output).component<ALL_COMPONENTS>(output);
@@ -158,7 +155,6 @@ void Scene::serialise(fs::path filepath, bool binary) {
 
         std::stringstream ss;
         {
-            // output finishes flushing its contents when it goes out of scope
             cereal::JSONOutputArchive output{ss};
             output(*this);
             entt::snapshot{ registry }.entities(output).component<ALL_COMPONENTS>(output);
@@ -224,11 +220,11 @@ void Scene::deserialise(fs::path filepath, bool binary) {
 }
 
 void Scene::importMesh(const fs::path& filepath) {
-    Model meshImporter{filepath};
+    auto model = AssetRegistry::Get()->get_or_emplace<Model>(filepath, filepath);
 
     auto hierarchySystem = getSystem<HierarchySystem>();
 
-    auto& root = meshImporter.getRoot();
+    auto& root = model->getRoot();
     auto entity = createEntity(root->name);
     registry.emplace<TransformComponent>(entity);
 
@@ -241,7 +237,7 @@ void Scene::importMesh(const fs::path& filepath) {
                 registry.emplace<MeshComponent>(childEntity, child->meshes[0]);
             } else {
                 for (const auto& mesh: child->meshes) {
-                    auto meshChildEntity = createEntity(mesh->getName());
+                    auto meshChildEntity = createEntity(child->name + " " + std::to_string(mesh->getMeshIndex()));
                     registry.emplace<TransformComponent>(meshChildEntity);
                     registry.emplace<MeshComponent>(meshChildEntity, mesh);
                     hierarchySystem->assignChild(childEntity, meshChildEntity);

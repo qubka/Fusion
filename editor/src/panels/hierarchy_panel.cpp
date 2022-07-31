@@ -308,11 +308,9 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
                 ImGui::TextDisabled("Paste");
             }
 
-            if (ImGui::Selectable("Undo"))
-                LOG_DEBUG << "undo";
+            /*if (ImGui::Selectable("Undo"))
 
-            if (ImGui::Selectable("Redo"))
-                LOG_DEBUG << "redo";
+            if (ImGui::Selectable("Redo"))*/
 
             ImGui::Separator();
 
@@ -377,8 +375,8 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered(ImGuiHoveredFlags_None)) {
             doubleClicked = node;
             if (editor->getState() == EditorState::Preview) {
-                /*if (auto transform = registry.try_get<TransformComponent>(node))
-                    editor->focusCamera(transform->position, 2.0f, 2.0f);*/
+                if (auto transform = registry.try_get<TransformComponent>(node))
+                    editor->focusCamera(transform->getWorldPosition(), 2.0f, 2.0f);
                 // TODO: Implement
             }
         }

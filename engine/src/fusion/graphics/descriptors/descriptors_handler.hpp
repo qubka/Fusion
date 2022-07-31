@@ -1,7 +1,6 @@
 #pragma once
 
-#include "descriptor.hpp"
-
+#include "fusion/graphics/descriptors/descriptor.hpp"
 #include "fusion/graphics/descriptors/descriptor_set.hpp"
 #include "fusion/graphics/pipelines/shader.hpp"
 

@@ -35,9 +35,8 @@ void ApplicationInfoPanel::onImGui() {
                 if (!manager->getAssets().empty()) {
                     for (const auto& [id, type] : manager->getAssets()) {
                         std::string table{ "##" + std::to_string(id) };
-                        if (ImGui::BeginTable(table.c_str(), 3, flags)) {
+                        if (ImGui::BeginTable(table.c_str(), 2, flags)) {
                             ImGui::TableSetupColumn("Path", ImGuiTableColumnFlags_WidthStretch);
-                            ImGui::TableSetupColumn("Asset", ImGuiTableColumnFlags_WidthFixed);
                             ImGui::TableSetupColumn("Count", ImGuiTableColumnFlags_WidthFixed);
                             ImGui::TableHeadersRow();
 
@@ -48,9 +47,6 @@ void ApplicationInfoPanel::onImGui() {
                                 ImGui::TextUnformatted(path.string().c_str());
 
                                 ImGui::TableSetColumnIndex(1);
-                                ImGui::TextUnformatted(asset->getName().c_str());
-
-                                ImGui::TableSetColumnIndex(2);
                                 ImGui::Text("%ld", asset.use_count());
                             }
                             ImGui::EndTable();

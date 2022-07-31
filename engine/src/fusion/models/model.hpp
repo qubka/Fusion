@@ -30,9 +30,13 @@ namespace fe {
         type_index getType() const override { return type_id<Model>; }
 
         const std::shared_ptr<SceneObject>& getRoot() const { return root; }
-        std::shared_ptr<Mesh> getMesh(const std::string& name) const {
-            auto it = meshesLoaded.find(name);
-            return it != meshesLoaded.end() ? it->second : nullptr;
+        std::shared_ptr<Mesh> getMesh(uint32_t index) const {
+            for (const auto& mesh : meshesLoaded) {
+                if (mesh->getMeshIndex() == index) {
+                    return mesh;
+                }
+            }
+            return nullptr;
         }
 
     private:
@@ -58,7 +62,7 @@ namespace fe {
         Vertex::Layout layout;
 
         std::shared_ptr<SceneObject> root;
-        std::unordered_map<std::string, std::shared_ptr<Mesh>> meshesLoaded;
+        std::vector<std::shared_ptr<Mesh>> meshesLoaded;
         //std::unordered_map<fs::path, std::shared_ptr<Texture2d>> texturesLoaded;
     };
 }

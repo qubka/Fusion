@@ -9,11 +9,11 @@ namespace fe {
     class Mesh : public Asset {
     public:
         template< typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-        explicit Mesh(const fs::path& path, const std::string& name, const std::vector<std::byte>& vertices, const std::vector<T>& indices, const Vertex::Layout& layout)
-                : Asset{path, name}
-                , layout{layout} {
+        explicit Mesh(const fs::path& filepath, const std::string& naming, const std::vector<std::byte>& vertices, const std::vector<T>& indices, const Vertex::Layout& layout) : layout{layout} {
             setVertices(vertices);
             setIndices(indices);
+            path = filepath;
+            name = naming;
         }
         /*template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
         explicit Mesh(fs::path path, std::string name, std::vector<std::byte>&& vertices, std::vector<T>&& indices, const Vertex::Layout& layout, float optimiseThreshold)
@@ -138,12 +138,16 @@ namespace fe {
 
         type_index getType() const override { return type_id<Mesh>; }
 
+        void setMeshIndex(uint32_t index) { meshIndex = index; }
+        uint32_t getMeshIndex() const { return meshIndex; }
+
     private:
         std::unique_ptr<Buffer> vertexBuffer;
         std::unique_ptr<Buffer> indexBuffer;
         uint32_t vertexCount{ 0 };
         uint32_t indexCount{ 0 };
 
+        uint32_t meshIndex{ 0 };
         VkIndexType indexType{ VK_INDEX_TYPE_NONE_KHR };
         Vertex::Layout layout;
 

@@ -239,9 +239,14 @@ void SceneViewPanel::drawToolBar() {
             ImGui::Columns(2);
             ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
 
-            float fov = camera.getFov();
-            if (ImGuiUtils::Property("Fov", fov, 1.0f, 120.0f, 1.0f, ortho ? ImGuiUtils::PropertyFlag::ReadOnly : ImGuiUtils::PropertyFlag::None)) {
-                camera.setFov(fov);
+            if (ortho) {
+                const float fov = camera.getFov();
+                ImGuiUtils::Property("Fov", fov);
+            } else {
+                float fov = camera.getFov();
+                if (ImGuiUtils::Property("Fov", fov, 1.0f, 120.0f, 1.0f)) {
+                    camera.setFov(fov);
+                }
             }
 
             float nearClip = camera.getNearClip();

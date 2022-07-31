@@ -37,13 +37,12 @@ Model::Model(const fs::path& filepath, uint32_t defaultFlags, const Vertex::Layo
     }
 
     path = filepath;
-    name = modelPath.filename().replace_extension().string();
+    name = filepath.filename().replace_extension().string();
+
     directory = modelPath.parent_path();
 
     root = std::make_shared<SceneObject>();
     processNode(scene, scene->mRootNode, root);
-
-    AssetRegistry::Get()->add(std::shared_ptr<Model>(this), filepath);
 }
 
 void Model::processNode(const aiScene* scene, const aiNode* node, std::shared_ptr<SceneObject>& targetParent) {
@@ -78,60 +77,61 @@ void Model::processNode(const aiScene* scene, const aiNode* node, std::shared_pt
 
 void Model::processMeshes(const aiScene* scene, const aiNode* node, std::shared_ptr<SceneObject>& parent) {
     for (uint32_t i = 0; i < node->mNumMeshes; i++) {
-        uint32_t index = node->mMeshes[i];
-        const aiMesh* mesh = scene->mMeshes[index];
-
         std::vector<std::byte> vertices;
-        vertices.reserve(mesh->mNumVertices * layout.getStride());
         std::vector<uint32_t> indices;
-        indices.reserve(mesh->mNumFaces * 3);
-        //std::vector<std::shared_ptr<Texture2d>> textures;
+        uint32_t index = node->mMeshes[i];
+        {
+            const aiMesh* mesh = scene->mMeshes[index];
+            vertices.reserve(mesh->mNumVertices * layout.getStride());
+            indices.reserve(mesh->mNumFaces * 3);
 
-        for (uint32_t j = 0; j < mesh->mNumVertices; j++) {
-            appendVertex(vertices, scene, mesh, j);
-        }
-
-        for (uint32_t j = 0; j < mesh->mNumFaces; j++) {
-            const aiFace& face = mesh->mFaces[j];
-            if (face.mNumIndices != 3)
-                continue;
-            for (uint32_t k = 0; k < face.mNumIndices; k++) {
-                indices.push_back(face.mIndices[k]);
+            for (uint32_t j = 0; j < mesh->mNumVertices; j++) {
+                appendVertex(vertices, scene, mesh, j);
             }
-        }
 
-        /*if (mesh->mMaterialIndex >= 0) {
-            const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-
-            auto diffuseMaps = loadTextures(material, aiTextureType_DIFFUSE);
-            textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-
-            auto specularMaps = loadTextures(material, aiTextureType_SPECULAR);
-            textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-
-            auto normalMaps = loadTextures(material, aiTextureType_HEIGHT);
-            textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-
-            auto heightMaps = loadTextures(material, aiTextureType_AMBIENT);
-            textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-
-            if (textures.empty()) {
-                aiColor3D color;
-                material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-
-                auto r = static_cast<uint8_t>(color.r * 255);
-                auto g = static_cast<uint8_t>(color.g * 255);
-                auto b = static_cast<uint8_t>(color.b * 255);
-                textures.push_back(std::make_shared<Image>(r, g, b));
+            for (uint32_t j = 0; j < mesh->mNumFaces; j++) {
+                const aiFace& face = mesh->mFaces[j];
+                if (face.mNumIndices != 3)
+                    continue;
+                for (uint32_t k = 0; k < face.mNumIndices; k++) {
+                    indices.push_back(face.mIndices[k]);
+                }
             }
-        }*/
+
+            /*if (mesh->mMaterialIndex >= 0) {
+                const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+                auto diffuseMaps = loadTextures(material, aiTextureType_DIFFUSE);
+                textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+
+                auto specularMaps = loadTextures(material, aiTextureType_SPECULAR);
+                textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+                auto normalMaps = loadTextures(material, aiTextureType_HEIGHT);
+                textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+
+                auto heightMaps = loadTextures(material, aiTextureType_AMBIENT);
+                textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+
+                if (textures.empty()) {
+                    aiColor3D color;
+                    material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+
+                    auto r = static_cast<uint8_t>(color.r * 255);
+                    auto g = static_cast<uint8_t>(color.g * 255);
+                    auto b = static_cast<uint8_t>(color.b * 255);
+                    textures.push_back(std::make_shared<Image>(r, g, b));
+                }
+            }*/
+        }
 
         std::string name{ node->mName.C_Str() + ":"s + std::to_string(index) };
+        auto mesh = std::make_shared<Mesh>(path, name, vertices, indices, layout);
+        mesh->setMeshIndex(index);
+        parent->meshes.push_back(mesh);
+        meshesLoaded.push_back(mesh); // mesh tree for fast search by name
 
-        auto meshp = std::make_shared<Mesh>(path, name, vertices, indices, layout);
-        parent->meshes.push_back(meshp);
-        meshesLoaded.emplace(name, meshp); // mesh tree for fast search by name
-        AssetRegistry::Get()->add(meshp, path / name);
+        AssetRegistry::Get()->add(mesh, index == 0 ? path : path / name);
     }
 }
 

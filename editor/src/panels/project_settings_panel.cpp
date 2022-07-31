@@ -24,13 +24,15 @@ void ProjectSettingsPanel::onImGui() {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
 
         auto& projectSettings = editor->getProjectSettings();
-        ImGuiUtils::PropertyText("Project Version", projectSettings.projectVersion, ImGuiUtils::PropertyFlag::ReadOnly);
-        ImGuiUtils::PropertyText("Project Name", projectSettings.projectName, ImGuiUtils::PropertyFlag::ReadOnly);
+        ImGuiUtils::PropertyText("Project Version", projectSettings.projectVersion.c_str());
+        ImGuiUtils::PropertyText("Project Name", projectSettings.projectName.c_str());
         ImGuiUtils::PropertyText("Project Root", projectSettings.projectRoot.string().c_str());
         if (ImGuiUtils::PropertyText("Title", projectSettings.title))
             window->setTitle(projectSettings.title);
-        ImGuiUtils::Property("Window Width", projectSettings.size.x, 0U, 0U, 1.0f, ImGuiUtils::PropertyFlag::ReadOnly);
-        ImGuiUtils::Property("Window Height", projectSettings.size.y, 0U, 0U, 1.0f, ImGuiUtils::PropertyFlag::ReadOnly);
+        const uint32_t width = projectSettings.size.x;
+        ImGuiUtils::Property("Window Width", width);
+        const uint32_t height = projectSettings.size.y;
+        ImGuiUtils::Property("Window Height", height);
         if (ImGuiUtils::Property("Fullscreen", projectSettings.isFullscreen))
             window->setFullscreen(projectSettings.isFullscreen, nullptr);
         if (ImGuiUtils::Property("VSync", projectSettings.isVSync))

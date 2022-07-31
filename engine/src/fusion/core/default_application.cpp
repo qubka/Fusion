@@ -3,7 +3,6 @@
 
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/filesystem/file_system.hpp"
-#include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
 
 #if FUSION_PLATFORM_WINDOWS
@@ -32,16 +31,6 @@ DefaultApplication::~DefaultApplication() {
 void DefaultApplication::onStart() {
     LOG_INFO << "Default application starting!";
 
-    auto vfs = VirtualFileSystem::Get();
-
-    //FileSystem::Get()->addSearchPath(executablePath, executablePath.string());
-    fs::path shaderPath{ executablePath / "engine" / "assets" / "shaders" };
-    vfs->mount("EngineShaders", shaderPath);
-    fs::path modelPath{ executablePath / "engine" / "assets" / "models" };
-    vfs->mount("EngineModels", modelPath);
-    fs::path texturePath{ executablePath / "engine" / "assets" / "textures" };
-    vfs->mount("EngineTextures", texturePath);
-
     deserialise();
 
     WindowInfo windowInfo = {};
@@ -58,8 +47,7 @@ void DefaultApplication::onStart() {
     window->OnClose().connect<&Engine::requestClose>(Engine::Get());
 
     // Sets icons to window
-    fs::path iconPath{ executablePath / "engine" / "assets" / "icons" };
-    vfs->mount("EngineIcons", iconPath);
+    fs::path iconPath{ "engine/assets/icons" };
     std::vector<fs::path> iconPaths {
         iconPath / "icon-16.png", iconPath / "icon-24.png", iconPath / "icon-32.png",
         iconPath / "icon-48.png", iconPath / "icon-64.png", iconPath / "icon-96.png",
@@ -128,8 +116,6 @@ void DefaultApplication::openNewProject(const fs::path& path, std::string_view n
     if (!fs::exists(soundPath))
         fs::create_directory(soundPath);
 
-    mountPaths();
-
     SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
 
     serialise();
@@ -143,8 +129,6 @@ void DefaultApplication::openNewProject(const fs::path& path, std::string_view n
 void DefaultApplication::openProject(const fs::path& path) {
     projectSettings.projectName = path.filename().replace_extension().string();
     projectSettings.projectRoot = path.parent_path();
-
-    mountPaths();
 
     deserialise();
 }
@@ -178,8 +162,6 @@ void DefaultApplication::deserialise() {
         return;
     }
 
-    mountPaths();
-
     try {
         std::istringstream is{FileSystem::ReadText(projectPath)};
         cereal::JSONInputArchive input{is};
@@ -198,18 +180,6 @@ void DefaultApplication::deserialise() {
     projectLoaded = true;
 
     LOG_INFO << "Deserialise application: \"" << projectPath << "\"";
-}
-
-void DefaultApplication::mountPaths() const {
-    auto vfs = VirtualFileSystem::Get();
-    fs::path assetPath{ projectSettings.projectRoot / "assets" };
-    vfs->mount("Assets", assetPath);
-    vfs->mount( "Meshes", assetPath / "meshes");
-    vfs->mount("Textures", assetPath / "textures");
-    vfs->mount("Sounds", assetPath / "sounds");
-    vfs->mount("Scripts", assetPath / "scripts");
-    vfs->mount("Shaders", assetPath / "shaders");
-    vfs->mount("Scenes", assetPath / "scenes");
 }
 
 void DefaultApplication::showConsole() {

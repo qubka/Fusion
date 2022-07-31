@@ -136,8 +136,8 @@ namespace fe {
         uint32_t getMipLevels() const { return mipLevels; }
         uint32_t getArrayLevels() const { return arrayLayers; }
 
-        //TextureType getType() const { return type; }
-        //void setType(TextureType textureType) { type = textureType; }
+        TextureType getTextureType() const { return textureType; }
+        void settTextureType(TextureType type) { textureType = type; }
 
         /** @brief Update image descriptor from current sampler, view and image layout */
         void updateDescriptor() {
@@ -149,7 +149,7 @@ namespace fe {
     protected:
         VkDescriptorImageInfo descriptor = {};
 
-        TextureType type{ TextureType::None };
+        TextureType textureType{ TextureType::None };
         uint32_t mipLevels{ 0 };
         uint32_t arrayLayers{ 0 };
         bool anisotropic{ false };

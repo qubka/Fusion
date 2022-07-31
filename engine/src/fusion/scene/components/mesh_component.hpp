@@ -18,13 +18,15 @@ namespace fe {
 
         template<typename Archive>
         void load(Archive& archive) {
-            fs::path name;
-            std::string path;
+            fs::path path;
+            uint32_t index;
             archive(cereal::make_nvp("path", path),
-                    cereal::make_nvp("name", name));
+                    cereal::make_nvp("index", index));
 
-            if (auto model = AssetRegistry::Get()->find<Model>(path)) {
-                runtime = model->getMesh(name);
+            if (auto model = AssetRegistry::Get()->get_or_emplace<Model>(path, path)) {
+                runtime = model->getMesh(index);
+            } else {
+                LOG_ERROR << "Asset not found: \"" << path << "\"";
             }
         }
 
@@ -32,10 +34,10 @@ namespace fe {
         void save(Archive& archive) const {
             if (runtime) {
                 archive(cereal::make_nvp("path", runtime->getPath()),
-                        cereal::make_nvp("name", runtime->getName()));
+                        cereal::make_nvp("index", runtime->getMeshIndex()));
             } else {
                 archive(cereal::make_nvp("path", ""),
-                        cereal::make_nvp("name", ""));
+                        cereal::make_nvp("index", ""));
             }
         }
     };

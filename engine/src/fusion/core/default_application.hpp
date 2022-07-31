@@ -3,7 +3,6 @@
 #include "application.hpp"
 
 #include "fusion/scene/scene_manager.hpp"
-#include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/filesystem/file_system.hpp"
 
 namespace fe {
@@ -40,11 +39,11 @@ namespace fe {
         bool isProjectLoaded() const { return projectLoaded; }
         bool isConsoleOpened() const { return consoleOpened; }
         ProjectSettings& getProjectSettings() { return projectSettings; }
+        const fs::path& getRootPath() const override { return projectSettings.projectRoot; }
 
         void serialise();
         void deserialise();
 
-        void mountPaths() const;
         void showConsole();
 
         template<typename Archive>

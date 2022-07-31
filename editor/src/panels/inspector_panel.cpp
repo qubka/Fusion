@@ -96,18 +96,13 @@ namespace ImGui {
         if (mesh) {
             ImGui::NewLine();
             ImGui::Separator();
-            ImGuiUtils::PropertyText("Name", mesh->getName().c_str());
+            ImGuiUtils::Property("Index", mesh->getMeshIndex());
             ImGuiUtils::PropertyText("Path", mesh->getPath().string().c_str());
-            uint32_t vertexCount = mesh->getVertexCount();
-            ImGuiUtils::Property("Vertex", vertexCount, 0U, 0U, 1.0f, ImGuiUtils::PropertyFlag::ReadOnly);
-            uint32_t indexCount = mesh->getIndexCount();
-            ImGuiUtils::Property("Index", indexCount, 0U, 0U, 1.0f, ImGuiUtils::PropertyFlag::ReadOnly);
-            glm::vec3 min{ mesh->getMinExtents() };
-            ImGuiUtils::Property("Min", min, 0.0f, 0.0f, 0.0f, ImGuiUtils::PropertyFlag::ReadOnly);
-            glm::vec3 max{ mesh->getMaxExtents() };
-            ImGuiUtils::Property("Max", max, 0.0f, 0.0f, 0.0f, ImGuiUtils::PropertyFlag::ReadOnly);
-            float radius = mesh->getRadius();
-            ImGuiUtils::Property("Radius", radius, 0.0f, 0.0f, 0.0f, ImGuiUtils::PropertyFlag::ReadOnly);
+            ImGuiUtils::Property("Vertex Count", mesh->getVertexCount());
+            ImGuiUtils::Property("Index Count", mesh->getIndexCount());
+            ImGuiUtils::Property("Min", mesh->getMinExtents());
+            ImGuiUtils::Property("Max", mesh->getMaxExtents());
+            ImGuiUtils::Property("Radius", mesh->getRadius());
         }
 
         ImGui::Columns(1);
@@ -124,10 +119,10 @@ namespace ImGui {
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
-        if (ImGuiUtils::Property("Color", light.color, 0.0f, 0.0f, 1.0f, ImGuiUtils::PropertyFlag::ColorValue)) {
+        if (ImGuiUtils::Property("Color", light.color, 0.0f, 0.0f, 1.0f, ImGuiUtils::PropertyType::Color)) {
         }
 
-        if (ImGuiUtils::Property("Radius", light.radius, 0.0f, 0.0f, 0.05f)) {
+        if (ImGuiUtils::Property("Radius", light.radius, 0.0f, 0.0f, 0.01f)) {
         }
 
         ImGui::Columns(1);

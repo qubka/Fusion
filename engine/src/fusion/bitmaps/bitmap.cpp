@@ -24,6 +24,7 @@ void Bitmap::load(const fs::path& filepath) {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
+
     std::string extension{ FileSystem::GetExtension(filepath) };
     if (auto it = Registry().find(extension); it != Registry().end()) {
         it->second.first(*this, filepath);

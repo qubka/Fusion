@@ -178,9 +178,9 @@ namespace fe {
                 registry.emplace_or_replace<T>(dst, *component);
         }
 
-        template <typename... Component>
+        template<typename... T>
         void copyEntity(entt::entity dst, entt::entity src) {
-            (copyComponent<Component>(dst, src), ...);
+            (copyComponent<T>(dst, src), ...);
         }
 
         std::string name;

@@ -14,6 +14,7 @@ Texture::Texture(const fs::path& filepath, VkFilter filter, VkSamplerAddressMode
         , anisotropic{anisotropic}
         , mipmap{mipmap} {
     path = filepath;
+    name = filepath.filename().replace_extension().string();
 }
 
 Texture::Texture(VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, VkImageLayout layout,
