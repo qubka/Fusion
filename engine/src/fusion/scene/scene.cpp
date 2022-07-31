@@ -2,9 +2,8 @@
 #include "system.hpp"
 #include "components.hpp"
 
+#include "fusion/core/engine.hpp"
 #include "fusion/filesystem/file_system.hpp"
-#include "fusion/filesystem/virtual_file_system.hpp"
-
 #include "fusion/scene/systems/hierarchy_system.hpp"
 #include "fusion/scene/systems/camera_system.hpp"
 #include "fusion/models/model.hpp"
@@ -99,12 +98,15 @@ entt::entity Scene::createEntity(std::string name) {
 
     registry.emplace<NameComponent>(entity, name);
 
+
+
     return entity;
 }
 
-void Scene::destroyEntity(entt::entity entity) {
+bool Scene::destroyEntity(entt::entity entity) {
     // TODO: Children ?
     registry.destroy(entity);
+    return true;
 }
 
 entt::entity Scene::duplicateEntity(entt::entity entity, entt::entity parent) {
@@ -139,7 +141,7 @@ entt::entity Scene::duplicateEntity(entt::entity entity, entt::entity parent) {
 void Scene::serialise(fs::path filepath, bool binary) {
     if (binary) {
         if (filepath.empty())
-            filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
+            filepath = Engine::Get()->getApp()->getRootPath() / "assets/scenes" / (name + ".bin");
 
         std::ofstream os{filepath, std::ios::binary};
         {
@@ -152,7 +154,7 @@ void Scene::serialise(fs::path filepath, bool binary) {
         LOG_INFO << "Serialise scene as binary: \"" << filepath << "\"";
     } else {
         if (filepath.empty())
-            filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
+            filepath = Engine::Get()->getApp()->getRootPath() / "assets/scenes" / (name + ".fsn");
 
         std::stringstream ss;
         {
@@ -175,7 +177,7 @@ void Scene::deserialise(fs::path filepath, bool binary) {
 
     if (binary) {
         if (filepath.empty())
-            filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".bin"));
+            filepath = Engine::Get()->getApp()->getRootPath() / "assets/scenes" / (name + ".bin");
 
         if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
             LOG_ERROR << "No saved scene file found: \"" << filepath << "\"";
@@ -195,7 +197,7 @@ void Scene::deserialise(fs::path filepath, bool binary) {
         LOG_INFO << "Deserialise scene as binary: \"" << filepath << "\"";
     } else {
         if (filepath.empty())
-            filepath = VirtualFileSystem::Get()->resolvePhysicalPath("Scenes"_p / (name + ".fsn"));
+            filepath = Engine::Get()->getApp()->getRootPath() / "assets/scenes" / (name + ".fsn");
 
         if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
             LOG_ERROR << "No saved scene file found: \"" << filepath << "\"";
@@ -221,14 +223,14 @@ void Scene::deserialise(fs::path filepath, bool binary) {
     });
 }
 
-void Scene::importMesh(const fs::path& filepath, const glm::vec3& position) {
+void Scene::importMesh(const fs::path& filepath) {
     Model meshImporter{filepath};
 
     auto hierarchySystem = getSystem<HierarchySystem>();
 
     auto& root = meshImporter.getRoot();
-    auto entity = createEntity<TransformComponent>(root->name);
-    registry.emplace<TransformComponent>(entity, position, quat::identity, vec3::one);
+    auto entity = createEntity(root->name);
+    registry.emplace<TransformComponent>(entity);
 
     std::function<void(const std::shared_ptr<SceneObject>&)> createObject = [&](const std::shared_ptr<SceneObject>& object) {
         for (const auto& child : object->children) {

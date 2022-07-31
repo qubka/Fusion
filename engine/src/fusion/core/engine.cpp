@@ -5,7 +5,6 @@
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/filesystem/file_system.hpp"
-#include "fusion/filesystem/virtual_file_system.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/assets/asset_registry.hpp"
 #include "fusion/input/input.hpp"
@@ -41,7 +40,6 @@ Engine::~Engine() {
 void Engine::init() {
     Time::Register("Time", Module::Stage::Pre);
     FileSystem::Register("FileSystem", Module::Stage::Never);
-    VirtualFileSystem::Register("VirtualFileSystem", Module::Stage::Never);
     Input::Register("Input", Module::Stage::Normal);
     Graphics::Register("Graphics", Module::Stage::Render);
     SceneManager::Register("SceneManager", Module::Stage::Normal);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shader.hpp"
+#include "fusion/graphics/pipelines/shader.hpp"
 
 namespace fe {
     class CommandBuffer;

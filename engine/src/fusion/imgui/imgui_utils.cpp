@@ -396,10 +396,10 @@ bool ToggleRoundButton(const char* name, bool& value) {
     return updated;
 }
 
-bool ToggleButton(const char* name, bool& value, bool text_style) {
+bool ToggleButton(const char* name, bool& value, bool textStyle) {
     bool updated = false;
     if (value) {
-        if (text_style) {
+        if (textStyle) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_CheckMark));
         } else {
             ImVec4 color{ ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive) };
@@ -411,7 +411,7 @@ bool ToggleButton(const char* name, bool& value, bool text_style) {
             value = !value;
             updated = true;
         }
-        ImGui::PopStyleColor(text_style ? 1 : 3);
+        ImGui::PopStyleColor(textStyle ? 1 : 3);
     } else {
         if (ImGui::Button(name)) {
             value = true;
@@ -589,9 +589,9 @@ void SetTheme(Theme theme) {
     else if (theme == Theme::Dark)
     {
         ImGui::StyleColorsDark();
-        ImVec4 Titlebar = ImVec4{ 40.0f / max, 42.0f / max, 54.0f / max, 1.0f };
-        ImVec4 TabActive = ImVec4{ 52.0f / max, 54.0f / max, 64.0f / max, 1.0f };
-        ImVec4 TabUnactive = ImVec4{ 35.0f / max, 43.0f / max, 59.0f / max, 1.0f };
+        ImVec4 Titlebar{ 40.0f / max, 42.0f / max, 54.0f / max, 1.0f };
+        ImVec4 TabActive{ 52.0f / max, 54.0f / max, 64.0f / max, 1.0f };
+        ImVec4 TabUnactive{ 35.0f / max, 43.0f / max, 59.0f / max, 1.0f };
 
         colors[ImGuiCol_Text] = ImVec4{ 200.0f / 255.0f, 200.0f / 255.0f, 200.0f / 255.0f, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ 0.36f, 0.42f, 0.47f, 1.00f };
@@ -804,46 +804,47 @@ void SetTheme(Theme theme) {
     }
     else if (theme == Theme::Blue)
     {
-        ImVec4 color_for_text = ImVec4{ 236.f / 255.f, 240.f / 255.f, 241.f / 255.f, 1.0f };
-        ImVec4 color_for_head = ImVec4{ 41.f / 255.f, 128.f / 255.f, 185.f / 255.f, 1.0f };
-        ImVec4 color_for_area = ImVec4{ 57.f / 255.f, 79.f / 255.f, 105.f / 255.f, 1.0f };
-        ImVec4 color_for_body = ImVec4{ 44.f / 255.f, 62.f / 255.f, 80.f / 255.f, 1.0f };
-        ImVec4 color_for_pops = ImVec4{ 33.f / 255.f, 46.f / 255.f, 60.f / 255.f, 1.0f };
-        colors[ImGuiCol_Text] = ImVec4{ color_for_text.x, color_for_text.y, color_for_text.z, 1.00f };
-        colors[ImGuiCol_TextDisabled] = ImVec4{ color_for_text.x, color_for_text.y, color_for_text.z, 0.58f };
+        ImVec4 textColor{ 236.f / 255.f, 240.f / 255.f, 241.f / 255.f, 1.0f };
+        ImVec4 headColor{ 41.f / 255.f, 128.f / 255.f, 185.f / 255.f, 1.0f };
+        ImVec4 areaColor{ 57.f / 255.f, 79.f / 255.f, 105.f / 255.f, 1.0f };
+        ImVec4 bodyColor{ 44.f / 255.f, 62.f / 255.f, 80.f / 255.f, 1.0f };
+        ImVec4 popsColor{ 33.f / 255.f, 46.f / 255.f, 60.f / 255.f, 1.0f };
 
-        colors[ImGuiCol_WindowBg] = ImVec4{ color_for_body.x, color_for_body.y, color_for_body.z, 0.95f };
-        colors[ImGuiCol_Border] = ImVec4{ color_for_body.x, color_for_body.y, color_for_body.z, 0.00f };
-        colors[ImGuiCol_BorderShadow] = ImVec4{ color_for_body.x, color_for_body.y, color_for_body.z, 0.00f };
-        colors[ImGuiCol_FrameBg] = ImVec4{ color_for_area.x, color_for_area.y, color_for_area.z, 1.00f };
-        colors[ImGuiCol_FrameBgHovered] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.78f };
-        colors[ImGuiCol_FrameBgActive] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 1.00f };
-        colors[ImGuiCol_TitleBg] = ImVec4{ color_for_area.x, color_for_area.y, color_for_area.z, 1.00f };
-        colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ color_for_area.x, color_for_area.y, color_for_area.z, 0.75f };
-        colors[ImGuiCol_TitleBgActive] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 1.00f };
-        colors[ImGuiCol_MenuBarBg] = ImVec4{ color_for_area.x, color_for_area.y, color_for_area.z, 0.47f };
-        colors[ImGuiCol_ScrollbarBg] = ImVec4{ color_for_area.x, color_for_area.y, color_for_area.z, 1.00f };
-        colors[ImGuiCol_ScrollbarGrab] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.21f };
-        colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.78f };
-        colors[ImGuiCol_ScrollbarGrabActive] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 1.00f };
-        colors[ImGuiCol_CheckMark] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.80f };
-        colors[ImGuiCol_SliderGrab] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.50f };
-        colors[ImGuiCol_SliderGrabActive] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 1.00f };
-        colors[ImGuiCol_Button] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.50f };
-        colors[ImGuiCol_ButtonHovered] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.86f };
-        colors[ImGuiCol_ButtonActive] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 1.00f };
-        colors[ImGuiCol_Header] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.76f };
-        colors[ImGuiCol_HeaderHovered] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.86f };
-        colors[ImGuiCol_HeaderActive] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 1.00f };
-        colors[ImGuiCol_ResizeGrip] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.15f };
-        colors[ImGuiCol_ResizeGripHovered] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.78f };
-        colors[ImGuiCol_ResizeGripActive] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 1.00f };
-        colors[ImGuiCol_PlotLines] = ImVec4{ color_for_text.x, color_for_text.y, color_for_text.z, 0.63f };
-        colors[ImGuiCol_PlotLinesHovered] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 1.00f };
-        colors[ImGuiCol_PlotHistogram] = ImVec4{ color_for_text.x, color_for_text.y, color_for_text.z, 0.63f };
-        colors[ImGuiCol_PlotHistogramHovered] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 1.00f };
-        colors[ImGuiCol_TextSelectedBg] = ImVec4{ color_for_head.x, color_for_head.y, color_for_head.z, 0.43f };
-        colors[ImGuiCol_PopupBg] = ImVec4{ color_for_pops.x, color_for_pops.y, color_for_pops.z, 0.92f };
+        colors[ImGuiCol_Text] = ImVec4{ textColor.x, textColor.y, textColor.z, 1.00f };
+        colors[ImGuiCol_TextDisabled] = ImVec4{ textColor.x, textColor.y, textColor.z, 0.58f };
+
+        colors[ImGuiCol_WindowBg] = ImVec4{ bodyColor.x, bodyColor.y, bodyColor.z, 0.95f };
+        colors[ImGuiCol_Border] = ImVec4{ bodyColor.x, bodyColor.y, bodyColor.z, 0.00f };
+        colors[ImGuiCol_BorderShadow] = ImVec4{ bodyColor.x, bodyColor.y, bodyColor.z, 0.00f };
+        colors[ImGuiCol_FrameBg] = ImVec4{ areaColor.x, areaColor.y, areaColor.z, 1.00f };
+        colors[ImGuiCol_FrameBgHovered] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.78f };
+        colors[ImGuiCol_FrameBgActive] = ImVec4{ headColor.x, headColor.y, headColor.z, 1.00f };
+        colors[ImGuiCol_TitleBg] = ImVec4{ areaColor.x, areaColor.y, areaColor.z, 1.00f };
+        colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ areaColor.x, areaColor.y, areaColor.z, 0.75f };
+        colors[ImGuiCol_TitleBgActive] = ImVec4{ headColor.x, headColor.y, headColor.z, 1.00f };
+        colors[ImGuiCol_MenuBarBg] = ImVec4{ areaColor.x, areaColor.y, areaColor.z, 0.47f };
+        colors[ImGuiCol_ScrollbarBg] = ImVec4{ areaColor.x, areaColor.y, areaColor.z, 1.00f };
+        colors[ImGuiCol_ScrollbarGrab] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.21f };
+        colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.78f };
+        colors[ImGuiCol_ScrollbarGrabActive] = ImVec4{ headColor.x, headColor.y, headColor.z, 1.00f };
+        colors[ImGuiCol_CheckMark] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.80f };
+        colors[ImGuiCol_SliderGrab] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.50f };
+        colors[ImGuiCol_SliderGrabActive] = ImVec4{ headColor.x, headColor.y, headColor.z, 1.00f };
+        colors[ImGuiCol_Button] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.50f };
+        colors[ImGuiCol_ButtonHovered] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.86f };
+        colors[ImGuiCol_ButtonActive] = ImVec4{ headColor.x, headColor.y, headColor.z, 1.00f };
+        colors[ImGuiCol_Header] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.76f };
+        colors[ImGuiCol_HeaderHovered] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.86f };
+        colors[ImGuiCol_HeaderActive] = ImVec4{ headColor.x, headColor.y, headColor.z, 1.00f };
+        colors[ImGuiCol_ResizeGrip] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.15f };
+        colors[ImGuiCol_ResizeGripHovered] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.78f };
+        colors[ImGuiCol_ResizeGripActive] = ImVec4{ headColor.x, headColor.y, headColor.z, 1.00f };
+        colors[ImGuiCol_PlotLines] = ImVec4{ textColor.x, textColor.y, textColor.z, 0.63f };
+        colors[ImGuiCol_PlotLinesHovered] = ImVec4{ headColor.x, headColor.y, headColor.z, 1.00f };
+        colors[ImGuiCol_PlotHistogram] = ImVec4{ textColor.x, textColor.y, textColor.z, 0.63f };
+        colors[ImGuiCol_PlotHistogramHovered] = ImVec4{ headColor.x, headColor.y, headColor.z, 1.00f };
+        colors[ImGuiCol_TextSelectedBg] = ImVec4{ headColor.x, headColor.y, headColor.z, 0.43f };
+        colors[ImGuiCol_PopupBg] = ImVec4{ popsColor.x, popsColor.y, popsColor.z, 0.92f };
     }
     else if (theme == Theme::Classic)
     {
@@ -1040,8 +1041,8 @@ void SetTheme(Theme theme) {
     colors[ImGuiCol_ChildBg] = colors[ImGuiCol_TabActive];
     colors[ImGuiCol_ScrollbarBg] = colors[ImGuiCol_TabActive];
 
-    colors[ImGuiCol_TitleBgActive] = colors[ImGuiCol_TitleBg];
-    colors[ImGuiCol_TitleBgCollapsed] = colors[ImGuiCol_TitleBg];
+    //colors[ImGuiCol_TitleBgActive] = colors[ImGuiCol_TitleBg];
+    //colors[ImGuiCol_TitleBgCollapsed] = colors[ImGuiCol_TitleBg];
     colors[ImGuiCol_MenuBarBg] = colors[ImGuiCol_TitleBg];
     colors[ImGuiCol_PopupBg] = colors[ImGuiCol_WindowBg] + ImVec4{ 0.05f, 0.05f, 0.05f, 0.0f };
 

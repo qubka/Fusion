@@ -364,7 +364,7 @@ void ImGuiSubrender::setupStyle() {
 
     //ImGui::ColorScheme::SetColors(0x252131FF /* Background */, 0xF4F1DEFF /* Text */, 0xDA115EFF /* MainColor */, 0x792359FF /* MainAccent */, 0xC7EF00FF /* Highlight */ );
     //ImGui::ColorScheme::ApplyTheme();
-    ImGuiUtils::SetTheme(ImGuiUtils::Theme::ClassicDark);
+    ImGuiUtils::SetTheme(ImGuiUtils::Theme::Black);
 }
 
 void ImGuiSubrender::addIconFont() {

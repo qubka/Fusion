@@ -1,8 +1,8 @@
 #include "model.hpp"
 
+#include "fusion/core/engine.hpp"
 #include "fusion/assets/asset_registry.hpp"
 #include "fusion/graphics/textures/texture2d.hpp"
-#include "fusion/filesystem/virtual_file_system.hpp"
 
 #include <assimp/Importer.hpp>
 #include <assimp/Exporter.hpp>
@@ -19,7 +19,7 @@ static inline glm::mat4 mat4_cast(const aiMatrix4x4 &m) { return glm::transpose(
 static inline glm::mat4 mat4_cast(const aiMatrix3x3 &m) { return glm::transpose(glm::make_mat3(&m.a1)); }
 
 Model::Model(const fs::path& filepath, uint32_t defaultFlags, const Vertex::Layout& layout) : layout{layout} {
-    fs::path modelPath{ VirtualFileSystem::Get()->resolvePhysicalPath(filepath) };
+    fs::path modelPath{ Engine::Get()->getApp()->getRootPath() / filepath };
 
     defaultFlags |= aiProcess_Triangulate;
     if (layout.contains(Vertex::Component::Normal)) {
@@ -85,7 +85,7 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, std::shared_
         vertices.reserve(mesh->mNumVertices * layout.getStride());
         std::vector<uint32_t> indices;
         indices.reserve(mesh->mNumFaces * 3);
-        std::vector<std::shared_ptr<Texture2d>> textures;
+        //std::vector<std::shared_ptr<Texture2d>> textures;
 
         for (uint32_t j = 0; j < mesh->mNumVertices; j++) {
             appendVertex(vertices, scene, mesh, j);
@@ -100,22 +100,22 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, std::shared_
             }
         }
 
-        if (mesh->mMaterialIndex >= 0) {
+        /*if (mesh->mMaterialIndex >= 0) {
             const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
             auto diffuseMaps = loadTextures(material, aiTextureType_DIFFUSE);
             textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-            /*auto specularMaps = loadTextures(material, aiTextureType_SPECULAR);
+            auto specularMaps = loadTextures(material, aiTextureType_SPECULAR);
             textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
             auto normalMaps = loadTextures(material, aiTextureType_HEIGHT);
             textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
             auto heightMaps = loadTextures(material, aiTextureType_AMBIENT);
-            textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());*/
+            textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-            /*if (textures.empty()) {
+            if (textures.empty()) {
                 aiColor3D color;
                 material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
 
@@ -123,8 +123,8 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, std::shared_
                 auto g = static_cast<uint8_t>(color.g * 255);
                 auto b = static_cast<uint8_t>(color.b * 255);
                 textures.push_back(std::make_shared<Image>(r, g, b));
-            }*/
-        }
+            }
+        }*/
 
         std::string name{ node->mName.C_Str() + ":"s + std::to_string(index) };
 
@@ -135,7 +135,7 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, std::shared_
     }
 }
 
-std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* material, int type) {
+/*std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* material, int type) {
     auto textureType = static_cast<aiTextureType>(type);
     std::vector<std::shared_ptr<Texture2d>> textures;
     for (uint32_t i = 0; i < material->GetTextureCount(textureType); i++) {
@@ -169,7 +169,7 @@ std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* ma
     }
 
     return textures;
-}
+}*/
 
 void Model::appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t i) {
     aiVector3D zero{0.0f, 0.0f, 0.0f};

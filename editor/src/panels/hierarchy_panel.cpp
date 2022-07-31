@@ -308,6 +308,12 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
                 ImGui::TextDisabled("Paste");
             }
 
+            if (ImGui::Selectable("Undo"))
+                LOG_DEBUG << "undo";
+
+            if (ImGui::Selectable("Redo"))
+                LOG_DEBUG << "redo";
+
             ImGui::Separator();
 
             if (ImGui::Selectable("Duplicate")) {

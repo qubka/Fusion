@@ -73,12 +73,6 @@ namespace fe {
          */
         void requestClose() { running = false; }
 
-        /**
-         * Gets the engine attached modules.
-         * @return The modules map.
-         */
-        const std::unordered_map<type_index, std::unique_ptr<Module>>& getModules() const { return modules; }
-
     private:
         static Engine* Instance;
 

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "mesh.hpp"
-
+#include "fusion/models/mesh.hpp"
 #include "fusion/assets/asset.hpp"
 #include "fusion/graphics/pipelines/vertex.hpp"
 
@@ -42,18 +41,10 @@ namespace fe {
         //void processLight(const aiScene* scene, const aiNode* node, const aiLight* light);
         //void processCamera(const aiScene* scene, const aiNode* node, const aiCamera* camera);
 
-        std::vector<std::shared_ptr<Texture2d>> loadTextures(const aiMaterial* material, int type);
+        //std::vector<std::shared_ptr<Texture2d>> loadTextures(const aiMaterial* material, int type);
         void appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t vertexIndex);
 
         //static aiScene GenerateScene(const Mesh& mesh);
-
-        /*template<typename T>
-        void appendOutput(std::vector<std::byte>& outputBuffer, const T& t) {
-            auto offset = outputBuffer.size();
-            auto copySize = sizeof(T);
-            outputBuffer.resize(offset + copySize);
-            std::memcpy(outputBuffer.data() + offset, &t, copySize);
-        }*/
 
         template<typename T>
         void appendOutput(std::vector<std::byte>& outputBuffer, std::span<const T> t) {
@@ -68,6 +59,6 @@ namespace fe {
 
         std::shared_ptr<SceneObject> root;
         std::unordered_map<std::string, std::shared_ptr<Mesh>> meshesLoaded;
-        std::unordered_map<fs::path, std::shared_ptr<Texture2d>> texturesLoaded;
+        //std::unordered_map<fs::path, std::shared_ptr<Texture2d>> texturesLoaded;
     };
 }

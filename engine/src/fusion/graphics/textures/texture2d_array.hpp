@@ -1,6 +1,6 @@
 #pragma once
 
-#include "texture.hpp"
+#include "fusion/graphics/textures/texture.hpp"
 
 namespace fe {
     /**
@@ -15,7 +15,7 @@ namespace fe {
          * @param addressMode The addressing mode for outside [0..1] range.
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
-         * @param load If this resource will be loaded immediately, otherwise {@link Texture2d#Load} can be called later.
+         * @param load If this resource will be loaded immediately, otherwise {@link Texture2d#load} can be called later.
          */
         explicit Texture2dArray(const fs::path& filepath,
                                 VkFilter filter = VK_FILTER_LINEAR,

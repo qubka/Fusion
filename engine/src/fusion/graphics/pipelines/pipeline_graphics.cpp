@@ -2,7 +2,7 @@
 
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/render_stage.hpp"
-#include "fusion/filesystem/virtual_file_system.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 using namespace fe;
 
@@ -88,7 +88,7 @@ void PipelineGraphics::createShaderProgram() {
 		ss << "#define " << defineName << ' ' << defineValue << '\n';
 
 	for (const auto& shaderStage : shaderStages) {
-		std::string shaderCode{ VirtualFileSystem::Get()->readText(shaderStage) };
+		std::string shaderCode{ FileSystem::ReadText(shaderStage) };
 		if (shaderCode.empty())
 			throw std::runtime_error("Could not create pipeline, missing shader stage");
 

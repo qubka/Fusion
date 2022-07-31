@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "buffer.hpp"
+#include "fusion/graphics/buffers/buffer.hpp"
 
 namespace fe {
     class InstanceBuffer : public Buffer {

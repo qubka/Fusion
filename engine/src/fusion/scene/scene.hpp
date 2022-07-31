@@ -103,22 +103,11 @@ namespace fe {
         entt::entity createEntity(std::string name = "");
 
         /**
-         * Creates an entity with components.
-         * @param name Name string.
-         * @return The Entity handle that you can use to access the entity.
-         */
-        template<typename ... Args>
-        entt::entity createEntity(const std::string& name) {
-            auto entity = createEntity(name);
-            (registry.emplace_or_replace<Args>(entity), ...);
-            return entity;
-        }
-
-        /**
          * Destroys an entity.
          * @param entity The Entity handle of the entity to destroy.
+         * @return True on success, false otherwise.
          */
-        void destroyEntity(entt::entity entity);
+        bool destroyEntity(entt::entity entity);
 
         /**
          * Clones an entity.
@@ -159,7 +148,7 @@ namespace fe {
             archive(cereal::make_nvp("name", name));
         }
 
-        void importMesh(const fs::path& filepath, const glm::vec3& position = vec3::zero);
+        void importMesh(const fs::path& filepath);
 
     protected:
         /**

@@ -26,8 +26,7 @@ namespace fe {
                     //{1, {0, 5}},
                     {0, {0, 1}},
                     {1, {0, 1}},
-                    {2, {0, 1}},
-                    {3, {0, 1}},
+                    {2, {0, 1}}
             };
 
             addRenderStage(std::make_unique<RenderStage>(std::move(renderpassAttachments0), std::move(renderpassSubpasses0)));
@@ -60,10 +59,10 @@ namespace fe {
             //addSubrender<DeferredSubrender>({0, 1});
             addSubrender<LightSubrender>({0, 1});
             //addSubrender<DeferredSubrender>({0, 1});
-            addSubrender<SkyboxSubrender>({0, 2});
-            addSubrender<GridSubrender>({0, 3});
+            //addSubrender<SkyboxSubrender>({0, 2});
+            addSubrender<GridSubrender>({0, 2});
 
-            addSubrender<SkyboxSubrender>({1, 0});
+            //addSubrender<SkyboxSubrender>({1, 0});
 
             addSubrender<ImGuiSubrender>({2, 0});
         }

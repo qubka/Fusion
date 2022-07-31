@@ -60,7 +60,7 @@ namespace ImGuiUtils {
     bool Spinner(const char* name, float radius, int thickness, ImU32 color);
     bool ToggleRoundButton(const char* name, bool& value);
 
-    bool ToggleButton(const char* name, bool& value, bool text_style = false); // if text true, select text on active
+    bool ToggleButton(const char* name, bool& value, bool textStyle = false); // if text true, select text on active
 
     void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, float yOffset, ImU32 colEven, ImU32 colOdd);
     void DrawItemActivityOutline(float rounding = 0.0f, bool drawWhenInactive = false, ImU32 colorWhenActive = IM_COL32(80, 80, 80, 255));
@@ -495,6 +495,8 @@ namespace ImGuiUtils {
 
         return updated;
     }
+
+
 };
 
 static inline ImVec2 operator*(const ImVec2& lhs, const float rhs) {
