@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fusion/assets/asset_registry.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 #include "material_design_icons.hpp"
 #include "imgui_color_scheme.hpp"
@@ -32,14 +33,11 @@ namespace ImGuiUtils {
         Steam
     };
 
-    enum class PropertyFlag : unsigned char {
-        None = 0,
-        ReadOnly = 1,
-        ColorValue = 2,
-        DragValue = 4, //! default in edit mode
-        SliderValue = 8,
+    enum class PropertyType : unsigned char {
+        Drag = 0, //! default in edit mode
+        Color = 1,
+        Slider = 2,
     };
-    BITMASK_DEFINE_MAX_ELEMENT(PropertyFlag, SliderValue);
 
     void TextCentered(const char* text, std::optional<float> offsetY = std::nullopt);
 
@@ -97,13 +95,14 @@ namespace ImGuiUtils {
         return ImGuiDataType_COUNT;
     }
 
-    using Flags = bitmask::bitmask<PropertyFlag>;
+/// TEXT
+    bool PropertyText(const char* name, std::string& value);
+    void PropertyText(const char* name, const char* value);
+///
 
-    void PropertyText(const char* name, const char* text);
-    bool PropertyText(const char* name, std::string& value, const Flags& flags = PropertyFlag::None);
-
+/// BOOL
     template<typename T, typename = std::enable_if_t<std::is_same_v<T, bool>>>
-    bool Property(const char* name, T& value, const Flags& flags = PropertyFlag::None) {
+    bool Property(const char* name, T& value) {
         bool updated = false;
 
         //ImGui::AlignTextToFramePadding();
@@ -113,11 +112,53 @@ namespace ImGuiUtils {
 
         ImGui::PushID(name);
 
-        if (flags & PropertyFlag::ReadOnly) {
-            ImGui::TextUnformatted(value ? glm::detail::LabelTrue : glm::detail::LabelFalse);
-        } else {
-            if (ImGui::Checkbox("", &value))
-                updated = true;
+        if (ImGui::Checkbox("", &value))
+            updated = true;
+
+        ImGui::PopID();
+
+        ImGui::PopItemWidth();
+        ImGui::NextColumn();
+
+        return updated;
+    }
+
+    template<typename T, typename = std::enable_if_t<std::is_same_v<T, bool>>>
+    void Property(const char* name, const T& value) {
+        //ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted(name);
+        ImGui::NextColumn();
+        ImGui::PushItemWidth(-1);
+
+        ImGui::TextUnformatted(value ? glm::detail::LabelTrue : glm::detail::LabelFalse);
+
+        ImGui::PopItemWidth();
+        ImGui::NextColumn();
+    }
+///
+
+/// DEFAULT VALUES
+    template<typename T, typename = std::enable_if_t<!std::is_same_v<T, bool>>>
+    bool Property(const char* name, T& value, const T min = 0, const T max = 0, float speed = 1.0f, PropertyType type = PropertyType::Drag) {
+        bool updated = false;
+
+        ImGui::TextUnformatted(name);
+        ImGui::NextColumn();
+        ImGui::PushItemWidth(-1);
+
+        ImGui::PushID(name);
+
+        switch (type) {
+            case PropertyType::Drag:
+                if (ImGui::DragScalar("", GetDataType<T>(), &value, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
+                    updated = true;
+                break;
+            case PropertyType::Slider:
+                if (ImGui::SliderScalar("", GetDataType<T>(), &value, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
+                    updated = true;
+                break;
+            default:
+                throw std::runtime_error("Unsupported property: " + std::string{me::enum_name(type)});
         }
 
         ImGui::PopID();
@@ -129,22 +170,33 @@ namespace ImGuiUtils {
     }
 
     template<typename T, typename = std::enable_if_t<!std::is_same_v<T, bool>>>
-    bool Property(const char* name, T& value, const T min = 0, const T max = 0, float speed = 1.0f, const Flags& flags = PropertyFlag::None) {
+    void Property(const char* name, const T& value, const T min = 0, const T max = 0, float speed = 1.0f, PropertyType type = PropertyType::Drag) {
+        ImGui::TextUnformatted(name);
+        ImGui::NextColumn();
+        ImGui::PushItemWidth(-1);
+
+        ImGui::Text(ImGui::DataTypeGetInfo(GetDataType<T>())->PrintFmt, value);
+
+        ImGui::PopItemWidth();
+        ImGui::NextColumn();
+    }
+///
+
+/// BOOL VECTOR
+    template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<std::is_same_v<T, bool>>>
+    bool Property(const char* name, glm::vec<L, T, Q>& value) {
         bool updated = false;
 
+        //ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted(name);
         ImGui::NextColumn();
         ImGui::PushItemWidth(-1);
 
         ImGui::PushID(name);
 
-        if (flags & PropertyFlag::ReadOnly) {
-            ImGui::Text(ImGui::DataTypeGetInfo(GetDataType<T>())->PrintFmt, value);
-        } else if (flags & PropertyFlag::SliderValue) {
-            if (ImGui::SliderScalar("", GetDataType<T>(), &value, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
-                updated = true;
-        } else {
-            if (ImGui::DragScalar("", GetDataType<T>(), &value, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
+        for (int i = 0; i < L; i++) {
+            std::string id{ "##" + std::to_string(i) };
+            if (ImGui::Checkbox(id.c_str(), &value[i]))
                 updated = true;
         }
 
@@ -157,36 +209,22 @@ namespace ImGuiUtils {
     }
 
     template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<std::is_same_v<T, bool>>>
-    bool Property(const char* name, glm::vec<L, T, Q>& value, const Flags& flags = PropertyFlag::None) {
-        bool updated = false;
-
+    void Property(const char* name, const glm::vec<L, T, Q>& value) {
         //ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted(name);
         ImGui::NextColumn();
         ImGui::PushItemWidth(-1);
 
-        ImGui::PushID(name);
-
-        if (flags & PropertyFlag::ReadOnly) {
-            ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").data());
-        } else {
-            for (int i = 0; i < L; i++) {
-                std::string id{ "##" + std::to_string(i) };
-                if (ImGui::Checkbox(id.c_str(), &value[i]))
-                    updated = true;
-            }
-        }
-
-        ImGui::PopID();
+        ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").data());
 
         ImGui::PopItemWidth();
         ImGui::NextColumn();
-
-        return updated;
     }
+///
 
+/// DEFAULT VECTOR
     template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<!std::is_same_v<T, bool>>>
-    bool Property(const char* name, glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, float speed = 1.0f, const Flags& flags = PropertyFlag::None) {
+    bool Property(const char* name, glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, float speed = 1.0f, PropertyType type = PropertyType::Drag) {
         bool updated = false;
 
         ImGui::AlignTextToFramePadding();
@@ -196,31 +234,26 @@ namespace ImGuiUtils {
 
         ImGui::PushID(name);
 
-        if (flags & PropertyFlag::ReadOnly) {
-            if (flags & PropertyFlag::ColorValue) {
-                glm::vec<L, T, Q> copy{ value };
+        switch (type) {
+            case PropertyType::Color:
                 if constexpr (L == 3) {
-                    ImGui::ColorEdit3("", glm::value_ptr(copy), ImGuiColorEditFlags_NoInputs);
+                    if (ImGui::ColorEdit3("", glm::value_ptr(value), ImGuiColorEditFlags_NoInputs))
+                        updated = true;
                 } else if constexpr (L == 4) {
-                    ImGui::ColorEdit4("", glm::value_ptr(copy), ImGuiColorEditFlags_NoInputs);
+                    if (ImGui::ColorEdit4("", glm::value_ptr(value), ImGuiColorEditFlags_NoInputs))
+                        updated = true;
                 }
-            } else {
-                ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").data());
-            }
-        } else if (flags & PropertyFlag::ColorValue) {
-            if constexpr (L == 3) {
-                if (ImGui::ColorEdit3("", glm::value_ptr(value), ImGuiColorEditFlags_NoInputs))
+                break;
+            case PropertyType::Drag:
+                if (ImGui::DragScalarN("", GetDataType<T>(), glm::value_ptr(value), L, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
                     updated = true;
-            } else if constexpr (L == 4) {
-                if (ImGui::ColorEdit4("", glm::value_ptr(value), ImGuiColorEditFlags_NoInputs))
+                break;
+            case PropertyType::Slider:
+                if (ImGui::SliderScalarN("", GetDataType<T>(), glm::value_ptr(value), L, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
                     updated = true;
-            }
-        } else if (flags & PropertyFlag::SliderValue) {
-            if (ImGui::SliderScalarN("", GetDataType<T>(), glm::value_ptr(value), L, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
-                updated = true;
-        } else {
-            if (ImGui::DragScalarN("", GetDataType<T>(), glm::value_ptr(value), L, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
-                updated = true;
+                break;
+            default:
+                throw std::runtime_error("Unsupported property: " + std::string{me::enum_name(type)});
         }
 
         ImGui::PopID();
@@ -232,7 +265,36 @@ namespace ImGuiUtils {
     }
 
     template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<!std::is_same_v<T, bool>>>
-    bool PropertyControl(const char* name, glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, T reset = 0, float speed = 1.0f, const Flags& flags = PropertyFlag::None) {
+    void Property(const char* name, const glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, float speed = 1.0f, PropertyType type = PropertyType::Drag) {
+        bool updated = false;
+
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted(name);
+        ImGui::NextColumn();
+        ImGui::PushItemWidth(-1);
+
+        ImGui::PushID(name);
+
+        if (type == PropertyType::Color) {
+            glm::vec<L, T, Q> copy{ value };
+            if constexpr (L == 3) {
+                ImGui::ColorEdit3("", glm::value_ptr(copy), ImGuiColorEditFlags_NoInputs);
+            } else if constexpr (L == 4) {
+                ImGui::ColorEdit4("", glm::value_ptr(copy), ImGuiColorEditFlags_NoInputs);
+            }
+        } else {
+            ImGui::TextUnformatted(String::Extract(glm::to_string(value), "(", ")").data());
+        }
+
+        ImGui::PopID();
+
+        ImGui::PopItemWidth();
+        ImGui::NextColumn();
+    }
+///
+
+    template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<!std::is_same_v<T, bool>>>
+    bool PropertyControl(const char* name, glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, T reset = 0, float speed = 1.0f) {
         bool updated = false;
 
         ImGuiIO& io = ImGui::GetIO();
@@ -339,7 +401,7 @@ namespace ImGuiUtils {
 
     bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t& selected);
     template<typename E, typename = std::enable_if_t<std::is_enum_v<E>>>
-    bool PropertyDropdown(const char* name, E& value, const Flags& flags = PropertyFlag::None) {
+    bool PropertyDropdown(const char* name, E& value) {
         bool updated = false;
 
         //ImGui::AlignTextToFramePadding();
@@ -352,21 +414,17 @@ namespace ImGuiUtils {
         constexpr auto entries = me::enum_entries<E>();
         const char* current = entries[me::enum_index(value).value_or(0)].second.data();
 
-        if (flags & PropertyFlag::ReadOnly) {
-            ImGui::TextUnformatted(current);
-        } else {
-            if (ImGui::BeginCombo("", current)) {
-                for (const auto& [type, title] : entries) {
-                    const bool is_selected = (value == type);
-                    if (ImGui::Selectable(title.data(), is_selected)) {
-                        value = type;
-                        updated = true;
-                    }
-                    if (is_selected)
-                        ImGui::SetItemDefaultFocus();
+        if (ImGui::BeginCombo("", current)) {
+            for (const auto& [type, title] : entries) {
+                const bool is_selected = (value == type);
+                if (ImGui::Selectable(title.data(), is_selected)) {
+                    value = type;
+                    updated = true;
                 }
-                ImGui::EndCombo();
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
             }
+            ImGui::EndCombo();
         }
 
         ImGui::PopID();
@@ -391,6 +449,8 @@ namespace ImGuiUtils {
 
         ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{4, 4});
+
+        ImGui::PushID(name);
 
         if (ImGui::BeginPopup("AssetExplorer", ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Dummy(ImVec2{200.0f, 0.0f});  // fix resize
@@ -424,7 +484,7 @@ namespace ImGuiUtils {
 
             ImGui::BeginChild("AssetExplorer", ImVec2{300.0f, 500.0f});
 
-            for (auto& [path, asset] : AssetRegistry::Get()->getAsset<T>()) {
+            for (auto& [path, asset] : AssetRegistry::Get()->getAssets<T>()) {
                 if (filter.IsActive() && !filter.PassFilter(asset->getName().c_str()))
                     continue;
 
@@ -442,7 +502,7 @@ namespace ImGuiUtils {
             ImGui::Separator();
 
             if (selected) {
-                ImGui::TextUnformatted(selected->getName().c_str());
+                ImGui::TextUnformatted(selected->getPath().string().c_str());
             }
 
             ImGui::EndPopup();
@@ -454,7 +514,6 @@ namespace ImGuiUtils {
             if (ImGui::Button("...", buttonSize)) {
                 filter.Clear();
                 selected.reset();
-                //files = FileSystem::GetFilesInPath("", true);
                 ImGui::OpenPopup("AssetExplorer");
             }
         } else {
@@ -471,13 +530,13 @@ namespace ImGuiUtils {
             updated = true;
         }
 
-        /*if (ImGui::BeginDragDropTarget()) {
+        if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                value = static_cast<const char*>(payload->Data);
+                value = AssetRegistry::Get()->get<T>(strip_root(static_cast<const char*>(payload->Data)));
                 updated = true;
             }
             ImGui::EndDragDropTarget();
-        }*/
+        }
 
         ImGui::SameLine();
 
@@ -487,6 +546,8 @@ namespace ImGuiUtils {
             ImGui::OpenPopup("AssetExplorer");
         }
 
+        ImGui::PopID();
+
         ImGui::PopItemWidth();
 
         ImGui::PopStyleVar();
@@ -495,8 +556,6 @@ namespace ImGuiUtils {
 
         return updated;
     }
-
-
 };
 
 static inline ImVec2 operator*(const ImVec2& lhs, const float rhs) {

@@ -119,10 +119,21 @@ namespace ImGui {
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
-        if (ImGuiUtils::Property("Color", light.color, 0.0f, 0.0f, 1.0f, ImGuiUtils::PropertyType::Color)) {
+        //dsffds
+        ImGuiUtils::PropertyDropdown("Type", light.type);
+        ImGuiUtils::Property("Color", light.color, 0.0f, 0.0f, 1.0f, ImGuiUtils::PropertyType::Color);
+        ImGuiUtils::Property("Radius", light.radius, 0.0f, 0.0f, 0.01f);
+        ImGuiUtils::Property("Ambient", light.ambient, 0.0f, 0.0f, 0.01f);
+        ImGuiUtils::Property("Diffuse", light.diffuse, 0.0f, 0.0f, 0.01f);
+        ImGuiUtils::Property("Specular", light.specular, 0.0f, 0.0f, 0.01f);
+        if (light.type != LightComponent::LightType::Directional) {
+            ImGuiUtils::Property("Constant", light.constant, 0.0f, 0.0f, 0.01f);
+            ImGuiUtils::Property("Linear", light.linear, 0.0f, 0.0f, 0.01f);
+            ImGuiUtils::Property("Quadratic", light.quadratic, 0.0f, 0.0f, 0.01f);
         }
-
-        if (ImGuiUtils::Property("Radius", light.radius, 0.0f, 0.0f, 0.01f)) {
+        if (light.type == LightComponent::LightType::Spot) {
+            ImGuiUtils::Property("Cut Off", light.cutOff, 0.0f, 0.0f, 0.01f);
+            ImGuiUtils::Property("Outer CutOff", light.outerCutOff, 0.0f, 0.0f, 0.01f);
         }
 
         ImGui::Columns(1);

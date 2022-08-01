@@ -20,8 +20,7 @@ layout (binding = 0) uniform UniformObject {
 
 layout (push_constant) uniform PushObject {
     vec4 color;
-    vec3 position;
-    float radius;
+    vec4 position;
 } push;
 
 void main() {
@@ -30,9 +29,9 @@ void main() {
     vec3 cameraRightWorld = vec3(ubo.view[0][0], ubo.view[1][0], ubo.view[2][0]);
     vec3 cameraUpWorld = vec3(ubo.view[0][1], ubo.view[1][1], ubo.view[2][1]);
 
-    vec3 positionWorld = push.position
-        + push.radius * fragOffset.x * cameraRightWorld
-        + push.radius * fragOffset.y * cameraUpWorld;
+    vec3 positionWorld = push.position.xyz
+        + push.position.w * fragOffset.x * cameraRightWorld
+        + push.position.w * fragOffset.y * cameraUpWorld;
 
     gl_Position = ubo.projection * ubo.view * vec4(positionWorld, 1.0);
 }

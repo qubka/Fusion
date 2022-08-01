@@ -26,7 +26,7 @@ namespace fe {
         bool freeAspect{ true };
         float fixedAspect{ 1.0f };
         float aspectRatio{ 1.0f };
-        ImGuiUtils::Theme theme{ ImGuiUtils::Theme::ClassicDark };
+        ImGuiUtils::Theme theme{ ImGuiUtils::Theme::Black };
 
         /*f
         uint32_t debugDrawFlags{ 0 };
@@ -89,7 +89,7 @@ namespace fe {
         void setSceneViewActive(bool flag) { sceneViewActive = flag; }
         void setSceneViewSize(const glm::vec2& size) { sceneViewSize = size; }
 
-        //void focusCamera(const glm::vec3& point, float distance, float speed = 1.0f);
+        void focusCamera(const glm::vec3& point, float distance, float speed = 1.0f);
 
         void onImGuizmo();
     private:
@@ -113,6 +113,7 @@ namespace fe {
         glm::vec3 cameraDestination{ 0.0f };
         glm::vec3 cameraStartPosition{ 0.0f };
 
+        std::queue<std::string> mementos;
         FileBrowserPanel fileBrowserPanel{ this };
         std::vector<std::unique_ptr<EditorPanel>> panels;
         std::unordered_map<type_index, std::string> componentIconMap;

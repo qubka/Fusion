@@ -10,23 +10,10 @@ namespace fe {
         }
 
         template<typename Archive>
-        void save(Archive& archive) const {
-            archive(cereal::make_nvp("position", getLocalPosition()),
-                    cereal::make_nvp("orientation", getWorldOrientation()),
-                    cereal::make_nvp("scale", getLocalScale()));
-        }
-
-        template<typename Archive>
-        void load(Archive& archive) {
-            glm::vec3 position;
-            glm::quat orientation;
-            glm::vec3 scale;
-            archive(cereal::make_nvp("position", position),
-                    cereal::make_nvp("orientation", orientation),
-                    cereal::make_nvp("scale", scale));
-            setLocalPosition(position);
-            setLocalOrientation(orientation);
-            setLocalScale(scale);
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("position", localPosition),
+                    cereal::make_nvp("orientation", localOrientation),
+                    cereal::make_nvp("scale", localScale));
         }
     };
 }

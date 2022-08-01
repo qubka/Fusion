@@ -6,6 +6,7 @@
 #include "fusion/graphics/buffers/push_handler.hpp"
 #include "fusion/graphics/descriptors/descriptors_handler.hpp"
 #include "fusion/graphics/buffers/storage_handler.hpp"
+#include "fusion/graphics/textures/texture2d.hpp"
 
 namespace fe {
     class MeshSubrender final : public Subrender {
@@ -14,10 +15,19 @@ namespace fe {
         ~MeshSubrender() override = default;
 
     private:
-        struct PointLight {
-            glm::vec4 color{ 0.0f, 0.0f, 0.0f, 1.0f };
+        struct Light {
             glm::vec3 position{ 0.0f };
-            float radius{ 0.0f };
+            glm::vec3 direction{ 0.0f};
+            float cutOff{ 0.0f };
+            float outerCutOff{ 0.0f};
+
+            glm::vec3 ambient{ 0.0f };
+            glm::vec3 diffuse{ 0.0f };
+            glm::vec3 specular{ 0.0f };
+
+            float constant{ 0.0f };
+            float linear{ 0.0f };
+            float quadratic{ 0.0f };
         };
 
         void onUpdate() override {};
@@ -27,6 +37,8 @@ namespace fe {
         DescriptorsHandler descriptorSet;
         UniformHandler uniformObject;
         StorageHandler storageLights;
+        std::unique_ptr<Texture2d> unknownDiffuse;
+        std::unique_ptr<Texture2d> unknownSpecular;
         PushHandler pushObject;
     };
 }

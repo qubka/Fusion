@@ -20,21 +20,7 @@ void TextCentered(const char* text, std::optional<float> offsetY) {
     ImGui::TextUnformatted(text);
 }
 
-void PropertyText(const char* name, const char* text) {
-    //ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted(name);
-    ImGui::NextColumn();
-    ImGui::PushItemWidth(-1);
-
-    {
-        ImGui::TextUnformatted(text);
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::NextColumn();
-}
-
-bool PropertyText(const char* name, std::string& value, const Flags& flags) {
+bool PropertyText(const char* name, std::string& value) {
     bool updated = false;
 
     //ImGui::AlignTextToFramePadding();
@@ -44,16 +30,12 @@ bool PropertyText(const char* name, std::string& value, const Flags& flags) {
 
     ImGui::PushID(name);
 
-    if (flags & PropertyFlag::ReadOnly) {
-        ImGui::TextUnformatted(value.c_str());
-    } else {
-        char buffer[256];
-        std::memset(buffer, 0, sizeof(buffer));
-        std::strncpy(buffer, value.c_str(), sizeof(buffer));
-        if (ImGui::InputText("", buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
-            value = std::string{buffer};
-            updated = true;
-        }
+    char buffer[256];
+    std::memset(buffer, 0, sizeof(buffer));
+    std::strncpy(buffer, value.c_str(), sizeof(buffer));
+    if (ImGui::InputText("", buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
+        value = std::string{buffer};
+        updated = true;
     }
 
     ImGui::PopID();
@@ -62,6 +44,18 @@ bool PropertyText(const char* name, std::string& value, const Flags& flags) {
     ImGui::NextColumn();
 
     return updated;
+}
+
+void PropertyText(const char* name, const char* value) {
+    //ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted(name);
+    ImGui::NextColumn();
+    ImGui::PushItemWidth(-1);
+
+    ImGui::TextUnformatted(value);
+
+    ImGui::PopItemWidth();
+    ImGui::NextColumn();
 }
 
 bool PropertyDropdown(const char* name,std::span<const char*> options, int32_t& selected) {
@@ -762,7 +756,7 @@ void SetTheme(Theme theme) {
 #define MED(v) ImVec4{ 0.455f, 0.198f, 0.301f, v }
 #define LOW(v) ImVec4{ 0.232f, 0.201f, 0.271f, v }
 #define BG(v) ImVec4{ 0.200f, 0.220f, 0.270f, v }
-#define TEXTCol(v) ImVec4{ 0.860f, 0.930f, 0.890f, v }
+#define TEXT(v) ImVec4{ 0.860f, 0.930f, 0.890f, v }
 
         colors[ImGuiCol_Text] = ImVec4{ 0.95f, 0.96f, 0.98f, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ 0.36f, 0.42f, 0.47f, 1.00f };
@@ -794,9 +788,9 @@ void SetTheme(Theme theme) {
         colors[ImGuiCol_ResizeGrip] = ImVec4{ 0.47f, 0.77f, 0.83f, 0.04f };
         colors[ImGuiCol_ResizeGripHovered] = MED(0.78f);
         colors[ImGuiCol_ResizeGripActive] = MED(1.00f);
-        colors[ImGuiCol_PlotLines] = TEXTCol(0.63f);
+        colors[ImGuiCol_PlotLines] = TEXT(0.63f);
         colors[ImGuiCol_PlotLinesHovered] = MED(1.00f);
-        colors[ImGuiCol_PlotHistogram] = TEXTCol(0.63f);
+        colors[ImGuiCol_PlotHistogram] = TEXT(0.63f);
         colors[ImGuiCol_PlotHistogramHovered] = MED(1.00f);
         colors[ImGuiCol_TextSelectedBg] = MED(0.43f);
         colors[ImGuiCol_Border] = ImVec4{ 0.539f, 0.479f, 0.255f, 0.162f };

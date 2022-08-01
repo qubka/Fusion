@@ -38,9 +38,11 @@ void LightSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
     auto lightView = scene->getRegistry().view<TransformComponent, LightComponent>();
 
     for (const auto& [entity, transform, light] : lightView.each()) {
+        if (light.type == LightComponent::LightType::Directional)
+            continue;
+
         pushObject.push("color", light.color);
-        pushObject.push("position", transform.getWorldPosition());
-        pushObject.push("radius", light.radius);
+        pushObject.push("position", glm::vec4{ transform.getWorldPosition(), light.radius });
         descriptorSet.push("PushObject", pushObject);
         pushObject.bindPush(commandBuffer, pipeline);
 

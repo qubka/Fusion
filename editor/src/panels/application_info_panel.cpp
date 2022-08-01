@@ -32,8 +32,8 @@ void ApplicationInfoPanel::onImGui() {
             if (ImGui::TreeNode("Asset Manager")) {
                 auto manager = AssetRegistry::Get();
 
-                if (!manager->getAssets().empty()) {
-                    for (const auto& [id, type] : manager->getAssets()) {
+                if (!manager->getAllAssets().empty()) {
+                    for (const auto& [id, type] : manager->getAllAssets()) {
                         std::string table{ "##" + std::to_string(id) };
                         if (ImGui::BeginTable(table.c_str(), 2, flags)) {
                             ImGui::TableSetupColumn("Path", ImGuiTableColumnFlags_WidthStretch);

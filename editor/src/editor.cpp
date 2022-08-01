@@ -29,6 +29,7 @@
 using namespace fe;
 
 Editor::Editor(std::string_view name) : DefaultApplication{name} {
+
 }
 
 Editor::~Editor() {
@@ -84,14 +85,13 @@ void Editor::onUpdate() {
         if (input->getKeyDown(Key::F)) {
             auto& registry = scene->getRegistry();
             if (registry.valid(selectedEntity)) {
-                /*auto transform = registry.try_get<TransformComponent>(selectedEntity);
-                if (transform)
-                    FocusCamera(transform->GetWorldPosition(), 2.0f, 2.0f);*/
+                if (auto transform = registry.try_get<TransformComponent>(selectedEntity))
+                    focusCamera(transform->getWorldPosition(), 2.0f, 2.0f);
             }
         }
 
         if (input->getKey(Key::O)) {
-            //focusCamera(glm::vec3(0.0f, 0.0f, 0.0f), 2.0f, 2.0f);
+            focusCamera(vec3::zero, 2.0f, 2.0f);
         }
 
         if (transitioningCamera) {
@@ -157,12 +157,19 @@ void Editor::onUpdate() {
                 if (cutCopyEntity) {
                     if (copiedEntity == selectedEntity)
                         selectedEntity = entt::null;
-                   scene->destroyEntity(copiedEntity);
+                    scene->destroyEntity(copiedEntity);
+                    copiedEntity = entt::null;
                 }
             }
 
             if (input->getKeyDown(Key::D) && selectedEntity != entt::null) {
                 scene->duplicateEntity(selectedEntity);
+            }
+
+            if (input->getKeyDown(Key::Z)) {
+            }
+
+            if (input->getKeyDown(Key::Y)) {
             }
         }
     } else
@@ -450,6 +457,14 @@ void Editor::drawMenuBar() {
                 }
             }
 
+            /*if (ImGui::MenuItem("Undo", "CTRL+Z", false, true)) {
+
+            }
+
+            if (ImGui::MenuItem("Redo", "CTRL+Y", false, true)) {
+
+            }*/
+
             ImGui::EndMenu();
         }
 
@@ -468,7 +483,7 @@ void Editor::drawMenuBar() {
         }
 
         if (ImGui::BeginMenu("Scenes")) {
-            fs::path scenePath{ projectSettings.projectRoot / "assets" / "scenes" };
+            fs::path scenePath{ projectSettings.projectRoot / "assets/scenes" };
             if (fs::exists(scenePath)) {
                 for (const auto& entry : fs::directory_iterator(scenePath)) {
                     const auto& path = entry.path();
@@ -726,12 +741,10 @@ void Editor::drawMenuBar() {
         ImGui::Separator();
 
         if (ImGui::Button("OK", buttonSize)) {
-            fs::path scenePath{ VirtualFileSystem::Get()->resolvePhysicalPath("Scenes") };
-            if (!scenePath.empty()) {
-                scenePath = FileFormat::GetNextFileName(scenePath);
-                std::string sceneName{ scenePath.filename().replace_extension().string() };
-                SceneManager::Get()->setScene(std::make_unique<Scene>(sceneName));
-            }
+            fs::path scenePath{ projectSettings.projectRoot / "assets/scenes/New Scene.fsn" };
+            scenePath = FileFormat::GetNextFileName(scenePath);
+            std::string sceneName{ scenePath.filename().replace_extension().string() };
+            SceneManager::Get()->setScene(std::make_unique<Scene>(sceneName));
             ImGui::CloseCurrentPopup();
         }
         ImGui::SetItemDefaultFocus();
@@ -771,13 +784,12 @@ void Editor::openFile() {
 }
 
 void Editor::fileOpenCallback(const fs::path& path) {
-    fs::path virtualPath { strip_root(path) };
+    fs::path filepath{ strip_root(path) };
 
     if (FileFormat::IsTextFile(path)) {
         openTextFile(path, []{});
     } else if (FileFormat::IsModelFile(path)) {
-        //auto pos = clicked ? vec3::zero : editorCamera->screenToWorld(Input::Get()->getMousePosition(), sceneViewSize);
-        //SceneManager::Get()->getScene()->importMesh(path, pos);
+        SceneManager::Get()->getScene()->importMesh(filepath);
     } else if (FileFormat::IsAudioFile(path)) {
     } else if (FileFormat::IsSceneFile(path)) {
         /*auto sceneManager = SceneManager::Get()->getScene();
@@ -792,7 +804,7 @@ void Editor::fileOpenCallback(const fs::path& path) {
     } else if (FileFormat::IsTextureFile(path)) {
     }
 
-    LOG_DEBUG << "File opened: \"" << virtualPath << "\"";
+    LOG_DEBUG << "File opened: \"" << filepath << "\"";
 }
 
 void Editor::projectOpenCallback(const fs::path& path) {
@@ -856,4 +868,18 @@ EditorPanel* Editor::getPanel(const std::string& name) {
         }
     }
     return nullptr;
+}
+
+void Editor::focusCamera(const glm::vec3& point, float distance, float speed) {
+    if (editorCamera->isOrthographic()) {
+        editorCamera->setEyePoint(point);
+        // editorCamera->setScale(distance * 0.5f);
+    } else {
+        transitioningCamera = true;
+
+        cameraDestination = point + editorCamera->getForwardDirection() * distance;
+        cameraTransitionStartTime = -1.0f;
+        cameraTransitionSpeed = 1.0f / speed;
+        cameraStartPosition = editorCamera->getEyePoint();
+    }
 }

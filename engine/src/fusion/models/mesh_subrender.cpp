@@ -11,9 +11,11 @@ static const uint32_t MAX_LIGHTS = 32; // TODO: Make configurable.
 
 MeshSubrender::MeshSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"engine/assets/shaders/simple/simple.vert", "engine/assets/shaders/simple/simple.frag"}, {{{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}}}, {},
+        , pipeline{pipelineStage, {"engine/assets/shaders/simple/simple.vert", "engine/assets/shaders/simple/simple.frag"}, {{{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::UV}}}, {},
                    PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::ReadWrite, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_FRONT_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE}
         , descriptorSet{pipeline} {
+    unknownDiffuse = std::make_unique<Texture2d>("engine/assets/textures/container2.png");
+    unknownSpecular = std::make_unique<Texture2d>("engine/assets/textures/container_specular.png");
 }
 
 void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
@@ -26,17 +28,28 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
         return;
 
     // Updates uniforms.
-    std::vector<PointLight> pointsLights(MAX_LIGHTS);
+    std::vector<Light> lights(MAX_LIGHTS);
     uint32_t lightCount = 0;
 
     auto lightView = scene->getRegistry().view<TransformComponent, LightComponent>();
 
     for (const auto& [entity, transform, light] : lightView.each()) {
-        PointLight pointsLight = {};
-        pointsLight.color = light.color;
+        Light pointsLight = {};
         pointsLight.position = transform.getWorldPosition();
-        pointsLight.radius = light.radius;
-        pointsLights[lightCount] = pointsLight;
+        if (light.type != LightComponent::LightType::Point) {
+            pointsLight.direction = transform.getWorldUpDirection();
+        }
+        if (light.type == LightComponent::LightType::Spot) {
+            pointsLight.cutOff = light.cutOff;
+            pointsLight.outerCutOff = light.outerCutOff;
+        }
+        pointsLight.ambient = light.ambient;
+        pointsLight.diffuse = light.diffuse;
+        pointsLight.specular = light.specular;
+        pointsLight.constant = light.constant;
+        pointsLight.linear = light.linear;
+        pointsLight.quadratic = light.quadratic;
+        lights[lightCount] = pointsLight;
         lightCount++;
 
         if (lightCount >= MAX_LIGHTS)
@@ -44,7 +57,7 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
     }
 
     // Updates storage buffers.
-    storageLights.push(pointsLights.data(), sizeof(PointLight) * MAX_LIGHTS);
+    storageLights.push(lights.data(), sizeof(Light) * MAX_LIGHTS);
     descriptorSet.push("BufferLights", storageLights);
 
     // Update uniforms
@@ -54,6 +67,8 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
     uniformObject.push("lightsCount", lightCount);
     uniformObject.push("ambientLightColor", glm::vec4{1.0f, 1.0f, 1.0f, 0.02f});
     descriptorSet.push("UniformObject", uniformObject);
+    descriptorSet.push("samplerDiffuse", unknownDiffuse.get());
+    descriptorSet.push("samplerSpecular", unknownSpecular.get());
     //descriptorSet.push("PushObject", pushObject);
 
     if (!descriptorSet.update(pipeline))

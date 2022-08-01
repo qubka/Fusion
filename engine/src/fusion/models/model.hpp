@@ -25,7 +25,7 @@ namespace fe {
     class Model : public Asset {
     public:
         // aiProcess_Triangulate by default
-        explicit Model(const fs::path& filepath, uint32_t defaultFlags = 0, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Color}});
+        explicit Model(const fs::path& filepath, uint32_t defaultFlags = 0, const Vertex::Layout& layout = {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::UV}});
 
         type_index getType() const override { return type_id<Model>; }
 

@@ -7,8 +7,7 @@ layout (location = 0) out vec4 outColor;
 
 layout (push_constant) uniform PushObject {
     vec4 color;
-    vec3 position;
-    float radius;
+    vec4 position;
 } push;
 
 const float M_PI = 3.1415926538;

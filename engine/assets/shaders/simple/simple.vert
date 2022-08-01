@@ -4,19 +4,17 @@
 
 layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 inNormal;
-layout (location = 2) in vec3 inColor;
-//layout (location = 3) in vec2 inUV;
+layout (location = 2) in vec2 inUV;
 
-layout (location = 0) out vec3 outColor;
-layout (location = 1) out vec3 outPosition;
-layout (location = 2) out vec3 outNormal;
+layout (location = 0) out vec3 outPosition;
+layout (location = 1) out vec3 outNormal;
+layout (location = 2) out vec2 outUV;
 
 layout (binding = 0) uniform UniformObject {
     mat4 projection;
     mat4 view;
     vec3 cameraPos;
     uint lightsCount;
-    vec4 ambientLightColor;
 } ubo;
 
 layout (push_constant) uniform PushObject {
@@ -27,7 +25,7 @@ layout (push_constant) uniform PushObject {
 void main() {
     vec4 worldPosition = push.model * vec4(inPosition, 1.0);
     gl_Position = ubo.projection * ubo.view * worldPosition;
-    outNormal = normalize(mat3(push.normal) * inNormal);
+    outNormal = mat3(push.normal) * inNormal;
     outPosition = worldPosition.xyz;
-    outColor = inColor;
+    outUV = inUV;
 }

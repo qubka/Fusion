@@ -57,7 +57,7 @@ namespace fe {
         //glm::vec3 inverseTransformPoint(const glm::vec3& point);
         //glm::vec3 inverseTransformDirection(const glm::vec3& direction);
 
-    private:
+    protected:
         void calcMatrices() const;
         void applyTransform();
 
