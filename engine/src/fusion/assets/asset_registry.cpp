@@ -1,14 +1,10 @@
 #include "asset_registry.hpp"
 
-#include "fusion/filesystem/virtual_file_system.hpp"
+#include "fusion/core/engine.hpp"
 
 using namespace fe;
 
 #define BIND_FILECHANGE_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
-
-void AssetRegistry::add(const std::shared_ptr<Asset>& asset, const fs::path& filepath) {
-    assets[asset->getType()].emplace(filepath, asset);
-}
 
 void AssetRegistry::remove(const std::shared_ptr<Asset>& asset) {
     if (auto it = assets.find(asset->getType()); it != assets.end()) {
@@ -21,19 +17,18 @@ void AssetRegistry::remove(const std::shared_ptr<Asset>& asset) {
 }
 
 void AssetRegistry::onUpdate() {
-    if (fileWatcher) {
-        if (fileWatcher->getWatchPath() != VirtualFileSystem::Get()->resolvePhysicalPath("Assets")) {
+    /*if (fileWatcher) {
+        if (fileWatcher->getWatchPath() != Engine::Get()->getApp()->getRootPath()) {
             fileWatcher.reset();
             return;
         }
         fileWatcher->update();
     } else {
-        fs::path assetPath{ VirtualFileSystem::Get()->resolvePhysicalPath("Assets") };
-        if (!assetPath.empty()) {
-            fileWatcher = std::make_unique<FileWatcher>(assetPath, BIND_FILECHANGE_FN(onFileChanged));
+        auto& rootPath = Engine::Get()->getApp()->getRootPath();
+        if (!rootPath.empty()) {
+            fileWatcher = std::make_unique<FileWatcher>(rootPath, BIND_FILECHANGE_FN(onFileChanged));
         }
-    }
-
+    }*/
 
     /*if (elapsedPurge.getElapsed() != 0) {
         for (auto it = assets.begin(); it != assets.end();) {
@@ -56,11 +51,6 @@ void AssetRegistry::onUpdate() {
 }
 
 void AssetRegistry::onFileChanged(const fs::path& path, FileStatus status) {
-    // Process only regular files, all other file types are ignored
-    /*if (!fs::is_regular_file(path)) {
-        return;
-    }*/
-
     switch(status) {
         case FileStatus::Created:
             LOG_DEBUG << "File created: " << path;
