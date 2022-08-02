@@ -57,6 +57,11 @@ namespace fe {
          */
         virtual void onImGui() = 0;
 
+        /**
+         * Called when app is being swapped and will no longer be rendered/updated.
+         */
+        virtual void onStop() = 0;
+
     private:
         std::string name;
         Version version{ 0, 1, 0, 0 };

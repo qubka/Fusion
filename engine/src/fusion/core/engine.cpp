@@ -48,12 +48,19 @@ void Engine::init() {
     StbToolbox::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
     GliToolbox::Register(".ktx", ".kmg", ".dds");
 
-    sortModules();
+    // Create all registered modules
+    for (const auto& [type, module] : Module::Registry()) {
+        auto index = static_cast<uint32_t>(modules.size());
+        modules.push_back(module.create());
+        stages[module.stage].push_back(index);
+        LOG_DEBUG << "Module: \"" << module.name << "\" was registered for the \"" << me::enum_name(module.stage) << "\" stage";
+    }
 }
 
 int32_t Engine::run() {
     try {
         init();
+        startup();
         running = true;
         while (running) {
             // Pre-Update
@@ -62,7 +69,10 @@ int32_t Engine::run() {
             // Main application and devices processing
             devices->onUpdate();
             if (application) {
-                startup();
+                if (!application->started) {
+                    application->onStart();
+                    application->started = true;
+                }
                 application->onUpdate();
             }
 
@@ -73,6 +83,7 @@ int32_t Engine::run() {
             // Render-Update
             updateStage(Module::Stage::Render);
         }
+        shutdown();
     }
     catch (std::exception& e) {
         LOG_FATAL << e.what();
@@ -82,44 +93,34 @@ int32_t Engine::run() {
 }
 
 void Engine::startup() {
-    if (!application->started) {
+    if (application && !application->started) {
         application->onStart();
         application->started = true;
+    }
 
-        for (auto& [type, module] : modules) {
-            if (!module->started) {
-                module->onStart();
-                module->started = true;
-            }
+    for (auto& module : modules) {
+        if (!module->started) {
+            module->onStart();
+            module->started = true;
+        }
+    }
+}
+
+void Engine::shutdown() {
+    if (application && application->started) {
+        application->started = false;
+        application->onStop();
+    }
+
+    for (auto& module : modules) {
+        if (module->started) {
+            module->started = false;
+            module->onStop();
         }
     }
 }
 
 void Engine::updateStage(Module::Stage stage) {
-    for (const auto& module : stages[stage])
-        modules[module]->onUpdate();
-}
-
-void Engine::sortModules() {
-    // Use the table to sort the modules for each stage depending on the number of mentions
-    // in the list of requirements specified in the registration of each module
-    std::unordered_map<Module::Stage, std::unordered_map<type_index, uint32_t>> dependencies;
-
-    // Create all registered modules
-    for (const auto& [type, module] : Module::Registry()) {
-        modules.emplace(type, module.create());
-        stages[module.stage].push_back(type);
-        for (const auto& require: module.requires) {
-            dependencies[module.stage][require]++;
-        }
-        LOG_DEBUG << "Module: \"" << module.name << "\" was registered for the \"" << me::enum_name(module.stage) << "\" stage";
-    }
-
-    // Sort by dependency count
-    for (auto& [stage, mods] : stages) {
-        auto& deps = dependencies[stage];
-        std::sort(mods.begin(), mods.end(), [&deps](const auto& a, const auto& b) {
-            return deps[a] > deps[b];
-        });
-    }
+    for (auto index : stages[stage])
+        modules[index]->onUpdate();
 }

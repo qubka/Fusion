@@ -51,126 +51,137 @@ Camera::Camera(float aspect, float near, float far)
     lookAt(glm::vec3{28, 21, 28}, vec3::zero, vec3::up);
 }
 
-void Camera::setFov(float fov) {
+bool Camera::setFov(float fov) {
     if (glm::epsilonEqual(fovDegrees, fov, FLT_EPSILON))
-        return;
+        return false;
 
     fovDegrees = fov;
     dirtyProjection();
+    return true;
 }
 
-void Camera::setFovHorizontal(float fov) {
+bool Camera::setFovHorizontal(float fov) {
     fov = glm::degrees(2.0f * std::atan(std::tan(glm::radians(fov) * 0.5f) / aspectRatio));
     if (glm::epsilonEqual(fovDegrees, fov, FLT_EPSILON))
-        return;
+        return false;
 
     fovDegrees = fov;
     dirtyProjection();
+    return true;
 }
 
-void Camera::setAspectRatio(float aspect) {
+bool Camera::setAspectRatio(float aspect) {
     if (glm::epsilonEqual(aspectRatio, aspect, FLT_EPSILON))
-        return;
+        return false;
 
     aspectRatio = aspect;
     dirtyProjection();
+    return true;
 }
 
-void Camera::setNearClip(float near) {
+bool Camera::setNearClip(float near) {
     if (glm::epsilonEqual(nearClip, near, FLT_EPSILON))
-        return;
+        return false;
 
     nearClip = near;
     dirtyProjection();
+    return true;
 }
 
-void Camera::setFarClip(float far) {
+bool Camera::setFarClip(float far) {
     if (glm::epsilonEqual(farClip, far, FLT_EPSILON))
-        return;
+        return false;
 
     farClip = far;
     dirtyProjection();
+    return true;
 }
 
-
-void Camera::setScale(float scalar) {
+bool Camera::setScale(float scalar) {
     if (glm::epsilonEqual(scale, scalar, FLT_EPSILON))
-        return;
+        return false;
 
     scale = scalar;
 
     if (orthographic)
         dirtyProjection();
+    return true;
 }
 
-void Camera::setEyePoint(const glm::vec3& point) {
+bool Camera::setEyePoint(const glm::vec3& point) {
     if (glm::all(glm::epsilonEqual(eyePoint, point, FLT_EPSILON)))
-        return;
+        return false;
 
     eyePoint = point;
     dirtyView();
+    return true;
 }
 
-void Camera::setViewDirection(glm::vec3 direction) {
+bool Camera::setViewDirection(glm::vec3 direction) {
     direction = glm::normalize(direction);
     if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)))
-        return;
+        return false;
 
     viewDirection = direction;
     orientation = glm::rotation(viewDirection, vec3::forward);
     dirtyView();
+    return true;
 }
 
-void Camera::setOrientation(glm::quat rotation) {
+bool Camera::setOrientation(glm::quat rotation) {
     rotation = glm::normalize(rotation);
     if (glm::all(glm::epsilonEqual(orientation, rotation, FLT_EPSILON)))
-        return;
+        return false;
 
     orientation = rotation;
     viewDirection = orientation * vec3::forward;
     dirtyView();
+    return true;
 }
 
-void Camera::setWorldUp(glm::vec3 up) {
+bool Camera::setWorldUp(glm::vec3 up) {
     up = glm::normalize(up);
     if (glm::all(glm::epsilonEqual(worldUp, up, FLT_EPSILON)))
-        return;
+        return false;
 
     worldUp = up;
     orientation = glm::toQuat(glm::alignZAxisWithTarget(viewDirection, worldUp));
     dirtyView();
+    return true;
 }
 
-void Camera::setOrthographic(bool flag) {
+bool Camera::setOrthographic(bool flag) {
     if (orthographic == flag)
-        return;
+        return false;
 
     orthographic = flag;
 
     //dirtyView();
     dirtyProjection();
+    return true;
 }
 
-void Camera::lookAt(glm::vec3 target) {
+bool Camera::lookAt(glm::vec3 target) {
     target -= eyePoint; // ray from target to eye
 
     glm::vec3 direction = glm::normalize(target);
     if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)))
-        return;
+        return false;
 
     viewDirection = direction;
     orientation = glm::toQuat(alignZAxisWithTarget(viewDirection, worldUp));
     pivotDistance = glm::length(target);
 
     dirtyView();
+    return true;
 }
 
-void Camera::lookAt(const glm::vec3& point, glm::vec3 target) {
+bool Camera::lookAt(const glm::vec3& point, glm::vec3 target) {
     target -= point; // ray from target to eye
 
     glm::vec3 direction = glm::normalize(target);
     if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)) && glm::all(glm::epsilonEqual(eyePoint, point, FLT_EPSILON)))
-        return;
+        return false;
 
     eyePoint = point;
     viewDirection = direction;
@@ -178,15 +189,16 @@ void Camera::lookAt(const glm::vec3& point, glm::vec3 target) {
     pivotDistance = glm::length(target);
 
     dirtyView();
+    return true;
 }
 
-void Camera::lookAt(const glm::vec3& point, glm::vec3 target, glm::vec3 up) {
+bool Camera::lookAt(const glm::vec3& point, glm::vec3 target, glm::vec3 up) {
     target -= point; // ray from target to eye
     up = glm::normalize(up);
 
     glm::vec3 direction = glm::normalize(target);
     if (glm::all(glm::epsilonEqual(viewDirection, direction, FLT_EPSILON)) && glm::all(glm::epsilonEqual(eyePoint, point, FLT_EPSILON)) && glm::all(glm::epsilonEqual(worldUp, up, FLT_EPSILON)))
-        return;
+        return false;
 
     eyePoint = point;
     worldUp = up;
@@ -195,6 +207,7 @@ void Camera::lookAt(const glm::vec3& point, glm::vec3 target, glm::vec3 up) {
     pivotDistance = glm::length(target);
 
     dirtyView();
+    return true;
 }
 
 glm::vec2 Camera::worldToScreen(const glm::vec3& worldCoord, const glm::vec2& screenSize) const {

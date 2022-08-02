@@ -87,14 +87,14 @@ namespace fe {
         void startup();
 
         /**
+         * The shutdown function for the application and modules.
+         */
+        void shutdown();
+
+        /**
          * The update engine modules for the required stage.
          */
         void updateStage(Module::Stage stage);
-
-        /**
-         * Sort engine modules on the initialization.
-         */
-         void sortModules();
 
         CommandLineArgs commandLineArgs;
         CommandLineParser commandLineParser;
@@ -104,8 +104,8 @@ namespace fe {
         std::unique_ptr<Application> application;
         std::unique_ptr<DeviceManager> devices;
 
-        std::unordered_map<type_index, std::unique_ptr<Module>> modules;
-        std::unordered_map<Module::Stage, std::vector<type_index>> stages;
+        std::vector<std::unique_ptr<Module>> modules;
+        std::unordered_map<Module::Stage, std::vector<uint32_t>> stages;
 
         bool running{ false };
 

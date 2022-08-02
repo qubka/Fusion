@@ -16,34 +16,34 @@ namespace fe {
         //! Returns the position in world-space from which the Camera is viewing
         glm::vec3 getEyePoint() const { return eyePoint; }
         //! Sets the position in world-space from which the Camera is viewing
-        void setEyePoint(const glm::vec3& eyePoint);
+        bool setEyePoint(const glm::vec3& eyePoint);
 
         //! Returns the vector in world-space which represents "up" - typically glm::vec3( 0, 1, 0 )
         glm::vec3 getWorldUp() const { return worldUp; }
         //! Sets the vector in world-space which represents "up" - typically glm::vec3( 0, 1, 0 )
-        void setWorldUp(glm::vec3 worldUp);
+        bool setWorldUp(glm::vec3 worldUp);
 
         //! Modifies the view direction to look from the current eyePoint to \a target. Also updates the pivot distance.
-        void lookAt(glm::vec3 target);
+        bool lookAt(glm::vec3 target);
         //! Modifies the eyePoint and view direction to look from \a eyePoint to \a target. Also updates the pivot distance.
-        void lookAt(const glm::vec3& eyePoint, glm::vec3 target);
+        bool lookAt(const glm::vec3& eyePoint, glm::vec3 target);
         //! Modifies the eyePoint and view direction to look from \a eyePoint to \a target with up vector \a up (to achieve camera roll). Also updates the pivot distance.
-        void lookAt(const glm::vec3& eyePoint, glm::vec3 target, glm::vec3 up);
+        bool lookAt(const glm::vec3& eyePoint, glm::vec3 target, glm::vec3 up);
 
         //! Returns the world-space vector along which the camera is oriented
         const glm::vec3& getViewDirection() const { return viewDirection; }
         //! Sets the world-space vector along which the camera is oriented
-        void setViewDirection(glm::vec3 viewDirection);
+        bool setViewDirection(glm::vec3 viewDirection);
 
         //! Returns the world-space glm::quaternion that expresses the camera's orientation
         const glm::quat& getOrientation() const { return orientation; }
         //! Sets the camera's orientation with world-space glm::quaternion \a orientation
-        void setOrientation(glm::quat orientation);
+        bool setOrientation(glm::quat orientation);
 
         //! Returns whether the camera represents an orthographic projection instead of an perspective
         bool isOrthographic() const { return orthographic; }
         //! Switch the camera mode to orthographic projection
-        void setOrthographic(bool flag);
+        bool setOrthographic(bool flag);
 
         //! Returns the camera's focal length, calculating it based on the field of view.
         float getFocalLength() const { return 1.0f / (glm::tan(glm::radians(fovDegrees) * 0.5f) * 2.0f); } /// @link http://paulbourke.net/miscellaneous/lens/
@@ -70,32 +70,32 @@ namespace fe {
         //! Returns the camera's vertical field of view measured in degrees.
         float getFov() const { return fovDegrees; }
         //! Sets the camera's vertical field of view measured in degrees.
-        void setFov(float value);
+        bool setFov(float value);
 
         //! Returns the camera's horizontal field of view measured in degrees.
         float getFovHorizontal() const { return glm::degrees(2.0f * std::atan(std::tan(glm::radians(fovDegrees) * 0.5f) * aspectRatio)); }
         //! Sets the camera's horizontal field of view measured in degrees.
-        void setFovHorizontal(float value);
+        bool setFovHorizontal(float value);
 
         //! Returns the aspect ratio of the image plane - its width divided by its height
         float getAspectRatio() const { return aspectRatio; }
         //! Sets the aspect ratio of the image plane - its width divided by its height
-        void setAspectRatio(float value);
+        bool setAspectRatio(float value);
 
         //! Returns the distance along the view direction to the Near clipping plane.
         float getNearClip() const { return nearClip; }
         //! Sets the distance along the view direction to the Near clipping plane.
-        void setNearClip(float value);
+        bool setNearClip(float value);
 
         //! Returns the distance along the view direction to the Far clipping plane.
         float getFarClip() const { return farClip; }
         //! Sets the distance along the view direction to the Far clipping plane.
-        void setFarClip(float value);
+        bool setFarClip(float value);
 
         //! Returns the scale distance of the Orthographic projection
         float getScale() const { return scale; }
         //! Sets the scale distance to the Orthographic projection
-        void setScale(float value);
+        bool setScale(float value);
 
         //! Converts a world-space coordinate \a worldCoord to screen coordinates as viewed by the camera, based on a screen which is \a screen.width x \a screen.height pixels.
         glm::vec2 worldToScreen(const glm::vec3& worldCoord, const glm::vec2& screenSize) const;

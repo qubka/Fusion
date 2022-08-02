@@ -106,12 +106,11 @@ namespace fe {
 
         EditorCameraController editorCameraController;
         std::shared_ptr<Camera> editorCamera;
-        float currentSceneAspectRatio{ 0.0f };
-        float cameraTransitionStartTime{ 0.0f };
-        float cameraTransitionSpeed{ 0.0f };
+        //float currentSceneAspectRatio{ 0.0f };
         bool transitioningCamera{ false };
         glm::vec3 cameraDestination{ 0.0f };
-        glm::vec3 cameraStartPosition{ 0.0f };
+        glm::vec3 cameraVelocity{ 0.0f };
+        float cameraTransitionMaxSpeed{ 0.0f };
 
         std::queue<std::string> mementos;
         FileBrowserPanel fileBrowserPanel{ this };

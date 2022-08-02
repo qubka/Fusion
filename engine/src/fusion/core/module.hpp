@@ -11,7 +11,6 @@ namespace fe {
             std::function<std::unique_ptr<Base>()> create;
             std::string_view name;
             typename Base::Stage stage;
-            std::vector<type_index> requires;
         };
         using TRegistryMap = std::unordered_map<type_index, TCreateValue>;
 
@@ -22,17 +21,6 @@ namespace fe {
             static TRegistryMap map;
             return map;
         }
-
-        template<typename ... Args>
-        class Requires {
-        public:
-            std::vector<type_index> get() const {
-                std::vector<type_index> requires;
-                requires.reserve(sizeof...(Args));
-                (requires.emplace_back(type_id<Args>), ...);
-                return requires;
-            }
-        };
 
         template<typename T>
         class Registrar : public Base {
@@ -50,11 +38,11 @@ namespace fe {
              * @return A dummy value in static initialization.
              */
             template<typename ... Args>
-            static bool Register(std::string_view name, typename Base::Stage stage, Requires<Args...>&& requires = {}) {
+            static bool Register(std::string_view name, typename Base::Stage stage) {
                 ModuleFactory::Registry()[type_id<T>] = { []() {
                         ModuleInstance = new T();
                         return std::unique_ptr<Base>(ModuleInstance);
-                    }, name, stage, requires.get()
+                    }, name, stage
                 };
                 return true;
             }
@@ -89,6 +77,11 @@ namespace fe {
          * The update function for the module.
          */
         virtual void onUpdate() {};
+
+        /**
+         * The stop function for the module.
+         */
+        virtual void onStop() {};
 
     private:
         bool started{ false };

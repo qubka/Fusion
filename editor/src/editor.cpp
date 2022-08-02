@@ -86,26 +86,18 @@ void Editor::onUpdate() {
             auto& registry = scene->getRegistry();
             if (registry.valid(selectedEntity)) {
                 if (auto transform = registry.try_get<TransformComponent>(selectedEntity))
-                    focusCamera(transform->getWorldPosition(), 2.0f, 2.0f);
+                    focusCamera(transform->getWorldPosition(), 5.0f, 0.2f);
             }
         }
 
         if (input->getKey(Key::O)) {
-            focusCamera(vec3::zero, 2.0f, 2.0f);
+            focusCamera(vec3::zero, 5.0f, 0.2f);
         }
 
         if (transitioningCamera) {
-            float ts = Time::DeltaTime().asSeconds();
-
-            if (cameraTransitionStartTime < 0.0f)
-                cameraTransitionStartTime = ts;
-
-            float focusProgress = std::min((ts - cameraTransitionStartTime) / cameraTransitionSpeed, 1.f);
-            glm::vec3 newCameraPosition = glm::mix(cameraStartPosition, cameraDestination, focusProgress);
-            editorCamera->setEyePoint(newCameraPosition);
-
-            if (editorCamera->getEyePoint() == cameraDestination)
-                transitioningCamera = false;
+            transitioningCamera = editorCamera->setEyePoint(glm::smoothdamp(editorCamera->getEyePoint(), cameraDestination, cameraVelocity, 0.3f, cameraTransitionMaxSpeed, Time::DeltaTime().asSeconds()));
+        } else {
+            cameraVelocity = vec3::zero;
         }
 
         if (!input->getMouseButton(MouseButton::ButtonRight) && !ImGuizmo::IsUsing()) {
@@ -877,9 +869,7 @@ void Editor::focusCamera(const glm::vec3& point, float distance, float speed) {
     } else {
         transitioningCamera = true;
 
-        cameraDestination = point + editorCamera->getForwardDirection() * distance;
-        cameraTransitionStartTime = -1.0f;
-        cameraTransitionSpeed = 1.0f / speed;
-        cameraStartPosition = editorCamera->getEyePoint();
+        cameraDestination = point - editorCamera->getForwardDirection() * distance;
+        cameraTransitionMaxSpeed = speed;
     }
 }
