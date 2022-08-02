@@ -30,6 +30,7 @@ namespace fe {
         void onStart() override;
         void onUpdate() override {};
         void onImGui() override {};
+        void onStop() override {};
 
     public:
         void openNewProject(const fs::path& path, std::string_view name = "New Project");

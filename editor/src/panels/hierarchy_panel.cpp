@@ -376,7 +376,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             doubleClicked = node;
             if (editor->getState() == EditorState::Preview) {
                 if (auto transform = registry.try_get<TransformComponent>(node))
-                    editor->focusCamera(transform->getWorldPosition(), 2.0f, 2.0f);
+                    editor->focusCamera(transform->getWorldPosition(), 5.0f, 0.2f);
                 // TODO: Implement
             }
         }
