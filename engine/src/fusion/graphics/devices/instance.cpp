@@ -234,7 +234,7 @@ void Instance::createDebugMessenger() {
 		enableValidationLayers = false;
 		LOG_ERROR << "Extension vkCreateDebugReportCallbackEXT not present!";
 	} else {
-		VK_RESULT(debugReportResult);
+        VK_CHECK_RESULT(debugReportResult);
 	}
 #endif
 }

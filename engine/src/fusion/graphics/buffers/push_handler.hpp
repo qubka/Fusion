@@ -21,20 +21,16 @@ namespace fe {
 
         template<typename T>
         void push(const std::string& uniformName, const T& object, size_t size = 0) {
-            if (!uniformBlock) {
+            if (!uniformBlock)
                 return;
-            }
 
             auto uniform = uniformBlock->getUniform(uniformName);
-            if (!uniform) {
+            if (!uniform)
                 return;
-            }
 
             auto realSize = size;
-
-            if (realSize == 0) {
+            if (realSize == 0)
                 realSize = std::min(sizeof(object), static_cast<size_t>(uniform->getSize()));
-            }
 
             push(object, static_cast<size_t>(uniform->getOffset()), realSize);
         }

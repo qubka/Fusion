@@ -139,6 +139,14 @@ namespace fe {
         TextureType getTextureType() const { return textureType; }
         void settTextureType(TextureType type) { textureType = type; }
 
+        void transitionImage(VkImageLayout newLayout, VkCommandBuffer commandBuffer) {
+            if (newLayout != layout) {
+                TransitionImageLayout(commandBuffer, image, format, layout, newLayout, aspect, mipLevels, 0, arrayLayers, 0);
+                layout = newLayout;
+                updateDescriptor();
+            }
+        }
+
         /** @brief Update image descriptor from current sampler, view and image layout */
         void updateDescriptor() {
             descriptor.sampler = sampler;
