@@ -14,7 +14,6 @@ namespace fe {
 	 * @param type The attachment type this represents.
 	 * @param multisampled If this attachment is multisampled.
 	 * @param format The format that will be created (only applies to type ATTACHMENT_IMAGE).
-	 * @param layout The layout that the image subresources accessible from (only applies to type ATTACHMENT_IMAGE).
 	 * @param clearColour The colour to clear to before rendering to it.
 	 */
     struct Attachment {
@@ -24,7 +23,6 @@ namespace fe {
         Type type{ Type:: Image };
         bool multisampled{ false };
         VkFormat format{ VK_FORMAT_R8G8B8A8_UNORM };
-        VkImageLayout layout{ VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
         glm::vec4 clearColor{ 0.0f, 0.0f, 0.0f, 1.0f };
     };
 

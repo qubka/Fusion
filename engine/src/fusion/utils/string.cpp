@@ -136,7 +136,6 @@ std::string String::ReplaceFirst(std::string str, std::string_view token, std::s
     const auto startPos = str.find(token);
     if (startPos == std::string::npos)
         return str;
-
     str.replace(startPos, token.length(), to);
     return str;
 }

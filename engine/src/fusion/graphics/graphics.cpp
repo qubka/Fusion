@@ -256,12 +256,12 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     // Check if source is BGR
     // Note: Not complete, only contains most common and basic BGR surface formats for demonstration purposes
     if (!supportsBlit) {
-        static const std::vector<VkFormat> BGR_FORMATS = {
-                VK_FORMAT_B8G8R8A8_SRGB,
-                VK_FORMAT_B8G8R8A8_UNORM,
-                VK_FORMAT_B8G8R8A8_SNORM
-        };
-        colorSwizzle = std::find(BGR_FORMATS.begin(), BGR_FORMATS.end(), format) != BGR_FORMATS.end();
+        switch(format) {
+            case VK_FORMAT_B8G8R8A8_SRGB:
+            case VK_FORMAT_B8G8R8A8_UNORM:
+            case VK_FORMAT_B8G8R8A8_SNORM:
+                colorSwizzle = true;
+        }
     }
 
     void* data;

@@ -2,7 +2,6 @@
 
 #include "fusion/core/engine.hpp"
 #include "fusion/assets/asset_registry.hpp"
-#include "fusion/graphics/textures/texture2d.hpp"
 
 #include <assimp/Importer.hpp>
 #include <assimp/Exporter.hpp>
@@ -15,8 +14,8 @@ using namespace fe;
 static inline const glm::vec3& vec3_cast(const aiVector3D& v) { return *reinterpret_cast<const glm::vec3*>(&v); }
 static inline const glm::vec2& vec2_cast(const aiVector3D& v) { return *reinterpret_cast<const glm::vec2*>(&v); }
 static inline const glm::quat& quat_cast(const aiQuaternion& q) { return *reinterpret_cast<const glm::quat*>(&q); }
-static inline glm::mat4 mat4_cast(const aiMatrix4x4 &m) { return glm::transpose(glm::make_mat4(&m.a1)); }
-static inline glm::mat4 mat4_cast(const aiMatrix3x3 &m) { return glm::transpose(glm::make_mat3(&m.a1)); }
+static inline glm::mat4 mat4_cast(const aiMatrix4x4& m) { return glm::transpose(glm::make_mat4(&m.a1)); }
+static inline glm::mat4 mat4_cast(const aiMatrix3x3& m) { return glm::transpose(glm::make_mat3(&m.a1)); }
 
 Model::Model(const fs::path& filepath, uint32_t defaultFlags, const Vertex::Layout& layout) : layout{layout} {
     fs::path modelPath{ Engine::Get()->getApp()->getRootPath() / filepath };
@@ -24,6 +23,9 @@ Model::Model(const fs::path& filepath, uint32_t defaultFlags, const Vertex::Layo
     defaultFlags |= aiProcess_Triangulate;
     if (layout.contains(Vertex::Component::Normal)) {
         defaultFlags |= aiProcess_GenSmoothNormals;
+    }
+    if (layout.contains(Vertex::Component::UV)) {
+        defaultFlags |= aiProcess_GenUVCoords | aiProcess_FlipUVs;
     }
     if (layout.contains(Vertex::Component::Tangent) || layout.contains(Vertex::Component::Bitangent)) {
         defaultFlags |= aiProcess_CalcTangentSpace;
@@ -171,16 +173,19 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, std::shared_
     return textures;
 }*/
 
-void Model::appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t i) {
-    aiVector3D zero{0.0f, 0.0f, 0.0f};
-    aiColor3D color{0.0f, 0.0f, 0.0f};
-    scene->mMaterials[mesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+static aiVector3D zero{0.0f, 0.0f, 0.0f};
 
-    const aiVector3D& pos = mesh->mVertices[i];
-    const aiVector3D& normal = mesh->mNormals[i];
-    const aiVector3D& texCoord = mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][i] : zero;
-    const aiVector3D& tangent = mesh->HasTangentsAndBitangents() ? mesh->mTangents[i] : zero;
-    const aiVector3D& biTangent = mesh->HasTangentsAndBitangents() ? mesh->mBitangents[i] : zero;
+const aiVector3D& getTextureCoord(const aiMesh* mesh, uint32_t texture, uint32_t i) {
+    for (uint32_t j = texture; j != -1; j--) {
+        if (mesh->HasTextureCoords(j)) {
+            return mesh->mTextureCoords[j][i];
+        }
+    }
+    return zero;
+}
+
+void Model::appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t i) {
+    uint32_t texture = 0;
 
     // preallocate float buffer with approximate size
     std::vector<float> vertexBuffer;
@@ -189,40 +194,68 @@ void Model::appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* sc
     using Component = Vertex::Component;
     for (const auto& component : layout) {
         switch (component) {
-            case Component::Position2:
+            case Component::Position2: {
+                const aiVector3D& pos = mesh->mVertices[i];
                 vertexBuffer.push_back(pos.x);
                 vertexBuffer.push_back(pos.y);
                 break;
-            case Component::Position:
+            }
+            case Component::Position: {
+                const aiVector3D& pos = mesh->mVertices[i];
                 vertexBuffer.push_back(pos.x);
                 vertexBuffer.push_back(pos.y);
                 vertexBuffer.push_back(pos.z);
                 break;
-            case Component::Normal:
+            }
+            case Component::Normal: {
+                const aiVector3D& normal = mesh->mNormals[i];
                 vertexBuffer.push_back(normal.x);
                 vertexBuffer.push_back(normal.y);
                 vertexBuffer.push_back(normal.z);
                 break;
-            case Component::UV:
-                vertexBuffer.push_back(texCoord.x);
-                vertexBuffer.push_back(texCoord.y);
-                break;
-            case Component::Color:
-                vertexBuffer.push_back(color.r);
-                vertexBuffer.push_back(color.g);
-                vertexBuffer.push_back(color.b);
-                break;
-            case Component::Tangent:
+            }
+            case Component::Tangent: {
+                const aiVector3D& tangent = mesh->HasTangentsAndBitangents() ? mesh->mTangents[i] : zero;
                 vertexBuffer.push_back(tangent.x);
                 vertexBuffer.push_back(tangent.y);
                 vertexBuffer.push_back(tangent.z);
                 break;
-            case Component::Bitangent:
+            }
+            case Component::Bitangent: {
+                const aiVector3D& biTangent = mesh->HasTangentsAndBitangents() ? mesh->mBitangents[i] : zero;
                 vertexBuffer.push_back(biTangent.x);
                 vertexBuffer.push_back(biTangent.y);
                 vertexBuffer.push_back(biTangent.z);
                 break;
-                // Dummy components for padding
+            }
+            case Component::UV: {
+                const aiVector3D& texCoord = getTextureCoord(mesh, texture, i);
+                vertexBuffer.push_back(texCoord.x);
+                vertexBuffer.push_back(texCoord.y);
+                //texture++;
+                break;
+            }
+            case Component::Color: {
+                aiColor3D color{0.0f, 0.0f, 0.0f};
+                scene->mMaterials[mesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+                vertexBuffer.push_back(color.r);
+                vertexBuffer.push_back(color.g);
+                vertexBuffer.push_back(color.b);
+                break;
+            }
+            case Component::RGBA: {
+                aiColor3D color{0.0f, 0.0f, 0.0f};
+                scene->mMaterials[mesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+                uint32_t result =
+                        (static_cast<uint32_t>(255) << 24) |
+                        (static_cast<uint32_t>(color.b * 255) << 16) |
+                        (static_cast<uint32_t>(color.g * 255) << 8) |
+                        (static_cast<uint32_t>(color.r * 255) << 0);
+                vertexBuffer.push_back(static_cast<float>(result));
+                break;
+            }
+
+            // Dummy components for padding
             case Component::DummyInt:
             case Component::DummyUint:
             case Component::DummyFloat:
@@ -241,14 +274,6 @@ void Model::appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* sc
             case Component::DummyVec2:
                 vertexBuffer.push_back(0.0f);
                 vertexBuffer.push_back(0.0f);
-                break;
-            case Component::RGBA:
-                uint32_t result =
-                        (static_cast<uint32_t>(255) << 24) |
-                        (static_cast<uint32_t>(color.b * 255) << 16) |
-                        (static_cast<uint32_t>(color.g * 255) << 8)  |
-                        (static_cast<uint32_t>(color.r * 255) << 0);
-                vertexBuffer.push_back(static_cast<float>(result));
                 break;
         };
     }
