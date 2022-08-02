@@ -14,10 +14,10 @@ namespace fe {
         void setWorldMatrix(const glm::mat4& mat);
         void setLocalTransform(const glm::mat4& localMat);
 
-        void setLocalPosition(const glm::vec3& localPos);
-        void setLocalScale(const glm::vec3& localScale);
-        void setLocalOrientation(const glm::quat& rotation);
-        void setLocalOrientation(const glm::vec3& axis, float angle);
+        bool setLocalPosition(const glm::vec3& localPos);
+        bool setLocalScale(const glm::vec3& localScale);
+        bool setLocalOrientation(const glm::quat& rotation);
+        bool setLocalOrientation(const glm::vec3& axis, float angle);
 
         const glm::mat4& getParentMatrix() const { return parentMatrix; }
         const glm::mat4& getWorldMatrix() const;

@@ -90,24 +90,41 @@ void Transform::setLocalTransform(const glm::mat4& localMat) {
     normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
 }
 
-void Transform::setLocalPosition(const glm::vec3& localPos) {
+bool Transform::setLocalPosition(const glm::vec3& localPos) {
+    if (glm::all(glm::epsilonEqual(localPosition, localPos, FLT_EPSILON)))
+        return false;
+
     localPosition = localPos;
     dirty = true;
+    return true;
 }
 
-void Transform::setLocalScale(const glm::vec3& scale) {
+bool Transform::setLocalScale(const glm::vec3& scale) {
+    if (glm::all(glm::epsilonEqual(localScale, scale, FLT_EPSILON)))
+        return false;
+
     localScale = scale;
     dirty = true;
+    return true;
 }
 
-void Transform::setLocalOrientation(const glm::quat& rotation) {
+bool Transform::setLocalOrientation(const glm::quat& rotation) {
+    if (glm::all(glm::epsilonEqual(localOrientation, rotation, FLT_EPSILON)))
+        return false;
+
     localOrientation = rotation;
     dirty = true;
+    return true;
 }
 
-void Transform::setLocalOrientation(const glm::vec3& axis, float angle) {
-    localOrientation = glm::angleAxis(angle, axis);
+bool Transform::setLocalOrientation(const glm::vec3& axis, float angle) {
+    glm::quat orientation{ glm::angleAxis(angle, axis) };
+    if (glm::all(glm::epsilonEqual(localOrientation, orientation, FLT_EPSILON)))
+        return false;
+
+    localOrientation = orientation;
     dirty = true;
+    return true;
 }
 
 glm::vec3 Transform::getWorldUpDirection() const {
