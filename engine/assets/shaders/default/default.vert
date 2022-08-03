@@ -56,6 +56,6 @@ void main() {
     vec4 worldPosition = push.model * position;
     gl_Position = scene.projection * scene.view * worldPosition;
     outPosition = worldPosition.xyz;
-    outNormal = mat3(push.normal) * normalize(normal.xyz);
+    outNormal = normalize(mat3(push.normal) * normal.xyz);
     outUV = inUV;
 }

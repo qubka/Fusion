@@ -37,7 +37,7 @@ layout(location = 3) out vec4 outMaterial;
 
 void main() {
     vec4 diffuse = object.baseDiffuse;
-    vec3 normal = normalize(inNormal);
+    vec3 normal = inNormal;
     vec3 material = vec3(object.metallic, object.roughness, 0.0f);
     float glowing = 0.0f;
 
@@ -63,7 +63,7 @@ void main() {
     vec2 st1 = dFdx(inUV);
     vec2 st2 = dFdy(inUV);
 
-    vec3 N = normalize(inNormal);
+    vec3 N = inNormal;
     vec3 T = normalize(q1 * st2.t - q2 * st1.t);
     vec3 B = -normalize(cross(N, T));
     mat3 TBN = mat3(T, B, N);

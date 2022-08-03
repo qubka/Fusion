@@ -23,13 +23,13 @@ layout (binding = 1) buffer BufferLights {
 } bufferLights;
 
 //layout (binding = 2) uniform sampler2D samplerShadows;
-layout (binding = 3) uniform sampler2D samplerPosition;
-layout (binding = 4) uniform sampler2D samplerDiffuse;
-layout (binding = 5) uniform sampler2D samplerNormal;
-layout (binding = 6) uniform sampler2D samplerMaterial;
-layout (binding = 7) uniform sampler2D samplerBRDF;
-layout (binding = 8) uniform samplerCube samplerIrradiance;
-layout (binding = 9) uniform samplerCube samplerPrefiltered;
+layout (binding = 2) uniform sampler2D samplerPosition;
+layout (binding = 3) uniform sampler2D samplerDiffuse;
+layout (binding = 4) uniform sampler2D samplerNormal;
+layout (binding = 5) uniform sampler2D samplerMaterial;
+layout (binding = 6) uniform sampler2D samplerBRDF;
+layout (binding = 7) uniform samplerCube samplerIrradiance;
+layout (binding = 8) uniform samplerCube samplerPrefiltered;
 
 layout (location = 0) in vec2 inUV;
 

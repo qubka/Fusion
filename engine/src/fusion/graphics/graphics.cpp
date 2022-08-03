@@ -47,6 +47,10 @@ Graphics::~Graphics() {
     renderer = nullptr;
 }
 
+void Graphics::onStop() {
+    VK_CHECK(vkDeviceWaitIdle(logicalDevice));
+}
+
 void Graphics::onUpdate() {
     if (!renderer || DeviceManager::Get()->getWindow(0)->isIconified())
         return;

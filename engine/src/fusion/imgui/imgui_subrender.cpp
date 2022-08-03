@@ -117,6 +117,7 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
             const ImDrawList* cmdLists = drawData->CmdLists[i];
             for (const auto& cmd : cmdLists->CmdBuffer) {
                 if (auto texture = static_cast<Texture*>(cmd.TextureId)) {
+                    //texture->transitionImage(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, commandBuffer);
                     descriptorImageInfos[cmd.TextureId] = &texture->getDescriptor();
                 }
             }

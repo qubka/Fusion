@@ -64,6 +64,7 @@ namespace fe {
 
     private:
         void onUpdate() override;
+        void onStop() override;
 
         struct FrameInfo {
             const size_t& id;
