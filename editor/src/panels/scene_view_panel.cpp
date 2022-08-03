@@ -81,8 +81,8 @@ void SceneViewPanel::onImGui() {
     editor->onImGuizmo();
 
     if (editor->isSceneActive() && Input::Get()->getMouseButton(MouseButton::ButtonLeft)) {
-        Ray ray = camera->screenPointToRay(Input::Get()->getMousePosition() - viewportPos, viewportSize);
-        //editor->selectObject(ray);
+        Ray ray = camera->screenPointToRay(Input::Get()->getMousePosition() - minBound, viewportSize, true);
+        editor->selectObject(ray);
     }
 
     if (ImGui::BeginDragDropTarget()) {

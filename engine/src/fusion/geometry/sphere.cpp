@@ -237,7 +237,3 @@ Sphere Sphere::CalculateBoundingSphere(std::span<const glm::vec3> points) {
 
     return { center, std::sqrt(maxDistance) };
 }
-
-std::ostream& operator<<(std::ostream& o, const Sphere& s) {
-    return o << "(" << glm::to_string(s.getCenter()) << ", " << s.getRadius() << ")";
-}

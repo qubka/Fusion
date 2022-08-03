@@ -22,10 +22,8 @@ namespace fe {
         template<typename T>
         void drawComponentGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset, const char* text) {
             if (showComponentGizmosMap[type_id<T>]) {
-                auto group = registry.group<T>(entt::get<TransformComponent>);
-                for (auto entity : group) {
-                    const auto& [component, transform] = group.template get<T, TransformComponent>(entity);
-
+                auto view = registry.view<T, TransformComponent>();
+                for (const auto& [entity, component, transform] : view.each()) {
                     glm::vec3 pos = transform.getWorldPosition();
                     if (!camera.getFrustum().contains(pos))
                         continue;

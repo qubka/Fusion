@@ -61,18 +61,18 @@ void Scene::clearEntities() {
 }
 
 const Camera* Scene::getCamera() const {
-    auto cameraView = registry.view<CameraComponent>();
-    if (!cameraView.empty()) {
-        return static_cast<const Camera*>(&registry.get<CameraComponent>(cameraView.front()));
+    auto view = registry.view<CameraComponent>();
+    if (!view.empty()) {
+        return static_cast<const Camera*>(&registry.get<CameraComponent>(view.front()));
     } else {
         return nullptr;
     }
 }
 
 entt::entity Scene::getCameraEntity() const {
-    auto cameraView = registry.view<CameraComponent>();
-    if (!cameraView.empty()) {
-        return cameraView.front();
+    auto view = registry.view<CameraComponent>();
+    if (!view.empty()) {
+        return view.front();
     } else {
         return entt::null;
     }
@@ -88,7 +88,7 @@ entt::entity Scene::createEntity(std::string name) {
 
     uint32_t i = 0;
     auto view = registry.view<NameComponent>();
-    for (auto [e, str] : view.each()) {
+    for (const auto& [e, str] : view.each()) {
         if (str.name.find(name) != std::string::npos) {
             i++;
         }

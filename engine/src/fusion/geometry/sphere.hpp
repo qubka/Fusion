@@ -45,5 +45,3 @@ namespace fe {
         float radius;
     };
 }
-
-std::ostream& operator<<(std::ostream& o, const fe::Sphere& s);
