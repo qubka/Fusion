@@ -357,7 +357,7 @@ void ImGuiSubrender::setupStyle() {
     style.TabBorderSize = 1.0f;
     style.TabRounding = roundingAmount; // + 4;
 
-    if(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         style.WindowRounding = roundingAmount;
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }

@@ -51,7 +51,7 @@ void AssetRegistry::onUpdate() {
 }
 
 void AssetRegistry::onFileChanged(const fs::path& path, FileStatus status) {
-    switch(status) {
+    switch (status) {
         case FileStatus::Created:
             LOG_DEBUG << "File created: " << path;
             break;

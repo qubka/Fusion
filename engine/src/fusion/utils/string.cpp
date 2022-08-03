@@ -192,12 +192,12 @@ std::string String::Quoted(const std::string& str) {
 }
 
 std::string String::Demangle(const std::string& str) {
-    if(str.empty())
+    if (str.empty())
         return {};
 
 #if FUSION_PLATFORM_WINDOWS
     char undecorated_name[1024];
-    if(!UnDecorateSymbolName(str.c_str(), undecorated_name, sizeof(undecorated_name), UNDNAME_COMPLETE)) {
+    if (!UnDecorateSymbolName(str.c_str(), undecorated_name, sizeof(undecorated_name), UNDNAME_COMPLETE)) {
         return str;
     } else {
         return std::string{undecorated_name};

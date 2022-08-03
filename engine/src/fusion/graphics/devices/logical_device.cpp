@@ -117,7 +117,7 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
 }
 
 LogicalDevice::~LogicalDevice() {
-	VK_CHECK(vkDeviceWaitIdle(logicalDevice));
+	//VK_CHECK(vkDeviceWaitIdle(logicalDevice));
 
 	vkDestroyDevice(logicalDevice, nullptr);
 }

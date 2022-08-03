@@ -277,7 +277,7 @@ Ray Camera::screenPointToRay(const glm::vec2& screenCoord, const glm::vec2& scre
 }
 
 void Camera::calcProjection() const {
-    if(orthographic)
+    if (orthographic)
         projectionMatrix = glm::ortho(-aspectRatio * scale, aspectRatio * scale, -scale, scale, nearClip, farClip);
     else
         projectionMatrix = glm::perspective(glm::radians(fovDegrees), aspectRatio, nearClip, farClip);

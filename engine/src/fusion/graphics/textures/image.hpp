@@ -107,7 +107,7 @@ namespace fe {
                 uint32_t mipLevels);
 
         static void CreateImageView(
-                const VkImage& image,
+                VkImage image,
                 VkImageView& imageView,
                 VkImageViewType viewType,
                 VkFormat format,
@@ -118,7 +118,7 @@ namespace fe {
                 uint32_t baseArrayLayer);
 
         static void CreateMipmaps(
-                const VkImage& image,
+                VkImage image,
                 const VkExtent3D& extent,
                 VkFormat format,
                 VkImageLayout dstImageLayout,
@@ -127,7 +127,7 @@ namespace fe {
                 uint32_t layerCount);
 
         static void TransitionImageLayout(
-                const VkImage& image,
+                VkImage image,
                 VkFormat format,
                 VkImageLayout srcImageLayout,
                 VkImageLayout dstImageLayout,
@@ -139,7 +139,7 @@ namespace fe {
 
         static void InsertImageMemoryBarrier(
                 VkCommandBuffer commandBuffer,
-                const VkImage& image,
+                VkImage image,
                 VkAccessFlags srcAccessMask,
                 VkAccessFlags dstAccessMask,
                 VkImageLayout oldImageLayout,
@@ -153,14 +153,14 @@ namespace fe {
                 uint32_t baseArrayLayer);
 
         static void CopyBufferToImage(
-                const VkBuffer& buffer,
-                const VkImage& image,
+                VkBuffer buffer,
+                VkImage image,
                 const VkExtent3D& extent,
                 uint32_t layerCount,
                 uint32_t baseArrayLayer);
 
         static bool CopyImage(
-                const VkImage& srcImage,
+                VkImage srcImage,
                 VkImage& dstImage,
                 VkDeviceMemory& dstImageMemory,
                 VkFormat srcFormat,
@@ -169,6 +169,10 @@ namespace fe {
                 VkImageLayout srcImageLayout,
                 uint32_t mipLevel,
                 uint32_t arrayLayer);
+
+    private:
+        static VkPipelineStageFlags AccessFlagsToPipelineStage(VkAccessFlags accessFlags, VkPipelineStageFlags stageFlags);
+        static VkPipelineStageFlags LayoutToAccessMask(VkImageLayout layout, bool isDestination);
 
     protected:
         VkExtent3D extent;

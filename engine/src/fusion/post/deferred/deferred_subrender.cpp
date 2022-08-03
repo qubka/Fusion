@@ -70,9 +70,9 @@ void DeferredSubrender::onRender(const CommandBuffer& commandBuffer, const Camer
     //    uniformScene.push("shadowSpace", shadows->GetShadowBox().GetToShadowMapSpaceMatrix()); // TODO::
     uniformScene.push("cameraPosition", camera->getEyePoint());
     uniformScene.push("lightsCount", lightCount);
-    uniformScene.push("fogColor", fog.getColor());
-    uniformScene.push("fogDensity", fog.getDensity());
-    uniformScene.push("fogGradient", fog.getGradient());
+    uniformScene.push("fogColor", fog.color);
+    uniformScene.push("fogDensity", fog.density);
+    uniformScene.push("fogGradient", fog.gradient);
 
     // Updates storage buffers.
     storageLights.push(deferredLights.data(), sizeof(DeferredLight) * MAX_LIGHTS);

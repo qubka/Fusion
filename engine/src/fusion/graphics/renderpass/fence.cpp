@@ -37,7 +37,7 @@ bool Fence::wait() {
 }
 
 void Fence::reset() {
-    if(signaled) {
+    if (signaled) {
         const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
         VK_CHECK(vkResetFences(logicalDevice, 1, &fence));
     }
@@ -45,7 +45,7 @@ void Fence::reset() {
 }
 
 void Fence::waitAndReset() {
-    if(!signaled)
+    if (!signaled)
         wait();
 
     reset();

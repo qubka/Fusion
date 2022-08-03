@@ -371,7 +371,7 @@ void PipelineGraphics::bindPipeline(const CommandBuffer& commandBuffer) const {
 
 #if FUSION_PLATFORM_APPLE
     // Bug in moltenVK. Needs to happen after pipeline bound for now.
-    if(depthBiasEnabled)
+    if (depthBiasEnabled)
         vkCmdSetDepthBias(commandBuffer, depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor);
 #endif
 }

@@ -34,7 +34,7 @@ bool Ray::triangleIntersection(const glm::vec3& v0, const glm::vec3& v1, const g
 	result = glm::dot(e2, q) / det;
 	return true;
 #else
-    if(det > -FLT_EPSILON && det < FLT_EPSILON)
+    if (det > -FLT_EPSILON && det < FLT_EPSILON)
         return false;
 
     glm::vec3 t {origin - v0};
