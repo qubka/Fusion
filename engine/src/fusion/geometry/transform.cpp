@@ -42,7 +42,6 @@ void Transform::calcMatrices() const {
         { 0.0f, 0.0f, localScale.z, 0.0f },
         { 0.0f, 0.0f, 0.0f, 1.0f }
     };
-
     worldMatrix = parentMatrix * localMatrix;
     normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
     dirty = false;
@@ -187,12 +186,16 @@ glm::vec3 Transform::getLocalBackDirection() const {
     return { m[2][0], m[2][1], m[2][2] };
 }
 
-void Transform::translateLocal(const glm::vec3& translation) {
+bool Transform::translateLocal(const glm::vec3& translation) {
+    if (glm::all(glm::epsilonEqual(translation, vec3::zero, FLT_EPSILON)))
+        return false;
+
     localPosition += translation;
     dirty = true;
+    return true;
 }
 
-void Transform::rotate(glm::quat rotation, Space space) {
+bool Transform::rotate(glm::quat rotation, Space space) {
     rotation = glm::normalize(rotation);
 
     switch (space) {
@@ -208,28 +211,34 @@ void Transform::rotate(glm::quat rotation, Space space) {
             break;
         }
         default:
-            break;
+            return false;
     }
 
     dirty = true;
+    return true;
 }
 
-void Transform::rotate(const glm::vec3& axis, float angle, Space space) {
-    rotate(glm::angleAxis(angle, axis), space);
+bool Transform::rotate(const glm::vec3& axis, float angle, Space space) {
+    return rotate(glm::angleAxis(angle, axis), space);
 }
 
-void Transform::lookAt(glm::vec3 target, glm::vec3 up) {
+bool Transform::lookAt(glm::vec3 target, glm::vec3 up) {
     glm::mat4 parentInv{ glm::inverse(parentMatrix) };
     target = parentInv * glm::vec4{target, 1}; // vec4 -> vec3
     up = parentInv * glm::vec4{up, 0}; // vec4 -> vec3
     glm::mat4 lookAtMatrix{ glm::inverse(glm::lookAt(localPosition, target, up)) };
-    setLocalOrientation(glm::quat_cast(lookAtMatrix));
+    return setLocalOrientation(glm::quat_cast(lookAtMatrix));
 }
 
-void Transform::scaleLocal(const glm::vec3& scale) {
+bool Transform::scaleLocal(const glm::vec3& scale) {
+    if (glm::all(glm::epsilonEqual(scale, vec3::one, FLT_EPSILON)))
+        return false;
+
     localScale *= scale;
     dirty = true;
+    return true;
 }
+
 glm::vec3 Transform::transformPoint(const glm::vec3& point) {
     return localMatrix * glm::vec4{point, 1};
 }

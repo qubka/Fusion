@@ -44,13 +44,12 @@ namespace fe {
         glm::vec3 getWorldBackDirection() const;
         glm::vec3 getLocalBackDirection() const;
 
-        void translateLocal(const glm::vec3& translation);
-        void scaleLocal(const glm::vec3& scale);
+        bool translateLocal(const glm::vec3& translation);
+        bool scaleLocal(const glm::vec3& scale);
 
-        void rotate(glm::quat rotation, Space space = Space::Self);
-        void rotate(const glm::vec3& axis, float angle, Space space = Space::Self);
-
-        void lookAt(glm::vec3 target, glm::vec3 up);
+        bool rotate(glm::quat rotation, Space space = Space::Self);
+        bool rotate(const glm::vec3& axis, float angle, Space space = Space::Self);
+        bool lookAt(glm::vec3 target, glm::vec3 up);
 
         glm::vec3 transformPoint(const glm::vec3& point);
         glm::vec3 transformDirection(const glm::vec3& direction);
