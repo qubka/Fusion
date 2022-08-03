@@ -100,9 +100,8 @@ namespace ImGui {
             ImGuiUtils::PropertyText("Path", mesh->getPath().string().c_str());
             ImGuiUtils::Property("Vertex Count", mesh->getVertexCount());
             ImGuiUtils::Property("Index Count", mesh->getIndexCount());
-            ImGuiUtils::Property("Min", mesh->getMinExtents());
-            ImGuiUtils::Property("Max", mesh->getMaxExtents());
-            ImGuiUtils::Property("Radius", mesh->getRadius());
+            ImGuiUtils::Property("Min", mesh->getBoundingBox().getMin());
+            ImGuiUtils::Property("Max", mesh->getBoundingBox().getMax());
         }
 
         ImGui::Columns(1);

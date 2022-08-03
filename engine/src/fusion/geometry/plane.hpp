@@ -70,5 +70,3 @@ namespace fe {
         float distance;
     };
 }
-
-std::ostream& operator<<(std::ostream& o, const fe::Plane& p);

@@ -248,32 +248,40 @@ glm::vec3 Camera::worldToNdc(const glm::vec3& worldCoord) const {
 }
 
 /// @link https://discourse.libcinder.org/t/screen-to-world-coordinates/1014/2
-glm::vec3 Camera::screenToWorld(const glm::vec2& screenCoord, const glm::vec2& screenSize) const {
+glm::vec3 Camera::screenToWorld(const glm::vec2& screenCoord, const glm::vec2& screenSize, bool flipY) const {
     if (screenSize.x == 0.0f || screenSize.y == 0.0f)
         return eyePoint;
 
-    glm::vec4 viewport{ 0, 0, screenSize.x, screenSize.y };
+    glm::vec4 viewport{ 0, flipY ? screenSize.y : 0, screenSize.x, flipY ? -screenSize.y : screenSize.y };
     return glm::unProject(glm::vec3{screenCoord, 0}, getViewMatrix(), getProjectionMatrix(), viewport);
 }
 
 /// @link https://antongerdelan.net/opengl/raycasting.html
-Ray Camera::screenPointToRay(const glm::vec2& screenCoord, const glm::vec2& screenSize) const {
+Ray Camera::screenPointToRay(const glm::vec2& screenCoord, const glm::vec2& screenSize, bool flipY) const {
     if (screenSize.x <= 1.0f || screenSize.y <= 1.0f)
         return { eyePoint, viewDirection };
 
-    glm::vec2 mouseNorm{ 2.0f * screenCoord / (screenSize - 1.0f) };
+    glm::vec2 mouseNorm{ 2.0f * (screenCoord / screenSize) - 1.0f };
 
-#ifdef GLM_FORCE_DEPTH_ZERO_TO_ONE
-    glm::vec4 screenPos{ mouseNorm.x, -mouseNorm.y, 0, 1 };
-#else
-    glm::vec4 screenPos{ mouseNorm.x, -mouseNorm.y, -1, 1 };
-#endif
+    if (flipY)
+        mouseNorm.y *= -1.0f;
 
+    /*glm::vec4 screenPos{ mouseNorm.x, mouseNorm.y, -1.0f, 1.0f };
     glm::vec4 eyeRay{ getInverseProjectionMatrix() * screenPos };
     eyeRay.z = -1;
     eyeRay.w = 0;
     glm::vec4 worldRay{ getInverseViewMatrix() * eyeRay };
-    return { eyePoint, glm::normalize(glm::vec3{worldRay}) };
+    return { eyePoint, glm::normalize(glm::vec3{worldRay}) };*/
+
+    auto invViewProjection = glm::inverse(getProjectionMatrix() * getViewMatrix());
+
+    glm::vec4 near = invViewProjection * glm::vec4{mouseNorm.x, mouseNorm.y, 0.0f, 1.0f};
+    near /= near.w;
+
+    glm::vec4 far = invViewProjection * glm::vec4{mouseNorm.x, mouseNorm.y, 1.0f, 1.0f};
+    far /= far.w;
+
+    return { near, glm::normalize(glm::vec3{far} - glm::vec3{near}) };
 }
 
 void Camera::calcProjection() const {

@@ -78,7 +78,3 @@ Ray Ray::transformed(const glm::mat4& transform) const {
         glm::mat3{transform} * direction
     };
 }
-
-std::ostream& operator<<(std::ostream& o, const Ray& r) {
-    return o << "(" << glm::to_string(r.getOrigin()) << ", " << glm::to_string(r.getDirection()) << ")";
-}

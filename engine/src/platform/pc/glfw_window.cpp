@@ -364,7 +364,7 @@ namespace glfw {
             return;
         }
 
-        glm::vec2 norm{ 2.0f * pos / glm::vec2{size - 1U}};
+        glm::vec2 norm{ 2.0f * (pos / glm::vec2{size}) - 1.0f};
 
         LOG_VERBOSE << "MouseMotionNormEvent: " << glm::to_string(norm);
 

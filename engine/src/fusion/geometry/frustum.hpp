@@ -35,8 +35,6 @@ namespace fe {
         bool contains(const Sphere& sphere) const;
         //! Returns true if the box is fully contained within frustum. See also 'intersects'.
         bool contains(const AABB& box) const;
-        //! Returns true if the rect is fully contained within frustum. See also 'intersects'.
-        bool contains(const Rect& rect) const;
 
         //! Returns true if point is within frustum.
         bool intersects(const glm::vec3& loc) const;
@@ -48,8 +46,6 @@ namespace fe {
         bool intersects(const Sphere& sphere) const;
         //! Returns true if the box is fully or partially contained within frustum. See also 'contains'.
         bool intersects(const AABB& box) const;
-        //! Returns true if the rect is fully or partially contained within frustum. See also 'contains'.
-        bool intersects(const Rect& rect) const;
 
         //! Transform the frustum by a given transform.
         void transform(const glm::mat4& transform);

@@ -160,7 +160,3 @@ glm::vec3 Plane::reflectPoint(const glm::vec3& p) const {
 glm::vec3 Plane::reflectVector(const glm::vec3& v) const {
     return normal * glm::dot(normal, v) * 2.0f - v;
 }
-
-std::ostream& operator<<(std::ostream& o, const Plane& p) {
-    return o << "(" << glm::to_string(p.getNormal()) << ", " << p.getDistance() << ")";
-}

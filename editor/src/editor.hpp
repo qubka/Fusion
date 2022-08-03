@@ -9,6 +9,7 @@
 namespace fe {
     class Camera;
     class Scene;
+    class Ray;
 
     struct EditorSettings {
         bool fullScreenOnPlay{ false };
@@ -90,6 +91,7 @@ namespace fe {
         void setSceneViewSize(const glm::vec2& size) { sceneViewSize = size; }
 
         void focusCamera(const glm::vec3& point, float distance, float speed = 1.0f);
+        void selectObject(const Ray& ray);
 
         void onImGuizmo();
     private:

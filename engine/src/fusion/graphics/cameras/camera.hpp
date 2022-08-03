@@ -102,9 +102,9 @@ namespace fe {
         //! Converts a eye-space coordinate \a eyeCoord to screen coordinates as viewed by the camera
         glm::vec2 eyeToScreen(const glm::vec3& eyeCoord, const glm::vec2& screenSize) const;
         //! Converts a screen coordinates as viewed by the camera, based on a screen which is \a screen.width x \a screen.height pixels to a world-space coordinate \a worldCoord.
-        glm::vec3 screenToWorld(const glm::vec2& screenCoord, const glm::vec2& screenSize) const;
+        glm::vec3 screenToWorld(const glm::vec2& screenCoord, const glm::vec2& screenSize, bool flipY = false) const;
         //! Converts a screen coordinates as viewed by the camera, based on a screen which is \a screen.width x \a screen.height pixels to a world-space ray.
-        Ray screenPointToRay(const glm::vec2& screenCoord, const glm::vec2& screenSize) const; // alternative to generateRay
+        Ray screenPointToRay(const glm::vec2& screenCoord, const glm::vec2& screenSize, bool flipY = false) const; // alternative to generateRay
 
         //! Converts a world-space coordinate \a worldCoord to eye-space, also known as camera-space. -Z is along the view direction.
         glm::vec3 worldToEye(const glm::vec3& worldCoord) const { return { getViewMatrix() * glm::vec4{worldCoord, 1} }; }

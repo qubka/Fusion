@@ -4,6 +4,7 @@
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/pipelines/vertex.hpp"
+#include "fusion/geometry/aabb.hpp"
 
 namespace fe {
     class Mesh : public Asset {
@@ -66,14 +67,9 @@ namespace fe {
         const Buffer* getIndexBuffer() const { return indexBuffer.get(); }
         uint32_t getVertexCount() const { return vertexCount; }
         uint32_t getIndexCount() const { return indexCount; }
-        const Vertex::Layout& getVertexLayout() const { return layout; }
         VkIndexType getIndexType() const { return indexType; }
-        const glm::vec3& getMinExtents() const { return minExtents; }
-        const glm::vec3& getMaxExtents() const { return maxExtents; }
-        float getWidth() const { return maxExtents.x - minExtents.x; }
-        float getHeight() const { return maxExtents.y - minExtents.y; }
-        float getDepth() const { return maxExtents.z - minExtents.z; }
-        float getRadius() const { return radius; }
+        const Vertex::Layout& getVertexLayout() const { return layout; }
+        const AABB& getBoundingBox() const { return boundingBox; }
 
         std::vector<std::byte> getVertices() const {
             auto vertexStaging = Buffer::DeviceToStageBuffer(*vertexBuffer);
@@ -95,12 +91,14 @@ namespace fe {
 
             vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, vertices.size(), vertices.data());
 
+            glm::vec3 min{ FLT_MAX };
+            glm::vec3 max{ -FLT_MAX };
             for (size_t i = 0; i < vertices.size(); i += layout.getStride()) {
                 const auto& position = *reinterpret_cast<const glm::vec3*>(&vertices[i]);
-                minExtents = glm::min(position, minExtents);
-                maxExtents = glm::max(position, maxExtents);
+                min = glm::min(position, min);
+                max = glm::max(position, max);
             }
-            radius = std::max(glm::length(minExtents), glm::length(maxExtents));
+            boundingBox = AABB{min, max};
         }
 
         template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
@@ -146,13 +144,9 @@ namespace fe {
         std::unique_ptr<Buffer> indexBuffer;
         uint32_t vertexCount{ 0 };
         uint32_t indexCount{ 0 };
-
         uint32_t meshIndex{ 0 };
         VkIndexType indexType{ VK_INDEX_TYPE_NONE_KHR };
+        AABB boundingBox;
         Vertex::Layout layout;
-
-        glm::vec3 minExtents{ FLT_MAX };
-        glm::vec3 maxExtents{ -FLT_MAX };
-        float radius{ 0.0f };
     };
 }

@@ -87,11 +87,6 @@ bool Frustum::contains(const AABB& box) const {
     return true;
 }
 
-bool Frustum::contains(const Rect& rect) const {
-    std::runtime_error("Not implemented");
-    return false;
-}
-
 bool Frustum::intersects(const glm::vec3& loc) const {
     return contains(loc);
 }
@@ -120,22 +115,6 @@ bool Frustum::intersects(const AABB& box) const {
     for (const auto& plane : planes) {
         if (plane.getDistanceToPoint(box.getPositive(plane.getNormal())) < 0)
             return false;
-    }
-    return true;
-}
-
-bool Frustum::intersects(const Rect& rect) const {
-    for (const auto& plane : planes) {
-        const glm::vec3& n = plane.getNormal();
-        if (n.x >= 0.0f) {
-            if (plane.getDistanceToPoint(glm::vec3{rect.getPosition(), 0}) < 0) {
-                return false;
-            }
-        } else {
-            if (plane.getDistanceToPoint(glm::vec3(rect.getPosition().x + rect.getSize().x, rect.getPosition().y, 0)) < 0) {
-                return false;
-            }
-        }
     }
     return true;
 }

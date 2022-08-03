@@ -27,11 +27,13 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
     if (!camera)
         return;
 
+    auto& registry = scene->getRegistry();
+
     // Updates uniforms.
     std::vector<Light> lights(MAX_LIGHTS);
     uint32_t lightCount = 0;
 
-    auto lightView = scene->getRegistry().view<TransformComponent, LightComponent>();
+    auto lightView = registry.view<TransformComponent, LightComponent>();
 
     for (const auto& [entity, transform, light] : lightView.each()) {
         Light baseLight = {};
@@ -79,9 +81,13 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
     descriptorSet.bindDescriptor(commandBuffer, pipeline);
     //pushObject.bindPush(commandBuffer, pipeline);
 
-    auto meshView = scene->getRegistry().view<TransformComponent, MeshComponent>();
+    auto meshGroup = registry.group<MeshComponent>(entt::get<TransformComponent>);
 
-    for (const auto& [entity, transform, mesh] : meshView.each()) {
+    meshGroup.sort([&registry](const entt::entity a, const entt::entity b) {
+        return registry.get<MeshComponent>(a).runtime < registry.get<MeshComponent>(b).runtime;
+    });
+
+    for (const auto& [entity, mesh, transform] : meshGroup.each()) {
         if (!mesh.runtime)
             continue;
 

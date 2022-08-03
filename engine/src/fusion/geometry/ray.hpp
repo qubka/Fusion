@@ -28,5 +28,3 @@ namespace fe {
         glm::vec3 direction;
     };
 }
-
-std::ostream& operator<<(std::ostream& o, const fe::Ray& r);
