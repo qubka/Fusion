@@ -183,8 +183,8 @@ namespace ImGuiUtils {
 ///
 
 /// BOOL VECTOR
-    template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<std::is_same_v<T, bool>>>
-    bool Property(const char* name, glm::vec<L, T, Q>& value) {
+    template<glm::length_t L, glm::qualifier Q>
+    bool Property(const char* name, glm::vec<L, bool, Q>& value) {
         bool updated = false;
 
         //ImGui::AlignTextToFramePadding();
@@ -198,6 +198,7 @@ namespace ImGuiUtils {
             std::string id{ "##" + std::to_string(i) };
             if (ImGui::Checkbox(id.c_str(), &value[i]))
                 updated = true;
+            ImGui::SameLine();
         }
 
         ImGui::PopID();
@@ -208,8 +209,8 @@ namespace ImGuiUtils {
         return updated;
     }
 
-    template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<std::is_same_v<T, bool>>>
-    void Property(const char* name, const glm::vec<L, T, Q>& value) {
+    template<glm::length_t L, glm::qualifier Q>
+    void Property(const char* name, const glm::vec<L, bool, Q>& value) {
         //ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted(name);
         ImGui::NextColumn();
@@ -266,8 +267,6 @@ namespace ImGuiUtils {
 
     template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<!std::is_same_v<T, bool>>>
     void Property(const char* name, const glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, float speed = 1.0f, PropertyType type = PropertyType::Drag) {
-        bool updated = false;
-
         ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted(name);
         ImGui::NextColumn();
@@ -292,6 +291,103 @@ namespace ImGuiUtils {
         ImGui::NextColumn();
     }
 ///
+
+    template<glm::length_t L, glm::qualifier Q>
+    bool PropertyControl(const char* name, glm::vec<L, bool, Q>& value) {
+        bool updated = false;
+
+        ImGuiIO& io = ImGui::GetIO();
+
+        //ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted(name);
+        ImGui::NextColumn();
+
+        float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
+        ImVec2 buttonSize{ lineHeight + 3.0f, lineHeight };
+
+        ImGui::PushMultiItemsWidths(L, ImGui::GetColumnWidth() - L * lineHeight); // ImGui::CalcItemWidth()
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
+
+        ImGui::PushID(name);
+
+        if constexpr(L > 0) {
+            ImVec4 color{ 0.8f, 0.1f, 0.15f, 1.0f };
+            ImGui::PushStyleColor(ImGuiCol_Button, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
+            ImGui::PushFont(io.Fonts->Fonts[1]);
+            ImGui::Button("X", buttonSize);
+            ImGui::PopFont();
+            ImGui::PopStyleColor(3);
+
+            ImGui::SameLine();
+            if (ImGui::Checkbox("##X", &value.x))
+                updated = true;
+            ImGui::PopItemWidth();
+        }
+
+        if constexpr(L > 1) {
+            ImGui::SameLine();
+
+            ImVec4 color{ 0.2f, 0.7f, 0.2f, 1.0f };
+            ImGui::PushStyleColor(ImGuiCol_Button, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
+            ImGui::PushFont(io.Fonts->Fonts[1]);
+            ImGui::Button("Y", buttonSize);
+            ImGui::PopFont();
+            ImGui::PopStyleColor(3);
+
+            ImGui::SameLine();
+            if (ImGui::Checkbox("##Y", &value.y))
+                updated = true;
+            ImGui::PopItemWidth();
+        }
+
+        if constexpr(L > 2) {
+            ImGui::SameLine();
+
+            ImVec4 color{ 0.1f, 0.25f, 0.8f, 1.0f };
+            ImGui::PushStyleColor(ImGuiCol_Button, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
+            ImGui::PushFont(io.Fonts->Fonts[1]);
+            ImGui::Button("Z", buttonSize);
+            ImGui::PopFont();
+            ImGui::PopStyleColor(3);
+
+            ImGui::SameLine();
+            if (ImGui::Checkbox("##Z", &value.z))
+                updated = true;
+            ImGui::PopItemWidth();
+        }
+
+        if constexpr(L > 3) {
+            ImGui::SameLine();
+
+            ImVec4 color{ 0.8f, 0.2f, 0.8f, 1.0f };
+            ImGui::PushStyleColor(ImGuiCol_Button, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
+            ImGui::PushFont(io.Fonts->Fonts[1]);
+            ImGui::Button("W", buttonSize);
+            ImGui::PopFont();
+            ImGui::PopStyleColor(3);
+
+            ImGui::SameLine();
+            if (ImGui::Checkbox("##W", &value.w))
+                updated = true;
+            ImGui::PopItemWidth();
+        }
+
+        ImGui::PopID();
+
+        ImGui::PopStyleVar();
+
+        ImGui::NextColumn();
+
+        return updated;
+    }
 
     template<glm::length_t L, typename T, glm::qualifier Q, typename = std::enable_if_t<!std::is_same_v<T, bool>>>
     bool PropertyControl(const char* name, glm::vec<L, T, Q>& value, const T min = 0, const T max = 0, T reset = 0, float speed = 1.0f) {
@@ -320,13 +416,14 @@ namespace ImGuiUtils {
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("X", buttonSize)) {
                 value.x = reset;
-                updated |= true;
+                updated = true;
             }
             ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            updated |= ImGui::DragScalar("##X", dataType, &value.x, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp);
+            if (ImGui::DragScalar("##X", dataType, &value.x, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
+                updated = true;
             ImGui::PopItemWidth();
         }
 
@@ -340,13 +437,14 @@ namespace ImGuiUtils {
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("Y", buttonSize)) {
                 value.y = reset;
-                updated |= true;
+                updated = true;
             }
             ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            updated |= ImGui::DragScalar("##Y", dataType, &value.y, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp);
+            if (ImGui::DragScalar("##Y", dataType, &value.y, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
+                updated = true;
             ImGui::PopItemWidth();
         }
 
@@ -360,13 +458,14 @@ namespace ImGuiUtils {
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("Z", buttonSize)) {
                 value.z = reset;
-                updated |= true;
+                updated = true;
             }
             ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            updated |= ImGui::DragScalar("##Z", dataType, &value.z, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp);
+            if (ImGui::DragScalar("##Z", dataType, &value.z, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
+                updated = true;
             ImGui::PopItemWidth();
         }
 
@@ -380,13 +479,14 @@ namespace ImGuiUtils {
             ImGui::PushFont(io.Fonts->Fonts[1]);
             if (ImGui::Button("W", buttonSize)) {
                 value.w = reset;
-                updated |= true;
+                updated = true;
             }
             ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            updated |= ImGui::DragScalar("##W", dataType, &value.w, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp);
+            if (ImGui::DragScalar("##W", dataType, &value.w, speed, &min, &max, nullptr, ImGuiSliderFlags_AlwaysClamp))
+                updated = true;
             ImGui::PopItemWidth();
         }
 
