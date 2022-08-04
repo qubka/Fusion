@@ -27,6 +27,9 @@ namespace cereal {
     template<class Archive> void serialize(Archive& archive, glm::dvec2& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y)); }
     template<class Archive> void serialize(Archive& archive, glm::dvec3& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y), make_nvp("z", v.z)); }
     template<class Archive> void serialize(Archive& archive, glm::dvec4& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y), make_nvp("z", v.z), make_nvp("w", v.w)); }
+    template<class Archive> void serialize(Archive& archive, glm::bvec2& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y)); }
+    template<class Archive> void serialize(Archive& archive, glm::bvec3& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y), make_nvp("z", v.z)); }
+    template<class Archive> void serialize(Archive& archive, glm::bvec4& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y), make_nvp("z", v.z), make_nvp("w", v.w)); }
 
     // glm matrices serialization
     template<class Archive> void serialize(Archive& archive, glm::mat2& m) { archive(make_nvp("c0", m[0]), make_nvp("c1", m[1])); }

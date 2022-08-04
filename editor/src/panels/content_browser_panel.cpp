@@ -126,7 +126,7 @@ void ContentBrowserPanel::onImGui() {
 
                 float xAvail = ImGui::GetContentRegionAvail().x;
 
-                gridItemsPerRow = std::max(1, static_cast<int>(std::floor(xAvail / (gridSize + style.ItemSpacing.x))));
+                gridItemsPerRow = glm::max(1, static_cast<int>(glm::floor(xAvail / (gridSize + style.ItemSpacing.x))));
 
                 if (isInListView) {
                     for (const auto& [i, child] : enumerate(currentDirectory->children)) {

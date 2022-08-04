@@ -7,7 +7,7 @@ ElapsedTime::ElapsedTime(const DateTime& interval) : startTime{DateTime::Now()},
 
 uint32_t ElapsedTime::getElapsed() {
     auto now = DateTime::Now();
-    auto elapsed = static_cast<uint32_t>(std::floor((now - startTime) / interval));
+    auto elapsed = static_cast<uint32_t>(glm::floor((now - startTime) / interval));
 
     if (elapsed != 0) {
         startTime = now;

@@ -126,7 +126,7 @@ void ConsolePanel::renderHeader() {
     for (int i = 0; i < 6; i++) {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
         ImGui::SameLine();
-        auto level = MessageLevel(std::pow(2, i));
+        auto level = MessageLevel(glm::pow(2, i));
 
         if (MessageBufferRenderFilter & level)
             ImGui::PushStyleColor(ImGuiCol_Text, Message::GetRenderColor(level));
@@ -140,6 +140,7 @@ void ConsolePanel::renderHeader() {
         if (ImGui::IsItemHovered()) {
             ImGui::SetTooltip("%s", Message::GetLevelName(level));
         }
+
         ImGui::PopStyleColor(2);
     }
 
@@ -222,7 +223,7 @@ void ConsolePanel::Message::onImGui() {
             ImGui::EndPopup();
         }
 
-        if (ImGui::IsItemHovered()) {
+        if (!source.empty() && ImGui::IsItemHovered()) {
             ImGui::SetTooltip("%s", source.c_str());
         }
 

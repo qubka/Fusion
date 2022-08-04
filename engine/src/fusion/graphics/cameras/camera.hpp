@@ -14,12 +14,12 @@ namespace fe {
         ~Camera() = default;
 
         //! Returns the position in world-space from which the Camera is viewing
-        glm::vec3 getEyePoint() const { return eyePoint; }
+        const glm::vec3& getEyePoint() const { return eyePoint; }
         //! Sets the position in world-space from which the Camera is viewing
         bool setEyePoint(const glm::vec3& eyePoint);
 
         //! Returns the vector in world-space which represents "up" - typically glm::vec3( 0, 1, 0 )
-        glm::vec3 getWorldUp() const { return worldUp; }
+        const glm::vec3& getWorldUp() const { return worldUp; }
         //! Sets the vector in world-space which represents "up" - typically glm::vec3( 0, 1, 0 )
         bool setWorldUp(glm::vec3 worldUp);
 
@@ -73,7 +73,7 @@ namespace fe {
         bool setFov(float value);
 
         //! Returns the camera's horizontal field of view measured in degrees.
-        float getFovHorizontal() const { return glm::degrees(2.0f * std::atan(std::tan(glm::radians(fovDegrees) * 0.5f) * aspectRatio)); }
+        float getFovHorizontal() const { return glm::degrees(2.0f * glm::atan(glm::tan(glm::radians(fovDegrees) * 0.5f) * aspectRatio)); }
         //! Sets the camera's horizontal field of view measured in degrees.
         bool setFovHorizontal(float value);
 

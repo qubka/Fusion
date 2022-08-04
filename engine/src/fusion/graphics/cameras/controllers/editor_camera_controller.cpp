@@ -25,11 +25,12 @@ void EditorCameraController::update(Camera& camera) {
 }
 
 void EditorCameraController::handleMouse(Camera& camera, float dt) {
-    const glm::vec2& pos = Input::Get()->getMousePosition();
+    auto input = Input::Get();
+    const glm::vec2& pos = input->getMousePosition();
     auto window = DeviceManager::Get()->getWindow(0);
 
     static bool mouseHeld = false;
-    if (Input::Get()->getMouseButtonDown(MouseButton::ButtonRight)) {
+    if (input->getMouseButtonDown(MouseButton::ButtonRight)) {
         mouseHeld = true;
         window->setCursorHidden(true);
         //window->setCursor(manager->getCursor(static_cast<size_t>(CursorStandard::Crosshair)));
@@ -38,9 +39,9 @@ void EditorCameraController::handleMouse(Camera& camera, float dt) {
     }
 
     if (camera.isOrthographic()) {
-        if (Input::Get()->getMouseButton(MouseButton::ButtonRight)) {
+        if (input->getMouseButton(MouseButton::ButtonRight)) {
             mouseSensitivity = 0.0005f;
-            glm::vec3 position = camera.getEyePoint();
+            glm::vec3 position{ camera.getEyePoint() };
             position.x -= (pos.x - previousCurserPos.x) * /*camera.getScale() **/ mouseSensitivity * 10.0f;
             position.z -= (pos.y - previousCurserPos.y) * /*camera.getScale() **/ mouseSensitivity * 10.0f;
             camera.setEyePoint(position);
@@ -54,7 +55,7 @@ void EditorCameraController::handleMouse(Camera& camera, float dt) {
             }
         }
     } else {
-        if (Input::Get()->getMouseButton(MouseButton::ButtonRight)) {
+        if (input->getMouseButton(MouseButton::ButtonRight)) {
             mouseSensitivity = 0.0002f;
             rotateVelocity = glm::vec2{(pos.x - previousCurserPos.x), (pos.y - previousCurserPos.y)} * mouseSensitivity * 10.0f;
         } else {
@@ -67,9 +68,9 @@ void EditorCameraController::handleMouse(Camera& camera, float dt) {
         }
 
         if (glm::length(rotateVelocity) > FLT_EPSILON) {
-            glm::quat orientation = camera.getOrientation();
-            glm::quat rotationX = glm::angleAxis(rotateVelocity.y, vec3::right);
-            glm::quat rotationY = glm::angleAxis(-rotateVelocity.x, vec3::up);
+            glm::quat orientation{ camera.getOrientation() };
+            glm::quat rotationX{ glm::angleAxis(rotateVelocity.y, vec3::right) };
+            glm::quat rotationY{ glm::angleAxis(-rotateVelocity.x, vec3::up) };
 
             orientation = rotationY * orientation;
             orientation = orientation * rotationX;
@@ -79,96 +80,98 @@ void EditorCameraController::handleMouse(Camera& camera, float dt) {
         }
     }
 
-    rotateVelocity *= std::pow(rotateDampeningFactor, dt);
+    rotateVelocity *= glm::pow(rotateDampeningFactor, dt);
 }
 
 void EditorCameraController::handleKeyboard(Camera& camera, float dt) {
+    auto input = Input::Get();
+    
     if (camera.isOrthographic()) {
         cameraSpeed = camera.getScale() * dt * 20.0f;
 
-        if (Input::Get()->getKey(Key::A)) {
+        if (input->getKey(Key::A)) {
             velocity += camera.getRightDirection() * cameraSpeed;
         }
 
-        if (Input::Get()->getKey(Key::D)) {
+        if (input->getKey(Key::D)) {
             velocity -= camera.getRightDirection() * cameraSpeed;
         }
 
-        if (Input::Get()->getKey(Key::W)) {
+        if (input->getKey(Key::W)) {
             velocity += camera.getUpDirection() * cameraSpeed;
         }
 
-        if (Input::Get()->getKey(Key::S)) {
+        if (input->getKey(Key::S)) {
             velocity -= camera.getUpDirection() * cameraSpeed;
         }
 
-        if (Input::Get()->getKey(Key::Q)) {
+        if (input->getKey(Key::Q)) {
             velocity -= camera.getForwardDirection() * cameraSpeed;
         }
 
-        if (Input::Get()->getKey(Key::E)) {
+        if (input->getKey(Key::E)) {
             velocity += camera.getForwardDirection() * cameraSpeed;
         }
 
         if (glm::length(velocity) > FLT_EPSILON) {
-            glm::vec3 position = camera.getEyePoint();
+            glm::vec3 position{ camera.getEyePoint() };
             position += velocity * dt;
-            velocity *= std::pow(dampeningFactor, dt);
+            velocity *= glm::pow(dampeningFactor, dt);
 
             camera.setEyePoint(position);
         }
     } else {
-
         float multiplier = 1000.0f;
 
-        if (Input::Get()->getKey(Key::LeftShift)) {
+        if (input->getKey(Key::LeftShift)) {
             multiplier = 10000.0f;
-        } else if (Input::Get()->getKey(Key::LeftAlt)) {
+        } else if (input->getKey(Key::LeftAlt)) {
             multiplier = 50.0f;
         }
 
         cameraSpeed = multiplier * dt;
 
-        if (Input::Get()->getMouseButton(MouseButton::ButtonRight)) {
-            if (Input::Get()->getKey(Key::W)) {
+        if (input->getMouseButton(MouseButton::ButtonRight)) {
+            if (input->getKey(Key::W)) {
                 velocity -= camera.getForwardDirection() * cameraSpeed;
             }
 
-            if (Input::Get()->getKey(Key::S)) {
+            if (input->getKey(Key::S)) {
                 velocity += camera.getForwardDirection() * cameraSpeed;
             }
 
-            if (Input::Get()->getKey(Key::A)) {
+            if (input->getKey(Key::A)) {
                 velocity -= camera.getRightDirection() * cameraSpeed;
             }
 
-            if (Input::Get()->getKey(Key::D)) {
+            if (input->getKey(Key::D)) {
                 velocity += camera.getRightDirection() * cameraSpeed;
             }
 
-            if (Input::Get()->getKey(Key::Q)) {
+            if (input->getKey(Key::Q)) {
                 velocity -= camera.getUpDirection() * cameraSpeed;
             }
 
-            if (Input::Get()->getKey(Key::E)) {
+            if (input->getKey(Key::E)) {
                 velocity += camera.getUpDirection() * cameraSpeed;
             }
         }
 
         if (glm::length(velocity) > FLT_EPSILON) {
-            glm::vec3 position = camera.getEyePoint();
+            glm::vec3 position{ camera.getEyePoint() };
             position -= velocity * dt;
             camera.setEyePoint(position);
-            velocity *= std::pow(dampeningFactor, dt);
+            velocity *= glm::pow(dampeningFactor, dt);
         }
     }
 }
 
 void EditorCameraController::handleScroll(Camera& camera, float dt) {
-    auto offset =  Input::Get()->getMouseScroll().y;
+    auto input = Input::Get();
+    auto offset =  input->getMouseScroll().y;
 
     if (camera.isOrthographic()) {
-        float multiplier = Input::Get()->getKey(Key::LeftShift) ? 10.0f : 2.0f;
+        float multiplier = input->getKey(Key::LeftShift) ? 10.0f : 2.0f;
 
         if (offset != 0.0f) {
             zoomVelocity += dt * offset * multiplier;
@@ -183,7 +186,7 @@ void EditorCameraController::handleScroll(Camera& camera, float dt) {
                 scale = 0.15f;
                 zoomVelocity = 0.0f;
             } else {
-                zoomVelocity *= std::pow(zoomDampeningFactor, dt);
+                zoomVelocity *= glm::pow(zoomDampeningFactor, dt);
             }
 
             camera.setScale(scale);
@@ -194,10 +197,10 @@ void EditorCameraController::handleScroll(Camera& camera, float dt) {
         }
 
         if (!glm::epsilonEqual(zoomVelocity, 0.0f, FLT_EPSILON)) {
-            glm::vec3 pos = camera.getEyePoint();
-            pos -= camera.getForwardDirection() * zoomVelocity;
-            zoomVelocity *= std::pow(zoomDampeningFactor, dt);
-            camera.setEyePoint(pos);
+            glm::vec3 position{ camera.getEyePoint() };
+            position -= camera.getForwardDirection() * zoomVelocity;
+            zoomVelocity *= glm::pow(zoomDampeningFactor, dt);
+            camera.setEyePoint(position);
         }
     }
 }

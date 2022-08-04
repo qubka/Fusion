@@ -235,11 +235,11 @@ VkResult Window::createSurface(VkInstance instance, const VkAllocationCallbacks*
 }
 
 int overlappingArea(const glm::ivec2& l1, const glm::ivec2& r1, const glm::ivec2& l2, const glm::ivec2& r2) {
-    int area1 = std::abs(l1.x - r1.x) * std::abs(l1.y - r1.y);
+    int area1 = glm::abs(l1.x - r1.x) * glm::abs(l1.y - r1.y);
 
-    int area2 = std::abs(l2.x - r2.x) * std::abs(l2.y - r2.y);
+    int area2 = glm::abs(l2.x - r2.x) * glm::abs(l2.y - r2.y);
 
-    int areaI = (std::min(r1.x, r2.x) - std::max(l1.x, l2.x)) * (std::min(r1.y, r2.y) - std::max(l1.y, l2.y));
+    int areaI = (glm::min(r1.x, r2.x) - glm::max(l1.x, l2.x)) * (glm::min(r1.y, r2.y) - glm::max(l1.y, l2.y));
 
     return area1 + area2 - areaI;
 }

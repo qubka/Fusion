@@ -61,7 +61,7 @@ bool Camera::setFov(float fov) {
 }
 
 bool Camera::setFovHorizontal(float fov) {
-    fov = glm::degrees(2.0f * std::atan(std::tan(glm::radians(fov) * 0.5f) / aspectRatio));
+    fov = glm::degrees(2.0f * glm::atan(glm::tan(glm::radians(fov) * 0.5f) / aspectRatio));
     if (glm::epsilonEqual(fovDegrees, fov, FLT_EPSILON))
         return false;
 

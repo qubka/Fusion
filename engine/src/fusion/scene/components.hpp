@@ -11,7 +11,15 @@
 #include "components/mesh_component.hpp"
 #include "components/light_component.hpp"
 
-#define ALL_COMPONENTS IdComponent, NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent
+#include "components/rigidbody_component.hpp"
+#include "components/box_collider_component.hpp"
+#include "components/capsule_collider_component.hpp"
+#include "components/mesh_collider_component.hpp"
+#include "components/sphere_collider_component.hpp"
+#include "components/physics_material_component.hpp"
+
+#define ALL_COMPONENTS IdComponent, NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent, \
+    RigidbodyComponent, BoxColliderComponent, CapsuleColliderComponent, MeshColliderComponent, SphereColliderComponent, PhysicsMaterialComponent
 
 namespace fe {
     /*struct PointLightComponent {
@@ -34,98 +42,17 @@ namespace fe {
         }
     };
 
-    struct RigidBodyComponent {
-        enum class BodyType : uchar { Static = 0, Dynamic = 1 };
-        BodyType type{ BodyType::Static };
-        //Layer layer;
-        float mass{ 1.0f };
-        float linearDrag{ 0.0f };
-        float angularDrag{ 0.05f };
-        bool disableGravity{ false };
-        bool kinematic{ false };
-        glm::bvec3 freezePosition{ false };
-        glm::bvec3 freezeRotation{ false };
 
-        // Storage for runtime
-        void* runtimeBody{ nullptr };
-    };
 
-    struct BoxColliderComponent {
-        glm::vec3 extent{ 1.0f };
-        bool trigger{ false };
-        //bool showColliderBounds{ true };
 
-        // Storage for runtime
-        void* runtimeShape{ nullptr };
 
-        template<typename Archive>
-        void serialize(Archive& archive) {
-            archive(cereal::make_nvp("extent", extent),
-                    cereal::make_nvp("trigger", trigger));
-        }
-    };
 
-    struct SphereColliderComponent {
-        float radius{ 0.0f };
-        bool trigger{ false };
-        //bool showColliderBounds{ true };
 
-        // Storage for runtime
-        void* runtimeShape{ nullptr };
 
-        template<typename Archive>
-        void serialize(Archive& archive) {
-            archive(cereal::make_nvp("radius", radius),
-                    cereal::make_nvp("trigger", trigger));
-        }
-    };
 
-    struct CapsuleColliderComponent {
-        float radius{ 0.0f };
-        float height{ 0.0f };
-        bool trigger{ false };
-        //bool showColliderBounds{ true };
 
-        // Storage for runtime
-        void* runtimeShape{ nullptr };
 
-        template<typename Archive>
-        void serialize(Archive& archive) {
-            archive(cereal::make_nvp("radius", radius),
-                    cereal::make_nvp("radius", radius),
-                    cereal::make_nvp("trigger", trigger));
-        }
-    };
 
-    struct MeshColliderComponent {
-        bool convex{ false };
-        bool trigger{ false };
-        bool overrideMesh{ false };
-        //bool showColliderBounds{ false };
-
-        // Storage for runtime
-        void* runtimeShape{ nullptr };
-
-        template<typename Archive>
-        void serialize(Archive& archive) {
-            archive(cereal::make_nvp("convex", convex),
-                    cereal::make_nvp("trigger", trigger),
-                    cereal::make_nvp("override mesh", overrideMesh));
-        }
-    };
-
-    struct PhysicsMaterialComponent {
-        enum class CombineMode : uchar { Average = 0, Minimum, Multiply, Maximum };
-
-        float dynamicFriction{ 0.5f };
-        float staticFriction{ 0.5f };
-        float restitution{ 0.5f };
-        CombineMode frictionCombine{ CombineMode::Average };
-        CombineMode restitutionCombine{ CombineMode::Average };
-
-        // Storage for runtime
-        void* runtimeMaterial{ nullptr };
-    };
 
     struct MaterialComponent {
         glm::vec4 ambient{ 1.0f };
