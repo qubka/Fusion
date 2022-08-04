@@ -46,10 +46,10 @@ VkExtent2D Surface::getExtent() const {
             DeviceManager::Get()->waitEvents();
         }
         return {
-                std::max(capabilities.minImageExtent.width,
-                         std::min(capabilities.maxImageExtent.width, size.x)),
-                std::max(capabilities.minImageExtent.height,
-                         std::min(capabilities.maxImageExtent.height, size.y))
+                glm::max(capabilities.minImageExtent.width,
+                         glm::min(capabilities.maxImageExtent.width, size.x)),
+                glm::max(capabilities.minImageExtent.height,
+                         glm::min(capabilities.maxImageExtent.height, size.y))
         };
     } else {
         return capabilities.currentExtent;

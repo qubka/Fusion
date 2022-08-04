@@ -156,28 +156,28 @@ Rect Rect::scaled(const glm::vec2& scale) const {
     return { x1 * scale.x, y1 * scale.y, x2 * scale.x, y2 * scale.y };
 }
 
-Rect Rect::transformed(const glm::mat3& matrix) const {
+Rect Rect::transformed(const glm::mat3& transform) const {
     glm::vec2 center{ glm::vec2(x1 + x2, y1 + y2) / 2.0f };
     glm::vec2 extents{ glm::abs(glm::vec2(x2, y2) - center) };
 
-    glm::vec3 x = matrix * glm::vec3{extents.x, 0, 0};
-    glm::vec3 y = matrix * glm::vec3{0, extents.y, 0};
+    glm::vec3 x {transform * glm::vec3{ extents.x, 0, 0 }};
+    glm::vec3 y {transform * glm::vec3{ 0, extents.y, 0 }};
 
     extents = glm::vec2{ glm::abs(x) + glm::abs(y) };
-    center = glm::vec2{matrix * glm::vec3{center, 1}};
+    center = glm::vec2{transform * glm::vec3{center, 1}};
 
     return { center.x - extents.x, center.y - extents.y, center.x + extents.x, center.y + extents.y };
 }
 
-void Rect::transform(const glm::mat3& matrix) {
+void Rect::transform(const glm::mat3& transform) {
     glm::vec2 center{ glm::vec2{ x1 + x2, y1 + y2 } / 2.0f };
     glm::vec2 extents{ glm::abs(glm::vec2{ x2, y2 } - center) };
 
-    glm::vec3 x{ matrix * glm::vec3{ extents.x, 0, 0 }};
-    glm::vec3 y{ matrix * glm::vec3{ 0, extents.y, 0 }};
+    glm::vec3 x {transform * glm::vec3{ extents.x, 0, 0 }};
+    glm::vec3 y {transform * glm::vec3{ 0, extents.y, 0 }};
 
     extents = glm::vec2{glm::abs(x) + glm::abs(y)};
-    center = glm::vec2{matrix * glm::vec3{center, 1}};
+    center = glm::vec2{transform * glm::vec3{center, 1}};
 
     x1 = center.x - extents.x;
     y1 = center.y - extents.y;
@@ -200,22 +200,17 @@ float Rect::distance(const glm::vec2& pt) const {
     else if (pt.y > y2) squaredDistance += (pt.y - y2) * (pt.y - y2);
 
     if (squaredDistance > 0)
-        return sqrtf(squaredDistance);
+        return glm::sqrt(squaredDistance);
     else
         return 0;
 }
 
 float Rect::distanceSquared(const glm::vec2& pt) const {
     float squaredDistance = 0;
-    if (pt.x < x1)
-        squaredDistance += (x1 - pt.x) * (x1 - pt.x);
-    else if (pt.x > x2)
-        squaredDistance += (pt.x - x2) * (pt.x - x2);
-    if (pt.y < y1)
-        squaredDistance += (y1 - pt.y) * (y1 - pt.y);
-    else if (pt.y > y2)
-        squaredDistance += (pt.y - y2) * (pt.y - y2);
-
+    if (pt.x < x1) squaredDistance += (x1 - pt.x) * (x1 - pt.x);
+    else if (pt.x > x2) squaredDistance += (pt.x - x2) * (pt.x - x2);
+    if (pt.y < y1) squaredDistance += (y1 - pt.y) * (y1 - pt.y);
+    else if (pt.y > y2) squaredDistance += (pt.y - y2) * (pt.y - y2);
     return squaredDistance;
 }
 

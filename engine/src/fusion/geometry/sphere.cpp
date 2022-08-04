@@ -114,7 +114,7 @@ glm::vec3 Sphere::closestPoint(const Ray& ray) const {
     float disc = b * b - 4 * a * c;
 
     if (disc > 0) {
-        float e = std::sqrt(disc);
+        float e = glm::sqrt(disc);
         float denominator = 2 * a;
         t = (-b - e) / denominator;
 
@@ -140,13 +140,13 @@ void Sphere::calcProjection(float focalLength, glm::vec2* outCenter, glm::vec2* 
 
     if (outCenter)
         *outCenter = focalLength * o.z * glm::vec2{o.x, o.y} / (z2 - r2);
-    if (std::fabs(z2 - l2) > 0.00001f) {
+    if (glm::abs(z2 - l2) > 0.00001f) {
         if (outAxisA)
-            *outAxisA = focalLength * sqrtf(-r2 * (r2 - l2) / ((l2 - z2) * (r2 - z2) * (r2 - z2))) * glm::vec2{o.x, o.y};
+            *outAxisA = focalLength * glm::sqrt(-r2 * (r2 - l2) / ((l2 - z2) * (r2 - z2) * (r2 - z2))) * glm::vec2{o.x, o.y};
         if (outAxisB)
-            *outAxisB = focalLength * sqrtf(std::fabs(-r2 * (r2 - l2) / ((l2 - z2) * (r2 - z2) * (r2 - l2)))) * glm::vec2{-o.y, o.x};
+            *outAxisB = focalLength * glm::sqrt(glm::abs(-r2 * (r2 - l2) / ((l2 - z2) * (r2 - z2) * (r2 - l2)))) * glm::vec2{-o.y, o.x};
     } else { // approximate with circle
-        float rad = focalLength * radius / sqrtf(z2 - r2);
+        float rad = focalLength * radius / glm::sqrt(z2 - r2);
         if (outAxisA)
             *outAxisA = {rad, 0};
         if (outAxisB)
@@ -189,7 +189,7 @@ float Sphere::calcProjectedArea(float focalLength, const glm::vec2& screenSize) 
     float z2 = o.z * o.z;
     float l2 = glm::dot(o, o);
 
-    float area = static_cast<float>(-M_PI) * focalLength * focalLength * r2 * std::sqrt(std::fabs((l2 - r2) / (r2 - z2))) / (r2 - z2);
+    float area = -glm::pi<float>() * focalLength * focalLength * r2 * glm::sqrt(glm::abs((l2 - r2) / (r2 - z2))) / (r2 - z2);
     float aspectRatio = screenSize.x / screenSize.y;
     return area * screenSize.x * screenSize.y * 0.25f / aspectRatio;
 }
@@ -235,5 +235,5 @@ Sphere Sphere::CalculateBoundingSphere(std::span<const glm::vec3> points) {
             maxDistance = dist;
     }
 
-    return { center, std::sqrt(maxDistance) };
+    return { center, glm::sqrt(maxDistance) };
 }

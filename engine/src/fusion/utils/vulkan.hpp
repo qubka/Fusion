@@ -14,7 +14,7 @@ namespace vku {
 
     /// Scale a value by mip level, but do not reduce to zero.
     inline uint32_t mipScale(uint32_t value, uint32_t mipLevel) {
-        return std::max(value >> mipLevel, 1U);
+        return glm::max(value >> mipLevel, 1U);
     }*/
 
     inline VkViewport viewport(float x, float y, float width, float height, float minDepth = 0, float maxDepth = 1) {

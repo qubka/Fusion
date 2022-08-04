@@ -62,7 +62,7 @@ namespace fe {
 
             auto realSize = size;
             if (realSize == 0)
-                realSize = std::min(sizeof(object), static_cast<size_t>(uniform->getSize()));
+                realSize = glm::min(sizeof(object), static_cast<size_t>(uniform->getSize()));
 
             push(object, static_cast<size_t>(uniform->getOffset()), realSize);
         }

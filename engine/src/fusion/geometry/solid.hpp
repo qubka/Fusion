@@ -18,7 +18,7 @@ namespace fe {
         Solid<N>& fitDimension(float newMaxDimension) {
             float maxDimension = 0;
             for (const auto& vertex : vertices) {
-                maxDimension = std::max(maxDimension, std::max(std::max(vertex.x, vertex.y), vertex.z));
+                maxDimension = glm::max(maxDimension, glm::max(glm::max(vertex.x, vertex.y), vertex.z));
             }
             float multiplier = newMaxDimension / maxDimension;
             for (auto& vertex : vertices) {

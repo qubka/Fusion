@@ -43,9 +43,9 @@ namespace fe {
         Rect scaled(const glm::vec2& scale) const;
 
         //! transforms the Rect by \a matrix. Represents the bounding box of the transformed Rect when \a matrix expresses non-scale/translate operations.
-        void transform(const glm::mat3& matrix);
+        void transform(const glm::mat3& transform);
         //! Returns a copy of the Rect transformed by \a matrix. Represents the bounding box of the transformed Rect when \a matrix expresses non-scale/translate operations.
-        Rect transformed(const glm::mat3& matrix) const;
+        Rect transformed(const glm::mat3& transform) const;
 
         //! Is a point \a pt inside the rectangle
         bool contains(const glm::vec2& pt) const { return (pt.x >= x1) && (pt.x <= x2) && (pt.y >= y1) && (pt.y <= y2); }

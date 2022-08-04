@@ -24,7 +24,9 @@ void SubrenderHolder::renderStage(Pipeline::Stage pipelineStage, const CommandBu
 		}
 
         if (auto& subrender = subrenders[type.first][type.second]) {
-            subrender->onRender(commandBuffer, overrideCamera);
+            if (subrender->isEnabled()) {
+                subrender->onRender(commandBuffer, overrideCamera);
+            }
         }
 	}
 }

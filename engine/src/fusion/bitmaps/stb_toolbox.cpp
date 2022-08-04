@@ -37,7 +37,7 @@ void StbToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
 
     bitmap.data = std::move(pixels);
     bitmap.size = { width, height };
-    int components = std::max(channels, desired_channels);
+    int components = glm::max(channels, desired_channels);
     switch (components) {
         case STBI_grey:
             bitmap.format = hdr ? VK_FORMAT_R16_UNORM : VK_FORMAT_R8_UNORM;
