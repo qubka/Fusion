@@ -104,7 +104,7 @@ VkSampleCountFlagBits PhysicalDevice::getMaxUsableSampleCount() const {
     VkPhysicalDeviceProperties physicalDeviceProperties;
     vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
 
-    auto counts = std::min(physicalDeviceProperties.limits.framebufferColorSampleCounts, physicalDeviceProperties.limits.framebufferDepthSampleCounts);
+    auto counts = glm::min(physicalDeviceProperties.limits.framebufferColorSampleCounts, physicalDeviceProperties.limits.framebufferDepthSampleCounts);
 
     for (const auto& sampleFlag : STAGE_FLAG_BITS) {
         if (counts & sampleFlag)

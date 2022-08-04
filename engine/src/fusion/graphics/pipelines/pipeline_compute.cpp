@@ -39,8 +39,8 @@ PipelineCompute::~PipelineCompute() {
 }
 
 void PipelineCompute::cmdRender(const CommandBuffer& commandBuffer, const glm::uvec2& extent) const {
-	auto groupCountX = static_cast<uint32_t>(std::ceil(static_cast<float>(extent.x) / static_cast<float>(*shader.getLocalSizes()[0])));
-	auto groupCountY = static_cast<uint32_t>(std::ceil(static_cast<float>(extent.y) / static_cast<float>(*shader.getLocalSizes()[1])));
+	auto groupCountX = static_cast<uint32_t>(glm::ceil(static_cast<float>(extent.x) / static_cast<float>(*shader.getLocalSizes()[0])));
+	auto groupCountY = static_cast<uint32_t>(glm::ceil(static_cast<float>(extent.y) / static_cast<float>(*shader.getLocalSizes()[1])));
 	vkCmdDispatch(commandBuffer, groupCountX, groupCountY, 1);
 }
 

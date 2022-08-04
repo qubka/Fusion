@@ -141,7 +141,7 @@ bool Plane::sameSide(const glm::vec3& p0, const glm::vec3& p1) const {
 bool Plane::rayCast(const Ray& ray, float& enter) const {
     float vdot = glm::dot(ray.getDirection(), normal);
 
-    if (std::abs(vdot) < FLT_EPSILON) {
+    if (glm::abs(vdot) < FLT_EPSILON) {
         enter = 0;
         return false;
     }

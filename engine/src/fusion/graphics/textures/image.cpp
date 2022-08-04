@@ -72,7 +72,7 @@ VkDescriptorSetLayoutBinding Image::GetDescriptorSetLayout(uint32_t binding, VkD
 }
 
 uint32_t Image::GetMipLevels(const VkExtent3D& extent) {
-	return static_cast<uint32_t>(std::floor(std::log2(std::max(extent.width, std::max(extent.height, extent.depth)))) + 1);
+	return static_cast<uint32_t>(glm::floor(std::log2(glm::max(extent.width, glm::max(extent.height, extent.depth)))) + 1);
 }
 
 VkFormat Image::FindSupportedFormat(std::span<const VkFormat> candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
@@ -162,7 +162,7 @@ void Image::CreateImageSampler(VkSampler& sampler, VkFilter filter, VkSamplerAdd
 	samplerCreateInfo.addressModeW = addressMode;
 	samplerCreateInfo.mipLodBias = 0.0f;
 	samplerCreateInfo.anisotropyEnable = static_cast<VkBool32>(anisotropic);
-	samplerCreateInfo.maxAnisotropy = (anisotropic && logicalDevice.getEnabledFeatures().samplerAnisotropy) ? std::min(ANISOTROPY, physicalDevice.getProperties().limits.maxSamplerAnisotropy) : 1.0f;
+	samplerCreateInfo.maxAnisotropy = (anisotropic && logicalDevice.getEnabledFeatures().samplerAnisotropy) ? glm::min(ANISOTROPY, physicalDevice.getProperties().limits.maxSamplerAnisotropy) : 1.0f;
 	//samplerCreateInfo.compareEnable = VK_FALSE;
 	//samplerCreateInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	samplerCreateInfo.minLod = 0.0f;
