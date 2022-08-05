@@ -12,8 +12,9 @@ namespace fe {
 	 * @param binding The index the attachment is bound to in the renderpass.
 	 * @param name The unique name given to the object for all renderpasses.
 	 * @param type The attachment type this represents.
-	 * @param multisampled If this attachment is multisampled.
-	 * @param format The format that will be created (only applies to type ATTACHMENT_IMAGE).
+	 * @param multisampled If this attachment is multisampled. (should be last attachment)
+	 * @param format The format that will be created (only applies to type ATTACHMENT_IMAGE). (VK_FORMAT_UNDEFINED will use the surface format)
+     * @param layout The layout the attachment image subresource will be transitioned to when a render pass instance ends.
 	 * @param clearColour The colour to clear to before rendering to it.
 	 */
     struct Attachment {
@@ -23,6 +24,7 @@ namespace fe {
         Type type{ Type:: Image };
         bool multisampled{ false };
         VkFormat format{ VK_FORMAT_R8G8B8A8_UNORM };
+        VkImageLayout layout{ VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL };
         glm::vec4 clearColor{ 0.0f, 0.0f, 0.0f, 1.0f };
     };
 
