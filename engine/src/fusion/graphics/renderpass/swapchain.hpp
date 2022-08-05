@@ -47,6 +47,7 @@ namespace fe {
         VkExtent2D extent;
         std::vector<VkImage> images;
         std::vector<VkImageView> imageViews;
+
         uint32_t imageCount{ 0 };
         VkSwapchainKHR swapchain{ VK_NULL_HANDLE };
         uint32_t activeImageIndex{ 0 };

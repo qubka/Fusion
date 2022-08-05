@@ -243,9 +243,8 @@ void PipelineGraphics::createAttributes() {
 	viewportState.viewportCount = 1;
 	viewportState.scissorCount = 1;
 
-	// TODO: Multisampled pipelines
-	//auto renderStage = Graphics::Get()->getRenderStage(stage.first);
-	bool multisampled = false; // renderStage->IsMultisampled(stage.second);
+	auto renderStage = Graphics::Get()->getRenderStage(stage.first);
+	bool multisampled = renderStage->isMultisampled(stage.second);
 
 	multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	multisampleState.rasterizationSamples = multisampled ? physicalDevice.getMsaaSamples() : VK_SAMPLE_COUNT_1_BIT;

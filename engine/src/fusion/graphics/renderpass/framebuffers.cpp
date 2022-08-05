@@ -9,14 +9,13 @@
 
 using namespace fe;
 
-Framebuffers::Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& swapchain, const RenderStage& renderStage, const Renderpass& renderPass, const TextureDepth& depthStencil,
-	const glm::uvec2& extent, VkSampleCountFlagBits samples) :
+Framebuffers::Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& swapchain, const RenderStage& renderStage, const Renderpass& renderPass, const TextureDepth& depthStencil, const glm::uvec2& extent, VkSampleCountFlagBits samples) :
 	logicalDevice{logicalDevice} {
 	for (const auto& attachment : renderStage.getAttachments()) {
         switch (attachment.type) {
             case Attachment::Type::Image:
-                imageAttachments.push_back(std::make_unique<Texture2d>(extent, attachment.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                   VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, attachment.multisampled ? samples : VK_SAMPLE_COUNT_1_BIT));
+                imageAttachments.push_back(std::make_unique<Texture2d>(extent, attachment.format != VK_FORMAT_UNDEFINED ? attachment.format : swapchain.getSurfaceFormat().format,
+                   attachment.layout, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, attachment.multisampled ? samples : VK_SAMPLE_COUNT_1_BIT));
                 break;
             case Attachment::Type::Depth:
                 imageAttachments.emplace_back(nullptr);
