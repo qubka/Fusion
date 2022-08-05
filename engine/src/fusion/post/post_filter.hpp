@@ -47,6 +47,6 @@ namespace fe {
         DescriptorsHandler descriptorSet;
         PipelineGraphics pipeline;
 
-        std::map<std::string, const Descriptor*> attachments;
+        std::unordered_map<std::string, const Descriptor*> attachments;
     };
 }
