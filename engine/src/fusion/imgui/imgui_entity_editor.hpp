@@ -131,7 +131,7 @@ namespace ImGui {
                         ImGui::SameLine();
 
                         float filterSize = xAvail - style.IndentSpacing;
-                        filterSize = std::min(200.0f, filterSize);
+                        filterSize = glm::min(200.0f, filterSize);
                         componentFilter.Draw("##ComponentFilter", filterSize);
 
                         for (const auto& [component, info] : hasNot) {

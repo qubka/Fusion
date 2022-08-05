@@ -83,9 +83,9 @@ uint32_t PhysicalDevice::ScorePhysicalDevice(VkPhysicalDevice device) {
 
     // Obtain the device features and properties of the current device being rateds
     VkPhysicalDeviceProperties physicalDeviceProperties;
-    VkPhysicalDeviceFeatures physicalDeviceFeatures;
+    //VkPhysicalDeviceFeatures physicalDeviceFeatures;
     vkGetPhysicalDeviceProperties(device, &physicalDeviceProperties);
-    vkGetPhysicalDeviceFeatures(device, &physicalDeviceFeatures);
+    //vkGetPhysicalDeviceFeatures(device, &physicalDeviceFeatures);
 
 #if FUSION_DEBUG
     LogVulkanDevice(physicalDeviceProperties, extensionProperties);

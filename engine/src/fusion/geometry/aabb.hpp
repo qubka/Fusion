@@ -57,5 +57,3 @@ namespace fe {
         glm::vec3 extents;
     };
 }
-
-std::ostream& operator<<(std::ostream& o, const fe::AABB& b);

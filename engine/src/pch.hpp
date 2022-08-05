@@ -96,3 +96,4 @@ using Random = effolkronium::random_static;
 #include "fusion/utils/string.hpp"
 #include "fusion/utils/thread_pool.hpp"
 #include "fusion/utils/vulkan.hpp"
+#include "fusion/utils/vector.hpp"

@@ -12,6 +12,7 @@ using namespace fe;
 
 // For fast converting between ASSIMP and glm
 static inline const glm::vec3& vec3_cast(const aiVector3D& v) { return *reinterpret_cast<const glm::vec3*>(&v); }
+static inline const glm::vec3& vec3_cast(const aiColor3D& v) { return *reinterpret_cast<const glm::vec3*>(&v); }
 static inline const glm::vec2& vec2_cast(const aiVector3D& v) { return *reinterpret_cast<const glm::vec2*>(&v); }
 static inline const glm::quat& quat_cast(const aiQuaternion& q) { return *reinterpret_cast<const glm::quat*>(&q); }
 static inline glm::mat4 mat4_cast(const aiMatrix4x4& m) { return glm::transpose(glm::make_mat4(&m.a1)); }
@@ -246,12 +247,7 @@ void Model::appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* sc
             case Component::RGBA: {
                 aiColor3D color{0.0f, 0.0f, 0.0f};
                 scene->mMaterials[mesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-                uint32_t result =
-                        (static_cast<uint32_t>(255) << 24) |
-                        (static_cast<uint32_t>(color.b * 255) << 16) |
-                        (static_cast<uint32_t>(color.g * 255) << 8) |
-                        (static_cast<uint32_t>(color.r * 255) << 0);
-                vertexBuffer.push_back(static_cast<float>(result));
+                vertexBuffer.push_back(static_cast<float>(glm::rgbaColor(vec3_cast(color))));
                 break;
             }
 
@@ -278,5 +274,5 @@ void Model::appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* sc
         };
     }
 
-    appendOutput<float>(outputBuffer, vertexBuffer);
+    Vector::Append(outputBuffer, vertexBuffer);
 }

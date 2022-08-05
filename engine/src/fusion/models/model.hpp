@@ -51,14 +51,6 @@ namespace fe {
 
         //static aiScene GenerateScene(const Mesh& mesh);
 
-        template<typename T>
-        void appendOutput(std::vector<std::byte>& outputBuffer, std::span<const T> t) {
-            auto offset = outputBuffer.size();
-            auto copySize = t.size() * sizeof(T);
-            outputBuffer.resize(offset + copySize);
-            std::memcpy(outputBuffer.data() + offset, t.data(), copySize);
-        }
-
         fs::path directory;
         Vertex::Layout layout;
 

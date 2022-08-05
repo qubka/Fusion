@@ -21,9 +21,15 @@ using namespace fe;
 
 ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"engine/assets/shaders/imgui/imgui.vert", "engine/assets/shaders/imgui/imgui.frag"}, {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}}, {}
-        , PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE/*, VK_FRONT_FACE_CLOCKWISE, PipelineGraphics::Blend::SrcAlphaOneMinusSrcAlpha
-        , false, 0.0f, 0.0f, 0.0f, 1.0f, true, true*/}
+        , pipeline{pipelineStage,
+                   {"engine/assets/shaders/imgui/imgui.vert", "engine/assets/shaders/imgui/imgui.frag"},
+                   {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}},
+                   {},
+                   PipelineGraphics::Mode::Polygon,
+                   PipelineGraphics::Depth::None,
+                   VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+                   VK_POLYGON_MODE_FILL,
+                   VK_CULL_MODE_NONE}
         , descriptorSet{pipeline} {
     ImGui::SetCurrentContext(ImGui::CreateContext());
 

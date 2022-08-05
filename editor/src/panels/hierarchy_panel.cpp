@@ -176,7 +176,7 @@ void HierarchyPanel::onImGui() {
                         ImVec2 maxSpace{ ImGui::GetWindowContentRegionMax() };
 
                         float yScroll = ImGui::GetScrollY();
-                        float yOffset = std::max(45.0f, yScroll); // Dont include search bar
+                        float yOffset = glm::max(45.0f, yScroll); // Dont include search bar
                         minSpace.x += ImGui::GetWindowPos().x + 1.0f;
                         minSpace.y += ImGui::GetWindowPos().y + 1.0f + yOffset;
                         maxSpace.x += ImGui::GetWindowPos().x - 1.0f;
@@ -253,6 +253,10 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
 
         if (registry.any_of<CameraComponent>(node)) {
             editor->getComponentIcon(type_id<CameraComponent>, icon);
+        } else if (registry.any_of<RigidbodyComponent>(node)) {
+            editor->getComponentIcon(type_id<RigidbodyComponent>, icon);
+        } else if (registry.any_of<LightComponent>(node)) {
+            editor->getComponentIcon(type_id<LightComponent>, icon);
         }
 
         //ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorScheme::GetIconColor());

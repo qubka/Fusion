@@ -172,7 +172,7 @@ float AABB::getDistanceToNearestEdge(const glm::vec3& point) const {
             minDistance = dist;
     }
 
-    return std::sqrt(minDistance);
+    return glm::sqrt(minDistance);
 }
 
 void AABB::transform(const glm::mat4& transform) {
@@ -191,12 +191,8 @@ AABB AABB::transformed(const glm::mat4& transform) const {
     glm::vec3 y {m * glm::vec3{0, extents.y, 0}};
     glm::vec3 z {m * glm::vec3{0, 0, extents.z}};
 
-    return {
-        glm::abs(x) + glm::abs(y) + glm::abs(z),
-        transform * glm::vec4{center, 1} // vec4 -> vec3
-    };
-}
-
-std::ostream& operator<<(std::ostream& o, const AABB& b) {
-    return o << "(" << glm::to_string(b.getMin()) << ", " << glm::to_string(b.getMax()) << ")";
+    AABB aabb;
+    aabb.extents = glm::abs(x) + glm::abs(y) + glm::abs(z);
+    aabb.center = transform * glm::vec4{center, 1}; // vec4 -> vec3
+    return aabb;
 }
