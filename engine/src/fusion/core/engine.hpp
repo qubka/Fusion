@@ -105,7 +105,7 @@ namespace fe {
         std::unique_ptr<DeviceManager> devices;
 
         std::vector<std::unique_ptr<Module>> modules;
-        std::unordered_map<Module::Stage, std::vector<uint32_t>> stages;
+        std::array<std::vector<uint32_t>, me::enum_count<Module::Stage>()> stages;
 
         bool running{ false };
 

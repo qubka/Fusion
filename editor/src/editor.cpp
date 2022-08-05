@@ -9,17 +9,18 @@
 #include "fusion/scene/components.hpp"
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/filesystem/file_format.hpp"
-
 #include "fusion/filesystem/file_system.hpp"
+#include "fusion/geometry/ray.hpp"
+
 #include "panels/application_info_panel.hpp"
 #include "panels/console_panel.hpp"
 #include "panels/content_browser_panel.hpp"
-#include "panels/project_settings_panel.hpp"
 #include "panels/text_edit_panel.hpp"
 #include "panels/hierarchy_panel.hpp"
 #include "panels/inspector_panel.hpp"
 #include "panels/scene_view_panel.hpp"
 #include "panels/game_view_panel.hpp"
+#include "panels/project_settings_panel.hpp"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
@@ -48,12 +49,13 @@ void Editor::onStart() {
     componentIconMap[type_id<MeshComponent>] = ICON_MDI_SHAPE;
     componentIconMap[type_id<CameraComponent>] = ICON_MDI_CAMERA;
     componentIconMap[type_id<LightComponent>] = ICON_MDI_LIGHTBULB;
-    /*componentIconMap[type_id<RigidBodyComponent>] = ICON_MDI_CUBE_OUTLINE;
-    componentIconMap[type_id<PhysicsMaterialComponent>] = ICON_FA_TENCENT_WEIBO;
-    componentIconMap[type_id<BoxColliderComponent>] = ICON_FA_SQUARE_O;
-    componentIconMap[type_id<SphereColliderComponent>] = ICON_FA_CIRCLE_O;
-    componentIconMap[type_id<CapsuleColliderComponent>] = ICON_FA_TOGGLE_OFF;
-    componentIconMap[type_id<MaterialComponent>] = ICON_MDI_MATERIAL_UI;
+    componentIconMap[type_id<RigidbodyComponent>] =  ICON_MDI_WEBPACK;
+    componentIconMap[type_id<PhysicsMaterialComponent>] = ICON_MDI_GRADIENT;
+    componentIconMap[type_id<BoxColliderComponent>] = ICON_MDI_SQUARE_OUTLINE;
+    componentIconMap[type_id<SphereColliderComponent>] = ICON_MDI_CIRCLE_OUTLINE;
+    componentIconMap[type_id<CapsuleColliderComponent>] = ICON_MDI_PILL;
+    componentIconMap[type_id<MeshColliderComponent>] =  ICON_MDI_SHAPE_OUTLINE;
+    /*componentIconMap[type_id<MaterialComponent>] = ICON_MDI_MATERIAL_UI;
     componentIconMap[type_id<PointLightComponent>] = ICON_MDI_LIGHTBULB;
     componentIconMap[type_id<DirectionalLightComponent>] = ICON_MDI_SPOTLIGHT_BEAM;
     componentIconMap[type_id<SoundComponent>] = ICON_MDI_VOLUME_HIGH;
@@ -76,28 +78,36 @@ void Editor::onStart() {
 
 void Editor::onUpdate() {
     auto scene = SceneManager::Get()->getScene();
-    if (sceneViewActive && scene) {
+    if (scene && sceneViewActive) {
         auto input = Input::Get();
 
-        if (editorCamera)
+        if (editorCamera) {
             editorCameraController.update(*editorCamera);
 
-        if (input->getKeyDown(Key::F)) {
-            auto& registry = scene->getRegistry();
-            if (registry.valid(selectedEntity)) {
-                if (auto transform = registry.try_get<TransformComponent>(selectedEntity))
-                    focusCamera(transform->getWorldPosition(), 5.0f, 0.2f);
+            if (input->getKeyDown(Key::F)) {
+                auto& registry = scene->getRegistry();
+                if (registry.valid(selectedEntity)) {
+                    if (auto transform = registry.try_get<TransformComponent>(selectedEntity))
+                        focusCamera(transform->getWorldPosition(), 5.0f, 0.2f);
+                }
             }
-        }
 
-        if (input->getKey(Key::O)) {
-            focusCamera(vec3::zero, 5.0f, 0.2f);
-        }
+            if (input->getKey(Key::O)) {
+                focusCamera(vec3::zero, 5.0f, 0.2f);
+            }
 
-        if (transitioningCamera) {
-            transitioningCamera = editorCamera->setEyePoint(glm::smoothdamp(editorCamera->getEyePoint(), cameraDestination, cameraVelocity, 0.3f, cameraTransitionMaxSpeed, Time::DeltaTime().asSeconds()));
-        } else {
-            cameraVelocity = vec3::zero;
+            if (transitioningCamera/* && glm::distance2(editorCamera->getEyePoint(), cameraDestination) > 1.0f*/) {
+                transitioningCamera = editorCamera->setEyePoint(
+                        glm::smoothdamp(editorCamera->getEyePoint(), cameraDestination, cameraVelocity, 0.15f,
+                                        cameraTransitionMaxSpeed, Time::DeltaTime().asSeconds()));
+            } else {
+                cameraVelocity = vec3::zero;
+            }
+
+            if (input->getMouseScroll().y != 0 || input->getKey(Key::W) || input->getKey(Key::S) ||
+                input->getKey(Key::A) || input->getKey(Key::D) || input->getKey(Key::Q) || input->getKey(Key::E)) {
+                transitioningCamera = false;
+            }
         }
 
         if (!input->getMouseButton(MouseButton::ButtonRight) && !ImGuizmo::IsUsing()) {
@@ -132,7 +142,7 @@ void Editor::onUpdate() {
             }
 
             if (input->getKeyDown(Key::O))
-               scene->deserialise();
+                scene->deserialise();
 
             if (input->getKeyDown(Key::X)) {
                 copiedEntity = selectedEntity;
@@ -168,88 +178,6 @@ void Editor::onUpdate() {
         editorCameraController.stopMovement();
 
     DefaultApplication::onUpdate();
-}
-
-void Editor::onImGuizmo() {
-    if (selectedEntity == entt::null || editorSettings.gizmosOperation == UINT32_MAX)
-        return;
-
-    if (editorSettings.showGizmos && editorCamera) {
-        ImGuizmo::SetDrawlist();
-        ImGuizmo::SetOrthographic(editorCamera->isOrthographic());
-
-        auto& registry = SceneManager::Get()->getScene()->getRegistry();
-        if (auto transform = registry.try_get<TransformComponent>(selectedEntity)) {
-            const glm::mat4& view = editorCamera->getViewMatrix();
-            const glm::mat4& proj = editorCamera->getProjectionMatrix();
-            glm::mat4 model = transform->getWorldMatrix();
-            glm::mat4 delta{1};
-
-            auto gizmosType = static_cast<ImGuizmo::OPERATION>(editorSettings.gizmosOperation);
-
-            // Snapping
-            float snapValue = editorSettings.snapAmount; // Snap to 0.5m for translation/scale
-            if (gizmosType == ImGuizmo::ROTATE)
-                snapValue = 45.0f;
-            glm::vec3 snapValues{ snapValue };
-
-            // Bounding
-            auto bounds = gizmosType == ImGuizmo::BOUNDS;
-            glm::vec3 boundsSnap{ editorSettings.snapBound };  // Snap to 0.1m for bound change
-            static glm::mat2x3 boundsValues = { glm::vec3{-1.0f}, glm::vec3{1.0f} };
-
-            ImGuizmo::Manipulate(glm::value_ptr(view),
-                                 glm::value_ptr(proj),
-                                 gizmosType,
-                                 ImGuizmo::LOCAL,
-                                 glm::value_ptr(model),
-                                 glm::value_ptr(delta),
-                                 editorSettings.snapGizmos ? glm::value_ptr(snapValues) : nullptr,
-                                 bounds ? glm::value_ptr(boundsValues) : nullptr,
-                                 bounds ? glm::value_ptr(boundsSnap) : nullptr);
-
-            if (ImGuizmo::IsUsing()) {
-                model = glm::inverse(transform->getParentMatrix()) * model;
-
-                glm::vec3 position, scale;
-                glm::quat orientation;
-                glm::vec3 skew;
-                glm::vec4 perspective;
-                glm::decompose(model, scale, orientation, position, skew, perspective);
-
-                switch (gizmosType) {
-                    case ImGuizmo::TRANSLATE:
-                        transform->setLocalPosition(position);
-                        break;
-                    case ImGuizmo::ROTATE:
-                        transform->setLocalOrientation(orientation);
-                        break;
-                    case ImGuizmo::SCALE:
-                        transform->setLocalScale(scale);
-                        break;
-                    default:
-                        transform->setLocalPosition(position);
-                        transform->setLocalOrientation(orientation);
-                        transform->setLocalScale(scale);
-                        break;
-                }
-            }
-
-            //transform->setLocalTransform(model);
-
-            /*RigidBody2DComponent* rigidBody2DComponent = registry.try_get<RigidBody2DComponent>(selectedEntity);
-
-            if (rigidBody2DComponent) {
-                rigidBody2DComponent->GetRigidBody()->SetPosition( { model[3].x, model[3].y });
-            } else {
-                RigidBody3DComponent* rigidBody3DComponent = registry.try_get<RigidBody3DComponent>(selectedEntity);
-                if (rigidBody3DComponent) {
-                    rigidBody3DComponent->GetRigidBody()->SetPosition(model[3]);
-                    rigidBody3DComponent->GetRigidBody()->SetOrientation(glm::eulerAngles(glm::quat_cast((model)));
-                }
-            }*/
-        }
-    }
 }
 
 void Editor::onImGui() {
@@ -359,10 +287,10 @@ void Editor::beginDockSpace(bool gameFullScreen) {
         ImGui::DockBuilderDockWindow("###profiler", DockingBottomLeftChild);
         ImGui::DockBuilderDockWindow("###content", DockingBottomLeftChild);
         ImGui::DockBuilderDockWindow("Dear ImGui Demo", DockLeft);
-        ImGui::DockBuilderDockWindow("###projectsettings", DockingBottomRightChild);
+        ImGui::DockBuilderDockWindow("###projecteditorSettings", DockingBottomRightChild);
         ImGui::DockBuilderDockWindow("###hierarchy", DockLeft);
         ImGui::DockBuilderDockWindow("###textedit", DockMiddle);
-        ImGui::DockBuilderDockWindow("###editorsettings", DockingBottomRightChild);
+        ImGui::DockBuilderDockWindow("###editoreditorSettings", DockingBottomRightChild);
         ImGui::DockBuilderDockWindow("###appinfo", DockingBottomRightChild);
 
         ImGui::DockBuilderFinish(dockspaceID);
@@ -863,13 +791,54 @@ EditorPanel* Editor::getPanel(const std::string& name) {
 }
 
 void Editor::focusCamera(const glm::vec3& point, float distance, float speed) {
-    if (editorCamera->isOrthographic()) {
-        editorCamera->setEyePoint(point);
-        // editorCamera->setScale(distance * 0.5f);
-    } else {
-        transitioningCamera = true;
+    transitioningCamera = true;
 
+    if (editorCamera->isOrthographic()) {
+        cameraDestination = glm::vec3{point.x, editorCamera->getEyePoint().y, point.z};
+    } else {
         cameraDestination = point - editorCamera->getForwardDirection() * distance;
-        cameraTransitionMaxSpeed = speed;
     }
+
+    cameraTransitionMaxSpeed = speed;
+}
+
+void Editor::selectObject(const Ray& ray, const glm::vec2& position) {
+    auto scene = SceneManager::Get()->getScene();
+    auto& registry = scene->getRegistry();
+    auto view = registry.view<TransformComponent, MeshComponent>();
+
+    float closestEntityDist = FLT_MAX;
+    entt::entity currentClosestEntity{ entt::null };
+
+    for (const auto& [entity, transform, mesh] : view.each()) {
+        if (!mesh.runtime)
+            continue;
+
+        const auto& worldTransform = transform.getWorldMatrix();
+
+        auto bbCopy = mesh.runtime->getBoundingBox().transformed(worldTransform);
+
+        float min, max;
+        if (bbCopy.intersect(ray, min, max) > 0) {
+            if (min < closestEntityDist) {
+                closestEntityDist = min;
+                currentClosestEntity = entity;
+            }
+        }
+    }
+
+    auto now = DateTime::Now();
+
+    if (selectedEntity != entt::null && selectedEntity == currentClosestEntity) {
+        if (((now - lastSelectTime).asSeconds() < 0.5f) && glm::distance2(lastSelectPos, position) <= 1.0f) {
+            auto& transform = registry.get<TransformComponent>(currentClosestEntity);
+            auto& bb = registry.get<MeshComponent>(currentClosestEntity).runtime->getBoundingBox();
+            focusCamera(transform.getWorldPosition(), glm::distance(bb.getMin(), bb.getMax()));
+        }
+    } else {
+        selectedEntity = currentClosestEntity;
+    }
+
+    lastSelectTime = now;
+    lastSelectPos = position;
 }

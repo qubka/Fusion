@@ -306,9 +306,9 @@ bool BufferingBar(const char* name, float value, ImVec2 size, ImU32 bgColor, ImU
     const float b = speed * 0.333f;
     const float c = speed * 0.666f;
 
-    const float o1 = (circleWidth + r) * (t + a - speed * std::round((t + a) / speed)) / speed;
-    const float o2 = (circleWidth + r) * (t + b - speed * std::round((t + b) / speed)) / speed;
-    const float o3 = (circleWidth + r) * (t + c - speed * std::round((t + c) / speed)) / speed;
+    const float o1 = (circleWidth + r) * (t + a - speed * glm::round((t + a) / speed)) / speed;
+    const float o2 = (circleWidth + r) * (t + b - speed * glm::round((t + b) / speed)) / speed;
+    const float o3 = (circleWidth + r) * (t + c - speed * glm::round((t + c) / speed)) / speed;
 
     drawList->AddCircleFilled(ImVec2{pos.x + circleEnd - o1, bb.Min.y + r}, r, bgColor);
     drawList->AddCircleFilled(ImVec2{pos.x + circleEnd - o2, bb.Min.y + r}, r, bgColor);
@@ -319,9 +319,9 @@ bool BufferingBar(const char* name, float value, ImVec2 size, ImU32 bgColor, ImU
 
 bool Spinner(const char* name, float radius, int thickness, ImU32 color) {
     ImGuiContext* g = ImGui::GetCurrentContext();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
     const ImGuiStyle& style = g->Style;
     const ImGuiID id = ImGui::GetID(name);
-    ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     ImVec2 pos{ ImGui::GetCursorPos() };
     ImVec2 size{ radius * 2, (radius + style.FramePadding.y) * 2 };
@@ -334,18 +334,18 @@ bool Spinner(const char* name, float radius, int thickness, ImU32 color) {
     // Render
     drawList->PathClear();
 
-    const int num_segments = 30;
-    float start = abs(ImSin(static_cast<float>(g->Time) * 1.8f) * static_cast<float>(num_segments - 5));
+    const float numSegments = 30.0f;
+    float start = abs(glm::sin(static_cast<float>(g->Time) * 1.8f) * numSegments - 5);
 
-    const float min = IM_PI * 2.0f * (start / static_cast<float>(num_segments));
-    const float max = IM_PI * 2.0f * (static_cast<float>(num_segments) - 3.0f) / static_cast<float>(num_segments);
+    const float min = glm::pi<float>() * 2.0f * (start / numSegments);
+    const float max = glm::pi<float>() * 2.0f * (numSegments - 3.0f) / numSegments;
 
     const ImVec2 centre{pos.x + radius, pos.y + radius + style.FramePadding.y};
 
-    for (int i = 0; i < num_segments; i++) {
-        const float a = min + (static_cast<float>(i) / static_cast<float>(num_segments)) * (max - min);
-        drawList->PathLineTo(ImVec2{centre.x + ImCos(a + static_cast<float>(g->Time) * 8) * radius,
-                                    centre.y + ImSin(a + static_cast<float>(g->Time) * 8) * radius});
+    for (int i = 0; i < static_cast<int>(numSegments); i++) {
+        const float a = min + (static_cast<float>(i) / numSegments) * (max - min);
+        drawList->PathLineTo(ImVec2{centre.x + glm::cos(a + static_cast<float>(g->Time) * 8) * radius,
+                                    centre.y + glm::sin(a + static_cast<float>(g->Time) * 8) * radius});
     }
 
     drawList->PathStroke(color, false, static_cast<float>(thickness));
@@ -417,7 +417,7 @@ bool ToggleButton(const char* name, bool& value, bool textStyle) {
 
 void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, float yOffset, ImU32 colEven, ImU32 colOdd) {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
-    float y0 = ImGui::GetCursorScreenPos().y + std::round(yOffset);
+    float y0 = ImGui::GetCursorScreenPos().y + glm::round(yOffset);
 
     ImGuiListClipper clipper;
     clipper.Begin(rowCount, lineHeight);
@@ -488,7 +488,7 @@ void AlternatingRowsBackground(float lineHeight) {
 
     float xScroll = ImGui::GetScrollX();
     float yScroll = ImGui::GetScrollY();
-    float scrolledOutLines = floorf(yScroll / lineHeight);
+    float scrolledOutLines = glm::floor(yScroll / lineHeight);
     yScroll -= lineHeight * scrolledOutLines;
 
     ImVec2 clipRectMin{ImGui::GetWindowPos()};

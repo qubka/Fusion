@@ -54,7 +54,7 @@ void Engine::init() {
     for (const auto& [type, module] : Module::Registry()) {
         auto index = static_cast<uint32_t>(modules.size());
         modules.push_back(module.create());
-        stages[module.stage].push_back(index);
+        stages[static_cast<size_t>(module.stage)].push_back(index);
         LOG_DEBUG << "Module: \"" << module.name << "\" was registered for the \"" << me::enum_name(module.stage) << "\" stage";
     }
 }
@@ -123,6 +123,6 @@ void Engine::shutdown() {
 }
 
 void Engine::updateStage(Module::Stage stage) {
-    for (auto index : stages[stage])
+    for (auto index : stages[static_cast<size_t>(stage)])
         modules[index]->onUpdate();
 }

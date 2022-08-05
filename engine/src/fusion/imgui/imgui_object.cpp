@@ -23,7 +23,7 @@ void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& 
     // Vertex buffer
     if (!vertexBuffer || (vertexCount != drawData->TotalVtxCount)) {
         if (vertexBuffer) {
-            removePool.push(std::move(vertexBuffer));
+            removeQueue.push(std::move(vertexBuffer));
         }
         vertexBuffer = std::make_unique<Buffer>(vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         vertexBuffer->map();
@@ -33,16 +33,16 @@ void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& 
     // Index buffer
     if (!indexBuffer || (indexCount != drawData->TotalIdxCount)) {
         if (indexBuffer) {
-            removePool.push(std::move(indexBuffer));
+            removeQueue.push(std::move(indexBuffer));
         }
         indexBuffer = std::make_unique<Buffer>(indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         indexBuffer->map();
         indexCount = drawData->TotalIdxCount;
     }
 
-    // Remove unused buffers from pool
-    while (removePool.size() > MAX_FRAMES_IN_FLIGHT * 2) {
-        removePool.pop();
+    // Make sure that removed not in use by a command buffer.
+    while (removeQueue.size() > MAX_FRAMES_IN_FLIGHT * 2) {
+        removeQueue.pop();
     }
 
     // Upload data

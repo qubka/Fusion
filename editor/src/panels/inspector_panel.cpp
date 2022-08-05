@@ -45,6 +45,8 @@ namespace ImGui {
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
+        // TODO::
+
         /*ImGuiUtils::Property("Is Primary", camera.primary);
 
         auto& sceneCamera = camera.camera;
@@ -93,6 +95,7 @@ namespace ImGui {
                 mesh.reset();
             }
         }
+        // Readonly
         if (mesh) {
             ImGui::NewLine();
             ImGui::Separator();
@@ -139,6 +142,122 @@ namespace ImGui {
         ImGui::Separator();
         ImGui::PopStyleVar();
     }
+
+    template<>
+    void ComponentEditorWidget<RigidbodyComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& rigidbody = registry.get<RigidbodyComponent>(entity);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        ImGuiUtils::PropertyDropdown("Type", rigidbody.type);
+        ImGuiUtils::Property("Mass", rigidbody.mass, 0.0f, FLT_MAX, 0.01f);
+        ImGuiUtils::Property("Linear Drag", rigidbody.linearDrag, 0.0f, FLT_MAX, 0.01f);
+        ImGuiUtils::Property("Angular Drag", rigidbody.angularDrag, 0.0f, FLT_MAX, 0.01f);
+        ImGuiUtils::PropertyControl("Freeze Position", rigidbody.freezePosition);
+        ImGuiUtils::PropertyControl("Freeze Rotation", rigidbody.freezeRotation);
+        ImGuiUtils::Property("Disable Gravity", rigidbody.disableGravity);
+        ImGuiUtils::Property("Is Kinematic", rigidbody.kinematic);
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
+
+    template<>
+    void ComponentEditorWidget<BoxColliderComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& collider = registry.get<BoxColliderComponent>(entity);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        ImGuiUtils::PropertyControl("Center", collider.center, 0.0f, 0.0f, 0.0f, 0.01f);
+        ImGuiUtils::PropertyControl("Extent", collider.extent, 0.01f, FLT_MAX, 0.01f, 0.01f);
+        ImGuiUtils::Property("Is Trigger", collider.trigger);
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
+
+    template<>
+    void ComponentEditorWidget<SphereColliderComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& collider = registry.get<SphereColliderComponent>(entity);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        ImGuiUtils::PropertyControl("Center", collider.center, 0.0f, 0.0f, 0.0f, 0.01f);
+        ImGuiUtils::Property("Radius", collider.radius, 0.01f, FLT_MAX, 0.01f);
+        ImGuiUtils::Property("Is Trigger", collider.trigger);
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
+
+    template<>
+    void ComponentEditorWidget<CapsuleColliderComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& collider = registry.get<CapsuleColliderComponent>(entity);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        ImGuiUtils::PropertyControl("Center", collider.center, 0.0f, 0.0f, 0.0f, 0.01f);
+        ImGuiUtils::Property("Radius", collider.radius, 0.01f, FLT_MAX, 0.01f);
+        ImGuiUtils::Property("Height", collider.height, 0.01f, FLT_MAX, 0.01f);
+        ImGuiUtils::Property("Is Trigger", collider.trigger);
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
+
+    template<>
+    void ComponentEditorWidget<MeshColliderComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& collider = registry.get<MeshColliderComponent>(entity);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        ImGuiUtils::Property("Is Convex", collider.convex);
+        ImGuiUtils::Property("Is Trigger", collider.trigger);
+        ImGuiUtils::Property("Override Mesh", collider.overrideMesh);
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
+
+    template<>
+    void ComponentEditorWidget<PhysicsMaterialComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& material = registry.get<PhysicsMaterialComponent>(entity);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        ImGuiUtils::Property("Dynamic Friction", material.dynamicFriction, 0.0f, FLT_MAX, 0.01f);
+        ImGuiUtils::Property("Static Friction", material.staticFriction, 0.0f, FLT_MAX, 0.01f);
+        ImGuiUtils::Property("Restitution", material.restitution, 0.0f, 1.0f, 0.01f);
+        ImGuiUtils::PropertyDropdown("Friction Combine", material.frictionCombine);
+        ImGuiUtils::PropertyDropdown("Restitution Combine", material.restitutionCombine);
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
 }
 
 #define REG_COMPONENT(ComponentType, ComponentName)            \
@@ -155,6 +274,12 @@ InspectorPanel::InspectorPanel(Editor* editor) : EditorPanel(ICON_MDI_INFORMATIO
     REG_COMPONENT(MeshComponent, "Mesh");
     REG_COMPONENT(CameraComponent, "Camera");
     REG_COMPONENT(LightComponent, "Light");
+    REG_COMPONENT(RigidbodyComponent, "Rigidbody");
+    REG_COMPONENT(BoxColliderComponent, "Box Collider");
+    REG_COMPONENT(SphereColliderComponent, "Sphere Collider");
+    REG_COMPONENT(CapsuleColliderComponent, "Capsule Collider");
+    REG_COMPONENT(MeshColliderComponent, "Mesh Collider");
+    REG_COMPONENT(PhysicsMaterialComponent, "Physics Material");
 }
 
 InspectorPanel::~InspectorPanel() {

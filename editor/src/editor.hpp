@@ -11,6 +11,16 @@ namespace fe {
     class Scene;
     class Ray;
 
+    enum class EditorDebugFlags : unsigned char {
+        Grid              = 1,
+        Gizmo             = 2,
+        ViewSelected      = 4,
+        CameraFrustum     = 8,
+        MeshBoundingBoxes = 16,
+        SpriteBoxes       = 32,
+    };
+    BITMASK_DEFINE_MAX_ELEMENT(EditorDebugFlags, SpriteBoxes);
+
     struct EditorSettings {
         bool fullScreenOnPlay{ false };
         bool fullScreenSceneView{ false };
@@ -28,9 +38,9 @@ namespace fe {
         float fixedAspect{ 1.0f };
         float aspectRatio{ 1.0f };
         ImGuiUtils::Theme theme{ ImGuiUtils::Theme::Black };
+        bitmask::bitmask<EditorDebugFlags> debugDrawFlags{};
 
         /*f
-        uint32_t debugDrawFlags{ 0 };
         uint32_t physics2DDebugFlags{ 0 };
         uint32_t physics3DDebugFlags{ 0 };
         bool showViewSelected{ false };
@@ -91,9 +101,8 @@ namespace fe {
         void setSceneViewSize(const glm::vec2& size) { sceneViewSize = size; }
 
         void focusCamera(const glm::vec3& point, float distance, float speed = 1.0f);
-        void selectObject(const Ray& ray);
+        void selectObject(const Ray& ray, const glm::vec2& position);
 
-        void onImGuizmo();
     private:
         void onStart() override;
         void onUpdate() override;
@@ -113,6 +122,8 @@ namespace fe {
         glm::vec3 cameraDestination{ 0.0f };
         glm::vec3 cameraVelocity{ 0.0f };
         float cameraTransitionMaxSpeed{ 0.0f };
+        DateTime lastSelectTime;
+        glm::vec2 lastSelectPos;
 
         std::queue<std::string> mementos;
         FileBrowserPanel fileBrowserPanel{ this };
