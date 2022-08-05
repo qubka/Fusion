@@ -55,8 +55,8 @@ namespace fe {
             //addSubrender<AtmosphereSubrender>({0, 0});
             addSubrender<MeshSubrender>({0, 0});
             addSubrender<LightSubrender>({0, 0});
-            addSubrender<GridSubrender>({0, 0});
             addSubrender<DebugSubrender>({0, 0});
+            addSubrender<GridSubrender>({0, 0});
             //addSubrender<DeferredSubrender>({0, 1});
             //addSubrender<DeferredSubrender>({0, 1});
             //addSubrender<SkyboxSubrender>({0, 2});

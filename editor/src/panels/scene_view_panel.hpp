@@ -16,11 +16,16 @@ namespace fe {
         void onImGui() override;
 
     private:
-        void drawGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset);
         void drawToolBar();
 
+        void drawGizmo(entt::registry& registry);
+        void drawDebug(entt::registry& registry);
+        // Return false when mouse is not hovering over gizmos
+        bool drawComponent(entt::registry& registry, const glm::vec2& coord, const glm::vec2& offset);
+
         template<typename T>
-        void drawComponentGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset, const char* text) {
+        bool drawComponentGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset, const char* text) {
+            bool hovered = false;
             if (showComponentGizmosMap[type_id<T>]) {
                 auto view = registry.view<T, TransformComponent>();
                 for (const auto& [entity, component, transform] : view.each()) {
@@ -44,11 +49,14 @@ namespace fe {
                         editor->setSelected(entity);
                     }
 
+                    hovered |= ImGui::IsItemHovered();
+
                     ImGui::PopStyleColor(3);
 
                     ImGuiUtils::Tooltip(text);
                 }
             }
+            return hovered;
         }
 
         std::unordered_map<type_index, bool> showComponentGizmosMap;

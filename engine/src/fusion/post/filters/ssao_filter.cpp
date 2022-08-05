@@ -25,8 +25,15 @@ SsaoFilter::SsaoFilter(Pipeline::Stage pipelineStage) :
 }
 
 void SsaoFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
+    auto scene = SceneManager::Get()->getScene();
+    if (!scene)
+        return;
+
+    const Camera* camera = overrideCamera ? overrideCamera : scene->getCamera();
+    if (!camera)
+        return;
+
     // Updates uniforms.
-    auto camera = SceneManager::Get()->getScene()->getCamera();
     uniformScene.push("kernel", *kernel.data(), sizeof(glm::vec3) * SSAO_KERNEL_SIZE);
     uniformScene.push("projection", camera->getProjectionMatrix());
     uniformScene.push("view", camera->getViewMatrix());

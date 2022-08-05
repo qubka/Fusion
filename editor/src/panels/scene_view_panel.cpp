@@ -7,7 +7,8 @@
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/devices/device_manager.hpp"
 #include "fusion/input/input.hpp"
-#include "fusion/grid/grid_subrender.hpp"
+#include "fusion/debug/grid_subrender.hpp"
+#include "fusion/debug/debug_renderer.hpp"
 
 using namespace fe;
 
@@ -54,6 +55,7 @@ void SceneViewPanel::onImGui() {
     }
 
     ImGuizmo::SetDrawlist();
+    ImGuizmo::SetOrthographic(camera->isOrthographic());
 
     float aspect = viewportSize.x / viewportSize.y;
     camera->setAspectRatio(aspect);
@@ -78,12 +80,9 @@ void SceneViewPanel::onImGui() {
 
     ImGui::GetWindowDrawList()->PushClipRect(viewportPos, { viewportSize.x + viewportPos.x, viewportSize.y + viewportPos.y - 2.0f });
 
-    editor->onImGuizmo();
+    auto& registry = scene->getRegistry();
 
-    if (editor->isSceneActive() && Input::Get()->getMouseButton(MouseButton::ButtonLeft)) {
-        Ray ray = camera->screenPointToRay(Input::Get()->getMousePosition() - minBound, viewportSize, true);
-        editor->selectObject(ray);
-    }
+    drawGizmo(registry);
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM", ImGuiDragDropFlags_AcceptNoDrawDefaultRect)) {
@@ -92,7 +91,15 @@ void SceneViewPanel::onImGui() {
         ImGui::EndDragDropTarget();
     }
 
-    drawGizmos(scene->getRegistry(), *camera, viewportSize, viewportOffset);
+    if (!drawComponent(registry, viewportSize, viewportOffset)) {
+        if (viewportFocused && viewportHovered && !ImGuizmo::IsUsing() && Input::Get()->getMouseButtonDown(MouseButton::ButtonLeft)) {
+            glm::vec2 position{ Input::Get()->getMousePosition() - minBound };
+            Ray ray = camera->screenPointToRay(position, viewportSize, true);
+            editor->selectObject(ray, position);
+        }
+    }
+
+    drawDebug(registry);
 
     ImGui::PopStyleVar();
     ImGui::End();
@@ -281,38 +288,37 @@ void SceneViewPanel::drawToolBar() {
             ImGui::Checkbox("Light", &showComponentGizmosMap[type_id<LightComponent>]);
             //ImGui::Checkbox("Audio", &showComponentGizmosMap[type_id<SoundComponent>]);
 
-            /*ImGui::Separator();
-
-            uint32_t flags = m_Editor->GetSettings().m_DebugDrawFlags;
-
-            bool showAABB = flags & EditorDebugFlags::MeshBoundingBoxes;
-            if (ImGui::Checkbox("Mesh AABB", &showAABB)) {
-                if (showAABB)
-                    flags += EditorDebugFlags::MeshBoundingBoxes;
-                else
-                    flags -= EditorDebugFlags::MeshBoundingBoxes;
-            }
-
-            bool showSpriteBox = flags & EditorDebugFlags::SpriteBoxes;
-            if (ImGui::Checkbox("Sprite Box", &showSpriteBox)) {
-                if (showSpriteBox)
-                    flags += EditorDebugFlags::SpriteBoxes;
-                else
-                    flags -= EditorDebugFlags::SpriteBoxes;
-            }
-
-            bool showCameraFrustums = flags & EditorDebugFlags::CameraFrustum;
-            if (ImGui::Checkbox("Camera Frustums", &showCameraFrustums)) {
-                if (showCameraFrustums)
-                    flags += EditorDebugFlags::CameraFrustum;
-                else
-                    flags -= EditorDebugFlags::CameraFrustum;
-            }
-
-            m_Editor->GetSettings().m_DebugDrawFlags = flags;
             ImGui::Separator();
 
-            auto physics2D = Application::Get().GetSystem<B2PhysicsEngine>();
+            auto& flags = editor->getSettings().debugDrawFlags;
+
+            bool showAABB = static_cast<bool>(flags & EditorDebugFlags::MeshBoundingBoxes);
+            if (ImGui::Checkbox("Mesh AABB", &showAABB)) {
+                if (showAABB)
+                    flags |= EditorDebugFlags::MeshBoundingBoxes;
+                else
+                    flags &= ~EditorDebugFlags::MeshBoundingBoxes;
+            }
+
+            bool showSpriteBox = static_cast<bool>(flags & EditorDebugFlags::SpriteBoxes);
+            if (ImGui::Checkbox("Sprite Box", &showSpriteBox)) {
+                if (showSpriteBox)
+                    flags |= EditorDebugFlags::SpriteBoxes;
+                else
+                    flags &= ~EditorDebugFlags::SpriteBoxes;
+            }
+
+            bool showCameraFrustums = static_cast<bool>(flags & EditorDebugFlags::CameraFrustum);
+            if (ImGui::Checkbox("Camera Frustums", &showCameraFrustums)) {
+                if (showCameraFrustums)
+                    flags |= EditorDebugFlags::CameraFrustum;
+                else
+                    flags &= ~EditorDebugFlags::CameraFrustum;
+            }
+
+            ImGui::Separator();
+
+            /*auto physics2D = Application::Get().GetSystem<B2PhysicsEngine>();
 
             if (physics2D) {
                 uint32_t flags = physics2D->GetDebugDrawFlags();
@@ -448,10 +454,208 @@ void SceneViewPanel::drawToolBar() {
     ImGui::Unindent();
 }
 
-#define DRAW_COMPONENT(ComponentType) drawComponentGizmos<ComponentType>(registry, camera, coord, offset, #ComponentType);
+void SceneViewPanel::drawDebug(entt::registry& registry) {
+    if (!editor->getSettings().showGizmos)
+        return;
 
-void SceneViewPanel::drawGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset) {
+    glm::vec4 selectedColour{0.9f};
+
+    if (editor->getSettings().debugDrawFlags & EditorDebugFlags::MeshBoundingBoxes) {
+        auto view = registry.view<TransformComponent, MeshComponent>();
+
+        for (const auto& [entity, transform, mesh] : view.each()) {
+            if (!mesh.runtime)
+                continue;
+
+            const auto& worldTransform = transform.getWorldMatrix();
+
+            auto bbCopy = mesh.runtime->getBoundingBox().transformed(worldTransform);
+
+            DebugRenderer::DebugDraw(bbCopy, selectedColour, true);
+        }
+    }
+
+    /*if (editor->getSettings().debugDrawFlags & EditorDebugFlags::SpriteBoxes) {
+        auto group = registry.group<Graphics::Sprite>(entt::get<Maths::Transform>);
+
+        for (auto entity: group) {
+            const auto& [sprite, trans] = group.get<Graphics::Sprite, Maths::Transform>(entity);
+
+            {
+                auto& worldTransform = trans.GetWorldMatrix();
+
+                auto bb = Maths::BoundingBox(Maths::Rect(sprite.GetPosition(), sprite.GetScale()));
+                bb.Transform(trans.GetWorldMatrix());
+                DebugRenderer::DebugDraw(bb, selectedColour, true);
+            }
+        }
+
+        auto animGroup = registry.group<Graphics::AnimatedSprite>(entt::get<Maths::Transform>);
+
+        for (auto entity: animGroup) {
+            const auto& [sprite, trans] = animGroup.get<Graphics::AnimatedSprite, Maths::Transform>(entity);
+
+            {
+                auto& worldTransform = trans.GetWorldMatrix();
+
+                auto bb = Maths::BoundingBox(Maths::Rect(sprite.GetPosition(), sprite.GetScale()));
+                bb.Transform(trans.GetWorldMatrix());
+                DebugRenderer::DebugDraw(bb, selectedColour, true);
+            }
+        }
+    }*/
+
+    if (editor->getSettings().debugDrawFlags & EditorDebugFlags::CameraFrustum) {
+        auto view = registry.view<TransformComponent, CameraComponent>();
+
+        for (const auto& [entity, transform, camera] : view.each()) {
+            DebugRenderer::DebugDraw(camera.getFrustum(), selectedColour);
+        }
+    }
+
+    auto selected = editor->getSelected();
+    
+    if (registry.valid(selected)/* && editorState == EditorState::Preview*/) {
+        auto [transform, mesh] = registry.try_get<TransformComponent, MeshComponent>(selected);
+        if (transform && mesh) {
+            const auto& worldTransform = transform->getWorldMatrix();
+
+            auto bbCopy = mesh->runtime->getBoundingBox().transformed(worldTransform);
+
+            DebugRenderer::DebugDraw(bbCopy, selectedColour, true);
+        }
+
+        /*auto sprite = registry.try_get<Graphics::Sprite>(selected);
+        if (transform && sprite) {
+            {
+                auto& worldTransform = transform->GetWorldMatrix();
+
+                auto bb = Maths::BoundingBox(Maths::Rect(sprite->GetPosition(), sprite->GetPosition() + sprite->GetScale()));
+                bb.Transform(worldTransform);
+                DebugRenderer::DebugDraw(bb, selectedColour, true);
+            }
+        }
+
+        auto animSprite = registry.try_get<Graphics::AnimatedSprite>(selected);
+        if (transform && animSprite) {
+            {
+                auto& worldTransform = transform->GetWorldMatrix();
+
+                auto bb = Maths::BoundingBox(Maths::Rect(animSprite->GetPosition(), animSprite->GetPosition() + animSprite->GetScale()));
+                bb.Transform(worldTransform);
+                DebugRenderer::DebugDraw(bb, selectedColour, true);
+            }
+        }*/
+
+        if (auto camera = registry.try_get<Camera>(selected)) {
+            DebugRenderer::DebugDraw(camera->getFrustum(), selectedColour);
+        }
+
+        /*auto light = registry.try_get<Graphics::Light>(selected);
+        if (light && transform) {
+            DebugRenderer::DebugDraw(light, transform->GetWorldOrientation(), glm::vec4(glm::vec3(light->Colour), 0.2f));
+        }*/
+
+        /*if (auto sound = registry.try_get<SoundComponent>(selected)) {
+            DebugRenderer::DebugDraw(sound->getSoundNode(), glm::vec4{0.8f, 0.8f, 0.8f, 0.2f});
+        }
+
+        if (auto rigidbody = registry.try_get<RigidbodyComponent>(selected)) {
+            auto cs = phys3D->GetRigidBody()->GetCollisionShape();
+            if (cs)
+                cs->DebugDraw(phys3D->GetRigidBody().get());
+        }*/
+    }
+}
+
+void SceneViewPanel::drawGizmo(entt::registry& registry) {
+    if (!editor->getSettings().showGizmos || editor->getSettings().gizmosOperation == UINT32_MAX)
+        return;
+
+    auto selected = editor->getSelected();
+    if (!registry.valid(selected))
+        return;
+
+    if (auto transform = registry.try_get<TransformComponent>(selected)) {
+        auto camera = editor->getCamera();
+        const glm::mat4& view = camera->getViewMatrix();
+        const glm::mat4& proj = camera->getProjectionMatrix();
+        glm::mat4 model = transform->getWorldMatrix();
+        glm::mat4 delta{1};
+
+        auto gizmosType = static_cast<ImGuizmo::OPERATION>(editor->getSettings().gizmosOperation);
+
+        // Snapping
+        float snapValue = editor->getSettings().snapAmount; // Snap to 0.5m for translation/scale
+        if (gizmosType == ImGuizmo::ROTATE)
+            snapValue = 45.0f;
+        glm::vec3 snapValues{ snapValue };
+
+        // Bounding
+        auto bounds = gizmosType == ImGuizmo::BOUNDS;
+        glm::vec3 boundsSnap{ editor->getSettings().snapBound };  // Snap to 0.1m for bound change
+        static glm::mat2x3 boundsValues = { glm::vec3{-1.0f}, glm::vec3{1.0f} };
+
+        ImGuizmo::Manipulate(glm::value_ptr(view),
+                             glm::value_ptr(proj),
+                             gizmosType,
+                             ImGuizmo::LOCAL,
+                             glm::value_ptr(model),
+                             glm::value_ptr(delta),
+                             editor->getSettings().snapGizmos ? glm::value_ptr(snapValues) : nullptr,
+                             bounds ? glm::value_ptr(boundsValues) : nullptr,
+                             bounds ? glm::value_ptr(boundsSnap) : nullptr);
+
+        if (ImGuizmo::IsUsing()) {
+            model = glm::inverse(transform->getParentMatrix()) * model;
+
+            glm::vec3 position, scale;
+            glm::quat orientation;
+            glm::vec3 skew;
+            glm::vec4 perspective;
+            glm::decompose(model, scale, orientation, position, skew, perspective);
+
+            switch (gizmosType) {
+                case ImGuizmo::TRANSLATE:
+                    transform->setLocalPosition(position);
+                    break;
+                case ImGuizmo::ROTATE:
+                    transform->setLocalOrientation(orientation);
+                    break;
+                case ImGuizmo::SCALE:
+                    transform->setLocalScale(scale);
+                    break;
+                default:
+                    transform->setLocalPosition(position);
+                    transform->setLocalOrientation(orientation);
+                    transform->setLocalScale(scale);
+                    break;
+            }
+        }
+
+        /*RigidBody2DComponent* rigidBody2DComponent = registry.try_get<RigidBody2DComponent>(selected);
+
+        if (rigidBody2DComponent) {
+            rigidBody2DComponent->GetRigidBody()->SetPosition( { model[3].x, model[3].y });
+        } else {
+            RigidBody3DComponent* rigidBody3DComponent = registry.try_get<RigidBody3DComponent>(selected);
+            if (rigidBody3DComponent) {
+                rigidBody3DComponent->GetRigidBody()->SetPosition(model[3]);
+                rigidBody3DComponent->GetRigidBody()->SetOrientation(glm::eulerAngles(glm::quat_cast((model)));
+            }
+        }*/
+    }
+}
+
+
+#define DRAW_COMPONENT(ComponentType) hovered |= drawComponentGizmos<ComponentType>(registry, camera, coord, offset, #ComponentType);
+
+bool SceneViewPanel::drawComponent(entt::registry& registry, const glm::vec2& coord, const glm::vec2& offset) {
+    auto& camera = *editor->getCamera();
+
+    bool hovered = false;
     DRAW_COMPONENT(LightComponent);
     DRAW_COMPONENT(CameraComponent);
     //DRAW_COMPONENT(SoundComponent);
+    return hovered;
 }

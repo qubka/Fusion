@@ -18,8 +18,15 @@ DofFilter::DofFilter(Pipeline::Stage pipelineStage, BlurPipeline* pipelineBlur, 
 }
 
 void DofFilter::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
+    auto scene = SceneManager::Get()->getScene();
+    if (!scene)
+        return;
+
+    const Camera* camera = overrideCamera ? overrideCamera : scene->getCamera();
+    if (!camera)
+        return;
+
     // Updates uniforms.
-    auto camera = SceneManager::Get()->getScene()->getCamera();
     pushScene.push("nearPlane", camera->getNearClip());
     pushScene.push("farPlane", camera->getFarClip());
     pushScene.push("focusPoint", focusPoint);
