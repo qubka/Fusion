@@ -29,6 +29,22 @@ namespace quat {
 
 namespace glm {
     template<typename T, qualifier Q>
+    GLM_FUNC_QUALIFIER GLM_CONSTEXPR uint32_t rgbaColor(const glm::vec<3, T, Q>& color) {
+        if (std::is_floating_point_v<T>)
+            return (255 << 24) | (static_cast<uint32_t>(color.b * 255) << 16) | (static_cast<uint32_t>(color.g * 255) << 8) | (static_cast<uint32_t>(color.r * 255) << 0);
+        else
+            return (255 << 24) | (static_cast<uint32_t>(color.b) << 16) | (static_cast<uint32_t>(color.g) << 8) | (static_cast<uint32_t>(color.r) << 0);
+    }
+
+    template<typename T, qualifier Q>
+    GLM_FUNC_QUALIFIER GLM_CONSTEXPR uint32_t rgbaColor(const glm::vec<4, T, Q>& color) {
+        if (std::is_floating_point_v<T>)
+            return (static_cast<uint32_t>(color.a * 255) << 24) | (static_cast<uint32_t>(color.b * 255) << 16) | (static_cast<uint32_t>(color.g * 255) << 8) | (static_cast<uint32_t>(color.r * 255) << 0);
+        else
+            return (static_cast<uint32_t>(color.a) << 24) | (static_cast<uint32_t>(color.b) << 16) | (static_cast<uint32_t>(color.g) << 8) | (static_cast<uint32_t>(color.r) << 0);
+    }
+
+    template<typename T, qualifier Q>
     GLM_FUNC_DECL bool decompose(mat<4, 4, T, Q> modelMatrix, vec<3, T, Q>& translation, vec<3, T, Q>& rotation, vec<3, T, Q>& scale) {
         // Normalize the matrix.
         if (epsilonEqual(modelMatrix[3][3], static_cast<T>(0), epsilon<T>()))
@@ -66,10 +82,10 @@ namespace glm {
         // is -1, then negate the matrix and the scaling factors.
         rotation.y = asin(-Row[0][2]);
         if (cos(rotation.y) != 0) {
-            rotation.x = atan2f(Row[1][2], Row[2][2]);
-            rotation.z = atan2f(Row[0][1], Row[0][0]);
+            rotation.x = atan2(Row[1][2], Row[2][2]);
+            rotation.z = atan2(Row[0][1], Row[0][0]);
         } else {
-            rotation.x = atan2f(-Row[2][0], Row[1][1]);
+            rotation.x = atan2(-Row[2][0], Row[1][1]);
             rotation.z = 0;
         }
 
@@ -146,7 +162,7 @@ namespace glm {
         row[1] = normalize(targetUpDir);
         row[2] = normalize(targetDir);
 
-        return mat<4, 4, T, Q>{
+        return {
             row[0].x,  row[0].y,  row[0].z,  0,
             row[1].x,  row[1].y,  row[1].z,  0,
             row[2].x,  row[2].y,  row[2].z,  0,
