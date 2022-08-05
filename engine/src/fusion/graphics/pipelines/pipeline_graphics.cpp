@@ -221,22 +221,22 @@ void PipelineGraphics::createAttributes() {
 	depthStencilState.back.compareOp = VK_COMPARE_OP_ALWAYS;
 
 	switch (depth) {
-	case Depth::None:
-		depthStencilState.depthTestEnable = VK_FALSE;
-		depthStencilState.depthWriteEnable = VK_FALSE;
-		break;
-	case Depth::Read:
-		depthStencilState.depthTestEnable = VK_TRUE;
-		depthStencilState.depthWriteEnable = VK_FALSE;
-		break;
-	case Depth::Write:
-		depthStencilState.depthTestEnable = VK_FALSE;
-		depthStencilState.depthWriteEnable = VK_TRUE;
-		break;
-	case Depth::ReadWrite:
-		depthStencilState.depthTestEnable = VK_TRUE;
-		depthStencilState.depthWriteEnable = VK_TRUE;
-		break;
+        case Depth::None:
+            depthStencilState.depthTestEnable = VK_FALSE;
+            depthStencilState.depthWriteEnable = VK_FALSE;
+            break;
+        case Depth::Read:
+            depthStencilState.depthTestEnable = VK_TRUE;
+            depthStencilState.depthWriteEnable = VK_FALSE;
+            break;
+        case Depth::Write:
+            depthStencilState.depthTestEnable = VK_FALSE;
+            depthStencilState.depthWriteEnable = VK_TRUE;
+            break;
+        case Depth::ReadWrite:
+            depthStencilState.depthTestEnable = VK_TRUE;
+            depthStencilState.depthWriteEnable = VK_TRUE;
+            break;
 	}
 
 	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -251,10 +251,13 @@ void PipelineGraphics::createAttributes() {
 	multisampleState.rasterizationSamples = multisampled ? physicalDevice.getMsaaSamples() : VK_SAMPLE_COUNT_1_BIT;
 	multisampleState.sampleShadingEnable = VK_FALSE;
 
-    dynamicStates.reserve(4);
-
     dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
     dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
+
+    /*if (depth == Depth::Dynamic) {
+        dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_TEST_ENABLE);
+        dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_WRITE_ENABLE);
+    }*/
 
     if (topology == VK_PRIMITIVE_TOPOLOGY_LINE_LIST || topology == VK_PRIMITIVE_TOPOLOGY_LINE_STRIP || topology == VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY || topology == VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY) {
         dynamicStates.push_back(VK_DYNAMIC_STATE_LINE_WIDTH);

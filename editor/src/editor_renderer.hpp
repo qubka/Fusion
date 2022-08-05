@@ -2,12 +2,13 @@
 
 #include "fusion/graphics/renderer.hpp"
 #include "fusion/imgui/imgui_subrender.hpp"
-#include "fusion/grid/grid_subrender.hpp"
+#include "fusion/debug/grid_subrender.hpp"
 #include "fusion/skybox/atmosphere_subrender.hpp"
 #include "fusion/skybox/skybox_subrender.hpp"
 #include "fusion/models/mesh_subrender.hpp"
 #include "fusion/ligthing/light_subrender.hpp"
 #include "fusion/post/deferred/deferred_subrender.hpp"
+#include "fusion/debug/debug_subrender.hpp"
 
 namespace fe {
     class EditorRenderer : public Renderer {
@@ -55,6 +56,7 @@ namespace fe {
             addSubrender<MeshSubrender>({0, 0});
             addSubrender<LightSubrender>({0, 0});
             addSubrender<GridSubrender>({0, 0});
+            addSubrender<DebugSubrender>({0, 0});
             //addSubrender<DeferredSubrender>({0, 1});
             //addSubrender<DeferredSubrender>({0, 1});
             //addSubrender<SkyboxSubrender>({0, 2});

@@ -15,7 +15,7 @@ namespace fe {
         ~MeshSubrender() override = default;
 
     private:
-        struct Light {
+        struct MEM_ALIGN Light {
             glm::vec3 position{ 0.0f };
             float cutOff{ 0.0f };
             glm::vec3 direction{ 0.0f};

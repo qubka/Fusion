@@ -12,7 +12,7 @@ layout (push_constant) uniform PushObject {
 layout (location = 0) in vec3 inNearPoint;
 layout (location = 1) in vec3 inFarPoint;
 
-layout (location = 0) out vec4 outFragColor;
+layout (location = 0) out vec4 outColor;
 //layout (location = 1) out float gl_FragDepth;
 
 vec4 grid(vec3 fragPos, float scale) {
@@ -50,8 +50,8 @@ void main() {
     float depth = computeDepth(fragPos);
     float fading = max(0, (0.5 - computeLinearDepth(depth, 0.1, 100.0)));
 
-    outFragColor = (grid(fragPos, 10) + grid(fragPos, 1)) * float(t > 0); // adding multiple resolution for the grid
-    outFragColor.a *= fading;
+    outColor = (grid(fragPos, 10) + grid(fragPos, 1)) * float(t > 0); // adding multiple resolution for the grid
+    outColor.a *= fading;
 
     gl_FragDepth = depth;
 }

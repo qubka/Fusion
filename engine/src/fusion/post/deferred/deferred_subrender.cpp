@@ -18,7 +18,12 @@ static const uint32_t BRDF_LUT_SIZE = 256;
 
 DeferredSubrender::DeferredSubrender(Pipeline::Stage pipelineStage)
     : Subrender{pipelineStage}
-    , pipeline{pipelineStage, {"engine/assets/shaders/deferred/deferred.vert", "engine/assets/shaders/deferred/deferred.frag"}, {}, {}, PipelineGraphics::Mode::Polygon, PipelineGraphics::Depth::None}
+    , pipeline{pipelineStage,
+               {"engine/assets/shaders/deferred/deferred.vert", "engine/assets/shaders/deferred/deferred.frag"},
+               {},
+               {},
+               PipelineGraphics::Mode::Polygon,
+               PipelineGraphics::Depth::None}
     , brdf{ComputeBRDF(BRDF_LUT_SIZE)}
     , skybox{std::make_shared<TextureCube>("engine/assets/textures/cubemap_vulkan.ktx")}
     , fog{{ 1.0f, 1.0f, 1.0f, 1.0f }, 0.00001f, 2.0f, -0.1f, 100.0f} {

@@ -8,6 +8,7 @@
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/assets/asset_registry.hpp"
 #include "fusion/input/input.hpp"
+#include "fusion/debug/debug_renderer.hpp"
 
 #include "fusion/bitmaps/gli_toolbox.hpp"
 #include "fusion/bitmaps/stb_toolbox.hpp"
@@ -44,6 +45,7 @@ void Engine::init() {
     Graphics::Register("Graphics", Module::Stage::Render);
     SceneManager::Register("SceneManager", Module::Stage::Normal);
     AssetRegistry::Register("AssetRegistry", Module::Stage::Post);
+    DebugRenderer::Register("DebugRenderer", Module::Stage::Render);
 
     StbToolbox::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
     GliToolbox::Register(".ktx", ".kmg", ".dds");

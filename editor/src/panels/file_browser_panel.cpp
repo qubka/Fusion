@@ -43,7 +43,7 @@ void FileBrowserPanel::setOpenDirectory(bool value) {
     if (value) {
         flags |= ImGuiFileBrowserFlags_SelectDirectory;
     } else {
-        flags &= ~(ImGuiFileBrowserFlags_SelectDirectory);
+        flags &= ~ImGuiFileBrowserFlags_SelectDirectory;
     }
     fileBrowser->SetFlags(flags);
 }

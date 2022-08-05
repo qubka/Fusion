@@ -19,14 +19,14 @@ namespace fe {
         };
 
         enum class Depth : unsigned char {
-            None = 0,
-            Read = 1,
-            Write = 2,
-            ReadWrite = Read | Write
+            None,
+            Read,
+            Write,
+            ReadWrite
         };
 
         enum class Blend : unsigned char {
-            None = 0,
+            None,
             OneZero,
             ZeroSrcColor,
             SrcAlphaOneMinusSrcAlpha,

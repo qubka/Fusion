@@ -11,7 +11,16 @@ static const uint32_t MAX_LIGHTS = 32; // TODO: Make configurable.
 
 MeshSubrender::MeshSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"engine/assets/shaders/simple/simple.vert", "engine/assets/shaders/simple/simple.frag"}, {{{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Tangent, Vertex::Component::Bitangent, Vertex::Component::UV, Vertex::Component::UV}}}}
+        , pipeline{pipelineStage,
+                   {"engine/assets/shaders/simple/simple.vert", "engine/assets/shaders/simple/simple.frag"},
+                   {{{
+                       Vertex::Component::Position,
+                       Vertex::Component::Normal,
+                       Vertex::Component::Tangent,
+                       Vertex::Component::Bitangent,
+                       Vertex::Component::UV,
+                       Vertex::Component::UV
+                   }}}}
         , descriptorSet{pipeline} {
     unknownDiffuse = std::make_unique<Texture2d>("engine/assets/textures/Diffuse.png");
     unknownSpecular = std::make_unique<Texture2d>("engine/assets/textures/Diffuse_Spec.png");
@@ -33,9 +42,9 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
     std::vector<Light> lights(MAX_LIGHTS);
     uint32_t lightCount = 0;
 
-    auto lightView = registry.view<TransformComponent, LightComponent>();
+    auto view = registry.view<TransformComponent, LightComponent>();
 
-    for (const auto& [entity, transform, light] : lightView.each()) {
+    for (const auto& [entity, transform, light] : view.each()) {
         Light baseLight = {};
         baseLight.position = transform.getWorldPosition();
         if (light.type != LightComponent::LightType::Point) {
@@ -81,13 +90,13 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
     descriptorSet.bindDescriptor(commandBuffer, pipeline);
     //pushObject.bindPush(commandBuffer, pipeline);
 
-    auto meshGroup = registry.group<MeshComponent>(entt::get<TransformComponent>);
+    auto group = registry.group<MeshComponent>(entt::get<TransformComponent>);
 
-    meshGroup.sort([&registry](const entt::entity a, const entt::entity b) {
+    group.sort([&registry](const entt::entity a, const entt::entity b) {
         return registry.get<MeshComponent>(a).runtime < registry.get<MeshComponent>(b).runtime;
     });
 
-    for (const auto& [entity, mesh, transform] : meshGroup.each()) {
+    for (const auto& [entity, mesh, transform] : group.each()) {
         if (!mesh.runtime)
             continue;
 
