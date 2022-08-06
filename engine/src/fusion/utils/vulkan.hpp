@@ -128,6 +128,75 @@ namespace vku {
         }
     }
 
+    template<typename VkStruct>
+    void AppendNextStruct(VkStruct& base, void* newStruct) {
+        VkBaseOutStructure* next = (VkBaseOutStructure*) &base;
+
+        while (next->pNext)
+            next = next->pNext;
+
+        next->pNext = (VkBaseOutStructure*) newStruct;
+    }
+
+    template<typename VkStruct>
+    const VkBaseInStructure* FindNextStruct(const VkStruct* haystack, VkStructureType needle) {
+        if (!haystack)
+            return nullptr;
+
+        const VkBaseInStructure* next = (const VkBaseInStructure*) haystack->pNext;
+        while (next) {
+            if (next->sType == needle)
+                return next;
+
+            next = next->pNext;
+        }
+
+        return nullptr;
+    }
+
+    template<typename VkStruct>
+    VkBaseInStructure* FindNextStruct(VkStruct* haystack, VkStructureType needle) {
+        if (!haystack)
+            return nullptr;
+
+        VkBaseInStructure* next = (VkBaseInStructure*) haystack->pNext;
+        while (next) {
+            if (next->sType == needle)
+                return next;
+
+            // assume non-const pNext in the original struct
+            next = (VkBaseInStructure*) next->pNext;
+        }
+
+        return nullptr;
+    }
+
+    template<typename VkStruct>
+    bool RemoveNextStruct(VkStruct* haystack, VkStructureType needle) {
+        bool ret = false;
+
+        // start from the haystack, and iterate
+        VkBaseInStructure* root = (VkBaseInStructure*) haystack;
+        while (root && root->pNext) {
+            // at each point, if the *next* struct is the needle, then point our next pointer at whatever
+            // its was - either the next in the chain or NULL if it was at the end. Then we can return true
+            // because we removed the struct. We keep going to handle duplicates, but we continue and skip
+            // the list iterate as we now have a new root->pNext.
+            // Note that this can't remove the first struct in the chain but that's expected, we only want
+            // to remove extension structs.
+            if (root->pNext->sType == needle) {
+                root->pNext = root->pNext->pNext;
+                ret = true;
+                continue;
+            }
+
+            // move to the next struct
+            root = (VkBaseInStructure*) root->pNext;
+        }
+
+        return ret;
+    }
+
     inline void BlitRGBToBGRSurface(std::byte* dst, const std::byte* src, const glm::uvec2& size) {
         for (auto i = 0; i < size.y; ++i) {
             for (auto j = 0; j < size.x; ++j) {
@@ -150,6 +219,8 @@ namespace vku {
             }
         }
     }
+
+    /*** GLI UTILS ***/
 
     /// Description of blocks for compressed formats.
     struct BlockParams {

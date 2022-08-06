@@ -8,7 +8,8 @@
 using namespace fe;
 
 const std::vector<const char*> LogicalDevice::DeviceExtensions = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
 };
 // VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME
 
@@ -17,60 +18,66 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
     const float queuePriority = 0.0f;
 
     for (uint32_t queueFamily : physicalDevice.getUniqueFamilies()) {
-        VkDeviceQueueCreateInfo queueCreateInfo = {};
-        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        VkDeviceQueueCreateInfo queueCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
         queueCreateInfo.queueFamilyIndex = queueFamily;
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &queuePriority;
         queueCreateInfos.push_back(queueCreateInfo);
     }
 
+    VkPhysicalDeviceDescriptorIndexingFeatures indexingFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, nullptr };
+    VkPhysicalDeviceFeatures2 deviceFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &indexingFeatures };
+    vkGetPhysicalDeviceFeatures2(physicalDevice, &deviceFeatures);
+    bool bindlessSupported = indexingFeatures.descriptorBindingPartiallyBound && indexingFeatures.runtimeDescriptorArray;
+    if (!bindlessSupported)
+        throw std::runtime_error("GPU is not support bindless ");
+
+    enabledFeatures = deviceFeatures.features;
+
     /// TODO: Rework that to allow user to change enable features
     {
-        auto physicalDeviceFeatures = physicalDevice.getFeatures();
-
         // Enable sample rate shading filtering if supported.
-        if (physicalDeviceFeatures.sampleRateShading)
+        if (enabledFeatures.sampleRateShading)
             enabledFeatures.sampleRateShading = VK_TRUE;
 
         // Fill mode non solid is required for wireframe display.
-        if (physicalDeviceFeatures.fillModeNonSolid) {
+        if (enabledFeatures.fillModeNonSolid) {
             enabledFeatures.fillModeNonSolid = VK_TRUE;
 
             // Wide lines must be present for line width > 1.0f.
-            if (physicalDeviceFeatures.wideLines)
+            if (enabledFeatures.wideLines)
                 enabledFeatures.wideLines = VK_TRUE;
         } else
             LOG_WARNING << "Selected GPU does not support wireframe pipelines!";
 
-        if (physicalDeviceFeatures.samplerAnisotropy)
+        if (enabledFeatures.samplerAnisotropy)
             enabledFeatures.samplerAnisotropy = VK_TRUE;
         else
             LOG_WARNING << "Selected GPU does not support sampler anisotropy!";
 
-        if (physicalDeviceFeatures.textureCompressionBC)
+        if (enabledFeatures.textureCompressionBC)
             enabledFeatures.textureCompressionBC = VK_TRUE;
-        else if (physicalDeviceFeatures.textureCompressionASTC_LDR)
+        else if (enabledFeatures.textureCompressionASTC_LDR)
             enabledFeatures.textureCompressionASTC_LDR = VK_TRUE;
-        else if (physicalDeviceFeatures.textureCompressionETC2)
+        else if (enabledFeatures.textureCompressionETC2)
             enabledFeatures.textureCompressionETC2 = VK_TRUE;
 
-        if (physicalDeviceFeatures.vertexPipelineStoresAndAtomics)
+        if (enabledFeatures.vertexPipelineStoresAndAtomics)
             enabledFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
         else
             LOG_WARNING << "Selected GPU does not support vertex pipeline stores and atomics!";
 
-        if (physicalDeviceFeatures.fragmentStoresAndAtomics)
+        if (enabledFeatures.fragmentStoresAndAtomics)
             enabledFeatures.fragmentStoresAndAtomics = VK_TRUE;
         else
             LOG_WARNING << "Selected GPU does not support fragment stores and atomics!";
 
-        if (physicalDeviceFeatures.shaderStorageImageExtendedFormats)
+        if (enabledFeatures.shaderStorageImageExtendedFormats)
             enabledFeatures.shaderStorageImageExtendedFormats = VK_TRUE;
         else
             LOG_WARNING << "Selected GPU does not support shader storage extended formats!";
 
-        if (physicalDeviceFeatures.shaderStorageImageWriteWithoutFormat)
+        if (enabledFeatures.shaderStorageImageWriteWithoutFormat)
             enabledFeatures.shaderStorageImageWriteWithoutFormat = VK_TRUE;
         else
             LOG_WARNING << "Selected GPU does not support shader storage write without format!";
@@ -78,33 +85,33 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
         //enabledFeatures.shaderClipDistance = VK_TRUE;
         //enabledFeatures.shaderCullDistance = VK_TRUE;
 
-        if (physicalDeviceFeatures.geometryShader)
+        if (enabledFeatures.geometryShader)
             enabledFeatures.geometryShader = VK_TRUE;
         else
             LOG_WARNING << "Selected GPU does not support geometry shaders!";
 
-        if (physicalDeviceFeatures.tessellationShader)
+        if (enabledFeatures.tessellationShader)
             enabledFeatures.tessellationShader = VK_TRUE;
         else
             LOG_WARNING << "Selected GPU does not support tessellation shaders!";
 
-        if (physicalDeviceFeatures.multiViewport)
+        if (enabledFeatures.multiViewport)
             enabledFeatures.multiViewport = VK_TRUE;
         else
             LOG_WARNING << "Selected GPU does not support multi viewports!";
     }
 
-    VkDeviceCreateInfo deviceCreateInfo = {};
-    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
     deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
     deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+    deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(DeviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = DeviceExtensions.data();
     if (instance.getEnableValidationLayers()) {
         deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(Instance::ValidationLayers.size());
         deviceCreateInfo.ppEnabledLayerNames = Instance::ValidationLayers.data();
     }
-    deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(DeviceExtensions.size());
-    deviceCreateInfo.ppEnabledExtensionNames = DeviceExtensions.data();
-    deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+    //deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+    deviceCreateInfo.pNext = &deviceFeatures;
     VK_CHECK(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice));
 
     volkLoadDevice(logicalDevice);
