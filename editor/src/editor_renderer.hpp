@@ -20,7 +20,7 @@ namespace fe {
                     {2, "diffuse", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM},
                     {3, "normal", Attachment::Type::Image, false, VK_FORMAT_R16G16B16A16_SFLOAT},
                     {4, "material", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM},*/
-                    {1, "scene_image", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM, { 0.27f, 0.27f, 0.27f, 1.0f }},
+                    {1, "scene_image", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, { 0.27f, 0.27f, 0.27f, 1.0f }},
             };
             std::vector<SubpassType> renderpassSubpasses0 = {
                    // {0, {0, 1, 2, 3, 4}},
@@ -31,7 +31,7 @@ namespace fe {
 
             std::vector<Attachment> renderpassAttachments1 = {
                     {0, "game_depth", Attachment::Type::Depth},
-                    {1, "game_image", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM}
+                    {1, "game_image", Attachment::Type::Image, false, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL}
             };
             std::vector<SubpassType> renderpassSubpasses1 = {
                     {0, {0, 1}},
