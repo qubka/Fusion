@@ -145,8 +145,7 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
                     auto& descriptor = descriptorSets[frameIndex][cmd.TextureId];
                     if (!descriptor) {
                         VkDescriptorSet set;
-                        VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
-                        descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+                        VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
                         descriptorSetAllocateInfo.descriptorPool = pipeline.getDescriptorPool();
                         descriptorSetAllocateInfo.descriptorSetCount = 1;
                         descriptorSetAllocateInfo.pSetLayouts = &pipeline.getDescriptorSetLayout();
@@ -157,8 +156,7 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
                     auto& updated = descriptorSetHasUpdated[frameIndex][cmd.TextureId];
                     if (!updated) {
                         auto& set = descriptorSets[frameIndex][cmd.TextureId];
-                        VkWriteDescriptorSet descriptorWrites = {};
-                        descriptorWrites.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                        VkWriteDescriptorSet descriptorWrites = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
                         descriptorWrites.dstSet = set;
                         descriptorWrites.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
                         descriptorWrites.pImageInfo = (VkDescriptorImageInfo*) descriptorImageInfos[cmd.TextureId];

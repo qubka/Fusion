@@ -9,8 +9,7 @@ CommandPool::CommandPool(const std::thread::id& threadId) : threadId{threadId} {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 	auto graphicsFamily = physicalDevice.getGraphicsFamily();
 
-	VkCommandPoolCreateInfo commandPoolCreateInfo = {};
-	commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	VkCommandPoolCreateInfo commandPoolCreateInfo = { VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO };
 	commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	commandPoolCreateInfo.queueFamilyIndex = graphicsFamily;
 	VK_CHECK(vkCreateCommandPool(logicalDevice, &commandPoolCreateInfo, nullptr, &commandPool));

@@ -43,7 +43,7 @@ namespace fe {
         Shader shader;
 
         VkShaderModule shaderModule{ VK_NULL_HANDLE };
-        VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
+        VkPipelineShaderStageCreateInfo shaderStageCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
 
         VkDescriptorSetLayout descriptorSetLayout{ VK_NULL_HANDLE };
         VkDescriptorPool descriptorPool{ VK_NULL_HANDLE };

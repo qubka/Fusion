@@ -121,8 +121,7 @@ void Image::CreateImage(VkImage& image, VkDeviceMemory& memory, const VkExtent3D
                         VkImageUsageFlags usage, VkMemoryPropertyFlags properties, uint32_t mipLevels, uint32_t arrayLayers, VkImageType imageType) {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	VkImageCreateInfo imageCreateInfo = {};
-	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	VkImageCreateInfo imageCreateInfo = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
 	imageCreateInfo.flags = arrayLayers == 6 ? VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT : 0;
 	imageCreateInfo.imageType = imageType;
 	imageCreateInfo.format = format;
@@ -139,8 +138,7 @@ void Image::CreateImage(VkImage& image, VkDeviceMemory& memory, const VkExtent3D
 	VkMemoryRequirements memoryRequirements;
 	vkGetImageMemoryRequirements(logicalDevice, image, &memoryRequirements);
 
-	VkMemoryAllocateInfo memoryAllocateInfo = {};
-	memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	VkMemoryAllocateInfo memoryAllocateInfo = { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
 	memoryAllocateInfo.allocationSize = memoryRequirements.size;
 	memoryAllocateInfo.memoryTypeIndex = Buffer::FindMemoryType(memoryRequirements.memoryTypeBits, properties);
 	VK_CHECK(vkAllocateMemory(logicalDevice, &memoryAllocateInfo, nullptr, &memory));
@@ -152,8 +150,7 @@ void Image::CreateImageSampler(VkSampler& sampler, VkFilter filter, VkSamplerAdd
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	VkSamplerCreateInfo samplerCreateInfo = {};
-	samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	VkSamplerCreateInfo samplerCreateInfo = { VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO };
 	samplerCreateInfo.magFilter = filter;
 	samplerCreateInfo.minFilter = filter;
 	samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
@@ -176,8 +173,7 @@ void Image::CreateImageView(VkImage image, VkImageView& imageView, VkImageViewTy
                             uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer) {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	VkImageViewCreateInfo imageViewCreateInfo = {};
-	imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	VkImageViewCreateInfo imageViewCreateInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 	imageViewCreateInfo.image = image;
 	imageViewCreateInfo.viewType = viewType;
 	imageViewCreateInfo.format = format;
@@ -205,8 +201,7 @@ void Image::CreateMipmaps(VkImage image, const VkExtent3D& extent, VkFormat form
 	assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
 
 	for (uint32_t i = 1; i < mipLevels; i++) {
-		VkImageMemoryBarrier barrier0 = {};
-		barrier0.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		VkImageMemoryBarrier barrier0 = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
 		barrier0.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 		barrier0.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 		barrier0.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
@@ -234,8 +229,7 @@ void Image::CreateMipmaps(VkImage image, const VkExtent3D& extent, VkFormat form
 		imageBlit.dstSubresource.layerCount = layerCount;
 		vkCmdBlitImage(commandBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageBlit, VK_FILTER_LINEAR);
 
-		VkImageMemoryBarrier barrier1 = {};
-		barrier1.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		VkImageMemoryBarrier barrier1 = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
 		barrier1.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 		barrier1.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 		barrier1.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
@@ -251,8 +245,7 @@ void Image::CreateMipmaps(VkImage image, const VkExtent3D& extent, VkFormat form
 		vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier1);
 	}
 
-	VkImageMemoryBarrier barrier = {};
-	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	VkImageMemoryBarrier barrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
 	barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 	barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 	barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
@@ -274,8 +267,7 @@ void Image::TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout 
                                   uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer) {
     CommandBuffer commandBuffer{true};
 
-    VkImageMemoryBarrier imageMemoryBarrier = {};
-    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    VkImageMemoryBarrier imageMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
     imageMemoryBarrier.oldLayout = srcImageLayout;
     imageMemoryBarrier.newLayout = dstImageLayout;
     imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -325,8 +317,7 @@ void Image::TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout 
 void Image::InsertImageMemoryBarrier(VkCommandBuffer commandBuffer, VkImage image, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask, VkImageLayout oldImageLayout,
                                      VkImageLayout newImageLayout, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask, VkImageAspectFlags imageAspect,
                                      uint32_t mipLevels, uint32_t baseMipLevel, uint32_t layerCount, uint32_t baseArrayLayer) {
-	VkImageMemoryBarrier imageMemoryBarrier = {};
-	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	VkImageMemoryBarrier imageMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
 	imageMemoryBarrier.srcAccessMask = srcAccessMask;
 	imageMemoryBarrier.dstAccessMask = dstAccessMask;
 	imageMemoryBarrier.oldLayout = oldImageLayout;

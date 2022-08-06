@@ -5,8 +5,7 @@
 using namespace fe;
 
 Fence::Fence(bool signaled) : signaled{signaled} {
-    VkFenceCreateInfo fenceCreateInfo = {};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    VkFenceCreateInfo fenceCreateInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
     if (signaled)
         fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 

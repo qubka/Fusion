@@ -95,8 +95,7 @@ void PipelineGraphics::createShaderProgram() {
 		auto stageFlag = Shader::GetShaderStage(shaderStage);
 		auto shaderModule = shader.createShaderModule(shaderStage, shaderCode, ss.str(), stageFlag);
 
-		VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfo = {};
-		pipelineShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
 		pipelineShaderStageCreateInfo.stage = stageFlag;
 		pipelineShaderStageCreateInfo.module = shaderModule;
 		pipelineShaderStageCreateInfo.pName = "main";
@@ -112,8 +111,7 @@ void PipelineGraphics::createDescriptorLayout() {
 
 	auto& descriptorSetLayouts = shader.getDescriptorSetLayouts();
 
-	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
-	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
 	descriptorSetLayoutCreateInfo.flags = pushDescriptors ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
 	descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(descriptorSetLayouts.size());
 	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayouts.data();
@@ -125,10 +123,9 @@ void PipelineGraphics::createDescriptorPool() {
 
 	auto& descriptorPools = shader.getDescriptorPools();
 
-	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
-	descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
 	descriptorPoolCreateInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-	descriptorPoolCreateInfo.maxSets = 8192; // 16384;
+	descriptorPoolCreateInfo.maxSets = 32; // 16384;
 	descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>(descriptorPools.size());
 	descriptorPoolCreateInfo.pPoolSizes = descriptorPools.data();
 	VK_CHECK(vkCreateDescriptorPool(logicalDevice, &descriptorPoolCreateInfo, nullptr, &descriptorPool));
@@ -139,8 +136,7 @@ void PipelineGraphics::createPipelineLayout() {
 
 	auto pushConstantRanges = shader.getPushConstantRanges();
 
-	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
-	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
 	pipelineLayoutCreateInfo.setLayoutCount = 1;
 	pipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
 	pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
@@ -156,11 +152,9 @@ void PipelineGraphics::createAttributes() {
 		throw std::runtime_error("Cannot create graphics pipeline with line polygon mode when logical device does not support non solid fills.");
 	}
 
-	inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	inputAssemblyState.topology = topology;
 	inputAssemblyState.primitiveRestartEnable = VK_FALSE;
 
-	rasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	rasterizationState.depthClampEnable = VK_FALSE;
 	rasterizationState.rasterizerDiscardEnable = VK_FALSE;
 	rasterizationState.polygonMode = polygonMode;
@@ -173,7 +167,7 @@ void PipelineGraphics::createAttributes() {
 	rasterizationState.lineWidth = lineWidth;
 
     for (auto& blendAttachmentState : blendAttachmentStates) {
-        blendAttachmentState = VkPipelineColorBlendAttachmentState();
+        //blendAttachmentState = VkPipelineColorBlendAttachmentState();
         blendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
         blendAttachmentState.alphaBlendOp = VK_BLEND_OP_MAX;
         blendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD;
@@ -205,7 +199,6 @@ void PipelineGraphics::createAttributes() {
         }
     }
 
-	colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlendState.logicOpEnable = VK_FALSE;
 	colorBlendState.logicOp = VK_LOGIC_OP_COPY;
 	colorBlendState.attachmentCount = static_cast<uint32_t>(blendAttachmentStates.size());
@@ -215,7 +208,6 @@ void PipelineGraphics::createAttributes() {
 	colorBlendState.blendConstants[2] = 0.0f;
 	colorBlendState.blendConstants[3] = 0.0f;
 
-	depthStencilState.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 	depthStencilState.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
 	depthStencilState.front = depthStencilState.back;
 	depthStencilState.back.compareOp = VK_COMPARE_OP_ALWAYS;
@@ -239,14 +231,12 @@ void PipelineGraphics::createAttributes() {
             break;
 	}
 
-	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 	viewportState.viewportCount = 1;
 	viewportState.scissorCount = 1;
 
 	auto renderStage = Graphics::Get()->getRenderStage(stage.first);
 	bool multisampled = renderStage->isMultisampled(stage.second);
 
-	multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	multisampleState.rasterizationSamples = multisampled ? physicalDevice.getMsaaSamples() : VK_SAMPLE_COUNT_1_BIT;
 	multisampleState.sampleShadingEnable = VK_FALSE;
 
@@ -266,11 +256,9 @@ void PipelineGraphics::createAttributes() {
         dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_BIAS);
     }
 
-    dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 	dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
 	dynamicState.pDynamicStates = dynamicStates.data();
 
-	tessellationState.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO;
 	tessellationState.patchControlPoints = 3;
 }
 
@@ -308,14 +296,12 @@ void PipelineGraphics::createPipeline() {
 			lastAttribute = attributeDescriptions.back().location + 1;
 	}
 
-	vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputStateCreateInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
 	vertexInputStateCreateInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 	vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
 	vertexInputStateCreateInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
-	VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
-	pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	VkGraphicsPipelineCreateInfo pipelineCreateInfo = { VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
 	pipelineCreateInfo.stageCount = static_cast<uint32_t>(stages.size());
 	pipelineCreateInfo.pStages = stages.data();
 

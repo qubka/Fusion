@@ -31,8 +31,7 @@ DebugMarker::DebugMarker() : logicalDevice{Graphics::Get()->getLogicalDevice()} 
 void DebugMarker::setObjectName(uint64_t object, VkDebugReportObjectTypeEXT objectType, const char* name) {
     // Check for valid function pointer (may not be present if not running in a debugging application)
     if (pfnDebugMarkerSetObjectName) {
-        VkDebugMarkerObjectNameInfoEXT nameInfo = {};
-        nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
+        VkDebugMarkerObjectNameInfoEXT nameInfo = { VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT };
         nameInfo.objectType = objectType;
         nameInfo.object = object;
         nameInfo.pObjectName = name;
@@ -43,8 +42,7 @@ void DebugMarker::setObjectName(uint64_t object, VkDebugReportObjectTypeEXT obje
 void DebugMarker::setObjectTag(uint64_t object, VkDebugReportObjectTypeEXT objectType, uint64_t name, size_t tagSize, const void* tag) {
     // Check for valid function pointer (may not be present if not running in a debugging application)
     if (pfnDebugMarkerSetObjectTag) {
-        VkDebugMarkerObjectTagInfoEXT tagInfo = {};
-        tagInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT;
+        VkDebugMarkerObjectTagInfoEXT tagInfo = { VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT };
         tagInfo.objectType = objectType;
         tagInfo.object = object;
         tagInfo.tagName = name;
@@ -57,8 +55,7 @@ void DebugMarker::setObjectTag(uint64_t object, VkDebugReportObjectTypeEXT objec
 void DebugMarker::beginRegion(VkCommandBuffer commandBuffer, const char* markerName, const glm::vec4& color) {
     // Check for valid function pointer (may not be present if not running in a debugging application)
     if (pfnCmdDebugMarkerBegin) {
-        VkDebugMarkerMarkerInfoEXT markerInfo = {};
-        markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
+        VkDebugMarkerMarkerInfoEXT markerInfo = { VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT };
         std::memcpy(markerInfo.color, glm::value_ptr(color), sizeof(glm::vec4));
         markerInfo.pMarkerName = markerName;
         pfnCmdDebugMarkerBegin(commandBuffer, &markerInfo);
@@ -68,8 +65,7 @@ void DebugMarker::beginRegion(VkCommandBuffer commandBuffer, const char* markerN
 void DebugMarker::insert(VkCommandBuffer commandBuffer, const char* markerName, const glm::vec4& color) {
     // Check for valid function pointer (may not be present if not running in a debugging application)
     if (pfnCmdDebugMarkerInsert) {
-        VkDebugMarkerMarkerInfoEXT markerInfo = {};
-        markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
+        VkDebugMarkerMarkerInfoEXT markerInfo = { VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT };
         std::memcpy(markerInfo.color, glm::value_ptr(color), sizeof(glm::vec4));
         markerInfo.pMarkerName = markerName;
         pfnCmdDebugMarkerInsert(commandBuffer, &markerInfo);

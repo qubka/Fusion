@@ -163,8 +163,7 @@ void Instance::createInstance() {
 
 	VK_CHECK(volkInitialize());
 	
-	VkApplicationInfo applicationInfo = {};
-	applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	VkApplicationInfo applicationInfo = { VK_STRUCTURE_TYPE_APPLICATION_INFO };
 	applicationInfo.pApplicationName = appName.c_str();
 	applicationInfo.applicationVersion =  static_cast<uint32_t>(appVersion);
 	applicationInfo.pEngineName = "Fusion";
@@ -178,18 +177,16 @@ void Instance::createInstance() {
 
 	auto extensions = getExtensions();
 	
-	VkInstanceCreateInfo instanceCreateInfo = {};
-	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	VkInstanceCreateInfo instanceCreateInfo = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
 	instanceCreateInfo.pApplicationInfo = &applicationInfo;
 	instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 	instanceCreateInfo.ppEnabledExtensionNames = extensions.data();
 
 #if USE_DEBUG_MESSENGER
-	VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfo = {};
+	VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfo = { VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT };
 #endif
 	if (enableValidationLayers) {
 #if USE_DEBUG_MESSENGER
-		debugUtilsMessengerCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 		debugUtilsMessengerCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | 
 			VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 		debugUtilsMessengerCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | 
@@ -216,15 +213,13 @@ void Instance::createDebugMessenger() {
         return;
 
 #if USE_DEBUG_MESSENGER
-	VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfo = {};
-	debugUtilsMessengerCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+	VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfo = { VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT };
 	debugUtilsMessengerCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 	debugUtilsMessengerCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 	debugUtilsMessengerCreateInfo.pfnUserCallback = &CallbackDebug;
 	VK_CHECK(FvkCreateDebugUtilsMessengerEXT(instance, &debugUtilsMessengerCreateInfo, nullptr, &debugMessenger));
 #else
-	VkDebugReportCallbackCreateInfoEXT debugReportCallbackCreateInfo = {};
-	debugReportCallbackCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+	VkDebugReportCallbackCreateInfoEXT debugReportCallbackCreateInfo = { VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT };
 	debugReportCallbackCreateInfo.pNext = nullptr;
 	debugReportCallbackCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
 	debugReportCallbackCreateInfo.pfnCallback = &CallbackDebug;

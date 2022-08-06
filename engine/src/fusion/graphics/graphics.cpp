@@ -159,8 +159,7 @@ bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
 
     auto clearValues = renderStage.getClearValues();
 
-    VkRenderPassBeginInfo renderPassBeginInfo = {};
-    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    VkRenderPassBeginInfo renderPassBeginInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
     renderPassBeginInfo.renderPass = *renderStage.getRenderpass();
     renderPassBeginInfo.framebuffer = renderStage.getActiveFramebuffer(swapchain.getActiveImageIndex());
     renderPassBeginInfo.renderArea = scissor; // same as render area

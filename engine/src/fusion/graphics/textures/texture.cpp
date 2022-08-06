@@ -79,8 +79,7 @@ Texture::Texture(const std::unique_ptr<Bitmap>& bitmap, VkFilter filter, VkSampl
 }
 
 WriteDescriptorSet Texture::getWriteDescriptor(uint32_t binding, VkDescriptorType descriptorType, const std::optional<OffsetSize>& offsetSize) const {
-    VkWriteDescriptorSet descriptorWrite = {};
-    descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    VkWriteDescriptorSet descriptorWrite = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
     descriptorWrite.dstSet = VK_NULL_HANDLE; // Will be set in the descriptor handler.
     descriptorWrite.dstBinding = binding;
     descriptorWrite.dstArrayElement = 0;

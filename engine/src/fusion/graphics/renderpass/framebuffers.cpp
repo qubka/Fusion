@@ -46,8 +46,7 @@ Framebuffers::Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& 
 			}
 		}
 
-		VkFramebufferCreateInfo framebufferCreateInfo = {};
-		framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		VkFramebufferCreateInfo framebufferCreateInfo = { VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
 		framebufferCreateInfo.renderPass = renderPass;
 		framebufferCreateInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 		framebufferCreateInfo.pAttachments = attachments.data();

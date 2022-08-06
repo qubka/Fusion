@@ -11,8 +11,7 @@ DescriptorSet::DescriptorSet(const Pipeline& pipeline)
         , descriptorPool{pipeline.getDescriptorPool()} {
 	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
-	descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
 	descriptorSetAllocateInfo.descriptorPool = descriptorPool;
 	descriptorSetAllocateInfo.descriptorSetCount = 1;
 	descriptorSetAllocateInfo.pSetLayouts = &pipeline.getDescriptorSetLayout();

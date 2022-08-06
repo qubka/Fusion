@@ -7,7 +7,7 @@
 #include "fusion/skybox/skybox_subrender.hpp"
 #include "fusion/models/mesh_subrender.hpp"
 #include "fusion/ligthing/light_subrender.hpp"
-#include "fusion/post/deferred/deferred_subrender.hpp"
+//#include "fusion/post/deferred/deferred_subrender.hpp"
 #include "fusion/debug/debug_subrender.hpp"
 
 namespace fe {

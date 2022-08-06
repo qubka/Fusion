@@ -9,8 +9,7 @@ CommandBuffer::CommandBuffer(bool begin, VkQueueFlagBits queueType, VkCommandBuf
         : logicalDevice{Graphics::Get()->getLogicalDevice()}
         , commandPool{Graphics::Get()->getCommandPool()}
         , queueType{queueType} {
-	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
-	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	VkCommandBufferAllocateInfo commandBufferAllocateInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO };
 	commandBufferAllocateInfo.commandPool = *commandPool;
 	commandBufferAllocateInfo.level = bufferLevel;
 	commandBufferAllocateInfo.commandBufferCount = 1;
@@ -28,8 +27,7 @@ void CommandBuffer::begin(VkCommandBufferUsageFlags usage) {
 	if (running)
 		return;
 
-	VkCommandBufferBeginInfo beginInfo = {};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	VkCommandBufferBeginInfo beginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
 	beginInfo.flags = usage;
 	VK_CHECK(vkBeginCommandBuffer(commandBuffer, &beginInfo));
 	running = true;
@@ -49,13 +47,11 @@ void CommandBuffer::submitIdle() {
 	if (running)
 		end();
 
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffer;
 
-	VkFenceCreateInfo fenceCreateInfo = {};
-	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	VkFenceCreateInfo fenceCreateInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
 
 	VkFence fence;
 	VK_CHECK(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &fence));
@@ -73,8 +69,7 @@ void CommandBuffer::submit(VkSemaphore waitSemaphore, VkSemaphore signalSemaphor
 	if (running)
 		end();
 
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffer;
 

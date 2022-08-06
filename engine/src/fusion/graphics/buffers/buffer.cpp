@@ -19,8 +19,7 @@ Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlag
     std::array queueFamily = {graphicsFamily, presentFamily, computeFamily};
 
     // Create the buffer handle
-    VkBufferCreateInfo bufferCreateInfo = {};
-    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    VkBufferCreateInfo bufferCreateInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
     bufferCreateInfo.size = size;
     bufferCreateInfo.usage = usage;
     bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -33,15 +32,13 @@ Buffer::Buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlag
     vkGetBufferMemoryRequirements(logicalDevice, buffer, &memoryRequirements);
 
     // Create the memory backing up the buffer handle
-    VkMemoryAllocateInfo memoryAllocateInfo = {};
-    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    VkMemoryAllocateInfo memoryAllocateInfo = { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
     memoryAllocateInfo.allocationSize = memoryRequirements.size;
     // Find a memory type index that fits the properties of the buffer
     memoryAllocateInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, properties);
     // If the buffer has VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT set we also need to enable the appropriate flag during allocation
     if (usage & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) {
-        VkMemoryAllocateFlagsInfoKHR allocFlagsInfo = {};
-        allocFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO_KHR;
+        VkMemoryAllocateFlagsInfoKHR allocFlagsInfo = { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO_KHR };
         allocFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
         memoryAllocateInfo.pNext = &allocFlagsInfo;
     }
@@ -118,8 +115,7 @@ void Buffer::extract(void* data, VkDeviceSize size, VkDeviceSize offset) {
 }
 
 void Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    VkMappedMemoryRange mappedRange = { VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE };
     mappedRange.memory = memory;
     mappedRange.offset = offset;
     mappedRange.size = size;
@@ -127,8 +123,7 @@ void Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
 }
 
 void Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    VkMappedMemoryRange mappedRange = { VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE };
     mappedRange.memory = memory;
     mappedRange.offset = offset;
     mappedRange.size = size;
@@ -163,8 +158,7 @@ uint32_t Buffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags requi
 
 void Buffer::InsertBufferMemoryBarrier(VkCommandBuffer commandBuffer, VkBuffer buffer, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask,
                                        VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask, VkDeviceSize offset, VkDeviceSize size) {
-    VkBufferMemoryBarrier bufferMemoryBarrier = {};
-    bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    VkBufferMemoryBarrier bufferMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
     bufferMemoryBarrier.srcAccessMask = srcAccessMask;
     bufferMemoryBarrier.dstAccessMask = dstAccessMask;
     bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;

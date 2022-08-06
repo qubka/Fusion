@@ -51,8 +51,7 @@ Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& 
     if (capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT)
         usage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
-	VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
-	swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	VkSwapchainCreateInfoKHR swapchainCreateInfo = { VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR };
 	swapchainCreateInfo.surface = surface;
 	swapchainCreateInfo.minImageCount = desiredImageCount;
 	swapchainCreateInfo.imageFormat = surfaceFormat.format;
@@ -117,8 +116,7 @@ VkResult Swapchain::acquireNextImage(VkSemaphore presentCompleteSemaphore, VkFen
 }
 
 VkResult Swapchain::queuePresent(VkQueue presentQueue, VkSemaphore waitSemaphore) {
-    VkPresentInfoKHR presentInfo = {};
-    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    VkPresentInfoKHR presentInfo = { VK_STRUCTURE_TYPE_PRESENT_INFO_KHR };
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = &swapchain;
     presentInfo.pImageIndices = &activeImageIndex;

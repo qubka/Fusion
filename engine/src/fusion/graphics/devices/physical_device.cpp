@@ -26,7 +26,7 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, uint32_t desiredDeviceI
     physicalDevice = desiredDeviceIndex < physicalDeviceCount ? physicalDevices[desiredDeviceIndex] : ChoosePhysicalDevice(physicalDevices);
 
     if (!physicalDevice)
-        throw std::runtime_error("Filed to find a suitable GPU");
+        throw std::runtime_error("Failed to find a suitable GPU");
 
     vkGetPhysicalDeviceProperties(physicalDevice, &properties);
     vkGetPhysicalDeviceFeatures(physicalDevice, &features);
@@ -83,9 +83,7 @@ uint32_t PhysicalDevice::ScorePhysicalDevice(VkPhysicalDevice device) {
 
     // Obtain the device features and properties of the current device being rateds
     VkPhysicalDeviceProperties physicalDeviceProperties;
-    //VkPhysicalDeviceFeatures physicalDeviceFeatures;
     vkGetPhysicalDeviceProperties(device, &physicalDeviceProperties);
-    //vkGetPhysicalDeviceFeatures(device, &physicalDeviceFeatures);
 
 #if FUSION_DEBUG
     LogVulkanDevice(physicalDeviceProperties, extensionProperties);

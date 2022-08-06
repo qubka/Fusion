@@ -56,7 +56,6 @@ void PipelineCompute::createShaderProgram() {
 	auto stageFlag = Shader::GetShaderStage(shaderStage);
 	shaderModule = shader.createShaderModule(shaderStage, shaderCode, ss.str(), stageFlag);
 
-	shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStageCreateInfo.stage = stageFlag;
 	shaderStageCreateInfo.module = shaderModule;
 	shaderStageCreateInfo.pName = "main";
@@ -75,8 +74,7 @@ void PipelineCompute::createDescriptorLayout() {
 
 	auto descriptorSetLayouts = shader.getDescriptorSetLayouts();
 
-	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
-	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
 	descriptorSetLayoutCreateInfo.flags = pushDescriptors ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
 	descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(descriptorSetLayouts.size());
 	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayouts.data();
@@ -88,10 +86,9 @@ void PipelineCompute::createDescriptorPool() {
 
 	auto descriptorPools = shader.getDescriptorPools();
 
-	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
-	descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
 	descriptorPoolCreateInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-	descriptorPoolCreateInfo.maxSets = 8192; // 16384;
+	descriptorPoolCreateInfo.maxSets = 32; // 16384;
 	descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>(descriptorPools.size());
 	descriptorPoolCreateInfo.pPoolSizes = descriptorPools.data();
 	VK_CHECK(vkCreateDescriptorPool(logicalDevice, &descriptorPoolCreateInfo, nullptr, &descriptorPool));
@@ -102,8 +99,7 @@ void PipelineCompute::createPipelineLayout() {
 
 	auto pushConstantRanges = shader.getPushConstantRanges();
 
-	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
-	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
 	pipelineLayoutCreateInfo.setLayoutCount = 1;
 	pipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
 	pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
@@ -115,8 +111,7 @@ void PipelineCompute::createPipelineCompute() {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 	auto pipelineCache = Graphics::Get()->getPipelineCache();
 
-	VkComputePipelineCreateInfo pipelineCreateInfo = {};
-	pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+	VkComputePipelineCreateInfo pipelineCreateInfo = { VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO };
 	pipelineCreateInfo.stage = shaderStageCreateInfo;
 	pipelineCreateInfo.layout = pipelineLayout;
 	pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;

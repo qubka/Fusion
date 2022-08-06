@@ -366,8 +366,7 @@ VkShaderModule Shader::createShaderModule(const fs::path& moduleName, const std:
 	std::vector<uint32_t> spirv;
 	GlslangToSpv(*program.getIntermediate(static_cast<EShLanguage>(language)), spirv, &logger, &spvOptions);
 
-	VkShaderModuleCreateInfo shaderModuleCreateInfo = {};
-	shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	VkShaderModuleCreateInfo shaderModuleCreateInfo = { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
 	shaderModuleCreateInfo.codeSize = spirv.size() * sizeof(uint32_t);
 	shaderModuleCreateInfo.pCode = spirv.data();
 
@@ -442,19 +441,19 @@ void Shader::createReflection() {
 	// We don't know the total usages of descriptor types by the pipeline.
 	descriptorPools.resize(7);
 	descriptorPools[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	descriptorPools[0].descriptorCount = 4096;
+	descriptorPools[0].descriptorCount = 32;
 	descriptorPools[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	descriptorPools[1].descriptorCount = 2048;
+	descriptorPools[1].descriptorCount = 16;
 	descriptorPools[2].type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-	descriptorPools[2].descriptorCount = 2048;
+	descriptorPools[2].descriptorCount = 16;
 	descriptorPools[3].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-	descriptorPools[3].descriptorCount = 2048;
+	descriptorPools[3].descriptorCount = 16;
 	descriptorPools[4].type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-	descriptorPools[4].descriptorCount = 2048;
+	descriptorPools[4].descriptorCount = 16;
 	descriptorPools[5].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	descriptorPools[5].descriptorCount = 2048;
+	descriptorPools[5].descriptorCount = 16;
     descriptorPools[6].type = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
-	descriptorPools[6].descriptorCount = 512;
+	descriptorPools[6].descriptorCount = 8;
 
 	// Sort descriptors by binding.
 	std::sort(descriptorSetLayouts.begin(), descriptorSetLayouts.end(), [](const VkDescriptorSetLayoutBinding& l, const VkDescriptorSetLayoutBinding& r) {

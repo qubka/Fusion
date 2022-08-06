@@ -110,8 +110,7 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 	}
 
 	// Creates the render pass.
-	VkRenderPassCreateInfo renderPassCreateInfo = {};
-	renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	VkRenderPassCreateInfo renderPassCreateInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO };
 	renderPassCreateInfo.attachmentCount = static_cast<uint32_t>(attachmentDescriptions.size());
 	renderPassCreateInfo.pAttachments = attachmentDescriptions.data();
 	renderPassCreateInfo.subpassCount = static_cast<uint32_t>(subpassDescriptions.size());

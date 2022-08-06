@@ -23,8 +23,7 @@ WriteDescriptorSet UniformBuffer::getWriteDescriptor(uint32_t binding, VkDescrip
         bufferInfo.range = size;
     }
 
-	VkWriteDescriptorSet descriptorWrite = {};
-	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	VkWriteDescriptorSet descriptorWrite = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
 	descriptorWrite.dstSet = VK_NULL_HANDLE; // Will be set in the descriptor handler.
 	descriptorWrite.dstBinding = binding;
 	descriptorWrite.dstArrayElement = 0;
