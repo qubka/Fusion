@@ -2,9 +2,9 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-//layout(constant_id = 0) const bool ANIMATED = false;
-//layout(constant_id = 1) const int MAX_JOINTS = 64;
-//layout(constant_id = 2) const int MAX_WEIGHTS = 64;
+//layout (constant_id = 0) const bool ANIMATED = false;
+//layout (constant_id = 1) const int MAX_JOINTS = 64;
+//layout (constant_id = 2) const int MAX_WEIGHTS = 64;
 
 layout (binding = 0) uniform UniformScene {
     mat4 projection;

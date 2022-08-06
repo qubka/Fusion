@@ -35,6 +35,10 @@ Engine::Engine(CommandLineArgs&& args)
 
 Engine::~Engine() {
     application = nullptr;
+    // Destroy modules in reverse order of insertion
+    for (auto it = modules.rbegin(); it != modules.rend(); ++it) {
+        it->reset();
+    }
     Instance = nullptr;
 }
 
@@ -54,7 +58,7 @@ void Engine::init() {
     for (const auto& [type, module] : Module::Registry()) {
         auto index = static_cast<uint32_t>(modules.size());
         modules.push_back(module.create());
-        stages[static_cast<size_t>(module.stage)].push_back(index);
+        stages[me::enum_integer(module.stage)].push_back(index);
         LOG_DEBUG << "Module: \"" << module.name << "\" was registered for the \"" << me::enum_name(module.stage) << "\" stage";
     }
 }
@@ -123,6 +127,6 @@ void Engine::shutdown() {
 }
 
 void Engine::updateStage(Module::Stage stage) {
-    for (auto index : stages[static_cast<size_t>(stage)])
+    for (auto index : stages[me::enum_integer(stage)])
         modules[index]->onUpdate();
 }

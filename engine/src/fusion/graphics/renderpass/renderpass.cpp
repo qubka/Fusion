@@ -8,9 +8,11 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 	std::vector<VkAttachmentDescription> attachmentDescriptions;
     attachmentDescriptions.reserve(renderStage.getAttachments().size());
 
+    auto lastBinding = renderStage.getAttachments().back().binding;
+
 	for (const auto& attachment : renderStage.getAttachments()) {
 		VkAttachmentDescription attachmentDescription = {};
-		attachmentDescription.samples = attachment.multisampled ? samples : VK_SAMPLE_COUNT_1_BIT;
+		attachmentDescription.samples = attachment.multisampled && attachment.binding != lastBinding ? samples : VK_SAMPLE_COUNT_1_BIT;
 		attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // Clear at beginning of the render pass.
 		attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE; // // The image can be read from so it's important to store the attachment results
 		attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -19,8 +21,8 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 
         switch (attachment.type) {
             case Attachment::Type::Image:
-                attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                attachmentDescription.format = attachment.format;
+                attachmentDescription.finalLayout = attachment.layout;
+                attachmentDescription.format = attachment.format != VK_FORMAT_UNDEFINED ? attachment.format : surfaceFormat;
                 break;
             case Attachment::Type::Depth:
                 attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
@@ -44,8 +46,9 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 		std::vector<VkAttachmentReference> subpassColorAttachments;
 
 		std::optional<uint32_t> depthAttachment;
+        bool resolveAttachment = false;
 
-		for (const auto& attachmentBinding : subpassType.attachmentBindings) {
+        for (const auto& attachmentBinding : subpassType.attachmentBindings) {
 			auto attachment = renderStage.getAttachment(attachmentBinding);
 
 			if (!attachment) {
@@ -62,10 +65,12 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 			attachmentReference.attachment = attachment->binding;
             attachmentReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			subpassColorAttachments.push_back(attachmentReference);
+
+            resolveAttachment = attachment->multisampled; // last attachment as resolve
 		}
 
 		// Subpass description.
-		subpasses.push_back(std::make_unique<SubpassDescription>(VK_PIPELINE_BIND_POINT_GRAPHICS, std::move(subpassColorAttachments), depthAttachment));
+		subpasses.push_back(std::make_unique<SubpassDescription>(VK_PIPELINE_BIND_POINT_GRAPHICS, std::move(subpassColorAttachments), depthAttachment, resolveAttachment));
 
 		// Subpass dependencies.
 		VkSubpassDependency subpassDependency = {};

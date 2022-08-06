@@ -9,11 +9,15 @@ namespace fe {
     public:
         class SubpassDescription {
         public:
-            SubpassDescription(VkPipelineBindPoint bindPoint, std::vector<VkAttachmentReference>&& colorAttachments, const std::optional<uint32_t>& depthAttachment)
-                : colorAttachments{std::move(colorAttachments)} {
+            SubpassDescription(VkPipelineBindPoint bindPoint, std::vector<VkAttachmentReference>&& colorAttachment, const std::optional<uint32_t>& depthAttachment, bool resolveAttachment) : colorAttachments{std::move(colorAttachment)} {
                 subpassDescription.pipelineBindPoint = bindPoint;
-                subpassDescription.colorAttachmentCount = static_cast<uint32_t>(this->colorAttachments.size());
-                subpassDescription.pColorAttachments = this->colorAttachments.data();
+                subpassDescription.colorAttachmentCount = static_cast<uint32_t>(colorAttachments.size());
+                subpassDescription.pColorAttachments = colorAttachments.data();
+
+                if (resolveAttachment) {
+                    subpassDescription.colorAttachmentCount--;
+                    subpassDescription.pResolveAttachments = &colorAttachments.back();
+                }
 
                 if (depthAttachment) {
                     depthStencilAttachment.attachment = *depthAttachment;
@@ -28,6 +32,7 @@ namespace fe {
 
         private:
             std::vector<VkAttachmentReference> colorAttachments;
+
             VkSubpassDescription subpassDescription = {};
             VkAttachmentReference depthStencilAttachment = {};
         };

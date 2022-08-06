@@ -1,6 +1,6 @@
 #pragma once
 
-#define FUSION_MAKE_VERSION(variant, major, minor, patch)  ((((uint32_t)(variant)) << 29) | (((uint32_t)(major)) << 22) | (((uint32_t)(minor)) << 12) | ((uint32_t)(patch)))
+#define FUSION_MAKE_VERSION(variant, major, minor, patch) ((((uint32_t)(variant)) << 29) | (((uint32_t)(major)) << 22) | (((uint32_t)(minor)) << 12) | ((uint32_t)(patch)))
 #define FUSION_MAKE_VERSION_VARIANT(version) ((uint32_t)(version) >> 29)
 #define FUSION_MAKE_VERSION_MAJOR(version) (((uint32_t)(version) >> 22) & 0x7FU)
 #define FUSION_MAKE_VERSION_MINOR(version) (((uint32_t)(version) >> 12) & 0x3FFU)
