@@ -414,13 +414,13 @@ void Shader::createReflection() {
             case 0x9108: // GL_SAMPLER_2D_MULTISAMPLE
             case 0x9055: // GL_IMAGE_2D_MULTISAMPLE
                 descriptorType = uniform.writeOnly ? VK_DESCRIPTOR_TYPE_STORAGE_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                descriptorSetLayouts.push_back(Texture2d::GetDescriptorSetLayout(static_cast<uint32_t>(uniform.binding), descriptorType, uniform.stageFlags, 1));
+                descriptorSetLayouts.push_back(Texture2d::GetDescriptorSetLayout(static_cast<uint32_t>(uniform.binding), descriptorType, uniform.stageFlags, uniform.size));
                 break;
             case 0x8B60: // GL_SAMPLER_CUBE
             case 0x9050: // GL_IMAGE_CUBE
             case 0x9054: // GL_IMAGE_CUBE_MAP_ARRAY
                 descriptorType = uniform.writeOnly ? VK_DESCRIPTOR_TYPE_STORAGE_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                descriptorSetLayouts.push_back(TextureCube::GetDescriptorSetLayout(static_cast<uint32_t>(uniform.binding), descriptorType, uniform.stageFlags, 1));
+                descriptorSetLayouts.push_back(TextureCube::GetDescriptorSetLayout(static_cast<uint32_t>(uniform.binding), descriptorType, uniform.stageFlags, uniform.size));
                 break;
             default:
                 break;
@@ -536,7 +536,7 @@ void Shader::loadUniform(const glslang::TProgram& program, VkShaderStageFlags st
 	}
 
 	auto& qualifier = reflection.getType()->getQualifier();
-	uniforms.emplace(reflection.name, Uniform{ reflection.getBinding(), reflection.offset, -1, reflection.glDefineType, qualifier.readonly, qualifier.writeonly, stageFlag });
+	uniforms.emplace(reflection.name, Uniform{ reflection.getBinding(), reflection.offset, reflection.size, reflection.glDefineType, qualifier.readonly, qualifier.writeonly, stageFlag });
 }
 
 void Shader::loadAttribute(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i) {

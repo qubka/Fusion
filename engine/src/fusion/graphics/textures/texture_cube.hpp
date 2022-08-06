@@ -68,8 +68,6 @@ namespace fe {
                              bool anisotropic = false,
                              bool mipmap = false);
 
-        static VkDescriptorSetLayoutBinding GetDescriptorSetLayout(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stage, uint32_t count);
-
         /**
          * Copies the images pixels from memory to a bitmap. The bitmap height will be scaled by the amount of layers.
          * @param mipLevel The mipmap level index to sample.
