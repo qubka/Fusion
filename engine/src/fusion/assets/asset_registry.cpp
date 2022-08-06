@@ -6,6 +6,9 @@ using namespace fe;
 
 #define BIND_FILECHANGE_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
+AssetRegistry::~AssetRegistry() {
+}
+
 void AssetRegistry::remove(const std::shared_ptr<Asset>& asset) {
     if (auto it = assets.find(asset->getType()); it != assets.end()) {
         if (auto it1 = it->second.find(asset->getPath()); it1 != it->second.end()) {

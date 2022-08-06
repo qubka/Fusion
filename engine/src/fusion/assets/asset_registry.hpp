@@ -10,7 +10,7 @@ namespace fe {
     class AssetRegistry : public Module::Registrar<AssetRegistry> {
     public:
         AssetRegistry() = default;
-        ~AssetRegistry() override = default;
+        ~AssetRegistry() override;
 
         template<typename T>
         std::shared_ptr<T> get(const fs::path& filepath) const {
