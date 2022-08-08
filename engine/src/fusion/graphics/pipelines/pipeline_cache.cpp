@@ -4,11 +4,11 @@
 
 using namespace fe;
 
-PipelineCache::PipelineCache(const LogicalDevice& logicalDevice) : logicalDevice{logicalDevice} {
+PipelineCache::PipelineCache(VkDevice device) : device{device} {
     VkPipelineCacheCreateInfo pipelineCacheCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO };
-    VK_CHECK(vkCreatePipelineCache(logicalDevice, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
+    VK_CHECK(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
 }
 
 PipelineCache::~PipelineCache() {
-    vkDestroyPipelineCache(logicalDevice, pipelineCache, nullptr);
+    vkDestroyPipelineCache(device, pipelineCache, nullptr);
 }

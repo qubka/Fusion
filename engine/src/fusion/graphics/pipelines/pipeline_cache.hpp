@@ -4,7 +4,7 @@ namespace fe {
     class LogicalDevice;
     class PipelineCache {
     public:
-        PipelineCache(const LogicalDevice& logicalDevice);
+        explicit PipelineCache(VkDevice device);
         ~PipelineCache();
 
         operator bool() const { return pipelineCache != VK_NULL_HANDLE; }
@@ -13,7 +13,7 @@ namespace fe {
         const VkPipelineCache& getPipelineCache() const { return pipelineCache; }
 
     private:
-        const LogicalDevice& logicalDevice;
+        VkDevice device;
 
         VkPipelineCache pipelineCache{ VK_NULL_HANDLE };
     };
