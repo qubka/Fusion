@@ -112,7 +112,7 @@ namespace fe {
         void renderStage(Pipeline::Stage pipelineStage, const CommandBuffer& commandBuffer, const Camera* overrideCamera = nullptr);
 
         /// List of all subrenders
-        std::unordered_map<type_index, std::vector<std::unique_ptr<Subrender>>> subrenders;
+        std::flat_map<type_index, std::vector<std::unique_ptr<Subrender>>> subrenders;
         /// List of subrender stages
         std::multimap<Pipeline::Stage, SubrenderIndex> stages;
     };

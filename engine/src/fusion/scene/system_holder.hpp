@@ -20,11 +20,8 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
         bool has() const {
-            auto it = std::find_if(systems.begin(), systems.end(), [](const auto& p) {
-                return p.first == type_id<T>;
-            });
-
-            return it != systems.end() && it->second;
+            auto it = systems.find(type_id<T>);
+            return it != systems.end();
         }
 
         /**
@@ -34,15 +31,8 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
         T* get() const {
-            auto it = std::find_if(systems.begin(), systems.end(), [](const auto& p) {
-                return p.first == type_id<T>;
-            });
-
-            if (it != systems.end() && it->second) {
-                return static_cast<T*>(it->second.get());
-            } else {
-                throw std::runtime_error("System Holder does not have requested system");
-            }
+            auto it = systems.find(type_id<T>);
+            return it != systems.end() ? reinterpret_cast<T*>(it->second.get()) : nullptr;
         }
 
         /**
@@ -52,16 +42,7 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
         void add(std::unique_ptr<T>&& system) {
-            auto it = std::find_if(systems.begin(), systems.end(), [](const auto& p) {
-                return p.first == type_id<T>;
-            });
-
-            if (it == systems.end()) {
-                // Then, add the system
-                systems.emplace_back(type_id<T>, std::move(system));
-            } else {
-                throw std::runtime_error("System Holder already have requested system");
-            }
+            systems.emplace(type_id<T>, std::move(system));
         }
 
         /**
@@ -70,16 +51,7 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
         void remove() {
-            auto it = std::find_if(systems.begin(), systems.end(), [](const auto& p) {
-                return p.first == type_id<T>;
-            });
-
-            if (it != systems.end()) {
-                // Then, remove the system
-                systems.erase(it);
-            } else {
-                throw std::runtime_error("System Holder does not requested system to remove");
-            }
+            systems.erase(type_id<T>);
         }
 
         /**
@@ -94,13 +66,13 @@ namespace fe {
          */
         template<typename F>
         void each(const F& func) {
-            for (const auto& [type, system] : systems) {
+            for (const auto& system : systems.values()) {
                 func(system.get());
             }
         }
 
     private:
         /// List of all systems
-        std::vector<std::pair<type_index, std::unique_ptr<System>>> systems;
+        std::flat_map<type_index, std::unique_ptr<System>> systems;
     };
 }

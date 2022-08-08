@@ -99,7 +99,7 @@ std::string_view String::Extract(std::string_view str, std::string_view start, s
     else
         strBegin = 0;
 
-    auto strEnd = str.find(stop);
+    auto strEnd = str.find_last_of(stop);
     if (strEnd == std::string::npos)
         strEnd = str.length() - 1;
 
@@ -155,7 +155,7 @@ std::string String::FixEscapedChars(std::string str) {
 }
 
 std::string String::UnfixEscapedChars(std::string str) {
-    static const std::vector<std::pair<std::string_view, char>> replaces = {{"\\n", '\n'}, {"\\r", '\r'}, {"\\t", '\t'}, {"\\\"", '\"'}, {"\\\\", '\\'}};
+    static const std::flat_map<std::string_view, char> replaces = {{"\\n", '\n'}, {"\\r", '\r'}, {"\\t", '\t'}, {"\\\"", '\"'}, {"\\\\", '\\'}};
 
     for (const auto& [from, to] : replaces) {
         auto pos = str.find(from);
@@ -204,9 +204,7 @@ std::string String::Demangle(const std::string& str) {
     }
 #else
     int status = -1;
-    char* demangled = abi::__cxa_demangle(str.c_str(), nullptr, nullptr, &status);
-    std::string ret{ demangled };
-    free(demangled);
-    return status == 0 ? ret : str;
+    std::string demangled = abi::__cxa_demangle(str.c_str(), nullptr, nullptr, &status);
+    return status == 0 ? demangled : str;
 #endif
 }

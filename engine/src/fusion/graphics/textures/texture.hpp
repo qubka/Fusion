@@ -7,7 +7,7 @@ namespace fe {
     /**
      * @brief Defines the purpose of a texture
      */
-    enum class TextureType : unsigned char {
+    /*enum class TextureType : unsigned char {
         None = 0,
         Diffuse = 1,
         Specular = 2,
@@ -30,7 +30,7 @@ namespace fe {
         Sheen = 19,
         Clearcoat = 20,
         Transmission = 21,
-    };
+    };*/
 
     class Texture : public Image, public Asset {
     public:
@@ -136,8 +136,8 @@ namespace fe {
         uint32_t getMipLevels() const { return mipLevels; }
         uint32_t getArrayLevels() const { return arrayLayers; }
 
-        TextureType getTextureType() const { return textureType; }
-        void settTextureType(TextureType type) { textureType = type; }
+        //TextureType getTextureType() const { return textureType; }
+        //void settTextureType(TextureType type) { textureType = type; }
 
         /*void transitionImage(VkImageLayout newLayout, VkCommandBuffer commandBuffer) {
             if (newLayout != layout) {
@@ -157,7 +157,7 @@ namespace fe {
     protected:
         VkDescriptorImageInfo descriptor = {};
 
-        TextureType textureType{ TextureType::None };
+        //TextureType textureType{ TextureType::None };
         uint32_t mipLevels{ 0 };
         uint32_t arrayLayers{ 0 };
         bool anisotropic{ false };

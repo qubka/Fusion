@@ -981,3 +981,28 @@ namespace vku {
 #define VK_CHECK(func) func
 #define VK_CHECK_RESULT(result)
 #endif
+
+static inline bool operator==(const VkSamplerCreateInfo& lhs, const VkSamplerCreateInfo& rhs) {
+    return lhs.sType == rhs.sType &&
+           lhs.pNext == rhs.pNext &&
+           lhs.flags == rhs.flags &&
+           lhs.magFilter == rhs.magFilter &&
+           lhs.minFilter == rhs.minFilter &&
+           lhs.mipmapMode == rhs.mipmapMode &&
+           lhs.addressModeU == rhs.addressModeU &&
+           lhs.addressModeV == rhs.addressModeV &&
+           lhs.addressModeW == rhs.addressModeW &&
+           lhs.mipLodBias == rhs.mipLodBias &&
+           lhs.anisotropyEnable == rhs.anisotropyEnable &&
+           lhs.maxAnisotropy == rhs.maxAnisotropy &&
+           lhs.compareEnable == rhs.compareEnable &&
+           lhs.compareOp == rhs.compareOp &&
+           lhs.minLod == rhs.minLod &&
+           lhs.maxLod == rhs.maxLod &&
+           lhs.borderColor == rhs.borderColor &&
+           lhs.unnormalizedCoordinates == rhs.unnormalizedCoordinates;
+}
+
+static inline bool operator!=(const VkSamplerCreateInfo& lhs, const VkSamplerCreateInfo& rhs) {
+    return !(lhs == rhs);
+}

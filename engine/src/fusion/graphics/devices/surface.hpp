@@ -2,14 +2,13 @@
 
 namespace fe {
     class Instance;
-    class LogicalDevice;
     class PhysicalDevice;
     class Window;
 
     class Surface {
         friend class Graphics;
     public:
-        Surface(const Instance& instance, const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Window& window);
+        Surface(const Instance& instance, const PhysicalDevice& physicalDevice, const Window& window);
         ~Surface();
         NONCOPYABLE(Surface);
 

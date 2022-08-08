@@ -8,7 +8,7 @@
 
 using namespace fe;
 
-Surface::Surface(const Instance& instance, const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Window& window)
+Surface::Surface(const Instance& instance, const PhysicalDevice& physicalDevice, const Window& window)
         : instance{instance}
         , physicalDevice{physicalDevice}
         , window{window} {

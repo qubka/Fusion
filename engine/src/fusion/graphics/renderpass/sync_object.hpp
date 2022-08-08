@@ -16,8 +16,8 @@ namespace fe {
         void reset();
 
     private:
-        void init(VkDevice device);
-        void destroy(VkDevice device);
+        void init();
+        void destroy();
 
         VkSemaphore imageAvailableSemaphore{ VK_NULL_HANDLE };
         VkSemaphore renderFinishedSemaphore{ VK_NULL_HANDLE };
