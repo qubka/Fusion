@@ -21,11 +21,10 @@ namespace fe {
         virtual void bindPipeline(const CommandBuffer& commandBuffer) const;
 
         virtual const Shader& getShader() const = 0;
-        virtual bool isPushDescriptors() const = 0;
-        virtual const VkDescriptorSetLayout& getDescriptorSetLayout() const = 0;
-        virtual const VkDescriptorPool& getDescriptorPool() const = 0;
         virtual const VkPipeline& getPipeline() const = 0;
         virtual const VkPipelineLayout& getPipelineLayout() const = 0;
         virtual const VkPipelineBindPoint& getPipelineBindPoint() const = 0;
+        virtual bool isPushDescriptors() const = 0;
+        virtual const VkDescriptorSetLayout& getDescriptorSetLayout() const = 0;
     };
 }
