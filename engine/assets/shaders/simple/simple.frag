@@ -2,7 +2,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-#define BLINN_PHONG_ENABLED 1
+layout (constant_id = 0) const bool blinnPhongEnabled = true;
 
 const float shininess = 32.0f;
 const float gamma = 2.2f;
@@ -40,9 +40,9 @@ layout (binding = 1) buffer BufferLights {
     Light lights[];
 } bufferLights;
 
-layout(binding = 2) uniform sampler2D samplerDiffuse;
-layout(binding = 3) uniform sampler2D samplerSpecular;
-layout(binding = 4) uniform sampler2D samplerNormal;
+layout (binding = 2) uniform sampler2D samplerDiffuse;
+layout (binding = 3) uniform sampler2D samplerSpecular;
+layout (binding = 4) uniform sampler2D samplerNormal;
 
 // Calculates the color when using a directional light.
 vec3 CalcDirLight(Light light, vec3 normal, vec3 viewDir) {
@@ -52,13 +52,14 @@ vec3 CalcDirLight(Light light, vec3 normal, vec3 viewDir) {
     float diff = max(dot(normal, lightDir), 0.0);
 
     // Specular shading
-#if BLINN_PHONG_ENABLED
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
-#else
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-#endif
+    float spec;
+    if (blinnPhongEnabled) {
+        vec3 halfwayDir = normalize(lightDir + viewDir);
+        spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
+    } else {
+        vec3 reflectDir = reflect(-lightDir, normal);
+        spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+    }
 
     // Combine results
     vec3 ambient = light.ambient * vec3(texture(samplerDiffuse, inUV0));
@@ -76,13 +77,14 @@ vec3 CalcPointLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     float diff = max(dot(normal, lightDir), 0.0);
 
     // Specular shading
-#if BLINN_PHONG_ENABLED
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
-#else
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-#endif
+    float spec;
+    if (blinnPhongEnabled) {
+        vec3 halfwayDir = normalize(lightDir + viewDir);
+        spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
+    } else {
+        vec3 reflectDir = reflect(-lightDir, normal);
+        spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+    }
 
     // Attenuation
     float distance = length(light.position - fragPos);
@@ -108,13 +110,14 @@ vec3 CalcSpotLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     float diff = max(dot(normal, lightDir), 0.0);
 
     // Specular shading
-#if BLINN_PHONG_ENABLED
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
-#else
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-#endif
+    float spec;
+    if (blinnPhongEnabled) {
+        vec3 halfwayDir = normalize(lightDir + viewDir);
+        spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
+    } else {
+        vec3 reflectDir = reflect(-lightDir, normal);
+        spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+    }
 
     // Attenuation
     float distance = length(light.position - fragPos);
