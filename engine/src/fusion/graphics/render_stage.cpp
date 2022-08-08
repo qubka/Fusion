@@ -84,13 +84,12 @@ void RenderStage::rebuild(size_t id, const Swapchain& swapchain) {
 	outOfDate = false;
 
 	descriptors.clear();
-	auto where = descriptors.end();
 
 	for (const auto& image : attachments) {
 		if (image.type == Attachment::Type::Depth)
-			where = descriptors.insert(where, { image.name, depthStencil.get() });
+			descriptors.emplace(image.name, depthStencil.get());
 		else
-			where = descriptors.insert(where, { image.name, framebuffers->getAttachment(image.binding) });
+            descriptors.emplace(image.name, framebuffers->getAttachment(image.binding));
 	}
 
 #if FUSION_DEBUG

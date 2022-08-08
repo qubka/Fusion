@@ -10,11 +10,12 @@ namespace fe {
         float angularDrag{ 0.05f };
         bool disableGravity{ false };
         bool kinematic{ false };
+        bool sleep{ false };
         glm::bvec3 freezePosition{ false };
         glm::bvec3 freezeRotation{ false };
 
         // Storage for runtime
-        void* runtimeBody{ nullptr };
+        void* runtime{ nullptr };
 
         template<typename Archive>
         void serialize(Archive& archive) {
@@ -24,6 +25,7 @@ namespace fe {
                     cereal::make_nvp("angular drag", angularDrag),
                     cereal::make_nvp("disable gravity", disableGravity),
                     cereal::make_nvp("kinematic", kinematic),
+                    cereal::make_nvp("sleep", sleep),
                     cereal::make_nvp("freeze position", freezePosition),
                     cereal::make_nvp("freeze rotation", freezeRotation));
         }

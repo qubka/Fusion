@@ -23,7 +23,7 @@ namespace fe {
             archive(cereal::make_nvp("path", path),
                     cereal::make_nvp("index", index));
 
-            if (auto model = AssetRegistry::Get()->get_or_emplace<Model>(path, path)) {
+            if (auto model = AssetRegistry::Get()->get_or_emplace<Model>(path)) {
                 runtime = model->getMesh(index);
             } else {
                 LOG_ERROR << "Asset not found: \"" << path << "\"";

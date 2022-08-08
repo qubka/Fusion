@@ -23,11 +23,15 @@ namespace fe {
          */
         void setScene(std::unique_ptr<Scene>&& scene) { this->scene = std::move(scene); }
 
+        bool cacheScene();
+        bool loadCachedScene();
+
     private:
         void onStart() override;
         void onUpdate() override;
         void onWindowResize(const glm::uvec2& size);
 
         std::unique_ptr<Scene> scene;
+        std::unique_ptr<Scene> sceneCached;
     };
 }

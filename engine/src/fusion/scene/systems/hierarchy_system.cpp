@@ -91,21 +91,23 @@ bool HierarchySystem::isParent(entt::entity parent, entt::entity child) const {
     return false;
 }
 
-void HierarchySystem::destroyParent(entt::entity entity) {
-    // Remove entity from existing parent if any
-    if (auto parent = getParent(entity); parent != entt::null) {
-        removeChild(parent, entity);
+void HierarchySystem::destroyParent(entt::entity entity, bool remove) {
+    if (remove) {
+        // Remove entity from existing parent if any
+        if (auto parent = getParent(entity); parent != entt::null) {
+            removeChild(parent, entity);
+        }
     }
 
-    for (auto child : getChildren((entity))) {
-        registry.destroy(child);
+    for (const auto child : getChildren((entity))) {
+        destroyParent(child, false);
     }
 
     registry.destroy(entity);
 }
 
 void HierarchySystem::removeParent(entt::entity entity) {
-    assert("FIX");
+    throw std::runtime_error("FIX");
     if (auto hierarchy = registry.try_get<HierarchyComponent>(entity)) {
         auto child = hierarchy->first;
         while (child != entt::null) {

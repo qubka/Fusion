@@ -1,6 +1,6 @@
 #include "physical_device.hpp"
-
 #include "instance.hpp"
+
 #include "fusion/graphics/graphics.hpp"
 
 using namespace fe;
@@ -119,8 +119,8 @@ void PhysicalDevice::findQueueFamilyIndices() {
     if (queueFamilyPropertyCount > 0)
         vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyPropertyCount, deviceQueueFamilyProperties.data());
 
-    for (uint32_t i = 0; i < queueFamilyPropertyCount; i++) {
-        VkQueueFlags flags = deviceQueueFamilyProperties[i].queueFlags;
+    for (const auto& [i, queueFamilyProperty] : enumerate(deviceQueueFamilyProperties)) {
+        VkQueueFlags flags = queueFamilyProperty.queueFlags;
 
         // Check for graphics support
         if (flags & VK_QUEUE_GRAPHICS_BIT) {
@@ -132,7 +132,7 @@ void PhysicalDevice::findQueueFamilyIndices() {
         //VkBool32 presentSupport;
         //vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, *surface, &presentSupport);
 
-        if (deviceQueueFamilyProperties[i].queueCount > 0 /*&& presentSupport*/) {
+        if (queueFamilyProperty.queueCount > 0 /*&& presentSupport*/) {
             presentFamily = i;
         }
 

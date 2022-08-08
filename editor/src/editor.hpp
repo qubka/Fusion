@@ -11,7 +11,7 @@ namespace fe {
     class Scene;
     class Ray;
 
-    enum class EditorDebugFlags : unsigned char {
+    enum EditorDebugFlags {
         Grid              = 1,
         Gizmo             = 2,
         ViewSelected      = 4,
@@ -19,7 +19,6 @@ namespace fe {
         MeshBoundingBoxes = 16,
         SpriteBoxes       = 32,
     };
-    BITMASK_DEFINE_MAX_ELEMENT(EditorDebugFlags, SpriteBoxes);
 
     struct EditorSettings {
         bool fullScreenOnPlay{ false };
@@ -38,7 +37,7 @@ namespace fe {
         float fixedAspect{ 1.0f };
         float aspectRatio{ 1.0f };
         ImGuiUtils::Theme theme{ ImGuiUtils::Theme::Black };
-        bitmask::bitmask<EditorDebugFlags> debugDrawFlags{};
+        int debugDrawFlags{};
 
         /*f
         uint32_t physics2DDebugFlags{ 0 };
@@ -85,7 +84,7 @@ namespace fe {
         entt::entity getCopiedEntity() const { return copiedEntity; }
         bool getCutCopyEntity() const { return cutCopyEntity; }
 
-        const std::unordered_map<type_index, std::string>& getComponentIconMap() const { return componentIconMap; }
+        const std::flat_map<type_index, std::string>& getComponentIconMap() const { return componentIconMap; }
         bool getComponentIcon(type_index type, std::string& out) const {
             if (auto icon = componentIconMap.find(type); icon != componentIconMap.end()) {
                 out = icon->second;
@@ -128,7 +127,7 @@ namespace fe {
         std::queue<std::string> mementos;
         FileBrowserPanel fileBrowserPanel{ this };
         std::vector<std::unique_ptr<EditorPanel>> panels;
-        std::unordered_map<type_index, std::string> componentIconMap;
+        std::flat_map<type_index, std::string> componentIconMap;
 
         entt::entity selectedEntity{ entt::null };
         entt::entity copiedEntity{ entt::null };

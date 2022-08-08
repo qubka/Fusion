@@ -199,7 +199,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
     if (dirInfo->isDirectory) {
         bool isContains = false;
 
-        for (auto& file: dirInfo->children) {
+        for (const auto& file: dirInfo->children) {
             if (file->isDirectory) {
                 isContains = true;
                 break;
@@ -257,14 +257,14 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
             verticalLineStart.x += smallOffsetX; // to nicely line up with the arrow symbol
             ImVec2 verticalLineEnd{ verticalLineStart };
 
-            for (auto& file : dirInfo->children) {
+            for (const auto& file : dirInfo->children) {
                 if (file->isDirectory) {
                     ImVec2 currentPos{ ImGui::GetCursorScreenPos() };
 
                     ImGui::Indent(10.0f);
 
                     bool containsFolderTemp = false;
-                    for (auto& f : file->children) {
+                    for (const auto& f : file->children) {
                         if (f->isDirectory) {
                             containsFolderTemp = true;
                             break;
@@ -382,7 +382,7 @@ void ContentBrowserPanel::drawBottom() {
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::ColorScheme::Hovered(color));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
 
-        for (auto& directory : breadCrumbData) {
+        for (const auto& directory : breadCrumbData) {
             if (ImGui::SmallButton(directory->name.c_str())) {
                 if (!isLocked) {
                     changeDirectory(directory);

@@ -186,7 +186,7 @@ void GameViewPanel::drawToolBar() {
             return glm::epsilonEqual(p.second, currentAspect, FLT_EPSILON);
         });
 
-        for (auto& [name, aspect] : SUPPORTED_ASPECTS) {
+        for (const auto& [name, aspect] : SUPPORTED_ASPECTS) {
             bool is_selected = (it->first == name);
             if (ImGui::Checkbox(name.c_str(), &is_selected)) {
                 editor->getSettings().freeAspect = (name == "Free Aspect ");

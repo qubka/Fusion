@@ -10,8 +10,7 @@ LightSubrender::LightSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
         , pipeline{pipelineStage,
                    {"engine/assets/shaders/simple/light.vert", "engine/assets/shaders/simple/light.frag"},
-                   {},
-                   {},
+                   {}, {}, {},
                    PipelineGraphics::Mode::Polygon,
                    PipelineGraphics::Depth::ReadWrite,
                    VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,

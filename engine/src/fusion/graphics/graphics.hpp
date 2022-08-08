@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fusion/devices/window.hpp"
+#include "fusion/graphics/renderer.hpp"
 #include "fusion/graphics/devices/instance.hpp"
 #include "fusion/graphics/devices/logical_device.hpp"
 #include "fusion/graphics/devices/physical_device.hpp"
@@ -8,7 +9,10 @@
 #include "fusion/graphics/pipelines/pipeline_cache.hpp"
 #include "fusion/graphics/renderpass/sync_object.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/graphics/renderer.hpp"
+#include "fusion/graphics/descriptors/descriptor_allocator.hpp"
+#include "fusion/graphics/descriptors/descriptor_layout_cache.hpp"
+#include "fusion/graphics/pipelines/pipeline_layout_cache.hpp"
+#include "fusion/graphics/textures/sampler_cache.hpp"
 
 #define MAX_FRAMES_IN_FLIGHT 2
 
@@ -49,7 +53,10 @@ namespace fe {
         const PhysicalDevice& getPhysicalDevice() const { return physicalDevice; }
         const LogicalDevice& getLogicalDevice() const { return logicalDevice; }
         const VkPipelineCache& getPipelineCache() const { return pipelineCache; }
-
+        const SamplerCache& getSamplerCache() const { return samplerCache; }
+        const DescriptorAllocator& getDescriptorAllocator() const { return descriptorAllocator; }
+        const DescriptorLayoutCache& getDescriptorLayoutCache() const { return descriptorLayoutCache; }
+        const PipelineLayoutCache& getPipilineLayoutCache() const { return pipelineLayoutCache; }
         const std::shared_ptr<CommandPool>& getCommandPool(const std::thread::id& threadId = std::this_thread::get_id());
         const Surface* getSurface(size_t id) const { return surfaces[id].get(); }
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
@@ -61,6 +68,7 @@ namespace fe {
          * @param filepath The file to save the screenshot as.
          */
         void captureScreenshot(const fs::path& filepath, size_t id = 0) const;
+
 
     private:
         void onUpdate() override;
@@ -100,11 +108,17 @@ namespace fe {
         Instance instance{};
         PhysicalDevice physicalDevice{ instance };
         LogicalDevice logicalDevice{ instance, physicalDevice };
+
+        DescriptorAllocator descriptorAllocator{ logicalDevice };
+        DescriptorLayoutCache descriptorLayoutCache{ logicalDevice };
+
+        SamplerCache samplerCache{ logicalDevice };
         PipelineCache pipelineCache{ logicalDevice };
+        PipelineLayoutCache pipelineLayoutCache{ logicalDevice };
 
-        std::unordered_map<std::string, const Descriptor*> attachments;
+        std::flat_map<std::string, const Descriptor*> attachments;
 
-        std::map<std::thread::id, std::shared_ptr<CommandPool>> commandPools;
+        std::unordered_map<std::thread::id, std::shared_ptr<CommandPool>> commandPools;
         ElapsedTime elapsedPurge; /// Timer used to remove unused command pools.
         std::unique_ptr<Renderer> renderer;
 

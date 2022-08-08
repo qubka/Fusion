@@ -3,16 +3,23 @@
 #include "components.hpp"
 
 #include "fusion/core/engine.hpp"
+#include "fusion/models/model.hpp"
 #include "fusion/filesystem/file_system.hpp"
 #include "fusion/scene/systems/hierarchy_system.hpp"
 #include "fusion/scene/systems/camera_system.hpp"
-#include "fusion/models/model.hpp"
+#include "fusion/scene/systems/physics_system.hpp"
 
 using namespace fe;
 
 Scene::Scene(std::string_view name) : name{name} {
     addSystem<HierarchySystem>();
     addSystem<CameraSystem>();
+    addSystem<PhysicsSystem>();
+}
+
+Scene::Scene(const Scene& other) : Scene{other.name} {
+    registry.assign(other.registry.data(), other.registry.data() + other.registry.size(), other.registry.released());
+    copyRegistry<ALL_COMPONENTS>(other.registry);
 }
 
 void Scene::onStart() {
@@ -20,7 +27,7 @@ void Scene::onStart() {
         system->setEnabled(true);
     });
 
-    LOG_DEBUG << "Scene : \"" << name << "\" created first time";
+    LOG_DEBUG << "Scene : \"" << name << "\" created";
 }
 
 void Scene::onUpdate() {
@@ -124,7 +131,7 @@ entt::entity Scene::duplicateEntity(entt::entity entity, entt::entity parent) {
 
     auto children = hierarchySystem->getChildren(entity);
 
-    for (auto child : children)  {
+    for (const auto child : children)  {
         duplicateEntity(child, newEntity);
     }
 
@@ -220,7 +227,7 @@ void Scene::deserialise(fs::path filepath, bool binary) {
 }
 
 void Scene::importMesh(const fs::path& filepath) {
-    auto model = AssetRegistry::Get()->get_or_emplace<Model>(filepath, filepath);
+    auto model = AssetRegistry::Get()->get_or_emplace<Model>(filepath);
 
     auto hierarchySystem = getSystem<HierarchySystem>();
 

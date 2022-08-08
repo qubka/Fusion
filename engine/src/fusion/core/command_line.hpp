@@ -38,6 +38,6 @@ namespace fe {
             bool hasValue{ false };
             bool set{ false };
         };
-        std::unordered_map<std::string, CommandLineOption> options;
+        std::flat_map<std::string, CommandLineOption> options;
     };
 }

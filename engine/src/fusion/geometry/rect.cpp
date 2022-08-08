@@ -7,7 +7,7 @@ Rect::Rect(std::span<const glm::vec2> points) {
     x2 = -FLT_MAX;
     y1 = FLT_MAX;
     y2 = -FLT_MAX;
-    for (auto& point : points)
+    for (const auto& point : points)
         include(point);
 }
 

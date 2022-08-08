@@ -513,11 +513,10 @@ void Editor::drawMenuBar() {
 
                 if (selected) {
                     ImGui::SetWindowFocus("###game");
-                    //cacheScene();
-                    //Application::Get().GetCurrentScene()->OnInit();
+                    SceneManager::Get()->cacheScene();
                 } else {
                     ImGui::SetWindowFocus("###scene");
-                    //loadCachedScene();
+                    SceneManager::Get()->loadCachedScene();
                 }
             }
             ImGuiUtils::Tooltip("Play");
@@ -782,7 +781,7 @@ void Editor::openTextFile(const fs::path& filepath, const std::function<void()>&
 }
 
 EditorPanel* Editor::getPanel(const std::string& name) {
-    for (auto& panel : panels) {
+    for (const auto& panel : panels) {
         if (panel->getName() == name) {
             return panel.get();
         }
@@ -808,7 +807,7 @@ void Editor::selectObject(const Ray& ray, const glm::vec2& position) {
     auto view = registry.view<TransformComponent, MeshComponent>();
 
     float closestEntityDist = FLT_MAX;
-    entt::entity currentClosestEntity{ entt::null };
+    entt::entity currentClosestEntity = entt::null;
 
     for (const auto& [entity, transform, mesh] : view.each()) {
         if (!mesh.runtime)

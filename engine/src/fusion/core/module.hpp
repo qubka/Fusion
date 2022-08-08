@@ -12,7 +12,7 @@ namespace fe {
             std::string_view name;
             typename Base::Stage stage;
         };
-        using TRegistryMap = std::vector<std::pair<type_index, TCreateValue>>;
+        using TRegistryMap = std::flat_map<type_index, TCreateValue>;
 
         //ModuleFactory() = default;
         virtual ~ModuleFactory() = default;
@@ -39,22 +39,12 @@ namespace fe {
              */
             template<typename ... Args>
             static bool Register(std::string_view name, typename Base::Stage stage) {
-                auto& registry = ModuleFactory::Registry();
 
-                auto it = std::find_if(registry.begin(), registry.end(), [](const auto& p) {
-                    return p.first == type_id<T>;
-                });
-
-                if (it == registry.end()) {
-                    // Then, add the module
-                    registry.emplace_back(type_id<T>, TCreateValue{ []() {
-                        ModuleInstance = new T();
-                        return std::unique_ptr<Base>(ModuleInstance);
-                    }, name, stage});
-                } else {
-                    LOG_WARNING << "Module already registered";
-                    return false;
-                }
+                // Then, add the module
+                ModuleFactory::Registry().emplace(type_id<T>, TCreateValue{ []() {
+                    ModuleInstance = new T();
+                    return std::unique_ptr<Base>(ModuleInstance);
+                }, name, stage});
 
                 return true;
             }

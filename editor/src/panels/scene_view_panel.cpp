@@ -90,9 +90,10 @@ void SceneViewPanel::onImGui() {
         }
         ImGui::EndDragDropTarget();
     }
-
+=
     if (!drawComponent(registry, viewportSize, viewportOffset)) {
         if (viewportFocused && viewportHovered && !ImGuizmo::IsUsing() && Input::Get()->getMouseButtonDown(MouseButton::ButtonLeft)) {
+
             glm::vec2 position{ Input::Get()->getMousePosition() - minBound };
             Ray ray = camera->screenPointToRay(position, viewportSize, true);
             editor->selectObject(ray, position);
@@ -284,37 +285,17 @@ void SceneViewPanel::drawToolBar() {
             ImGui::Checkbox("Selected Gizmos", &editor->getSettings().showGizmos);
 
             ImGui::Separator();
-            ImGui::Checkbox("Camera", &showComponentGizmosMap[type_id<CameraComponent>]);
-            ImGui::Checkbox("Light", &showComponentGizmosMap[type_id<LightComponent>]);
-            //ImGui::Checkbox("Audio", &showComponentGizmosMap[type_id<SoundComponent>]);
+            ImGui::Checkbox("Camera", reinterpret_cast<bool*>(&showComponentGizmosMap[type_id<CameraComponent>]));
+            ImGui::Checkbox("Light", reinterpret_cast<bool*>(&showComponentGizmosMap[type_id<LightComponent>]));
+            //ImGui::Checkbox("Audio", (bool*)showComponentGizmosMap[type_id<SoundComponent>]);
 
             ImGui::Separator();
 
             auto& flags = editor->getSettings().debugDrawFlags;
 
-            bool showAABB = static_cast<bool>(flags & EditorDebugFlags::MeshBoundingBoxes);
-            if (ImGui::Checkbox("Mesh AABB", &showAABB)) {
-                if (showAABB)
-                    flags |= EditorDebugFlags::MeshBoundingBoxes;
-                else
-                    flags &= ~EditorDebugFlags::MeshBoundingBoxes;
-            }
-
-            bool showSpriteBox = static_cast<bool>(flags & EditorDebugFlags::SpriteBoxes);
-            if (ImGui::Checkbox("Sprite Box", &showSpriteBox)) {
-                if (showSpriteBox)
-                    flags |= EditorDebugFlags::SpriteBoxes;
-                else
-                    flags &= ~EditorDebugFlags::SpriteBoxes;
-            }
-
-            bool showCameraFrustums = static_cast<bool>(flags & EditorDebugFlags::CameraFrustum);
-            if (ImGui::Checkbox("Camera Frustums", &showCameraFrustums)) {
-                if (showCameraFrustums)
-                    flags |= EditorDebugFlags::CameraFrustum;
-                else
-                    flags &= ~EditorDebugFlags::CameraFrustum;
-            }
+            ImGui::CheckboxFlags("Mesh AABB", &flags, EditorDebugFlags::MeshBoundingBoxes);
+            ImGui::CheckboxFlags("Sprite Box", &flags, EditorDebugFlags::SpriteBoxes);
+            ImGui::CheckboxFlags("Camera Frustums", &flags, EditorDebugFlags::CameraFrustum);
 
             ImGui::Separator();
 

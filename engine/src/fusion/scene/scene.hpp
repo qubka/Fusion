@@ -12,6 +12,7 @@ namespace fe {
          * @param name The scenes name.
          */
         explicit Scene(std::string_view name);
+        explicit Scene(const Scene& other);
         ~Scene() = default;
 
         /**
@@ -172,6 +173,19 @@ namespace fe {
         virtual void onStop();
 
     private:
+        template<typename... T>
+        void copyRegistry(const entt::registry& src) {
+            (copyComponents<T>(src), ...);
+        }
+
+        template<typename T>
+        void copyComponents(const entt::registry& src) {
+            auto view = src.view<const T>();
+            for (const auto& [entity, component] : view.each()) {
+                registry.emplace_or_replace<T>(entity, component);
+            }
+        }
+
         template<typename T>
         void copyComponent(entt::entity dst, entt::entity src) {
             if (auto component = registry.try_get<T>(src))

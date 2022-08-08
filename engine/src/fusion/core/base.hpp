@@ -43,10 +43,11 @@
 #define MEM_ALIGN __attribute__((aligned(MEM_ALIGNMENT)))
 #endif
 
+// TODO: Move from here ?
+
 #include <uuid.h>
 
 namespace fe {
-    // TODO: Rework
     inline static uuids::uuid_random_generator uuid_random_generator{ Random::engine() };
 }
 
@@ -55,4 +56,21 @@ namespace fe {
     /// https://mikejsavage.co.uk/blog/cpp-tricks-type-id.html
     inline type_index type_id_seq = 0;
     template<typename T> inline const type_index type_id = type_id_seq++;
+}
+
+namespace fe {
+    /**
+     * Combines a seed into a hash and modifies the seed by the new hash.
+     * @param seed The seed.
+     * @param v The value to hash.
+     * https://stackoverflow.com/questions/2590677/how-do-i-combine-hash-values-in-c0x
+     */
+    inline void hash_combine(size_t& seed) { }
+
+    template <typename T, typename... Rest>
+    inline void hash_combine(size_t& seed, const T& v, Rest... rest) {
+        std::hash<T> hasher;
+        seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+        hash_combine(seed, rest...);
+    }
 }

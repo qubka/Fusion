@@ -36,7 +36,7 @@ namespace ImGui {
         using ComponentType = ENTT_ID_TYPE;
         ImGuiTextFilter componentFilter;
 
-        std::map<ComponentType, ComponentInfo> componentInfos;
+        std::flat_map<ComponentType, ComponentInfo> componentInfos;
 
         bool entityHasComponent(Registry& registry, EntityType& entity, ComponentType type) {
             const auto storage = registry.storage(type);
@@ -49,13 +49,13 @@ namespace ImGui {
             auto index = entt::type_hash<Component>::value();
             auto [it, result] = componentInfos.insert_or_assign(index, info);
             assert(result);
-            return std::get<ComponentInfo>(*it);
+            return it->second;
         }
 
         template<class Component>
-        ComponentInfo& registerComponent(std::string name, typename ComponentInfo::Callback widget) {
+        ComponentInfo& registerComponent(const std::string& name, typename ComponentInfo::Callback widget) {
             return registerComponent<Component>(ComponentInfo{
-                    std::move(name),
+                    name,
                     widget,
                     ComponentAddAction<Component, EntityType>,
                     ComponentRemoveAction<Component, EntityType>,
@@ -63,8 +63,8 @@ namespace ImGui {
         }
 
         template<class Component>
-        ComponentInfo& registerComponent(std::string name) {
-            return registerComponent<Component>(std::move(name), ComponentEditorWidget<Component, EntityType>);
+        ComponentInfo& registerComponent(const std::string& name) {
+            return registerComponent<Component>(name, ComponentEditorWidget<Component, EntityType>);
         }
 
         // calls all the ImGui functions
@@ -72,7 +72,7 @@ namespace ImGui {
         void Render(Registry& registry, EntityType& entity) {
             if (entity != entt::null) {
                 ImGuiStyle& style = ImGui::GetStyle();
-                std::map<ComponentType, ComponentInfo> hasNot;
+                std::flat_map<ComponentType, ComponentInfo> hasNot;
                 for (const auto& [component, info] : componentInfos) {
                     if (entityHasComponent(registry, entity, component)) {
                         ImGui::PushID(component);

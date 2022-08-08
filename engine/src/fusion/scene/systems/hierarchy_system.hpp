@@ -34,7 +34,7 @@ namespace fe {
          * @brief Destroy a parent entity and all its children.
          * @param entity A valid identifier.
          */
-        void destroyParent(entt::entity entity);
+        void destroyParent(entt::entity entity, bool remove = true);
 
         /**
          * @brief Assign an entity to a parent as a child.

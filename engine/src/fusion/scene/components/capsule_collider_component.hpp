@@ -9,7 +9,7 @@ namespace fe {
         //bool showColliderBounds{ true };
 
         // Storage for runtime
-        void* runtimeShape{ nullptr };
+        void* runtime{ nullptr };
 
         template<typename Archive>
         void serialize(Archive& archive) {

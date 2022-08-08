@@ -8,8 +8,7 @@ namespace fe {
         explicit DescriptorSet(const Pipeline& pipeline);
         ~DescriptorSet();
 
-        static void update(std::span<const VkWriteDescriptorSet> descriptorWrites);
-
+        static void updateDescriptor(std::span<const VkWriteDescriptorSet> descriptorWrites);
         void bindDescriptor(const CommandBuffer& commandBuffer) const;
 
         operator bool() const { return descriptorSet != VK_NULL_HANDLE; }
@@ -20,7 +19,6 @@ namespace fe {
     private:
         VkPipelineLayout pipelineLayout;
         VkPipelineBindPoint pipelineBindPoint;
-        VkDescriptorPool descriptorPool;
 
         VkDescriptorSet descriptorSet{ VK_NULL_HANDLE };
     };

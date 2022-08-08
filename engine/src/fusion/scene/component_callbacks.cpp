@@ -50,7 +50,7 @@ template<>
 void onComponentUpdate<BoxColliderComponent>(entt::registry& registry, entt::entity entity) {
     if (!active) return;
     auto& collider = registry.get<BoxColliderComponent>(entity);
-    if (auto shape = static_cast<PxShape*>(collider.runtimeShape)) {
+    if (auto shape = static_cast<PxShape*>(collider.runtime)) {
         auto& transform = registry.get<TransformComponent>(entity);
         glm::vec3 halfExtent{ collider.extent / 2.0f * transform.scale };
         shape->setGeometry(PxBoxGeometry(PxVec3{ halfExtent.x, halfExtent.y, halfExtent.z }));
@@ -63,7 +63,7 @@ template<>
 void onComponentUpdate<SphereColliderComponent>(entt::registry& registry, entt::entity entity) {
     if (!active) return;
     auto& collider = registry.get<SphereColliderComponent>(entity);
-    if (auto shape = static_cast<PxShape*>(collider.runtimeShape)) {
+    if (auto shape = static_cast<PxShape*>(collider.runtime)) {
         auto& transform = registry.get<TransformComponent>(entity);
         float scalar = glm::max(transform.scale.x, transform.scale.y, transform.scale.z);
         float radius = collider.radius * scalar;
@@ -77,7 +77,7 @@ template<>
 void onComponentUpdate<CapsuleColliderComponent>(entt::registry& registry, entt::entity entity) {
     if (!active) return;
     auto& collider = registry.get<CapsuleColliderComponent>(entity);
-    if (auto shape = static_cast<PxShape*>(collider.runtimeShape)) {
+    if (auto shape = static_cast<PxShape*>(collider.runtime)) {
         auto& transform = registry.get<TransformComponent>(entity);
         float scalar = glm::max(transform.scale.x, transform.scale.y, transform.scale.z);
         float radius = collider.radius * scalar;

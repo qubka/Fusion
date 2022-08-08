@@ -9,7 +9,7 @@ namespace fe {
     // See VulkanExampleBase::createInstance and VulkanExampleBase::createDevice (base/vulkanexamplebase.cpp)
     class DebugMarker {
     public:
-        DebugMarker();
+        DebugMarker(VkDevice device);
         ~DebugMarker() = default;
         NONCOPYABLE(DebugMarker);
 
@@ -49,7 +49,7 @@ namespace fe {
         void setEventName(VkEvent event, const char* name);
 
     private:
-        const LogicalDevice& logicalDevice;
+        VkDevice device;
 
         PFN_vkDebugMarkerSetObjectTagEXT pfnDebugMarkerSetObjectTag{ VK_NULL_HANDLE };
         PFN_vkDebugMarkerSetObjectNameEXT pfnDebugMarkerSetObjectName{ VK_NULL_HANDLE };

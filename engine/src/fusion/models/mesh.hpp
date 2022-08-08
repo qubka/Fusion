@@ -9,7 +9,7 @@
 namespace fe {
     class Mesh : public Asset {
     public:
-        template< typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+        template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
         explicit Mesh(const fs::path& filepath, const std::string& naming, const std::vector<std::byte>& vertices, const std::vector<T>& indices, const Vertex::Layout& layout) : layout{layout} {
             setVertices(vertices);
             setIndices(indices);

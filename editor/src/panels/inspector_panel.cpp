@@ -160,6 +160,7 @@ namespace ImGui {
         ImGuiUtils::PropertyControl("Freeze Rotation", rigidbody.freezeRotation);
         ImGuiUtils::Property("Disable Gravity", rigidbody.disableGravity);
         ImGuiUtils::Property("Is Kinematic", rigidbody.kinematic);
+        ImGuiUtils::Property("Is Sleep", rigidbody.sleep);
 
         ImGui::Columns(1);
         ImGui::Separator();

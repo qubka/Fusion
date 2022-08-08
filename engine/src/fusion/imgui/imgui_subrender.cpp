@@ -24,7 +24,7 @@ ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
         , pipeline{pipelineStage,
                    {"engine/assets/shaders/imgui/imgui.vert", "engine/assets/shaders/imgui/imgui.frag"},
                    {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}},
-                   {},
+                   {}, {},
                    PipelineGraphics::Mode::Polygon,
                    PipelineGraphics::Depth::None,
                    VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
@@ -144,14 +144,7 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
                 if (cmd.TextureId) {
                     auto& descriptor = descriptorSets[frameIndex][cmd.TextureId];
                     if (!descriptor) {
-                        VkDescriptorSet set;
-                        VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
-                        descriptorSetAllocateInfo.descriptorPool = pipeline.getDescriptorPool();
-                        descriptorSetAllocateInfo.descriptorSetCount = 1;
-                        descriptorSetAllocateInfo.pSetLayouts = &pipeline.getDescriptorSetLayout();
-                        descriptorSetAllocateInfo.pNext = nullptr;
-                        vkAllocateDescriptorSets(logicalDevice, &descriptorSetAllocateInfo, &set);
-                        descriptor = set;
+                        Graphics::Get()->getDescriptorAllocator().allocateDescriptor(pipeline.getDescriptorSetLayout(), descriptor);
                     }
                     auto& updated = descriptorSetHasUpdated[frameIndex][cmd.TextureId];
                     if (!updated) {

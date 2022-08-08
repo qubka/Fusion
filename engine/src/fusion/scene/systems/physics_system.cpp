@@ -34,8 +34,7 @@ PhysicsSystem::PhysicsSystem(entt::registry& registry) : System{registry} {
     scene = physics->createScene(sceneDesc);
     scene->setSimulationEventCallback(this);
 
-    PxPvdSceneClient* pvdClient = scene->getScenePvdClient();
-    if (pvdClient) {
+    if (PxPvdSceneClient* pvdClient = scene->getScenePvdClient()) {
         pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
         pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
         pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
@@ -50,11 +49,15 @@ PhysicsSystem::~PhysicsSystem() {
 }
 
 void PhysicsSystem::onPlay() {
-    /*auto view = registry.view<TransformComponent, RigidbodyComponent>();
+    auto view = registry.view<TransformComponent, RigidbodyComponent>();
     for (auto [entity, transform, rigidbody] : view.each()) {
+        auto position = transform.getWorldPosition();
+        auto rotation = transform.getWorldOrientation();
+        auto scale = transform.getLocalScale();
+
         PxTransform t{
-                PxVec3{ transform.position.z, transform.position.y, transform.position.z },
-                PxQuat{ transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w }
+            PxVec3{ position.z, position.y, position.z },
+            PxQuat{ rotation.x, rotation.y, rotation.z, rotation.w }
         };
 
         PxRigidActor* body;
@@ -70,13 +73,14 @@ void PhysicsSystem::onPlay() {
             rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, rigidbody.freezeRotation.x);
             rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, rigidbody.freezeRotation.y);
             rigid->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, rigidbody.freezeRotation.z);
-
+            if (rigidbody.sleep)
+                rigid->putToSleep();
             body = rigid;
         } else {
             body = physics->createRigidStatic(t);
         }
 
-        float scalar = glm::max(transform.scale.x, transform.scale.y, transform.scale.z);
+        float scalar = glm::max(scale.x, scale.y, scale.z);
 
         PxMaterial* mat;
         if (auto material = registry.try_get<PhysicsMaterialComponent>(entity)) {
@@ -89,7 +93,7 @@ void PhysicsSystem::onPlay() {
         }
 
         if (auto collider = registry.try_get<BoxColliderComponent>(entity)) {
-            glm::vec3 halfExtent{ collider->extent / 2.0f * transform.scale };
+            glm::vec3 halfExtent{ collider->extent / 2.0f * scale };
 
             PxShape* shape = physics->createShape(PxBoxGeometry{{ halfExtent.x, halfExtent.y, halfExtent.z }}, *mat);
             if (collider->trigger) {
@@ -97,7 +101,7 @@ void PhysicsSystem::onPlay() {
                 shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
             }
             body->attachShape(*shape);
-            collider->runtimeShape = shape;
+            collider->runtime = shape;
         }
 
         if (auto collider = registry.try_get<SphereColliderComponent>(entity)) {
@@ -109,7 +113,7 @@ void PhysicsSystem::onPlay() {
                 shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
             }
             body->attachShape(*shape);
-            collider->runtimeShape = shape;
+            collider->runtime = shape;
         }
 
         if (auto collider = registry.try_get<CapsuleColliderComponent>(entity)) {
@@ -122,15 +126,15 @@ void PhysicsSystem::onPlay() {
                 shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
             }
             body->attachShape(*shape);
-            collider->runtimeShape = shape;
+            collider->runtime = shape;
         }
 
         /*if (auto collider = world.try_get<MeshColliderComponent>(entity)) {
-        }
+        }*/
 
-        rigidbody.runtimeBody = body;
+        rigidbody.runtime = body;
         scene->addActor(*body);
-    }*/
+    }
 }
 
 void PhysicsSystem::onStop() {
@@ -147,15 +151,15 @@ void PhysicsSystem::onUpdate() {
         scene->fetchResults(true);
 
         // Retrieve transform from PhysX
-        /*auto view = registry.view<TransformComponent, const RigidbodyComponent>();
+        auto view = registry.view<TransformComponent, const RigidbodyComponent>();
         for (auto [entity, transform, rigidbody] : view.each()) {
             if (rigidbody.type == RigidbodyComponent::BodyType::Static)
                 continue;
-            auto body = reinterpret_cast<PxRigidBody*>(rigidbody.runtimeBody);
+
+            auto body = reinterpret_cast<PxRigidBody*>(rigidbody.runtime);
             PxTransform t{ body->getGlobalPose() };
-            transform.position = { t.p.x, t.p.y, t.p.z };
-            transform.rotation = { t.q.w, t.q.x, t.q.y, t.q.z };
-            registry.patch<TransformComponent>(entity);
-        }*/
+            transform.setLocalPosition({t.p.x, t.p.y, t.p.z});
+            transform.setLocalOrientation({ t.q.w, t.q.x, t.q.y, t.q.z });
+        }
     }
 }

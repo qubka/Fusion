@@ -27,7 +27,7 @@ namespace fe {
         std::shared_ptr<T> get_or_emplace(const fs::path& path, Args... args) {
             if (auto asset = get<T>(path))
                 return asset;
-            auto it = assets[type_id<T>].emplace(path, std::make_shared<T>(std::forward<Args>(args)...));
+            auto it = assets[type_id<T>].emplace(path, std::make_shared<T>(path, std::forward<Args>(args)...));
             return std::dynamic_pointer_cast<T>(it.first->second);
         }
 

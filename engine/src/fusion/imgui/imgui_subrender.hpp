@@ -52,9 +52,9 @@ namespace fe {
 
         std::vector<std::unique_ptr<Texture2d>> fontTextures;
 
-        std::array<std::unordered_map<ImTextureID, VkDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptorSets;
-        std::unordered_map<ImTextureID, const VkDescriptorImageInfo*> descriptorImageInfos;
-        std::array<std::unordered_map<ImTextureID, bool>, MAX_FRAMES_IN_FLIGHT> descriptorSetHasUpdated;
+        std::array<std::flat_map<ImTextureID, VkDescriptorSet>, MAX_FRAMES_IN_FLIGHT> descriptorSets;
+        std::flat_map<ImTextureID, const VkDescriptorImageInfo*> descriptorImageInfos;
+        std::array<std::flat_map<ImTextureID, bool>, MAX_FRAMES_IN_FLIGHT> descriptorSetHasUpdated;
 
         float fontSize;
         float fontScale;

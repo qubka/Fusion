@@ -69,14 +69,10 @@ namespace fe {
             if (!shader)
                 return;
 
-            if (auto it = descriptors.find(descriptorName); it != descriptors.end()) {
-                descriptors.erase(it);
-            }
-
             auto location = shader->getDescriptorLocation(descriptorName);
-            //auto descriptorType = shader->getDescriptorType(*location);
 
-            descriptors.emplace(descriptorName, DescriptorValue{descriptor, std::move(writeDescriptorSet), std::nullopt, *location});
+            descriptors[descriptorName] = DescriptorValue{descriptor, std::move(writeDescriptorSet), std::nullopt, *location};
+
             changed = true;
         }
 
@@ -100,7 +96,7 @@ namespace fe {
 
         const Shader* shader{ nullptr };
         std::unique_ptr<DescriptorSet> descriptorSet;
-        std::unordered_map<std::string, DescriptorValue> descriptors;
+        std::flat_map<std::string, DescriptorValue> descriptors;
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         bool pushDescriptors{ false };
         bool changed{ false };

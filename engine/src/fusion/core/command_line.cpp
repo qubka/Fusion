@@ -44,7 +44,7 @@ void CommandLineParser::add(std::string_view name, std::vector<std::string>&& co
 void CommandLineParser::parse(const CommandLineArgs& arguments) {
     bool printHelp = false;
     // Known arguments.
-    for (auto& [alias, option] : options) {
+    for (const auto& [alias, option] : options) {
         for (const auto& command : option.commands) {
             for (const auto& [argument, parameter] : arguments) {
                 if (argument == command) {
@@ -70,7 +70,7 @@ void CommandLineParser::parse(const CommandLineArgs& arguments) {
 void CommandLineParser::printHelp() {
     std::cout << "Available command line options:\n";
 
-    for (const auto& [alias, option] : options) {
+    for (const auto& option : options.values()) {
         std::cout << " ";
         for (size_t i = 0; i < option.commands.size(); i++) {
             std::cout << option.commands[i];

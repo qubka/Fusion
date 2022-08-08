@@ -30,3 +30,20 @@ void SceneManager::onWindowResize(const glm::uvec2& size) {
 
     }
 }
+
+bool SceneManager::cacheScene() {
+    if (!scene)
+        return false;
+
+    sceneCached = std::move(scene);
+    scene = std::make_unique<Scene>(*sceneCached);
+    return true;
+}
+
+bool SceneManager::loadCachedScene() {
+    if (!sceneCached)
+        return false;
+
+    scene = std::move(sceneCached);
+    return true;
+}

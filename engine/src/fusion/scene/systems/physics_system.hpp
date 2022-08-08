@@ -19,7 +19,7 @@ namespace fe {
         void onEnabled() override {};
         void onDisabled() override {};
 
-        // TODO: Connect to events
+        // connect to events
         void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) override {};
         void onWake(physx::PxActor** actors, physx::PxU32 count) override {};
         void onSleep(physx::PxActor** actors, physx::PxU32 count) override {};

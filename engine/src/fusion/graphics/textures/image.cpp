@@ -26,7 +26,6 @@ Image::~Image() {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
 	vkDestroyImageView(logicalDevice, view, nullptr);
-	vkDestroySampler(logicalDevice, sampler, nullptr);
 	vkFreeMemory(logicalDevice, memory, nullptr);
 	vkDestroyImage(logicalDevice, image, nullptr);
 }
@@ -147,9 +146,6 @@ void Image::CreateImage(VkImage& image, VkDeviceMemory& memory, const VkExtent3D
 }
 
 void Image::CreateImageSampler(VkSampler& sampler, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, uint32_t mipLevels) {
-    const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-
 	VkSamplerCreateInfo samplerCreateInfo = { VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO };
 	samplerCreateInfo.magFilter = filter;
 	samplerCreateInfo.minFilter = filter;
@@ -159,14 +155,14 @@ void Image::CreateImageSampler(VkSampler& sampler, VkFilter filter, VkSamplerAdd
 	samplerCreateInfo.addressModeW = addressMode;
 	samplerCreateInfo.mipLodBias = 0.0f;
 	samplerCreateInfo.anisotropyEnable = static_cast<VkBool32>(anisotropic);
-	samplerCreateInfo.maxAnisotropy = (anisotropic && logicalDevice.getEnabledFeatures().samplerAnisotropy) ? glm::min(ANISOTROPY, physicalDevice.getProperties().limits.maxSamplerAnisotropy) : 1.0f;
+	samplerCreateInfo.maxAnisotropy = (anisotropic && Graphics::Get()->getLogicalDevice().getEnabledFeatures().samplerAnisotropy) ?glm::min(ANISOTROPY, Graphics::Get()->getPhysicalDevice().getProperties().limits.maxSamplerAnisotropy) : 1.0f;
 	//samplerCreateInfo.compareEnable = VK_FALSE;
 	//samplerCreateInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	samplerCreateInfo.minLod = 0.0f;
 	samplerCreateInfo.maxLod = static_cast<float>(mipLevels);
 	samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 	samplerCreateInfo.unnormalizedCoordinates = VK_FALSE;
-	VK_CHECK(vkCreateSampler(logicalDevice, &samplerCreateInfo, nullptr, &sampler));
+    sampler = Graphics::Get()->getSamplerCache().createSampler(samplerCreateInfo);
 }
 
 void Image::CreateImageView(VkImage image, VkImageView& imageView, VkImageViewType viewType, VkFormat format, VkImageAspectFlags imageAspect,
@@ -177,7 +173,7 @@ void Image::CreateImageView(VkImage image, VkImageView& imageView, VkImageViewTy
 	imageViewCreateInfo.image = image;
 	imageViewCreateInfo.viewType = viewType;
 	imageViewCreateInfo.format = format;
-	imageViewCreateInfo.components = {VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A};
+	imageViewCreateInfo.components = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
 	imageViewCreateInfo.subresourceRange.aspectMask = imageAspect;
 	imageViewCreateInfo.subresourceRange.baseMipLevel = baseMipLevel;
 	imageViewCreateInfo.subresourceRange.levelCount = mipLevels;

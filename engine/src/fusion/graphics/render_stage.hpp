@@ -119,7 +119,7 @@ namespace fe {
         std::unique_ptr<TextureDepth> depthStencil;
         std::unique_ptr<Framebuffers> framebuffers;
 
-        std::unordered_map<std::string, const Descriptor*> descriptors;
+        std::flat_map<std::string, const Descriptor*> descriptors;
 
         std::vector<VkClearValue> clearValues;
         std::vector<uint32_t> subpassAttachmentCount;

@@ -59,6 +59,6 @@ namespace fe {
             return hovered;
         }
 
-        std::unordered_map<type_index, bool> showComponentGizmosMap;
+        std::flat_map<type_index, bool> showComponentGizmosMap;
     };
 }

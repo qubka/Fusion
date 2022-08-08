@@ -13,10 +13,10 @@ const float Epsilon = 0.00001;
 const uint NumSamples = 1024;
 const float InvNumSamples = 1.0 / float(NumSamples);
 
-//layout (constant_id = 0) const int NUM_MIP_LEVELS = 1;
+layout (constant_id = 0) const int numMipLevels = 1;
 
 layout (binding = 0) uniform samplerCube inputTexture;
-layout (binding = 1, rgba16f) restrict writeonly uniform imageCube outputTexture[NUM_MIP_LEVELS];
+layout (binding = 1, rgba16f) restrict writeonly uniform imageCube outputTexture[numMipLevels];
 
 layout (push_constant) uniform PushObject {
 // Output texture mip level (without base mip level).

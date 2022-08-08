@@ -9,7 +9,7 @@
 
 using namespace fe;
 
-void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, std::unordered_map<ImTextureID, VkDescriptorSet>& descriptorSets) {
+void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, std::flat_map<ImTextureID, VkDescriptorSet>& descriptorSets) {
     ImDrawData* drawData = ImGui::GetDrawData();
 
     // Note: Alignment is done inside buffer creation

@@ -339,8 +339,11 @@ void Graphics::recreateSwapchain(size_t id) {
 void Graphics::recreateAttachmentsMap() {
     attachments.clear();
 
-    for (const auto& renderStage : renderer->renderStages)
-        attachments.insert(renderStage->descriptors.begin(), renderStage->descriptors.end());
+    for (const auto& renderStage : renderer->renderStages) {
+        for (const auto& [name, descriptor] : renderStage->descriptors) {
+            attachments.emplace(name, descriptor);
+        }
+    }
 }
 
 void Graphics::recreatePass(FrameInfo& info, RenderStage& renderStage) {
@@ -360,7 +363,7 @@ void Graphics::recreatePass(FrameInfo& info, RenderStage& renderStage) {
 void Graphics::onWindowCreate(Window* window, bool create) {
     if (!window) return;
     if (create) {
-        auto& surface = surfaces.emplace_back(std::make_unique<Surface>(instance, physicalDevice, logicalDevice, *window));
+        auto& surface = surfaces.emplace_back(std::make_unique<Surface>(instance, physicalDevice, *window));
     } else {
         /*surfaces.erase(std::remove_if(surfaces.begin(), surfaces.end(), [window](const auto& s) {
             return window == &s->window;
