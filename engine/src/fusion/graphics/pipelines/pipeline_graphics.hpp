@@ -55,7 +55,7 @@ namespace fe {
         PipelineGraphics(Stage stage,
                          std::vector<fs::path>&& paths,
                          std::vector<Vertex::Input>&& vertexInputs = {},
-                         std::flat_map<std::string, SpecConstant>&& specConstants = {},
+                         std::flat_map<std::string, Shader::SpecConstant>&& specConstants = {},
                          std::vector<std::string>&& bindlessSets = {},
                          Mode mode = Mode::Polygon,
                          Depth depth = Depth::ReadWrite,
@@ -100,7 +100,7 @@ namespace fe {
         const Stage& getStage() const { return stage; }
         const std::vector<fs::path>& getPaths() const { return paths; }
         const std::vector<Vertex::Input>& getVertexInputs() const { return vertexInputs; }
-        const std::flat_map<std::string, SpecConstant>& getSpecConstants() const { return specConstants; }
+        const std::flat_map<std::string, Shader::SpecConstant>& getSpecConstants() const { return specConstants; }
         Mode getMode() const { return mode; }
         Depth getDepth() const { return depth; }
         VkPrimitiveTopology getTopology() const { return topology; }
@@ -126,7 +126,7 @@ namespace fe {
         Stage stage;
         std::vector<fs::path> paths;
         std::vector<Vertex::Input> vertexInputs;
-        std::flat_map<std::string, SpecConstant> specConstants;
+        std::flat_map<std::string, Shader::SpecConstant> specConstants;
         std::vector<std::string> bindlessSets;
         Mode mode;
         Depth depth;
@@ -147,8 +147,9 @@ namespace fe {
 
         std::vector<VkShaderModule> modules;
         std::vector<VkPipelineShaderStageCreateInfo> stages;
-        std::vector<VkSpecializationInfo> specInfos;
         std::vector<VkDynamicState> dynamicStates;
+
+        std::vector<std::optional<Shader::Specialization>> specializations;
 
         VkDescriptorSetLayout descriptorSetLayout{ VK_NULL_HANDLE };
 

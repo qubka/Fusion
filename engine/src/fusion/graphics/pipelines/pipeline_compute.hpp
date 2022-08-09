@@ -15,13 +15,13 @@ namespace fe {
          * @param bindlessSets
          * @param pushDescriptors If no actual descriptor sets are allocated but instead pushed.
          */
-        explicit PipelineCompute(fs::path&& path, std::flat_map<std::string, SpecConstant>&& specConstants = {}, std::vector<std::string>&& bindlessSets = {}, bool pushDescriptors = false);
+        explicit PipelineCompute(fs::path&& path, std::flat_map<std::string, Shader::SpecConstant>&& specConstants = {}, std::vector<std::string>&& bindlessSets = {}, bool pushDescriptors = false);
         ~PipelineCompute() override;
 
         void cmdRender(const CommandBuffer& commandBuffer, const glm::uvec2& extent) const;
 
         const fs::path& getPath() const { return path; }
-        const std::flat_map<std::string, SpecConstant>& getSpecConstants() const { return specConstants; }
+        const std::flat_map<std::string, Shader::SpecConstant>& getSpecConstants() const { return specConstants; }
         bool isPushDescriptors() const override { return pushDescriptors; }
         const Shader& getShader() const override { return shader; }
         const VkDescriptorSetLayout& getDescriptorSetLayout() const override { return descriptorSetLayout; }
@@ -36,7 +36,7 @@ namespace fe {
         void createPipelineCompute();
 
         fs::path path;
-        std::flat_map<std::string, SpecConstant> specConstants;
+        std::flat_map<std::string, Shader::SpecConstant> specConstants;
         std::vector<std::string> bindlessSets;
         bool pushDescriptors;
 
@@ -45,7 +45,8 @@ namespace fe {
         VkShaderModule shaderModule{ VK_NULL_HANDLE };
         VkPipelineShaderStageCreateInfo shaderStageCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
 
-        VkSpecializationInfo specializationInfo = {};
+        std::optional<Shader::Specialization> specialization;
+
         VkDescriptorSetLayout descriptorSetLayout{ VK_NULL_HANDLE };
 
         VkPipeline pipeline{ VK_NULL_HANDLE };
