@@ -1,15 +1,17 @@
 #include "pipeline_compute.hpp"
+#include "shader_file.hpp"
 
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/filesystem/file_system.hpp"
+#include "fusion/assets/asset_registry.hpp"
 
 using namespace fe;
 
-PipelineCompute::PipelineCompute(fs::path&& shaderStage, std::vector<Shader::Define>&& defines, bool pushDescriptors)
+PipelineCompute::PipelineCompute(fs::path&& path, std::flat_map<std::string, Shader::SpecConstant>&& specConstants, std::vector<std::string>&& bindlessSets, bool pushDescriptors)
         : shader{}
-        , shaderStage{std::move(shaderStage)}
-        , defines{std::move(defines)}
+        , path{std::move(path)}
+        , specConstants{std::move(specConstants)}
+        , bindlessSets{std::move(bindlessSets)}
         , pushDescriptors{pushDescriptors}
         , pipelineBindPoint{VK_PIPELINE_BIND_POINT_COMPUTE} {
 #if FUSION_DEBUG
@@ -18,7 +20,6 @@ PipelineCompute::PipelineCompute(fs::path&& shaderStage, std::vector<Shader::Def
 
 	createShaderProgram();
 	createDescriptorLayout();
-	createDescriptorPool();
 	createPipelineLayout();
 	createPipelineCompute();
 
@@ -32,10 +33,7 @@ PipelineCompute::~PipelineCompute() {
 
 	vkDestroyShaderModule(logicalDevice, shaderModule, nullptr);
 
-	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, nullptr);
-	vkDestroyDescriptorPool(logicalDevice, descriptorPool, nullptr);
 	vkDestroyPipeline(logicalDevice, pipeline, nullptr);
-	vkDestroyPipelineLayout(logicalDevice, pipelineLayout, nullptr);
 }
 
 void PipelineCompute::cmdRender(const CommandBuffer& commandBuffer, const glm::uvec2& extent) const {
@@ -45,28 +43,18 @@ void PipelineCompute::cmdRender(const CommandBuffer& commandBuffer, const glm::u
 }
 
 void PipelineCompute::createShaderProgram() {
-	std::stringstream ss;
-	for (const auto& [defineName, defineValue] : defines)
-		ss << "#define " << defineName << ' ' << defineValue << '\n';
+    auto shaderFile = AssetRegistry::Get()->get_or_emplace<ShaderFile>(path);
 
-    std::string shaderCode{ FileSystem::ReadText(shaderStage) };
-	if (shaderCode.empty())
-		throw std::runtime_error("Could not create compute pipeline, missing shader stage");
+	auto shaderStage = shaderFile->getStage();
+	shaderModule = shader.createShaderModule(*shaderFile);
+    specialization = shader.getSpecialization(specConstants, shaderStage);
 
-	auto stageFlag = Shader::GetShaderStage(shaderStage);
-	shaderModule = shader.createShaderModule(shaderStage, shaderCode, ss.str(), stageFlag);
-
-	shaderStageCreateInfo.stage = stageFlag;
+    shaderStageCreateInfo.stage = shaderStage;
 	shaderStageCreateInfo.module = shaderModule;
 	shaderStageCreateInfo.pName = "main";
+    shaderStageCreateInfo.pSpecializationInfo = specialization ? &specialization->getInfo() : nullptr;
 
-    /*const VkSpecializationMapEntry specializationMap = { 0, 0, sizeof(uint32_t) };
-    const uint32_t specializationData[] = { numMipTailLevels };
-    const VkSpecializationInfo specializationInfo = { 1, &specializationMap, sizeof(specializationData), specializationData };
-
-    shaderStageCreateInfo.pSpecializationInfo = specializationInfo;*/
-
-	shader.createReflection();
+    shader.createReflection();
 }
 
 void PipelineCompute::createDescriptorLayout() {
@@ -78,20 +66,7 @@ void PipelineCompute::createDescriptorLayout() {
 	descriptorSetLayoutCreateInfo.flags = pushDescriptors ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
 	descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(descriptorSetLayouts.size());
 	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayouts.data();
-	VK_CHECK(vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayout));
-}
-
-void PipelineCompute::createDescriptorPool() {
-	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-
-	auto descriptorPools = shader.getDescriptorPools();
-
-	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
-	descriptorPoolCreateInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-	descriptorPoolCreateInfo.maxSets = 32; // 16384;
-	descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>(descriptorPools.size());
-	descriptorPoolCreateInfo.pPoolSizes = descriptorPools.data();
-	VK_CHECK(vkCreateDescriptorPool(logicalDevice, &descriptorPoolCreateInfo, nullptr, &descriptorPool));
+    descriptorSetLayout = Graphics::Get()->getDescriptorLayoutCache().createDescriptorLayout(descriptorSetLayoutCreateInfo);
 }
 
 void PipelineCompute::createPipelineLayout() {
@@ -104,7 +79,7 @@ void PipelineCompute::createPipelineLayout() {
 	pipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
 	pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
 	pipelineLayoutCreateInfo.pPushConstantRanges = pushConstantRanges.data();
-	VK_CHECK(vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+    pipelineLayout = Graphics::Get()->getPipilineLayoutCache().createPipelineLayout(pipelineLayoutCreateInfo);
 }
 
 void PipelineCompute::createPipelineCompute() {
@@ -116,5 +91,5 @@ void PipelineCompute::createPipelineCompute() {
 	pipelineCreateInfo.layout = pipelineLayout;
 	pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
 	pipelineCreateInfo.basePipelineIndex = -1;
-	vkCreateComputePipelines(logicalDevice, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline);
+	VK_CHECK(vkCreateComputePipelines(logicalDevice, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
 }

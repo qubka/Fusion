@@ -1,19 +1,21 @@
 #include "pipeline_graphics.hpp"
+#include "shader_file.hpp"
 
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/render_stage.hpp"
-#include "fusion/filesystem/file_system.hpp"
+#include "fusion/assets/asset_registry.hpp"
 
 using namespace fe;
 
-PipelineGraphics::PipelineGraphics(Stage stage, std::vector<fs::path>&& shaderStages, std::vector<Vertex::Input>&& vertexInputs, std::vector<Shader::Define>&& defines,
-	Mode mode, Depth depth, VkPrimitiveTopology topology, VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace, Blend blend, bool depthBiasEnabled,
-    float depthBiasConstantFactor, float depthBiasSlopeFactor, float depthBiasClamp, float lineWidth, bool transparencyEnabled, bool pushDescriptors)
+PipelineGraphics::PipelineGraphics(Stage stage, std::vector<fs::path>&& paths, std::vector<Vertex::Input>&& vertexInputs, std::flat_map<std::string, Shader::SpecConstant>&& specConstants,
+    std::vector<std::string>&& bindlessSets, Mode mode, Depth depth, VkPrimitiveTopology topology, VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace, Blend blend,
+    bool depthBiasEnabled, float depthBiasConstantFactor, float depthBiasSlopeFactor, float depthBiasClamp, float lineWidth, bool transparencyEnabled, bool pushDescriptors)
         : shader{}
         , stage{std::move(stage)}
-        , shaderStages{std::move(shaderStages)}
+        , paths{std::move(paths)}
         , vertexInputs{std::move(vertexInputs)}
-        , defines{std::move(defines)}
+        , specConstants{std::move(specConstants)}
+        , bindlessSets{}
         , mode{mode}
         , depth{depth}
         , topology{topology}
@@ -38,19 +40,18 @@ PipelineGraphics::PipelineGraphics(Stage stage, std::vector<fs::path>&& shaderSt
 
 	createShaderProgram();
 	createDescriptorLayout();
-	createDescriptorPool();
 	createPipelineLayout();
 	createAttributes();
 
 	switch (mode) {
-	case Mode::Polygon:
-		createPipelinePolygon();
-		break;
-	case Mode::MRT:
-		createPipelineMrt();
-		break;
-	default:
-		throw std::runtime_error("Unknown pipeline mode");
+        case Mode::Polygon:
+            createPipelinePolygon();
+            break;
+        case Mode::MRT:
+            createPipelineMrt();
+            break;
+        default:
+            throw std::runtime_error("Unknown pipeline mode");
 	}
 
 #if FUSION_DEBUG
@@ -64,10 +65,7 @@ PipelineGraphics::~PipelineGraphics() {
 	for (const auto& shaderModule : modules)
 		vkDestroyShaderModule(logicalDevice, shaderModule, nullptr);
 
-	vkDestroyDescriptorPool(logicalDevice, descriptorPool, nullptr);
 	vkDestroyPipeline(logicalDevice, pipeline, nullptr);
-	vkDestroyPipelineLayout(logicalDevice, pipelineLayout, nullptr);
-	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, nullptr);
 }
 
 const TextureDepth* PipelineGraphics::getDepthStencil(const std::optional<uint32_t>& stage) const {
@@ -83,24 +81,18 @@ const RenderArea& PipelineGraphics::getRenderArea(const std::optional<uint32_t>&
 }
 
 void PipelineGraphics::createShaderProgram() {
-	std::stringstream ss;
-	for (const auto& [defineName, defineValue] : defines)
-		ss << "#define " << defineName << ' ' << defineValue << '\n';
+	for (const auto& path : paths) {
+        auto shaderFile = AssetRegistry::Get()->get_or_emplace<ShaderFile>(path);
 
-	for (const auto& shaderStage : shaderStages) {
-		std::string shaderCode{ FileSystem::ReadText(shaderStage) };
-		if (shaderCode.empty())
-			throw std::runtime_error("Could not create pipeline, missing shader stage");
+        auto shaderStage = shaderFile->getStage();
+        auto& shaderModule = modules.emplace_back(shader.createShaderModule(*shaderFile));
+        auto& specialization = specializations.emplace_back(shader.getSpecialization(specConstants, shaderStage));
 
-		auto stageFlag = Shader::GetShaderStage(shaderStage);
-		auto shaderModule = shader.createShaderModule(shaderStage, shaderCode, ss.str(), stageFlag);
-
-		VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
-		pipelineShaderStageCreateInfo.stage = stageFlag;
+		auto& pipelineShaderStageCreateInfo = stages.emplace_back(VkPipelineShaderStageCreateInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO });
+		pipelineShaderStageCreateInfo.stage = shaderStage;
 		pipelineShaderStageCreateInfo.module = shaderModule;
 		pipelineShaderStageCreateInfo.pName = "main";
-		stages.push_back(pipelineShaderStageCreateInfo);
-		modules.push_back(shaderModule);
+        pipelineShaderStageCreateInfo.pSpecializationInfo = specialization ? &specialization->getInfo() : nullptr;
 	}
 
 	shader.createReflection();
@@ -115,20 +107,7 @@ void PipelineGraphics::createDescriptorLayout() {
 	descriptorSetLayoutCreateInfo.flags = pushDescriptors ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
 	descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(descriptorSetLayouts.size());
 	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayouts.data();
-	VK_CHECK(vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayout));
-}
-
-void PipelineGraphics::createDescriptorPool() {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-
-	auto& descriptorPools = shader.getDescriptorPools();
-
-	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
-	descriptorPoolCreateInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-	descriptorPoolCreateInfo.maxSets = 32; // 16384;
-	descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>(descriptorPools.size());
-	descriptorPoolCreateInfo.pPoolSizes = descriptorPools.data();
-	VK_CHECK(vkCreateDescriptorPool(logicalDevice, &descriptorPoolCreateInfo, nullptr, &descriptorPool));
+    descriptorSetLayout = Graphics::Get()->getDescriptorLayoutCache().createDescriptorLayout(descriptorSetLayoutCreateInfo);
 }
 
 void PipelineGraphics::createPipelineLayout() {
@@ -136,12 +115,14 @@ void PipelineGraphics::createPipelineLayout() {
 
 	auto pushConstantRanges = shader.getPushConstantRanges();
 
+    std::vector<VkDescriptorSetLayout> setLayouts = { descriptorSetLayout };
+
 	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
-	pipelineLayoutCreateInfo.setLayoutCount = 1;
-	pipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
+	pipelineLayoutCreateInfo.setLayoutCount = static_cast<uint32_t>(setLayouts.size());
+	pipelineLayoutCreateInfo.pSetLayouts = setLayouts.data();
 	pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
 	pipelineLayoutCreateInfo.pPushConstantRanges = pushConstantRanges.data();
-	VK_CHECK(vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+    pipelineLayout = Graphics::Get()->getPipilineLayoutCache().createPipelineLayout(pipelineLayoutCreateInfo);
 }
 
 void PipelineGraphics::createAttributes() {
@@ -177,18 +158,23 @@ void PipelineGraphics::createAttributes() {
             blendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
             blendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_DST_ALPHA;
 
-            if (blend == Blend::SrcAlphaOneMinusSrcAlpha) {
-                blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-                blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-            } else if (blend == Blend::ZeroSrcColor) {
-                blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-                blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_SRC_COLOR;
-            } else if (blend == Blend::OneZero) {
-                blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-                blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-            } else {
-                blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-                blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+            switch (blend) {
+                case Blend::None:
+                    blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+                    blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+                    break;
+                case Blend::OneZero:
+                    blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+                    blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+                    break;
+                case Blend::ZeroSrcColor:
+                    blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+                    blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_SRC_COLOR;
+                    break;
+                case Blend::SrcAlphaOneMinusSrcAlpha:
+                    blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+                    blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+                    break;
             }
         } else {
             blendAttachmentState.blendEnable = VK_FALSE;
@@ -334,19 +320,17 @@ void PipelineGraphics::createPipelineMrt() {
 	std::vector<VkPipelineColorBlendAttachmentState> blendAttachmentStates;
 	blendAttachmentStates.reserve(attachmentCount);
 
-    VkPipelineColorBlendAttachmentState blendAttachmentState = {};
-    blendAttachmentState.blendEnable = VK_TRUE;
-    blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-    blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    blendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD;
-    blendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    blendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    blendAttachmentState.alphaBlendOp = VK_BLEND_OP_ADD;
-    blendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-
-	for (uint32_t i = 0; i < attachmentCount; i++) {
-		blendAttachmentStates.push_back(blendAttachmentState);
-	}
+    for (uint32_t i = 0; i < attachmentCount; i++) {
+        auto& blendAttachmentState = blendAttachmentStates.emplace_back();
+        blendAttachmentState.blendEnable = VK_TRUE;
+        blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+        blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        blendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD;
+        blendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        blendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        blendAttachmentState.alphaBlendOp = VK_BLEND_OP_ADD;
+        blendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    }
 
 	colorBlendState.attachmentCount = static_cast<uint32_t>(blendAttachmentStates.size());
 	colorBlendState.pAttachments = blendAttachmentStates.data();
