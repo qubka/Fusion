@@ -14,7 +14,7 @@ PipelineLayoutCache::~PipelineLayoutCache() {
 }
 
 VkPipelineLayout PipelineLayoutCache::createPipelineLayout(const VkPipelineLayoutCreateInfo& info) const {
-    PipelineLayoutInfo layoutInfo;
+    PipelineLayoutInfo layoutInfo = {};
     layoutInfo.flags = info.flags;
     layoutInfo.setLayouts.reserve(info.setLayoutCount);
     layoutInfo.pushConstants.reserve(info.pushConstantRangeCount);
@@ -70,7 +70,7 @@ bool PipelineLayoutCache::PipelineLayoutInfo::operator==(const PipelineLayoutCac
                 return false;
             }
         }
-        // Compare each of the push contants is the same. Constants are aligned so they will match
+        // Compare each of the push constant is the same. Constants are aligned so they will match
         for (int i = 0; i < pushConstants.size(); i++) {
             if (other.pushConstants[i].stageFlags != pushConstants[i].stageFlags) {
                 return false;
