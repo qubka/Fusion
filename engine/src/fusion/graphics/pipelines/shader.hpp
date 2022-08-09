@@ -6,8 +6,7 @@ namespace glslang {
     class TIntermediate;
 }
 
-namespace fe {
-    class ShaderFile;
+namespace fe {\
     /**
      * @brief Class that loads and processes a shader, and provides a reflection.
      */
@@ -204,11 +203,12 @@ namespace fe {
         std::optional<UniformBlock> getUniformBlock(const std::string& name) const;
         std::optional<Attribute> getAttribute(const std::string& name) const;
         std::optional<Constant> getConstant(const std::string& name) const;
-        std::optional<Specialization> getSpecialization(const std::flat_map<std::string, SpecConstant>& specConstants, VkShaderStageFlagBits shaderStage) const;
-        std::vector<VkPushConstantRange> getPushConstantRanges() const;
-        std::vector<VkSpecializationMapEntry> getSpecializationMapEntries(VkShaderStageFlagBits shaderStage) const;
 
-        VkShaderModule createShaderModule(const ShaderFile& shaderFile);
+        std::vector<VkPushConstantRange> getPushConstantRanges() const;
+        std::vector<VkSpecializationMapEntry> getSpecializationMapEntries(VkShaderStageFlagBits moduleFlag) const;
+
+        VkShaderModule createShaderModule(const std::string& moduleName, const std::string& moduleCode, VkShaderStageFlags moduleFlag);
+        std::optional<Specialization> createSpecialization(const std::flat_map<std::string, SpecConstant>& specConstants, VkShaderStageFlagBits moduleFlag) const;
         void createReflection();
 
         const std::string& getName() const { return name; }

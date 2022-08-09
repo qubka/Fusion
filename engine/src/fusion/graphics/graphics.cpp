@@ -51,6 +51,10 @@ void Graphics::onStop() {
     VK_CHECK(vkDeviceWaitIdle(logicalDevice));
 }
 
+void Graphics::onStart() {
+    bindlessDescriptors.emplace("textures", std::make_unique<BindlessDescriptorSet>(10));
+}
+
 void Graphics::onUpdate() {
     if (!renderer || DeviceManager::Get()->getWindow(0)->isIconified())
         return;

@@ -16,7 +16,7 @@ static const std::vector<std::pair<VkDescriptorType, float>> DESCRIPTOR_SIZES = 
         { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 0.5f }
 };
 
-DescriptorAllocator::DescriptorAllocator(VkDevice device) : device{device} {
+DescriptorAllocator::DescriptorAllocator(VkDevice device, uint32_t count, VkDescriptorPoolCreateFlags flags) : device{device}, count{count}, flags{flags} {
 }
 
 DescriptorAllocator::~DescriptorAllocator() {
@@ -37,11 +37,11 @@ VkDescriptorPool DescriptorAllocator::grabPool() const {
         return pool;
     } else {
         // No pools available, so create a new one
-        return createPool(1000, 0);
+        return createPool();
     }
 }
 
-VkDescriptorPool DescriptorAllocator::createPool(uint32_t count, VkDescriptorPoolCreateFlags flags) const {
+VkDescriptorPool DescriptorAllocator::createPool() const {
     std::vector<VkDescriptorPoolSize> descriptorPools;
     descriptorPools.reserve(DESCRIPTOR_SIZES.size());
 
@@ -60,7 +60,7 @@ VkDescriptorPool DescriptorAllocator::createPool(uint32_t count, VkDescriptorPoo
     return descriptorPool;
 }
 
-bool DescriptorAllocator::allocateDescriptor(VkDescriptorSetLayout layout, VkDescriptorSet& set) const {
+bool DescriptorAllocator::allocateDescriptor(VkDescriptorSetLayout layout, VkDescriptorSet& set, const void* next) const {
     // Initialize the currentPool handle if it's null
     if (!currentPool) {
         currentPool = grabPool();
@@ -71,7 +71,7 @@ bool DescriptorAllocator::allocateDescriptor(VkDescriptorSetLayout layout, VkDes
     descriptorSetAllocateInfo.pSetLayouts = &layout;
     descriptorSetAllocateInfo.descriptorPool = currentPool;
     descriptorSetAllocateInfo.descriptorSetCount = 1;
-    descriptorSetAllocateInfo.pNext = nullptr;
+    descriptorSetAllocateInfo.pNext = next;
 
     // Try to allocate the descriptor set
     auto result = vkAllocateDescriptorSets(device, &descriptorSetAllocateInfo, &set);

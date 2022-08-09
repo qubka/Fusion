@@ -1,5 +1,4 @@
 #include "shader.hpp"
-#include "shader_file.hpp"
 
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/buffers/uniform_buffer.hpp"
@@ -306,45 +305,13 @@ std::optional<Shader::Constant> Shader::getConstant(const std::string& name) con
     return std::nullopt;
 }
 
-std::optional<Shader::Specialization> Shader::getSpecialization(const std::flat_map<std::string, SpecConstant>& specConstants, VkShaderStageFlagBits shaderStage) const {
-    auto mapEntries = getSpecializationMapEntries(shaderStage);
-    if (mapEntries.empty())
-        return std::nullopt;
-
-    std::flat_map<uint32_t, SpecConstant> data;
-    // Sorting constants by specId for specified stage
-    for (const auto& [constantName, specConstant] : specConstants) {
-        auto constant = getConstant(constantName);
-        if (constant && constant->getStageFlags() & shaderStage) {
-            data.emplace(constant->getSpecId(), specConstant);
-        }
-    }
-
-    if (data.empty())
-        return std::nullopt;
-
-    if (data.size() != mapEntries.size()) {
-        LOG_ERROR << "Invalid amount of specialization constants provided in \"" << name << "\"" << " required = " << mapEntries.size() << ", provided = " << data.size();
-        return std::nullopt;
-    }
-
-    Specialization specialization = {};
-    specialization.mapEntries = std::move(mapEntries);
-    specialization.data = std::move(data);
-    specialization.info.mapEntryCount = static_cast<uint32_t>(specialization.mapEntries.size());
-    specialization.info.pMapEntries = specialization.mapEntries.data();
-    specialization.info.dataSize = static_cast<uint32_t>(specialization.data.size() * sizeof(SpecConstant));
-    specialization.info.pData = specialization.data.values().data();
-    return specialization;
-}
-
-std::vector<VkSpecializationMapEntry> Shader::getSpecializationMapEntries(VkShaderStageFlagBits shaderStage) const {
+std::vector<VkSpecializationMapEntry> Shader::getSpecializationMapEntries(VkShaderStageFlagBits moduleFlag) const {
     if (constants.empty())
         return {};
 
     std::vector<const Constant*> values;
     for (auto& constant : constants.values()) {
-        if (constant.stageFlags == shaderStage)
+        if (constant.stageFlags == moduleFlag)
             values.push_back(&constant);
     }
 
@@ -524,16 +491,14 @@ TBuiltInResource getResources() {
 	return resources;
 }
 
-VkShaderModule Shader::createShaderModule(const ShaderFile& shaderFile) {
+VkShaderModule Shader::createShaderModule(const std::string& moduleName, const std::string& moduleCode, VkShaderStageFlags moduleFlag) {
 	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
     if (name.empty())
-        name = String::Extract(shaderFile.getName(), "", ".");
-
-    VkShaderStageFlagBits shaderStage = shaderFile.getStage();
+        name = String::Extract(moduleName, "", ".");
 
 	// Starts converting GLSL to SPIR-V.
-	auto language = getEshLanguage(shaderStage);
+	auto language = getEshLanguage(moduleFlag);
 	glslang::TProgram program;
 	glslang::TShader shader{language};
 	auto resources = getResources();
@@ -544,8 +509,8 @@ VkShaderModule Shader::createShaderModule(const ShaderFile& shaderFile) {
 	messages = static_cast<EShMessages>(messages | EShMsgDebugInfo);
 #endif
 
-	auto shaderName = shaderFile.getName().c_str();
-	auto shaderSource = shaderFile.getCode().c_str();
+	auto shaderName = moduleName.c_str();
+	auto shaderSource = moduleCode.c_str();
 	shader.setStringsWithLengthsAndNames(&shaderSource, nullptr, &shaderName, 1);
 	//shader.setPreamble(preamble.c_str());
 
@@ -587,16 +552,16 @@ VkShaderModule Shader::createShaderModule(const ShaderFile& shaderFile) {
 	}
 
 	for (int32_t i = program.getNumLiveUniformBlocks() - 1; i >= 0; i--)
-		loadUniformBlock(program, shaderStage, i);
+		loadUniformBlock(program, moduleFlag, i);
 
 	for (int32_t i = 0; i < program.getNumLiveUniformVariables(); i++)
-		loadUniform(program, shaderStage, i);
+		loadUniform(program, moduleFlag, i);
 
 	for (int32_t i = 0; i < program.getNumLiveAttributes(); i++)
-		loadAttribute(program, shaderStage, i);
+		loadAttribute(program, moduleFlag, i);
 
     // Custom traverser used
-    loadConstants(*intermediate, shaderStage);
+    loadConstants(*intermediate, moduleFlag);
 
 	glslang::SpvOptions spvOptions;
 #if FUSION_DEBUG
@@ -620,6 +585,38 @@ VkShaderModule Shader::createShaderModule(const ShaderFile& shaderFile) {
 	VkShaderModule shaderModule;
 	VK_CHECK(vkCreateShaderModule(logicalDevice, &shaderModuleCreateInfo, nullptr, &shaderModule));
 	return shaderModule;
+}
+
+std::optional<Shader::Specialization> Shader::createSpecialization(const std::flat_map<std::string, SpecConstant>& specConstants, VkShaderStageFlagBits moduleFlag) const {
+    auto mapEntries = getSpecializationMapEntries(moduleFlag);
+    if (mapEntries.empty())
+        return std::nullopt;
+
+    std::flat_map<uint32_t, SpecConstant> data;
+    // Sorting constants by specId for specified stage
+    for (const auto& [constantName, specConstant] : specConstants) {
+        auto constant = getConstant(constantName);
+        if (constant && constant->getStageFlags() & moduleFlag) {
+            data.emplace(constant->getSpecId(), specConstant);
+        }
+    }
+
+    if (data.empty())
+        return std::nullopt;
+
+    if (data.size() != mapEntries.size()) {
+        LOG_ERROR << "Invalid amount of specialization constants provided in \"" << name << "\"" << " required = " << mapEntries.size() << ", provided = " << data.size();
+        return std::nullopt;
+    }
+
+    Specialization specialization = {};
+    specialization.mapEntries = std::move(mapEntries);
+    specialization.data = std::move(data);
+    specialization.info.mapEntryCount = static_cast<uint32_t>(specialization.mapEntries.size());
+    specialization.info.pMapEntries = specialization.mapEntries.data();
+    specialization.info.dataSize = static_cast<uint32_t>(specialization.data.size() * sizeof(SpecConstant));
+    specialization.info.pData = specialization.data.values().data();
+    return specialization;
 }
 
 void Shader::createReflection() {

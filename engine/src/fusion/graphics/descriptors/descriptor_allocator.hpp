@@ -3,22 +3,24 @@
 namespace fe {
     class DescriptorAllocator {
     public:
-        explicit DescriptorAllocator(VkDevice device);
+        explicit DescriptorAllocator(VkDevice device, uint32_t count, VkDescriptorPoolCreateFlags flags = 0);
         ~DescriptorAllocator();
         NONCOPYABLE(DescriptorAllocator);
 
-        bool allocateDescriptor(VkDescriptorSetLayout layout, VkDescriptorSet& set) const;
+        bool allocateDescriptor(VkDescriptorSetLayout layout, VkDescriptorSet& set, const void* next = nullptr) const;
 
         void resetPools() const;
 
     private:
         VkDescriptorPool grabPool() const;
-        VkDescriptorPool createPool(uint32_t count, VkDescriptorPoolCreateFlags flags) const;
+        VkDescriptorPool createPool() const;
 
         mutable VkDescriptorPool currentPool{ VK_NULL_HANDLE };
         mutable std::vector<VkDescriptorPool> usedPools;
         mutable std::vector<VkDescriptorPool> freePools;
 
         VkDevice device;
+        uint32_t count;
+        VkDescriptorPoolCreateFlags flags;
     };
 }

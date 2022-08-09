@@ -4,7 +4,6 @@
 
 namespace fe {
     class Bitmap;
-    class CommandBuffer;
 
     /**
      * @brief A representation of a Vulkan image, sampler, and view.

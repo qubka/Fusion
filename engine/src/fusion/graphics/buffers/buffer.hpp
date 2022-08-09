@@ -2,11 +2,11 @@
 
 namespace fe {
     class LogicalDevice;
+    class CommandBuffer;
     /**
     * @brief Encapsulates access to a Vulkan buffer backed up by device memory.
     * @note To be filled by an external source like the VulkanDevice.
     */
-    class CommandBuffer;
     struct Buffer {
         enum class Status : unsigned char { Reset, Changed, Normal };
 

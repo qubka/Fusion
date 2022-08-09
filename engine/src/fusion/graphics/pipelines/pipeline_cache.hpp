@@ -1,7 +1,6 @@
 #pragma once
 
 namespace fe {
-    class LogicalDevice;
     class PipelineCache {
     public:
         explicit PipelineCache(VkDevice device);

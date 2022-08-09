@@ -1,7 +1,6 @@
 #pragma once
 
 namespace fe {
-    class LogicalDevice;
     // Setup and functions for the VK_EXT_debug_marker_extension
     // Extension spec can be found at https://github.com/KhronosGroup/Vulkan-Docs/blob/1.0-VK_EXT_debug_marker/doc/specs/vulkan/appendices/VK_EXT_debug_marker.txt
     // Note that the extension will only be present if run from an offline debugging application

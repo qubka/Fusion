@@ -4,76 +4,34 @@
 
 using namespace fe;
 
-static const uint32_t MAX_BINDLESS_RESOURCES = 1024;
+static const uint32_t MAX_BINDLESS_RESOURCES = 1024; // Same as pool size
+static const uint32_t MAX_BINDING = MAX_BINDLESS_RESOURCES - 1;
 
-BindlessDescriptorSet::BindlessDescriptorSet(uint32_t binding) : binding{binding} {
-    createDescriptorLayout();
-    createDescriptorPool();
-    createDescriptors();
-}
+// TODO: Find workaround for pNext chain
+static VkDescriptorBindingFlags bindlessFlags = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT | VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT_EXT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT;
+static VkDescriptorSetLayoutBindingFlagsCreateInfoEXT descriptorSetLayoutBindingFlagsCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT, nullptr, 1, &bindlessFlags };
+static VkDescriptorSetVariableDescriptorCountAllocateInfoEXT descriptorSetVariableDescriptorCountAllocateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT, nullptr, 1, &MAX_BINDING };
 
-BindlessDescriptorSet::~BindlessDescriptorSet() {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-
-    VK_CHECK(vkFreeDescriptorSets(logicalDevice, descriptorPool, 1, &descriptorSet));
-    vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, nullptr);
-    vkDestroyDescriptorPool(logicalDevice, descriptorPool, nullptr);
-}
-
-void BindlessDescriptorSet::createDescriptorLayout() {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-
+BindlessDescriptorSet::BindlessDescriptorSet(uint32_t binding) {
     VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = {};
     descriptorSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     descriptorSetLayoutBinding.descriptorCount = MAX_BINDLESS_RESOURCES;
     descriptorSetLayoutBinding.binding = binding;
     descriptorSetLayoutBinding.stageFlags = VK_SHADER_STAGE_ALL;
-    descriptorSetLayoutBinding.pImmutableSamplers = nullptr;
-
-    VkDescriptorBindingFlags bindlessFlags = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT | VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT_EXT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT;
-    VkDescriptorSetLayoutBindingFlagsCreateInfoEXT extendedInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT, nullptr };
-    extendedInfo.bindingCount = 1;
-    extendedInfo.pBindingFlags = &bindlessFlags;
 
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
     descriptorSetLayoutCreateInfo.bindingCount = 1;
     descriptorSetLayoutCreateInfo.pBindings = &descriptorSetLayoutBinding;
     descriptorSetLayoutCreateInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
-    descriptorSetLayoutCreateInfo.pNext = &extendedInfo;
-    VK_CHECK(vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayout));
+    descriptorSetLayoutCreateInfo.pNext = &descriptorSetLayoutBindingFlagsCreateInfo;
+
+    descriptorSetLayout = Graphics::Get()->getDescriptorLayoutCache().createDescriptorLayout(descriptorSetLayoutCreateInfo);
+
+    Graphics::Get()->getBindlessDescriptorAllocator().allocateDescriptor(descriptorSetLayout, descriptorSet, &descriptorSetVariableDescriptorCountAllocateInfo);
 }
 
-void BindlessDescriptorSet::createDescriptorPool() {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-
-    // Create bindless descriptor pool
-    std::vector<VkDescriptorPoolSize> descriptorPools = {
-            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, MAX_BINDLESS_RESOURCES },
-            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, MAX_BINDLESS_RESOURCES },
-    };
-
-    VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
-    descriptorPoolCreateInfo.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT_EXT;
-    descriptorPoolCreateInfo.maxSets = MAX_BINDLESS_RESOURCES * static_cast<uint32_t>(descriptorPools.size());
-    descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>(descriptorPools.size());
-    descriptorPoolCreateInfo.pPoolSizes = descriptorPools.data();
-    VK_CHECK(vkCreateDescriptorPool(logicalDevice, &descriptorPoolCreateInfo, nullptr, &descriptorPool));
+BindlessDescriptorSet::~BindlessDescriptorSet() {
+    // TODO: Descriptor allocator should be clean up ?
+    //const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
+    //VK_CHECK(vkFreeDescriptorSets(logicalDevice, descriptorPool, 1, &descriptorSet));
 }
-
-void BindlessDescriptorSet::createDescriptors() {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-
-    VkDescriptorSetVariableDescriptorCountAllocateInfoEXT countInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT };
-    uint32_t maxBinding = MAX_BINDLESS_RESOURCES - 1;
-    countInfo.descriptorSetCount = 1;
-    countInfo.pDescriptorCounts = &maxBinding; // This number is the max allocatable count
-    countInfo.pNext = &countInfo;
-
-    VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
-    descriptorSetAllocateInfo.descriptorPool = descriptorPool;
-    descriptorSetAllocateInfo.descriptorSetCount = 1;
-    descriptorSetAllocateInfo.pSetLayouts = &descriptorSetLayout;
-    descriptorSetAllocateInfo.pNext = &countInfo;
-    VK_CHECK(vkAllocateDescriptorSets(logicalDevice, &descriptorSetAllocateInfo, &descriptorSet));
-}
-

@@ -11,6 +11,7 @@
 #include "fusion/graphics/commands/command_buffer.hpp"
 #include "fusion/graphics/descriptors/descriptor_allocator.hpp"
 #include "fusion/graphics/descriptors/descriptor_layout_cache.hpp"
+#include "fusion/graphics/descriptors/bindless_descriptor_set.hpp"
 #include "fusion/graphics/pipelines/pipeline_layout_cache.hpp"
 #include "fusion/graphics/textures/sampler_cache.hpp"
 
@@ -21,12 +22,6 @@ namespace tracy {
 }
 
 namespace fe {
-    class Renderer;
-    class RenderStage;
-    class CommandPool;
-    class Descriptor;
-    class Swapchain;
-
     /**
      * @brief Module that manages the Vulkan's graphics context.
      */
@@ -52,11 +47,15 @@ namespace fe {
 
         const PhysicalDevice& getPhysicalDevice() const { return physicalDevice; }
         const LogicalDevice& getLogicalDevice() const { return logicalDevice; }
+
         const VkPipelineCache& getPipelineCache() const { return pipelineCache; }
         const SamplerCache& getSamplerCache() const { return samplerCache; }
+
         const DescriptorAllocator& getDescriptorAllocator() const { return descriptorAllocator; }
         const DescriptorLayoutCache& getDescriptorLayoutCache() const { return descriptorLayoutCache; }
         const PipelineLayoutCache& getPipilineLayoutCache() const { return pipelineLayoutCache; }
+        const DescriptorAllocator& getBindlessDescriptorAllocator() const { return bindlessDescriptorAllocator; }
+
         const std::shared_ptr<CommandPool>& getCommandPool(const std::thread::id& threadId = std::this_thread::get_id());
         const Surface* getSurface(size_t id) const { return surfaces[id].get(); }
         const Swapchain* getSwapchain(size_t id) const { return swapchains[id].get(); }
@@ -71,6 +70,7 @@ namespace fe {
 
 
     private:
+        void onStart() override;
         void onUpdate() override;
         void onStop() override;
 
@@ -109,12 +109,15 @@ namespace fe {
         PhysicalDevice physicalDevice{ instance };
         LogicalDevice logicalDevice{ instance, physicalDevice };
 
-        DescriptorAllocator descriptorAllocator{ logicalDevice };
+        DescriptorAllocator descriptorAllocator{ logicalDevice, 1024 };
         DescriptorLayoutCache descriptorLayoutCache{ logicalDevice };
 
         SamplerCache samplerCache{ logicalDevice };
         PipelineCache pipelineCache{ logicalDevice };
         PipelineLayoutCache pipelineLayoutCache{ logicalDevice };
+
+        DescriptorAllocator bindlessDescriptorAllocator{ logicalDevice, 1024, VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT_EXT };
+        std::flat_map<std::string, std::unique_ptr<BindlessDescriptorSet>> bindlessDescriptors;
 
         std::flat_map<std::string, const Descriptor*> attachments;
 

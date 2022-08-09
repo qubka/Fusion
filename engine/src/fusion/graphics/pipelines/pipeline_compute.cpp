@@ -46,8 +46,8 @@ void PipelineCompute::createShaderProgram() {
     auto shaderFile = AssetRegistry::Get()->get_or_emplace<ShaderFile>(path);
 
 	auto shaderStage = shaderFile->getStage();
-	shaderModule = shader.createShaderModule(*shaderFile);
-    specialization = shader.getSpecialization(specConstants, shaderStage);
+	shaderModule = shader.createShaderModule(shaderFile->getName(), shaderFile->getCode(), shaderStage);
+    specialization = shader.createSpecialization(specConstants, shaderStage);
 
     shaderStageCreateInfo.stage = shaderStage;
 	shaderStageCreateInfo.module = shaderModule;

@@ -85,8 +85,8 @@ void PipelineGraphics::createShaderProgram() {
         auto shaderFile = AssetRegistry::Get()->get_or_emplace<ShaderFile>(path);
 
         auto shaderStage = shaderFile->getStage();
-        auto& shaderModule = modules.emplace_back(shader.createShaderModule(*shaderFile));
-        auto& specialization = specializations.emplace_back(shader.getSpecialization(specConstants, shaderStage));
+        auto& shaderModule = modules.emplace_back(shader.createShaderModule(shaderFile->getName(), shaderFile->getCode(), shaderStage));
+        auto& specialization = specializations.emplace_back(shader.createSpecialization(specConstants, shaderStage));
 
 		auto& pipelineShaderStageCreateInfo = stages.emplace_back(VkPipelineShaderStageCreateInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO });
 		pipelineShaderStageCreateInfo.stage = shaderStage;
