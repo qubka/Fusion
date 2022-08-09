@@ -27,9 +27,9 @@ void CommandBuffer::begin(VkCommandBufferUsageFlags usage) {
 	if (running)
 		return;
 
-	VkCommandBufferBeginInfo beginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
-	beginInfo.flags = usage;
-	VK_CHECK(vkBeginCommandBuffer(commandBuffer, &beginInfo));
+	VkCommandBufferBeginInfo commandBufferBeginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
+    commandBufferBeginInfo.flags = usage;
+	VK_CHECK(vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo));
 	running = true;
 }
 

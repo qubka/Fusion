@@ -11,7 +11,7 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
     auto lastBinding = renderStage.getAttachments().back().binding;
 
 	for (const auto& attachment : renderStage.getAttachments()) {
-		VkAttachmentDescription attachmentDescription = {};
+		auto& attachmentDescription = attachmentDescriptions.emplace_back();
 		attachmentDescription.samples = attachment.multisampled && attachment.binding != lastBinding ? samples : VK_SAMPLE_COUNT_1_BIT;
 		attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // Clear at beginning of the render pass.
 		attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE; // // The image can be read from so it's important to store the attachment results
@@ -33,8 +33,6 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
                 attachmentDescription.format = surfaceFormat;
                 break;
 		}
-
-		attachmentDescriptions.push_back(attachmentDescription);
 	}
 
 	// Creates each subpass and its dependencies.
@@ -61,10 +59,9 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 				continue;
 			}
 
-			VkAttachmentReference attachmentReference = {};
+			auto& attachmentReference = subpassColorAttachments.emplace_back();
 			attachmentReference.attachment = attachment->binding;
             attachmentReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			subpassColorAttachments.push_back(attachmentReference);
 
             resolveAttachment = attachment->multisampled; // last attachment as resolve
 		}
@@ -73,7 +70,7 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 		subpasses.push_back(std::make_unique<SubpassDescription>(VK_PIPELINE_BIND_POINT_GRAPHICS, std::move(subpassColorAttachments), depthAttachment, resolveAttachment));
 
 		// Subpass dependencies.
-		VkSubpassDependency subpassDependency = {};
+		auto& subpassDependency = dependencies.emplace_back();
 		subpassDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		subpassDependency.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 		subpassDependency.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
@@ -98,8 +95,6 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 		} else {
 			subpassDependency.srcSubpass = subpassType.binding - 1;
 		}
-
-		dependencies.push_back(subpassDependency);
 	}
 
 	std::vector<VkSubpassDescription> subpassDescriptions;

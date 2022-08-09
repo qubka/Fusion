@@ -149,13 +149,13 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
                     auto& updated = descriptorSetHasUpdated[frameIndex][cmd.TextureId];
                     if (!updated) {
                         auto& set = descriptorSets[frameIndex][cmd.TextureId];
-                        VkWriteDescriptorSet descriptorWrites = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
-                        descriptorWrites.dstSet = set;
-                        descriptorWrites.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                        descriptorWrites.pImageInfo = (VkDescriptorImageInfo*) descriptorImageInfos[cmd.TextureId];
-                        descriptorWrites.descriptorCount = 1;
-                        descriptorWrites.dstBinding = 0;
-                        vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrites, 0, nullptr);
+                        VkWriteDescriptorSet descriptorWrite = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
+                        descriptorWrite.dstSet = set;
+                        descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                        descriptorWrite.pImageInfo = (VkDescriptorImageInfo*) descriptorImageInfos[cmd.TextureId];
+                        descriptorWrite.descriptorCount = 1;
+                        descriptorWrite.dstBinding = 0;
+                        vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, nullptr);
                         updated = true;
                     }
                 }

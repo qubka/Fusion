@@ -1,19 +1,16 @@
 #pragma once
 
 namespace fe {
-    using CommandArg = std::pair<std::string, std::string>;
-
     class CommandLineArgs {
     public:
         CommandLineArgs() = default;
         CommandLineArgs(int count, char** args);
 
-        const CommandArg& operator[](size_t index) const;
-        ITERATABLE(CommandArg, arguments);
+        const std::string& operator[](size_t index) const;
+        std::optional<std::string> getParameter(const std::string& name) const;
 
     private:
-        std::vector<CommandArg> arguments;
-        static CommandArg Empty;
+        std::flat_map<std::string, std::string> arguments;
     };
 
     class CommandLineParser {

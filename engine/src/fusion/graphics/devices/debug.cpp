@@ -31,24 +31,24 @@ DebugMarker::DebugMarker(VkDevice device) : device{device} {
 void DebugMarker::setObjectName(uint64_t object, VkDebugReportObjectTypeEXT objectType, const char* name) {
     // Check for valid function pointer (may not be present if not running in a debugging application)
     if (pfnDebugMarkerSetObjectName) {
-        VkDebugMarkerObjectNameInfoEXT nameInfo = { VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT };
-        nameInfo.objectType = objectType;
-        nameInfo.object = object;
-        nameInfo.pObjectName = name;
-        pfnDebugMarkerSetObjectName(device, &nameInfo);
+        VkDebugMarkerObjectNameInfoEXT debugMarkerObjectNameInfo = { VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT };
+        debugMarkerObjectNameInfo.objectType = objectType;
+        debugMarkerObjectNameInfo.object = object;
+        debugMarkerObjectNameInfo.pObjectName = name;
+        pfnDebugMarkerSetObjectName(device, &debugMarkerObjectNameInfo);
     }
 }
 
 void DebugMarker::setObjectTag(uint64_t object, VkDebugReportObjectTypeEXT objectType, uint64_t name, size_t tagSize, const void* tag) {
     // Check for valid function pointer (may not be present if not running in a debugging application)
     if (pfnDebugMarkerSetObjectTag) {
-        VkDebugMarkerObjectTagInfoEXT tagInfo = { VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT };
-        tagInfo.objectType = objectType;
-        tagInfo.object = object;
-        tagInfo.tagName = name;
-        tagInfo.tagSize = tagSize;
-        tagInfo.pTag = tag;
-        pfnDebugMarkerSetObjectTag(device, &tagInfo);
+        VkDebugMarkerObjectTagInfoEXT debugMarkerObjectTagInfo = { VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT };
+        debugMarkerObjectTagInfo.objectType = objectType;
+        debugMarkerObjectTagInfo.object = object;
+        debugMarkerObjectTagInfo.tagName = name;
+        debugMarkerObjectTagInfo.tagSize = tagSize;
+        debugMarkerObjectTagInfo.pTag = tag;
+        pfnDebugMarkerSetObjectTag(device, &debugMarkerObjectTagInfo);
     }
 }
 

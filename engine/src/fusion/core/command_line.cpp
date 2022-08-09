@@ -2,21 +2,25 @@
 
 using namespace fe;
 
-CommandArg CommandLineArgs::Empty = std::make_pair("", "");
-
 CommandLineArgs::CommandLineArgs(int count, char** args) {
     for (size_t i = 0; i < count; i++) {
         std::string_view argument{ args[i] };
         if (auto pos = argument.find('='); pos != std::string::npos) {
-            arguments.emplace_back(argument.substr(0, pos), argument.substr(pos + 1));
+            arguments.emplace(argument.substr(0, pos), argument.substr(pos + 1));
         } else {
-            arguments.emplace_back(argument, "");
+            arguments.emplace(argument, "");
         }
     }
 }
 
-const CommandArg& CommandLineArgs::operator[](size_t index) const {
-    return index < arguments.size() ? arguments[index] : Empty;
+const std::string& CommandLineArgs::operator[](size_t index) const {
+    return arguments.values().at(index);
+}
+
+std::optional<std::string> CommandLineArgs::getParameter(const std::string& name) const {
+    if (auto it = arguments.find(name); it != arguments.end())
+        return it->second;
+    return std::nullopt;
 }
 
 CommandLineParser::CommandLineParser() {
@@ -46,17 +50,15 @@ void CommandLineParser::parse(const CommandLineArgs& arguments) {
     // Known arguments.
     for (const auto& [alias, option] : options) {
         for (const auto& command : option.commands) {
-            for (const auto& [argument, parameter] : arguments) {
-                if (argument == command) {
-                    option.set = true;
-                    // Get value.
-                    if (option.hasValue) {
-                        if (parameter.empty()) {
-                            printHelp = true;
-                            break;
-                        }
-                        option.value = parameter;
+            if (auto parameter = arguments.getParameter(command)) {
+                option.set = true;
+                // Get value.
+                if (option.hasValue) {
+                    if (parameter->empty()) {
+                        printHelp = true;
+                        break;
                     }
+                    option.value = *parameter;
                 }
             }
         }

@@ -155,7 +155,7 @@ std::string String::FixEscapedChars(std::string str) {
 }
 
 std::string String::UnfixEscapedChars(std::string str) {
-    static const std::flat_map<std::string_view, char> replaces = {{"\\n", '\n'}, {"\\r", '\r'}, {"\\t", '\t'}, {"\\\"", '\"'}, {"\\\\", '\\'}};
+    static const std::vector<std::pair<std::string_view, char>> replaces = {{"\\n", '\n'}, {"\\r", '\r'}, {"\\t", '\t'}, {"\\\"", '\"'}, {"\\\\", '\\'}};
 
     for (const auto& [from, to] : replaces) {
         auto pos = str.find(from);

@@ -97,11 +97,10 @@ namespace fe {
             const std::vector<VkVertexInputAttributeDescription>& getAttributeDescriptions() const { return attributeDescriptions; }
 
             void append(const Layout& vertexLayout, VkVertexInputRate rate = VK_VERTEX_INPUT_RATE_VERTEX) {
-                VkVertexInputBindingDescription bindingDescription = {};
+                auto& bindingDescription = bindingDescriptions.emplace_back();
                 bindingDescription.binding = vertexLayout.getBinding();
                 bindingDescription.stride = vertexLayout.getStride();
                 bindingDescription.inputRate = rate;
-                bindingDescriptions.push_back(bindingDescription);
 
                 auto componentsSize = vertexLayout.getSize();
                 attributeDescriptions.reserve(attributeDescriptions.size() + componentsSize);
@@ -109,12 +108,11 @@ namespace fe {
                 auto attributeIndexOffset = static_cast<uint32_t>(attributeDescriptions.size());
 
                 for (uint32_t i = 0; i < componentsSize; ++i) {
-                    VkVertexInputAttributeDescription attributeDescription = {};
+                    auto& attributeDescription = attributeDescriptions.emplace_back();
                     attributeDescription.location = attributeIndexOffset + i;
                     attributeDescription.binding = vertexLayout.getBinding();
                     attributeDescription.format = vertexLayout.getFormat(i);
                     attributeDescription.offset = vertexLayout.getOffset(i);
-                    attributeDescriptions.push_back(attributeDescription);
                 }
             }
 

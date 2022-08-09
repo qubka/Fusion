@@ -117,7 +117,7 @@ void Texture2dArray::load() {
             auto image = tex2DArray[layer][level];
             auto imageExtent = image.extent();
 
-            VkBufferImageCopy region = {};
+            auto& region = bufferCopyRegions.emplace_back();
             region.bufferRowLength = 0;
             region.bufferImageHeight = 0;
             region.imageSubresource.aspectMask = aspect;
@@ -129,7 +129,6 @@ void Texture2dArray::load() {
             region.imageExtent.height = static_cast<uint32_t>(imageExtent.y);
             region.imageExtent.depth = 1;
             region.bufferOffset = offset;
-            bufferCopyRegions.push_back(region);
 
             // Increase offset into staging buffer for next level / face
             offset += image.size();

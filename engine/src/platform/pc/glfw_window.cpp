@@ -200,11 +200,10 @@ void Window::setIcons(std::span<const fs::path> filepaths) {
         if (!bitmap)
             continue;
 
-        GLFWimage icon = {};
+        auto& icon = icons.emplace_back();
         icon.width = bitmap->getWidth();
         icon.height = bitmap->getHeight();
         icon.pixels = bitmap->getData<unsigned char>();
-        icons.push_back(icon);
         bitmaps.push_back(std::move(bitmap));
     }
 

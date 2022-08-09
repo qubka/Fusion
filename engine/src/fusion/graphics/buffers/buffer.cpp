@@ -115,19 +115,19 @@ void Buffer::extract(void* data, VkDeviceSize size, VkDeviceSize offset) {
 }
 
 void Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
-    VkMappedMemoryRange mappedRange = { VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE };
-    mappedRange.memory = memory;
-    mappedRange.offset = offset;
-    mappedRange.size = size;
-    VK_CHECK(vkFlushMappedMemoryRanges(logicalDevice, 1, &mappedRange));
+    VkMappedMemoryRange mappedMemoryRange = { VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE };
+    mappedMemoryRange.memory = memory;
+    mappedMemoryRange.offset = offset;
+    mappedMemoryRange.size = size;
+    VK_CHECK(vkFlushMappedMemoryRanges(logicalDevice, 1, &mappedMemoryRange));
 }
 
 void Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
-    VkMappedMemoryRange mappedRange = { VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE };
-    mappedRange.memory = memory;
-    mappedRange.offset = offset;
-    mappedRange.size = size;
-    VK_CHECK(vkInvalidateMappedMemoryRanges(logicalDevice, 1, &mappedRange));
+    VkMappedMemoryRange mappedMemoryRange = { VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE };
+    mappedMemoryRange.memory = memory;
+    mappedMemoryRange.offset = offset;
+    mappedMemoryRange.size = size;
+    VK_CHECK(vkInvalidateMappedMemoryRanges(logicalDevice, 1, &mappedMemoryRange));
 }
 
 VkDescriptorBufferInfo Buffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {

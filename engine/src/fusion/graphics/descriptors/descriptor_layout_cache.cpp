@@ -14,7 +14,7 @@ DescriptorLayoutCache::~DescriptorLayoutCache() {
 }
 
 VkDescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(const VkDescriptorSetLayoutCreateInfo& info) const {
-    DescriptorLayoutInfo layoutInfo;
+    DescriptorLayoutInfo layoutInfo = {};
     layoutInfo.flags = info.flags;
     layoutInfo.bindings.reserve(info.bindingCount);
 
