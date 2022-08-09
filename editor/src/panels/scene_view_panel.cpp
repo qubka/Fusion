@@ -90,10 +90,9 @@ void SceneViewPanel::onImGui() {
         }
         ImGui::EndDragDropTarget();
     }
-=
+
     if (!drawComponent(registry, viewportSize, viewportOffset)) {
         if (viewportFocused && viewportHovered && !ImGuizmo::IsUsing() && Input::Get()->getMouseButtonDown(MouseButton::ButtonLeft)) {
-
             glm::vec2 position{ Input::Get()->getMousePosition() - minBound };
             Ray ray = camera->screenPointToRay(position, viewportSize, true);
             editor->selectObject(ray, position);

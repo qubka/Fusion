@@ -21,7 +21,7 @@ MeshSubrender::MeshSubrender(Pipeline::Stage pipelineStage)
                        Vertex::Component::UV,
                        Vertex::Component::UV
                    }}},
-                   {{"blinnPhongEnabled", VK_TRUE}}
+                   {{"blinnPhongEnabled", true}}
                    }
         , descriptorSet{pipeline} {
     unknownDiffuse = std::make_unique<Texture2d>("engine/assets/textures/Diffuse.png");
