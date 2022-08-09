@@ -35,26 +35,28 @@ namespace fe {
         /**
          * Creates a new pipeline.
          * @param stage The graphics stage this pipeline will be run on.
-         * @param shaderStages The source files to load the pipeline shaders from.
+         * @param paths The source files to load the pipeline shaders from.
          * @param vertexInputs The vertex inputs that will be used as a shaders input.
-         * @param defines A list of defines added to the top of each shader.
+         * @param constants A list of specialization constants.
+         * @param bindlessSets
          * @param mode The mode this pipeline will run in.
          * @param depth The depth read/write that will be used.
          * @param topology The topology of the input assembly.
          * @param polygonMode The polygon draw mode.
          * @param cullMode The vertex cull mode.
          * @param frontFace The direction to render faces.
-         * @param depthBiasEnabled
-         * @param depthBiasConstantFactor
-         * @param depthBiasSlopeFactor
-         * @param lineWidth
+         * @param depthBiasEnabled Controls whether to bias fragment depth values.
+         * @param depthBiasConstantFactor The scalar factor controlling the constant depth value added to each fragment.
+         * @param depthBiasSlopeFactor The scalar factor applied to a fragment’s slope in depth bias calculations.
+         * @param lineWidth The width of rasterized line segments.
          * @param transparencyEnabled
          * @param pushDescriptors If no actual descriptor sets are allocated but instead pushed.
          */
         PipelineGraphics(Stage stage,
-                         std::vector<fs::path>&& shaderStages,
+                         std::vector<fs::path>&& paths,
                          std::vector<Vertex::Input>&& vertexInputs = {},
-                         std::vector<Shader::Define>&& defines = {},
+                         std::flat_map<std::string, SpecConstant>&& constants = {},
+                         std::vector<std::string>&& bindlessSets = {},
                          Mode mode = Mode::Polygon,
                          Depth depth = Depth::ReadWrite,
                          VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
@@ -96,9 +98,9 @@ namespace fe {
         void bindPipeline(const CommandBuffer& commandBuffer) const override;
 
         const Stage& getStage() const { return stage; }
-        const std::vector<fs::path>& getShaderStages() const { return shaderStages; }
+        const std::vector<fs::path>& getPaths() const { return paths; }
         const std::vector<Vertex::Input>& getVertexInputs() const { return vertexInputs; }
-        const std::vector<Shader::Define>& getDefines() const { return defines; }
+        const std::flat_map<std::string, SpecConstant>& getConstants() const { return constants; }
         Mode getMode() const { return mode; }
         Depth getDepth() const { return depth; }
         VkPrimitiveTopology getTopology() const { return topology; }
@@ -108,7 +110,6 @@ namespace fe {
         bool isPushDescriptors() const override { return pushDescriptors; }
         const Shader& getShader() const override { return shader; }
         const VkDescriptorSetLayout& getDescriptorSetLayout() const override { return descriptorSetLayout; }
-        const VkDescriptorPool& getDescriptorPool() const override { return descriptorPool; }
         const VkPipeline& getPipeline() const override { return pipeline; }
         const VkPipelineLayout& getPipelineLayout() const override { return pipelineLayout; }
         const VkPipelineBindPoint& getPipelineBindPoint() const override { return pipelineBindPoint; }
@@ -116,7 +117,6 @@ namespace fe {
     private:
         void createShaderProgram();
         void createDescriptorLayout();
-        void createDescriptorPool();
         void createPipelineLayout();
         void createAttributes();
         void createPipeline();
@@ -124,9 +124,10 @@ namespace fe {
         void createPipelineMrt();
 
         Stage stage;
-        std::vector<fs::path> shaderStages;
+        std::vector<fs::path> paths;
         std::vector<Vertex::Input> vertexInputs;
-        std::vector<Shader::Define> defines;
+        std::flat_map<std::string, SpecConstant> constants;
+        std::vector<std::string> bindlessSets;
         Mode mode;
         Depth depth;
         Blend blend;
@@ -149,14 +150,13 @@ namespace fe {
         std::vector<VkDynamicState> dynamicStates;
 
         VkDescriptorSetLayout descriptorSetLayout{ VK_NULL_HANDLE };
-        VkDescriptorPool descriptorPool{ VK_NULL_HANDLE };
 
         VkPipeline pipeline{ VK_NULL_HANDLE };
         VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };
         VkPipelineBindPoint pipelineBindPoint;
 
         std::array<VkPipelineColorBlendAttachmentState, 1> blendAttachmentStates = {};
-        VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO };
+        VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO };
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = { VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO };
         VkPipelineRasterizationStateCreateInfo rasterizationState = { VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO };
         VkPipelineColorBlendStateCreateInfo colorBlendState = { VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO };

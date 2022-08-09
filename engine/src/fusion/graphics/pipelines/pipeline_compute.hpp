@@ -10,21 +10,21 @@ namespace fe {
     public:
         /**
          * Creates a new compute pipeline.
-         * @param shaderStage The shader file that will be loaded.
-         * @param defines A list of defines added to the top of each shader.
+         * @param path The shader file that will be loaded.
+         * @param constants A list of specialization constants.
+         * @param bindlessSets
          * @param pushDescriptors If no actual descriptor sets are allocated but instead pushed.
          */
-        explicit PipelineCompute(fs::path&& shaderStage, std::vector<Shader::Define>&& defines = {}, bool pushDescriptors = false);
+        explicit PipelineCompute(fs::path&& path, std::flat_map<std::string, SpecConstant>&& constants = {}, std::vector<std::string>&& bindlessSets = {}, bool pushDescriptors = false);
         ~PipelineCompute() override;
 
         void cmdRender(const CommandBuffer& commandBuffer, const glm::uvec2& extent) const;
 
-        const fs::path& getShaderStage() const { return shaderStage; }
-        const std::vector<Shader::Define>& getDefines() const { return defines; }
+        const fs::path& getPath() const { return path; }
+        const std::flat_map<std::string, SpecConstant>& getConstants() const { return constants; }
         bool isPushDescriptors() const override { return pushDescriptors; }
         const Shader& getShader() const override { return shader; }
         const VkDescriptorSetLayout& getDescriptorSetLayout() const override { return descriptorSetLayout; }
-        const VkDescriptorPool& getDescriptorPool() const override { return descriptorPool; }
         const VkPipeline& getPipeline() const override { return pipeline; }
         const VkPipelineLayout& getPipelineLayout() const override { return pipelineLayout; }
         const VkPipelineBindPoint& getPipelineBindPoint() const override { return pipelineBindPoint; }
@@ -32,12 +32,12 @@ namespace fe {
     private:
         void createShaderProgram();
         void createDescriptorLayout();
-        void createDescriptorPool();
         void createPipelineLayout();
         void createPipelineCompute();
 
-        fs::path shaderStage;
-        std::vector<Shader::Define> defines;
+        fs::path path;
+        std::flat_map<std::string, SpecConstant> constants;
+        std::vector<std::string> bindlessSets;
         bool pushDescriptors;
 
         Shader shader;
@@ -46,7 +46,6 @@ namespace fe {
         VkPipelineShaderStageCreateInfo shaderStageCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
 
         VkDescriptorSetLayout descriptorSetLayout{ VK_NULL_HANDLE };
-        VkDescriptorPool descriptorPool{ VK_NULL_HANDLE };
 
         VkPipeline pipeline{ VK_NULL_HANDLE };
         VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };
