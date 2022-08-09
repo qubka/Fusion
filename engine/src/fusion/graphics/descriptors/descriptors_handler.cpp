@@ -57,7 +57,10 @@ bool DescriptorsHandler::update(const Pipeline& pipeline) {
 
 		for (const auto& descriptor : descriptors.values()) {
 			auto& writeDescriptorSet = writeDescriptorSets.emplace_back(descriptor.writeDescriptor.getWriteDescriptorSet());
-            writeDescriptorSet.dstSet = pushDescriptors ? VK_NULL_HANDLE : *descriptorSet;
+            if (pushDescriptors)
+                writeDescriptorSet.dstSet = VK_NULL_HANDLE;
+            else
+                writeDescriptorSet.dstSet = *descriptorSet;
 		}
 
 		if (!pushDescriptors)

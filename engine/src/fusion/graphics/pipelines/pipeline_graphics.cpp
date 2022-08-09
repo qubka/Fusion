@@ -92,7 +92,7 @@ void PipelineGraphics::createShaderProgram() {
 		pipelineShaderStageCreateInfo.stage = shaderStage;
 		pipelineShaderStageCreateInfo.module = shaderModule;
 		pipelineShaderStageCreateInfo.pName = "main";
-        pipelineShaderStageCreateInfo.pSpecializationInfo = specialization ? &specialization->getInfo() : nullptr;
+        pipelineShaderStageCreateInfo.pSpecializationInfo = specialization ? &specialization->getSpecializationInfo() : nullptr;
 	}
 
 	shader.createReflection();
@@ -226,13 +226,9 @@ void PipelineGraphics::createAttributes() {
 	multisampleState.rasterizationSamples = multisampled ? physicalDevice.getMsaaSamples() : VK_SAMPLE_COUNT_1_BIT;
 	multisampleState.sampleShadingEnable = VK_FALSE;
 
+    dynamicStates.reserve(2);
     dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
     dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
-
-    /*if (depth == Depth::Dynamic) {
-        dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_TEST_ENABLE);
-        dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_WRITE_ENABLE);
-    }*/
 
     if (topology == VK_PRIMITIVE_TOPOLOGY_LINE_LIST || topology == VK_PRIMITIVE_TOPOLOGY_LINE_STRIP || topology == VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY || topology == VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY) {
         dynamicStates.push_back(VK_DYNAMIC_STATE_LINE_WIDTH);

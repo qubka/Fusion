@@ -1,4 +1,5 @@
 #include "shader.hpp"
+#include "shader_file.hpp"
 
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/buffers/uniform_buffer.hpp"
@@ -10,6 +11,8 @@
 
 #include <SPIRV/GlslangToSpv.h>
 #include <glslang/Public/ShaderLang.h>
+#include <glslang/MachineIndependent/gl_types.h>
+#include <glslang/Include/BaseTypes.h>
 
 using namespace fe;
 
@@ -50,35 +53,205 @@ public:
 	}
 };
 
+/**
+ * Translate a glslang type into the GL API #define number. Ignores arrayness.
+ */
+int mapToGlType(const glslang::TType& type) {
+    using namespace glslang;
+
+    switch (type.getBasicType()) {
+        case EbtSampler:
+            //return mapSamplerToGlType(type.getSampler()); // TODO: We use mapToGlType only for specialization constant, so samplers not really important
+        case EbtStruct:
+        case EbtBlock:
+        case EbtVoid:
+            return 0;
+        default:
+            break;
+    }
+
+    if (type.isVector()) {
+        int offset = type.getVectorSize() - 2;
+        switch (type.getBasicType()) {
+            case EbtFloat:      return GL_FLOAT_VEC2                  + offset;
+            case EbtDouble:     return GL_DOUBLE_VEC2                 + offset;
+            case EbtFloat16:    return GL_FLOAT16_VEC2_NV             + offset;
+            case EbtInt:        return GL_INT_VEC2                    + offset;
+            case EbtUint:       return GL_UNSIGNED_INT_VEC2           + offset;
+            case EbtInt64:      return GL_INT64_VEC2_ARB              + offset;
+            case EbtUint64:     return GL_UNSIGNED_INT64_VEC2_ARB     + offset;
+            case EbtBool:       return GL_BOOL_VEC2                   + offset;
+            case EbtAtomicUint: return GL_UNSIGNED_INT_ATOMIC_COUNTER + offset;
+            default:            return 0;
+        }
+    }
+
+    if (type.isMatrix()) {
+        switch (type.getBasicType()) {
+            case EbtFloat:
+                switch (type.getMatrixCols()) {
+                    case 2:
+                        switch (type.getMatrixRows()) {
+                            case 2:    return GL_FLOAT_MAT2;
+                            case 3:    return GL_FLOAT_MAT2x3;
+                            case 4:    return GL_FLOAT_MAT2x4;
+                            default:   return 0;
+                        }
+                    case 3:
+                        switch (type.getMatrixRows()) {
+                            case 2:    return GL_FLOAT_MAT3x2;
+                            case 3:    return GL_FLOAT_MAT3;
+                            case 4:    return GL_FLOAT_MAT3x4;
+                            default:   return 0;
+                        }
+                    case 4:
+                        switch (type.getMatrixRows()) {
+                            case 2:    return GL_FLOAT_MAT4x2;
+                            case 3:    return GL_FLOAT_MAT4x3;
+                            case 4:    return GL_FLOAT_MAT4;
+                            default:   return 0;
+                        }
+                }
+            case EbtDouble:
+                switch (type.getMatrixCols()) {
+                    case 2:
+                        switch (type.getMatrixRows()) {
+                            case 2:    return GL_DOUBLE_MAT2;
+                            case 3:    return GL_DOUBLE_MAT2x3;
+                            case 4:    return GL_DOUBLE_MAT2x4;
+                            default:   return 0;
+                        }
+                    case 3:
+                        switch (type.getMatrixRows()) {
+                            case 2:    return GL_DOUBLE_MAT3x2;
+                            case 3:    return GL_DOUBLE_MAT3;
+                            case 4:    return GL_DOUBLE_MAT3x4;
+                            default:   return 0;
+                        }
+                    case 4:
+                        switch (type.getMatrixRows()) {
+                            case 2:    return GL_DOUBLE_MAT4x2;
+                            case 3:    return GL_DOUBLE_MAT4x3;
+                            case 4:    return GL_DOUBLE_MAT4;
+                            default:   return 0;
+                        }
+                }
+            case EbtFloat16:
+                switch (type.getMatrixCols()) {
+                    case 2:
+                        switch (type.getMatrixRows()) {
+                            case 2:    return GL_FLOAT16_MAT2_AMD;
+                            case 3:    return GL_FLOAT16_MAT2x3_AMD;
+                            case 4:    return GL_FLOAT16_MAT2x4_AMD;
+                            default:   return 0;
+                        }
+                    case 3:
+                        switch (type.getMatrixRows()) {
+                            case 2:    return GL_FLOAT16_MAT3x2_AMD;
+                            case 3:    return GL_FLOAT16_MAT3_AMD;
+                            case 4:    return GL_FLOAT16_MAT3x4_AMD;
+                            default:   return 0;
+                        }
+                    case 4:
+                        switch (type.getMatrixRows()) {
+                            case 2:    return GL_FLOAT16_MAT4x2_AMD;
+                            case 3:    return GL_FLOAT16_MAT4x3_AMD;
+                            case 4:    return GL_FLOAT16_MAT4_AMD;
+                            default:   return 0;
+                        }
+                }
+            default:
+                return 0;
+        }
+    }
+
+    if (type.getVectorSize() == 1) {
+        switch (type.getBasicType()) {
+            case EbtFloat:      return GL_FLOAT;
+            case EbtDouble:     return GL_DOUBLE;
+            case EbtFloat16:    return GL_FLOAT16_NV;
+            case EbtInt:        return GL_INT;
+            case EbtUint:       return GL_UNSIGNED_INT;
+            case EbtInt64:      return GL_INT64_ARB;
+            case EbtUint64:     return GL_UNSIGNED_INT64_ARB;
+            case EbtBool:       return GL_BOOL;
+            case EbtAtomicUint: return GL_UNSIGNED_INT_ATOMIC_COUNTER;
+            default:            return 0;
+        }
+    }
+
+    return 0;
+}
+
+template <typename T>
+bool ptrComp(const T* const & a, const T* const& b) {
+    return *a < *b;
+}
+
 VkFormat Shader::GlTypeToVk(int32_t type) {
-	switch (type) {
-        case 0x1406: // GL_FLOAT
+    switch (type) {
+        case GL_BOOL:
+            return VK_FORMAT_R32_UINT;
+        case GL_FLOAT:
             return VK_FORMAT_R32_SFLOAT;
-        case 0x8B50: // GL_FLOAT_VEC2
+        case GL_FLOAT_VEC2:
             return VK_FORMAT_R32G32_SFLOAT;
-        case 0x8B51: // GL_FLOAT_VEC3
+        case GL_FLOAT_VEC3:
             return VK_FORMAT_R32G32B32_SFLOAT;
-        case 0x8B52: // GL_FLOAT_VEC4
+        case GL_FLOAT_VEC4:
             return VK_FORMAT_R32G32B32A32_SFLOAT;
-        case 0x1404: // GL_INT
+        case GL_INT:
             return VK_FORMAT_R32_SINT;
-        case 0x8B53: // GL_INT_VEC2
+        case GL_INT_VEC2:
             return VK_FORMAT_R32G32_SINT;
-        case 0x8B54: // GL_INT_VEC3
+        case GL_INT_VEC3:
             return VK_FORMAT_R32G32B32_SINT;
-        case 0x8B55: // GL_INT_VEC4
+        case GL_INT_VEC4:
             return VK_FORMAT_R32G32B32A32_SINT;
-        case 0x1405: // GL_UNSIGNED_INT
-            return VK_FORMAT_R32_SINT;
-        case 0x8DC6: // GL_UNSIGNED_INT_VEC2
-            return VK_FORMAT_R32G32_SINT;
-        case 0x8DC7: // GL_UNSIGNED_INT_VEC3
-            return VK_FORMAT_R32G32B32_SINT;
-        case 0x8DC8: // GL_UNSIGNED_INT_VEC4
-            return VK_FORMAT_R32G32B32A32_SINT;
+        case GL_UNSIGNED_INT:
+            return VK_FORMAT_R32_UINT;
+        case GL_UNSIGNED_INT_VEC2:
+            return VK_FORMAT_R32G32_UINT;
+        case GL_UNSIGNED_INT_VEC3:
+            return VK_FORMAT_R32G32B32_UINT;
+        case GL_UNSIGNED_INT_VEC4:
+            return VK_FORMAT_R32G32B32A32_UINT;
         default:
             return VK_FORMAT_UNDEFINED;
-	}
+    }
+}
+
+uint32_t Shader::GlTypeToSize(int32_t type) {
+    switch (type) {
+        case GL_BOOL:
+            return sizeof(VkBool32);
+        case GL_FLOAT:
+            return sizeof(float);
+        case GL_FLOAT_VEC2:
+            return sizeof(glm::vec2);
+        case GL_FLOAT_VEC3:
+            return sizeof(glm::vec3);
+        case GL_FLOAT_VEC4:
+            return sizeof(glm::vec4);
+        case GL_INT:
+            return sizeof(int32_t);
+        case GL_INT_VEC2:
+            return sizeof(glm::ivec2);
+        case GL_INT_VEC3:
+            return sizeof(glm::ivec3);
+        case GL_INT_VEC4:
+            return sizeof(glm::ivec4);
+        case GL_UNSIGNED_INT:
+            return sizeof(uint32_t);
+        case GL_UNSIGNED_INT_VEC2:
+            return sizeof(glm::uvec2);
+        case GL_UNSIGNED_INT_VEC3:
+            return sizeof(glm::uvec3);
+        case GL_UNSIGNED_INT_VEC4:
+            return sizeof(glm::uvec4);
+        default:
+            return VK_FORMAT_UNDEFINED;
+    }
 }
 
 bool Shader::reportedNotFound(const std::string& name, bool reportIfFound) const {
@@ -89,6 +262,12 @@ bool Shader::reportedNotFound(const std::string& name, bool reportIfFound) const
         return true;
     }
     return false;
+}
+
+std::optional<VkDescriptorType> Shader::getDescriptorType(uint32_t location) const {
+    if (auto it = descriptorTypes.find(location); it != descriptorTypes.end())
+        return it->second;
+    return std::nullopt;
 }
 
 std::optional<uint32_t> Shader::getDescriptorLocation(const std::string& name) const {
@@ -121,48 +300,112 @@ std::optional<Shader::Attribute> Shader::getAttribute(const std::string& name) c
 	return std::nullopt;
 }
 
+std::optional<Shader::Constant> Shader::getConstant(const std::string& name) const {
+    if (auto it = constants.find(name); it != constants.end())
+        return it->second;
+    return std::nullopt;
+}
+
+std::optional<Shader::Specialization> Shader::getSpecialization(const std::flat_map<std::string, SpecConstant>& specConstants, VkShaderStageFlagBits shaderStage) const {
+    auto mapEntries = getSpecializationMapEntries(shaderStage);
+    if (mapEntries.empty())
+        return std::nullopt;
+
+    std::flat_map<uint32_t, SpecConstant> data;
+    // Sorting constants by specId for specified stage
+    for (const auto& [constantName, specConstant] : specConstants) {
+        auto constant = getConstant(constantName);
+        if (constant && constant->getStageFlags() & shaderStage) {
+            data.emplace(constant->getSpecId(), specConstant);
+        }
+    }
+
+    if (data.empty())
+        return std::nullopt;
+
+    if (data.size() != mapEntries.size()) {
+        LOG_ERROR << "Invalid amount of specialization constants provided in \"" << name << "\"" << " required = " << mapEntries.size() << ", provided = " << data.size();
+        return std::nullopt;
+    }
+
+    Specialization specialization = {};
+    specialization.mapEntries = std::move(mapEntries);
+    specialization.data = std::move(data);
+    specialization.info.mapEntryCount = static_cast<uint32_t>(specialization.mapEntries.size());
+    specialization.info.pMapEntries = specialization.mapEntries.data();
+    specialization.info.dataSize = static_cast<uint32_t>(specialization.data.size() * sizeof(SpecConstant));
+    specialization.info.pData = specialization.data.values().data();
+    return specialization;
+}
+
+std::vector<VkSpecializationMapEntry> Shader::getSpecializationMapEntries(VkShaderStageFlagBits shaderStage) const {
+    if (constants.empty())
+        return {};
+
+    std::vector<const Constant*> values;
+    for (auto& constant : constants.values()) {
+        if (constant.stageFlags == shaderStage)
+            values.push_back(&constant);
+    }
+
+    switch (values.size()) {
+        case 0:
+            return {};
+        case 1:
+            break;
+        default:
+            std::sort(values.begin(), values.end(), ptrComp<Constant>);
+            break;
+    }
+
+    uint32_t currentOffset = 0;
+    std::vector<VkSpecializationMapEntry> specializationMapEntries;
+    specializationMapEntries.reserve(values.size());
+
+    for (const auto constant : values) {
+        auto& specializationMapEntry = specializationMapEntries.emplace_back();
+        specializationMapEntry.constantID = static_cast<uint32_t>(constant->specId);
+        specializationMapEntry.offset = currentOffset;
+        specializationMapEntry.size = static_cast<uint32_t>(constant->size);
+        currentOffset += specializationMapEntry.size;
+    }
+
+    return specializationMapEntries;
+}
+
 std::vector<VkPushConstantRange> Shader::getPushConstantRanges() const {
-	std::vector<VkPushConstantRange> pushConstantRanges;
+    if (uniformBlocks.empty())
+        return {};
 
-	uint32_t currentOffset = 0;
+    std::vector<const UniformBlock*> values;
+    for (const auto& uniformBlock : uniformBlocks.values()) {
+        if (uniformBlock.type == UniformBlock::Type::Push)
+            values.push_back(&uniformBlock);
+    }
 
-	for (const auto& [uniformBlockName, uniformBlock] : uniformBlocks) {
-		if (uniformBlock.type != UniformBlock::Type::Push)
-			continue;
+    switch (values.size()) {
+        case 0:
+            return {};
+        case 1:
+            break;
+        default:
+            std::sort(values.begin(), values.end(), ptrComp<UniformBlock>);
+            break;
+    }
 
-		VkPushConstantRange pushConstantRange = {};
-		pushConstantRange.stageFlags = uniformBlock.stageFlags;
-		pushConstantRange.offset = currentOffset;
-		pushConstantRange.size = static_cast<uint32_t>(uniformBlock.size);
-		pushConstantRanges.push_back(pushConstantRange);
-		currentOffset += pushConstantRange.size;
-	}
+    uint32_t currentOffset = 0;
+    std::vector<VkPushConstantRange> pushConstantRanges;
+    pushConstantRanges.reserve(values.size());
 
-	return pushConstantRanges;
-}
+    for (const auto uniformBlock : values) {
+        auto& pushConstantRange = pushConstantRanges.emplace_back();
+        pushConstantRange.stageFlags = uniformBlock->stageFlags;
+        pushConstantRange.offset = currentOffset;
+        pushConstantRange.size = static_cast<uint32_t>(uniformBlock->size);
+        currentOffset += pushConstantRange.size;
+    }
 
-std::optional<VkDescriptorType> Shader::getDescriptorType(uint32_t location) const {
-	if (auto it = descriptorTypes.find(location); it != descriptorTypes.end())
-		return it->second;
-	return std::nullopt;
-}
-
-VkShaderStageFlagBits Shader::GetShaderStage(const fs::path& filepath) {
-	std::string extension{ FileSystem::GetExtension(filepath) };
-	if (extension == ".comp")
-		return VK_SHADER_STAGE_COMPUTE_BIT;
-	if (extension == ".vert")
-		return VK_SHADER_STAGE_VERTEX_BIT;
-	if (extension == ".tesc")
-		return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-	if (extension == ".tese")
-		return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-	if (extension == ".geom")
-		return VK_SHADER_STAGE_GEOMETRY_BIT;
-	if (extension == ".frag")
-		return VK_SHADER_STAGE_FRAGMENT_BIT;
-
-	return VK_SHADER_STAGE_ALL;
+    return pushConstantRanges;
 }
 
 EShLanguage getEshLanguage(VkShaderStageFlags stageFlag) {
@@ -281,18 +524,18 @@ TBuiltInResource getResources() {
 	return resources;
 }
 
-VkShaderModule Shader::createShaderModule(const fs::path& moduleName, const std::string& moduleCode, const std::string& preamble, VkShaderStageFlags moduleFlag) {
+VkShaderModule Shader::createShaderModule(const ShaderFile& shaderFile) {
 	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
     if (name.empty())
-        name = moduleName.filename().replace_extension().string();
+        name = String::Extract(shaderFile.getName(), "", ".");
 
-    stages.push_back(moduleName);
+    VkShaderStageFlagBits shaderStage = shaderFile.getStage();
 
 	// Starts converting GLSL to SPIR-V.
-	auto language = getEshLanguage(moduleFlag);
+	auto language = getEshLanguage(shaderStage);
 	glslang::TProgram program;
-	glslang::TShader shader(language);
+	glslang::TShader shader{language};
 	auto resources = getResources();
 
 	// Enable SPIR-V and Vulkan rules when parsing GLSL.
@@ -301,13 +544,12 @@ VkShaderModule Shader::createShaderModule(const fs::path& moduleName, const std:
 	messages = static_cast<EShMessages>(messages | EShMsgDebugInfo);
 #endif
 
-	auto shaderName = moduleName.string();
-	auto shaderNameCstr = shaderName.c_str();
-	auto shaderSource = moduleCode.c_str();
-	shader.setStringsWithLengthsAndNames(&shaderSource, nullptr, &shaderNameCstr, 1);
-	shader.setPreamble(preamble.c_str());
+	auto shaderName = shaderFile.getName().c_str();
+	auto shaderSource = shaderFile.getCode().c_str();
+	shader.setStringsWithLengthsAndNames(&shaderSource, nullptr, &shaderName, 1);
+	//shader.setPreamble(preamble.c_str());
 
-	auto defaultVersion = glslang::EShTargetVulkan_1_1;
+	auto defaultVersion = glslang::EShTargetVulkan_1_3;
 	shader.setEnvInput(glslang::EShSourceGlsl, language, glslang::EShClientVulkan, 110);
 	shader.setEnvClient(glslang::EShClientVulkan, defaultVersion);
 	shader.setEnvTarget(glslang::EShTargetSpv, volkGetInstanceVersion() >= VK_API_VERSION_1_1 ? glslang::EShTargetSpv_1_3 : glslang::EShTargetSpv_1_0);
@@ -337,19 +579,24 @@ VkShaderModule Shader::createShaderModule(const fs::path& moduleName, const std:
 	program.buildReflection();
 	//program.dumpReflection();
 
+    auto intermediate = program.getIntermediate(language);
+
 	for (int32_t dim = 0; dim < 3; ++dim) {
 		if (uint32_t localSize = program.getLocalSize(dim); localSize > 1)
 			localSizes[dim] = localSize;
 	}
 
 	for (int32_t i = program.getNumLiveUniformBlocks() - 1; i >= 0; i--)
-		loadUniformBlock(program, moduleFlag, i);
+		loadUniformBlock(program, shaderStage, i);
 
 	for (int32_t i = 0; i < program.getNumLiveUniformVariables(); i++)
-		loadUniform(program, moduleFlag, i);
+		loadUniform(program, shaderStage, i);
 
 	for (int32_t i = 0; i < program.getNumLiveAttributes(); i++)
-		loadAttribute(program, moduleFlag, i);
+		loadAttribute(program, shaderStage, i);
+
+    // Custom traverser used
+    loadConstants(*intermediate, shaderStage);
 
 	glslang::SpvOptions spvOptions;
 #if FUSION_DEBUG
@@ -362,9 +609,9 @@ VkShaderModule Shader::createShaderModule(const fs::path& moduleName, const std:
 	spvOptions.optimizeSize = true;
 #endif
 
-	spv::SpvBuildLogger logger;
+    spv::SpvBuildLogger logger;
 	std::vector<uint32_t> spirv;
-	GlslangToSpv(*program.getIntermediate(static_cast<EShLanguage>(language)), spirv, &logger, &spvOptions);
+	GlslangToSpv(*intermediate, spirv, &logger, &spvOptions);
 
 	VkShaderModuleCreateInfo shaderModuleCreateInfo = { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
 	shaderModuleCreateInfo.codeSize = spirv.size() * sizeof(uint32_t);
@@ -376,8 +623,6 @@ VkShaderModule Shader::createShaderModule(const fs::path& moduleName, const std:
 }
 
 void Shader::createReflection() {
-	std::unordered_map<VkDescriptorType, uint32_t> descriptorPoolCounts;
-
 	// Process to descriptors.
 	for (const auto& [uniformBlockName, uniformBlock] : uniformBlocks) {
 		auto descriptorType = VK_DESCRIPTOR_TYPE_MAX_ENUM;
@@ -398,7 +643,6 @@ void Shader::createReflection() {
                 break;
 		}
 
-		incrementDescriptorPool(descriptorPoolCounts, descriptorType);
 		descriptorLocations.emplace(uniformBlockName, uniformBlock.binding);
 		descriptorSizes.emplace(uniformBlockName, uniformBlock.size);
 	}
@@ -407,17 +651,17 @@ void Shader::createReflection() {
 		auto descriptorType = VK_DESCRIPTOR_TYPE_MAX_ENUM;
 
 		switch (uniform.glType) {
-            case 0x8B5E: // GL_SAMPLER_2D
-            case 0x904D: // GL_IMAGE_2D
-            case 0x8DC1: // GL_TEXTURE_2D_ARRAY
-            case 0x9108: // GL_SAMPLER_2D_MULTISAMPLE
-            case 0x9055: // GL_IMAGE_2D_MULTISAMPLE
+            case GL_IMAGE_2D:
+            case GL_SAMPLER_2D:
+            case GL_SAMPLER_2D_ARRAY:
+            case GL_SAMPLER_2D_MULTISAMPLE:
+            case GL_IMAGE_2D_MULTISAMPLE:
                 descriptorType = uniform.writeOnly ? VK_DESCRIPTOR_TYPE_STORAGE_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
                 descriptorSetLayouts.push_back(Texture2d::GetDescriptorSetLayout(static_cast<uint32_t>(uniform.binding), descriptorType, uniform.stageFlags, uniform.size));
                 break;
-            case 0x8B60: // GL_SAMPLER_CUBE
-            case 0x9050: // GL_IMAGE_CUBE
-            case 0x9054: // GL_IMAGE_CUBE_MAP_ARRAY
+            case GL_SAMPLER_CUBE:
+            case GL_IMAGE_CUBE:
+            case GL_IMAGE_CUBE_MAP_ARRAY:
                 descriptorType = uniform.writeOnly ? VK_DESCRIPTOR_TYPE_STORAGE_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
                 descriptorSetLayouts.push_back(TextureCube::GetDescriptorSetLayout(static_cast<uint32_t>(uniform.binding), descriptorType, uniform.stageFlags, uniform.size));
                 break;
@@ -425,35 +669,9 @@ void Shader::createReflection() {
                 break;
 		}
 
-		incrementDescriptorPool(descriptorPoolCounts, descriptorType);
 		descriptorLocations.emplace(uniformName, uniform.binding);
 		descriptorSizes.emplace(uniformName, uniform.size);
 	}
-
-	for (const auto& [type, descriptorCount] : descriptorPoolCounts) {
-		VkDescriptorPoolSize descriptorPoolSize = {};
-		descriptorPoolSize.type = type;
-		descriptorPoolSize.descriptorCount = descriptorCount;
-		descriptorPools.push_back(descriptorPoolSize);
-	}
-
-	// TODO: This is a AMD workaround that works on NVidia too...
-	// We don't know the total usages of descriptor types by the pipeline.
-	descriptorPools.resize(7);
-	descriptorPools[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	descriptorPools[0].descriptorCount = 32;
-	descriptorPools[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	descriptorPools[1].descriptorCount = 16;
-	descriptorPools[2].type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-	descriptorPools[2].descriptorCount = 16;
-	descriptorPools[3].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-	descriptorPools[3].descriptorCount = 16;
-	descriptorPools[4].type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-	descriptorPools[4].descriptorCount = 16;
-	descriptorPools[5].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	descriptorPools[5].descriptorCount = 16;
-    descriptorPools[6].type = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
-	descriptorPools[6].descriptorCount = 8;
 
 	// Sort descriptors by binding.
 	std::sort(descriptorSetLayouts.begin(), descriptorSetLayouts.end(), [](const VkDescriptorSetLayoutBinding& l, const VkDescriptorSetLayoutBinding& r) {
@@ -468,32 +686,41 @@ void Shader::createReflection() {
 	for (const auto& descriptor : descriptorSetLayouts)
 		descriptorTypes.emplace(descriptor.binding, descriptor.descriptorType);
 
-	// Process attribute descriptions.
-	uint32_t currentOffset = 4;
+    // Process attribute descriptions.
+    {
+        std::vector<const Attribute*> values;
+        for (auto& attribute : attributes.values()) {
+            values.push_back(&attribute);
+        }
 
-	for (const auto& [attributeName, attribute] : attributes) {
-		VkVertexInputAttributeDescription attributeDescription = {};
-		attributeDescription.location = static_cast<uint32_t>(attribute.location);
-		attributeDescription.binding = 0;
-		attributeDescription.format = GlTypeToVk(attribute.glType);
-		attributeDescription.offset = currentOffset;
-		attributeDescriptions.push_back(attributeDescription);
-		currentOffset += attribute.size;
-	}
-}
+        switch (values.size()) {
+            case 0:
+                return;
+            case 1:
+                break;
+            default:
+                std::sort(values.begin(), values.end(), ptrComp<Attribute>);
+                break;
+        }
 
-void Shader::incrementDescriptorPool(std::unordered_map<VkDescriptorType, uint32_t>& descriptorPoolCounts, VkDescriptorType type) {
-	if (type == VK_DESCRIPTOR_TYPE_MAX_ENUM)
-		return;
+        uint32_t currentOffset = 0;
+        attributeDescriptions.reserve(values.size());
 
-	if (auto it = descriptorPoolCounts.find(type); it != descriptorPoolCounts.end())
-		it->second++;
-	else
-		descriptorPoolCounts.emplace(type, 1);
+        for (const auto attribute : values) {
+            auto& attributeDescription = attributeDescriptions.emplace_back();
+            attributeDescription.location = static_cast<uint32_t>(attribute->location);
+            attributeDescription.binding = 0;
+            attributeDescription.format = GlTypeToVk(attribute->glType);
+            attributeDescription.offset = currentOffset;
+            currentOffset += attribute->size;
+        }
+    }
 }
 
 void Shader::loadUniformBlock(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i) {
 	auto reflection = program.getUniformBlock(i);
+    if (reflection.name.empty())
+        return;
 
     if (auto it = uniformBlocks.find(reflection.name); it != uniformBlocks.end()) {
         it->second.stageFlags |= stageFlag;
@@ -513,6 +740,8 @@ void Shader::loadUniformBlock(const glslang::TProgram& program, VkShaderStageFla
 
 void Shader::loadUniform(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i) {
 	auto reflection = program.getUniform(i);
+    if (reflection.name.empty())
+        return;
 
 	if (reflection.getBinding() == -1) {
 		auto splitName = String::Split(reflection.name, '.');
@@ -521,26 +750,28 @@ void Shader::loadUniform(const glslang::TProgram& program, VkShaderStageFlags st
             auto& name = splitName.front();
             if (auto it = uniformBlocks.find(name); it != uniformBlocks.end()) {
                 it->second.uniforms.emplace(String::ReplaceFirst(reflection.name, name + ".", ""),
-                                            Uniform{ reflection.getBinding(), reflection.offset, computeSize(reflection.getType()), reflection.glDefineType, false, false, stageFlag });
+                                            Uniform{ reflection.getBinding(), reflection.offset, computeSize(*reflection.getType()),
+                                                     reflection.glDefineType, false, false, stageFlag });
                 return;
             }
 		}
 	}
 
-	for (auto& [uniformName, uniform] : uniforms) {
-		if (uniformName == reflection.name) {
-			uniform.stageFlags |= stageFlag;
-			return;
-		}
-	}
+    if (auto it = uniforms.find(reflection.name); it != uniforms.end()) {
+        it->second.stageFlags |= stageFlag;
+        return;
+    }
 
 	auto& qualifier = reflection.getType()->getQualifier();
 	uniforms.emplace(reflection.name, Uniform{ reflection.getBinding(), reflection.offset, reflection.size, reflection.glDefineType, qualifier.readonly, qualifier.writeonly, stageFlag });
+
+    /*if (reflection.arrayStride > 0 && reflection.topLevelArrayStride > 0 && reflection.size == -1) {
+    LOG_DEBUG << "Bindless???";
+    }*/
 }
 
 void Shader::loadAttribute(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i) {
 	auto reflection = program.getPipeInput(i);
-
 	if (reflection.name.empty())
 		return;
 
@@ -548,28 +779,64 @@ void Shader::loadAttribute(const glslang::TProgram& program, VkShaderStageFlags 
         return;
 
 	auto& qualifier = reflection.getType()->getQualifier();
-	attributes.emplace(reflection.name, Attribute{ static_cast<int32_t>(qualifier.layoutSet), static_cast<int32_t>(qualifier.layoutLocation), computeSize(reflection.getType()), reflection.glDefineType });
+	attributes.emplace(reflection.name, Attribute{ static_cast<int32_t>(qualifier.layoutSet), static_cast<int32_t>(qualifier.layoutLocation), computeSize(*reflection.getType()), reflection.glDefineType });
 }
 
-int32_t Shader::computeSize(const glslang::TType* ttype) {
+void Shader::loadConstants(const glslang::TIntermediate& intermediate, VkShaderStageFlags stageFlag) {
+    class ConstantTraverser : public glslang::TIntermTraverser {
+    public:
+        ConstantTraverser(std::flat_map<std::string, Shader::Constant>& constants, VkShaderStageFlags stageFlag)
+                : TIntermTraverser{}, constants{constants}, stageFlag{stageFlag} {}
+
+        void visitSymbol(glslang::TIntermSymbol* symbol) override {
+            if (symbol->getQualifier().isSpecConstant()) {
+                std::string name{ symbol->getName() };
+                if (name.empty())
+                    return;
+
+                auto specId = static_cast<int32_t>(symbol->getQualifier().layoutSpecConstantId);
+
+                if (auto it = constants.find(name); it != constants.end()) {
+                    if (it->second.specId != specId) {
+                        LOG_WARNING << "Same constants with different specialization constant Id";
+                    }
+                    it->second.stageFlags |= stageFlag;
+                    return;
+                }
+
+                constants.emplace(name, Constant{ specId, computeSize(symbol->getType()), stageFlag, mapToGlType(symbol->getType()) });
+            }
+        }
+
+    private:
+        std::flat_map<std::string, Shader::Constant>& constants;
+        VkShaderStageFlags stageFlag;
+    };
+
+    ConstantTraverser traverser{constants, stageFlag};
+    auto root = intermediate.getTreeRoot();
+    root->traverse(&traverser);
+}
+
+int32_t Shader::computeSize(const glslang::TType& type) {
 	// TODO: glslang::TType::computeNumComponents is available but has many issues resolved in this method.
 	int32_t components = 0;
 
-	if (ttype->getBasicType() == glslang::EbtStruct || ttype->getBasicType() == glslang::EbtBlock) {
-		for (const auto& tl : *ttype->getStruct())
-			components += computeSize(tl.type);
-	} else if (ttype->getMatrixCols() != 0) {
-		components = ttype->getMatrixCols() * ttype->getMatrixRows();
+	if (type.getBasicType() == glslang::EbtStruct || type.getBasicType() == glslang::EbtBlock) {
+		for (const auto& tl : *type.getStruct())
+			components += computeSize(*tl.type);
+	} else if (type.getMatrixCols() != 0) {
+		components = type.getMatrixCols() * type.getMatrixRows();
 	} else {
-		components = ttype->getVectorSize();
+		components = type.getVectorSize();
 	}
 
-	if (ttype->getArraySizes()) {
+	if (type.getArraySizes()) {
 		int32_t arraySize = 1;
 
-		for (int32_t d = 0; d < ttype->getArraySizes()->getNumDims(); ++d) {
+		for (int32_t d = 0; d < type.getArraySizes()->getNumDims(); ++d) {
 			// This only makes sense in paths that have a known array size.
-			if (auto dimSize = ttype->getArraySizes()->getDimSize(d); dimSize != glslang::UnsizedArraySize)
+			if (auto dimSize = type.getArraySizes()->getDimSize(d); dimSize != glslang::UnsizedArraySize)
 				arraySize *= dimSize;
 		}
 

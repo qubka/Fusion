@@ -3,80 +3,37 @@
 namespace glslang {
     class TProgram;
     class TType;
+    class TIntermediate;
 }
 
 namespace fe {
+    class ShaderFile;
     /**
      * @brief Class that loads and processes a shader, and provides a reflection.
      */
     class Shader {
     public:
-        class Uniform;
-        class UniformBlock;
-        class Attribute;
-        class Constant;
+        class SpecConstant {
+        public:
+            SpecConstant() : value{0.0f} {}
+            template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
+            SpecConstant(const T& value) : value{static_cast<float>(value)} {}
 
-        /**
-         * A define added to the start of a shader, first value is the define name and second is the value to be set.
-         */
-        using Define = std::pair<std::string, std::string>;
+        private:
+            float value;
+        };
 
-        Shader() = default;
-        ~Shader() = default;
+        class Specialization {
+            friend class Shader;
+        public:
+            const VkSpecializationInfo& getSpecializationInfo() const { return info; }
 
-        bool reportedNotFound(const std::string& name, bool reportIfFound) const;
-        static VkFormat GlTypeToVk(int32_t type);
-        std::optional<uint32_t> getDescriptorLocation(const std::string& name) const;
-        std::optional<uint32_t> getDescriptorSize(const std::string& name) const;
-        std::optional<Uniform> getUniform(const std::string& name) const;
-        std::optional<UniformBlock> getUniformBlock(const std::string& name) const;
-        std::optional<Attribute> getAttribute(const std::string& name) const;
-        std::vector<VkPushConstantRange> getPushConstantRanges() const;
+        private:
+            VkSpecializationInfo info = { 0 };
+            std::vector<VkSpecializationMapEntry> mapEntries;
+            std::flat_map<uint32_t, SpecConstant> data;
+        };
 
-        std::optional<VkDescriptorType> getDescriptorType(uint32_t location) const;
-        static VkShaderStageFlagBits GetShaderStage(const fs::path& filepath);
-        VkShaderModule createShaderModule(const fs::path& moduleName, const std::string& moduleCode, const std::string& preamble, VkShaderStageFlags moduleFlag);
-        void createReflection();
-
-        const std::string& getName() const { return name; }
-        uint32_t getLastDescriptorBinding() const { return lastDescriptorBinding; }
-        const std::unordered_map<std::string, Uniform>& getUniforms() const { return uniforms; };
-        const std::unordered_map<std::string, UniformBlock>& getUniformBlocks() const { return uniformBlocks; };
-        const std::unordered_map<std::string, Attribute>& getAttributes() const { return attributes; };
-        const std::unordered_map<std::string, Constant>& getConstants() const { return constants; };
-        const std::array<std::optional<uint32_t>, 3>& getLocalSizes() const { return localSizes; }
-        const std::vector<VkDescriptorSetLayoutBinding>& getDescriptorSetLayouts() const { return descriptorSetLayouts; }
-        const std::vector<VkDescriptorPoolSize>& getDescriptorPools() const { return descriptorPools; }
-        const std::vector<VkVertexInputAttributeDescription>& getAttributeDescriptions() const { return attributeDescriptions; }
-
-    private:
-        static void incrementDescriptorPool(std::unordered_map<VkDescriptorType, uint32_t>& descriptorPoolCounts, VkDescriptorType type);
-        void loadUniformBlock(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i);
-        void loadUniform(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i);
-        void loadAttribute(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i);
-        static int32_t computeSize(const glslang::TType* ttype);
-
-        std::string name;
-        std::vector<fs::path> stages;
-        std::unordered_map<std::string, Uniform> uniforms;
-        std::unordered_map<std::string, UniformBlock> uniformBlocks;
-        std::unordered_map<std::string, Attribute> attributes;
-        std::unordered_map<std::string, Constant> constants;
-
-        std::array<std::optional<uint32_t>, 3> localSizes;
-
-        std::unordered_map<std::string, uint32_t> descriptorLocations;
-        std::unordered_map<std::string, uint32_t> descriptorSizes;
-
-        std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayouts;
-        uint32_t lastDescriptorBinding{ 0 };
-        std::vector<VkDescriptorPoolSize> descriptorPools;
-        std::unordered_map<uint32_t, VkDescriptorType> descriptorTypes;
-        std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
-
-        mutable std::vector<std::string> notFoundNames;
-
-    public:
         class Uniform {
             friend class Shader;
         public:
@@ -107,6 +64,10 @@ namespace fe {
                 return !operator==(rhs);
             }
 
+            bool operator<(const Uniform& rhs) const {
+                return binding < rhs.binding;
+            }
+
         private:
             int32_t binding;
             int32_t offset;
@@ -133,7 +94,7 @@ namespace fe {
             int32_t getSize() const { return size; }
             VkShaderStageFlags getStageFlags() const { return stageFlags; }
             Type getType() const { return type; }
-            const std::unordered_map<std::string, Uniform>& getUniforms() const { return uniforms; }
+            const std::flat_map<std::string, Uniform>& getUniforms() const { return uniforms; }
 
             std::optional<Uniform> getUniform(const std::string& name) const {
                 if (auto it = uniforms.find(name); it != uniforms.end())
@@ -149,12 +110,16 @@ namespace fe {
                 return !operator==(rhs);
             }
 
+            bool operator<(const UniformBlock& rhs) const {
+                return binding < rhs.binding;
+            }
+
         private:
             int32_t binding;
             int32_t size;
             VkShaderStageFlags stageFlags;
             Type type;
-            std::unordered_map<std::string, Uniform> uniforms{};
+            std::flat_map<std::string, Uniform> uniforms{};
         };
 
         class Attribute {
@@ -180,6 +145,10 @@ namespace fe {
                 return !operator==(rhs);
             }
 
+            bool operator<(const Attribute& rhs) const {
+                return location < rhs.location;
+            }
+
         private:
             int32_t set;
             int32_t location;
@@ -190,31 +159,91 @@ namespace fe {
         class Constant {
             friend class Shader;
         public:
-            explicit Constant(int32_t binding = -1, int32_t size = -1, VkShaderStageFlags stageFlags = 0, int32_t glType = -1)
-                    : binding{binding}
+            explicit Constant(int32_t specId = -1, int32_t size = -1, VkShaderStageFlags stageFlags = 0, int32_t glType = -1)
+                    : specId{specId}
                     , size{size}
                     , stageFlags{stageFlags}
                     , glType{glType} {
             }
 
-            int32_t getBinding() const { return binding; }
+            int32_t getSpecId() const { return specId; }
             int32_t getSize() const { return size; }
             VkShaderStageFlags getStageFlags() const { return stageFlags; }
             int32_t getGlType() const { return glType; }
 
             bool operator==(const Constant& rhs) const {
-                return binding == rhs.binding && size == rhs.size && stageFlags == rhs.stageFlags && glType == rhs.glType;
+                return specId == rhs.specId && size == rhs.size && stageFlags == rhs.stageFlags && glType == rhs.glType;
             }
 
             bool operator!=(const Constant& rhs) const {
                 return !operator==(rhs);
             }
 
+            bool operator<(const Constant& rhs) const {
+                return specId < rhs.specId;
+            }
+
         private:
-            int32_t binding;
+            int32_t specId;
             int32_t size;
             VkShaderStageFlags stageFlags;
             int32_t glType;
         };
+
+        Shader() = default;
+        ~Shader() = default;
+
+        static VkFormat GlTypeToVk(int32_t type);
+        static uint32_t GlTypeToSize(int32_t type);
+
+        bool reportedNotFound(const std::string& name, bool reportIfFound) const;
+        std::optional<VkDescriptorType> getDescriptorType(uint32_t location) const;
+        std::optional<uint32_t> getDescriptorLocation(const std::string& name) const;
+        std::optional<uint32_t> getDescriptorSize(const std::string& name) const;
+        std::optional<Uniform> getUniform(const std::string& name) const;
+        std::optional<UniformBlock> getUniformBlock(const std::string& name) const;
+        std::optional<Attribute> getAttribute(const std::string& name) const;
+        std::optional<Constant> getConstant(const std::string& name) const;
+        std::optional<Specialization> getSpecialization(const std::flat_map<std::string, SpecConstant>& specConstants, VkShaderStageFlagBits shaderStage) const;
+        std::vector<VkPushConstantRange> getPushConstantRanges() const;
+        std::vector<VkSpecializationMapEntry> getSpecializationMapEntries(VkShaderStageFlagBits shaderStage) const;
+
+        VkShaderModule createShaderModule(const ShaderFile& shaderFile);
+        void createReflection();
+
+        const std::string& getName() const { return name; }
+        const std::flat_map<std::string, Uniform>& getUniforms() const { return uniforms; };
+        const std::flat_map<std::string, UniformBlock>& getUniformBlocks() const { return uniformBlocks; };
+        const std::flat_map<std::string, Attribute>& getAttributes() const { return attributes; };
+        const std::flat_map<std::string, Constant>& getConstants() const { return constants; };
+        const std::array<std::optional<uint32_t>, 3>& getLocalSizes() const { return localSizes; }
+        const std::vector<VkDescriptorSetLayoutBinding>& getDescriptorSetLayouts() const { return descriptorSetLayouts; }
+        const std::vector<VkVertexInputAttributeDescription>& getAttributeDescriptions() const { return attributeDescriptions; }
+        uint32_t getLastDescriptorBinding() const { return lastDescriptorBinding; }
+
+    private:
+        void loadUniformBlock(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i);
+        void loadUniform(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i);
+        void loadAttribute(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i);
+        void loadConstants(const glslang::TIntermediate& intermediate, VkShaderStageFlags stageFlag);
+        static int32_t computeSize(const glslang::TType& type);
+
+        std::string name;
+        std::flat_map<std::string, Uniform> uniforms;
+        std::flat_map<std::string, UniformBlock> uniformBlocks;
+        std::flat_map<std::string, Attribute> attributes;
+        std::flat_map<std::string, Constant> constants;
+
+        std::array<std::optional<uint32_t>, 3> localSizes;
+
+        std::flat_map<std::string, uint32_t> descriptorLocations;
+        std::flat_map<std::string, uint32_t> descriptorSizes;
+
+        std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayouts;
+        std::flat_map<uint32_t, VkDescriptorType> descriptorTypes;
+        std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+        uint32_t lastDescriptorBinding{ 0 };
+
+        mutable std::vector<std::string> notFoundNames;
     };
 }

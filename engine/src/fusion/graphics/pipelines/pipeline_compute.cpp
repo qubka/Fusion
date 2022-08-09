@@ -52,7 +52,7 @@ void PipelineCompute::createShaderProgram() {
     shaderStageCreateInfo.stage = shaderStage;
 	shaderStageCreateInfo.module = shaderModule;
 	shaderStageCreateInfo.pName = "main";
-    shaderStageCreateInfo.pSpecializationInfo = specialization ? &specialization->getInfo() : nullptr;
+    shaderStageCreateInfo.pSpecializationInfo = specialization ? &specialization->getSpecializationInfo() : nullptr;
 
     shader.createReflection();
 }
@@ -60,7 +60,7 @@ void PipelineCompute::createShaderProgram() {
 void PipelineCompute::createDescriptorLayout() {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	auto descriptorSetLayouts = shader.getDescriptorSetLayouts();
+	auto& descriptorSetLayouts = shader.getDescriptorSetLayouts();
 
 	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
 	descriptorSetLayoutCreateInfo.flags = pushDescriptors ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
