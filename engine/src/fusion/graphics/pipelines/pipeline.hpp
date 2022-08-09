@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fusion/graphics/pipelines/shader.hpp"
-#include "fusion/graphics/pipelines/spec_constant.hpp"
 
 namespace fe {
     class CommandBuffer;
