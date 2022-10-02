@@ -59,3 +59,11 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
         FUSION_COMPILED_SYSTEM="${CMAKE_SYSTEM}"
         FUSION_COMPILED_GENERATOR="${CMAKE_GENERATOR}"
         )
+
+#### Windows only: Copy the Physx dll files to the simulation executable####
+
+if(WIN32)
+    # copy PhysX dll's to build dir. Happens on every build.
+    #add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+   #         COMMAND ${CMAKE_COMMAND} -E copy_directory "${PhysxOutputPath}" "$<TARGET_FILE_DIR:${PROJECT_NAME}")
+endif()

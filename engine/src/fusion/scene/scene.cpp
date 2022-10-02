@@ -227,35 +227,40 @@ void Scene::deserialise(fs::path filepath, bool binary) {
 }
 
 void Scene::importMesh(const fs::path& filepath) {
-    auto model = AssetRegistry::Get()->get_or_emplace<Model>(filepath);
+    auto model = AssetRegistry::Get()->load<Model>(filepath);
 
     auto hierarchySystem = getSystem<HierarchySystem>();
 
     auto& root = model->getRoot();
-    auto entity = createEntity(root->name);
-    registry.emplace<TransformComponent>(entity);
+    auto entity = createEntity(root.name);
+    registry.emplace<TransformComponent>(entity, root.position, root.orientation, root.scale);
+    if (root.children.size() == 1) {
+        auto& main = root.children.front();
+        if (main.meshes.size() == 1 && main.children.empty())
+            registry.emplace<MeshComponent>(entity, model, main.meshes.front()->getIndex());
+    } else {
+        std::function<void(const SceneObject&)> createObject = [&](const SceneObject& object) {
+            for (const auto& child : object.children) {
+                auto childEntity = createEntity(child.name);
+                registry.emplace<TransformComponent>(childEntity, child.position, child.orientation, child.scale);
 
-    std::function<void(const std::shared_ptr<SceneObject>&)> createObject = [&](const std::shared_ptr<SceneObject>& object) {
-        for (const auto& child : object->children) {
-            auto childEntity = createEntity(child->name);
-            registry.emplace<TransformComponent>(childEntity, child->position, child->oritentation, child->scale);
-
-            if (child->meshes.size() == 1) {
-                registry.emplace<MeshComponent>(childEntity, child->meshes[0]);
-            } else {
-                for (const auto& mesh: child->meshes) {
-                    auto meshChildEntity = createEntity(child->name + " " + std::to_string(mesh->getMeshIndex()));
-                    registry.emplace<TransformComponent>(meshChildEntity);
-                    registry.emplace<MeshComponent>(meshChildEntity, mesh);
-                    hierarchySystem->assignChild(childEntity, meshChildEntity);
+                if (child.meshes.size() == 1) {
+                    registry.emplace<MeshComponent>(childEntity, model, child.meshes.front()->getIndex());
+                } else {
+                    for (const auto& mesh: child.meshes) {
+                        auto meshChildEntity = createEntity(child.name + " " + std::to_string(mesh->getIndex()));
+                        registry.emplace<TransformComponent>(meshChildEntity);
+                        registry.emplace<MeshComponent>(meshChildEntity, model, mesh->getIndex());
+                        hierarchySystem->assignChild(childEntity, meshChildEntity);
+                    }
                 }
+
+                hierarchySystem->assignChild(entity, childEntity);
+
+                createObject(child);
             }
+        };
 
-            hierarchySystem->assignChild(entity, childEntity);
-
-            createObject(child);
-        }
-    };
-
-    createObject(root);
+        createObject(root);
+    }
 }

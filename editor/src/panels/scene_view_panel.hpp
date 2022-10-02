@@ -10,7 +10,7 @@
 namespace fe {
     class SceneViewPanel : public EditorPanel {
     public:
-        explicit SceneViewPanel(Editor* editor);
+        explicit SceneViewPanel(Editor& editor);
         ~SceneViewPanel() override;
 
         void onImGui() override;
@@ -43,10 +43,10 @@ namespace fe {
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::ColorScheme::Active(color));
 
                     std::string icon{ ICON_MDI_CUBE_OUTLINE };
-                    editor->getComponentIcon(type_id<T>, icon);
+                    editor.getComponentIcon(type_id<T>, icon);
 
                     if (ImGui::Button(icon.c_str())) {
-                        editor->setSelected(entity);
+                        editor.setSelected(entity);
                     }
 
                     hovered |= ImGui::IsItemHovered();
@@ -59,6 +59,6 @@ namespace fe {
             return hovered;
         }
 
-        std::flat_map<type_index, bool> showComponentGizmosMap;
+        fst::unordered_flatmap<type_index, bool> showComponentGizmosMap;
     };
 }

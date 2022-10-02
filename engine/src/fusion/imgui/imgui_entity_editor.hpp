@@ -36,7 +36,7 @@ namespace ImGui {
         using ComponentType = ENTT_ID_TYPE;
         ImGuiTextFilter componentFilter;
 
-        std::flat_map<ComponentType, ComponentInfo> componentInfos;
+        fst::unordered_flatmap<ComponentType, ComponentInfo> componentInfos;
 
         bool entityHasComponent(Registry& registry, EntityType& entity, ComponentType type) {
             const auto storage = registry.storage(type);
@@ -72,7 +72,7 @@ namespace ImGui {
         void Render(Registry& registry, EntityType& entity) {
             if (entity != entt::null) {
                 ImGuiStyle& style = ImGui::GetStyle();
-                std::flat_map<ComponentType, ComponentInfo> hasNot;
+                fst::unordered_flatmap<ComponentType, ComponentInfo> hasNot;
                 for (const auto& [component, info] : componentInfos) {
                     if (entityHasComponent(registry, entity, component)) {
                         ImGui::PushID(component);

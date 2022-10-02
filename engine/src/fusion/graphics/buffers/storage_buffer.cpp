@@ -39,6 +39,6 @@ VkDescriptorSetLayoutBinding StorageBuffer::GetDescriptorSetLayout(uint32_t bind
 	descriptorSetLayoutBinding.descriptorType = descriptorType;
 	descriptorSetLayoutBinding.descriptorCount = count;
 	descriptorSetLayoutBinding.stageFlags = stage;
-	descriptorSetLayoutBinding.pImmutableSamplers = nullptr;
+	descriptorSetLayoutBinding.pImmutableSamplers = VK_NULL_HANDLE;
 	return descriptorSetLayoutBinding;
 }

@@ -38,8 +38,9 @@ DeviceManager::DeviceManager() : fe::DeviceManager{} {
     // Get connected monitors
     int count;
     auto glfwMonitors = glfwGetMonitors(&count);
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         monitors.push_back(std::make_unique<Monitor>(glfwMonitors[i]));
+    }
 
     constexpr auto values = me::enum_values<fe::CursorStandard>();
     for (auto& cursor : values) {

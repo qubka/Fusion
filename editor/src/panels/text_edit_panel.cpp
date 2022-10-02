@@ -7,30 +7,15 @@
 
 using namespace fe;
 
-TextEditPanel::TextEditPanel(const fs::path& filepath, const std::function<void()>& callback, Editor* editor)
-        : path{filepath}
-        , callback{callback}
+TextEditPanel::TextEditPanel(fs::path filepath, std::function<void()> callback, Editor& editor)
+        : path{std::move(filepath)}
+        , callback{std::move(callback)}
         , EditorPanel{ICON_MDI_NOTE_TEXT "Text Editor###textedit", "TextEdit", editor}
 {
     textEditor.SetCustomIdentifiers({});
 
-    // T
     std::string extension{ FileSystem::GetExtension(path) };
-    /*if (extension == "lua") {
-        const auto& lang = ImGui::TextEditor::LanguageDefinition::Lua();
-        textEditor.SetLanguageDefinition(lang);
-
-        auto& customIdentifiers = LuaManager::GetIdentifiers();
-        ImGui::TextEditor::Identifiers identifiers;
-
-        for (auto& k: customIdentifiers) {
-            ImGui::TextEditor::Identifier id;
-            id.mDeclaration = "Engine function";
-            identifiers.insert(std::make_pair(k, id));
-        }
-
-        textEditor.SetCustomIdentifiers(identifiers);
-    }*/ if (extension == "cpp") {
+    if (extension == "cpp") {
         const auto& lang = ImGui::TextEditor::LanguageDefinition::CPlusPlus();
         textEditor.SetLanguageDefinition(lang);
     } else if (extension == "glsl" || extension == "vert" || extension == "frag" || extension == "comp" || extension == "tesc" || extension == "tese" || extension == "geom") {
@@ -128,7 +113,7 @@ void TextEditPanel::onImGui() {
 }
 
 void TextEditPanel::onClose() {
-    editor->removePanel(this);
+    editor.removePanel(this);
 }
 
 void TextEditPanel::setErrors(const std::map<int, std::string>& errors) {

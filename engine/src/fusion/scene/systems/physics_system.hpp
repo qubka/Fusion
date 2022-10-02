@@ -3,11 +3,11 @@
 #include "fusion/scene/system.hpp"
 #include "fusion/scene/components.hpp"
 
-#include <PxPhysics.h>
-#include <PxPhysicsAPI.h>
+//#include <PxPhysics.h>
+//#include <PxPhysicsAPI.h>
 
 namespace fe {
-    class PhysicsSystem final : public System, public physx::PxSimulationEventCallback {
+    class PhysicsSystem final : public System/*, public physx::PxSimulationEventCallback*/ {
     public:
         explicit PhysicsSystem(entt::registry& registry);
         ~PhysicsSystem() override;
@@ -20,7 +20,7 @@ namespace fe {
         void onDisabled() override {};
 
         // connect to events
-        void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) override {};
+       /* void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) override {};
         void onWake(physx::PxActor** actors, physx::PxU32 count) override {};
         void onSleep(physx::PxActor** actors, physx::PxU32 count) override {};
         void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override {};
@@ -36,6 +36,6 @@ namespace fe {
         static physx::PxPhysics* physics;
 
         physx::PxScene* scene;
-        physx::PxMaterial* defaultMaterial;
+        physx::PxMaterial* defaultMaterial;*/
     };
 }

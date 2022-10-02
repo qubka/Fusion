@@ -4,6 +4,7 @@
 #include "fusion/scene/scene_manager.hpp"
 #include "fusion/scene/components.hpp"
 #include "fusion/scene/scene.hpp"
+#include "fusion/graphics/graphics.hpp"
 
 using namespace fe;
 
@@ -18,15 +19,10 @@ MeshSubrender::MeshSubrender(Pipeline::Stage pipelineStage)
                        Vertex::Component::Normal,
                        Vertex::Component::Tangent,
                        Vertex::Component::Bitangent,
-                       Vertex::Component::UV,
                        Vertex::Component::UV
                    }}},
-                   {{"blinnPhongEnabled", true}}
-                   }
+                   {{"blinnPhongEnabled", true}}}
         , descriptorSet{pipeline} {
-    unknownDiffuse = std::make_unique<Texture2d>("engine/assets/textures/Diffuse.png");
-    unknownSpecular = std::make_unique<Texture2d>("engine/assets/textures/Diffuse_Spec.png");
-    unknownNormal = std::make_unique<Texture2d>("engine/assets/textures/Diffuse_Normal.png");
 }
 
 void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) {
@@ -44,29 +40,31 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
     std::vector<Light> lights(MAX_LIGHTS);
     uint32_t lightCount = 0;
 
-    auto view = registry.view<TransformComponent, LightComponent>();
+    {
+        auto view = registry.view<TransformComponent, LightComponent>();
 
-    for (const auto& [entity, transform, light] : view.each()) {
-        Light baseLight = {};
-        baseLight.position = transform.getWorldPosition();
-        if (light.type != LightComponent::LightType::Point) {
-            baseLight.direction = transform.getWorldDownDirection();
-        }
-        if (light.type == LightComponent::LightType::Spot) {
-            baseLight.cutOff = glm::cos(glm::radians(light.cutOff));
-            baseLight.outerCutOff = glm::cos(glm::radians(light.outerCutOff));
-        }
-        baseLight.ambient = light.ambient;
-        baseLight.diffuse = light.diffuse;
-        baseLight.specular = light.specular;
-        baseLight.constant = light.constant;
-        baseLight.linear = light.linear;
-        baseLight.quadratic = light.quadratic;
-        lights[lightCount] = baseLight;
-        lightCount++;
+        for (const auto& [entity, transform, light]: view.each()) {
+            Light baseLight = {};
+            baseLight.position = transform.getWorldPosition();
+            if (light.type != LightComponent::LightType::Point) {
+                baseLight.direction = transform.getWorldForwardDirection();
+            }
+            if (light.type == LightComponent::LightType::Spot) {
+                baseLight.cutOff = glm::cos(glm::radians(light.cutOff));
+                baseLight.outerCutOff = glm::cos(glm::radians(light.outerCutOff));
+            }
+            baseLight.ambient = light.ambient;
+            baseLight.diffuse = light.diffuse;
+            baseLight.specular = light.specular;
+            baseLight.constant = light.constant;
+            baseLight.linear = light.linear;
+            baseLight.quadratic = light.quadratic;
+            lights[lightCount] = baseLight;
+            lightCount++;
 
-        if (lightCount >= MAX_LIGHTS)
-            break;
+            if (lightCount >= MAX_LIGHTS)
+                break;
+        }
     }
 
     // Updates storage buffers.
@@ -79,10 +77,20 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
     uniformObject.push("cameraPos", camera->getEyePoint());
     uniformObject.push("lightsCount", lightCount);
     descriptorSet.push("UniformObject", uniformObject);
-    descriptorSet.push("samplerDiffuse", unknownDiffuse.get());
-    descriptorSet.push("samplerNormal", unknownNormal.get());
-    descriptorSet.push("samplerSpecular", unknownSpecular.get());
     //descriptorSet.push("PushObject", pushObject);
+
+    bindlessDescriptors.clear();
+
+    auto view = registry.view<MaterialComponent>();
+
+    float i = 0.0f;
+    for (const auto& [entity, material]: view.each()) {
+        if (material.diffuse && *material.diffuse) if (bindlessDescriptors.emplace(material.diffuse.get(), i).second) i++;
+        if (material.specular && *material.specular) if (bindlessDescriptors.emplace(material.specular.get(), i).second) i++;
+        if (material.normal && *material.normal) if (bindlessDescriptors.emplace(material.normal.get(), i).second) i++;
+    }
+
+    descriptorSet.push("textures", bindlessDescriptors.keys());
 
     if (!descriptorSet.update(pipeline))
         return;
@@ -90,24 +98,31 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
     // Draws the object
     pipeline.bindPipeline(commandBuffer);
     descriptorSet.bindDescriptor(commandBuffer, pipeline);
-    //pushObject.bindPush(commandBuffer, pipeline);
 
-    auto group = registry.group<MeshComponent>(entt::get<TransformComponent>);
+    auto group = registry.group<MeshComponent>(entt::get<TransformComponent, MaterialComponent>);
 
     group.sort([&registry](const entt::entity a, const entt::entity b) {
-        return registry.get<MeshComponent>(a).runtime < registry.get<MeshComponent>(b).runtime;
+        return registry.get<MeshComponent>(a).get() < registry.get<MeshComponent>(b).get();
     });
 
-    for (const auto& [entity, mesh, transform] : group.each()) {
-        if (!mesh.runtime)
+    for (const auto& [entity, mesh, transform, material] : group.each()) {
+        auto filter = mesh.get();
+        if (!filter)
             continue;
 
         pushObject.push("model", transform.getWorldMatrix());
-        pushObject.push("normal", glm::mat4{transform.getNormalMatrix()});
-        descriptorSet.push("PushObject", pushObject);
-        pushObject.bindPush(commandBuffer, pipeline);
 
-        mesh.runtime->cmdRender(commandBuffer);
+        glm::mat4 normal{ transform.getNormalMatrix() };
+        normal[0].w = material.diffuse && *material.diffuse ? bindlessDescriptors[material.diffuse.get()] : -1.0f;
+        normal[1].w = material.specular && *material.specular ? bindlessDescriptors[material.specular.get()] : -1.0f;
+        normal[2].w = material.normal && *material.normal ? bindlessDescriptors[material.normal.get()] : -1.0f;
+        normal[3] = glm::vec4{material.baseColor, material.shininess};
+        pushObject.push("normal", normal);
+
+        descriptorSet.push("PushObject", pushObject);
+
+        pushObject.bindPush(commandBuffer, pipeline);
+        filter->cmdRender(commandBuffer);
     }
 }
 
@@ -159,7 +174,6 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
  */
 
 // Simple 3
-
 /*
     auto scene = SceneManager::Get()->getScene();
     if (!scene)

@@ -180,7 +180,7 @@ namespace fe {
 
         template<typename T>
         void copyComponents(const entt::registry& src) {
-            auto view = src.view<const T>();
+            auto view = src.view<T>();
             for (const auto& [entity, component] : view.each()) {
                 registry.emplace_or_replace<T>(entity, component);
             }

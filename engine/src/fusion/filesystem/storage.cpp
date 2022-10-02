@@ -3,7 +3,7 @@
 using namespace fe;
 
 #if FUSION_PLATFORM_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 #if FUSION_PLATFORM_ANDROID

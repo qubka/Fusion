@@ -38,7 +38,6 @@ namespace fe {
          * @param paths The source files to load the pipeline shaders from.
          * @param vertexInputs The vertex inputs that will be used as a shaders input.
          * @param specConstants A map of specialization constants.
-         * @param bindlessSets
          * @param mode The mode this pipeline will run in.
          * @param depth The depth read/write that will be used.
          * @param topology The topology of the input assembly.
@@ -55,8 +54,7 @@ namespace fe {
         PipelineGraphics(Stage stage,
                          std::vector<fs::path>&& paths,
                          std::vector<Vertex::Input>&& vertexInputs = {},
-                         std::flat_map<std::string, Shader::SpecConstant>&& specConstants = {},
-                         std::vector<std::string>&& bindlessSets = {},
+                         fst::unordered_flatmap<std::string, Shader::SpecConstant>&& specConstants = {},
                          Mode mode = Mode::Polygon,
                          Depth depth = Depth::ReadWrite,
                          VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
@@ -100,7 +98,7 @@ namespace fe {
         const Stage& getStage() const { return stage; }
         const std::vector<fs::path>& getPaths() const { return paths; }
         const std::vector<Vertex::Input>& getVertexInputs() const { return vertexInputs; }
-        const std::flat_map<std::string, Shader::SpecConstant>& getSpecConstants() const { return specConstants; }
+        const fst::unordered_flatmap<std::string, Shader::SpecConstant>& getSpecConstants() const { return specConstants; }
         Mode getMode() const { return mode; }
         Depth getDepth() const { return depth; }
         VkPrimitiveTopology getTopology() const { return topology; }
@@ -108,6 +106,7 @@ namespace fe {
         VkCullModeFlags getCullMode() const { return cullMode; }
         VkFrontFace getFrontFace() const { return frontFace; }
         bool isPushDescriptors() const override { return pushDescriptors; }
+        bool isIndexedDescriptors() const override { return indexedDescriptors; }
         const Shader& getShader() const override { return shader; }
         const VkDescriptorSetLayout& getDescriptorSetLayout() const override { return descriptorSetLayout; }
         const VkPipeline& getPipeline() const override { return pipeline; }
@@ -126,8 +125,7 @@ namespace fe {
         Stage stage;
         std::vector<fs::path> paths;
         std::vector<Vertex::Input> vertexInputs;
-        std::flat_map<std::string, Shader::SpecConstant> specConstants;
-        std::vector<std::string> bindlessSets;
+        fst::unordered_flatmap<std::string, Shader::SpecConstant> specConstants;
         Mode mode;
         Depth depth;
         Blend blend;
@@ -142,6 +140,7 @@ namespace fe {
         float lineWidth;
         bool transparencyEnabled;
         bool pushDescriptors;
+        bool indexedDescriptors;
 
         Shader shader;
 

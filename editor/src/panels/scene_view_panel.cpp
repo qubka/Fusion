@@ -12,7 +12,7 @@
 
 using namespace fe;
 
-SceneViewPanel::SceneViewPanel(Editor* editor) : EditorPanel{ICON_MDI_GAMEPAD_VARIANT " Scene###scene", "Scene", editor} {
+SceneViewPanel::SceneViewPanel(Editor& editor) : EditorPanel{ICON_MDI_GAMEPAD_VARIANT " Scene###scene", "Scene", editor} {
     showComponentGizmosMap[type_id<LightComponent>] = true;
     showComponentGizmosMap[type_id<CameraComponent>] = true;
     //showComponentGizmosMap[type_id<SoundComponent>] = true;
@@ -45,7 +45,7 @@ void SceneViewPanel::onImGui() {
     viewportSize.x -= static_cast<int>(viewportSize.x) % 2 != 0 ? 1.0f : 0.0f;
     viewportSize.y -= static_cast<int>(viewportSize.y) % 2 != 0 ? 1.0f : 0.0f;
 
-    auto camera = editor->getCamera();
+    auto camera = editor.getCamera();
     if (!camera) {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
         drawList->AddRectFilled(viewportPos, viewportPos + viewportSize, IM_COL32(0, 0, 0, 255));
@@ -72,9 +72,9 @@ void SceneViewPanel::onImGui() {
     bool viewportHovered = ImGui::IsMouseHoveringRect(minBound, maxBound); // || Input::Get().getMouseMode() == MouseMode::Captured;
     bool viewportFocused = ImGui::IsWindowFocused();
 
-    editor->setSceneActive(viewportFocused && viewportHovered && !ImGuizmo::IsUsing());
-    editor->setSceneViewActive(viewportHovered);
-    editor->setSceneViewSize(viewportSize);
+    editor.setSceneActive(viewportFocused && viewportHovered && !ImGuizmo::IsUsing());
+    editor.setSceneViewActive(viewportHovered);
+    editor.setSceneViewSize(viewportSize);
 
     ImGuizmo::SetRect(viewportPos.x, viewportPos.y, viewportSize.x, viewportSize.y);
 
@@ -86,7 +86,7 @@ void SceneViewPanel::onImGui() {
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM", ImGuiDragDropFlags_AcceptNoDrawDefaultRect)) {
-            editor->fileOpenCallback(static_cast<const char*>(payload->Data));
+            editor.fileOpenCallback(static_cast<const char*>(payload->Data));
         }
         ImGui::EndDragDropTarget();
     }
@@ -95,7 +95,7 @@ void SceneViewPanel::onImGui() {
         if (viewportFocused && viewportHovered && !ImGuizmo::IsUsing() && Input::Get()->getMouseButtonDown(MouseButton::ButtonLeft)) {
             glm::vec2 position{ Input::Get()->getMousePosition() - minBound };
             Ray ray = camera->screenPointToRay(position, viewportSize, true);
-            editor->selectObject(ray, position);
+            editor.selectObject(ray, position);
         }
     }
 
@@ -111,10 +111,10 @@ void SceneViewPanel::drawToolBar() {
     bool selected = false;
 
     {
-        selected = editor->getSettings().gizmosOperation == UINT32_MAX;
+        selected = editor.getSettings().gizmosOperation == UINT32_MAX;
         ImGui::SameLine();
         if (ImGuiUtils::ToggleButton(ICON_MDI_CURSOR_DEFAULT, selected))
-            editor->getSettings().gizmosOperation = UINT32_MAX;
+            editor.getSettings().gizmosOperation = UINT32_MAX;
         ImGuiUtils::Tooltip("Select mode");
     }
 
@@ -123,26 +123,26 @@ void SceneViewPanel::drawToolBar() {
     ImGui::SameLine();
 
     {
-        selected = editor->getSettings().gizmosOperation == ImGuizmo::TRANSLATE;
+        selected = editor.getSettings().gizmosOperation == ImGuizmo::TRANSLATE;
         ImGui::SameLine();
         if (ImGuiUtils::ToggleButton(ICON_MDI_ARROW_ALL, selected))
-            editor->getSettings().gizmosOperation = ImGuizmo::TRANSLATE;
+            editor.getSettings().gizmosOperation = ImGuizmo::TRANSLATE;
         ImGuiUtils::Tooltip("Translation mode");
     }
 
     {
-        selected = editor->getSettings().gizmosOperation == ImGuizmo::ROTATE;
+        selected = editor.getSettings().gizmosOperation == ImGuizmo::ROTATE;
         ImGui::SameLine();
         if (ImGuiUtils::ToggleButton(ICON_MDI_ROTATE_3D, selected))
-            editor->getSettings().gizmosOperation = ImGuizmo::ROTATE;
+            editor.getSettings().gizmosOperation = ImGuizmo::ROTATE;
         ImGuiUtils::Tooltip("Rotatation mode");
     }
 
     {
-        selected = editor->getSettings().gizmosOperation == ImGuizmo::SCALE;
+        selected = editor.getSettings().gizmosOperation == ImGuizmo::SCALE;
         ImGui::SameLine();
         if (ImGuiUtils::ToggleButton(ICON_MDI_ARROW_EXPAND_ALL, selected))
-            editor->getSettings().gizmosOperation = ImGuizmo::SCALE;
+            editor.getSettings().gizmosOperation = ImGuizmo::SCALE;
         ImGuiUtils::Tooltip("Scaling mode");
     }
 
@@ -151,10 +151,10 @@ void SceneViewPanel::drawToolBar() {
     ImGui::SameLine();
 
     {
-        selected = editor->getSettings().gizmosOperation == ImGuizmo::UNIVERSAL;
+        selected = editor.getSettings().gizmosOperation == ImGuizmo::UNIVERSAL;
         ImGui::SameLine();
         if (ImGuiUtils::ToggleButton(ICON_MDI_CROP_ROTATE, selected))
-            editor->getSettings().gizmosOperation = ImGuizmo::UNIVERSAL;
+            editor.getSettings().gizmosOperation = ImGuizmo::UNIVERSAL;
         ImGuiUtils::Tooltip("Universal mode");
     }
 
@@ -163,10 +163,10 @@ void SceneViewPanel::drawToolBar() {
     ImGui::SameLine();
 
     {
-        selected = editor->getSettings().gizmosOperation == ImGuizmo::BOUNDS;
+        selected = editor.getSettings().gizmosOperation == ImGuizmo::BOUNDS;
         ImGui::SameLine();
         if (ImGuiUtils::ToggleButton(ICON_MDI_BORDER_NONE, selected))
-            editor->getSettings().gizmosOperation = ImGuizmo::BOUNDS;
+            editor.getSettings().gizmosOperation = ImGuizmo::BOUNDS;
         ImGuiUtils::Tooltip("Bounds mode");
     }
 
@@ -175,10 +175,10 @@ void SceneViewPanel::drawToolBar() {
     ImGui::SameLine();
 
     {
-        selected = editor->getSettings().snapGizmos;
+        selected = editor.getSettings().snapGizmos;
         ImGui::SameLine();
         if (ImGuiUtils::ToggleButton(ICON_MDI_MAGNET, selected))
-            editor->getSettings().snapGizmos = selected;
+            editor.getSettings().snapGizmos = selected;
         ImGuiUtils::Tooltip("Snap enable");
     }
 
@@ -187,10 +187,10 @@ void SceneViewPanel::drawToolBar() {
     ImGui::SameLine();
 
     {
-        selected = editor->getSettings().showGrid;
+        selected = editor.getSettings().showGrid;
         ImGui::SameLine();
         if (ImGuiUtils::ToggleButton(selected ? ICON_MDI_GRID : ICON_MDI_GRID_OFF, selected)) {
-            editor->getSettings().showGrid = selected;
+            editor.getSettings().showGrid = selected;
             Graphics::Get()->getRenderer()->getSubrender<GridSubrender>()->setEnabled(selected);
         }
         ImGuiUtils::Tooltip("Toggle visibility of the grid");
@@ -202,7 +202,7 @@ void SceneViewPanel::drawToolBar() {
 
     {
         // Editor Camera Modes
-        auto& camera = *editor->getCamera();
+        auto& camera = *editor.getCamera();
         bool ortho = camera.isOrthographic();
 
         selected = !ortho;
@@ -235,7 +235,7 @@ void SceneViewPanel::drawToolBar() {
     if (ImGui::BeginPopup("CameraPopup", ImGuiWindowFlags_AlwaysAutoResize)) {
         {
             // Editor Camera Settings
-            auto& camera = *editor->getCamera();
+            auto& camera = *editor.getCamera();
             bool ortho = camera.isOrthographic();
 
             ImGui::Dummy(ImVec2{200.0f, 0.0f});  // fix resize
@@ -281,7 +281,7 @@ void SceneViewPanel::drawToolBar() {
         ImGui::OpenPopup("GizmosPopup");
     if (ImGui::BeginPopup("GizmosPopup", ImGuiWindowFlags_AlwaysAutoResize)) {
         {
-            ImGui::Checkbox("Selected Gizmos", &editor->getSettings().showGizmos);
+            ImGui::Checkbox("Selected Gizmos", &editor.getSettings().showGizmos);
 
             ImGui::Separator();
             ImGui::Checkbox("Camera", reinterpret_cast<bool*>(&showComponentGizmosMap[type_id<CameraComponent>]));
@@ -290,141 +290,13 @@ void SceneViewPanel::drawToolBar() {
 
             ImGui::Separator();
 
-            auto& flags = editor->getSettings().debugDrawFlags;
+            auto& flags = editor.getSettings().debugDrawFlags;
 
             ImGui::CheckboxFlags("Mesh AABB", &flags, EditorDebugFlags::MeshBoundingBoxes);
             ImGui::CheckboxFlags("Sprite Box", &flags, EditorDebugFlags::SpriteBoxes);
             ImGui::CheckboxFlags("Camera Frustums", &flags, EditorDebugFlags::CameraFrustum);
 
             ImGui::Separator();
-
-            /*auto physics2D = Application::Get().GetSystem<B2PhysicsEngine>();
-
-            if (physics2D) {
-                uint32_t flags = physics2D->GetDebugDrawFlags();
-
-                bool show2DShapes = flags & b2Draw::e_shapeBit;
-                if (ImGui::Checkbox("Shapes (2D)", &show2DShapes)) {
-                    if (show2DShapes)
-                        flags += b2Draw::e_shapeBit;
-                    else
-                        flags -= b2Draw::e_shapeBit;
-                }
-
-                bool showCOG = flags & b2Draw::e_centerOfMassBit;
-                if (ImGui::Checkbox("Centre of Mass (2D)", &showCOG)) {
-                    if (showCOG)
-                        flags += b2Draw::e_centerOfMassBit;
-                    else
-                        flags -= b2Draw::e_centerOfMassBit;
-                }
-
-                bool showJoint = flags & b2Draw::e_jointBit;
-                if (ImGui::Checkbox("Joint Connection (2D)", &showJoint)) {
-                    if (showJoint)
-                        flags += b2Draw::e_jointBit;
-                    else
-                        flags -= b2Draw::e_jointBit;
-                }
-
-                bool showAABB = flags & b2Draw::e_aabbBit;
-                if (ImGui::Checkbox("AABB (2D)", &showAABB)) {
-                    if (showAABB)
-                        flags += b2Draw::e_aabbBit;
-                    else
-                        flags -= b2Draw::e_aabbBit;
-                }
-
-                bool showPairs = static_cast<bool>(flags & b2Draw::e_pairBit);
-                if (ImGui::Checkbox("Broadphase Pairs  (2D)", &showPairs)) {
-                    if (showPairs)
-                        flags += b2Draw::e_pairBit;
-                    else
-                        flags -= b2Draw::e_pairBit;
-                }
-
-                physics2D->SetDebugDrawFlags(flags);
-            }
-
-            auto physics3D = Application::Get().GetSystem<LumosPhysicsEngine>();
-
-            if (physics3D) {
-                uint32_t flags = physics3D->GetDebugDrawFlags();
-
-                bool showCollisionShapes = flags & PhysicsDebugFlags::COLLISIONVOLUMES;
-                if (ImGui::Checkbox("Collision Volumes", &showCollisionShapes)) {
-                    if (showCollisionShapes)
-                        flags += PhysicsDebugFlags::COLLISIONVOLUMES;
-                    else
-                        flags -= PhysicsDebugFlags::COLLISIONVOLUMES;
-                }
-
-                bool showConstraints = static_cast<bool>(flags & PhysicsDebugFlags::CONSTRAINT);
-                if (ImGui::Checkbox("Constraints", &showConstraints)) {
-                    if (showConstraints)
-                        flags += PhysicsDebugFlags::CONSTRAINT;
-                    else
-                        flags -= PhysicsDebugFlags::CONSTRAINT;
-                }
-
-                bool showManifolds = static_cast<bool>(flags & PhysicsDebugFlags::MANIFOLD);
-                if (ImGui::Checkbox("Manifolds", &showManifolds)) {
-                    if (showManifolds)
-                        flags += PhysicsDebugFlags::MANIFOLD;
-                    else
-                        flags -= PhysicsDebugFlags::MANIFOLD;
-                }
-
-                bool showCollisionNormals = flags & PhysicsDebugFlags::COLLISIONNORMALS;
-                if (ImGui::Checkbox("Collision Normals", &showCollisionNormals)) {
-                    if (showCollisionNormals)
-                        flags += PhysicsDebugFlags::COLLISIONNORMALS;
-                    else
-                        flags -= PhysicsDebugFlags::COLLISIONNORMALS;
-                }
-
-                bool showAABB = flags & PhysicsDebugFlags::AABB;
-                if (ImGui::Checkbox("AABB", &showAABB)) {
-                    if (showAABB)
-                        flags += PhysicsDebugFlags::AABB;
-                    else
-                        flags -= PhysicsDebugFlags::AABB;
-                }
-
-                bool showLinearVelocity = flags & PhysicsDebugFlags::LINEARVELOCITY;
-                if (ImGui::Checkbox("Linear Velocity", &showLinearVelocity)) {
-                    if (showLinearVelocity)
-                        flags += PhysicsDebugFlags::LINEARVELOCITY;
-                    else
-                        flags -= PhysicsDebugFlags::LINEARVELOCITY;
-                }
-
-                bool LINEARFORCE = flags & PhysicsDebugFlags::LINEARFORCE;
-                if (ImGui::Checkbox("Linear Force", &LINEARFORCE)) {
-                    if (LINEARFORCE)
-                        flags += PhysicsDebugFlags::LINEARFORCE;
-                    else
-                        flags -= PhysicsDebugFlags::LINEARFORCE;
-                }
-
-                bool BROADPHASE = flags & PhysicsDebugFlags::BROADPHASE;
-                if (ImGui::Checkbox("Broadphase", &BROADPHASE)) {
-                    if (BROADPHASE)
-                        flags += PhysicsDebugFlags::BROADPHASE;
-                    else
-                        flags -= PhysicsDebugFlags::BROADPHASE;
-                }
-
-                bool showPairs = flags & PhysicsDebugFlags::BROADPHASE_PAIRS;
-                if (ImGui::Checkbox("Broadphase Pairs", &showPairs)) {
-                    if (showPairs)
-                        flags += PhysicsDebugFlags::BROADPHASE_PAIRS;
-                    else
-                        flags -= PhysicsDebugFlags::BROADPHASE_PAIRS;
-                }
-
-                physics3D->SetDebugDrawFlags(flags);
-            }*/
 
             ImGui::EndPopup();
         }
@@ -435,57 +307,28 @@ void SceneViewPanel::drawToolBar() {
 }
 
 void SceneViewPanel::drawDebug(entt::registry& registry) {
-    if (!editor->getSettings().showGizmos)
+    if (!editor.getSettings().showGizmos)
         return;
 
     glm::vec4 selectedColour{0.9f};
 
-    if (editor->getSettings().debugDrawFlags & EditorDebugFlags::MeshBoundingBoxes) {
+    if (editor.getSettings().debugDrawFlags & EditorDebugFlags::MeshBoundingBoxes) {
         auto view = registry.view<TransformComponent, MeshComponent>();
 
         for (const auto& [entity, transform, mesh] : view.each()) {
-            if (!mesh.runtime)
+            auto filter = mesh.get();
+            if (!filter)
                 continue;
 
             const auto& worldTransform = transform.getWorldMatrix();
 
-            auto bbCopy = mesh.runtime->getBoundingBox().transformed(worldTransform);
+            auto bbCopy = filter->getBoundingBox().transformed(worldTransform);
 
             DebugRenderer::DebugDraw(bbCopy, selectedColour, true);
         }
     }
 
-    /*if (editor->getSettings().debugDrawFlags & EditorDebugFlags::SpriteBoxes) {
-        auto group = registry.group<Graphics::Sprite>(entt::get<Maths::Transform>);
-
-        for (auto entity: group) {
-            const auto& [sprite, trans] = group.get<Graphics::Sprite, Maths::Transform>(entity);
-
-            {
-                auto& worldTransform = trans.GetWorldMatrix();
-
-                auto bb = Maths::BoundingBox(Maths::Rect(sprite.GetPosition(), sprite.GetScale()));
-                bb.Transform(trans.GetWorldMatrix());
-                DebugRenderer::DebugDraw(bb, selectedColour, true);
-            }
-        }
-
-        auto animGroup = registry.group<Graphics::AnimatedSprite>(entt::get<Maths::Transform>);
-
-        for (auto entity: animGroup) {
-            const auto& [sprite, trans] = animGroup.get<Graphics::AnimatedSprite, Maths::Transform>(entity);
-
-            {
-                auto& worldTransform = trans.GetWorldMatrix();
-
-                auto bb = Maths::BoundingBox(Maths::Rect(sprite.GetPosition(), sprite.GetScale()));
-                bb.Transform(trans.GetWorldMatrix());
-                DebugRenderer::DebugDraw(bb, selectedColour, true);
-            }
-        }
-    }*/
-
-    if (editor->getSettings().debugDrawFlags & EditorDebugFlags::CameraFrustum) {
+    if (editor.getSettings().debugDrawFlags & EditorDebugFlags::CameraFrustum) {
         auto view = registry.view<TransformComponent, CameraComponent>();
 
         for (const auto& [entity, transform, camera] : view.each()) {
@@ -493,87 +336,57 @@ void SceneViewPanel::drawDebug(entt::registry& registry) {
         }
     }
 
-    auto selected = editor->getSelected();
+    auto selected = editor.getSelected();
     
-    if (registry.valid(selected)/* && editorState == EditorState::Preview*/) {
+    if (registry.valid(selected)) {
         auto [transform, mesh] = registry.try_get<TransformComponent, MeshComponent>(selected);
         if (transform && mesh) {
-            const auto& worldTransform = transform->getWorldMatrix();
+            if (auto filter = mesh->get()) {
+                const auto& worldTransform = transform->getWorldMatrix();
 
-            auto bbCopy = mesh->runtime->getBoundingBox().transformed(worldTransform);
+                auto bbCopy = filter->getBoundingBox().transformed(worldTransform);
 
-            DebugRenderer::DebugDraw(bbCopy, selectedColour, true);
-        }
-
-        /*auto sprite = registry.try_get<Graphics::Sprite>(selected);
-        if (transform && sprite) {
-            {
-                auto& worldTransform = transform->GetWorldMatrix();
-
-                auto bb = Maths::BoundingBox(Maths::Rect(sprite->GetPosition(), sprite->GetPosition() + sprite->GetScale()));
-                bb.Transform(worldTransform);
-                DebugRenderer::DebugDraw(bb, selectedColour, true);
+                DebugRenderer::DebugDraw(bbCopy, selectedColour, true);
             }
         }
 
-        auto animSprite = registry.try_get<Graphics::AnimatedSprite>(selected);
-        if (transform && animSprite) {
-            {
-                auto& worldTransform = transform->GetWorldMatrix();
-
-                auto bb = Maths::BoundingBox(Maths::Rect(animSprite->GetPosition(), animSprite->GetPosition() + animSprite->GetScale()));
-                bb.Transform(worldTransform);
-                DebugRenderer::DebugDraw(bb, selectedColour, true);
-            }
-        }*/
-
-        if (auto camera = registry.try_get<Camera>(selected)) {
+        if (auto camera = registry.try_get<CameraComponent>(selected)) {
             DebugRenderer::DebugDraw(camera->getFrustum(), selectedColour);
         }
 
-        /*auto light = registry.try_get<Graphics::Light>(selected);
+        auto light = registry.try_get<LightComponent>(selected);
         if (light && transform) {
-            DebugRenderer::DebugDraw(light, transform->GetWorldOrientation(), glm::vec4(glm::vec3(light->Colour), 0.2f));
-        }*/
-
-        /*if (auto sound = registry.try_get<SoundComponent>(selected)) {
-            DebugRenderer::DebugDraw(sound->getSoundNode(), glm::vec4{0.8f, 0.8f, 0.8f, 0.2f});
+            DebugRenderer::DebugDraw(*light, transform->getWorldPosition(), transform->getWorldOrientation(), transform->getWorldForwardDirection(), light->color);
         }
-
-        if (auto rigidbody = registry.try_get<RigidbodyComponent>(selected)) {
-            auto cs = phys3D->GetRigidBody()->GetCollisionShape();
-            if (cs)
-                cs->DebugDraw(phys3D->GetRigidBody().get());
-        }*/
     }
 }
 
 void SceneViewPanel::drawGizmo(entt::registry& registry) {
-    if (!editor->getSettings().showGizmos || editor->getSettings().gizmosOperation == UINT32_MAX)
+    if (!editor.getSettings().showGizmos || editor.getSettings().gizmosOperation == UINT32_MAX)
         return;
 
-    auto selected = editor->getSelected();
+    auto selected = editor.getSelected();
     if (!registry.valid(selected))
         return;
 
     if (auto transform = registry.try_get<TransformComponent>(selected)) {
-        auto camera = editor->getCamera();
+        auto camera = editor.getCamera();
         const glm::mat4& view = camera->getViewMatrix();
         const glm::mat4& proj = camera->getProjectionMatrix();
         glm::mat4 model = transform->getWorldMatrix();
         glm::mat4 delta{1};
 
-        auto gizmosType = static_cast<ImGuizmo::OPERATION>(editor->getSettings().gizmosOperation);
+        auto gizmosType = static_cast<ImGuizmo::OPERATION>(editor.getSettings().gizmosOperation);
 
         // Snapping
-        float snapValue = editor->getSettings().snapAmount; // Snap to 0.5m for translation/scale
+        float snapValue = editor.getSettings().snapAmount; // Snap to 0.5m for translation/scale
         if (gizmosType == ImGuizmo::ROTATE)
             snapValue = 45.0f;
         glm::vec3 snapValues{ snapValue };
 
         // Bounding
         auto bounds = gizmosType == ImGuizmo::BOUNDS;
-        glm::vec3 boundsSnap{ editor->getSettings().snapBound };  // Snap to 0.1m for bound change
+        glm::vec3 boundsSnap{ editor.getSettings().snapBound };  // Snap to 0.1m for bound change
         static glm::mat2x3 boundsValues = { glm::vec3{-1.0f}, glm::vec3{1.0f} };
 
         ImGuizmo::Manipulate(glm::value_ptr(view),
@@ -582,7 +395,7 @@ void SceneViewPanel::drawGizmo(entt::registry& registry) {
                              ImGuizmo::LOCAL,
                              glm::value_ptr(model),
                              glm::value_ptr(delta),
-                             editor->getSettings().snapGizmos ? glm::value_ptr(snapValues) : nullptr,
+                             editor.getSettings().snapGizmos ? glm::value_ptr(snapValues) : nullptr,
                              bounds ? glm::value_ptr(boundsValues) : nullptr,
                              bounds ? glm::value_ptr(boundsSnap) : nullptr);
 
@@ -612,18 +425,6 @@ void SceneViewPanel::drawGizmo(entt::registry& registry) {
                     break;
             }
         }
-
-        /*RigidBody2DComponent* rigidBody2DComponent = registry.try_get<RigidBody2DComponent>(selected);
-
-        if (rigidBody2DComponent) {
-            rigidBody2DComponent->GetRigidBody()->SetPosition( { model[3].x, model[3].y });
-        } else {
-            RigidBody3DComponent* rigidBody3DComponent = registry.try_get<RigidBody3DComponent>(selected);
-            if (rigidBody3DComponent) {
-                rigidBody3DComponent->GetRigidBody()->SetPosition(model[3]);
-                rigidBody3DComponent->GetRigidBody()->SetOrientation(glm::eulerAngles(glm::quat_cast((model)));
-            }
-        }*/
     }
 }
 
@@ -631,7 +432,7 @@ void SceneViewPanel::drawGizmo(entt::registry& registry) {
 #define DRAW_COMPONENT(ComponentType) hovered |= drawComponentGizmos<ComponentType>(registry, camera, coord, offset, #ComponentType);
 
 bool SceneViewPanel::drawComponent(entt::registry& registry, const glm::vec2& coord, const glm::vec2& offset) {
-    auto& camera = *editor->getCamera();
+    auto& camera = *editor.getCamera();
 
     bool hovered = false;
     DRAW_COMPONENT(LightComponent);

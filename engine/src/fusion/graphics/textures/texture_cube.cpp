@@ -1,5 +1,6 @@
 #include "texture_cube.hpp"
 
+#include "fusion/core/engine.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
@@ -10,8 +11,8 @@
 
 using namespace fe;
 
-TextureCube::TextureCube(const fs::path& filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
-        : Texture{filepath,
+TextureCube::TextureCube(fs::path filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
+        : Texture{std::move(filepath),
                   filter,
                   addressMode,
                   VK_SAMPLE_COUNT_1_BIT,
@@ -28,9 +29,8 @@ TextureCube::TextureCube(const fs::path& filepath, VkFilter filter, VkSamplerAdd
     if (!FileFormat::IsTextureStorageFile(path))
         throw std::runtime_error("Unsupported format for fast and single loading");
 
-    if (load) {
-        TextureCube::load();
-    }
+    if (load)
+        loadFromFile();
 }
 
 TextureCube::TextureCube(const glm::uvec2& extent, VkFormat format, VkImageLayout layout, VkImageUsageFlags usage, VkFilter filter,
@@ -91,16 +91,23 @@ void TextureCube::setPixels(const std::byte* pixels, uint32_t layerCount, uint32
 	CopyBufferToImage(bufferStaging, image, extent, layerCount, baseArrayLayer);
 }
 
-void TextureCube::load() {
+void TextureCube::loadFromFile() {
+    fs::path filepath{ Engine::Get()->getApp()->getRootPath() / path };
+
+    if (operator bool()) {
+        LOG_DEBUG << "TextureCube: \"" << filepath << "\" already was loaded";
+        return;
+    }
+
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
     std::unique_ptr<gli::texture_cube> texture;
-    FileSystem::ReadBytes(path, [&texture](std::span<const std::byte> buffer) {
+    FileSystem::ReadBytes(filepath, [&texture](std::span<const std::byte> buffer) {
         texture = std::make_unique<gli::texture_cube>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
     });
 #if FUSION_DEBUG
-    LOG_DEBUG << "TextureCube: \"" << path << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "TextureCube: \"" << filepath << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 
     const gli::texture_cube& texCube = *texture;

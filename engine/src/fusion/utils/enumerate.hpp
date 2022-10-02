@@ -11,7 +11,7 @@ namespace fe {
         struct iterator {
             size_t i;
             TIter it;
-            bool operator!=(const iterator& other) const { return it != other.it; }
+            bool operator!=(const iterator& rhs) const { return it != rhs.it; }
             void operator++() { ++i; ++it; }
             auto operator*() const { return std::tie(i, *it); }
         };

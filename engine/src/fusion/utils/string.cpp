@@ -1,8 +1,8 @@
 #include "string.hpp"
 
 #ifdef FUSION_PLATFORM_WINDOWS
-#include <Windows.h>
-#include <DbgHelp.h>
+#include <windows.h>
+#include <dbghelp.h>
 #else
 #include <cxxabi.h> // __cxa_demangle()
 #endif
@@ -16,7 +16,7 @@ std::string String::ConvertUtf8(std::wstring_view str) {
 }
 
 char String::ConvertUtf8(wchar_t c) {
-    return UTF8_TO_UTF16_CONVERTER.to_bytes(c)[0];
+    return UTF8_TO_UTF16_CONVERTER.to_bytes(c).front();
 }
 
 std::wstring String::ConvertUtf16(std::string_view str) {
@@ -24,7 +24,7 @@ std::wstring String::ConvertUtf16(std::string_view str) {
 }
 
 wchar_t String::ConvertUtf16(char c) {
-    return UTF8_TO_UTF16_CONVERTER.from_bytes(c)[0];
+    return UTF8_TO_UTF16_CONVERTER.from_bytes(c).front();
 }
 
 bool String::ConvertBool(std::string str) {
@@ -196,12 +196,14 @@ std::string String::Demangle(const std::string& str) {
         return {};
 
 #if FUSION_PLATFORM_WINDOWS
-    char undecorated_name[1024];
+    // TODO: Fix that
+    /*char undecorated_name[1024];
     if (!UnDecorateSymbolName(str.c_str(), undecorated_name, sizeof(undecorated_name), UNDNAME_COMPLETE)) {
         return str;
     } else {
         return std::string{undecorated_name};
-    }
+    }*/
+    return str;
 #else
     int status = -1;
     std::string demangled = abi::__cxa_demangle(str.c_str(), nullptr, nullptr, &status);

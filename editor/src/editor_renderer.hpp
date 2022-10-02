@@ -52,21 +52,21 @@ namespace fe {
 
     private:
         void onStart() override {
-            //addSubrender<AtmosphereSubrender>({0, 0});
             addSubrender<MeshSubrender>({0, 0});
             addSubrender<LightSubrender>({0, 0});
             addSubrender<DebugSubrender>({0, 0});
             addSubrender<GridSubrender>({0, 0});
-            //addSubrender<DeferredSubrender>({0, 1});
-            //addSubrender<DeferredSubrender>({0, 1});
-            //addSubrender<SkyboxSubrender>({0, 2});
 
+            addSubrender<MeshSubrender>({1, 0});
+            addSubrender<LightSubrender>({1, 0});
             //addSubrender<SkyboxSubrender>({1, 0});
+            //addSubrender<AtmosphereSubrender>({1, 0});
 
             addSubrender<ImGuiSubrender>({2, 0});
         }
 
         void onUpdate() override {
+
         }
     };
 }

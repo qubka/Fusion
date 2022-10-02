@@ -12,17 +12,17 @@ namespace fe {
          * Creates a new compute pipeline.
          * @param path The shader file that will be loaded.
          * @param specConstants A map of specialization constants.
-         * @param bindlessSets
          * @param pushDescriptors If no actual descriptor sets are allocated but instead pushed.
          */
-        explicit PipelineCompute(fs::path&& path, std::flat_map<std::string, Shader::SpecConstant>&& specConstants = {}, std::vector<std::string>&& bindlessSets = {}, bool pushDescriptors = false);
+        explicit PipelineCompute(fs::path&& path, fst::unordered_flatmap<std::string, Shader::SpecConstant>&& specConstants = {}, bool pushDescriptors = false);
         ~PipelineCompute() override;
 
         void cmdRender(const CommandBuffer& commandBuffer, const glm::uvec2& extent) const;
 
         const fs::path& getPath() const { return path; }
-        const std::flat_map<std::string, Shader::SpecConstant>& getSpecConstants() const { return specConstants; }
+        const fst::unordered_flatmap<std::string, Shader::SpecConstant>& getSpecConstants() const { return specConstants; }
         bool isPushDescriptors() const override { return pushDescriptors; }
+        bool isIndexedDescriptors() const override { return false; }
         const Shader& getShader() const override { return shader; }
         const VkDescriptorSetLayout& getDescriptorSetLayout() const override { return descriptorSetLayout; }
         const VkPipeline& getPipeline() const override { return pipeline; }
@@ -36,8 +36,7 @@ namespace fe {
         void createPipelineCompute();
 
         fs::path path;
-        std::flat_map<std::string, Shader::SpecConstant> specConstants;
-        std::vector<std::string> bindlessSets;
+        fst::unordered_flatmap<std::string, Shader::SpecConstant> specConstants;
         bool pushDescriptors;
 
         Shader shader;

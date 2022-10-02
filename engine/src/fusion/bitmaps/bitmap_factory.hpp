@@ -9,7 +9,7 @@ namespace fe {
     public:
         using TLoadMethod = std::function<void(Base&, const fs::path&)>;
         using TWriteMethod = std::function<void(const Base&, const fs::path&)>;
-        using TRegistryMap = std::flat_map<std::string, std::pair<TLoadMethod, TWriteMethod>>;
+        using TRegistryMap = std::unordered_map<std::string, std::pair<TLoadMethod, TWriteMethod>>;
 
         //BitmapFactory() = default;
         virtual ~BitmapFactory() = default;

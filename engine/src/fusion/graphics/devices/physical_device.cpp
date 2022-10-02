@@ -77,8 +77,10 @@ uint32_t PhysicalDevice::ScorePhysicalDevice(VkPhysicalDevice device) {
         }
 
         // Returns a score of 0 if this device is missing a required extension
-        if (!extensionFound)
+        if (!extensionFound) {
+            LOG_ERROR << "Extension \"" << currentExtension << "\" wasn't found";
             return 0;
+        }
     }
 
     // Obtain the device features and properties of the current device being rateds
@@ -223,10 +225,23 @@ void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalD
     };
     ss << "API Version: " << supportedVersion[0] << '.' << supportedVersion[1] << '.' << supportedVersion[2] << '\n';
 
+    LOG_DEBUG << ss.str();
+
+    ss.str("");
+
     ss << "Extensions: ";
-    for (const auto& extension : extensionProperties)
+
+    int i = 0;
+    for (const auto& extension : extensionProperties) {
         ss << extension.extensionName << ", ";
 
-    ss << "\n\n";
-    LOG_DEBUG << ss.str();
+        // Limit print
+        if (i > 50) {
+            LOG_DEBUG << ss.str();
+            ss.str("");
+            i = 0;
+        }
+
+        i++;
+    }
 }

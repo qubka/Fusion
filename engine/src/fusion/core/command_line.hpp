@@ -6,11 +6,11 @@ namespace fe {
         CommandLineArgs() = default;
         CommandLineArgs(int count, char** args);
 
-        const std::string& operator[](size_t index) const;
+        //const std::string& operator[](size_t index) const;
         std::optional<std::string> getParameter(const std::string& name) const;
 
     private:
-        std::flat_map<std::string, std::string> arguments;
+        fst::unordered_flatmap<std::string, std::string> arguments;
     };
 
     class CommandLineParser {
@@ -35,6 +35,6 @@ namespace fe {
             bool hasValue{ false };
             bool set{ false };
         };
-        std::flat_map<std::string, CommandLineOption> options;
+        fst::unordered_flatmap<std::string, CommandLineOption> options;
     };
 }

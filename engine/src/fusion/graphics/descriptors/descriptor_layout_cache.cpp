@@ -55,22 +55,13 @@ VkDescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(const VkDesc
     }
 }
 
-bool DescriptorLayoutCache::DescriptorLayoutInfo::operator==(const DescriptorLayoutInfo& other) const {
-    if (other.flags != flags || other.bindings.size() != bindings.size()) {
+bool DescriptorLayoutCache::DescriptorLayoutInfo::operator==(const DescriptorLayoutInfo& rhs) const {
+    if (rhs.flags != flags || rhs.bindings.size() != bindings.size()) {
         return false;
     } else {
         // Compare each of the bindings is the same. Bindings are sorted so they will match
-        for (int i = 0; i < bindings.size(); i++) {
-            if (other.bindings[i].binding != bindings[i].binding) {
-                return false;
-            }
-            if (other.bindings[i].descriptorType != bindings[i].descriptorType) {
-                return false;
-            }
-            if (other.bindings[i].descriptorCount != bindings[i].descriptorCount) {
-                return false;
-            }
-            if (other.bindings[i].stageFlags != bindings[i].stageFlags) {
+        for (const auto& [i, binding] : enumerate(bindings)) {
+            if (rhs.bindings[i] != binding) {
                 return false;
             }
         }

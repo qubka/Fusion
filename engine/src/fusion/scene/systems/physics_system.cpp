@@ -3,18 +3,18 @@
 #include "fusion/scene/scene_manager.hpp"
 
 using namespace fe;
-using namespace physx;
+/*using namespace physx;
 
 PxDefaultAllocator PhysicsSystem::defaultAllocatorCallback{};
 PxDefaultErrorCallback PhysicsSystem::defaultErrorCallback{};
 PxFoundation* PhysicsSystem::foundation = nullptr;
 PxDefaultCpuDispatcher* PhysicsSystem::dispatcher = nullptr;
 PxPhysics* PhysicsSystem::physics = nullptr;
-PxPvd* PhysicsSystem::pvd = nullptr;
+PxPvd* PhysicsSystem::pvd = nullptr;*/
 
 PhysicsSystem::PhysicsSystem(entt::registry& registry) : System{registry} {
     // init physx
-    if (!foundation) {
+    /*if (!foundation) {
         foundation = PxCreateFoundation(PX_PHYSICS_VERSION, defaultAllocatorCallback, defaultErrorCallback);
         if (!foundation) throw std::runtime_error("Failed to create PhysX foundation!");
         pvd = PxCreatePvd(*foundation);
@@ -40,16 +40,16 @@ PhysicsSystem::PhysicsSystem(entt::registry& registry) : System{registry} {
         pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
     }
 
-    defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
+    defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);*/
 }
 
 PhysicsSystem::~PhysicsSystem() {
-    scene->release();
-    defaultMaterial->release();
+    //scene->release();
+    //defaultMaterial->release();
 }
 
 void PhysicsSystem::onPlay() {
-    auto view = registry.view<TransformComponent, RigidbodyComponent>();
+    /*auto view = registry.view<TransformComponent, RigidbodyComponent>();
     for (auto [entity, transform, rigidbody] : view.each()) {
         auto position = transform.getWorldPosition();
         auto rotation = transform.getWorldOrientation();
@@ -129,12 +129,12 @@ void PhysicsSystem::onPlay() {
             collider->runtime = shape;
         }
 
-        /*if (auto collider = world.try_get<MeshColliderComponent>(entity)) {
-        }*/
+        if (auto collider = world.try_get<MeshColliderComponent>(entity)) {
+        }
 
         rigidbody.runtime = body;
         scene->addActor(*body);
-    }
+    }*/
 }
 
 void PhysicsSystem::onStop() {
@@ -142,7 +142,7 @@ void PhysicsSystem::onStop() {
 }
 
 void PhysicsSystem::onUpdate() {
-    if (!SceneManager::Get()->getScene()->isRuntime())
+    /*if (!SceneManager::Get()->getScene()->isRuntime())
         return;
 
     // Physics
@@ -161,5 +161,5 @@ void PhysicsSystem::onUpdate() {
             transform.setLocalPosition({t.p.x, t.p.y, t.p.z});
             transform.setLocalOrientation({ t.q.w, t.q.x, t.q.y, t.q.z });
         }
-    }
+    }*/
 }

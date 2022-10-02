@@ -1,5 +1,6 @@
 #include "texture2d_array.hpp"
 
+#include "fusion/core/engine.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
@@ -10,8 +11,8 @@
 
 using namespace fe;
 
-Texture2dArray::Texture2dArray(const fs::path& filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
-        : Texture{filepath,
+Texture2dArray::Texture2dArray(fs::path filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
+        : Texture{std::move(filepath),
                   filter,
                   addressMode,
                   VK_SAMPLE_COUNT_1_BIT,
@@ -28,9 +29,8 @@ Texture2dArray::Texture2dArray(const fs::path& filepath, VkFilter filter, VkSamp
     if (!FileFormat::IsTextureStorageFile(path))
         throw std::runtime_error("Unsupported format for fast and single loading");
 
-    if (load) {
-        Texture2dArray::load();
-    }
+    if (load)
+        loadFromFile();
 }
 
 Texture2dArray::Texture2dArray(const glm::uvec2& extent, uint32_t arrayLayers, VkFormat format, VkImageLayout layout,
@@ -76,16 +76,23 @@ void Texture2dArray::setPixels(const float* pixels, uint32_t arrayLayer) {
 	CopyBufferToImage(bufferStaging, image, extent, 1, arrayLayer);
 }
 
-void Texture2dArray::load() {
+void Texture2dArray::loadFromFile() {
+    fs::path filepath{ Engine::Get()->getApp()->getRootPath() / path };
+
+    if (operator bool()) {
+        LOG_DEBUG << "Texture2dArray: \"" << filepath << "\" already was loaded";
+        return;
+    }
+
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
     std::unique_ptr<gli::texture2d_array> texture;
-    FileSystem::ReadBytes(path, [&texture](std::span<const std::byte> buffer) {
+    FileSystem::ReadBytes(filepath, [&texture](std::span<const std::byte> buffer) {
         texture = std::make_unique<gli::texture2d_array>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
     });
 #if FUSION_DEBUG
-    LOG_DEBUG << "Texture2dArray: \"" << path << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    LOG_DEBUG << "Texture2dArray: \"" << filepath << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
 
     const gli::texture2d_array& tex2DArray = *texture;

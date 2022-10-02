@@ -20,26 +20,30 @@ namespace fe {
         uint32_t size;
     };
 
+    class Descriptor;
+
     class WriteDescriptorSet {
     public:
         WriteDescriptorSet(const VkWriteDescriptorSet& writeDescriptorSet, const VkDescriptorImageInfo& imageInfo)
-            : writeDescriptorSet{writeDescriptorSet}
-            , imageInfo{std::make_unique<VkDescriptorImageInfo>(imageInfo)} {
-            this->writeDescriptorSet.pImageInfo = this->imageInfo.get();
+                : writeDescriptorSet{writeDescriptorSet}
+                , imageInfos{imageInfo} {
+            this->writeDescriptorSet.pImageInfo = imageInfos.data();
         }
 
         WriteDescriptorSet(const VkWriteDescriptorSet& writeDescriptorSet, const VkDescriptorBufferInfo& bufferInfo)
-            : writeDescriptorSet{writeDescriptorSet}
-            , bufferInfo{std::make_unique<VkDescriptorBufferInfo>(bufferInfo)} {
-            this->writeDescriptorSet.pBufferInfo = this->bufferInfo.get();
+                : writeDescriptorSet{writeDescriptorSet}
+                , bufferInfos{bufferInfo} {
+            this->writeDescriptorSet.pBufferInfo = bufferInfos.data();
         }
+
+        WriteDescriptorSet(const VkWriteDescriptorSet& writeDescriptorSet, const std::vector<const Descriptor*>& descriptors);
 
         const VkWriteDescriptorSet& getWriteDescriptorSet() const { return writeDescriptorSet; }
 
     private:
         VkWriteDescriptorSet writeDescriptorSet;
-        std::unique_ptr<VkDescriptorImageInfo> imageInfo;
-        std::unique_ptr<VkDescriptorBufferInfo> bufferInfo;
+        std::vector<VkDescriptorImageInfo> imageInfos;
+        std::vector<VkDescriptorBufferInfo> bufferInfos;
     };
 
     class Descriptor {

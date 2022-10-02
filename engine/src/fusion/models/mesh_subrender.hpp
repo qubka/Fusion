@@ -15,11 +15,11 @@ namespace fe {
         ~MeshSubrender() override = default;
 
     private:
-        struct MEM_ALIGN Light {
+        struct/* MEM_ALIGN*/ Light {
             glm::vec3 position{ 0.0f };
             float cutOff{ 0.0f };
-            glm::vec3 direction{ 0.0f};
-            float outerCutOff{ 0.0f};
+            glm::vec3 direction{ 0.0f };
+            float outerCutOff{ 0.0f };
             glm::vec3 ambient{ 0.0f };
             float constant{ 0.0f };
             glm::vec3 diffuse{ 0.0f };
@@ -36,9 +36,9 @@ namespace fe {
         UniformHandler uniformObject;
         UniformHandler uniformScene;
         StorageHandler storageLights;
-        std::unique_ptr<Texture2d> unknownDiffuse;
-        std::unique_ptr<Texture2d> unknownSpecular;
-        std::unique_ptr<Texture2d> unknownNormal;
+
         PushHandler pushObject;
+
+        fst::unordered_split_flatmap<const Descriptor*, float> bindlessDescriptors;
     };
 }

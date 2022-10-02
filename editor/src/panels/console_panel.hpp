@@ -18,7 +18,7 @@ namespace fe {
     public:
         class Message {
         public:
-            explicit Message(const std::string& message, MessageLevel level, const std::string& source = "");
+            explicit Message(std::string  message, MessageLevel level, std::string  source = "");
             ~Message();
 
             void onImGui();
@@ -39,7 +39,7 @@ namespace fe {
         };
 
     public:
-        explicit ConsolePanel(Editor* editor);
+        explicit ConsolePanel(Editor& editor);
         ~ConsolePanel() override;
 
         void onImGui() override;

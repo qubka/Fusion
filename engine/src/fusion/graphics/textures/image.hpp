@@ -10,6 +10,8 @@ namespace fe {
      */
     class Image : public Descriptor {
     public:
+        Image() = default;
+
         /**
          * Creates a new image object.
          * @param filter The magnification/minification filter to apply to lookups.
@@ -168,6 +170,26 @@ namespace fe {
                 VkImageLayout srcImageLayout,
                 uint32_t mipLevel,
                 uint32_t arrayLayer);
+
+        /*bool operator==(const Image& rhs) const {
+            return extent == rhs.extent &&
+                   samples == rhs.samples &&
+                   usage == rhs.usage &&
+                   format == rhs.format &&
+                   filter == rhs.filter &&
+                   addressMode == rhs.addressMode &&
+                   viewType == rhs.viewType &&
+                   aspect == rhs.aspect &&
+                   layout == rhs.layout &&
+                   image == rhs.image &&
+                   memory == rhs.memory &&
+                   sampler == rhs.sampler &&
+                   view == rhs.view;
+        }
+
+        bool operator!=(const Image& rhs) const {
+            return !operator==(rhs);
+        }*/
 
     private:
         static VkPipelineStageFlags AccessFlagsToPipelineStage(VkAccessFlags accessFlags, VkPipelineStageFlags stageFlags);

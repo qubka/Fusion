@@ -5,8 +5,8 @@
 namespace fe {
     class ProjectSettingsPanel : public EditorPanel {
     public:
-        ProjectSettingsPanel(Editor* editor);
-        ~ProjectSettingsPanel();
+        explicit ProjectSettingsPanel(Editor& editor);
+        ~ProjectSettingsPanel() override;
 
         void onImGui() override;
 

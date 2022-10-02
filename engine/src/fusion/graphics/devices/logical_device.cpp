@@ -9,9 +9,9 @@ using namespace fe;
 
 const std::vector<const char*> LogicalDevice::DeviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
+        //VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME,
+        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
 };
-// VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME
 
 LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& physicalDevice) : instance{instance}, physicalDevice{physicalDevice} {
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -24,14 +24,16 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
         queueCreateInfo.pQueuePriorities = &queuePriority;
     }
 
-    VkPhysicalDeviceDescriptorIndexingFeatures indexingFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, nullptr };
-    VkPhysicalDeviceFeatures2 deviceFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &indexingFeatures };
-    vkGetPhysicalDeviceFeatures2(physicalDevice, &deviceFeatures);
-    bool bindlessSupported = indexingFeatures.descriptorBindingPartiallyBound && indexingFeatures.runtimeDescriptorArray;
-    if (!bindlessSupported)
-        throw std::runtime_error("GPU is not support bindless ");
+    enabledFeatures = physicalDevice.getFeatures();
 
-    enabledFeatures = deviceFeatures.features;
+    // Enable required extension features
+    physicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+    physicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
+    physicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount = VK_TRUE;
+    physicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound = VK_TRUE;
+    physicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+    physicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
+    void* pNextChain = &physicalDeviceDescriptorIndexingFeatures;
 
     /// TODO: Rework that to allow user to change enable features
     {
@@ -109,8 +111,16 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
         deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(Instance::ValidationLayers.size());
         deviceCreateInfo.ppEnabledLayerNames = Instance::ValidationLayers.data();
     }
-    //deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
-    deviceCreateInfo.pNext = &deviceFeatures;
+
+    if (pNextChain) {
+        VkPhysicalDeviceFeatures2 physicalDeviceFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
+        physicalDeviceFeatures2.features = enabledFeatures;
+        physicalDeviceFeatures2.pNext = pNextChain;
+        deviceCreateInfo.pEnabledFeatures = VK_NULL_HANDLE;
+        deviceCreateInfo.pNext = &physicalDeviceFeatures2;
+    } else {
+        deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+    }
     VK_CHECK(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice));
 
     volkLoadDevice(logicalDevice);

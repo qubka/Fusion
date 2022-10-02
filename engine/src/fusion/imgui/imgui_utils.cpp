@@ -58,7 +58,7 @@ void PropertyText(const char* name, const char* value) {
     ImGui::NextColumn();
 }
 
-bool PropertyDropdown(const char* name,std::span<const char*> options, int32_t& selected) {
+bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t& selected) {
     bool updated = false;
 
     //ImGui::AlignTextToFramePadding();
@@ -71,10 +71,10 @@ bool PropertyDropdown(const char* name,std::span<const char*> options, int32_t& 
     const char* current = options[selected];
 
     if (ImGui::BeginCombo("", current)) {
-        for (int i = 0; i < options.size(); i++) {
-            const bool is_selected = (current == options[i]);
-            if (ImGui::Selectable(options[i], is_selected)) {
-                current = options[i];
+        for (const auto& [i, option] : enumerate(options)) {
+            const bool is_selected = (current == option);
+            if (ImGui::Selectable(option, is_selected)) {
+                current = option;
                 selected = i;
                 updated = true;
             }
@@ -516,8 +516,6 @@ void AlternatingRowsBackground(float lineHeight) {
 }
 
 void SetTheme(Theme theme) {
-    static const float max = 255.0f;
-
     ImGuiStyle& style = ImGui::GetStyle();
     ImVec4* colors = style.Colors;
 
@@ -583,9 +581,9 @@ void SetTheme(Theme theme) {
     else if (theme == Theme::Dark)
     {
         ImGui::StyleColorsDark();
-        ImVec4 Titlebar{ 40.0f / max, 42.0f / max, 54.0f / max, 1.0f };
-        ImVec4 TabActive{ 52.0f / max, 54.0f / max, 64.0f / max, 1.0f };
-        ImVec4 TabUnactive{ 35.0f / max, 43.0f / max, 59.0f / max, 1.0f };
+        ImVec4 Titlebar{ 40.0f / 255.0f, 42.0f / 255.0f, 54.0f / 255.0f, 1.0f };
+        ImVec4 TabActive{ 52.0f / 255.0f, 54.0f / 255.0f, 64.0f / 255.0f, 1.0f };
+        ImVec4 TabUnactive{ 35.0f / 255.0f, 43.0f / 255.0f, 59.0f / 255.0f, 1.0f };
 
         colors[ImGuiCol_Text] = ImVec4{ 200.0f / 255.0f, 200.0f / 255.0f, 200.0f / 255.0f, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ 0.36f, 0.42f, 0.47f, 1.00f };
@@ -893,9 +891,9 @@ void SetTheme(Theme theme) {
     {
         ImGui::StyleColorsDark();
 
-        ImVec4 Titlebar = ImVec4{ 36.0f / max, 38.0f / max, 48.0f / max, 1.0f };
-        ImVec4 TabActive = ImVec4{ 40.0f / max, 42.0f / max, 54.0f / max, 1.0f };
-        ImVec4 TabUnactive = ImVec4{ 35.0f / max, 43.0f / max, 59.0f / max, 1.0f };
+        ImVec4 Titlebar = ImVec4{ 36.0f / 255.0f, 38.0f / 255.0f, 48.0f / 255.0f, 1.0f };
+        ImVec4 TabActive = ImVec4{ 40.0f / 255.0f, 42.0f / 255.0f, 54.0f / 255.0f, 1.0f };
+        ImVec4 TabUnactive = ImVec4{ 35.0f / 255.0f, 43.0f / 255.0f, 59.0f / 255.0f, 1.0f };
 
         colors[ImGuiCol_Text] = ImVec4{ 159.0f / 255.0f, 159.0f / 255.0f, 163.0f / 255.0f, 1.00f };
         colors[ImGuiCol_TextDisabled] = ImVec4{ 0.36f, 0.42f, 0.47f, 1.00f };

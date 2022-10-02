@@ -5,6 +5,7 @@
 #include "fusion/graphics/pipelines/shader.hpp"
 
 namespace fe {
+    class Image;
     class UniformHandler;
     class StorageHandler;
     class PushHandler;
@@ -24,20 +25,18 @@ namespace fe {
             // Finds the local value given to the descriptor name
             if (auto it = descriptors.find(descriptorName); it != descriptors.end()) {
                 // If the descriptor and size have not changed then the write is not modified
-                if (it->second.descriptor == descriptor && it->second.offsetSize == offsetSize) {
+                if (it->second.descriptors.front() == descriptor && it->second.offsetSize == offsetSize) {
                     return;
                 }
                 descriptors.erase(it);
             }
 
             // Only non-null descriptors can be mapped
-            if (!descriptor) {
+            if (!descriptor)
                 return;
-            }
 
             // When adding the descriptor find the location in the shader
             auto location = shader->getDescriptorLocation(descriptorName);
-
             if (!location) {
     #if FUSION_DEBUG
                 if (shader->reportedNotFound(descriptorName, true)) {
@@ -48,7 +47,6 @@ namespace fe {
             }
 
             auto descriptorType = shader->getDescriptorType(*location);
-
             if (!descriptorType) {
     #if FUSION_DEBUG
                 if (shader->reportedNotFound(descriptorName, true)) {
@@ -60,7 +58,59 @@ namespace fe {
 
             // Adds the new descriptor value
             auto writeDescriptor = descriptor->getWriteDescriptor(*location, *descriptorType, offsetSize);
-            descriptors.emplace(descriptorName, DescriptorValue{descriptor, std::move(writeDescriptor), offsetSize, *location});
+            descriptors.emplace(descriptorName, DescriptorValue{std::vector{reinterpret_cast<const Descriptor*>(descriptor)}, std::move(writeDescriptor), offsetSize, *location});
+            changed = true;
+        }
+
+        template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Descriptor*>>>
+        void push(const std::string& descriptorName, const std::vector<const T*>& descriptor) {
+            if (!shader)
+                return;
+
+            // Finds the local value given to the descriptor name
+            if (auto it = descriptors.find(descriptorName); it != descriptors.end()) {
+                // If the descriptor and size have not changed then the write is not modified
+                if (it->second.descriptors.size() == descriptor.size() && it->second.descriptors == descriptor) {
+                    return;
+                }
+                descriptors.erase(it);
+            }
+
+            // Only non-null descriptors can be mapped
+            if (descriptors.empty())
+                return;
+
+            // When adding the descriptor find the location in the shader
+            auto location = shader->getDescriptorLocation(descriptorName);
+            if (!location) {
+#if FUSION_DEBUG
+                if (shader->reportedNotFound(descriptorName, true)) {
+                    LOG_ERROR << "Could not find descriptor in shader \"" << shader->getName() << "\" of name \"" << descriptorName << "\"";
+                }
+#endif
+                return;
+            }
+
+            auto descriptorType = shader->getDescriptorType(*location);
+            if (!descriptorType) {
+#if FUSION_DEBUG
+                if (shader->reportedNotFound(descriptorName, true)) {
+                    LOG_ERROR << "Could not find descriptor in shader \"" << shader->getName() << "\" of name \"" << descriptorName << "\" at location " << *location;
+                }
+#endif
+                return;
+            }
+
+            //auto writeDescriptor = descriptor->getWriteDescriptor(*location, *descriptorType, offsetSize);
+            VkWriteDescriptorSet descriptorWrite = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
+            descriptorWrite.dstSet = VK_NULL_HANDLE; // Will be set in the descriptor handler.
+            descriptorWrite.dstBinding = *location;
+            descriptorWrite.dstArrayElement = 0;
+            //descriptorWrite.descriptorCount = 1;
+            descriptorWrite.descriptorType = *descriptorType;
+            //descriptorWrite.pImageInfo = &imageInfo;
+
+            descriptors.emplace(descriptorName, DescriptorValue{descriptor, WriteDescriptorSet{descriptorWrite, descriptor}, std::nullopt, *location});
             changed = true;
         }
 
@@ -70,9 +120,16 @@ namespace fe {
                 return;
 
             auto location = shader->getDescriptorLocation(descriptorName);
+            if (!location) {
+#if FUSION_DEBUG
+                if (shader->reportedNotFound(descriptorName, true)) {
+                    LOG_ERROR << "Could not find descriptor in shader \"" << shader->getName() << "\" of name \"" << descriptorName << "\"";
+                }
+#endif
+                return;
+            }
 
-            descriptors[descriptorName] = DescriptorValue{descriptor, std::move(writeDescriptorSet), std::nullopt, *location};
-
+            descriptors[descriptorName] = DescriptorValue{std::vector{reinterpret_cast<const Descriptor*>(descriptor)}, std::move(writeDescriptorSet), std::nullopt, *location};
             changed = true;
         }
 
@@ -88,7 +145,7 @@ namespace fe {
 
     private:
         struct DescriptorValue {
-            const Descriptor* descriptor;
+            std::vector<const Descriptor*> descriptors;
             WriteDescriptorSet writeDescriptor;
             std::optional<OffsetSize> offsetSize;
             uint32_t location;
@@ -96,9 +153,8 @@ namespace fe {
 
         const Shader* shader{ nullptr };
         std::unique_ptr<DescriptorSet> descriptorSet;
-        std::flat_map<std::string, DescriptorValue> descriptors;
+        fst::unordered_flatmap<std::string, DescriptorValue> descriptors;
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
-        bool pushDescriptors{ false };
         bool changed{ false };
     };
 }

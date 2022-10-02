@@ -24,7 +24,7 @@ ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
         , pipeline{pipelineStage,
                    {"engine/assets/shaders/imgui/imgui.vert", "engine/assets/shaders/imgui/imgui.frag"},
                    {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}},
-                   {}, {},
+                   {},
                    PipelineGraphics::Mode::Polygon,
                    PipelineGraphics::Depth::None,
                    VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
@@ -117,19 +117,6 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
     if (size.x <= 0 || size.y <= 0)
         return;
 
-    // Updates descriptors
-    {
-        for (int i = 0; i < drawData->CmdListsCount; i++) {
-            const ImDrawList* cmdLists = drawData->CmdLists[i];
-            for (const auto& cmd : cmdLists->CmdBuffer) {
-                if (auto texture = static_cast<Texture*>(cmd.TextureId)) {
-                    //texture->transitionImage(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, commandBuffer);
-                    descriptorImageInfos[cmd.TextureId] = &texture->getDescriptor();
-                }
-            }
-        }
-    }
-
     size_t frameIndex = Graphics::Get()->getCurrentFrame(0);
 
     // Create descriptors
@@ -148,11 +135,10 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
                     }
                     auto& updated = descriptorSetHasUpdated[frameIndex][cmd.TextureId];
                     if (!updated) {
-                        auto& set = descriptorSets[frameIndex][cmd.TextureId];
                         VkWriteDescriptorSet descriptorWrite = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
-                        descriptorWrite.dstSet = set;
+                        descriptorWrite.dstSet = descriptorSets[frameIndex][cmd.TextureId];
                         descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                        descriptorWrite.pImageInfo = (VkDescriptorImageInfo*) descriptorImageInfos[cmd.TextureId];
+                        descriptorWrite.pImageInfo = &static_cast<Texture*>(cmd.TextureId)->getDescriptor();
                         descriptorWrite.descriptorCount = 1;
                         descriptorWrite.dstBinding = 0;
                         vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, nullptr);

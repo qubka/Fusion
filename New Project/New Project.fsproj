@@ -1,0 +1,19 @@
+{
+    "value0": {
+        "project version": "0.1.0.0",
+        "project root": "New Project",
+        "project name": "New Project",
+        "title": "New Project",
+        "size": {
+            "x": 1280,
+            "y": 720
+        },
+        "borderless": false,
+        "resizable": true,
+        "floating": false,
+        "fullscreen": false,
+        "vsync": false,
+        "show console": true,
+        "current scene": "Scene 4"
+    }
+}

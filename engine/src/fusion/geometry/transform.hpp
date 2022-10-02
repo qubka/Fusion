@@ -69,6 +69,6 @@ namespace fe {
         mutable glm::mat4 worldMatrix{ 1.0f };
         mutable glm::mat3 normalMatrix{ 1.0f };
 
-        mutable bool dirty{ false };
+        mutable bool dirty{ true };
     };
 }

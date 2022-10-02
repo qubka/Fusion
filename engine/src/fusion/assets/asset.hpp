@@ -11,11 +11,9 @@ namespace fe {
         NONCOPYABLE(Asset);
 
         virtual type_index getType() const = 0;
-        const fs::path& getPath() const { return path; }
-        const std::string& getName() const { return name; }
+        virtual const fs::path& getPath() const = 0;
+        virtual const std::string& getName() const = 0;
 
-    protected:
-        fs::path path;
-        std::string name;
+        virtual void loadResource() = 0;
     };
 }

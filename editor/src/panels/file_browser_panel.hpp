@@ -2,14 +2,12 @@
 
 #include "editor_panel.hpp"
 
-namespace ImGui {
-    class FileBrowser;
-}
+#include <imgui-plugins/ImFileBrowser.h>
 
 namespace fe {
     class FileBrowserPanel : public EditorPanel {
     public:
-        explicit FileBrowserPanel(Editor* editor);
+        explicit FileBrowserPanel(Editor& editor);
         ~FileBrowserPanel() override;
 
         void onImGui() override;
@@ -26,6 +24,6 @@ namespace fe {
 
     private:
         std::function<void(const fs::path&)> callback;
-        ImGui::FileBrowser* fileBrowser;
+        ImGui::FileBrowser fileBrowser;
     };
 }

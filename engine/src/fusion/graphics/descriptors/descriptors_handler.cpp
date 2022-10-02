@@ -10,7 +10,6 @@ using namespace fe;
 
 DescriptorsHandler::DescriptorsHandler(const Pipeline& pipeline)
         : shader{&pipeline.getShader()}
-        , pushDescriptors{pipeline.isPushDescriptors()}
         , descriptorSet{std::make_unique<DescriptorSet>(pipeline)}
         , changed{true} {
 }
@@ -39,13 +38,11 @@ bool DescriptorsHandler::update(const Pipeline& pipeline) {
     auto currentShader = &pipeline.getShader();
 	if (shader != currentShader) {
 		shader = currentShader;
-		pushDescriptors = pipeline.isPushDescriptors();
 		descriptors.clear();
 		writeDescriptorSets.clear();
 
-		if (!pushDescriptors) {
+		if (!pipeline.isPushDescriptors())
 			descriptorSet = std::make_unique<DescriptorSet>(pipeline);
-		}
 
 		changed = false;
 		return false;
@@ -55,15 +52,20 @@ bool DescriptorsHandler::update(const Pipeline& pipeline) {
 		writeDescriptorSets.clear();
 		writeDescriptorSets.reserve(descriptors.size());
 
-		for (const auto& descriptor : descriptors.values()) {
-			auto& writeDescriptorSet = writeDescriptorSets.emplace_back(descriptor.writeDescriptor.getWriteDescriptorSet());
-            if (pushDescriptors)
+		for (const auto& [descriptorName, descriptor] : descriptors) {
+            auto writeDescriptorSet = descriptor.writeDescriptor.getWriteDescriptorSet();
+            if (writeDescriptorSet.descriptorCount == 0)
+                continue;
+
+            if (pipeline.isPushDescriptors())
                 writeDescriptorSet.dstSet = VK_NULL_HANDLE;
             else
                 writeDescriptorSet.dstSet = *descriptorSet;
+
+            writeDescriptorSets.push_back(writeDescriptorSet);
 		}
 
-		if (!pushDescriptors)
+		if (!pipeline.isPushDescriptors())
 			descriptorSet->updateDescriptor(writeDescriptorSets);
 
 		changed = false;
@@ -73,10 +75,10 @@ bool DescriptorsHandler::update(const Pipeline& pipeline) {
 }
 
 void DescriptorsHandler::bindDescriptor(const CommandBuffer& commandBuffer, const Pipeline& pipeline) {
-	if (pushDescriptors) {
+	if (pipeline.isPushDescriptors()) {
         const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
-		Instance::FvkCmdPushDescriptorSetKHR(logicalDevice, commandBuffer, pipeline.getPipelineBindPoint(), pipeline.getPipelineLayout(), 0, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data());
+        Instance::FvkCmdPushDescriptorSetKHR(logicalDevice, commandBuffer, pipeline.getPipelineBindPoint(), pipeline.getPipelineLayout(), 0, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data());
 	} else {
-		descriptorSet->bindDescriptor(commandBuffer);
-	}
+        descriptorSet->bindDescriptor(commandBuffer, pipeline);
+    }
 }

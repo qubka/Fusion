@@ -61,24 +61,18 @@ VkPipelineLayout PipelineLayoutCache::createPipelineLayout(const VkPipelineLayou
     }
 }
 
-bool PipelineLayoutCache::PipelineLayoutInfo::operator==(const PipelineLayoutCache::PipelineLayoutInfo& other) const {
-    if (other.flags != flags || other.setLayouts.size() != setLayouts.size() || other.pushConstants.size() != pushConstants.size()) {
+bool PipelineLayoutCache::PipelineLayoutInfo::operator==(const PipelineLayoutCache::PipelineLayoutInfo& rhs) const {
+    if (rhs.flags != flags || rhs.setLayouts.size() != setLayouts.size() || rhs.pushConstants.size() != pushConstants.size()) {
         return false;
     } else {
-        for (int i = 0; i < setLayouts.size(); i++) {
-            if (other.setLayouts[i] != setLayouts[i]) {
+        for (const auto& [i, setLayout] : enumerate(setLayouts)) {
+            if (rhs.setLayouts[i] != setLayout) {
                 return false;
             }
         }
         // Compare each of the push constant is the same. Constants are aligned so they will match
-        for (int i = 0; i < pushConstants.size(); i++) {
-            if (other.pushConstants[i].stageFlags != pushConstants[i].stageFlags) {
-                return false;
-            }
-            if (other.pushConstants[i].offset != pushConstants[i].offset) {
-                return false;
-            }
-            if (other.pushConstants[i].size != pushConstants[i].size) {
+        for (const auto& [i, pushConstant] : enumerate(pushConstants)) {
+            if (rhs.pushConstants[i] != pushConstant) {
                 return false;
             }
         }

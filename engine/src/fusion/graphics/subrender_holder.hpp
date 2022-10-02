@@ -31,7 +31,7 @@ namespace fe {
          * @return The subrender.
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Subrender*>>>
-       T* get() const {
+        T* get() const {
             /*if (auto it = subrenders.find(type_id<T>); it != subrenders.end() && it->second) {
                 std::vector<T*> result;
                 result.reserve(it->second.size());
@@ -112,7 +112,7 @@ namespace fe {
         void renderStage(Pipeline::Stage pipelineStage, const CommandBuffer& commandBuffer, const Camera* overrideCamera = nullptr);
 
         /// List of all subrenders
-        std::flat_map<type_index, std::vector<std::unique_ptr<Subrender>>> subrenders;
+        fst::unordered_flatmap<type_index, std::vector<std::unique_ptr<Subrender>>> subrenders;
         /// List of subrender stages
         std::multimap<Pipeline::Stage, SubrenderIndex> stages;
     };

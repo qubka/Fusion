@@ -101,7 +101,6 @@ bool FileFormat::IsModelFile(const fs::path& filepath) {
             ".scn",
     };
 
-
     return MODEL_FORMATS.find(extension) != MODEL_FORMATS.end();
 }
 

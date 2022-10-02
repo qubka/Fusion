@@ -20,17 +20,17 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("type", type),
-                    cereal::make_nvp("color", color),
-                    cereal::make_nvp("radius", radius),
-                    cereal::make_nvp("cutOff", cutOff),
-                    cereal::make_nvp("outerCutOff", outerCutOff),
-                    cereal::make_nvp("ambient", ambient),
-                    cereal::make_nvp("diffuse", diffuse),
-                    cereal::make_nvp("specular", specular),
-                    cereal::make_nvp("constant", constant),
-                    cereal::make_nvp("linear", linear),
-                    cereal::make_nvp("quadratic", quadratic));
+            archive(cereal::make_nvp("type", type));
+            archive(cereal::make_nvp("color", color));
+            archive(cereal::make_nvp("radius", radius));
+            archive(cereal::make_nvp("cutOff", cutOff));
+            archive(cereal::make_nvp("outerCutOff", outerCutOff));
+            archive(cereal::make_nvp("ambient", ambient));
+            archive(cereal::make_nvp("diffuse", diffuse));
+            archive(cereal::make_nvp("specular", specular));
+            archive(cereal::make_nvp("constant", constant));
+            archive(cereal::make_nvp("linear", linear));
+            archive(cereal::make_nvp("quadratic", quadratic));
         }
     };
 }

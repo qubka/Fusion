@@ -1,21 +1,19 @@
 #include "pipeline_graphics.hpp"
-#include "shader_file.hpp"
 
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/render_stage.hpp"
-#include "fusion/assets/asset_registry.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 using namespace fe;
 
-PipelineGraphics::PipelineGraphics(Stage stage, std::vector<fs::path>&& paths, std::vector<Vertex::Input>&& vertexInputs, std::flat_map<std::string, Shader::SpecConstant>&& specConstants,
-    std::vector<std::string>&& bindlessSets, Mode mode, Depth depth, VkPrimitiveTopology topology, VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace, Blend blend,
-    bool depthBiasEnabled, float depthBiasConstantFactor, float depthBiasSlopeFactor, float depthBiasClamp, float lineWidth, bool transparencyEnabled, bool pushDescriptors)
+PipelineGraphics::PipelineGraphics(Stage stage, std::vector<fs::path>&& paths, std::vector<Vertex::Input>&& vertexInputs, fst::unordered_flatmap<std::string, Shader::SpecConstant>&& specConstants,
+    Mode mode, Depth depth, VkPrimitiveTopology topology, VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace, Blend blend, bool depthBiasEnabled,
+    float depthBiasConstantFactor, float depthBiasSlopeFactor, float depthBiasClamp, float lineWidth, bool transparencyEnabled, bool pushDescriptors)
         : shader{}
         , stage{std::move(stage)}
         , paths{std::move(paths)}
         , vertexInputs{std::move(vertexInputs)}
         , specConstants{std::move(specConstants)}
-        , bindlessSets{}
         , mode{mode}
         , depth{depth}
         , topology{topology}
@@ -30,6 +28,7 @@ PipelineGraphics::PipelineGraphics(Stage stage, std::vector<fs::path>&& paths, s
         , lineWidth{lineWidth}
         , transparencyEnabled{transparencyEnabled}
         , pushDescriptors{pushDescriptors}
+        , indexedDescriptors{false}
         , pipelineBindPoint{VK_PIPELINE_BIND_POINT_GRAPHICS} {
 
 #if FUSION_DEBUG
@@ -82,10 +81,12 @@ const RenderArea& PipelineGraphics::getRenderArea(const std::optional<uint32_t>&
 
 void PipelineGraphics::createShaderProgram() {
 	for (const auto& path : paths) {
-        auto shaderFile = AssetRegistry::Get()->get_or_emplace<ShaderFile>(path);
+        auto shaderCode = FileSystem::ReadText(path);
+        if (shaderCode.empty())
+            throw std::runtime_error("Shader file is empty");
 
-        auto shaderStage = shaderFile->getStage();
-        auto& shaderModule = modules.emplace_back(shader.createShaderModule(shaderFile->getName(), shaderFile->getCode(), shaderStage));
+        auto shaderStage = Shader::GetShaderStage(path);
+        auto& shaderModule = modules.emplace_back(shader.createShaderModule(path.filename().string(), shaderCode, shaderStage));
         auto& specialization = specializations.emplace_back(shader.createSpecialization(specConstants, shaderStage));
 
 		auto& pipelineShaderStageCreateInfo = stages.emplace_back(VkPipelineShaderStageCreateInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO });
@@ -101,12 +102,31 @@ void PipelineGraphics::createShaderProgram() {
 void PipelineGraphics::createDescriptorLayout() {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	auto& descriptorSetLayouts = shader.getDescriptorSetLayouts();
+    auto& descriptorSetLayouts = shader.getDescriptorSetLayouts();
 
-	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
-	descriptorSetLayoutCreateInfo.flags = pushDescriptors ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
-	descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(descriptorSetLayouts.size());
-	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayouts.data();
+    VkDescriptorSetLayoutBindingFlagsCreateInfoEXT setLayoutBindingFlags = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT };
+    setLayoutBindingFlags.bindingCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+    std::vector<VkDescriptorBindingFlagsEXT> descriptorBindingFlags(descriptorSetLayouts.size());
+    for (size_t i = 0; i < descriptorBindingFlags.size(); i++) {
+        auto setLayout = descriptorSetLayouts[i];
+        if ((setLayout.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER || setLayout.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE) && setLayout.descriptorCount > 1) {
+            descriptorBindingFlags[i] =
+                    VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT |
+                    VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT_EXT |
+                    VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT;
+            indexedDescriptors = true;
+            break;
+        }
+    }
+    setLayoutBindingFlags.pBindingFlags = descriptorBindingFlags.data();
+
+    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
+    descriptorSetLayoutCreateInfo.flags = pushDescriptors ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR :
+                                          indexedDescriptors ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT : 0; // TODO
+    descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+    descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayouts.data();
+    if (indexedDescriptors && !pushDescriptors)
+        descriptorSetLayoutCreateInfo.pNext = &setLayoutBindingFlags;
     descriptorSetLayout = Graphics::Get()->getDescriptorLayoutCache().createDescriptorLayout(descriptorSetLayoutCreateInfo);
 }
 
@@ -115,11 +135,9 @@ void PipelineGraphics::createPipelineLayout() {
 
 	auto pushConstantRanges = shader.getPushConstantRanges();
 
-    std::vector<VkDescriptorSetLayout> setLayouts = { descriptorSetLayout };
-
 	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
-	pipelineLayoutCreateInfo.setLayoutCount = static_cast<uint32_t>(setLayouts.size());
-	pipelineLayoutCreateInfo.pSetLayouts = setLayouts.data();
+	pipelineLayoutCreateInfo.setLayoutCount = 1;
+	pipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
 	pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
 	pipelineLayoutCreateInfo.pPushConstantRanges = pushConstantRanges.data();
     pipelineLayout = Graphics::Get()->getPipilineLayoutCache().createPipelineLayout(pipelineLayoutCreateInfo);
@@ -230,8 +248,15 @@ void PipelineGraphics::createAttributes() {
     dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
     dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
 
-    if (topology == VK_PRIMITIVE_TOPOLOGY_LINE_LIST || topology == VK_PRIMITIVE_TOPOLOGY_LINE_STRIP || topology == VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY || topology == VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY) {
-        dynamicStates.push_back(VK_DYNAMIC_STATE_LINE_WIDTH);
+    switch (topology) {
+        case VK_PRIMITIVE_TOPOLOGY_LINE_LIST:
+        case VK_PRIMITIVE_TOPOLOGY_LINE_STRIP:
+        case VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY:
+        case VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY:
+            dynamicStates.push_back(VK_DYNAMIC_STATE_LINE_WIDTH);
+            break;
+        default:
+            break;
     }
 
     if (depthBiasEnabled) {
@@ -302,6 +327,7 @@ void PipelineGraphics::createPipeline() {
 	pipelineCreateInfo.subpass = stage.second;
 	pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
 	pipelineCreateInfo.basePipelineIndex = -1;
+
 	VK_CHECK(vkCreateGraphicsPipelines(logicalDevice, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
 }
 

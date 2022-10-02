@@ -13,9 +13,9 @@ CommandLineArgs::CommandLineArgs(int count, char** args) {
     }
 }
 
-const std::string& CommandLineArgs::operator[](size_t index) const {
+/*const std::string& CommandLineArgs::operator[](size_t index) const {
     return arguments.values().at(index);
-}
+}*/
 
 std::optional<std::string> CommandLineArgs::getParameter(const std::string& name) const {
     if (auto it = arguments.find(name); it != arguments.end())
@@ -48,7 +48,7 @@ void CommandLineParser::add(std::string_view name, std::vector<std::string>&& co
 void CommandLineParser::parse(const CommandLineArgs& arguments) {
     bool printHelp = false;
     // Known arguments.
-    for (const auto& [alias, option] : options) {
+    for (auto& [alias, option] : options) {
         for (const auto& command : option.commands) {
             if (auto parameter = arguments.getParameter(command)) {
                 option.set = true;
@@ -72,10 +72,10 @@ void CommandLineParser::parse(const CommandLineArgs& arguments) {
 void CommandLineParser::printHelp() {
     std::cout << "Available command line options:\n";
 
-    for (const auto& option : options.values()) {
+    for (const auto& [optionName, option] : options) {
         std::cout << " ";
-        for (size_t i = 0; i < option.commands.size(); i++) {
-            std::cout << option.commands[i];
+        for (const auto& [i, command] : enumerate(option.commands)) {
+            std::cout << command;
             if (i < option.commands.size() - 1) {
                 std::cout << ", ";
             }

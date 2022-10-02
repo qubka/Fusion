@@ -24,7 +24,8 @@ namespace fe {
         virtual const VkPipeline& getPipeline() const = 0;
         virtual const VkPipelineLayout& getPipelineLayout() const = 0;
         virtual const VkPipelineBindPoint& getPipelineBindPoint() const = 0;
-        virtual bool isPushDescriptors() const = 0;
         virtual const VkDescriptorSetLayout& getDescriptorSetLayout() const = 0;
+        virtual bool isPushDescriptors() const = 0;
+        virtual bool isIndexedDescriptors() const = 0;
     };
 }

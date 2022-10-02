@@ -982,6 +982,23 @@ namespace vku {
 #define VK_CHECK_RESULT(result)
 #endif
 
+static inline bool operator==(const VkDescriptorSetLayoutBinding& lhs, const VkDescriptorSetLayoutBinding& rhs) {
+    return lhs.binding == rhs.binding && lhs.descriptorType == rhs.descriptorType && lhs.descriptorCount == rhs.descriptorCount && lhs.stageFlags == rhs.stageFlags;
+    // TODO: pImmutableSamplers ?
+}
+
+static inline bool operator!=(const VkDescriptorSetLayoutBinding& lhs, const VkDescriptorSetLayoutBinding& rhs) {
+    return !(lhs == rhs);
+}
+
+static inline bool operator==(const VkPushConstantRange& lhs, const VkPushConstantRange& rhs) {
+    return lhs.stageFlags == rhs.stageFlags && lhs.offset == rhs.offset && lhs.size == rhs.size;
+}
+
+static inline bool operator!=(const VkPushConstantRange& lhs, const VkPushConstantRange& rhs) {
+    return !(lhs == rhs);
+}
+
 static inline bool operator==(const VkSamplerCreateInfo& lhs, const VkSamplerCreateInfo& rhs) {
     return lhs.sType == rhs.sType &&
            lhs.pNext == rhs.pNext &&
@@ -1004,5 +1021,37 @@ static inline bool operator==(const VkSamplerCreateInfo& lhs, const VkSamplerCre
 }
 
 static inline bool operator!=(const VkSamplerCreateInfo& lhs, const VkSamplerCreateInfo& rhs) {
+    return !(lhs == rhs);
+}
+
+static inline bool operator==(const VkExtent3D& lhs, const VkExtent3D& rhs) {
+    return lhs.width == rhs.width && lhs.height == rhs.height && lhs.depth == rhs.depth;
+}
+
+static inline bool operator!=(const VkExtent3D& lhs, const VkExtent3D& rhs) {
+    return !(lhs == rhs);
+}
+
+static inline bool operator==(const VkExtent2D& lhs, const VkExtent2D& rhs) {
+    return lhs.width == rhs.width && lhs.height == rhs.height;
+}
+
+static inline bool operator!=(const VkExtent2D& lhs, const VkExtent2D& rhs) {
+    return !(lhs == rhs);
+}
+
+static inline bool operator==(const VkOffset3D& lhs, const VkOffset3D& rhs) {
+    return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
+}
+
+static inline bool operator!=(const VkOffset3D& lhs, const VkOffset3D& rhs) {
+    return !(lhs == rhs);
+}
+
+static inline bool operator==(const VkOffset2D& lhs, const VkOffset2D& rhs) {
+    return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
+static inline bool operator!=(const VkOffset2D& lhs, const VkOffset2D& rhs) {
     return !(lhs == rhs);
 }

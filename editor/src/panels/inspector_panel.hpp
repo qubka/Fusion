@@ -7,7 +7,7 @@
 namespace fe {
     class InspectorPanel : public EditorPanel {
     public:
-        explicit InspectorPanel(Editor* editor);
+        explicit InspectorPanel(Editor& editor);
         ~InspectorPanel() override;
 
         void onImGui() override;

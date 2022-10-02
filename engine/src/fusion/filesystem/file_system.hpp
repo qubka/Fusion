@@ -73,9 +73,9 @@ namespace fe {
 
         /**
          * Gets the file extention in the lowercase format.
-         * @param path The path to the file.
+         * @param filepath The path to the file.
          * @return The string extension.
          */
-        static std::string GetExtension(const fs::path& path);
+        static std::string GetExtension(const fs::path& filepath);
     };
 }

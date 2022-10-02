@@ -15,6 +15,11 @@ CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(std::filesystem::path, cereal::specialization
 CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(uuids::uuid, cereal::specialization::non_member_load_save_minimal);*/
 
 namespace cereal {
+    template<class Archive> void serialize(Archive& archive, VkExtent3D& e) { archive(make_nvp("width", e.width), make_nvp("height", e.height), make_nvp("depth", e.depth)); }
+    template<class Archive> void serialize(Archive& archive, VkExtent2D& e) { archive(make_nvp("width", e.width), make_nvp("height", e.height)); }
+    template<class Archive> void serialize(Archive& archive, VkOffset3D& o) { archive(make_nvp("x", o.x), make_nvp("y", o.y), make_nvp("z", o.z)); }
+    template<class Archive> void serialize(Archive& archive, VkOffset2D& o) { archive(make_nvp("x", o.x), make_nvp("y", o.y)); }
+
     template<class Archive> void serialize(Archive& archive, glm::vec2& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y)); }
     template<class Archive> void serialize(Archive& archive, glm::vec3& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y), make_nvp("z", v.z)); }
     template<class Archive> void serialize(Archive& archive, glm::vec4& v) { archive(make_nvp("x", v.x), make_nvp("y", v.y), make_nvp("z", v.z), make_nvp("w", v.w)); }

@@ -8,7 +8,7 @@ void SubrenderHolder::clear() {
 }
 
 void SubrenderHolder::updateAll() {
-    for (const auto& subrender : subrenders.values()) {
+    for (const auto& [typeId, subrender] : subrenders) {
         for (auto& i : subrender) {
             if (i->isEnabled()) {
                 i->onUpdate();

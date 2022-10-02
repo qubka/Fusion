@@ -34,6 +34,8 @@ namespace fe {
 
     class Texture : public Image, public Asset {
     public:
+        Texture() = default;
+
         /**
          * Creates a new image.
          * @param path
@@ -51,7 +53,7 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        Texture(const fs::path& filepath,
+        Texture(fs::path filepath,
                 VkFilter filter,
                 VkSamplerAddressMode addressMode,
                 VkSampleCountFlagBits samples,
@@ -154,9 +156,31 @@ namespace fe {
             descriptor.imageLayout = layout;
         }
 
+        const fs::path& getPath() const override { return path; };
+        const std::string& getName() const override { return name; };
+
+        /*bool operator==(const Texture& rhs) const {
+            //if (!Image::operator==(rhs)) return false;
+
+            return mipmap == rhs.mipmap &&
+                   anisotropic == rhs.anisotropic &&
+                   arrayLayers == rhs.arrayLayers &&
+                   mipLevels == rhs.mipLevels &&
+                   name == rhs.name &&
+                   path == rhs.path;
+        }
+
+        bool operator!=(const Texture& rhs) const {
+            return !operator==(rhs);
+        }*/
+
+        operator bool() const { return image != VK_NULL_HANDLE || memory != VK_NULL_HANDLE || view != VK_NULL_HANDLE || sampler != VK_NULL_HANDLE; }
+
     protected:
         VkDescriptorImageInfo descriptor = {};
 
+        fs::path path;
+        std::string name;
         //TextureType textureType{ TextureType::None };
         uint32_t mipLevels{ 0 };
         uint32_t arrayLayers{ 0 };

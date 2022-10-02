@@ -41,6 +41,7 @@ namespace fe {
         uint32_t getActiveImageIndex() const { return activeImageIndex; }
         VkSurfaceFormatKHR getSurfaceFormat() const { return surfaceFormat; }
         VkPresentModeKHR getPresentMode() const { return presentMode; }
+
     private:
         const LogicalDevice& logicalDevice;
 

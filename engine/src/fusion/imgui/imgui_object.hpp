@@ -12,7 +12,7 @@ namespace fe {
         ~ImGuiObject() = default;
         NONCOPYABLE(ImGuiObject);
 
-        void cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, std::flat_map<ImTextureID, VkDescriptorSet>& descriptorSets);
+        void cmdRender(const CommandBuffer& commandBuffer, const Pipeline& pipeline, fst::unordered_flatmap<ImTextureID, VkDescriptorSet>& descriptorSets);
 
     private:
         std::unique_ptr<Buffer> vertexBuffer;

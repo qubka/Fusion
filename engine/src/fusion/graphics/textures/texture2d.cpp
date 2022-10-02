@@ -1,5 +1,6 @@
 #include "texture2d.hpp"
 
+#include "fusion/core/engine.hpp"
 #include "fusion/bitmaps/bitmap.hpp"
 #include "fusion/graphics/buffers/buffer.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
@@ -10,8 +11,8 @@
 
 using namespace fe;
 
-Texture2d::Texture2d(const fs::path& filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
-        : Texture{filepath,
+Texture2d::Texture2d(fs::path filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
+        : Texture{std::move(filepath),
                   filter,
                   addressMode,
                   VK_SAMPLE_COUNT_1_BIT,
@@ -25,9 +26,8 @@ Texture2d::Texture2d(const fs::path& filepath, VkFilter filter, VkSamplerAddress
                   { 0, 0, 1 },
                   anisotropic,
                   mipmap} {
-    if (load) {
-        Texture2d::load();
-    }
+    if (load)
+        loadFromFile();
 }
 
 Texture2d::Texture2d(const glm::uvec2& extent, VkFormat format, VkImageLayout layout, VkImageUsageFlags usage, VkFilter filter,
@@ -72,19 +72,25 @@ void Texture2d::setPixels(const std::byte* pixels, uint32_t layerCount, uint32_t
     CopyBufferToImage(bufferStaging, image, extent, layerCount, baseArrayLayer);
 }
 
-void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
-    bool loadFromFile = !path.empty() && !loadBitmap;
+void Texture2d::loadFromFile() {
+    fs::path filepath{ Engine::Get()->getApp()->getRootPath() / path };
+
+    if (operator bool()) {
+        LOG_DEBUG << "Texture2d: \"" << filepath << "\" already was loaded";
+        return;
+    }
+
     // That is fast loading approach
-    if (loadFromFile && FileFormat::IsTextureStorageFile(path)) {
+    if (FileFormat::IsTextureStorageFile(filepath)) {
 #if FUSION_DEBUG
         auto debugStart = DateTime::Now();
 #endif
         std::unique_ptr<gli::texture2d> texture;
-        FileSystem::ReadBytes(path, [&texture](std::span<const std::byte> buffer) {
+        FileSystem::ReadBytes(filepath, [&texture](std::span<const std::byte> buffer) {
             texture = std::make_unique<gli::texture2d>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
         });
 #if FUSION_DEBUG
-        LOG_DEBUG << "Texture2d \"" << path << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+        LOG_DEBUG << "Texture2d \"" << filepath << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
 #endif
         const gli::texture2d& tex = *texture;
         if (tex.empty())
@@ -107,11 +113,9 @@ void Texture2d::load(std::unique_ptr<Bitmap> loadBitmap) {
         Buffer bufferStaging{tex.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, tex.data()};
         CopyBufferToImage(bufferStaging, image, extent, arrayLayers, 0);
     } else {
-        if (loadFromFile) {
-            loadBitmap = std::make_unique<Bitmap>(path);
-            extent =  vku::uvec3_cast(loadBitmap->getExtent());
-            format = loadBitmap->getFormat();
-        }
+        auto loadBitmap = std::make_unique<Bitmap>(filepath);
+        extent =  vku::uvec3_cast(loadBitmap->getExtent());
+        format = loadBitmap->getFormat();
 
         if (extent.width == 0 || extent.height == 0)
             throw std::runtime_error("Width or height is empty");

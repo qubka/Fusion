@@ -11,8 +11,8 @@
 
 using namespace fe;
 
-ContentBrowserPanel::ContentBrowserPanel(Editor* editor) : EditorPanel{ICON_MDI_ARCHIVE " Content Browser###content", "ContentBrowser", editor} {
-    root = editor->getProjectSettings().projectRoot / "assets";
+ContentBrowserPanel::ContentBrowserPanel(Editor& editor) : EditorPanel{ICON_MDI_ARCHIVE " Content Browser###content", "ContentBrowser", editor} {
+    root = editor.getProjectSettings().projectRoot / "assets";
 
     auto base = processDirectory(root, nullptr);
     baseDirectory = directories[base];
@@ -158,7 +158,7 @@ void ContentBrowserPanel::onImGui() {
 
                 if (ImGui::BeginPopupContextWindow()) {
                     if (ImGui::Selectable("Import New Asset")) {
-                        editor->openFile();
+                        editor.openFile();
                     }
 
                     if (ImGui::Selectable("Refresh")) {
@@ -338,7 +338,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
             changeDirectory(directory);
             return true;
         } else {
-            editor->fileOpenCallback(root / path);
+            editor.fileOpenCallback(root / path);
         }
     }
 
@@ -413,7 +413,7 @@ void ContentBrowserPanel::onNewProject() {
 }
 
 void ContentBrowserPanel::refresh() {
-    root = editor->getProjectSettings().projectRoot / "assets";
+    root = editor.getProjectSettings().projectRoot / "assets";
 
     const auto& currentPath = currentDirectory->path;
 
@@ -468,7 +468,7 @@ bool ContentBrowserPanel::moveFile(const fs::path& filepath, const fs::path& mov
     std::string cmd{ String::Quoted(filepath.string()) + " " + String::Quoted(movepath.string()) };
 #if FUSION_PLATFORM_LINUX
     system(("mv " + cmd).c_str());
-#elif
+#else
     #ifndef FUSION_PLATFORM_IOS
         system(("move " + cmd).c_str());
     #endif

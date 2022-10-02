@@ -7,7 +7,7 @@
 
 using namespace fe;
 
-constexpr static float ANISOTROPY = 16.0f;
+static const float ANISOTROPY = 16.0f;
 
 Image::Image(VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, VkImageLayout layout,
              VkImageUsageFlags usage, VkImageAspectFlags aspect, VkImageViewType viewType, VkFormat format, const VkExtent3D& extent)
@@ -64,9 +64,9 @@ VkDescriptorSetLayoutBinding Image::GetDescriptorSetLayout(uint32_t binding, VkD
     VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = {};
     descriptorSetLayoutBinding.binding = binding;
     descriptorSetLayoutBinding.descriptorType = descriptorType;
-    descriptorSetLayoutBinding.descriptorCount = count;
+    descriptorSetLayoutBinding.descriptorCount = count > 0 ? count : MAX_BINDLESS_RESOURCES;
     descriptorSetLayoutBinding.stageFlags = stage;
-    descriptorSetLayoutBinding.pImmutableSamplers = nullptr;
+    descriptorSetLayoutBinding.pImmutableSamplers = VK_NULL_HANDLE;
     return descriptorSetLayoutBinding;
 }
 
@@ -155,7 +155,7 @@ void Image::CreateImageSampler(VkSampler& sampler, VkFilter filter, VkSamplerAdd
 	samplerCreateInfo.addressModeW = addressMode;
 	samplerCreateInfo.mipLodBias = 0.0f;
 	samplerCreateInfo.anisotropyEnable = static_cast<VkBool32>(anisotropic);
-	samplerCreateInfo.maxAnisotropy = (anisotropic && Graphics::Get()->getLogicalDevice().getEnabledFeatures().samplerAnisotropy) ?glm::min(ANISOTROPY, Graphics::Get()->getPhysicalDevice().getProperties().limits.maxSamplerAnisotropy) : 1.0f;
+	samplerCreateInfo.maxAnisotropy = (anisotropic && Graphics::Get()->getLogicalDevice().getEnabledFeatures().samplerAnisotropy) ? glm::min(ANISOTROPY, Graphics::Get()->getPhysicalDevice().getProperties().limits.maxSamplerAnisotropy) : 1.0f;
 	//samplerCreateInfo.compareEnable = VK_FALSE;
 	//samplerCreateInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	samplerCreateInfo.minLod = 0.0f;

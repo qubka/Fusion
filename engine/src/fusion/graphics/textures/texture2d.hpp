@@ -8,6 +8,8 @@ namespace fe {
      */
     class Texture2d : public Texture {
     public:
+        Texture2d() = default;
+
         /**
          * Creates a new 2D image.
          * @param filename The file to load the image from.
@@ -17,12 +19,12 @@ namespace fe {
          * @param mipmap If mapmaps will be generated.
          * @param load If this resource will be loaded immediately, otherwise {@link Texture2d#load} can be called later.
          */
-        explicit Texture2d(const fs::path& filepath,
+        explicit Texture2d(fs::path filepath,
                            VkFilter filter = VK_FILTER_LINEAR,
                            VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT,
                            bool anisotropic = true,
                            bool mipmap = true,
-                           bool load = true);
+                           bool load = false);
 
         /**
          * Creates a new 2D image.
@@ -78,6 +80,9 @@ namespace fe {
 
         type_index getType() const override { return type_id<Texture2d>; }
 
-        void load(std::unique_ptr<Bitmap> loadBitmap = nullptr);
+        void loadResource() override { loadFromFile(); };
+
+    private:
+        void loadFromFile();
     };
 }

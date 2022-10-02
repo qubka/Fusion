@@ -1,5 +1,7 @@
 #include "console_panel.hpp"
 
+#include <utility>
+
 using namespace fe;
 using namespace std::string_literals;
 
@@ -12,7 +14,7 @@ std::vector<std::unique_ptr<ConsolePanel::Message>> ConsolePanel::MessageBuffer 
 bool ConsolePanel::AllowScrollingToBottom = true;
 bool ConsolePanel::RequestScrollToBottom = false;
 
-ConsolePanel::ConsolePanel(Editor* editor) : EditorPanel{ICON_MDI_VIEW_LIST " Console###console", "Console", editor} {
+ConsolePanel::ConsolePanel(Editor& editor) : EditorPanel{ICON_MDI_VIEW_LIST " Console###console", "Console", editor} {
     Log::GetConsoleAppender().OnMessage().connect<&ConsolePanel::OnMessage>();
 }
 
@@ -50,7 +52,7 @@ void ConsolePanel::AddMessage(std::unique_ptr<Message>&& message) {
         }
     }
 
-    if (MessageBufferBegin != 0) { // Skipped first messages in vector
+    if (MessageBufferBegin != 0) {
         for (auto it = MessageBuffer.begin(); it != messageStart; it++) {
             if (*it) {
                 if (message->getMessageID() == (*it)->getMessageID()) {
@@ -121,7 +123,7 @@ void ConsolePanel::renderHeader() {
         ImGui::PopFont();
     }
 
-    ImGui::SameLine(); // ImGui::GetWindowWidth() - levelButtonWidths);
+    ImGui::SameLine();
 
     for (int i = 0; i < 6; i++) {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
@@ -197,10 +199,10 @@ void ConsolePanel::renderMessages() {
     ImGui::EndChild();
 }
 
-ConsolePanel::Message::Message(const std::string& message, MessageLevel level, const std::string& source)
-        : message{message}
+ConsolePanel::Message::Message(std::string message, MessageLevel level, std::string source)
+        : message{std::move(message)}
         , level{level}
-        , source{source}
+        , source{std::move(source)}
         , messageID{MessageID++} {
 }
 
@@ -209,7 +211,7 @@ ConsolePanel::Message::~Message() {
 }
 void ConsolePanel::Message::onImGui() {
     if (MessageBufferRenderFilter & level) {
-        ImGui::PushID(messageID);
+        ImGui::PushID(static_cast<int>(messageID));
         ImGui::PushStyleColor(ImGuiCol_Text, GetRenderColor(level));
         ImGui::TextUnformatted(GetLevelIcon(level));
         ImGui::PopStyleColor();

@@ -632,7 +632,7 @@ namespace ImGuiUtils {
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                value = AssetRegistry::Get()->get<T>(strip_root(static_cast<const char*>(payload->Data)));
+                value = AssetRegistry::Get()->load<T>(strip_root(static_cast<const char*>(payload->Data)));
                 updated = true;
             }
             ImGui::EndDragDropTarget();

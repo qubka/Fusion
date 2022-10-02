@@ -43,8 +43,6 @@
 #define MEM_ALIGN __attribute__((aligned(MEM_ALIGNMENT)))
 #endif
 
-// TODO: Move from here ?
-
 #include <uuid.h>
 
 namespace fe {

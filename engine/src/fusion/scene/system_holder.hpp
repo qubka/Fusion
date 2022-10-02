@@ -31,8 +31,10 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
         T* get() const {
-            auto it = systems.find(type_id<T>);
-            return it != systems.end() ? reinterpret_cast<T*>(it->second.get()) : nullptr;
+            if (auto it = systems.find(type_id<T>); it != systems.end()) {
+                return static_cast<T*>(it->second.get());
+            }
+            throw std::runtime_error("System Holder does not have requested system");
         }
 
         /**
@@ -42,6 +44,7 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
         void add(std::unique_ptr<T>&& system) {
+            // Then, add the system
             systems.emplace(type_id<T>, std::move(system));
         }
 
@@ -51,6 +54,7 @@ namespace fe {
          */
         template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, System*>>>
         void remove() {
+            // Then, remove the system
             systems.erase(type_id<T>);
         }
 
@@ -66,13 +70,13 @@ namespace fe {
          */
         template<typename F>
         void each(const F& func) {
-            for (const auto& system : systems.values()) {
+            for (const auto& [typeId, system] : systems) {
                 func(system.get());
             }
         }
 
     private:
         /// List of all systems
-        std::flat_map<type_index, std::unique_ptr<System>> systems;
+        fst::unordered_flatmap<type_index, std::unique_ptr<System>> systems;
     };
 }

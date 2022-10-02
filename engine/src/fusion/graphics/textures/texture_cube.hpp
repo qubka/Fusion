@@ -8,6 +8,8 @@ namespace fe {
      */
     class TextureCube : public Texture {
     public:
+        TextureCube() = default;
+
         /**
          * Creates a new cubemap image.
          * @param filepath The file to load the image from. (supports .ktx and .dds)
@@ -17,12 +19,12 @@ namespace fe {
          * @param mipmap If mapmaps will be generated.
          * @param load If this resource will be loaded immediately, otherwise {@link ImageCube#load} can be called later.
          */
-        explicit TextureCube(const fs::path& filepath,
+        explicit TextureCube(fs::path filepath,
                              VkFilter filter = VK_FILTER_LINEAR,
                              VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
                              bool anisotropic = true,
                              bool mipmap = true,
-                             bool load = true);
+                             bool load = false);
 
         /**
          * Creates a new cubemap image.
@@ -85,6 +87,9 @@ namespace fe {
 
         type_index getType() const override { return type_id<TextureCube>; }
 
-        void load();
+        void loadResource() override { loadFromFile(); }
+
+    private:
+        void loadFromFile();
     };
 }

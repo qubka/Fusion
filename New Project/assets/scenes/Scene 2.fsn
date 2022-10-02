@@ -1,0 +1,4740 @@
+{
+    "value0": {
+        "name": "Scene 2"
+    },
+    "value1": 93,
+    "value2": 4294967295,
+    "value3": 1048576,
+    "value4": 2097153,
+    "value5": 1048578,
+    "value6": 1048579,
+    "value7": 4,
+    "value8": 5,
+    "value9": 6,
+    "value10": 7,
+    "value11": 8,
+    "value12": 9,
+    "value13": 10,
+    "value14": 11,
+    "value15": 12,
+    "value16": 13,
+    "value17": 14,
+    "value18": 15,
+    "value19": 16,
+    "value20": 17,
+    "value21": 18,
+    "value22": 19,
+    "value23": 20,
+    "value24": 21,
+    "value25": 22,
+    "value26": 23,
+    "value27": 24,
+    "value28": 25,
+    "value29": 26,
+    "value30": 27,
+    "value31": 28,
+    "value32": 29,
+    "value33": 30,
+    "value34": 31,
+    "value35": 32,
+    "value36": 33,
+    "value37": 34,
+    "value38": 35,
+    "value39": 36,
+    "value40": 37,
+    "value41": 38,
+    "value42": 39,
+    "value43": 40,
+    "value44": 41,
+    "value45": 42,
+    "value46": 43,
+    "value47": 44,
+    "value48": 45,
+    "value49": 46,
+    "value50": 47,
+    "value51": 48,
+    "value52": 49,
+    "value53": 50,
+    "value54": 51,
+    "value55": 52,
+    "value56": 53,
+    "value57": 54,
+    "value58": 55,
+    "value59": 56,
+    "value60": 57,
+    "value61": 58,
+    "value62": 59,
+    "value63": 60,
+    "value64": 61,
+    "value65": 62,
+    "value66": 63,
+    "value67": 64,
+    "value68": 65,
+    "value69": 66,
+    "value70": 67,
+    "value71": 68,
+    "value72": 69,
+    "value73": 70,
+    "value74": 71,
+    "value75": 72,
+    "value76": 73,
+    "value77": 74,
+    "value78": 75,
+    "value79": 76,
+    "value80": 77,
+    "value81": 78,
+    "value82": 79,
+    "value83": 80,
+    "value84": 81,
+    "value85": 82,
+    "value86": 83,
+    "value87": 84,
+    "value88": 85,
+    "value89": 86,
+    "value90": 87,
+    "value91": 88,
+    "value92": 89,
+    "value93": 90,
+    "value94": 91,
+    "value95": 92,
+    "value96": 1048578,
+    "value97": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value98": 2097153,
+    "value99": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value100": 1048579,
+    "value101": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value102": 1048576,
+    "value103": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value104": 4,
+    "value105": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value106": 5,
+    "value107": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value108": 6,
+    "value109": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value110": 7,
+    "value111": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value112": 8,
+    "value113": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value114": 9,
+    "value115": {
+        "uuid": "9156038c-011d-4ae9-a6e2-8907550941c8"
+    },
+    "value116": 10,
+    "value117": {
+        "uuid": "7cdbfb4e-e563-4810-bb18-202f9d72e6f8"
+    },
+    "value118": 11,
+    "value119": {
+        "uuid": "dff71194-9b23-433e-96a3-532eb42d17e1"
+    },
+    "value120": 12,
+    "value121": {
+        "uuid": "9156038c-011d-4ae9-a6e2-8907550941c8"
+    },
+    "value122": 13,
+    "value123": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value124": 14,
+    "value125": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value126": 15,
+    "value127": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value128": 16,
+    "value129": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value130": 17,
+    "value131": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value132": 18,
+    "value133": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value134": 19,
+    "value135": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value136": 20,
+    "value137": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value138": 21,
+    "value139": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value140": 22,
+    "value141": {
+        "uuid": "9156038c-011d-4ae9-a6e2-8907550941c8"
+    },
+    "value142": 23,
+    "value143": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value144": 24,
+    "value145": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value146": 25,
+    "value147": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value148": 26,
+    "value149": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value150": 27,
+    "value151": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value152": 28,
+    "value153": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value154": 29,
+    "value155": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value156": 30,
+    "value157": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value158": 31,
+    "value159": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value160": 32,
+    "value161": {
+        "uuid": "9156038c-011d-4ae9-a6e2-8907550941c8"
+    },
+    "value162": 33,
+    "value163": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value164": 34,
+    "value165": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value166": 35,
+    "value167": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value168": 36,
+    "value169": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value170": 37,
+    "value171": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value172": 38,
+    "value173": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value174": 39,
+    "value175": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value176": 40,
+    "value177": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value178": 41,
+    "value179": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value180": 42,
+    "value181": {
+        "uuid": "9156038c-011d-4ae9-a6e2-8907550941c8"
+    },
+    "value182": 43,
+    "value183": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value184": 44,
+    "value185": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value186": 45,
+    "value187": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value188": 46,
+    "value189": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value190": 47,
+    "value191": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value192": 48,
+    "value193": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value194": 49,
+    "value195": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value196": 50,
+    "value197": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value198": 51,
+    "value199": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value200": 52,
+    "value201": {
+        "uuid": "9156038c-011d-4ae9-a6e2-8907550941c8"
+    },
+    "value202": 53,
+    "value203": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value204": 54,
+    "value205": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value206": 55,
+    "value207": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value208": 56,
+    "value209": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value210": 57,
+    "value211": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value212": 58,
+    "value213": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value214": 59,
+    "value215": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value216": 60,
+    "value217": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value218": 61,
+    "value219": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value220": 62,
+    "value221": {
+        "uuid": "9156038c-011d-4ae9-a6e2-8907550941c8"
+    },
+    "value222": 63,
+    "value223": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value224": 64,
+    "value225": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value226": 65,
+    "value227": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value228": 66,
+    "value229": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value230": 67,
+    "value231": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value232": 68,
+    "value233": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value234": 69,
+    "value235": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value236": 70,
+    "value237": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value238": 71,
+    "value239": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value240": 72,
+    "value241": {
+        "uuid": "9156038c-011d-4ae9-a6e2-8907550941c8"
+    },
+    "value242": 73,
+    "value243": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value244": 74,
+    "value245": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value246": 75,
+    "value247": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value248": 76,
+    "value249": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value250": 77,
+    "value251": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value252": 78,
+    "value253": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value254": 79,
+    "value255": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value256": 80,
+    "value257": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value258": 81,
+    "value259": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value260": 82,
+    "value261": {
+        "uuid": "9156038c-011d-4ae9-a6e2-8907550941c8"
+    },
+    "value262": 83,
+    "value263": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value264": 84,
+    "value265": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value266": 85,
+    "value267": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value268": 86,
+    "value269": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value270": 87,
+    "value271": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value272": 88,
+    "value273": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value274": 89,
+    "value275": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value276": 90,
+    "value277": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value278": 91,
+    "value279": {
+        "uuid": "4e5f0a91-2d3b-42a0-a5a3-a3d5742a5c2d"
+    },
+    "value280": 92,
+    "value281": 1048578,
+    "value282": {
+        "name": "RubixCube.obj"
+    },
+    "value283": 2097153,
+    "value284": {
+        "name": "RubixCube.obj"
+    },
+    "value285": 1048579,
+    "value286": {
+        "name": "RubixCube.obj"
+    },
+    "value287": 1048576,
+    "value288": {
+        "name": "RubixCube.obj"
+    },
+    "value289": 4,
+    "value290": {
+        "name": "RubixCube.obj"
+    },
+    "value291": 5,
+    "value292": {
+        "name": "RubixCube.obj"
+    },
+    "value293": 6,
+    "value294": {
+        "name": "RubixCube.obj"
+    },
+    "value295": 7,
+    "value296": {
+        "name": "RubixCube.obj"
+    },
+    "value297": 8,
+    "value298": {
+        "name": "RubixCube.obj"
+    },
+    "value299": 9,
+    "value300": {
+        "name": "Mesh Groiup"
+    },
+    "value301": 10,
+    "value302": {
+        "name": "Light Object"
+    },
+    "value303": 11,
+    "value304": {
+        "name": "Camera Object"
+    },
+    "value305": 12,
+    "value306": {
+        "name": "Mesh Groiup"
+    },
+    "value307": 13,
+    "value308": {
+        "name": "RubixCube.obj"
+    },
+    "value309": 14,
+    "value310": {
+        "name": "RubixCube.obj"
+    },
+    "value311": 15,
+    "value312": {
+        "name": "RubixCube.obj"
+    },
+    "value313": 16,
+    "value314": {
+        "name": "RubixCube.obj"
+    },
+    "value315": 17,
+    "value316": {
+        "name": "RubixCube.obj"
+    },
+    "value317": 18,
+    "value318": {
+        "name": "RubixCube.obj"
+    },
+    "value319": 19,
+    "value320": {
+        "name": "RubixCube.obj"
+    },
+    "value321": 20,
+    "value322": {
+        "name": "RubixCube.obj"
+    },
+    "value323": 21,
+    "value324": {
+        "name": "RubixCube.obj"
+    },
+    "value325": 22,
+    "value326": {
+        "name": "Mesh Groiup"
+    },
+    "value327": 23,
+    "value328": {
+        "name": "RubixCube.obj"
+    },
+    "value329": 24,
+    "value330": {
+        "name": "RubixCube.obj"
+    },
+    "value331": 25,
+    "value332": {
+        "name": "RubixCube.obj"
+    },
+    "value333": 26,
+    "value334": {
+        "name": "RubixCube.obj"
+    },
+    "value335": 27,
+    "value336": {
+        "name": "RubixCube.obj"
+    },
+    "value337": 28,
+    "value338": {
+        "name": "RubixCube.obj"
+    },
+    "value339": 29,
+    "value340": {
+        "name": "RubixCube.obj"
+    },
+    "value341": 30,
+    "value342": {
+        "name": "RubixCube.obj"
+    },
+    "value343": 31,
+    "value344": {
+        "name": "RubixCube.obj"
+    },
+    "value345": 32,
+    "value346": {
+        "name": "Mesh Groiup"
+    },
+    "value347": 33,
+    "value348": {
+        "name": "RubixCube.obj"
+    },
+    "value349": 34,
+    "value350": {
+        "name": "RubixCube.obj"
+    },
+    "value351": 35,
+    "value352": {
+        "name": "RubixCube.obj"
+    },
+    "value353": 36,
+    "value354": {
+        "name": "RubixCube.obj"
+    },
+    "value355": 37,
+    "value356": {
+        "name": "RubixCube.obj"
+    },
+    "value357": 38,
+    "value358": {
+        "name": "RubixCube.obj"
+    },
+    "value359": 39,
+    "value360": {
+        "name": "RubixCube.obj"
+    },
+    "value361": 40,
+    "value362": {
+        "name": "RubixCube.obj"
+    },
+    "value363": 41,
+    "value364": {
+        "name": "RubixCube.obj"
+    },
+    "value365": 42,
+    "value366": {
+        "name": "Mesh Groiup"
+    },
+    "value367": 43,
+    "value368": {
+        "name": "RubixCube.obj"
+    },
+    "value369": 44,
+    "value370": {
+        "name": "RubixCube.obj"
+    },
+    "value371": 45,
+    "value372": {
+        "name": "RubixCube.obj"
+    },
+    "value373": 46,
+    "value374": {
+        "name": "RubixCube.obj"
+    },
+    "value375": 47,
+    "value376": {
+        "name": "RubixCube.obj"
+    },
+    "value377": 48,
+    "value378": {
+        "name": "RubixCube.obj"
+    },
+    "value379": 49,
+    "value380": {
+        "name": "RubixCube.obj"
+    },
+    "value381": 50,
+    "value382": {
+        "name": "RubixCube.obj"
+    },
+    "value383": 51,
+    "value384": {
+        "name": "RubixCube.obj"
+    },
+    "value385": 52,
+    "value386": {
+        "name": "Mesh Groiup"
+    },
+    "value387": 53,
+    "value388": {
+        "name": "RubixCube.obj"
+    },
+    "value389": 54,
+    "value390": {
+        "name": "RubixCube.obj"
+    },
+    "value391": 55,
+    "value392": {
+        "name": "RubixCube.obj"
+    },
+    "value393": 56,
+    "value394": {
+        "name": "RubixCube.obj"
+    },
+    "value395": 57,
+    "value396": {
+        "name": "RubixCube.obj"
+    },
+    "value397": 58,
+    "value398": {
+        "name": "RubixCube.obj"
+    },
+    "value399": 59,
+    "value400": {
+        "name": "RubixCube.obj"
+    },
+    "value401": 60,
+    "value402": {
+        "name": "RubixCube.obj"
+    },
+    "value403": 61,
+    "value404": {
+        "name": "RubixCube.obj"
+    },
+    "value405": 62,
+    "value406": {
+        "name": "Mesh Groiup"
+    },
+    "value407": 63,
+    "value408": {
+        "name": "RubixCube.obj"
+    },
+    "value409": 64,
+    "value410": {
+        "name": "RubixCube.obj"
+    },
+    "value411": 65,
+    "value412": {
+        "name": "RubixCube.obj"
+    },
+    "value413": 66,
+    "value414": {
+        "name": "RubixCube.obj"
+    },
+    "value415": 67,
+    "value416": {
+        "name": "RubixCube.obj"
+    },
+    "value417": 68,
+    "value418": {
+        "name": "RubixCube.obj"
+    },
+    "value419": 69,
+    "value420": {
+        "name": "RubixCube.obj"
+    },
+    "value421": 70,
+    "value422": {
+        "name": "RubixCube.obj"
+    },
+    "value423": 71,
+    "value424": {
+        "name": "RubixCube.obj"
+    },
+    "value425": 72,
+    "value426": {
+        "name": "Mesh Groiup"
+    },
+    "value427": 73,
+    "value428": {
+        "name": "RubixCube.obj"
+    },
+    "value429": 74,
+    "value430": {
+        "name": "RubixCube.obj"
+    },
+    "value431": 75,
+    "value432": {
+        "name": "RubixCube.obj"
+    },
+    "value433": 76,
+    "value434": {
+        "name": "RubixCube.obj"
+    },
+    "value435": 77,
+    "value436": {
+        "name": "RubixCube.obj"
+    },
+    "value437": 78,
+    "value438": {
+        "name": "RubixCube.obj"
+    },
+    "value439": 79,
+    "value440": {
+        "name": "RubixCube.obj"
+    },
+    "value441": 80,
+    "value442": {
+        "name": "RubixCube.obj"
+    },
+    "value443": 81,
+    "value444": {
+        "name": "RubixCube.obj"
+    },
+    "value445": 82,
+    "value446": {
+        "name": "Mesh Groiup"
+    },
+    "value447": 83,
+    "value448": {
+        "name": "RubixCube.obj"
+    },
+    "value449": 84,
+    "value450": {
+        "name": "RubixCube.obj"
+    },
+    "value451": 85,
+    "value452": {
+        "name": "RubixCube.obj"
+    },
+    "value453": 86,
+    "value454": {
+        "name": "RubixCube.obj"
+    },
+    "value455": 87,
+    "value456": {
+        "name": "RubixCube.obj"
+    },
+    "value457": 88,
+    "value458": {
+        "name": "RubixCube.obj"
+    },
+    "value459": 89,
+    "value460": {
+        "name": "RubixCube.obj"
+    },
+    "value461": 90,
+    "value462": {
+        "name": "RubixCube.obj"
+    },
+    "value463": 91,
+    "value464": {
+        "name": "RubixCube.obj"
+    },
+    "value465": 0,
+    "value466": 90,
+    "value467": 9,
+    "value468": {
+        "children": 9,
+        "parent": 4294967295,
+        "first": 8,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value469": 8,
+    "value470": {
+        "children": 0,
+        "parent": 9,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 7
+    },
+    "value471": 7,
+    "value472": {
+        "children": 0,
+        "parent": 9,
+        "first": 4294967295,
+        "prev": 8,
+        "next": 6
+    },
+    "value473": 6,
+    "value474": {
+        "children": 0,
+        "parent": 9,
+        "first": 4294967295,
+        "prev": 7,
+        "next": 5
+    },
+    "value475": 5,
+    "value476": {
+        "children": 0,
+        "parent": 9,
+        "first": 4294967295,
+        "prev": 6,
+        "next": 4
+    },
+    "value477": 4,
+    "value478": {
+        "children": 0,
+        "parent": 9,
+        "first": 4294967295,
+        "prev": 5,
+        "next": 1048579
+    },
+    "value479": 1048579,
+    "value480": {
+        "children": 0,
+        "parent": 9,
+        "first": 4294967295,
+        "prev": 4,
+        "next": 2097153
+    },
+    "value481": 2097153,
+    "value482": {
+        "children": 0,
+        "parent": 9,
+        "first": 4294967295,
+        "prev": 1048579,
+        "next": 1048578
+    },
+    "value483": 1048578,
+    "value484": {
+        "children": 0,
+        "parent": 9,
+        "first": 4294967295,
+        "prev": 2097153,
+        "next": 1048576
+    },
+    "value485": 1048576,
+    "value486": {
+        "children": 0,
+        "parent": 9,
+        "first": 4294967295,
+        "prev": 1048578,
+        "next": 4294967295
+    },
+    "value487": 12,
+    "value488": {
+        "children": 9,
+        "parent": 4294967295,
+        "first": 13,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value489": 13,
+    "value490": {
+        "children": 0,
+        "parent": 12,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 14
+    },
+    "value491": 14,
+    "value492": {
+        "children": 0,
+        "parent": 12,
+        "first": 4294967295,
+        "prev": 13,
+        "next": 15
+    },
+    "value493": 15,
+    "value494": {
+        "children": 0,
+        "parent": 12,
+        "first": 4294967295,
+        "prev": 14,
+        "next": 16
+    },
+    "value495": 16,
+    "value496": {
+        "children": 0,
+        "parent": 12,
+        "first": 4294967295,
+        "prev": 15,
+        "next": 17
+    },
+    "value497": 17,
+    "value498": {
+        "children": 0,
+        "parent": 12,
+        "first": 4294967295,
+        "prev": 16,
+        "next": 18
+    },
+    "value499": 18,
+    "value500": {
+        "children": 0,
+        "parent": 12,
+        "first": 4294967295,
+        "prev": 17,
+        "next": 19
+    },
+    "value501": 19,
+    "value502": {
+        "children": 0,
+        "parent": 12,
+        "first": 4294967295,
+        "prev": 18,
+        "next": 20
+    },
+    "value503": 20,
+    "value504": {
+        "children": 0,
+        "parent": 12,
+        "first": 4294967295,
+        "prev": 19,
+        "next": 21
+    },
+    "value505": 21,
+    "value506": {
+        "children": 0,
+        "parent": 12,
+        "first": 4294967295,
+        "prev": 20,
+        "next": 4294967295
+    },
+    "value507": 22,
+    "value508": {
+        "children": 9,
+        "parent": 4294967295,
+        "first": 23,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value509": 23,
+    "value510": {
+        "children": 0,
+        "parent": 22,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 24
+    },
+    "value511": 24,
+    "value512": {
+        "children": 0,
+        "parent": 22,
+        "first": 4294967295,
+        "prev": 23,
+        "next": 25
+    },
+    "value513": 25,
+    "value514": {
+        "children": 0,
+        "parent": 22,
+        "first": 4294967295,
+        "prev": 24,
+        "next": 26
+    },
+    "value515": 26,
+    "value516": {
+        "children": 0,
+        "parent": 22,
+        "first": 4294967295,
+        "prev": 25,
+        "next": 27
+    },
+    "value517": 27,
+    "value518": {
+        "children": 0,
+        "parent": 22,
+        "first": 4294967295,
+        "prev": 26,
+        "next": 28
+    },
+    "value519": 28,
+    "value520": {
+        "children": 0,
+        "parent": 22,
+        "first": 4294967295,
+        "prev": 27,
+        "next": 29
+    },
+    "value521": 29,
+    "value522": {
+        "children": 0,
+        "parent": 22,
+        "first": 4294967295,
+        "prev": 28,
+        "next": 30
+    },
+    "value523": 30,
+    "value524": {
+        "children": 0,
+        "parent": 22,
+        "first": 4294967295,
+        "prev": 29,
+        "next": 31
+    },
+    "value525": 31,
+    "value526": {
+        "children": 0,
+        "parent": 22,
+        "first": 4294967295,
+        "prev": 30,
+        "next": 4294967295
+    },
+    "value527": 32,
+    "value528": {
+        "children": 9,
+        "parent": 4294967295,
+        "first": 33,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value529": 33,
+    "value530": {
+        "children": 0,
+        "parent": 32,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 34
+    },
+    "value531": 34,
+    "value532": {
+        "children": 0,
+        "parent": 32,
+        "first": 4294967295,
+        "prev": 33,
+        "next": 35
+    },
+    "value533": 35,
+    "value534": {
+        "children": 0,
+        "parent": 32,
+        "first": 4294967295,
+        "prev": 34,
+        "next": 36
+    },
+    "value535": 36,
+    "value536": {
+        "children": 0,
+        "parent": 32,
+        "first": 4294967295,
+        "prev": 35,
+        "next": 37
+    },
+    "value537": 37,
+    "value538": {
+        "children": 0,
+        "parent": 32,
+        "first": 4294967295,
+        "prev": 36,
+        "next": 38
+    },
+    "value539": 38,
+    "value540": {
+        "children": 0,
+        "parent": 32,
+        "first": 4294967295,
+        "prev": 37,
+        "next": 39
+    },
+    "value541": 39,
+    "value542": {
+        "children": 0,
+        "parent": 32,
+        "first": 4294967295,
+        "prev": 38,
+        "next": 40
+    },
+    "value543": 40,
+    "value544": {
+        "children": 0,
+        "parent": 32,
+        "first": 4294967295,
+        "prev": 39,
+        "next": 41
+    },
+    "value545": 41,
+    "value546": {
+        "children": 0,
+        "parent": 32,
+        "first": 4294967295,
+        "prev": 40,
+        "next": 4294967295
+    },
+    "value547": 42,
+    "value548": {
+        "children": 9,
+        "parent": 4294967295,
+        "first": 43,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value549": 43,
+    "value550": {
+        "children": 0,
+        "parent": 42,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 44
+    },
+    "value551": 44,
+    "value552": {
+        "children": 0,
+        "parent": 42,
+        "first": 4294967295,
+        "prev": 43,
+        "next": 45
+    },
+    "value553": 45,
+    "value554": {
+        "children": 0,
+        "parent": 42,
+        "first": 4294967295,
+        "prev": 44,
+        "next": 46
+    },
+    "value555": 46,
+    "value556": {
+        "children": 0,
+        "parent": 42,
+        "first": 4294967295,
+        "prev": 45,
+        "next": 47
+    },
+    "value557": 47,
+    "value558": {
+        "children": 0,
+        "parent": 42,
+        "first": 4294967295,
+        "prev": 46,
+        "next": 48
+    },
+    "value559": 48,
+    "value560": {
+        "children": 0,
+        "parent": 42,
+        "first": 4294967295,
+        "prev": 47,
+        "next": 49
+    },
+    "value561": 49,
+    "value562": {
+        "children": 0,
+        "parent": 42,
+        "first": 4294967295,
+        "prev": 48,
+        "next": 50
+    },
+    "value563": 50,
+    "value564": {
+        "children": 0,
+        "parent": 42,
+        "first": 4294967295,
+        "prev": 49,
+        "next": 51
+    },
+    "value565": 51,
+    "value566": {
+        "children": 0,
+        "parent": 42,
+        "first": 4294967295,
+        "prev": 50,
+        "next": 4294967295
+    },
+    "value567": 52,
+    "value568": {
+        "children": 9,
+        "parent": 4294967295,
+        "first": 53,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value569": 53,
+    "value570": {
+        "children": 0,
+        "parent": 52,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 54
+    },
+    "value571": 54,
+    "value572": {
+        "children": 0,
+        "parent": 52,
+        "first": 4294967295,
+        "prev": 53,
+        "next": 55
+    },
+    "value573": 55,
+    "value574": {
+        "children": 0,
+        "parent": 52,
+        "first": 4294967295,
+        "prev": 54,
+        "next": 56
+    },
+    "value575": 56,
+    "value576": {
+        "children": 0,
+        "parent": 52,
+        "first": 4294967295,
+        "prev": 55,
+        "next": 57
+    },
+    "value577": 57,
+    "value578": {
+        "children": 0,
+        "parent": 52,
+        "first": 4294967295,
+        "prev": 56,
+        "next": 58
+    },
+    "value579": 58,
+    "value580": {
+        "children": 0,
+        "parent": 52,
+        "first": 4294967295,
+        "prev": 57,
+        "next": 59
+    },
+    "value581": 59,
+    "value582": {
+        "children": 0,
+        "parent": 52,
+        "first": 4294967295,
+        "prev": 58,
+        "next": 60
+    },
+    "value583": 60,
+    "value584": {
+        "children": 0,
+        "parent": 52,
+        "first": 4294967295,
+        "prev": 59,
+        "next": 61
+    },
+    "value585": 61,
+    "value586": {
+        "children": 0,
+        "parent": 52,
+        "first": 4294967295,
+        "prev": 60,
+        "next": 4294967295
+    },
+    "value587": 62,
+    "value588": {
+        "children": 9,
+        "parent": 4294967295,
+        "first": 63,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value589": 63,
+    "value590": {
+        "children": 0,
+        "parent": 62,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 64
+    },
+    "value591": 64,
+    "value592": {
+        "children": 0,
+        "parent": 62,
+        "first": 4294967295,
+        "prev": 63,
+        "next": 65
+    },
+    "value593": 65,
+    "value594": {
+        "children": 0,
+        "parent": 62,
+        "first": 4294967295,
+        "prev": 64,
+        "next": 66
+    },
+    "value595": 66,
+    "value596": {
+        "children": 0,
+        "parent": 62,
+        "first": 4294967295,
+        "prev": 65,
+        "next": 67
+    },
+    "value597": 67,
+    "value598": {
+        "children": 0,
+        "parent": 62,
+        "first": 4294967295,
+        "prev": 66,
+        "next": 68
+    },
+    "value599": 68,
+    "value600": {
+        "children": 0,
+        "parent": 62,
+        "first": 4294967295,
+        "prev": 67,
+        "next": 69
+    },
+    "value601": 69,
+    "value602": {
+        "children": 0,
+        "parent": 62,
+        "first": 4294967295,
+        "prev": 68,
+        "next": 70
+    },
+    "value603": 70,
+    "value604": {
+        "children": 0,
+        "parent": 62,
+        "first": 4294967295,
+        "prev": 69,
+        "next": 71
+    },
+    "value605": 71,
+    "value606": {
+        "children": 0,
+        "parent": 62,
+        "first": 4294967295,
+        "prev": 70,
+        "next": 4294967295
+    },
+    "value607": 72,
+    "value608": {
+        "children": 9,
+        "parent": 4294967295,
+        "first": 73,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value609": 73,
+    "value610": {
+        "children": 0,
+        "parent": 72,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 74
+    },
+    "value611": 74,
+    "value612": {
+        "children": 0,
+        "parent": 72,
+        "first": 4294967295,
+        "prev": 73,
+        "next": 75
+    },
+    "value613": 75,
+    "value614": {
+        "children": 0,
+        "parent": 72,
+        "first": 4294967295,
+        "prev": 74,
+        "next": 76
+    },
+    "value615": 76,
+    "value616": {
+        "children": 0,
+        "parent": 72,
+        "first": 4294967295,
+        "prev": 75,
+        "next": 77
+    },
+    "value617": 77,
+    "value618": {
+        "children": 0,
+        "parent": 72,
+        "first": 4294967295,
+        "prev": 76,
+        "next": 78
+    },
+    "value619": 78,
+    "value620": {
+        "children": 0,
+        "parent": 72,
+        "first": 4294967295,
+        "prev": 77,
+        "next": 79
+    },
+    "value621": 79,
+    "value622": {
+        "children": 0,
+        "parent": 72,
+        "first": 4294967295,
+        "prev": 78,
+        "next": 80
+    },
+    "value623": 80,
+    "value624": {
+        "children": 0,
+        "parent": 72,
+        "first": 4294967295,
+        "prev": 79,
+        "next": 81
+    },
+    "value625": 81,
+    "value626": {
+        "children": 0,
+        "parent": 72,
+        "first": 4294967295,
+        "prev": 80,
+        "next": 4294967295
+    },
+    "value627": 82,
+    "value628": {
+        "children": 9,
+        "parent": 4294967295,
+        "first": 83,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value629": 83,
+    "value630": {
+        "children": 0,
+        "parent": 82,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 84
+    },
+    "value631": 84,
+    "value632": {
+        "children": 0,
+        "parent": 82,
+        "first": 4294967295,
+        "prev": 83,
+        "next": 85
+    },
+    "value633": 85,
+    "value634": {
+        "children": 0,
+        "parent": 82,
+        "first": 4294967295,
+        "prev": 84,
+        "next": 86
+    },
+    "value635": 86,
+    "value636": {
+        "children": 0,
+        "parent": 82,
+        "first": 4294967295,
+        "prev": 85,
+        "next": 87
+    },
+    "value637": 87,
+    "value638": {
+        "children": 0,
+        "parent": 82,
+        "first": 4294967295,
+        "prev": 86,
+        "next": 88
+    },
+    "value639": 88,
+    "value640": {
+        "children": 0,
+        "parent": 82,
+        "first": 4294967295,
+        "prev": 87,
+        "next": 89
+    },
+    "value641": 89,
+    "value642": {
+        "children": 0,
+        "parent": 82,
+        "first": 4294967295,
+        "prev": 88,
+        "next": 90
+    },
+    "value643": 90,
+    "value644": {
+        "children": 0,
+        "parent": 82,
+        "first": 4294967295,
+        "prev": 89,
+        "next": 91
+    },
+    "value645": 91,
+    "value646": {
+        "children": 0,
+        "parent": 82,
+        "first": 4294967295,
+        "prev": 90,
+        "next": 4294967295
+    },
+    "value647": 92,
+    "value648": 59,
+    "value649": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value650": 60,
+    "value651": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value652": 61,
+    "value653": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value654": 63,
+    "value655": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value656": 7,
+    "value657": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value658": 24,
+    "value659": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value660": 64,
+    "value661": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value662": 71,
+    "value663": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value664": 55,
+    "value665": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value666": 58,
+    "value667": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value668": 35,
+    "value669": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value670": 34,
+    "value671": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value672": 65,
+    "value673": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value674": 66,
+    "value675": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value676": 67,
+    "value677": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value678": 68,
+    "value679": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value680": 69,
+    "value681": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value682": 70,
+    "value683": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value684": 54,
+    "value685": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value686": 56,
+    "value687": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value688": 8,
+    "value689": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value690": 13,
+    "value691": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value692": 27,
+    "value693": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value694": 28,
+    "value695": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value696": 29,
+    "value697": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value698": 30,
+    "value699": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value700": 17,
+    "value701": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value702": 14,
+    "value703": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value704": 21,
+    "value705": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value706": 33,
+    "value707": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value708": 57,
+    "value709": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value710": 25,
+    "value711": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value712": 26,
+    "value713": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value714": 15,
+    "value715": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value716": 31,
+    "value717": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value718": 16,
+    "value719": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value720": 18,
+    "value721": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value722": 19,
+    "value723": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value724": 20,
+    "value725": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value726": 23,
+    "value727": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value728": 36,
+    "value729": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value730": 37,
+    "value731": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value732": 38,
+    "value733": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value734": 1048578,
+    "value735": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value736": 53,
+    "value737": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value738": 1048579,
+    "value739": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value740": 1048576,
+    "value741": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value742": 4,
+    "value743": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value744": 6,
+    "value745": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value746": 5,
+    "value747": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value748": 41,
+    "value749": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value750": 43,
+    "value751": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value752": 44,
+    "value753": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value754": 91,
+    "value755": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value756": 79,
+    "value757": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value758": 46,
+    "value759": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value760": 47,
+    "value761": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value762": 48,
+    "value763": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value764": 49,
+    "value765": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value766": 50,
+    "value767": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value768": 80,
+    "value769": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value770": 51,
+    "value771": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value772": 2097153,
+    "value773": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value774": 73,
+    "value775": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value776": 74,
+    "value777": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value778": 75,
+    "value779": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value780": 76,
+    "value781": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value782": 77,
+    "value783": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value784": 78,
+    "value785": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value786": 40,
+    "value787": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value788": 45,
+    "value789": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value790": 81,
+    "value791": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value792": 83,
+    "value793": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value794": 84,
+    "value795": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value796": 85,
+    "value797": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value798": 86,
+    "value799": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value800": 87,
+    "value801": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value802": 88,
+    "value803": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": 3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value804": 89,
+    "value805": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value806": 90,
+    "value807": {
+        "position": {
+            "x": 3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value808": 39,
+    "value809": {
+        "position": {
+            "x": -3.0,
+            "y": 0.0,
+            "z": -3.0
+        },
+        "orientation": {
+            "x": 2.328716386390539e-10,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value810": 9,
+    "value811": {
+        "position": {
+            "x": 9.506044387817383,
+            "y": 0.0,
+            "z": -8.582880973815918
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value812": 82,
+    "value813": {
+        "position": {
+            "x": 9.506044387817383,
+            "y": 0.0,
+            "z": 8.907344818115235
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value814": 72,
+    "value815": {
+        "position": {
+            "x": 9.506044387817383,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value816": 62,
+    "value817": {
+        "position": {
+            "x": 0.43287694454193118,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value818": 32,
+    "value819": {
+        "position": {
+            "x": -9.0,
+            "y": 0.0,
+            "z": 8.870259284973145
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value820": 22,
+    "value821": {
+        "position": {
+            "x": -9.0,
+            "y": 0.0,
+            "z": -0.17832303047180177
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value822": 10,
+    "value823": {
+        "position": {
+            "x": 0.0,
+            "y": 19.465667724609376,
+            "z": 0.39441391825675967
+        },
+        "orientation": {
+            "x": -0.6961341500282288,
+            "y": 0.006264739669859409,
+            "z": 0.006074985954910517,
+            "w": 0.717858612537384
+        },
+        "scale": {
+            "x": 1.399999976158142,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value824": 11,
+    "value825": {
+        "position": {
+            "x": 0.0,
+            "y": 45.519325256347659,
+            "z": -1.8206849098205567
+        },
+        "orientation": {
+            "x": 0.6928408145904541,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 0.72109055519104
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value826": 42,
+    "value827": {
+        "position": {
+            "x": 0.4607199430465698,
+            "y": 0.0,
+            "z": 9.0
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value828": 12,
+    "value829": {
+        "position": {
+            "x": -9.216573715209961,
+            "y": 0.0,
+            "z": -8.953136444091797
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value830": 52,
+    "value831": {
+        "position": {
+            "x": 0.4607199430465698,
+            "y": 0.0,
+            "z": -8.953136444091797
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value832": 1,
+    "value833": 11,
+    "value834": {
+        "fov degrees": 45.0,
+        "near clip": 0.10000000149011612,
+        "far clip": 1000.0,
+        "aspect ratio": 0.9468598961830139,
+        "pivot distance": 44.821868896484378,
+        "scale": 10.0,
+        "aperture": 50.0,
+        "shutter speed": 0.01666666753590107,
+        "sensitivity": 200.0,
+        "shadow bounding radius": 10.0,
+        "orthographic": false
+    },
+    "value835": 81,
+    "value836": 59,
+    "value837": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value838": 60,
+    "value839": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value840": 61,
+    "value841": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value842": 63,
+    "value843": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value844": 7,
+    "value845": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value846": 24,
+    "value847": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value848": 64,
+    "value849": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value850": 71,
+    "value851": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value852": 55,
+    "value853": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value854": 58,
+    "value855": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value856": 35,
+    "value857": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value858": 34,
+    "value859": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value860": 65,
+    "value861": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value862": 66,
+    "value863": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value864": 67,
+    "value865": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value866": 68,
+    "value867": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value868": 69,
+    "value869": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value870": 70,
+    "value871": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value872": 54,
+    "value873": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value874": 56,
+    "value875": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value876": 8,
+    "value877": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value878": 13,
+    "value879": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value880": 27,
+    "value881": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value882": 28,
+    "value883": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value884": 29,
+    "value885": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value886": 30,
+    "value887": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value888": 17,
+    "value889": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value890": 14,
+    "value891": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value892": 21,
+    "value893": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value894": 33,
+    "value895": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value896": 57,
+    "value897": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value898": 25,
+    "value899": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value900": 26,
+    "value901": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value902": 15,
+    "value903": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value904": 31,
+    "value905": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value906": 16,
+    "value907": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value908": 18,
+    "value909": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value910": 19,
+    "value911": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value912": 20,
+    "value913": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value914": 23,
+    "value915": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value916": 36,
+    "value917": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value918": 37,
+    "value919": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value920": 38,
+    "value921": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value922": 1048578,
+    "value923": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value924": 53,
+    "value925": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value926": 1048579,
+    "value927": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value928": 1048576,
+    "value929": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value930": 4,
+    "value931": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value932": 6,
+    "value933": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value934": 5,
+    "value935": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value936": 41,
+    "value937": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value938": 43,
+    "value939": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value940": 44,
+    "value941": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value942": 91,
+    "value943": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value944": 79,
+    "value945": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value946": 46,
+    "value947": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value948": 47,
+    "value949": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value950": 48,
+    "value951": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value952": 49,
+    "value953": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value954": 50,
+    "value955": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value956": 80,
+    "value957": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value958": 51,
+    "value959": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value960": 2097153,
+    "value961": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value962": 73,
+    "value963": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value964": 74,
+    "value965": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value966": 75,
+    "value967": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value968": 76,
+    "value969": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value970": 77,
+    "value971": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value972": 78,
+    "value973": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value974": 40,
+    "value975": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value976": 45,
+    "value977": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value978": 81,
+    "value979": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value980": 83,
+    "value981": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value982": 84,
+    "value983": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value984": 85,
+    "value985": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value986": 86,
+    "value987": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value988": 87,
+    "value989": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value990": 88,
+    "value991": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value992": 89,
+    "value993": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value994": 90,
+    "value995": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value996": 39,
+    "value997": {
+        "model": "assets\\meshes\\RubixCube.obj",
+        "index": 0
+    },
+    "value998": 1,
+    "value999": 10,
+    "value1000": {
+        "type": 2,
+        "color": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0,
+            "w": 1.0
+        },
+        "radius": 1.059999942779541,
+        "cutOff": 0.0,
+        "outerCutOff": 0.0,
+        "ambient": {
+            "x": 0.0,
+            "y": 0.10000000149011612,
+            "z": 0.10000000149011612
+        },
+        "diffuse": {
+            "x": 0.800000011920929,
+            "y": 0.800000011920929,
+            "z": 0.800000011920929
+        },
+        "specular": {
+            "x": 1.7999999523162842,
+            "y": 1.7999999523162842,
+            "z": 1.7999999523162842
+        },
+        "constant": 1.0,
+        "linear": 0.09000000357627869,
+        "quadratic": 0.03200000151991844
+    },
+    "value1001": 81,
+    "value1002": 59,
+    "value1003": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1004": 60,
+    "value1005": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1006": 61,
+    "value1007": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1008": 63,
+    "value1009": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1010": 7,
+    "value1011": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1012": 24,
+    "value1013": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1014": 64,
+    "value1015": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1016": 71,
+    "value1017": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1018": 55,
+    "value1019": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1020": 58,
+    "value1021": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1022": 35,
+    "value1023": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1024": 34,
+    "value1025": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1026": 65,
+    "value1027": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1028": 66,
+    "value1029": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1030": 67,
+    "value1031": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1032": 68,
+    "value1033": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1034": 69,
+    "value1035": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1036": 70,
+    "value1037": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1038": 54,
+    "value1039": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1040": 56,
+    "value1041": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1042": 8,
+    "value1043": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1044": 13,
+    "value1045": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1046": 27,
+    "value1047": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1048": 28,
+    "value1049": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1050": 29,
+    "value1051": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1052": 30,
+    "value1053": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1054": 17,
+    "value1055": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1056": 14,
+    "value1057": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1058": 21,
+    "value1059": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1060": 33,
+    "value1061": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1062": 57,
+    "value1063": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1064": 25,
+    "value1065": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1066": 26,
+    "value1067": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1068": 15,
+    "value1069": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1070": 31,
+    "value1071": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1072": 16,
+    "value1073": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1074": 18,
+    "value1075": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1076": 19,
+    "value1077": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1078": 20,
+    "value1079": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1080": 23,
+    "value1081": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1082": 36,
+    "value1083": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1084": 37,
+    "value1085": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1086": 38,
+    "value1087": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1088": 1048578,
+    "value1089": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1090": 53,
+    "value1091": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1092": 1048579,
+    "value1093": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1094": 1048576,
+    "value1095": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1096": 4,
+    "value1097": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1098": 6,
+    "value1099": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1100": 5,
+    "value1101": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1102": 41,
+    "value1103": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1104": 43,
+    "value1105": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1106": 44,
+    "value1107": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1108": 91,
+    "value1109": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1110": 79,
+    "value1111": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1112": 46,
+    "value1113": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1114": 47,
+    "value1115": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1116": 48,
+    "value1117": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1118": 49,
+    "value1119": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1120": 50,
+    "value1121": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1122": 80,
+    "value1123": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1124": 51,
+    "value1125": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1126": 2097153,
+    "value1127": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1128": 73,
+    "value1129": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1130": 74,
+    "value1131": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1132": 75,
+    "value1133": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1134": 76,
+    "value1135": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1136": 77,
+    "value1137": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1138": 78,
+    "value1139": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1140": 40,
+    "value1141": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1142": 45,
+    "value1143": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1144": 81,
+    "value1145": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1146": 83,
+    "value1147": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1148": 84,
+    "value1149": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1150": 85,
+    "value1151": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1152": 86,
+    "value1153": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1154": 87,
+    "value1155": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1156": 88,
+    "value1157": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1158": 89,
+    "value1159": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1160": 90,
+    "value1161": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1162": 39,
+    "value1163": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "assets\\textures\\Diffuse.png",
+        "specular": "assets\\textures\\Diffuse_Spec.png",
+        "normal": "assets\\textures\\Diffuse_Normal.png",
+        "shininess": 22.493999481201173
+    },
+    "value1164": 0,
+    "value1165": 0,
+    "value1166": 0,
+    "value1167": 0,
+    "value1168": 0,
+    "value1169": 0
+}

@@ -5,7 +5,7 @@
 namespace fe {
     class HierarchyPanel : public EditorPanel {
     public:
-        explicit HierarchyPanel(Editor* editor);
+        explicit HierarchyPanel(Editor& editor);
         ~HierarchyPanel() override;
 
         void onImGui() override;

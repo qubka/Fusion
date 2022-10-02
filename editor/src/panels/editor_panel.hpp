@@ -13,7 +13,7 @@ namespace fe {
     class EditorPanel {
         friend class Editor;
     public:
-        EditorPanel(std::string_view title, std::string_view name, Editor* editor) : title{title}, name{name}, editor{editor} {};
+        EditorPanel(std::string_view title, std::string_view name, Editor& editor) : title{title}, name{name}, editor{editor} {};
         virtual ~EditorPanel() = default;
 
         const std::string& getTitle() const { return title; }
@@ -23,9 +23,6 @@ namespace fe {
         bool isActive() const { return active; }
         void setActive(bool flag) { active = flag; }
 
-        Editor* getEditor() { return editor; }
-        void setEditor(Editor* ptr) { editor = ptr; }
-
     protected:
         virtual void onImGui() = 0;
         virtual void onNewScene(Scene* scene) {}
@@ -33,7 +30,7 @@ namespace fe {
 
         std::string title;
         std::string name;
-        Editor* editor;
+        Editor& editor;
         bool active{ true };
     };
 }

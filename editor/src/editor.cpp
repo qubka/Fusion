@@ -55,8 +55,8 @@ void Editor::onStart() {
     componentIconMap[type_id<SphereColliderComponent>] = ICON_MDI_CIRCLE_OUTLINE;
     componentIconMap[type_id<CapsuleColliderComponent>] = ICON_MDI_PILL;
     componentIconMap[type_id<MeshColliderComponent>] =  ICON_MDI_SHAPE_OUTLINE;
-    /*componentIconMap[type_id<MaterialComponent>] = ICON_MDI_MATERIAL_UI;
-    componentIconMap[type_id<PointLightComponent>] = ICON_MDI_LIGHTBULB;
+    componentIconMap[type_id<MaterialComponent>] = ICON_MDI_MATERIAL_UI;
+    /*componentIconMap[type_id<PointLightComponent>] = ICON_MDI_LIGHTBULB;
     componentIconMap[type_id<DirectionalLightComponent>] = ICON_MDI_SPOTLIGHT_BEAM;
     componentIconMap[type_id<SoundComponent>] = ICON_MDI_VOLUME_HIGH;
     componentIconMap[type_id<SpriteComponent>] = ICON_MDI_IMAGE;
@@ -64,14 +64,14 @@ void Editor::onStart() {
     componentIconMap[type_id<EnvironmentComponent>] = ICON_MDI_EARTH;*/
     componentIconMap[type_id<Editor>] = ICON_MDI_SQUARE;
 
-    panels.push_back(std::make_unique<ApplicationInfoPanel>(this));
-    panels.push_back(std::make_unique<ConsolePanel>(this));
-    panels.push_back(std::make_unique<ContentBrowserPanel>(this));
-    panels.push_back(std::make_unique<ProjectSettingsPanel>(this));
-    panels.push_back(std::make_unique<HierarchyPanel>(this));
-    panels.push_back(std::make_unique<InspectorPanel>(this));
-    panels.push_back(std::make_unique<SceneViewPanel>(this));
-    panels.push_back(std::make_unique<GameViewPanel>(this));
+    panels.push_back(std::make_unique<ApplicationInfoPanel>(*this));
+    panels.push_back(std::make_unique<ConsolePanel>(*this));
+    panels.push_back(std::make_unique<ContentBrowserPanel>(*this));
+    panels.push_back(std::make_unique<ProjectSettingsPanel>(*this));
+    panels.push_back(std::make_unique<HierarchyPanel>(*this));
+    panels.push_back(std::make_unique<InspectorPanel>(*this));
+    panels.push_back(std::make_unique<SceneViewPanel>(*this));
+    panels.push_back(std::make_unique<GameViewPanel>(*this));
 
     editorSettings.showImGuiDemo = false;
 }
@@ -247,6 +247,8 @@ void Editor::beginDockSpace(bool gameFullScreen) {
                 }
             }
         } else {
+
+
             for (auto& panel: hiddenPanels) {
                 panel->setActive(true);
             }
@@ -391,7 +393,6 @@ void Editor::drawMenuBar() {
         if (ImGui::BeginMenu("Panels")) {
             for (auto& panel : panels) {
                 if (ImGui::MenuItem(panel->getTitle().c_str(), "", &panel->Active(), true)) {
-                    panel->setActive(true);
                 }
             }
 
@@ -423,7 +424,19 @@ void Editor::drawMenuBar() {
         }
 
         if (ImGui::BeginMenu("Entity")) {
-            // TODO::
+
+            auto scene = SceneManager::Get()->getScene();
+            auto& registry = scene->getRegistry();
+
+            if (ImGui::MenuItem("Create Empty")) {
+                scene->createEntity();
+            }
+
+            if (ImGui::MenuItem("Light")) {
+                auto entity = scene->createEntity("Light");
+                registry.emplace<TransformComponent>(entity);
+                registry.emplace<LightComponent>(entity);
+            }
 
             ImGui::EndMenu();
         }
@@ -610,7 +623,7 @@ void Editor::drawMenuBar() {
 
         ImGui::SameLine();
 
-        ImGui::TextUnformatted(projectLocation.empty() ? fs::current_path().string().c_str() : projectLocation.c_str());
+        ImGui::TextUnformatted(projectLocation.empty() ? fs::current_path().string().c_str() : projectLocation.string().c_str());
 
         ImGui::Separator();
 
@@ -761,32 +774,23 @@ void Editor::newProjectLocationCallback(const fs::path& path) {
 }
 
 void Editor::removePanel(EditorPanel* panel) {
-    for (const auto& [i, p] : enumerate(panels)) {
-        if (p.get() == panel) {
-            panels.erase(panels.begin() + i);
-            return;
-        }
-    }
+    panels.erase(std::remove_if(panels.begin(), panels.end(), [&panel](const auto& p) {
+        return p.get() == panel;
+    }));
 }
 
 void Editor::openTextFile(const fs::path& filepath, const std::function<void()>& callback) {
-    for (const auto& [i, p] : enumerate(panels)) {
-        if (p->getName() == "TextEdit") {
-            panels.erase(panels.begin() + i);
-            break;
-        }
-    }
-
-    panels.emplace_back(std::make_unique<TextEditPanel>(filepath, callback, this));
+    panels.erase(std::remove_if(panels.begin(), panels.end(), [](const auto& p) {
+        return p->getName() == "TextEdit";
+    }));
+    panels.push_back(std::make_unique<TextEditPanel>(filepath, callback, *this));
 }
 
 EditorPanel* Editor::getPanel(const std::string& name) {
-    for (const auto& panel : panels) {
-        if (panel->getName() == name) {
-            return panel.get();
-        }
-    }
-    return nullptr;
+    auto it = std::find_if(panels.begin(), panels.end(), [&name](const auto& p) {
+        return p->getName() == name;
+    });
+    return it != panels.end() ? it->get() : nullptr;
 }
 
 void Editor::focusCamera(const glm::vec3& point, float distance, float speed) {
@@ -810,12 +814,13 @@ void Editor::selectObject(const Ray& ray, const glm::vec2& position) {
     entt::entity currentClosestEntity = entt::null;
 
     for (const auto& [entity, transform, mesh] : view.each()) {
-        if (!mesh.runtime)
+        auto filter = mesh.get();
+        if (!filter)
             continue;
 
         const auto& worldTransform = transform.getWorldMatrix();
 
-        auto bbCopy = mesh.runtime->getBoundingBox().transformed(worldTransform);
+        auto bbCopy = filter->getBoundingBox().transformed(worldTransform);
 
         float min, max;
         if (bbCopy.intersect(ray, min, max) > 0) {
@@ -831,7 +836,7 @@ void Editor::selectObject(const Ray& ray, const glm::vec2& position) {
     if (selectedEntity != entt::null && selectedEntity == currentClosestEntity) {
         if (((now - lastSelectTime).asSeconds() < 0.5f) && glm::distance2(lastSelectPos, position) <= 1.0f) {
             auto& transform = registry.get<TransformComponent>(currentClosestEntity);
-            auto& bb = registry.get<MeshComponent>(currentClosestEntity).runtime->getBoundingBox();
+            auto& bb = registry.get<MeshComponent>(currentClosestEntity).get()->getBoundingBox();
             focusCamera(transform.getWorldPosition(), glm::distance(bb.getMin(), bb.getMax()));
         }
     } else {

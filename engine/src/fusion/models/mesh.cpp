@@ -2,6 +2,9 @@
 
 using namespace fe;
 
+Mesh::Mesh(uint32_t index) : index{index} {
+}
+
 bool Mesh::cmdRender(const CommandBuffer& commandBuffer, uint32_t instances) const {
     if (vertexBuffer && indexBuffer) {
         VkBuffer vertexBuffers[1] = { *vertexBuffer };

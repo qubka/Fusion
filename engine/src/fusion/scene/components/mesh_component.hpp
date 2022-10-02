@@ -7,38 +7,23 @@
 
 namespace fe {
     struct MeshComponent {
-        std::shared_ptr<Mesh> runtime;
+        std::shared_ptr<Model> model;
+        uint32_t index;
 
-        /*Model& operator*() { return *model; }
-        const Model& operator*() const { return *model; }
-        operator Model() const { return *model; }*/
-
-        //fs::path path;
-        //bool castShadows{ false };
+        const Mesh* get() const { return (model && *model) ? model->getMesh(index) : nullptr; }
 
         template<typename Archive>
         void load(Archive& archive) {
-            fs::path path;
-            uint32_t index;
-            archive(cereal::make_nvp("path", path),
-                    cereal::make_nvp("index", index));
-
-            if (auto model = AssetRegistry::Get()->get_or_emplace<Model>(path)) {
-                runtime = model->getMesh(index);
-            } else {
-                LOG_ERROR << "Asset not found: \"" << path << "\"";
-            }
+            fs::path modelPath;
+            archive(cereal::make_nvp("model", modelPath));
+            model = AssetRegistry::Get()->load<Model>(modelPath);
+            archive(cereal::make_nvp("index", index));
         }
 
         template<typename Archive>
         void save(Archive& archive) const {
-            if (runtime) {
-                archive(cereal::make_nvp("path", runtime->getPath()),
-                        cereal::make_nvp("index", runtime->getMeshIndex()));
-            } else {
-                archive(cereal::make_nvp("path", ""),
-                        cereal::make_nvp("index", ""));
-            }
+            archive(cereal::make_nvp("model", model->getPath()));
+            archive(cereal::make_nvp("index", index));
         }
     };
 }

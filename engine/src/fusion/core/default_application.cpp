@@ -6,16 +6,22 @@
 #include "fusion/scene/scene_manager.hpp"
 
 #if FUSION_PLATFORM_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 using namespace fe;
 
 DefaultApplication::DefaultApplication(std::string_view name) : Application{name} {
-#if FUSION_PLATFORM_MAC
+#ifdef FUSION_PLATFORM_WINDOWS
+    wchar_t path[MAX_PATH] = { 0 };
+    GetModuleFileNameW(nullptr, path, MAX_PATH);
+    executablePath = fs::path{path}.parent_path().parent_path().parent_path();
+#else
+    #if FUSION_PLATFORM_MAC
     executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path().parent_path().parent_path().parent_path();
 #else
     executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path();
+#endif
 #endif
 
     LOG_INFO << "Working directory: \"" << executablePath << "\"";
@@ -192,7 +198,7 @@ void DefaultApplication::showConsole() {
         freopen_s(&stream, "CONIN$", "r", stdin);
         freopen_s(&stream, "CONOUT$", "w+", stdout);
         freopen_s(&stream, "CONOUT$", "w+", stderr);
-        SetConsoleTitle(TEXT(windowInfo.title.c_str()));
+        SetConsoleTitle(TEXT(projectSettings.title.c_str()));
         consoleOpened = true;
     } else if (!projectSettings.isShowConsole && consoleOpened) {
         FreeConsole();

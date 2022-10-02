@@ -12,7 +12,7 @@ namespace fe {
             std::string_view name;
             typename Base::Stage stage;
         };
-        using TRegistryMap = std::flat_map<type_index, TCreateValue>;
+        using TRegistryMap = fst::unordered_flatmap<type_index, TCreateValue>;
 
         //ModuleFactory() = default;
         virtual ~ModuleFactory() = default;

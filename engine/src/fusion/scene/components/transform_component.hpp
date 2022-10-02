@@ -11,9 +11,9 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("position", localPosition),
-                    cereal::make_nvp("orientation", localOrientation),
-                    cereal::make_nvp("scale", localScale));
+            archive(cereal::make_nvp("position", localPosition));
+            archive(cereal::make_nvp("orientation", localOrientation));
+            archive(cereal::make_nvp("scale", localScale));
         }
     };
 }

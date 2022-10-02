@@ -36,8 +36,8 @@ namespace fe {
         void setVersion(Version ver) { version = ver; }
 
         /**
-         *
-         * @return
+         * Gets the root path of the application.
+         * @return The root path.
          */
         virtual const fs::path& getRootPath() const = 0;
 

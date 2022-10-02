@@ -5,7 +5,7 @@
 
 using namespace fe;
 
-ProjectSettingsPanel::ProjectSettingsPanel(Editor* editor) : EditorPanel{ICON_MDI_APPLICATION " Project Settings###projectsettings", "Project Settings", editor} {
+ProjectSettingsPanel::ProjectSettingsPanel(Editor& editor) : EditorPanel{ICON_MDI_APPLICATION " Project Settings###projectsettings", "Project Settings", editor} {
 
 }
 
@@ -23,7 +23,7 @@ void ProjectSettingsPanel::onImGui() {
         ImGui::Columns(2);
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
 
-        auto& projectSettings = editor->getProjectSettings();
+        auto& projectSettings = editor.getProjectSettings();
         ImGuiUtils::PropertyText("Project Version", projectSettings.projectVersion.c_str());
         ImGuiUtils::PropertyText("Project Name", projectSettings.projectName.c_str());
         ImGuiUtils::PropertyText("Project Root", projectSettings.projectRoot.string().c_str());
@@ -44,7 +44,7 @@ void ProjectSettingsPanel::onImGui() {
         if (ImGuiUtils::Property("Floating", projectSettings.isFloating))
             window->setFloating(projectSettings.isVSync);
         if (ImGuiUtils::Property("Show Console", projectSettings.isShowConsole))
-            editor->showConsole();
+            editor.showConsole();
         ImGui::PopStyleVar();
         ImGui::Columns(1);
     }

@@ -253,6 +253,24 @@ uint32_t Shader::GlTypeToSize(int32_t type) {
     }
 }
 
+VkShaderStageFlagBits Shader::GetShaderStage(const fs::path& path) {
+    std::string extension{ FileSystem::GetExtension(path) };
+    if (extension == ".comp")
+        return VK_SHADER_STAGE_COMPUTE_BIT;
+    else if (extension == ".vert")
+        return VK_SHADER_STAGE_VERTEX_BIT;
+    else if (extension == ".tesc")
+        return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+    else if (extension == ".tese")
+        return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+    else if (extension == ".geom")
+        return VK_SHADER_STAGE_GEOMETRY_BIT;
+    else if (extension == ".frag")
+        return VK_SHADER_STAGE_FRAGMENT_BIT;
+    else
+        return VK_SHADER_STAGE_ALL;
+}
+
 bool Shader::reportedNotFound(const std::string& name, bool reportIfFound) const {
     if (std::find(notFoundNames.begin(), notFoundNames.end(), name) == notFoundNames.end()) {
         if (reportIfFound) {
@@ -265,6 +283,12 @@ bool Shader::reportedNotFound(const std::string& name, bool reportIfFound) const
 
 std::optional<VkDescriptorType> Shader::getDescriptorType(uint32_t location) const {
     if (auto it = descriptorTypes.find(location); it != descriptorTypes.end())
+        return it->second;
+    return std::nullopt;
+}
+
+std::optional<uint32_t> Shader::getDescriptorSet(const std::string& name) const {
+    if (auto it = descriptorSets.find(name); it != descriptorSets.end())
         return it->second;
     return std::nullopt;
 }
@@ -310,7 +334,7 @@ std::vector<VkSpecializationMapEntry> Shader::getSpecializationMapEntries(VkShad
         return {};
 
     std::vector<const Constant*> values;
-    for (auto& constant : constants.values()) {
+    for (const auto& [constantName, constant] : constants) {
         if (constant.stageFlags == moduleFlag)
             values.push_back(&constant);
     }
@@ -345,7 +369,7 @@ std::vector<VkPushConstantRange> Shader::getPushConstantRanges() const {
         return {};
 
     std::vector<const UniformBlock*> values;
-    for (const auto& uniformBlock : uniformBlocks.values()) {
+    for (const auto& [uniformName, uniformBlock] : uniformBlocks) {
         if (uniformBlock.type == UniformBlock::Type::Push)
             values.push_back(&uniformBlock);
     }
@@ -491,7 +515,7 @@ TBuiltInResource getResources() {
 	return resources;
 }
 
-VkShaderModule Shader::createShaderModule(const std::string& moduleName, const std::string& moduleCode, VkShaderStageFlags moduleFlag) {
+VkShaderModule Shader::createShaderModule(const std::string& moduleName, const std::string& moduleCode, VkShaderStageFlagBits moduleFlag) {
 	const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
     if (name.empty())
@@ -587,12 +611,12 @@ VkShaderModule Shader::createShaderModule(const std::string& moduleName, const s
 	return shaderModule;
 }
 
-std::optional<Shader::Specialization> Shader::createSpecialization(const std::flat_map<std::string, SpecConstant>& specConstants, VkShaderStageFlagBits moduleFlag) const {
+std::optional<Shader::Specialization> Shader::createSpecialization(const fst::unordered_flatmap<std::string, Shader::SpecConstant>& specConstants, VkShaderStageFlagBits moduleFlag) const {
     auto mapEntries = getSpecializationMapEntries(moduleFlag);
     if (mapEntries.empty())
         return std::nullopt;
 
-    std::flat_map<uint32_t, SpecConstant> data;
+    fst::split_flatmap<uint32_t, SpecConstant> data;
     // Sorting constants by specId for specified stage
     for (const auto& [constantName, specConstant] : specConstants) {
         auto constant = getConstant(constantName);
@@ -640,6 +664,7 @@ void Shader::createReflection() {
                 break;
 		}
 
+        descriptorSets.emplace(uniformBlockName, uniformBlock.set);
 		descriptorLocations.emplace(uniformBlockName, uniformBlock.binding);
 		descriptorSizes.emplace(uniformBlockName, uniformBlock.size);
 	}
@@ -666,27 +691,25 @@ void Shader::createReflection() {
                 break;
 		}
 
+        descriptorSets.emplace(uniformName, uniform.set);
 		descriptorLocations.emplace(uniformName, uniform.binding);
 		descriptorSizes.emplace(uniformName, uniform.size);
 	}
 
 	// Sort descriptors by binding.
-	std::sort(descriptorSetLayouts.begin(), descriptorSetLayouts.end(), [](const VkDescriptorSetLayoutBinding& l, const VkDescriptorSetLayoutBinding& r) {
-		return l.binding < r.binding;
-	});
-
-	// Gets the last descriptors binding.
-	if (!descriptorSetLayouts.empty())
-		lastDescriptorBinding = descriptorSetLayouts.back().binding;
+    std::sort(descriptorSetLayouts.begin(), descriptorSetLayouts.end(), [](const VkDescriptorSetLayoutBinding& l, const VkDescriptorSetLayoutBinding& r) {
+        return l.binding < r.binding;
+    });
 
 	// Gets the descriptor type for each descriptor.
-	for (const auto& descriptor : descriptorSetLayouts)
-		descriptorTypes.emplace(descriptor.binding, descriptor.descriptorType);
+    for (const auto& layout : descriptorSetLayouts) {
+        descriptorTypes.emplace(layout.binding, layout.descriptorType);
+    }
 
     // Process attribute descriptions.
     {
         std::vector<const Attribute*> values;
-        for (auto& attribute : attributes.values()) {
+        for (const auto& [attributeName, attribute] : attributes) {
             values.push_back(&attribute);
         }
 
@@ -714,10 +737,12 @@ void Shader::createReflection() {
     }
 }
 
-void Shader::loadUniformBlock(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i) {
+void Shader::loadUniformBlock(const glslang::TProgram& program, VkShaderStageFlagBits stageFlag, int32_t i) {
 	auto reflection = program.getUniformBlock(i);
     if (reflection.name.empty())
         return;
+
+    auto& qualifier = reflection.getType()->getQualifier();
 
     if (auto it = uniformBlocks.find(reflection.name); it != uniformBlocks.end()) {
         it->second.stageFlags |= stageFlag;
@@ -725,20 +750,22 @@ void Shader::loadUniformBlock(const glslang::TProgram& program, VkShaderStageFla
     }
 
 	auto type = UniformBlock::Type::None;
-	if (reflection.getType()->getQualifier().storage == glslang::EvqUniform)
+	if (qualifier.storage == glslang::EvqUniform)
 		type = UniformBlock::Type::Uniform;
-	if (reflection.getType()->getQualifier().storage == glslang::EvqBuffer)
+	if (qualifier.storage == glslang::EvqBuffer)
 		type = UniformBlock::Type::Storage;
-	if (reflection.getType()->getQualifier().layoutPushConstant)
+	if (qualifier.layoutPushConstant)
 		type = UniformBlock::Type::Push;
 
-	uniformBlocks.emplace(reflection.name, UniformBlock{ reflection.getBinding(), reflection.size, stageFlag, type });
+	uniformBlocks.emplace(reflection.name, UniformBlock{ static_cast<int32_t>(qualifier.layoutSet), reflection.getBinding(), reflection.size, stageFlag, type });
 }
 
-void Shader::loadUniform(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i) {
+void Shader::loadUniform(const glslang::TProgram& program, VkShaderStageFlagBits stageFlag, int32_t i) {
 	auto reflection = program.getUniform(i);
     if (reflection.name.empty())
         return;
+
+    auto& qualifier = reflection.getType()->getQualifier();
 
 	if (reflection.getBinding() == -1) {
 		auto splitName = String::Split(reflection.name, '.');
@@ -747,8 +774,8 @@ void Shader::loadUniform(const glslang::TProgram& program, VkShaderStageFlags st
             auto& name = splitName.front();
             if (auto it = uniformBlocks.find(name); it != uniformBlocks.end()) {
                 it->second.uniforms.emplace(String::ReplaceFirst(reflection.name, name + ".", ""),
-                                            Uniform{ reflection.getBinding(), reflection.offset, computeSize(*reflection.getType()),
-                                                     reflection.glDefineType, false, false, stageFlag });
+                                            Uniform{ static_cast<int32_t>(qualifier.layoutSet), reflection.getBinding(), reflection.offset,
+                                                     computeSize(*reflection.getType()), reflection.glDefineType, false, false, stageFlag });
                 return;
             }
 		}
@@ -759,15 +786,11 @@ void Shader::loadUniform(const glslang::TProgram& program, VkShaderStageFlags st
         return;
     }
 
-	auto& qualifier = reflection.getType()->getQualifier();
-	uniforms.emplace(reflection.name, Uniform{ reflection.getBinding(), reflection.offset, reflection.size, reflection.glDefineType, qualifier.readonly, qualifier.writeonly, stageFlag });
-
-    /*if (reflection.arrayStride > 0 && reflection.topLevelArrayStride > 0 && reflection.size == -1) {
-    LOG_DEBUG << "Bindless???";
-    }*/
+	uniforms.emplace(reflection.name, Uniform{ static_cast<int32_t>(qualifier.layoutSet), reflection.getBinding(), reflection.offset,
+                                               reflection.size, reflection.glDefineType, qualifier.readonly, qualifier.writeonly, stageFlag });
 }
 
-void Shader::loadAttribute(const glslang::TProgram& program, VkShaderStageFlags stageFlag, int32_t i) {
+void Shader::loadAttribute(const glslang::TProgram& program, VkShaderStageFlagBits stageFlag, int32_t i) {
 	auto reflection = program.getPipeInput(i);
 	if (reflection.name.empty())
 		return;
@@ -779,10 +802,10 @@ void Shader::loadAttribute(const glslang::TProgram& program, VkShaderStageFlags 
 	attributes.emplace(reflection.name, Attribute{ static_cast<int32_t>(qualifier.layoutSet), static_cast<int32_t>(qualifier.layoutLocation), computeSize(*reflection.getType()), reflection.glDefineType });
 }
 
-void Shader::loadConstants(const glslang::TIntermediate& intermediate, VkShaderStageFlags stageFlag) {
+void Shader::loadConstants(const glslang::TIntermediate& intermediate, VkShaderStageFlagBits stageFlag) {
     class ConstantTraverser : public glslang::TIntermTraverser {
     public:
-        ConstantTraverser(std::flat_map<std::string, Shader::Constant>& constants, VkShaderStageFlags stageFlag)
+        ConstantTraverser(fst::unordered_flatmap<std::string, Shader::Constant>& constants, VkShaderStageFlagBits stageFlag)
                 : TIntermTraverser{}, constants{constants}, stageFlag{stageFlag} {}
 
         void visitSymbol(glslang::TIntermSymbol* symbol) override {
@@ -806,8 +829,8 @@ void Shader::loadConstants(const glslang::TIntermediate& intermediate, VkShaderS
         }
 
     private:
-        std::flat_map<std::string, Shader::Constant>& constants;
-        VkShaderStageFlags stageFlag;
+        fst::unordered_flatmap<std::string, Shader::Constant>& constants;
+        VkShaderStageFlagBits stageFlag;
     };
 
     ConstantTraverser traverser{constants, stageFlag};

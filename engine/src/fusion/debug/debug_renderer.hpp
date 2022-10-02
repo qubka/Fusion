@@ -5,6 +5,7 @@ namespace fe {
     class Frustum;
     class AABB;
     class Sphere;
+    class LightComponent;
 
     class DebugRenderer : public Module::Registrar<DebugRenderer> {
     public:
@@ -46,7 +47,7 @@ namespace fe {
         static void DebugDraw(const AABB& box, const glm::vec4& edgeColour, bool cornersOnly = false, float width = 0.02f);
         static void DebugDraw(const Sphere& sphere, const glm::vec4& color);
         static void DebugDraw(const Frustum& frustum, const glm::vec4& color);
-        //static void DebugDraw(const Light* light, const glm::quat& rotation, const glm::vec4& color);
+        static void DebugDraw(const LightComponent& light, const glm::vec3& position, const glm::quat& rotation, const glm::vec3& direction, const glm::vec4& color);
         static void DebugDraw(const Ray& ray, const glm::vec4& color = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f}, float distance = 1000.0f);
         //static void DebugDraw(SoundNode* sound, const glm::vec4& color);
         static void DebugDrawSphere(float radius, const glm::vec3& position, const glm::vec4& color);

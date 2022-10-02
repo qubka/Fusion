@@ -9,6 +9,7 @@ Transform::Transform(const glm::mat4& local) {
     localMatrix = local;
     worldMatrix = local;
     normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
+    dirty = false;
 }
 
 Transform::Transform(const glm::mat4& parent, const glm::mat4& local) {
@@ -19,6 +20,7 @@ Transform::Transform(const glm::mat4& parent, const glm::mat4& local) {
     localMatrix = local;
     worldMatrix = parent * local;
     normalMatrix = glm::inverseTranspose(glm::mat3{worldMatrix});
+    dirty = false;
 }
 
 Transform::Transform(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale) {

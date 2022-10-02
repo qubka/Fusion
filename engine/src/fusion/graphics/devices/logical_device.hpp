@@ -30,6 +30,8 @@ namespace fe {
         VkDevice logicalDevice{ VK_NULL_HANDLE };
         VkPhysicalDeviceFeatures enabledFeatures = {};
 
+        VkPhysicalDeviceDescriptorIndexingFeaturesEXT physicalDeviceDescriptorIndexingFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT };
+
         VkQueue graphicsQueue{ VK_NULL_HANDLE };
         VkQueue presentQueue{ VK_NULL_HANDLE };
         VkQueue computeQueue{ VK_NULL_HANDLE };

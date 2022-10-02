@@ -38,14 +38,6 @@ namespace fe {
         float aspectRatio{ 1.0f };
         ImGuiUtils::Theme theme{ ImGuiUtils::Theme::Black };
         int debugDrawFlags{};
-
-        /*f
-        uint32_t physics2DDebugFlags{ 0 };
-        uint32_t physics3DDebugFlags{ 0 };
-        bool showViewSelected{ false };
-        bool sleepOutofFocus{ true };
-        float imGuizmoScale{ 0.25f };
-        */
     };
 
     enum class EditorState : unsigned char {
@@ -62,7 +54,6 @@ namespace fe {
 
         void openFile();
 
-        // TODO: Rework
         void fileOpenCallback(const fs::path& path);
         void projectOpenCallback(const fs::path& path);
         void newProjectOpenCallback(const fs::path& path);
@@ -84,7 +75,7 @@ namespace fe {
         entt::entity getCopiedEntity() const { return copiedEntity; }
         bool getCutCopyEntity() const { return cutCopyEntity; }
 
-        const std::flat_map<type_index, std::string>& getComponentIconMap() const { return componentIconMap; }
+        const fst::unordered_flatmap<type_index, std::string>& getComponentIconMap() const { return componentIconMap; }
         bool getComponentIcon(type_index type, std::string& out) const {
             if (auto icon = componentIconMap.find(type); icon != componentIconMap.end()) {
                 out = icon->second;
@@ -124,10 +115,9 @@ namespace fe {
         DateTime lastSelectTime;
         glm::vec2 lastSelectPos;
 
-        std::queue<std::string> mementos;
-        FileBrowserPanel fileBrowserPanel{ this };
+        FileBrowserPanel fileBrowserPanel{ *this };
         std::vector<std::unique_ptr<EditorPanel>> panels;
-        std::flat_map<type_index, std::string> componentIconMap;
+        fst::unordered_flatmap<type_index, std::string> componentIconMap;
 
         entt::entity selectedEntity{ entt::null };
         entt::entity copiedEntity{ entt::null };

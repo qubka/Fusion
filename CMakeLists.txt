@@ -11,12 +11,18 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
+# Speed up building on MinGW
+if(WIN32)
+    add_link_options(-fuse-ld=lld)
+    #add_compile_options(-femulated-tls)
+endif()
+
 if(NOT "${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
     message(FATAL_ERROR "Only 64 bit builds supported.")
 endif()
 
 add_subdirectory(external)
 add_subdirectory(engine)
-#add_subdirectory(game)
+add_subdirectory(game)
 add_subdirectory(editor)
 

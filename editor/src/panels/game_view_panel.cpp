@@ -7,7 +7,7 @@
 
 using namespace fe;
 
-GameViewPanel::GameViewPanel(Editor* editor) : EditorPanel{ICON_MDI_GAMEPAD_VARIANT " Game###game", "Game", editor} {
+GameViewPanel::GameViewPanel(Editor& editor) : EditorPanel{ICON_MDI_GAMEPAD_VARIANT " Game###game", "Game", editor} {
 
 }
 
@@ -48,8 +48,8 @@ void GameViewPanel::onImGui() {
         return;
     }
 
-    if (!editor->getSettings().freeAspect) {
-        float fixedAspect = editor->getSettings().fixedAspect;
+    if (!editor.getSettings().freeAspect) {
+        float fixedAspect = editor.getSettings().fixedAspect;
         float heightNeededForAspect = viewportSize.x / fixedAspect;
 
         if (heightNeededForAspect > viewportSize.y) {
@@ -83,9 +83,9 @@ void GameViewPanel::onImGui() {
     bool viewportHovered = ImGui::IsMouseHoveringRect(minBound, maxBound); // || Input::Get().getMouseMode() == MouseMode::Captured;
     bool viewportFocused = ImGui::IsWindowFocused();
 
-    editor->setSceneActive(viewportFocused && viewportHovered && !ImGuizmo::IsUsing());
+    editor.setSceneActive(viewportFocused && viewportHovered && !ImGuizmo::IsUsing());
 
-    if (editor->getSettings().showStats) {
+    if (editor.getSettings().showStats) {
         static bool open = true;
         static int corner = 0;
         const float distance = 5.0f;
@@ -105,21 +105,13 @@ void GameViewPanel::onImGui() {
                          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize |
                          ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
                          ImGuiWindowFlags_NoNav)) {
-            ImGuiIO& io = ImGui::GetIO();
-
-            /*static float timer = 1.0f;
-            timer += io.DeltaTime;
-
-            if (timer > 1.0f) {
-                timer = 0.0f;
-            }*/
-
             ImGui::Text("%.2f ms (%.i FPS)", Time::DeltaTime().asMilliseconds(), Time::FramesPerSecond());
             ImGui::Separator();
 
-            if (ImGui::IsMousePosValid())
+            if (ImGui::IsMousePosValid()) {
+                ImGuiIO& io = ImGui::GetIO();
                 ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
-            else
+            } else
                 ImGui::TextUnformatted("Mouse Position: <invalid>");
 
             //ImGui::Text("Num Rendered Objects %u", frameStats.NumRenderedObjects);
@@ -157,10 +149,10 @@ void GameViewPanel::drawToolBar() {
 
     float xAvail = ImGui::GetContentRegionAvail().x - 285.0f;
     {
-        selected = editor->getSettings().showStats;
+        selected = editor.getSettings().showStats;
         ImGui::SameLine(xAvail);
         if (ImGuiUtils::ToggleButton(ICON_MDI_POLL_BOX " Stats", selected))
-            editor->getSettings().showStats = selected;
+            editor.getSettings().showStats = selected;
         ImGuiUtils::Tooltip("Show Statistics");
     }
 
@@ -181,7 +173,7 @@ void GameViewPanel::drawToolBar() {
                     {"9:16", 9.0f / 16.0f}
         }};
 
-        float currentAspect = editor->getSettings().fixedAspect;
+        float currentAspect = editor.getSettings().fixedAspect;
         auto it = std::find_if(SUPPORTED_ASPECTS.begin(), SUPPORTED_ASPECTS.end(), [currentAspect](const auto& p) {
             return glm::epsilonEqual(p.second, currentAspect, FLT_EPSILON);
         });
@@ -189,8 +181,8 @@ void GameViewPanel::drawToolBar() {
         for (const auto& [name, aspect] : SUPPORTED_ASPECTS) {
             bool is_selected = (it->first == name);
             if (ImGui::Checkbox(name.c_str(), &is_selected)) {
-                editor->getSettings().freeAspect = (name == "Free Aspect ");
-                editor->getSettings().fixedAspect = aspect;
+                editor.getSettings().freeAspect = (name == "Free Aspect ");
+                editor.getSettings().fixedAspect = aspect;
             }
         }
 
@@ -200,20 +192,20 @@ void GameViewPanel::drawToolBar() {
     ImGui::SameLine();
 
     {
-        selected = editor->getSettings().muteAudio;
+        selected = editor.getSettings().muteAudio;
         ImGui::SameLine();
         if (ImGuiUtils::ToggleButton(ICON_MDI_VOLUME_MUTE " Mute", selected))
-            editor->getSettings().muteAudio = selected;
+            editor.getSettings().muteAudio = selected;
         ImGuiUtils::Tooltip("Mute audio");
     }
 
     ImGui::SameLine();
 
     {
-        selected = editor->getSettings().fullScreenOnPlay;
+        selected = editor.getSettings().fullScreenOnPlay;
         ImGui::SameLine();
         if (ImGuiUtils::ToggleButton(ICON_MDI_WINDOW_MAXIMIZE " Maximise", selected))
-            editor->getSettings().fullScreenOnPlay = selected;
+            editor.getSettings().fullScreenOnPlay = selected;
         ImGuiUtils::Tooltip("Maximise on play");
     }
 

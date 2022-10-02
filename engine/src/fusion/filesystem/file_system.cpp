@@ -45,6 +45,6 @@ bool FileSystem::WriteText(const fs::path& filepath, std::string_view text) {
     return true;
 }
 
-std::string FileSystem::GetExtension(const fs::path& path) {
-    return String::Lowercase(path.extension().string());
+std::string FileSystem::GetExtension(const fs::path& filepath) {
+    return String::Lowercase(filepath.extension().string());
 }

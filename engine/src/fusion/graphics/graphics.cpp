@@ -52,7 +52,6 @@ void Graphics::onStop() {
 }
 
 void Graphics::onStart() {
-    bindlessDescriptors.emplace("textures", std::make_unique<BindlessDescriptorSet>(10));
 }
 
 void Graphics::onUpdate() {
@@ -102,7 +101,6 @@ void Graphics::onUpdate() {
         endFrame(info);
     }
 
-    // Purges unused command pools.
     if (elapsedPurge.getElapsed() != 0) {
         for (auto it = commandPools.begin(); it != commandPools.end();) {
             if ((*it).second.use_count() <= 1) {
@@ -244,7 +242,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     VkImage dstImage;
     VkDeviceMemory dstImageMemory;
 
-    bool supportsBlit = Image::CopyImage(swapchain->getActiveImage(), dstImage, dstImageMemory, format, VK_FORMAT_R8G8B8A8_UNORM, { size.x, size.y, 1}, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
+    bool supportsBlit = Image::CopyImage(swapchain->getActiveImage(), dstImage, dstImageMemory, format, VK_FORMAT_R8G8B8A8_UNORM, { size.x, size.y, 1 }, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 0, 0);
 
     // Get layout of the image (including row pitch)
     VkImageSubresource imageSubresource = {};
@@ -268,6 +266,8 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
             case VK_FORMAT_B8G8R8A8_UNORM:
             case VK_FORMAT_B8G8R8A8_SNORM:
                 colorSwizzle = true;
+            default:
+                break;
         }
     }
 
@@ -323,13 +323,11 @@ void Graphics::recreateSwapchain(size_t id) {
     auto& size = surface->getWindow().getSize();
     LOG_DEBUG << "Recreating swapchain[" << id << "] old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")";
 #endif
-
     swapchain = std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, swapchain.get());
 
     // Reset sync objects
-    for (auto& sync : perSurfaceBuffer->syncObjects) {
+    for (auto& sync : perSurfaceBuffer->syncObjects)
         sync.reset();
-    }
 
     auto graphicsQueue = logicalDevice.getGraphicsQueue();
     VK_CHECK(vkQueueWaitIdle(graphicsQueue));
@@ -367,7 +365,7 @@ void Graphics::recreatePass(FrameInfo& info, RenderStage& renderStage) {
 void Graphics::onWindowCreate(Window* window, bool create) {
     if (!window) return;
     if (create) {
-        auto& surface = surfaces.emplace_back(std::make_unique<Surface>(instance, physicalDevice, *window));
+        surfaces.push_back(std::make_unique<Surface>(instance, physicalDevice, *window));
     } else {
         /*surfaces.erase(std::remove_if(surfaces.begin(), surfaces.end(), [window](const auto& s) {
             return window == &s->window;

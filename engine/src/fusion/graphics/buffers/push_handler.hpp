@@ -41,7 +41,7 @@ namespace fe {
 
     private:
         std::optional<Shader::UniformBlock> uniformBlock;
-        std::unique_ptr<char[]> data;
+        std::unique_ptr<std::byte[]> data;
         bool multipipeline;
     };
 }

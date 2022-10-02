@@ -29,12 +29,12 @@ namespace fe {
 
         operator uint32_t() const { return FUSION_MAKE_VERSION(variant, major, minor, patch); }
 
-        bool operator==(const Version& other) const { return (operator uint32_t()) == (other.operator uint32_t()); }
-        bool operator!=(const Version& other) const { return (operator uint32_t()) != (other.operator uint32_t()); }
-        bool operator<=(const Version& other) const { return (operator uint32_t()) <= (other.operator uint32_t()); }
-        bool operator>=(const Version& other) const { return (operator uint32_t()) >= (other.operator uint32_t()); }
-        bool operator>(const Version& other)  const { return (operator uint32_t()) > (other.operator uint32_t()); }
-        bool operator<(const Version& other)  const { return (operator uint32_t()) < (other.operator uint32_t()); }
+        bool operator==(const Version& rhs) const { return (operator uint32_t()) == (rhs.operator uint32_t()); }
+        bool operator!=(const Version& rhs) const { return (operator uint32_t()) != (rhs.operator uint32_t()); }
+        bool operator<=(const Version& rhs) const { return (operator uint32_t()) <= (rhs.operator uint32_t()); }
+        bool operator>=(const Version& rhs) const { return (operator uint32_t()) >= (rhs.operator uint32_t()); }
+        bool operator>(const Version& rhs)  const { return (operator uint32_t()) > (rhs.operator uint32_t()); }
+        bool operator<(const Version& rhs)  const { return (operator uint32_t()) < (rhs.operator uint32_t()); }
 
         std::string toString() const {
             std::stringstream ss;

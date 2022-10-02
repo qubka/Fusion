@@ -49,38 +49,38 @@ namespace fe {
 
         template<typename Archive>
         void save(Archive& archive) const {
-            archive(cereal::make_nvp("project version", projectSettings.projectVersion),
-                    cereal::make_nvp("project root", projectSettings.projectRoot),
-                    cereal::make_nvp("project name", projectSettings.projectName),
-                    //cereal::make_nvp("engine asset path", projectSettings.engineAssetPath),
-                    cereal::make_nvp("title", projectSettings.title),
-                    cereal::make_nvp("size", projectSettings.size),
-                    cereal::make_nvp("borderless", projectSettings.isBorderless),
-                    cereal::make_nvp("resizable", projectSettings.isResizable),
-                    cereal::make_nvp("floating", projectSettings.isFloating),
-                    cereal::make_nvp("fullscreen", projectSettings.isFullscreen),
-                    cereal::make_nvp("vsync", projectSettings.isVSync),
-                    cereal::make_nvp("show console", projectSettings.isShowConsole),
-                    cereal::make_nvp("current scene", SceneManager::Get()->getScene()->getName())
+            archive(cereal::make_nvp("project version", projectSettings.projectVersion));
+            archive(cereal::make_nvp("project root", projectSettings.projectRoot));
+            archive(cereal::make_nvp("project name", projectSettings.projectName));
+            //archive(cereal::make_nvp("engine asset path", projectSettings.engineAssetPath));
+            archive(cereal::make_nvp("title", projectSettings.title));
+            archive(cereal::make_nvp("size", projectSettings.size));
+            archive(cereal::make_nvp("borderless", projectSettings.isBorderless));
+            archive(cereal::make_nvp("resizable", projectSettings.isResizable));
+            archive(cereal::make_nvp("floating", projectSettings.isFloating));
+            archive(cereal::make_nvp("fullscreen", projectSettings.isFullscreen));
+            archive(cereal::make_nvp("vsync", projectSettings.isVSync));
+            archive(cereal::make_nvp("show console", projectSettings.isShowConsole));
+            archive(cereal::make_nvp("current scene", SceneManager::Get()->getScene()->getName())
             );
         }
 
         template<typename Archive>
         void load(Archive& archive) {
             std::string sceneName;
-            archive(cereal::make_nvp("project version", projectSettings.projectVersion),
-                    cereal::make_nvp("project root", projectSettings.projectRoot),
-                    cereal::make_nvp("project name", projectSettings.projectName),
-                    //cereal::make_nvp("Engine Asset Path", projectSettings.engineAssetPath),
-                    cereal::make_nvp("title", projectSettings.title),
-                    cereal::make_nvp("size", projectSettings.size),
-                    cereal::make_nvp("borderless", projectSettings.isBorderless),
-                    cereal::make_nvp("resizable", projectSettings.isResizable),
-                    cereal::make_nvp("floating", projectSettings.isFloating),
-                    cereal::make_nvp("fullscreen", projectSettings.isFullscreen),
-                    cereal::make_nvp("vsync", projectSettings.isVSync),
-                    cereal::make_nvp("show console", projectSettings.isShowConsole),
-                    cereal::make_nvp("current scene", sceneName)
+            archive(cereal::make_nvp("project version", projectSettings.projectVersion));
+            archive(cereal::make_nvp("project root", projectSettings.projectRoot));
+            archive(cereal::make_nvp("project name", projectSettings.projectName));
+            //archive(cereal::make_nvp("Engine Asset Path", projectSettings.engineAssetPath));
+            archive(cereal::make_nvp("title", projectSettings.title));
+            archive(cereal::make_nvp("size", projectSettings.size));
+            archive(cereal::make_nvp("borderless", projectSettings.isBorderless));
+            archive(cereal::make_nvp("resizable", projectSettings.isResizable));
+            archive(cereal::make_nvp("floating", projectSettings.isFloating));
+            archive(cereal::make_nvp("fullscreen", projectSettings.isFullscreen));
+            archive(cereal::make_nvp("vsync", projectSettings.isVSync));
+            archive(cereal::make_nvp("show console", projectSettings.isShowConsole));
+            archive(cereal::make_nvp("current scene", sceneName)
             );
 
             if (sceneName.empty()) {

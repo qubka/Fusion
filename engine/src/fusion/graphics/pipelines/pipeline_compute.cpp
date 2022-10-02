@@ -1,17 +1,15 @@
 #include "pipeline_compute.hpp"
-#include "shader_file.hpp"
 
 #include "fusion/graphics/graphics.hpp"
 #include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/assets/asset_registry.hpp"
+#include "fusion/filesystem/file_system.hpp"
 
 using namespace fe;
 
-PipelineCompute::PipelineCompute(fs::path&& path, std::flat_map<std::string, Shader::SpecConstant>&& specConstants, std::vector<std::string>&& bindlessSets, bool pushDescriptors)
+PipelineCompute::PipelineCompute(fs::path&& path, fst::unordered_flatmap<std::string, Shader::SpecConstant>&& specConstants, bool pushDescriptors)
         : shader{}
         , path{std::move(path)}
         , specConstants{std::move(specConstants)}
-        , bindlessSets{std::move(bindlessSets)}
         , pushDescriptors{pushDescriptors}
         , pipelineBindPoint{VK_PIPELINE_BIND_POINT_COMPUTE} {
 #if FUSION_DEBUG
@@ -43,10 +41,12 @@ void PipelineCompute::cmdRender(const CommandBuffer& commandBuffer, const glm::u
 }
 
 void PipelineCompute::createShaderProgram() {
-    auto shaderFile = AssetRegistry::Get()->get_or_emplace<ShaderFile>(path);
+    auto shaderCode = FileSystem::ReadText(path);
+    if (shaderCode.empty())
+        throw std::runtime_error("Shader file is empty");
 
-	auto shaderStage = shaderFile->getStage();
-	shaderModule = shader.createShaderModule(shaderFile->getName(), shaderFile->getCode(), shaderStage);
+	auto shaderStage = Shader::GetShaderStage(path);
+	shaderModule = shader.createShaderModule(path.filename().string(), shaderCode, shaderStage);
     specialization = shader.createSpecialization(specConstants, shaderStage);
 
     shaderStageCreateInfo.stage = shaderStage;
@@ -60,12 +60,12 @@ void PipelineCompute::createShaderProgram() {
 void PipelineCompute::createDescriptorLayout() {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	auto& descriptorSetLayouts = shader.getDescriptorSetLayouts();
+    auto& descriptorSetLayouts = shader.getDescriptorSetLayouts();
 
-	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
-	descriptorSetLayoutCreateInfo.flags = pushDescriptors ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
-	descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(descriptorSetLayouts.size());
-	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayouts.data();
+    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
+    descriptorSetLayoutCreateInfo.flags = pushDescriptors ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
+    descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+    descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayouts.data();
     descriptorSetLayout = Graphics::Get()->getDescriptorLayoutCache().createDescriptorLayout(descriptorSetLayoutCreateInfo);
 }
 

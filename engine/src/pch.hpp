@@ -31,6 +31,10 @@
 #include <random>
 #include <any>
 #include <iterator>
+#include <type_traits>
+#include <experimental/type_traits>
+#include <new>
+#include <tuple>
 #include <filesystem>
 namespace fs = std::filesystem;
 
@@ -86,11 +90,9 @@ using Random = effolkronium::random_static;
 #include "fusion/utils/date_time.hpp"
 #include "fusion/utils/elapsed_time.hpp"
 #include "fusion/utils/enumerate.hpp"
-#include "fusion/utils/future.hpp"
 #include "fusion/utils/glm_extention.hpp"
 #include "fusion/utils/cereal_extention.hpp"
 #include "fusion/utils/string.hpp"
-#include "fusion/utils/thread_pool.hpp"
 #include "fusion/utils/vulkan.hpp"
 #include "fusion/utils/vector.hpp"
 

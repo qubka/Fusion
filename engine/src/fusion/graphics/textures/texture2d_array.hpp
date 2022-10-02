@@ -8,6 +8,8 @@ namespace fe {
      */
     class Texture2dArray : public Texture {
     public:
+        Texture2dArray() = default;
+
         /**
          * Creates a new array of 2D images.
          * @param filename The file to load the image from. (supports .ktx and .dds)
@@ -17,12 +19,12 @@ namespace fe {
          * @param mipmap If mapmaps will be generated.
          * @param load If this resource will be loaded immediately, otherwise {@link Texture2d#load} can be called later.
          */
-        explicit Texture2dArray(const fs::path& filepath,
+        explicit Texture2dArray(fs::path filepath,
                                 VkFilter filter = VK_FILTER_LINEAR,
                                 VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT,
                                 bool anisotropic = true,
                                 bool mipmap = true,
-                                bool load = true);
+                                bool load = false);
 
         /**
          * Creates a new array of 2D images.
@@ -77,6 +79,9 @@ namespace fe {
 
         type_index getType() const override { return type_id<Texture2dArray>; }
 
-        void load();
+        void loadResource() override { loadFromFile(); }
+
+    private:
+        void loadFromFile();
     };
 }

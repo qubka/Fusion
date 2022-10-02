@@ -11,5 +11,7 @@ namespace fe {
         explicit TextureDepth(const glm::uvec2& extent, VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT);
 
         type_index getType() const override { return type_id<TextureDepth>; }
+
+        void loadResource() override {};
     };
 }

@@ -85,7 +85,7 @@ ProcessInfo::ProcessInfo(unsigned int processId) : mProcessId{processId} {
 #endif
 }
 
-ProcessInfo::~ProcessInfo() throw() {
+ProcessInfo::~ProcessInfo() noexcept {
 }
 
 unsigned int ProcessInfo::getProcessId() {

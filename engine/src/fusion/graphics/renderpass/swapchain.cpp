@@ -67,7 +67,7 @@ Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& 
 	} else {
         swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         swapchainCreateInfo.queueFamilyIndexCount = 0;
-        swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+        swapchainCreateInfo.pQueueFamilyIndices = VK_NULL_HANDLE;
     }
     swapchainCreateInfo.preTransform = static_cast<VkSurfaceTransformFlagBitsKHR>(preTransform);
     swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;

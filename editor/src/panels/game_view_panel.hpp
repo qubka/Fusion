@@ -5,7 +5,7 @@
 namespace fe {
     class GameViewPanel : public EditorPanel {
     public:
-        explicit GameViewPanel(Editor* editor);
+        explicit GameViewPanel(Editor& editor);
         ~GameViewPanel() override;
 
         void onImGui() override;

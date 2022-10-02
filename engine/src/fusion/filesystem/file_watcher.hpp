@@ -1,3 +1,5 @@
+#include <utility>
+
 #pragma once
 
 namespace fe {
@@ -6,7 +8,10 @@ namespace fe {
 
     class FileWatcher {
     public:
-        explicit FileWatcher(const fs::path& watchPath, const std::function<void(const fs::path&, FileStatus)>& callback, const DateTime& interval = 1s) : watchPath{watchPath}, callback{callback}, elapsedUpdate{interval} {
+        explicit FileWatcher(fs::path watchPath, std::function<void(const fs::path&, FileStatus)> callback, const DateTime& interval = 1s)
+            : watchPath{std::move(watchPath)}
+            , callback{std::move(callback)}
+            , elapsedUpdate{interval} {
             for (const auto& entry: fs::recursive_directory_iterator(watchPath)) {
                 auto& file = entry.path();
                 paths[file] = fs::last_write_time(file);

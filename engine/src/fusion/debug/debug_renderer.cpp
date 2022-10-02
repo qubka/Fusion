@@ -5,6 +5,8 @@
 #include "fusion/geometry/sphere.hpp"
 #include "fusion/geometry/ray.hpp"
 
+#include "fusion/scene/components.hpp"
+
 using namespace fe;
 
 // Draw Point (circle)
@@ -222,24 +224,24 @@ void DebugRenderer::DebugDraw(const Frustum& frustum, const glm::vec4& color) {
     DrawHairLine(vertices[3], vertices[7], color);
 }
 
-/*void DebugRenderer::DebugDraw(Graphics::Light* light, const glm::quat& rotation, const glm::vec4& color) {
+void DebugRenderer::DebugDraw(const LightComponent& light, const glm::vec3& position, const glm::quat& rotation, const glm::vec3& direction, const glm::vec4& color) {
     // Directional
-    if (light->Type < 0.1f) {
-        glm::vec3 offset{0.0f, 0.1f, 0.0f};
-        DrawHairLine(glm::vec3{light->Position} + offset, glm::vec3{light->Position + (light->Direction) * 2.0f} + offset, color);
-        DrawHairLine(glm::vec3{light->Position} - offset, glm::vec3{light->Position + (light->Direction) * 2.0f} - offset, color);
-        DrawHairLine(glm::vec3{light->Position}, glm::vec3{light->Position + (light->Direction) * 2.0f}, color);
-        DebugDrawCone(20, 4, 30.0f, 1.5f, (light->Position - (light->Direction) * 1.5f), rotation, color);
+    switch (light.type) {
+        case LightComponent::LightType::Point:
+            DebugDrawSphere(light.radius * 0.5f, position, color);
+            break;
+        case LightComponent::LightType::Spot:
+            DebugDrawCone(20, 4, light.outerCutOff - light.cutOff, 10.0f, position, rotation, color);
+            break;
+        case LightComponent::LightType::Directional:
+            glm::vec3 offset{0.0f, 0.1f, 0.0f};
+            DrawHairLine(position + offset, (position + direction * 2.0f) + offset, color);
+            DrawHairLine(position - offset, (position + direction * 2.0f) - offset, color);
+            DrawHairLine(position, (position + direction * 2.0f), color);
+            DebugDrawCone(20, 4, 30.0f, 1.5f, (position - direction * 1.5f), rotation, color);
+            break;
     }
-    // Spot
-    else if (light->Type < 1.1f) {
-        DebugDrawCone(20, 4, light->Angle * RADTODEG, light->Intensity, light->Position, rotation, color);
-    }
-    // Point
-    else {
-        DebugDrawSphere(light->Radius * 0.5f, light->Position, color);
-    }
-}*/
+}
 
 /*void DebugRenderer::DebugDraw(SoundNode* sound, const glm::vec4& color) {
     DrawPoint(sound->GetPosition(), sound->GetRadius(), color);
@@ -283,7 +285,7 @@ void DebugRenderer::DebugDrawCone(int numCircleVerts, int numLinesToCircle, floa
 
 void DebugDrawArc(int numVerts, float radius, const glm::vec3& start, const glm::vec3& end, const glm::quat& rotation, const glm::vec4& color) {
     float step = 180.0f / static_cast<float>(numVerts);
-    glm::quat rot = glm::lookAt(rotation * start, rotation * end, glm::vec3{0.0f, 1.0f, 0.0f});
+    glm::quat rot{ glm::lookAt(rotation * start, rotation * end, glm::vec3{0.0f, 1.0f, 0.0f}) };
     rot = rotation * rot;
 
     glm::vec3 arcCentre = (start + end) * 0.5f;

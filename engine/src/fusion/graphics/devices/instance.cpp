@@ -82,9 +82,9 @@ void Instance::FvkDestroyDebugReportCallbackEXT(VkInstance instance, VkDebugRepo
 #endif
 
 void Instance::FvkCmdPushDescriptorSetKHR(VkDevice device, VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint, VkPipelineLayout layout, uint32_t set,
-	uint32_t descriptorWriteCount, const VkWriteDescriptorSet* pDescriptorWrites) {
-	auto func = reinterpret_cast<PFN_vkCmdPushDescriptorSetKHR>(vkGetDeviceProcAddr(device, "vkCmdPushDescriptorSetKHR"));
-	if (func) func(commandBuffer, pipelineBindPoint, layout, set, descriptorWriteCount, pDescriptorWrites);
+uint32_t descriptorWriteCount, const VkWriteDescriptorSet* pDescriptorWrites) {
+    auto func = reinterpret_cast<PFN_vkCmdPushDescriptorSetKHR>(vkGetDeviceProcAddr(device, "vkCmdPushDescriptorSetKHR"));
+    if (func) func(commandBuffer, pipelineBindPoint, layout, set, descriptorWriteCount, pDescriptorWrites);
 }
 
 uint32_t Instance::FindMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties* deviceMemoryProperties, const VkMemoryRequirements* memoryRequirements, VkMemoryPropertyFlags requiredProperties) {
@@ -220,10 +220,10 @@ void Instance::createDebugMessenger() {
 	VK_CHECK(FvkCreateDebugUtilsMessengerEXT(instance, &debugUtilsMessengerCreateInfo, nullptr, &debugMessenger));
 #else
 	VkDebugReportCallbackCreateInfoEXT debugReportCallbackCreateInfo = { VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT };
-	debugReportCallbackCreateInfo.pNext = nullptr;
+	debugReportCallbackCreateInfo.pNext = VK_NULL_HANDLE;
 	debugReportCallbackCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
 	debugReportCallbackCreateInfo.pfnCallback = &CallbackDebug;
-	debugReportCallbackCreateInfo.pUserData = nullptr;
+	debugReportCallbackCreateInfo.pUserData = VK_NULL_HANDLE;
 	auto debugReportResult = FvkCreateDebugReportCallbackEXT(instance, &debugReportCallbackCreateInfo, nullptr, &debugReportCallback);
 	if (debugReportResult == VK_ERROR_EXTENSION_NOT_PRESENT) {
 		enableValidationLayers = false;

@@ -6,7 +6,7 @@
 
 using namespace fe;
 
-ApplicationInfoPanel::ApplicationInfoPanel(Editor* editor) : EditorPanel{ICON_MDI_INFORMATION_VARIANT " Application Info###appinfo", "AppInfo", editor} {
+ApplicationInfoPanel::ApplicationInfoPanel(Editor& editor) : EditorPanel{ICON_MDI_INFORMATION_VARIANT " Application Info###appinfo", "AppInfo", editor} {
 
 }
 
@@ -80,7 +80,7 @@ void ApplicationInfoPanel::onImGui() {
                             ImGui::TableNextRow();
 
                             ImGui::TableSetColumnIndex(0);
-                            ImGui::Text("%lu", i);
+                            ImGui::Text("%lu", static_cast<unsigned long>(i));
 
                             ImGui::TableSetColumnIndex(1);
                             ImGui::TextUnformatted(window->getTitle().c_str());
@@ -132,7 +132,7 @@ void ApplicationInfoPanel::onImGui() {
                             ImGui::TableNextRow();
 
                             ImGui::TableSetColumnIndex(0);
-                            ImGui::Text("%lu", i);
+                            ImGui::Text("%lu", static_cast<unsigned long>(i));
 
                             ImGui::TableSetColumnIndex(1);
                             ImGui::TextUnformatted(monitor->getName().c_str());
@@ -178,7 +178,7 @@ void ApplicationInfoPanel::onImGui() {
                             ImGui::TableNextRow();
 
                             ImGui::TableSetColumnIndex(0);
-                            ImGui::Text("%lu", i);
+                            ImGui::Text("%lu", static_cast<unsigned long>(i));
 
                             ImGui::TableSetColumnIndex(1);
                             ImGui::Text("%i", joystick->getPort());
@@ -199,13 +199,13 @@ void ApplicationInfoPanel::onImGui() {
                                 ImGui::PopStyleColor(3);
 
                             ImGui::TableSetColumnIndex(4);
-                            ImGui::Text("%lu", joystick->getAxisCount());
+                            ImGui::Text("%lu", static_cast<unsigned long>(joystick->getAxisCount()));
 
                             ImGui::TableSetColumnIndex(5);
-                            ImGui::Text("%lu", joystick->getButtonCount());
+                            ImGui::Text("%lu", static_cast<unsigned long>(joystick->getButtonCount()));
 
                             ImGui::TableSetColumnIndex(6);
-                            ImGui::Text("%lu", joystick->getHatCount());
+                            ImGui::Text("%lu", static_cast<unsigned long>(joystick->getHatCount()));
                         }
                         ImGui::EndTable();
                     }
@@ -225,7 +225,7 @@ void ApplicationInfoPanel::onImGui() {
                             ImGui::TableNextRow();
 
                             ImGui::TableSetColumnIndex(0);
-                            ImGui::Text("%lu", i);
+                            ImGui::Text("%lu", static_cast<unsigned long>(i));
 
                             ImGui::TableSetColumnIndex(1);
                             ImGui::Text("%s", cursor->getPath().empty() ? "Empty" : cursor->getPath().string().c_str());

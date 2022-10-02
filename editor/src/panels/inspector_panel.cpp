@@ -45,31 +45,27 @@ namespace ImGui {
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
-        // TODO::
-
-        /*ImGuiUtils::Property("Is Primary", camera.primary);
-
-        auto& sceneCamera = camera.camera;
-
-        auto currentProjection = sceneCamera.getProjectionType();
-        if (ImGuiUtils::PropertyDropdown("Type", currentProjection)) {
-            sceneCamera.setProjectionType(currentProjection);
+        bool ortho = camera.isOrthographic();
+        if (ImGuiUtils::Property("Orthographic", ortho)) {
+            camera.setOrthographic(ortho);
         }
 
-        float fov = sceneCamera.getFOV();
-        if (ImGuiUtils::Property(sceneCamera.isOrthographic() ? "Size" : "Fov", fov, 1.0f, 120.0f)) {
-            sceneCamera.setFOV(fov);
+        if (!ortho) {
+            float fov = camera.getFov();
+            if (ImGuiUtils::Property("Fov", fov, 1.0f, 120.0f)) {
+                camera.setFov(fov);
+            }
         }
 
-        float nearClip = sceneCamera.getNearClip();
+        float nearClip = camera.getNearClip();
         if (ImGuiUtils::Property("Near Clip", nearClip, 0.0f, 10.0f)) {
-            sceneCamera.setNearClip(nearClip);
+            camera.setNearClip(nearClip);
         }
 
-        float farClip = sceneCamera.getFarClip();
+        float farClip = camera.getFarClip();
         if (ImGuiUtils::Property("Far Clip", farClip, 10.0f, 10000.0f)) {
-            sceneCamera.setFarClip(farClip);
-        }*/
+            camera.setFarClip(farClip);
+        }
 
         ImGui::Columns(1);
         ImGui::Separator();
@@ -78,14 +74,14 @@ namespace ImGui {
 
     template<>
     void ComponentEditorWidget<MeshComponent>(entt::registry& registry, entt::registry::entity_type entity) {
-        auto& mesh = registry.get<MeshComponent>(entity).runtime;
+        auto& mesh = registry.get<MeshComponent>(entity);
 
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
         ImGui::Columns(2);
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
-        static ImGuiTextFilter filter;
+        /*static ImGuiTextFilter filter;
         static std::shared_ptr<Asset> selected;
         std::shared_ptr<Asset> current = mesh;
         if (ImGuiUtils::PropertyAsset<Mesh>("Mesh Filter", current, selected, filter)) {
@@ -94,17 +90,20 @@ namespace ImGui {
             } else {
                 mesh.reset();
             }
-        }
+        }*/
+
         // Readonly
-        if (mesh) {
+        if (auto filter = mesh.get()) {
             ImGui::NewLine();
             ImGui::Separator();
-            ImGuiUtils::Property("Index", mesh->getMeshIndex());
-            ImGuiUtils::PropertyText("Path", mesh->getPath().string().c_str());
-            ImGuiUtils::Property("Vertex Count", mesh->getVertexCount());
-            ImGuiUtils::Property("Index Count", mesh->getIndexCount());
-            ImGuiUtils::Property("Min", mesh->getBoundingBox().getMin());
-            ImGuiUtils::Property("Max", mesh->getBoundingBox().getMax());
+            if (mesh.model)
+                ImGuiUtils::PropertyText("Path", mesh.model->getPath().string().c_str());
+            if (filter->getIndex() != UINT32_MAX)
+                ImGuiUtils::Property("Index", filter->getIndex());
+            ImGuiUtils::Property("Vertex Count", filter->getVertexCount());
+            ImGuiUtils::Property("Index Count", filter->getIndexCount());
+            ImGuiUtils::Property("Min", filter->getBoundingBox().getMin());
+            ImGuiUtils::Property("Max", filter->getBoundingBox().getMax());
         }
 
         ImGui::Columns(1);
@@ -121,7 +120,6 @@ namespace ImGui {
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
-        //dsffds
         ImGuiUtils::PropertyDropdown("Type", light.type);
         ImGuiUtils::Property("Color", light.color, 0.0f, 0.0f, 1.0f, ImGuiUtils::PropertyType::Color);
         ImGuiUtils::Property("Radius", light.radius, 0.01f, 5.0f, 0.005f);
@@ -137,6 +135,58 @@ namespace ImGui {
             ImGuiUtils::Property("Cut Off", light.cutOff, 0.01f, 360.f, 0.01f, ImGuiUtils::PropertyType::Slider);
             ImGuiUtils::Property("Outer CutOff", light.outerCutOff, 0.01f, 360.f, 0.01f, ImGuiUtils::PropertyType::Slider);
         }
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
+
+    template<>
+    void ComponentEditorWidget<MaterialComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& material = registry.get<MaterialComponent>(entity);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        static ImGuiTextFilter filter;
+        static std::shared_ptr<Asset> selected;
+
+        ImGuiUtils::Property("Base Color", material.baseColor, 0.0f, 1.0f, 0.01f, ImGuiUtils::PropertyType::Color);
+
+        {
+            std::shared_ptr<Asset> current = material.diffuse;
+            if (ImGuiUtils::PropertyAsset<Texture2d>("Diffuse", current, selected, filter)) {
+                if (current) {
+                    material.diffuse = std::dynamic_pointer_cast<Texture2d>(current);
+                } else {
+                    material.diffuse.reset();
+                }
+            }
+        }
+        {
+            std::shared_ptr<Asset> current = material.specular;
+            if (ImGuiUtils::PropertyAsset<Texture2d>("Specular", current, selected, filter)) {
+                if (current) {
+                    material.specular = std::dynamic_pointer_cast<Texture2d>(current);
+                } else {
+                    material.specular.reset();
+                }
+            }
+        }
+        {
+            std::shared_ptr<Asset> current = material.normal;
+            if (ImGuiUtils::PropertyAsset<Texture2d>("Normal", current, selected, filter)) {
+                if (current) {
+                    material.normal = std::dynamic_pointer_cast<Texture2d>(current);
+                } else {
+                    material.normal.reset();
+                }
+            }
+        }
+
+        ImGuiUtils::Property("Shininess", material.shininess, 0.0f, 128.0f, 0.01f, ImGuiUtils::PropertyType::Slider);
 
         ImGui::Columns(1);
         ImGui::Separator();
@@ -264,17 +314,18 @@ namespace ImGui {
 #define REG_COMPONENT(ComponentType, ComponentName)            \
 {                                                              \
     std::string name;                                          \
-    editor->getComponentIcon(type_id<ComponentType>, name);    \
+    editor.getComponentIcon(type_id<ComponentType>, name);    \
     name += "\t";                                              \
     name += (ComponentName);                                   \
     enttEditor.registerComponent<ComponentType>(name); \
 }
 
-InspectorPanel::InspectorPanel(Editor* editor) : EditorPanel(ICON_MDI_INFORMATION " Inspector###inspector", "Inspector", editor) {
+InspectorPanel::InspectorPanel(Editor& editor) : EditorPanel{ICON_MDI_INFORMATION " Inspector###inspector", "Inspector", editor} {
     REG_COMPONENT(TransformComponent, "Transform");
     REG_COMPONENT(MeshComponent, "Mesh");
     REG_COMPONENT(CameraComponent, "Camera");
     REG_COMPONENT(LightComponent, "Light");
+    REG_COMPONENT(MaterialComponent, "Material");
     REG_COMPONENT(RigidbodyComponent, "Rigidbody");
     REG_COMPONENT(BoxColliderComponent, "Box Collider");
     REG_COMPONENT(SphereColliderComponent, "Sphere Collider");
@@ -288,19 +339,19 @@ InspectorPanel::~InspectorPanel() {
 }
 
 void InspectorPanel::onImGui() {
-    auto selected = editor->getSelected();
+    auto selected = editor.getSelected();
 
     if (ImGui::Begin(title.c_str(), &active)) {
         auto scene = SceneManager::Get()->getScene();
         if (!scene) {
-            editor->setSelected(entt::null);
+            editor.setSelected(entt::null);
             ImGui::End();
             return;
         }
 
         auto& registry = scene->getRegistry();
         if (selected == entt::null || !registry.valid(selected)) {
-            editor->setSelected(entt::null);
+            editor.setSelected(entt::null);
             ImGui::End();
             return;
         }

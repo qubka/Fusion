@@ -9,7 +9,7 @@
 
 using namespace fe;
 
-HierarchyPanel::HierarchyPanel(Editor* editor) : EditorPanel{ICON_MDI_FILE_TREE " Hierarchy###hierarchy", "Hierarchy", editor} {
+HierarchyPanel::HierarchyPanel(Editor& editor) : EditorPanel{ICON_MDI_FILE_TREE " Hierarchy###hierarchy", "Hierarchy", editor} {
 
 }
 
@@ -40,42 +40,28 @@ void HierarchyPanel::onImGui() {
 
         auto& registry = scene->getRegistry();
 
-        auto addEntity = [scene]() {
+        auto addEntity = [&]() {
             if (ImGui::Selectable("Add Empty Entity")) {
                 scene->createEntity();
             }
 
-            /*if (ImGui::Selectable("Add Light")) {
-                auto entity = scene->CreateEntity("Light");
-                entity.AddComponent<Graphics::Light>();
-                entity.GetOrAddComponent<Maths::Transform>();
+            if (ImGui::Selectable("Add Light")) {
+                auto entity = scene->createEntity("Light");
+                registry.emplace<TransformComponent>(entity);
+                registry.emplace<LightComponent>(entity);
             }
 
             if (ImGui::Selectable("Add Rigid Body")) {
-                auto entity = scene->CreateEntity("RigidBody");
-                entity.AddComponent<RigidBody3DComponent>();
-                entity.GetOrAddComponent<Maths::Transform>();
-                entity.AddComponent<AxisConstraintComponent>(entity, Axes::XZ);
-                entity.GetComponent<RigidBody3DComponent>().GetRigidBody()->SetCollisionShape(
-                        CollisionShapeType::CollisionCuboid);
+                auto entity = scene->createEntity("RigidBody");
+                registry.emplace<TransformComponent>(entity);
+                registry.emplace<RigidbodyComponent>(entity);
             }
 
             if (ImGui::Selectable("Add Camera")) {
-                auto entity = scene->CreateEntity("Camera");
-                entity.AddComponent<Camera>();
-                entity.GetOrAddComponent<Maths::Transform>();
+                auto entity = scene->createEntity("Camera");
+                registry.emplace<TransformComponent>(entity);
+                registry.emplace<CameraComponent>(entity);
             }
-
-            if (ImGui::Selectable("Add Sprite")) {
-                auto entity = scene->CreateEntity("Sprite");
-                entity.AddComponent<Graphics::Sprite>();
-                entity.GetOrAddComponent<Maths::Transform>();
-            }
-
-            if (ImGui::Selectable("Add Lua Script")) {
-                auto entity = scene->CreateEntity("LuaScript");
-                entity.AddComponent<LuaScriptComponent>();
-            }*/
         };
 
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImGui::GetStyleColorVec4(ImGuiCol_TabActive));
@@ -126,16 +112,16 @@ void HierarchyPanel::onImGui() {
         ImGui::BeginChild("##hierarchy_nodes");
         {
             if (ImGui::BeginPopupContextWindow()) {
-                auto copiedEntity = editor->getCopiedEntity();
+                auto copiedEntity = editor.getCopiedEntity();
                 if (copiedEntity != entt::null && registry.valid(copiedEntity)) {
                     if (ImGui::Selectable("Paste")) {
                         if (!registry.valid(copiedEntity)) {
-                            editor->setCopiedEntity(entt::null);
+                            editor.setCopiedEntity(entt::null);
                         } else {
                             scene->duplicateEntity(copiedEntity);
 
-                            if (editor->getCutCopyEntity()) {
-                                hierarchySystem->destroyParent(editor->getCopiedEntity());
+                            if (editor.getCutCopyEntity()) {
+                                hierarchySystem->destroyParent(editor.getCopiedEntity());
                             }
                         }
                     }
@@ -221,7 +207,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         auto hierarchyComponent = registry.try_get<HierarchyComponent>(node);
         bool hasChildren = (hierarchyComponent != nullptr && hierarchyComponent->children > 0); // hierarchySystem->hasChildren(node)
 
-        ImGuiTreeNodeFlags nodeFlags = ((editor->getSelected() == node) ? ImGuiTreeNodeFlags_Selected : 0);
+        ImGuiTreeNodeFlags nodeFlags = ((editor.getSelected() == node) ? ImGuiTreeNodeFlags_Selected : 0);
 
         nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_FramePadding |
                 ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
@@ -252,11 +238,11 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         std::string icon{ ICON_MDI_CUBE_OUTLINE };
 
         if (registry.any_of<CameraComponent>(node)) {
-            editor->getComponentIcon(type_id<CameraComponent>, icon);
+            editor.getComponentIcon(type_id<CameraComponent>, icon);
         } else if (registry.any_of<RigidbodyComponent>(node)) {
-            editor->getComponentIcon(type_id<RigidbodyComponent>, icon);
+            editor.getComponentIcon(type_id<RigidbodyComponent>, icon);
         } else if (registry.any_of<LightComponent>(node)) {
-            editor->getComponentIcon(type_id<LightComponent>, icon);
+            editor.getComponentIcon(type_id<LightComponent>, icon);
         }
 
         //ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorScheme::GetIconColor());
@@ -265,7 +251,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         {
             // Allow clicking of icon and text. Need twice as they are separated
             if (ImGui::IsItemClicked())
-                editor->setSelected(node);
+                editor.setSelected(node);
             else if (doubleClicked == node && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsItemHovered(ImGuiHoveredFlags_None))
                 doubleClicked = entt::null;
         }
@@ -291,20 +277,20 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         bool deleteEntity = false;
         if (ImGui::BeginPopupContextItem(name.c_str())) {
             if (ImGui::Selectable("Copy"))
-                editor->setCopiedEntity(node);
+                editor.setCopiedEntity(node);
 
             if (ImGui::Selectable("Cut"))
-                editor->setCopiedEntity(node, true);
+                editor.setCopiedEntity(node, true);
 
-            auto copiedEntity = editor->getCopiedEntity();
+            auto copiedEntity = editor.getCopiedEntity();
             if (copiedEntity != entt::null && registry.valid(copiedEntity)) {
                 if (ImGui::Selectable("Paste")) {
                     if (!registry.valid(copiedEntity)) {
-                        editor->setCopiedEntity(entt::null);
+                        editor.setCopiedEntity(entt::null);
                     } else {
                         scene->duplicateEntity(copiedEntity, node);
 
-                        if (editor->getCutCopyEntity())
+                        if (editor.getCutCopyEntity())
                             deleteEntity = true;
                     }
                 }
@@ -323,8 +309,8 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
             }
             if (ImGui::Selectable("Delete"))
                 deleteEntity = true;
-            if (editor->getSelected() == node)
-                editor->setSelected(entt::null);
+            if (editor.getSelected() == node)
+                editor.setSelected(entt::null);
             ImGui::Separator();
             if (ImGui::Selectable("Rename"))
                 doubleClicked = node;
@@ -367,20 +353,20 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
                 ImGui::EndDragDropTarget();
             }
 
-            if (editor->getSelected() == entity)
-                editor->setSelected(entt::null);
+            if (editor.getSelected() == entity)
+                editor.setSelected(entt::null);
         }
 
         if (ImGui::IsItemClicked() && !deleteEntity)
-            editor->setSelected(node);
+            editor.setSelected(node);
         else if (doubleClicked == node && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsItemHovered(ImGuiHoveredFlags_None))
             doubleClicked = entt::null;
 
         if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered(ImGuiHoveredFlags_None)) {
             doubleClicked = node;
-            if (editor->getState() == EditorState::Preview) {
+            if (editor.getState() == EditorState::Preview) {
                 if (auto transform = registry.try_get<TransformComponent>(node))
-                    editor->focusCamera(transform->getWorldPosition(), 5.0f, 0.2f);
+                    editor.focusCamera(transform->getWorldPosition(), 5.0f, 0.2f);
                 // TODO: Implement
             }
         }
@@ -395,22 +381,22 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         }
 
         if (selectUp) {
-            if (registry.valid(currentPrevious) && editor->getSelected() == node) {
+            if (registry.valid(currentPrevious) && editor.getSelected() == node) {
                 selectUp = false;
-                editor->setSelected(currentPrevious);
+                editor.setSelected(currentPrevious);
             }
         }
 
         if (selectDown) {
-            if (registry.valid(currentPrevious) && currentPrevious == editor->getSelected()) {
+            if (registry.valid(currentPrevious) && currentPrevious == editor.getSelected()) {
                 selectDown = false;
-                editor->setSelected(node);
+                editor.setSelected(node);
             }
         }
 
         currentPrevious = node;
 
-        if (nodeOpen == false) {
+        if (!nodeOpen) {
             ImGui::PopID();
             return;
         }

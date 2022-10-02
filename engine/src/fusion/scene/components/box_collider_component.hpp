@@ -12,9 +12,9 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("center", center),
-                    cereal::make_nvp("extent", extent),
-                    cereal::make_nvp("trigger", trigger));
+            archive(cereal::make_nvp("center", center));
+            archive(cereal::make_nvp("extent", extent));
+            archive(cereal::make_nvp("trigger", trigger));
         }
     };
 }

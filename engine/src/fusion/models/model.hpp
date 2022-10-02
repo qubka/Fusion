@@ -15,35 +15,44 @@ namespace fe {
 
     struct SceneObject {
         std::string name;
-        std::vector<std::shared_ptr<Mesh>> meshes;
-        std::vector<std::shared_ptr<SceneObject>> children;
-        glm::vec3 position;
-        glm::quat oritentation;
-        glm::vec3 scale;
+        glm::vec3 position{ 0.0f };
+        glm::quat orientation{ quat::identity };
+        glm::vec3 scale{ 1.0f };
+        std::vector<std::unique_ptr<Mesh>> meshes;
+        std::vector<SceneObject> children;
+
+        SceneObject() = default;
+        SceneObject(const char* name, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale)
+                : name{name}, position{position}, orientation{orientation}, scale{scale} {
+        }
     };
 
     class Model : public Asset {
     public:
         // aiProcess_Triangulate by default
-        explicit Model(const fs::path& filepath, uint32_t defaultFlags = 0, const Vertex::Layout& layout =
-                {{Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Tangent, Vertex::Component::Bitangent, Vertex::Component::UV, Vertex::Component::UV}});
+        Model() = default;
+        explicit Model(fs::path filepath, bool load = false);
         ~Model() override = default;
 
+        const fs::path& getPath() const override { return path; }
+        const std::string& getName() const override { return name; }
         type_index getType() const override { return type_id<Model>; }
 
-        const std::shared_ptr<SceneObject>& getRoot() const { return root; }
-        std::shared_ptr<Mesh> getMesh(uint32_t index) const {
-            for (const auto& mesh : meshesLoaded) {
-                if (mesh->getMeshIndex() == index) {
-                    return mesh;
-                }
-            }
-            return nullptr;
-        }
+        const SceneObject& getRoot() const { return root; }
+        const Mesh* getMesh(uint32_t index) const { return index < meshesLoaded.size() ? meshesLoaded[index] : nullptr; }
+
+        operator bool() const { return !root.name.empty(); }
+
+        void loadResource() override { loadFromFile(); }
 
     private:
-        void processNode(const aiScene* scene, const aiNode* node, std::shared_ptr<SceneObject>& parent);
-        void processMeshes(const aiScene* scene, const aiNode* node, std::shared_ptr<SceneObject>& parent);
+        // TODO: May be load from shader ?
+        static Vertex::Layout Layout;
+
+        void loadFromFile();
+
+        void processNode(const aiScene* scene, const aiNode* node, SceneObject& parent);
+        void processMeshes(const aiScene* scene, const aiNode* node, SceneObject& parent);
         //void processLight(const aiScene* scene, const aiNode* node, const aiLight* light);
         //void processCamera(const aiScene* scene, const aiNode* node, const aiCamera* camera);
 
@@ -52,11 +61,12 @@ namespace fe {
 
         //static aiScene GenerateScene(const Mesh& mesh);
 
-        fs::path directory;
-        Vertex::Layout layout;
+        fs::path path;
+        std::string name;
+        //fs::path directory;
 
-        std::shared_ptr<SceneObject> root;
-        std::vector<std::shared_ptr<Mesh>> meshesLoaded;
-        //std::unordered_map<fs::path, std::shared_ptr<Texture2d>> texturesLoaded;
+        SceneObject root;
+        std::vector<const Mesh*> meshesLoaded;
+        //std::unordered_map<fs::path, const Texture2d*> texturesLoaded;
     };
 }
