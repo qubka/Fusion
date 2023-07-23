@@ -1,5 +1,5 @@
-#include "plane.hpp"
-#include "ray.hpp"
+#include "plane.h"
+#include "ray.h"
 
 using namespace fe;
 

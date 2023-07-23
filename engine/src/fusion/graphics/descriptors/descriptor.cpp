@@ -1,6 +1,6 @@
-#include "descriptor.hpp"
+#include "descriptor.h"
 
-#include "fusion/graphics/textures/texture.hpp"
+#include "fusion/graphics/textures/texture.h"
 
 using namespace fe;
 

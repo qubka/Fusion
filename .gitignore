@@ -21,6 +21,7 @@ bld/
 [Oo]bj/
 cmake-build-debug/
 cmake-build-debug-mingw-clang/
+cmake-build-debug-mingw/
 
 # User-specific files
 *.suo

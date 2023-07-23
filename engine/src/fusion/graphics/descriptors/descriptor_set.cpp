@@ -1,7 +1,7 @@
-#include "descriptor_set.hpp"
+#include "descriptor_set.h"
 
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/graphics/graphics.h"
+#include "fusion/graphics/commands/command_buffer.h"
 
 using namespace fe;
 

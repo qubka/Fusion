@@ -1,6 +1,6 @@
-#include "fusion/core/engine.hpp"
+#include "fusion/core/engine.h"
 
-#include "editor.hpp"
+#include "editor.h"
 
 int main(int args, char** argv) {
     using namespace fe;

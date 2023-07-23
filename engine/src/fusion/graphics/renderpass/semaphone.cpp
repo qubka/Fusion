@@ -1,6 +1,6 @@
-#include "semaphore.hpp"
+#include "semaphore.h"
 
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

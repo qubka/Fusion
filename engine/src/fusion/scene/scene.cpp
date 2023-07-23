@@ -1,13 +1,13 @@
-#include "scene.hpp"
-#include "system.hpp"
-#include "components.hpp"
+#include "scene.h"
+#include "system.h"
+#include "components.h"
 
-#include "fusion/core/engine.hpp"
-#include "fusion/models/model.hpp"
-#include "fusion/filesystem/file_system.hpp"
-#include "fusion/scene/systems/hierarchy_system.hpp"
-#include "fusion/scene/systems/camera_system.hpp"
-#include "fusion/scene/systems/physics_system.hpp"
+#include "fusion/core/engine.h"
+#include "fusion/models/model.h"
+#include "fusion/filesystem/file_system.h"
+#include "fusion/scene/systems/hierarchy_system.h"
+#include "fusion/scene/systems/camera_system.h"
+#include "fusion/scene/systems/physics_system.h"
 
 using namespace fe;
 
@@ -87,16 +87,15 @@ entt::entity Scene::getCameraEntity() const {
 
 entt::entity Scene::createEntity(std::string name) {
     auto entity = registry.create();
-    registry.emplace<IdComponent>(entity);
-    //registry.emplace<TransformComponent>(entity);
+    auto& id = registry.emplace<IdComponent>(entity);
 
     if (name.empty())
         name = "Empty Entity";
 
     uint32_t i = 0;
     auto view = registry.view<NameComponent>();
-    for (const auto& [e, str] : view.each()) {
-        if (str.name.find(name) != std::string::npos) {
+    for (const auto& [e, n] : view.each()) {
+        if (n.name.find(name) != std::string::npos) {
             i++;
         }
     }
@@ -105,10 +104,15 @@ entt::entity Scene::createEntity(std::string name) {
 
     registry.emplace<NameComponent>(entity, name);
 
+    entityMap[id.uuid] = entity;
+
     return entity;
 }
 
 bool Scene::destroyEntity(entt::entity entity) {
+    if (auto id = registry.try_get<IdComponent>(entity)) {
+        entityMap.erase(id->uuid);
+    }
     // TODO: Children ?
     registry.destroy(entity);
     return true;
@@ -141,6 +145,23 @@ entt::entity Scene::duplicateEntity(entt::entity entity, entt::entity parent) {
     hierarchySystem->setEnabled(true);
     
     return newEntity;
+}
+
+entt::entity Scene::getEntityByName(std::string_view name) {
+    auto view = registry.view<NameComponent>();
+    for (auto [e, n] : view.each()) {
+        if (n.name == name)
+            return e;
+    }
+    return entt::null;
+}
+
+entt::entity Scene::getEntityByUUID(uint64_t uuid) {
+    // TODO: May be use registry instead ?
+    if (auto it = entityMap.find(uuid); it != entityMap.end())
+        return it->second;
+
+    return entt::null;
 }
 
 void Scene::serialise(fs::path filepath, bool binary) {

@@ -1,6 +1,6 @@
-#include "aabb.hpp"
-#include "ray.hpp"
-#include "sphere.hpp"
+#include "aabb.h"
+#include "ray.h"
+#include "sphere.h"
 
 using namespace fe;
 

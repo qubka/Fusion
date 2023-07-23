@@ -1,11 +1,11 @@
-#include "file_browser_panel.hpp"
+#include "file_browser_panel.h"
 
 using namespace fe;
 
 FileBrowserPanel::FileBrowserPanel(Editor& editor) : EditorPanel{"File Browser Window", "FileBrowser", editor},
     fileBrowser{ ImGuiFileBrowserFlags_CreateNewDir | ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_NoModal } {
     fileBrowser.SetTitle("Test File Browser");
-   // fileBrowser.SetTypeFilters({ ".cpp" , ".hpp" });
+   // fileBrowser.SetTypeFilters({ ".cpp" , ".h" });
     fileBrowser.SetLabels(ICON_MDI_FOLDER, ICON_MDI_FILE, ICON_MDI_FOLDER_PLUS, ICON_MDI_AUTORENEW);
     fileBrowser.SetPwd();
 }

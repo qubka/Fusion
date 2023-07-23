@@ -1,4 +1,4 @@
-#include "editor_settings_panel.hpp"
+#include "editor_settings_panel.h"
 
 using namespace fe;
 

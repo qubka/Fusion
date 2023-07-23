@@ -1,5 +1,5 @@
-#include "glfw_monitor.hpp"
-#include "glfw_device_manager.hpp"
+#include "glfw_monitor.h"
+#include "glfw_device_manager.h"
 
 using namespace glfw;
 

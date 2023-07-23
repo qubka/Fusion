@@ -1,5 +1,5 @@
-#include "renderpass.hpp"
-#include "fusion/graphics/graphics.hpp"
+#include "renderpass.h"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

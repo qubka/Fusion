@@ -1,11 +1,11 @@
-#include "framebuffers.hpp"
+#include "framebuffers.h"
 
-#include "fusion/graphics/render_stage.hpp"
-#include "fusion/graphics/textures/texture_depth.hpp"
-#include "fusion/graphics/textures/texture2d.hpp"
-#include "fusion/graphics/renderpass/renderpass.hpp"
-#include "fusion/graphics/renderpass/swapchain.hpp"
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/render_stage.h"
+#include "fusion/graphics/textures/texture_depth.h"
+#include "fusion/graphics/textures/texture2d.h"
+#include "fusion/graphics/renderpass/renderpass.h"
+#include "fusion/graphics/renderpass/swapchain.h"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

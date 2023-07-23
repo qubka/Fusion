@@ -1,4 +1,4 @@
-#include "glfw_joystick.hpp"
+#include "glfw_joystick.h"
 
 using namespace glfw;
 

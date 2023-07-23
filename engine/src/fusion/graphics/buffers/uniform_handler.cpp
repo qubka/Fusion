@@ -1,5 +1,5 @@
-#include "uniform_handler.hpp"
-#include "uniform_buffer.hpp"
+#include "uniform_handler.h"
+#include "uniform_buffer.h"
 
 using namespace fe;
 

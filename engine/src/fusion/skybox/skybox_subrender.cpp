@@ -1,11 +1,11 @@
-#include "skybox_subrender.hpp"
+#include "skybox_subrender.h"
 
-#include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/graphics/cameras/camera.hpp"
-#include "fusion/graphics/buffers/buffer.hpp"
-#include "fusion/graphics/textures/texture_cube.hpp"
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/scene/scene_manager.hpp"
+#include "fusion/graphics/commands/command_buffer.h"
+#include "fusion/graphics/cameras/camera.h"
+#include "fusion/graphics/buffers/buffer.h"
+#include "fusion/graphics/textures/texture_cube.h"
+#include "fusion/devices/device_manager.h"
+#include "fusion/scene/scene_manager.h"
 
 using namespace fe;
 

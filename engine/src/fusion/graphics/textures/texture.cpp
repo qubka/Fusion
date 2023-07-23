@@ -1,7 +1,7 @@
-#include "texture.hpp"
+#include "texture.h"
 
-#include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/graphics/buffers/buffer.hpp"
+#include "fusion/bitmaps/bitmap.h"
+#include "fusion/graphics/buffers/buffer.h"
 
 using namespace fe;
 

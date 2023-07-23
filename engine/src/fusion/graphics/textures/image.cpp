@@ -1,9 +1,9 @@
-#include "image.hpp"
+#include "image.h"
 
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/graphics/buffers/buffer.hpp"
-#include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/graphics/graphics.h"
+#include "fusion/bitmaps/bitmap.h"
+#include "fusion/graphics/buffers/buffer.h"
+#include "fusion/graphics/commands/command_buffer.h"
 
 using namespace fe;
 

@@ -1,12 +1,12 @@
-#include "render_stage.hpp"
-#include "graphics.hpp"
+#include "render_stage.h"
+#include "graphics.h"
 
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/graphics/textures/texture_depth.hpp"
-#include "fusion/graphics/textures/texture2d.hpp"
-#include "fusion/graphics/renderpass/framebuffers.hpp"
-#include "fusion/graphics/renderpass/renderpass.hpp"
-#include "fusion/graphics/renderpass/swapchain.hpp"
+#include "fusion/devices/device_manager.h"
+#include "fusion/graphics/textures/texture_depth.h"
+#include "fusion/graphics/textures/texture2d.h"
+#include "fusion/graphics/renderpass/framebuffers.h"
+#include "fusion/graphics/renderpass/renderpass.h"
+#include "fusion/graphics/renderpass/swapchain.h"
 
 using namespace fe;
 

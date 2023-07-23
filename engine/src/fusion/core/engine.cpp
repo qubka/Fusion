@@ -1,17 +1,17 @@
-#include "engine.hpp"
-#include "module.hpp"
-#include "time.hpp"
+#include "engine.h"
+#include "module.h"
+#include "time.h"
 
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/filesystem/file_system.hpp"
-#include "fusion/scene/scene_manager.hpp"
-#include "fusion/assets/asset_registry.hpp"
-#include "fusion/input/input.hpp"
-#include "fusion/debug/debug_renderer.hpp"
+#include "fusion/devices/device_manager.h"
+#include "fusion/graphics/graphics.h"
+#include "fusion/filesystem/file_system.h"
+#include "fusion/scene/scene_manager.h"
+#include "fusion/assets/asset_registry.h"
+#include "fusion/input/input.h"
+#include "fusion/debug/debug_renderer.h"
 
-#include "fusion/bitmaps/gli_toolbox.hpp"
-#include "fusion/bitmaps/stb_toolbox.hpp"
+#include "fusion/bitmaps/gli_toolbox.h"
+#include "fusion/bitmaps/stb_toolbox.h"
 
 using namespace fe;
 

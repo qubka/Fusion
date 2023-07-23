@@ -1,7 +1,7 @@
-#include "buffer.hpp"
+#include "buffer.h"
 
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/graphics/graphics.h"
+#include "fusion/graphics/commands/command_buffer.h"
 
 using namespace fe;
 

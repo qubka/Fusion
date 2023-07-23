@@ -1,9 +1,9 @@
-#include "default_application.hpp"
-#include "engine.hpp"
+#include "default_application.h"
+#include "engine.h"
 
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/filesystem/file_system.hpp"
-#include "fusion/scene/scene_manager.hpp"
+#include "fusion/devices/device_manager.h"
+#include "fusion/filesystem/file_system.h"
+#include "fusion/scene/scene_manager.h"
 
 #if FUSION_PLATFORM_WINDOWS
 #include <windows.h>

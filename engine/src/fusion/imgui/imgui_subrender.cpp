@@ -1,14 +1,14 @@
-#include "imgui_subrender.hpp"
-#include "imgui_utils.hpp"
+#include "imgui_subrender.h"
+#include "imgui_utils.h"
 
-#include "fusion/core/engine.hpp"
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/filesystem/file_system.hpp"
-#include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/graphics/textures/texture2d.hpp"
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/imgui/material_design_icons.hpp"
+#include "fusion/core/engine.h"
+#include "fusion/devices/device_manager.h"
+#include "fusion/filesystem/file_system.h"
+#include "fusion/bitmaps/bitmap.h"
+#include "fusion/graphics/textures/texture2d.h"
+#include "fusion/graphics/graphics.h"
+#include "fusion/graphics/commands/command_buffer.h"
+#include "fusion/imgui/material_design_icons.h"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>

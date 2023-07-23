@@ -1,8 +1,8 @@
-#include "light_subrender.hpp"
+#include "light_subrender.h"
 
-#include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/scene/scene_manager.hpp"
-#include "fusion/scene/components.hpp"
+#include "fusion/graphics/commands/command_buffer.h"
+#include "fusion/scene/scene_manager.h"
+#include "fusion/scene/components.h"
 
 using namespace fe;
 

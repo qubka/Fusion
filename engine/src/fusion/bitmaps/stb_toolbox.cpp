@@ -1,6 +1,6 @@
-#include "stb_toolbox.hpp"
+#include "stb_toolbox.h"
 
-#include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/file_system.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>

@@ -1,8 +1,8 @@
-#include "instance.hpp"
+#include "instance.h"
 
-#include "fusion/core/engine.hpp"
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/devices/device_manager.hpp"
+#include "fusion/core/engine.h"
+#include "fusion/graphics/graphics.h"
+#include "fusion/devices/device_manager.h"
 
 using namespace fe;
 

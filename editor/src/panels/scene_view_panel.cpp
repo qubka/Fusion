@@ -1,14 +1,14 @@
-#include "scene_view_panel.hpp"
-#include "editor.hpp"
+#include "scene_view_panel.h"
+#include "editor.h"
 
-#include "fusion/scene/scene_manager.hpp"
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/textures/texture2d.hpp"
-#include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/input/input.hpp"
-#include "fusion/debug/grid_subrender.hpp"
-#include "fusion/debug/debug_renderer.hpp"
+#include "fusion/scene/scene_manager.h"
+#include "fusion/graphics/graphics.h"
+#include "fusion/graphics/textures/texture2d.h"
+#include "fusion/bitmaps/bitmap.h"
+#include "fusion/devices/device_manager.h"
+#include "fusion/input/input.h"
+#include "fusion/debug/grid_subrender.h"
+#include "fusion/debug/debug_renderer.h"
 
 using namespace fe;
 

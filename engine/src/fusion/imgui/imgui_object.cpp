@@ -1,9 +1,9 @@
-#include "imgui_object.hpp"
+#include "imgui_object.h"
 
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/textures/texture2d.hpp"
-#include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/imgui/imgui_utils.hpp"
+#include "fusion/graphics/graphics.h"
+#include "fusion/graphics/textures/texture2d.h"
+#include "fusion/graphics/commands/command_buffer.h"
+#include "fusion/imgui/imgui_utils.h"
 
 #include <imgui/imgui.h>
 

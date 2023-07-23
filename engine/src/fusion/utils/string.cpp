@@ -1,4 +1,4 @@
-#include "string.hpp"
+#include "string.h"
 
 #ifdef FUSION_PLATFORM_WINDOWS
 #include <windows.h>

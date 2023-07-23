@@ -1,10 +1,10 @@
-#include "descriptors_handler.hpp"
+#include "descriptors_handler.h"
 
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/buffers/uniform_handler.hpp"
-#include "fusion/graphics/buffers/storage_handler.hpp"
-#include "fusion/graphics/buffers/push_handler.hpp"
-#include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/graphics/graphics.h"
+#include "fusion/graphics/buffers/uniform_handler.h"
+#include "fusion/graphics/buffers/storage_handler.h"
+#include "fusion/graphics/buffers/push_handler.h"
+#include "fusion/graphics/commands/command_buffer.h"
 
 using namespace fe;
 

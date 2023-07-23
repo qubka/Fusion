@@ -1,16 +1,16 @@
-#include "graphics.hpp"
+#include "graphics.h"
 
-#include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/devices/window.hpp"
-#include "fusion/graphics/renderpass/swapchain.hpp"
-#include "fusion/graphics/renderpass/framebuffers.hpp"
-#include "fusion/graphics/renderpass/renderpass.hpp"
-#include "fusion/graphics/commands/command_pool.hpp"
-#include "fusion/graphics/textures/texture_depth.hpp"
-#include "fusion/graphics/render_stage.hpp"
-#include "fusion/graphics/renderer.hpp"
-#include "fusion/graphics/subrender.hpp"
+#include "fusion/bitmaps/bitmap.h"
+#include "fusion/devices/device_manager.h"
+#include "fusion/devices/window.h"
+#include "fusion/graphics/renderpass/swapchain.h"
+#include "fusion/graphics/renderpass/framebuffers.h"
+#include "fusion/graphics/renderpass/renderpass.h"
+#include "fusion/graphics/commands/command_pool.h"
+#include "fusion/graphics/textures/texture_depth.h"
+#include "fusion/graphics/render_stage.h"
+#include "fusion/graphics/renderer.h"
+#include "fusion/graphics/subrender.h"
 
 #include <glslang/Public/ShaderLang.h>
 
@@ -146,7 +146,7 @@ bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
     FUSION_PROFILE_GPU("Begin Renderpass");
 
     if (renderStage.isOutOfDate()) {
-        LOG_WARNING << "Render stage is out of date!";
+        //LOG_WARNING << "Render stage is out of date!";
         recreatePass(info, renderStage);
         return false;
     }
@@ -321,7 +321,7 @@ void Graphics::recreateSwapchain(size_t id) {
 
 #if FUSION_DEBUG
     auto& size = surface->getWindow().getSize();
-    LOG_DEBUG << "Recreating swapchain[" << id << "] old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")";
+    //LOG_DEBUG << "Recreating swapchain[" << id << "] old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")";
 #endif
     swapchain = std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, swapchain.get());
 

@@ -1,4 +1,4 @@
-#include "console_panel.hpp"
+#include "console_panel.h"
 
 #include <utility>
 

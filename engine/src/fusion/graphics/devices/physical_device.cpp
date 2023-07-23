@@ -1,7 +1,7 @@
-#include "physical_device.hpp"
-#include "instance.hpp"
+#include "physical_device.h"
+#include "instance.h"
 
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

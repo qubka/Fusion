@@ -1,4 +1,4 @@
-#include "process_info.hpp"
+#include "process_info.h"
 
 #if FUSION_PLATFORM_WINDOWS
 #include "psapi.h"

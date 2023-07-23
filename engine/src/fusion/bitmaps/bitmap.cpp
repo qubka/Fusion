@@ -1,6 +1,6 @@
-#include "bitmap.hpp"
+#include "bitmap.h"
 
-#include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/file_system.h"
 
 using namespace fe;
 

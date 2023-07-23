@@ -1,6 +1,6 @@
-#include "scene_manager.hpp"
+#include "scene_manager.h"
 
-#include "fusion/devices/device_manager.hpp"
+#include "fusion/devices/device_manager.h"
 
 using namespace fe;
 
@@ -9,7 +9,7 @@ SceneManager::~SceneManager() {
 }
 
 void SceneManager::onStart() {
-    DeviceManager::Get()->getWindow(0)->OnResize().connect<&SceneManager::onWindowResize>(this);
+    //DeviceManager::Get()->getWindow(0)->OnResize().connect<&SceneManager::onWindowResize>(this);
     // TODO: Delete hook ?
 }
 

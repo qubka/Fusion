@@ -1,7 +1,7 @@
-#include "push_handler.hpp"
+#include "push_handler.h"
 
-#include "fusion/graphics/pipelines/pipeline.hpp"
-#include "fusion/graphics/commands/command_buffer.hpp"
+#include "fusion/graphics/pipelines/pipeline.h"
+#include "fusion/graphics/commands/command_buffer.h"
 
 using namespace fe;
 

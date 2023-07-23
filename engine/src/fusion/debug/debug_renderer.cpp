@@ -1,11 +1,11 @@
-#include "debug_renderer.hpp"
+#include "debug_renderer.h"
 
-#include "fusion/geometry/aabb.hpp"
-#include "fusion/geometry/frustum.hpp"
-#include "fusion/geometry/sphere.hpp"
-#include "fusion/geometry/ray.hpp"
+#include "fusion/geometry/aabb.h"
+#include "fusion/geometry/frustum.h"
+#include "fusion/geometry/sphere.h"
+#include "fusion/geometry/ray.h"
 
-#include "fusion/scene/components.hpp"
+#include "fusion/scene/components.h"
 
 using namespace fe;
 

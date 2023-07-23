@@ -1,11 +1,11 @@
-#include "device_manager.hpp"
-#include "monitor.hpp"
-#include "joystick.hpp"
+#include "device_manager.h"
+#include "monitor.h"
+#include "joystick.h"
 
 #if FUSION_PLATFORM_ANDROID
-#include "platform/android/android_device_manager.hpp"
+#include "platform/android/android_device_manager.h"
 #else
-#include "platform/pc/glfw_device_manager.hpp"
+#include "platform/pc/glfw_device_manager.h"
 #endif
 
 using namespace fe;

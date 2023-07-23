@@ -1,10 +1,10 @@
-#include "mesh_subrender.hpp"
-#include "mesh.hpp"
+#include "mesh_subrender.h"
+#include "mesh.h"
 
-#include "fusion/scene/scene_manager.hpp"
-#include "fusion/scene/components.hpp"
-#include "fusion/scene/scene.hpp"
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/scene/scene_manager.h"
+#include "fusion/scene/components.h"
+#include "fusion/scene/scene.h"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

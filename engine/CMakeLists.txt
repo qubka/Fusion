@@ -11,13 +11,18 @@ else()
 endif()
 
 file(GLOB_RECURSE SRC_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/fusion/*.cpp" "src/platform/${PLATFORM_FOLDER}/*.cpp")
-file(GLOB_RECURSE HDR_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/fusion/*.hpp" "src/platform/${PLATFORM_FOLDER}/*.hpp")
-set(PCH_FILE "src/pch.hpp")
+file(GLOB_RECURSE HDR_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/fusion/*.h" "src/platform/${PLATFORM_FOLDER}/*.h")
+set(PCH_FILE "src/pch.h")
+
+# mono-2.0
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(MONO REQUIRED mono-2)
 
 # create library and exectuable
 add_library(${PROJECT_NAME} STATIC ${SRC_FILES} ${HDR_FILES})
 target_precompile_headers(${PROJECT_NAME} PUBLIC ${PCH_FILE})
-target_include_directories(${PROJECT_NAME} PUBLIC "src")
+target_include_directories(${PROJECT_NAME} PUBLIC "src" ${MONO_INCLUDE_DIRS})
+target_link_directories(${PROJECT_NAME} PRIVATE ${MONO_LIBRARY_DIRS})
 
 # copy all asset files to the binary directory of the engine
 file(GLOB_RECURSE ASSET_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "assets/*")
@@ -28,6 +33,7 @@ endforeach()
 target_link_libraries(${PROJECT_NAME} PUBLIC
         git-info
         ${FUSION_ALL_SYSTEM_LIBS}
+        ${MONO_LIBRARIES}
         )
 
 if(ANDROID)
@@ -48,7 +54,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC GLM_FORCE_DEPTH_ZERO_TO_ONE)
 target_compile_definitions(${PROJECT_NAME} PUBLIC FUSION_DEBUG)
 #target_compile_definitions(${PROJECT_NAME} PUBLIC FUSION_PROFILE)
 target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
-target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_USER_CONFIG="fusion/imgui/imconfig.hpp")
+target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_USER_CONFIG="fusion/imgui/imconfig.h")
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC
         FUSION_VERSION_VARIANT=${FUSION_VERSION_VARIANT}
@@ -67,3 +73,17 @@ if(WIN32)
     #add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
    #         COMMAND ${CMAKE_COMMAND} -E copy_directory "${PhysxOutputPath}" "$<TARGET_FILE_DIR:${PROJECT_NAME}")
 endif()
+
+
+# TODO REWORK, ADD AUTO CSC COMPILATION
+# Compile core mono library
+#set(SCRIPT_DIR assets/scripts)
+#file(MAKE_DIRECTORY ${SCRIPT_DIR})
+#execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${SCRIPT_DIR})
+#file(GLOB_RECURSE LIB_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "script-core/src/*.cs")
+#string(REPLACE ";" " " LIB_FILE_LIST "${LIB_FILES}")
+#execute_process(COMMAND "csc -target:library -out:${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_DIR}/Fusion-ScriptCore.dll ${CMAKE_CURRENT_SOURCE_DIR}/script-core/src/Fusion/*.cs"
+#        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+# Compile core mono library (2)
+#add_custom_target(MonoBuild COMMAND cmd ${CMAKE_CURRENT_SOURCE_DIR}/script-core/build.bat)
+#add_dependencies(${PROJECT_NAME} MonoBuild)

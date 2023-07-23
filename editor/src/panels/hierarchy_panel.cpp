@@ -1,11 +1,11 @@
-#include "hierarchy_panel.hpp"
-#include "editor.hpp"
+#include "hierarchy_panel.h"
+#include "editor.h"
 
-#include "fusion/input/input.hpp"
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/scene/scene_manager.hpp"
-#include "fusion/scene/components.hpp"
-#include "fusion/scene/systems/hierarchy_system.hpp"
+#include "fusion/input/input.h"
+#include "fusion/devices/device_manager.h"
+#include "fusion/scene/scene_manager.h"
+#include "fusion/scene/components.h"
+#include "fusion/scene/systems/hierarchy_system.h"
 
 using namespace fe;
 
@@ -263,11 +263,11 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         // ImGui::EndGroup();
 
         if (isDoubleClicked) {
-            static char objName[256];
-            std::strcpy(objName, name.c_str());
+            static char buffer[256]{};
+            std::strncpy(buffer, name.c_str(), sizeof(buffer));
             ImGui::PushItemWidth(-1);
-            if (ImGui::InputText("##EntityName", objName, IM_ARRAYSIZE(objName), 0))
-                registry.get_or_emplace<NameComponent>(node).name = objName;
+            if (ImGui::InputText("##EntityName", buffer, sizeof(buffer)))
+                registry.get_or_emplace<NameComponent>(node).name = buffer;
             ImGui::PopStyleVar();
         }
 

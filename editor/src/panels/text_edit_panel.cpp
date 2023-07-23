@@ -1,9 +1,9 @@
-#include "text_edit_panel.hpp"
-#include "editor.hpp"
+#include "text_edit_panel.h"
+#include "editor.h"
 
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/filesystem/file_system.hpp"
-#include "fusion/filesystem/file_format.hpp"
+#include "fusion/devices/device_manager.h"
+#include "fusion/filesystem/file_system.h"
+#include "fusion/filesystem/file_format.h"
 
 using namespace fe;
 

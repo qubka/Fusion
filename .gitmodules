@@ -87,10 +87,6 @@
 	path = external/meshoptimizer
 	url = https://github.com/zeux/meshoptimizer
 	ignore = all
-[submodule "external/stduuid"]
-	path = external/stduuid
-	url = https://github.com/mariusbancila/stduuid
-	ignore = all
 [submodule "external/span"]
 	path = external/span
 	url = https://github.com/tcbrindle/span

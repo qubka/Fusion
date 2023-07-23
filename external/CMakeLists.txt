@@ -58,17 +58,6 @@ endif()
 list(APPEND ALL_SYSTEM_LIBS span)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
-# stduuid
-#╒◖═════════════════════════════════════════════════════════════════════◗╕
-find_package(stduuid QUIET)
-if(NOT stduuid_FOUND)
-    add_library(stduuid INTERFACE)
-
-    target_include_directories(stduuid INTERFACE stduuid/include)
-endif()
-list(APPEND ALL_SYSTEM_LIBS stduuid)
-#╘◖═════════════════════════════════════════════════════════════════════◗╛
-
 # glm
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
 find_package(glm QUIET)

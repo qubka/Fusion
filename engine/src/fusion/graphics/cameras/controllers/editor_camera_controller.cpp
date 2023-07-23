@@ -1,8 +1,8 @@
-#include "editor_camera_controller.hpp"
+#include "editor_camera_controller.h"
 
-#include "fusion/input/input.hpp"
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/graphics/cameras/camera.hpp"
+#include "fusion/input/input.h"
+#include "fusion/devices/device_manager.h"
+#include "fusion/graphics/cameras/camera.h"
 
 using namespace fe;
 

@@ -1,26 +1,27 @@
-#include "editor.hpp"
-#include "editor_renderer.hpp"
+#include "editor.h"
+#include "editor_renderer.h"
 
-#include "fusion/core/engine.hpp"
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/input/input.hpp"
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/cameras/camera.hpp"
-#include "fusion/scene/components.hpp"
-#include "fusion/scene/scene_manager.hpp"
-#include "fusion/filesystem/file_format.hpp"
-#include "fusion/filesystem/file_system.hpp"
-#include "fusion/geometry/ray.hpp"
+#include "fusion/core/engine.h"
+#include "fusion/devices/device_manager.h"
+#include "fusion/input/input.h"
+#include "fusion/graphics/graphics.h"
+#include "fusion/graphics/cameras/camera.h"
+#include "fusion/scene/components.h"
+#include "fusion/scene/scene_manager.h"
+#include "fusion/filesystem/file_format.h"
+#include "fusion/filesystem/file_system.h"
+#include "fusion/geometry/ray.h"
+#include "fusion/scripting/script_engine.h"
 
-#include "panels/application_info_panel.hpp"
-#include "panels/console_panel.hpp"
-#include "panels/content_browser_panel.hpp"
-#include "panels/text_edit_panel.hpp"
-#include "panels/hierarchy_panel.hpp"
-#include "panels/inspector_panel.hpp"
-#include "panels/scene_view_panel.hpp"
-#include "panels/game_view_panel.hpp"
-#include "panels/project_settings_panel.hpp"
+#include "panels/application_info_panel.h"
+#include "panels/console_panel.h"
+#include "panels/content_browser_panel.h"
+#include "panels/text_edit_panel.h"
+#include "panels/hierarchy_panel.h"
+#include "panels/inspector_panel.h"
+#include "panels/scene_view_panel.h"
+#include "panels/game_view_panel.h"
+#include "panels/project_settings_panel.h"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
@@ -390,6 +391,13 @@ void Editor::drawMenuBar() {
             ImGui::EndMenu();
         }
 
+        if (ImGui::BeginMenu("Script")) {
+            if (ImGui::MenuItem("Reload assembly", "Ctrl+T"))
+                ScriptEngine::ReloadAssembly();
+
+            ImGui::EndMenu();
+        }
+
         if (ImGui::BeginMenu("Panels")) {
             for (auto& panel : panels) {
                 if (ImGui::MenuItem(panel->getTitle().c_str(), "", &panel->Active(), true)) {
@@ -751,9 +759,11 @@ void Editor::projectOpenCallback(const fs::path& path) {
     }
 
     LOG_DEBUG << "Project opened: \"" << path << "\"";
+
+    AssetRegistry::Get()->releaseAll();
 }
 
-void Editor::newProjectOpenCallback(const fs::path& path) {
+/*void Editor::newProjectOpenCallback(const fs::path& path) {
     openNewProject(path);
     fileBrowserPanel.setOpenDirectory(false);
 
@@ -762,7 +772,9 @@ void Editor::newProjectOpenCallback(const fs::path& path) {
     }
 
     LOG_DEBUG << "New project opened: \"" << path << "\"";
-}
+
+    AssetRegistry::Get()->releaseAll();
+}*/
 
 void Editor::newProjectLocationCallback(const fs::path& path) {
     projectLocation = path;
@@ -771,6 +783,8 @@ void Editor::newProjectLocationCallback(const fs::path& path) {
     locationPopupOpened = false;
 
     LOG_DEBUG << "New Project opened: \"" << path << "\"";
+
+    AssetRegistry::Get()->releaseAll();
 }
 
 void Editor::removePanel(EditorPanel* panel) {

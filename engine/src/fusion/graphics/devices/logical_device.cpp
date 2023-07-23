@@ -1,9 +1,9 @@
-#include "logical_device.hpp"
+#include "logical_device.h"
 
-#include "instance.hpp"
-#include "physical_device.hpp"
+#include "instance.h"
+#include "physical_device.h"
 
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

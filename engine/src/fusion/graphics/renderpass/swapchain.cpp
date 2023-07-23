@@ -1,9 +1,9 @@
-#include "swapchain.hpp"
+#include "swapchain.h"
 
-#include "fusion/graphics/devices/physical_device.hpp"
-#include "fusion/graphics/devices/logical_device.hpp"
-#include "fusion/graphics/devices/surface.hpp"
-#include "fusion/graphics/textures/image.hpp"
+#include "fusion/graphics/devices/physical_device.h"
+#include "fusion/graphics/devices/logical_device.h"
+#include "fusion/graphics/devices/surface.h"
+#include "fusion/graphics/textures/image.h"
 
 using namespace fe;
 

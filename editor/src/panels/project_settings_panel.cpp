@@ -1,7 +1,7 @@
-#include "project_settings_panel.hpp"
-#include "editor.hpp"
+#include "project_settings_panel.h"
+#include "editor.h"
 
-#include "fusion/devices/device_manager.hpp"
+#include "fusion/devices/device_manager.h"
 
 using namespace fe;
 

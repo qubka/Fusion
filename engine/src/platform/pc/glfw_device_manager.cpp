@@ -1,8 +1,8 @@
-#include "glfw_device_manager.hpp"
-#include "glfw_monitor.hpp"
-#include "glfw_window.hpp"
-#include "glfw_joystick.hpp"
-#include "glfw_cursor.hpp"
+#include "glfw_device_manager.h"
+#include "glfw_monitor.h"
+#include "glfw_window.h"
+#include "glfw_joystick.h"
+#include "glfw_cursor.h"
 
 using namespace glfw;
 

@@ -1,10 +1,10 @@
-#include "surface.hpp"
+#include "surface.h"
 
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/devices/instance.hpp"
-#include "fusion/graphics/devices/logical_device.hpp"
-#include "fusion/graphics/devices/physical_device.hpp"
-#include "fusion/devices/device_manager.hpp"
+#include "fusion/graphics/graphics.h"
+#include "fusion/graphics/devices/instance.h"
+#include "fusion/graphics/devices/logical_device.h"
+#include "fusion/graphics/devices/physical_device.h"
+#include "fusion/devices/device_manager.h"
 
 using namespace fe;
 

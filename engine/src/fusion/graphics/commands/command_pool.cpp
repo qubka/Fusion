@@ -1,6 +1,6 @@
-#include "command_pool.hpp"
+#include "command_pool.h"
 
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

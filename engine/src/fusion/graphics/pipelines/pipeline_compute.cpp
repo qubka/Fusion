@@ -1,8 +1,8 @@
-#include "pipeline_compute.hpp"
+#include "pipeline_compute.h"
 
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/filesystem/file_system.hpp"
+#include "fusion/graphics/graphics.h"
+#include "fusion/graphics/commands/command_buffer.h"
+#include "fusion/filesystem/file_system.h"
 
 using namespace fe;
 

@@ -1,7 +1,7 @@
-#include "debug_subrender.hpp"
+#include "debug_subrender.h"
 
-#include "fusion/graphics/cameras/camera.hpp"
-#include "fusion/scene/scene_manager.hpp"
+#include "fusion/graphics/cameras/camera.h"
+#include "fusion/scene/scene_manager.h"
 
 using namespace fe;
 

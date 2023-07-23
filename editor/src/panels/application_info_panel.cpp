@@ -1,8 +1,8 @@
-#include "application_info_panel.hpp"
+#include "application_info_panel.h"
 
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/scene/scene_manager.hpp"
-#include "fusion/filesystem/file_system.hpp"
+#include "fusion/devices/device_manager.h"
+#include "fusion/scene/scene_manager.h"
+#include "fusion/filesystem/file_system.h"
 
 using namespace fe;
 

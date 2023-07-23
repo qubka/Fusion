@@ -1,4 +1,4 @@
-#include "instance_buffer.hpp"
+#include "instance_buffer.h"
 
 using namespace fe;
 

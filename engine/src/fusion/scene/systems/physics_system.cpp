@@ -1,6 +1,6 @@
-#include "physics_system.hpp"
+#include "physics_system.h"
 
-#include "fusion/scene/scene_manager.hpp"
+#include "fusion/scene/scene_manager.h"
 
 using namespace fe;
 /*using namespace physx;

@@ -1,8 +1,8 @@
-#include "sandbox.hpp"
-#include "sandbox_renderer.hpp"
+#include "sandbox.h"
+#include "sandbox_renderer.h"
 
-#include "fusion/core/engine.hpp"
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/core/engine.h"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

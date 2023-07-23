@@ -1,6 +1,6 @@
-#include "fusion/core/engine.hpp"
+#include "fusion/core/engine.h"
 
-#include "sandbox.hpp"
+#include "sandbox.h"
 
 int main(int args, char** argv) {
     using namespace fe;

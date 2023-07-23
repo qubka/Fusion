@@ -1,6 +1,6 @@
-#include "pipeline_cache.hpp"
+#include "pipeline_cache.h"
 
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

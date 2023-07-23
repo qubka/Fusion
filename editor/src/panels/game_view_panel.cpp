@@ -1,9 +1,9 @@
-#include "game_view_panel.hpp"
-#include "editor.hpp"
+#include "game_view_panel.h"
+#include "editor.h"
 
-#include "fusion/graphics/graphics.hpp"
-#include "fusion/scene/scene_manager.hpp"
-#include "fusion/scene/components/camera_component.hpp"
+#include "fusion/graphics/graphics.h"
+#include "fusion/scene/scene_manager.h"
+#include "fusion/scene/components/camera_component.h"
 
 using namespace fe;
 

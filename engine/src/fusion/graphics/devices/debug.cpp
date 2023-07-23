@@ -1,7 +1,7 @@
-#include "debug.hpp"
-#include "logical_device.hpp"
+#include "debug.h"
+#include "logical_device.h"
 
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

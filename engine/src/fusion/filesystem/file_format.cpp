@@ -1,7 +1,7 @@
-#include "file_format.hpp"
-#include "file_system.hpp"
+#include "file_format.h"
+#include "file_system.h"
 
-#include "fusion/imgui/material_design_icons.hpp"
+#include "fusion/imgui/material_design_icons.h"
 
 using namespace fe;
 

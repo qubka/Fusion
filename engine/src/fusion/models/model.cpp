@@ -1,7 +1,7 @@
-#include "model.hpp"
+#include "model.h"
 
-#include "fusion/core/engine.hpp"
-#include "fusion/assets/asset_registry.hpp"
+#include "fusion/core/engine.h"
+#include "fusion/assets/asset_registry.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/Exporter.hpp>

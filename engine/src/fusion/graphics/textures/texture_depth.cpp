@@ -1,4 +1,4 @@
-#include "texture_depth.hpp"
+#include "texture_depth.h"
 
 using namespace fe;
 

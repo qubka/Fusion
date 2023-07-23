@@ -1,11 +1,11 @@
-#include "content_browser_panel.hpp"
+#include "content_browser_panel.h"
 
-#include "editor.hpp"
+#include "editor.h"
 
-#include "fusion/core/engine.hpp"
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/filesystem/file_system.hpp"
-#include "fusion/filesystem/file_format.hpp"
+#include "fusion/core/engine.h"
+#include "fusion/devices/device_manager.h"
+#include "fusion/filesystem/file_system.h"
+#include "fusion/filesystem/file_format.h"
 
 #include <imgui/imgui.h>
 

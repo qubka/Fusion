@@ -1,6 +1,6 @@
-#include "gli_toolbox.hpp"
+#include "gli_toolbox.h"
 
-#include "fusion/filesystem/file_system.hpp"
+#include "fusion/filesystem/file_system.h"
 
 #include <gli/gli.hpp>
 

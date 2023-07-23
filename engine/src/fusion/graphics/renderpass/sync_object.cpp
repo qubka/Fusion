@@ -1,6 +1,6 @@
-#include "sync_object.hpp"
+#include "sync_object.h"
 
-#include "fusion/graphics/graphics.hpp"
+#include "fusion/graphics/graphics.h"
 
 using namespace fe;
 

@@ -1,11 +1,11 @@
-#include "texture_cube.hpp"
+#include "texture_cube.h"
 
-#include "fusion/core/engine.hpp"
-#include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/graphics/buffers/buffer.hpp"
-#include "fusion/graphics/commands/command_buffer.hpp"
-#include "fusion/filesystem/file_format.hpp"
-#include "fusion/filesystem/file_system.hpp"
+#include "fusion/core/engine.h"
+#include "fusion/bitmaps/bitmap.h"
+#include "fusion/graphics/buffers/buffer.h"
+#include "fusion/graphics/commands/command_buffer.h"
+#include "fusion/filesystem/file_format.h"
+#include "fusion/filesystem/file_system.h"
 
 #include <gli/gli.hpp>
 

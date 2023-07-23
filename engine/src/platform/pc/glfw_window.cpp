@@ -1,8 +1,8 @@
-#include "glfw_window.hpp"
+#include "glfw_window.h"
 
-#include "fusion/bitmaps/bitmap.hpp"
-#include "fusion/devices/device_manager.hpp"
-#include "fusion/devices/cursor.hpp"
+#include "fusion/bitmaps/bitmap.h"
+#include "fusion/devices/device_manager.h"
+#include "fusion/devices/cursor.h"
 
 using namespace glfw;
 

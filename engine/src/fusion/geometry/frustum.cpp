@@ -1,7 +1,7 @@
-#include "frustum.hpp"
-#include "aabb.hpp"
-#include "sphere.hpp"
-#include "rect.hpp"
+#include "frustum.h"
+#include "aabb.h"
+#include "sphere.h"
+#include "rect.h"
 
 using namespace fe;
 

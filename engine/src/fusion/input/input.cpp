@@ -1,6 +1,6 @@
-#include "input.hpp"
+#include "input.h"
 
-#include "fusion/devices/device_manager.hpp"
+#include "fusion/devices/device_manager.h"
 
 #define MOUSE_BUTTONS 1024
 

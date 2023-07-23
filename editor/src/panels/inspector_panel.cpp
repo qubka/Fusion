@@ -1,8 +1,9 @@
-#include "inspector_panel.hpp"
-#include "editor.hpp"
+#include "inspector_panel.h"
+#include "editor.h"
 
-#include "fusion/scene/components.hpp"
-#include "fusion/models/mesh.hpp"
+#include "fusion/scene/components.h"
+#include "fusion/models/mesh.h"
+#include "fusion/scripting/script_engine.h"
 
 using namespace fe;
 
@@ -70,6 +71,65 @@ namespace ImGui {
         ImGui::Columns(1);
         ImGui::Separator();
         ImGui::PopStyleVar();
+    }
+
+    template<>
+    void ComponentEditorWidget<ScriptComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& script = registry.get<ScriptComponent>(entity);
+
+        bool scriptClassExists = ScriptEngine::EntityClassExists(script.className);
+
+        ImGuiUtils::PropertyText("Class", script.className);
+
+        auto& id = registry.get<IdComponent>(entity);
+
+        // Fields
+        auto scene = SceneManager::Get()->getScene();
+        bool sceneRunning = scene && scene->isRuntime();
+        if (sceneRunning) {
+            std::shared_ptr<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(id.uuid);
+            if (scriptInstance) {
+                const auto& fields = scriptInstance->getScriptClass()->getFields();
+                for (const auto& [name, field] : fields) {
+                    if (field.type == ScriptFieldType::Float) {
+                        float data = scriptInstance->getFieldValue<float>(name);
+                        if (ImGui::DragFloat(name.c_str(), &data)) {
+                            scriptInstance->setFieldValue(name, data);
+                        }
+                    }
+                }
+            }
+        } else {
+            if (scriptClassExists) {
+                std::shared_ptr<ScriptClass> entityClass = ScriptEngine::GetEntityClass(script.className);
+                const auto& fields = entityClass->getFields();
+
+                auto& entityFields = ScriptEngine::GetScriptFieldMap(id.uuid);
+                for (const auto& [name, field] : fields) {
+                    // Field has been set in editor
+                    if (auto it = entityFields.find(name); it != entityFields.end()) {
+                        ScriptFieldInstance& scriptField = it->second;
+
+                        // Display control to set it maybe
+                        if (field.type == ScriptFieldType::Float) {
+                            float data = scriptField.getValue<float>();
+                            if (ImGui::DragFloat(name.c_str(), &data))
+                                scriptField.setValue(data);
+                        }
+                    } else {
+                        // Display control to set it maybe
+                        if (field.type == ScriptFieldType::Float) {
+                            float data = 0.0f;
+                            if (ImGui::DragFloat(name.c_str(), &data)) {
+                                ScriptFieldInstance& fieldInstance = entityFields[name];
+                                fieldInstance.field = field;
+                                fieldInstance.setValue(data);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     template<>
@@ -408,7 +468,7 @@ void InspectorPanel::onImGui() {
         if (debugMode) {
             auto idComponent = registry.try_get<IdComponent>(selected);
 
-            ImGui::Text("UUID: %s", uuids::to_string(idComponent->uuid).c_str());
+            ImGui::Text("UUID: %s", std::to_string(idComponent->uuid).c_str());
 
             if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(selected)) {
                 auto parent = hierarchyComponent->parent;
