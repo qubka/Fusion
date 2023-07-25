@@ -63,6 +63,7 @@ void Editor::onStart() {
     componentIconMap[type_id<SpriteComponent>] = ICON_MDI_IMAGE;
     componentIconMap[type_id<LuaScriptComponent>] = ICON_MDI_SCRIPT;
     componentIconMap[type_id<EnvironmentComponent>] = ICON_MDI_EARTH;*/
+    componentIconMap[type_id<ScriptComponent>] = ICON_MDI_SCRIPT;
     componentIconMap[type_id<Editor>] = ICON_MDI_SQUARE;
 
     panels.push_back(std::make_unique<ApplicationInfoPanel>(*this));
@@ -393,7 +394,7 @@ void Editor::drawMenuBar() {
 
         if (ImGui::BeginMenu("Script")) {
             if (ImGui::MenuItem("Reload assembly", "Ctrl+T"))
-                ScriptEngine::ReloadAssembly();
+                ScriptEngine::Get()->reloadAssembly();
 
             ImGui::EndMenu();
         }
@@ -517,8 +518,8 @@ void Editor::drawMenuBar() {
 
         ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (1.5f * (ImGui::GetFontSize() + style.ItemSpacing.x)));
 
-        if (editorState == EditorState::Next)
-            editorState = EditorState::Paused;
+        //if (editorState == EditorState::Next)
+        //    editorState = EditorState::Paused;
 
         bool selected;
 
@@ -552,14 +553,14 @@ void Editor::drawMenuBar() {
             ImGuiUtils::Tooltip("Pause");
         }
 
-        ImGui::SameLine();
+        /*ImGui::SameLine();
 
         {
             selected = editorState == EditorState::Next;
             if (ImGuiUtils::ToggleButton(ICON_MDI_STEP_FORWARD, selected, true))
                 editorState = EditorState::Next;
             ImGuiUtils::Tooltip("Next");
-        }
+        }*/
 
         auto size = ImGui::CalcTextSize("%.2f ms (%.i FPS)");
         ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - size.x - style.ItemSpacing.x * 2.0f);

@@ -14,6 +14,6 @@
         "fullscreen": false,
         "vsync": false,
         "show console": true,
-        "current scene": "Empty Scene"
+        "current scene": "New Scene"
     }
 }

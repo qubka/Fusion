@@ -263,7 +263,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         // ImGui::EndGroup();
 
         if (isDoubleClicked) {
-            static char buffer[256]{};
+            char buffer[256]{};
             std::strncpy(buffer, name.c_str(), sizeof(buffer));
             ImGui::PushItemWidth(-1);
             if (ImGui::InputText("##EntityName", buffer, sizeof(buffer)))

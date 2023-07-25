@@ -72,64 +72,230 @@ namespace ImGui {
         ImGui::Separator();
         ImGui::PopStyleVar();
     }
-
+    
+    namespace Widget {
+        template<typename T>
+        inline void SetFieldProperty(ScriptInstance& scriptInstance, const std::string& name) {
+            T data = scriptInstance.getFieldValue<T>(name);
+            if (ImGuiUtils::Property(name.c_str(), data)) {
+                scriptInstance.setFieldValue(name, data);
+            }
+        }
+    
+        template<typename T>
+        inline void SetFieldProperty(ScriptFieldInstance& scriptField, const std::string& name) {
+            T data = scriptField.getValue<T>();
+            if (ImGuiUtils::Property(name.c_str(), data)) {
+                scriptField.setValue(data);
+            }
+        }
+    
+        template<typename T>
+        inline void SetFieldProperty(ScriptFieldMap& entityFields, const ScriptField& scriptField, const std::string& name) {
+            T data{};
+            if (ImGuiUtils::Property(name.c_str(), data)) {
+                ScriptFieldInstance& fieldInstance = entityFields[name];
+                fieldInstance.field = scriptField;
+                fieldInstance.setValue(data);
+            }
+        }
+    }
+    
     template<>
     void ComponentEditorWidget<ScriptComponent>(entt::registry& registry, entt::registry::entity_type entity) {
         auto& script = registry.get<ScriptComponent>(entity);
 
-        bool scriptClassExists = ScriptEngine::EntityClassExists(script.className);
+        auto scriptEngine = ScriptEngine::Get();
+        bool scriptClassExists = scriptEngine->entityClassExists(script.className);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
 
         ImGuiUtils::PropertyText("Class", script.className);
 
         auto& id = registry.get<IdComponent>(entity);
 
         // Fields
-        auto scene = SceneManager::Get()->getScene();
+        auto scene = scriptEngine->getSceneContext();
         bool sceneRunning = scene && scene->isRuntime();
         if (sceneRunning) {
-            std::shared_ptr<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(id.uuid);
+            std::shared_ptr<ScriptInstance> scriptInstance = scriptEngine->getEntityScriptInstance(id.uuid);
             if (scriptInstance) {
                 const auto& fields = scriptInstance->getScriptClass()->getFields();
                 for (const auto& [name, field] : fields) {
-                    if (field.type == ScriptFieldType::Float) {
-                        float data = scriptInstance->getFieldValue<float>(name);
-                        if (ImGui::DragFloat(name.c_str(), &data)) {
-                            scriptInstance->setFieldValue(name, data);
-                        }
+                    switch (field.type) {
+                        case ScriptFieldType::Float:
+                            Widget::SetFieldProperty<float>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::Double:
+                            Widget::SetFieldProperty<double>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::Bool:
+                            Widget::SetFieldProperty<bool>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::Char:
+                            Widget::SetFieldProperty<char>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::Byte:
+                            Widget::SetFieldProperty<int8_t>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::Short:
+                            Widget::SetFieldProperty<int16_t>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::Int:
+                            Widget::SetFieldProperty<int32_t>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::Long:
+                            Widget::SetFieldProperty<int64_t>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::UByte:
+                            Widget::SetFieldProperty<uint8_t>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::UShort:
+                            Widget::SetFieldProperty<uint16_t>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::UInt:
+                            Widget::SetFieldProperty<uint32_t>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::ULong:
+                            Widget::SetFieldProperty<uint64_t>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::Vector2:
+                            Widget::SetFieldProperty<glm::vec2>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::Vector3:
+                            Widget::SetFieldProperty<glm::vec3>(*scriptInstance, name);
+                            break;
+                        case ScriptFieldType::Vector4:
+                            Widget::SetFieldProperty<glm::vec4>(*scriptInstance, name);
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
         } else {
             if (scriptClassExists) {
-                std::shared_ptr<ScriptClass> entityClass = ScriptEngine::GetEntityClass(script.className);
+                std::shared_ptr<ScriptClass> entityClass = scriptEngine->getEntityClass(script.className);
                 const auto& fields = entityClass->getFields();
 
-                auto& entityFields = ScriptEngine::GetScriptFieldMap(id.uuid);
+                auto& entityFields = scriptEngine->getScriptFieldMap(id.uuid);
                 for (const auto& [name, field] : fields) {
                     // Field has been set in editor
                     if (auto it = entityFields.find(name); it != entityFields.end()) {
                         ScriptFieldInstance& scriptField = it->second;
 
                         // Display control to set it maybe
-                        if (field.type == ScriptFieldType::Float) {
-                            float data = scriptField.getValue<float>();
-                            if (ImGui::DragFloat(name.c_str(), &data))
-                                scriptField.setValue(data);
+                        switch (field.type) {
+                            case ScriptFieldType::Float:
+                                Widget::SetFieldProperty<float>(scriptField, name);
+                                break;
+                            case ScriptFieldType::Double:
+                                Widget::SetFieldProperty<double>(scriptField, name);
+                                break;
+                            case ScriptFieldType::Bool:
+                                Widget::SetFieldProperty<bool>(scriptField, name);
+                                break;
+                            case ScriptFieldType::Char:
+                                Widget::SetFieldProperty<int8_t>(scriptField, name);
+                                break;
+                            case ScriptFieldType::Byte:
+                                Widget::SetFieldProperty<int8_t>(scriptField, name);
+                                break;
+                            case ScriptFieldType::Short:
+                                Widget::SetFieldProperty<int16_t>(scriptField, name);
+                                break;
+                            case ScriptFieldType::Int:
+                                Widget::SetFieldProperty<int32_t>(scriptField, name);
+                                break;
+                            case ScriptFieldType::Long:
+                                Widget::SetFieldProperty<int64_t>(scriptField, name);
+                                break;
+                            case ScriptFieldType::UByte:
+                                Widget::SetFieldProperty<uint8_t>(scriptField, name);
+                                break;
+                            case ScriptFieldType::UShort:
+                                Widget::SetFieldProperty<uint16_t>(scriptField, name);
+                                break;
+                            case ScriptFieldType::UInt:
+                                Widget::SetFieldProperty<uint32_t>(scriptField, name);
+                                break;
+                            case ScriptFieldType::ULong:
+                                Widget::SetFieldProperty<uint64_t>(scriptField, name);
+                                break;
+                            case ScriptFieldType::Vector2:
+                                Widget::SetFieldProperty<glm::vec2>(scriptField, name);
+                                break;
+                            case ScriptFieldType::Vector3:
+                                Widget::SetFieldProperty<glm::vec3>(scriptField, name);
+                                break;
+                            case ScriptFieldType::Vector4:
+                                Widget::SetFieldProperty<glm::vec4>(scriptField, name);
+                                break;
+                            default:
+                                break;
                         }
                     } else {
                         // Display control to set it maybe
-                        if (field.type == ScriptFieldType::Float) {
-                            float data = 0.0f;
-                            if (ImGui::DragFloat(name.c_str(), &data)) {
-                                ScriptFieldInstance& fieldInstance = entityFields[name];
-                                fieldInstance.field = field;
-                                fieldInstance.setValue(data);
-                            }
+                        switch (field.type) {
+                            case ScriptFieldType::Float:
+                                Widget::SetFieldProperty<float>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::Double:
+                                Widget::SetFieldProperty<double>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::Bool:
+                                Widget::SetFieldProperty<bool>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::Char:
+                                Widget::SetFieldProperty<int8_t>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::Byte:
+                                Widget::SetFieldProperty<int8_t>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::Short:
+                                Widget::SetFieldProperty<int16_t>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::Int:
+                                Widget::SetFieldProperty<int32_t>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::Long:
+                                Widget::SetFieldProperty<int64_t>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::UByte:
+                                Widget::SetFieldProperty<uint8_t>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::UShort:
+                                Widget::SetFieldProperty<uint16_t>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::UInt:
+                                Widget::SetFieldProperty<uint32_t>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::ULong:
+                                Widget::SetFieldProperty<uint64_t>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::Vector2:
+                                Widget::SetFieldProperty<glm::vec2>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::Vector3:
+                                Widget::SetFieldProperty<glm::vec3>(entityFields, field, name);
+                                break;
+                            case ScriptFieldType::Vector4:
+                                Widget::SetFieldProperty<glm::vec4>(entityFields, field, name);
+                                break;
+                            default:
+                                break;
                         }
                     }
                 }
             }
         }
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
     }
 
     template<>
@@ -374,7 +540,7 @@ namespace ImGui {
 #define REG_COMPONENT(ComponentType, ComponentName)            \
 {                                                              \
     std::string name;                                          \
-    editor.getComponentIcon(type_id<ComponentType>, name);    \
+    editor.getComponentIcon(type_id<ComponentType>, name);     \
     name += "\t";                                              \
     name += (ComponentName);                                   \
     enttEditor.registerComponent<ComponentType>(name); \
@@ -385,6 +551,7 @@ InspectorPanel::InspectorPanel(Editor& editor) : EditorPanel{ICON_MDI_INFORMATIO
     REG_COMPONENT(MeshComponent, "Mesh");
     REG_COMPONENT(CameraComponent, "Camera");
     REG_COMPONENT(LightComponent, "Light");
+    REG_COMPONENT(ScriptComponent, "Script");
     REG_COMPONENT(MaterialComponent, "Material");
     REG_COMPONENT(RigidbodyComponent, "Rigidbody");
     REG_COMPONENT(BoxColliderComponent, "Box Collider");

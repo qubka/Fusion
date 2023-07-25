@@ -25,10 +25,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC "src" ${MONO_INCLUDE_DIRS})
 target_link_directories(${PROJECT_NAME} PRIVATE ${MONO_LIBRARY_DIRS})
 
 # copy all asset files to the binary directory of the engine
-file(GLOB_RECURSE ASSET_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "assets/*")
-foreach(ASSET_FILE ${ASSET_FILES})
-    configure_file(${ASSET_FILE} ${CMAKE_CURRENT_BINARY_DIR}/${ASSET_FILE} COPYONLY)
-endforeach()
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_CURRENT_SOURCE_DIR}/assets
+        ${CMAKE_CURRENT_BINARY_DIR}/assets)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_CURRENT_SOURCE_DIR}/mono
+        ${CMAKE_CURRENT_BINARY_DIR}/mono)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
         git-info

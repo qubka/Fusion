@@ -30,7 +30,7 @@ bool PropertyText(const char* name, std::string& value) {
 
     ImGui::PushID(name);
 
-    static char buffer[256]{};
+    char buffer[256]{};
     std::strncpy(buffer, value.c_str(), sizeof(buffer));
     if (ImGui::InputText("", buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
         value = std::string{buffer};
@@ -455,7 +455,7 @@ bool InputText(const char* name, std::string& currentText) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
     ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
 
-    static char buffer[256]{};
+    char buffer[256]{};
     std::strncpy(buffer, currentText.c_str(), sizeof(buffer));
 
     bool updated = ImGui::InputText(name, buffer, 256);

@@ -20,6 +20,11 @@ Scene::Scene(std::string_view name) : name{name} {
 Scene::Scene(const Scene& other) : Scene{other.name} {
     registry.assign(other.registry.data(), other.registry.data() + other.registry.size(), other.registry.released());
     copyRegistry<ALL_COMPONENTS>(other.registry);
+
+    auto view = registry.view<IdComponent>();
+    for (const auto& [entity, id] : view.each()) {
+        entityMap.emplace(id.uuid, entity);
+    }
 }
 
 void Scene::onStart() {
@@ -212,6 +217,7 @@ void Scene::deserialise(fs::path filepath, bool binary) {
             std::ifstream is{filepath, std::ios::binary};
             cereal::BinaryInputArchive input{is};
             input(*this);
+
             entt::snapshot_loader{ registry }.entities(input).component<ALL_COMPONENTS>(input);
         }
         catch (...) {

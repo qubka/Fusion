@@ -43,7 +43,7 @@ namespace fe {
     enum class EditorState : unsigned char {
         Paused,
         Play,
-        Next,
+        //Next,
         Preview
     };
 

@@ -207,17 +207,17 @@ list(APPEND ALL_SYSTEM_LIBS cereal)
 
 # physx
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-set(PHYSX_LIBRARIES
-            PhysXExtensions
-            PhysX
-            PhysXPvdSDK
-            PhysXVehicle
-            PhysXCharacterKinematic
-            PhysXCooking
-            PhysXCommon
-            PhysXFoundation
-            # SnippetUtils
-            )
+#set(PHYSX_LIBRARIES
+#            PhysXExtensions
+#            PhysX
+#            PhysXPvdSDK
+#            PhysXVehicle
+#            PhysXCharacterKinematic
+#            PhysXCooking
+#            PhysXCommon
+#            PhysXFoundation
+#            # SnippetUtils
+#            )
 
 #list(APPEND ALL_SYSTEM_LIBS ${PHYSX_LIBRARIES})
 
