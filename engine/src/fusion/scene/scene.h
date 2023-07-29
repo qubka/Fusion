@@ -94,7 +94,7 @@ namespace fe {
          * Gets if the scene is in runtime.
          * @return If the scene is in runtime.
          */
-        bool isRuntime() { return runtime; }
+        bool isRuntime() const { return runtime; }
 
         /**
          * Creates an entity with default components.
@@ -119,7 +119,7 @@ namespace fe {
         entt::entity duplicateEntity(entt::entity entity, entt::entity parent = entt::null);
 
         entt::entity getEntityByName(std::string_view name);
-        entt::entity getEntityByUUID(uint64_t uuid);
+        bool isEntityValid(entt::entity entity);
 
         /**
          * Gets the scene entity registry.
@@ -184,9 +184,8 @@ namespace fe {
         template<typename T>
         void copyComponents(const entt::registry& src) {
             auto view = src.view<T>();
-            for (const auto& [entity, component] : view.each()) {
+            for (const auto& [entity, component] : view.each())
                 registry.emplace_or_replace<T>(entity, component);
-            }
         }
 
         template<typename T>
@@ -205,7 +204,5 @@ namespace fe {
         SystemHolder systems;
         bool started{ false };
         bool runtime{ false };
-
-        std::unordered_map<uint64_t, entt::entity> entityMap;
     };
 }

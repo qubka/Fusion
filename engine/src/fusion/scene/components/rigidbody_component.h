@@ -21,13 +21,13 @@ namespace fe {
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("type", type));
             archive(cereal::make_nvp("mass", mass));
-            archive(cereal::make_nvp("linear drag", linearDrag));
-            archive(cereal::make_nvp("angular drag", angularDrag));
-            archive(cereal::make_nvp("disable gravity", disableGravity));
+            archive(cereal::make_nvp("linearDrag", linearDrag));
+            archive(cereal::make_nvp("angularDrag", angularDrag));
+            archive(cereal::make_nvp("disableGravity", disableGravity));
             archive(cereal::make_nvp("kinematic", kinematic));
             archive(cereal::make_nvp("sleep", sleep));
-            archive(cereal::make_nvp("freeze position", freezePosition));
-            archive(cereal::make_nvp("freeze rotation", freezeRotation));
+            archive(cereal::make_nvp("freezePosition", freezePosition));
+            archive(cereal::make_nvp("freezeRotation", freezeRotation));
         }
     };
 }

@@ -5,14 +5,14 @@ namespace Fusion
 {
 	public class Entity
 	{
-		protected Entity() { ID = 0; } 
+		protected Entity() { ID = uint.MaxValue; } 
 
-		internal Entity(ulong id)
+		internal Entity(uint id)
 		{
 			ID = id;
 		}
 
-		public readonly ulong ID;
+		public readonly uint ID;
 
 		public Vector3 Translation
 		{
@@ -44,8 +44,8 @@ namespace Fusion
 		
 		public Entity FindEntityByName(string name)
 		{
-			ulong entityID = InternalCalls.Entity_FindEntityByName(name);
-			if (entityID == 0)
+			uint entityID = InternalCalls.Entity_FindEntityByName(name);
+			if (entityID == uint.MaxValue)
 				return null;
 
 			return new Entity(entityID);

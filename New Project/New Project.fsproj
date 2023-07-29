@@ -1,19 +1,20 @@
 {
     "value0": {
-        "project version": "0.1.0.0",
-        "project root": "New Project",
-        "project name": "New Project",
+        "projectVersion": "0.1.0.0",
+        "projectRoot": "New Project",
+        "projectName": "New Project",
+		"scriptModule"
         "title": "New Project",
         "size": {
             "x": 1280,
             "y": 720
         },
-        "borderless": false,
-        "resizable": true,
-        "floating": false,
-        "fullscreen": false,
-        "vsync": false,
-        "show console": true,
-        "current scene": "New Scene"
+        "isBorderless": false,
+        "isResizable": true,
+        "isFloating": false,
+        "isFullscreen": false,
+        "isVSync": false,
+        "isShowConsole": true,
+        "currentScene": "New Scene(1)"
     }
 }

@@ -2,7 +2,6 @@
 
 #include <cereal/cereal.hpp>
 
-#include "components/id_component.h"
 #include "components/name_component.h"
 #include "components/active_component.h"
 #include "components/hierarchy_component.h"
@@ -20,7 +19,7 @@
 #include "components/sphere_collider_component.h"
 #include "components/physics_material_component.h"
 
-#define ALL_COMPONENTS IdComponent, NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent, MaterialComponent, ScriptComponent, RigidbodyComponent, BoxColliderComponent, CapsuleColliderComponent, MeshColliderComponent, SphereColliderComponent, PhysicsMaterialComponent
+#define ALL_COMPONENTS NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent, MaterialComponent, ScriptComponent, RigidbodyComponent, BoxColliderComponent, CapsuleColliderComponent, MeshColliderComponent, SphereColliderComponent, PhysicsMaterialComponent
 namespace fe {
     template<typename... Component>
     struct ComponentGroup {

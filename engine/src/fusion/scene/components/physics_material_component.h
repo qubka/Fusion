@@ -15,11 +15,11 @@ namespace fe {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(cereal::make_nvp("dynamic friction", dynamicFriction));
-            archive(cereal::make_nvp("static friction", staticFriction));
+            archive(cereal::make_nvp("dynamicFriction", dynamicFriction));
+            archive(cereal::make_nvp("staticFriction", staticFriction));
             archive(cereal::make_nvp("restitution", restitution));
-            archive(cereal::make_nvp("friction combine", frictionCombine));
-            archive(cereal::make_nvp("restitution combine", restitutionCombine));
+            archive(cereal::make_nvp("frictionCombine", frictionCombine));
+            archive(cereal::make_nvp("restitutionCombine", restitutionCombine));
         }
     };
 }

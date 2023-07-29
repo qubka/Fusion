@@ -38,16 +38,16 @@ static float NativeLog_VectorDot(glm::vec3* parameter) {
     return glm::dot(*parameter, *parameter);
 }
 
-static MonoObject* GetScriptInstance(uint64_t entityID) {
-    return ScriptEngine::Get()->getManagedInstance(entityID);
+static MonoObject* GetScriptInstance(uint32_t entityID) {
+    auto entity = static_cast<entt::entity>(entityID);
+    return ScriptEngine::Get()->getManagedInstance(entity);
 }
 
-static bool Entity_HasComponent(uint64_t entityID, MonoReflectionType* componentType) {
-    Scene* scene = ScriptEngine::Get()->getSceneContext();
+static bool Entity_HasComponent(uint32_t entityID, MonoReflectionType* componentType) {
+    auto scene = ScriptEngine::Get()->getSceneContext();
     assert(scene);
-    entt::entity entity = scene->getEntityByUUID(entityID);
-
-    if (entity == entt::null)
+    auto entity = static_cast<entt::entity>(entityID);
+    if (!scene->isEntityValid(entity))
         return false;
 
     MonoType* managedType = mono_reflection_type_get_type(componentType);
@@ -56,37 +56,35 @@ static bool Entity_HasComponent(uint64_t entityID, MonoReflectionType* component
     return it->second(scene->getRegistry(), entity);
 }
 
-static uint64_t Entity_FindEntityByName(MonoString* name) {
+static uint32_t Entity_FindEntityByName(MonoString* name) {
     char* nameCStr = mono_string_to_utf8(name);
 
-    Scene* scene = ScriptEngine::Get()->getSceneContext();
+    auto scene = ScriptEngine::Get()->getSceneContext();
     assert(scene);
-    entt::entity entity = scene->getEntityByName(nameCStr);
+    auto entity = scene->getEntityByName(nameCStr);
     mono_free(nameCStr);
 
-    if (entity == entt::null)
-        return 0;
-
-    auto& registry = scene->getRegistry();
-    return registry.get<IdComponent>(entity).uuid;
+    using type = std::underlying_type_t<entt::entity>;
+    static_assert(std::is_same_v<type, uint32_t>, "Wrong entity id type");
+    return static_cast<type>(entity);
 }
 
-static void TransformComponent_GetTranslation(uint64_t entityID, glm::vec3* outTranslation) {
-    Scene* scene = ScriptEngine::Get()->getSceneContext();
+static void TransformComponent_GetTranslation(uint32_t entityID, glm::vec3* outTranslation) {
+    auto scene = ScriptEngine::Get()->getSceneContext();
     assert(scene);
-    entt::entity entity = scene->getEntityByUUID(entityID);
-    if (entity == entt::null)
+    auto entity = static_cast<entt::entity>(entityID);
+    if (!scene->isEntityValid(entity))
         return;
 
     auto& registry = scene->getRegistry();
     *outTranslation = registry.get<TransformComponent>(entity).getLocalPosition();
 }
 
-static void TransformComponent_SetTranslation(uint64_t entityID, glm::vec3* translation) {
-    Scene* scene = ScriptEngine::Get()->getSceneContext();
+static void TransformComponent_SetTranslation(uint32_t entityID, glm::vec3* translation) {
+    auto scene = ScriptEngine::Get()->getSceneContext();
     assert(scene);
-    entt::entity entity = scene->getEntityByUUID(entityID);
-    if (entity == entt::null)
+    auto entity = static_cast<entt::entity>(entityID);
+    if (!scene->isEntityValid(entity))
         return;
 
     auto& registry = scene->getRegistry();

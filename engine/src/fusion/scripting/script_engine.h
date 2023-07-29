@@ -52,7 +52,7 @@ namespace fe {
         template<typename T>
         void setValue(T value) {
             static_assert(sizeof(T) <= 16, "Type too large!");
-            memcpy(buffer, &value, sizeof(T));
+            std::memcpy(buffer, &value, sizeof(T));
         }
 
     private:
@@ -87,7 +87,7 @@ namespace fe {
 
     class ScriptInstance {
     public:
-        ScriptInstance(std::shared_ptr<ScriptClass> scriptClass, uint64_t uuid);
+        ScriptInstance(std::shared_ptr<ScriptClass> scriptClass, entt::entity entity);
 
         void invokeOnCreate();
         void invokeOnUpdate(float ts);
@@ -100,7 +100,7 @@ namespace fe {
 
             bool success = getFieldValueInternal(name, FieldValueBuffer);
             if (!success)
-                return T();
+                return T{};
 
             return *(T*)FieldValueBuffer;
         }
@@ -145,18 +145,18 @@ namespace fe {
         void onRuntimeStop();
 
         bool entityClassExists(const std::string& fullClassName);
-        void onCreateEntity(uint64_t uuid, const std::string& className);
-        void onUpdateEntity(uint64_t uuid);
+        void onCreateEntity(entt::entity entity, const std::string& className);
+        void onUpdateEntity(entt::entity entity);
 
         Scene* getSceneContext();
-        std::shared_ptr<ScriptInstance> getEntityScriptInstance(uint64_t entityID);
+        std::shared_ptr<ScriptInstance> getEntityScriptInstance(entt::entity entity);
 
         std::shared_ptr<ScriptClass> getEntityClass(const std::string& name);
         std::unordered_map<std::string, std::shared_ptr<ScriptClass>>& getEntityClasses();
-        ScriptFieldMap& getScriptFieldMap(uint64_t uuid);
+        ScriptFieldMap& getScriptFieldMap(entt::entity entity);
 
         MonoImage* getCoreAssemblyImage();
-        MonoObject* getManagedInstance(uint64_t uuid);
+        MonoObject* getManagedInstance(entt::entity entity);
         MonoString* createString(const char* string);
 
     private:
@@ -189,8 +189,8 @@ namespace fe {
         ScriptClass entityCoreClass;
 
         std::unordered_map<std::string, std::shared_ptr<ScriptClass>> entityClasses;
-        std::unordered_map<uint64_t, std::shared_ptr<ScriptInstance>> entityInstances;
-        std::unordered_map<uint64_t, ScriptFieldMap> entityScriptFields;
+        std::unordered_map<entt::entity, std::shared_ptr<ScriptInstance>> entityInstances;
+        std::unordered_map<entt::entity, ScriptFieldMap> entityScriptFields;
 
         //Scope<filewatch::FileWatch<std::string>> appAssemblyFileWatcher;
         bool assemblyReloadPending{ false };

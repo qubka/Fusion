@@ -2,6 +2,8 @@
 #include "script_glue.h"
 
 #include "fusion/filesystem/file_system.h"
+#include "fusion/scene/scene.h"
+#include "fusion/core/engine.h"
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
@@ -159,12 +161,15 @@ void ScriptEngine::onStart() {
 
     ScriptGlue::RegisterFunctions();
 
-    /*bool status = loadAssembly("engine/assets/scripts/Fusion-ScriptCore.dll");
+    bool status = loadAssembly("engine/assets/scripts/Fusion-ScriptCore.dll");
     if (!status) {
         LOG_ERROR << "[ScriptEngine] Could not load Fusion-ScriptCore assembly.";
         return;
     }
 
+    dynamic_cast<DefaultApplication*>(Engine::Get()->getApp())
+
+    projectSettings.projectRoot / (projectSettings.projectName + ".fsproj")
     //auto scriptModulePath = Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
     status = loadAppAssembly("engine/assets/scripts/Camera.dll");
     if (!status) {
@@ -177,7 +182,7 @@ void ScriptEngine::onStart() {
     ScriptGlue::RegisterComponents();
 
     // Retrieve and instantiate class
-    entityCoreClass = ScriptClass{"Fusion", "Entity", true};*/
+    entityCoreClass = ScriptClass{"Fusion", "Entity", true};
 }
 
 void ScriptEngine::onStop() {
@@ -267,14 +272,14 @@ bool ScriptEngine::entityClassExists(const std::string& fullClassName) {
     return entityClasses.find(fullClassName) != entityClasses.end();
 }
 
-void ScriptEngine::onCreateEntity(uint64_t uuid, const std::string& className) {
+void ScriptEngine::onCreateEntity(entt::entity entity, const std::string& className) {
     if (entityClassExists(className)) {
-        std::shared_ptr<ScriptInstance> instance = std::make_shared<ScriptInstance>(entityClasses[className], uuid);
-        entityInstances[uuid] = instance;
+        std::shared_ptr<ScriptInstance> instance = std::make_shared<ScriptInstance>(entityClasses[className], entity);
+        entityInstances[entity] = instance;
 
         // Copy field values
-        if (entityScriptFields.find(uuid) != entityScriptFields.end()) {
-            const ScriptFieldMap& fieldMap = entityScriptFields.at(uuid);
+        if (auto it = entityScriptFields.find(entity); it != entityScriptFields.end()) {
+            const ScriptFieldMap& fieldMap = it->second;
             for (const auto& [name, fieldInstance] : fieldMap)
                 instance->setFieldValueInternal(name, fieldInstance.buffer);
         }
@@ -283,12 +288,12 @@ void ScriptEngine::onCreateEntity(uint64_t uuid, const std::string& className) {
     }
 }
 
-void ScriptEngine::onUpdateEntity(uint64_t uuid) {
-    if (entityInstances.find(uuid) != entityInstances.end()) {
-        std::shared_ptr<ScriptInstance> instance = entityInstances[uuid];
+void ScriptEngine::onUpdateEntity(entt::entity entity) {
+    if (auto it = entityInstances.find(entity); it != entityInstances.end()) {
+        std::shared_ptr<ScriptInstance>& instance = it->second;
         instance->invokeOnUpdate(Time::DeltaTime().asSeconds());
     } else {
-        LOG_ERROR << "Could not find ScriptInstance for entity: " << uuid;
+        LOG_ERROR << "Could not find ScriptInstance for entity: " << static_cast<std::underlying_type_t<entt::entity>>(entity);
     }
 }
 
@@ -296,8 +301,8 @@ Scene* ScriptEngine::getSceneContext() {
     return sceneContext;
 }
 
-std::shared_ptr<ScriptInstance> ScriptEngine::getEntityScriptInstance(uint64_t entityID) {
-    auto it = entityInstances.find(entityID);
+std::shared_ptr<ScriptInstance> ScriptEngine::getEntityScriptInstance(entt::entity entity) {
+    auto it = entityInstances.find(entity);
     return it != entityInstances.end() ? it->second : nullptr;
 }
 
@@ -316,8 +321,8 @@ std::unordered_map<std::string, std::shared_ptr<ScriptClass>>& ScriptEngine::get
     return entityClasses;
 }
 
-ScriptFieldMap& ScriptEngine::getScriptFieldMap(uint64_t uuid) {
-    return entityScriptFields[uuid];
+ScriptFieldMap& ScriptEngine::getScriptFieldMap(entt::entity entity) {
+    return entityScriptFields[entity];
 }
 
 void ScriptEngine::loadAssemblyClasses() {
@@ -376,8 +381,8 @@ MonoImage* ScriptEngine::getCoreAssemblyImage() {
     return coreAssemblyImage;
 }
 
-MonoObject* ScriptEngine::getManagedInstance(uint64_t uuid) {
-    if (auto it = entityInstances.find(uuid); it != entityInstances.end())
+MonoObject* ScriptEngine::getManagedInstance(entt::entity entity) {
+    if (auto it = entityInstances.find(entity); it != entityInstances.end())
         return it->second->getManagedObject();
     return nullptr;
 }
@@ -413,7 +418,7 @@ MonoObject* ScriptClass::invokeMethod(MonoObject* instance, MonoMethod* method, 
 
 /*_________________________________________________*/
 
-ScriptInstance::ScriptInstance(std::shared_ptr<ScriptClass> _scriptClass, uint64_t uuid) : scriptClass{std::move(_scriptClass)} {
+ScriptInstance::ScriptInstance(std::shared_ptr<ScriptClass> _scriptClass, entt::entity entity) : scriptClass{std::move(_scriptClass)} {
     instance = scriptClass->instantiate();
 
     constructor = ScriptEngine::Get()->entityCoreClass.getMethod(".ctor", 1);
@@ -422,7 +427,8 @@ ScriptInstance::ScriptInstance(std::shared_ptr<ScriptClass> _scriptClass, uint64
 
     // Call Entity constructor
     {
-        void* param = &uuid;
+        auto entityID = static_cast<std::underlying_type_t<entt::entity>>(entity);
+        void* param = &entityID;
         scriptClass->invokeMethod(instance, constructor, &param);
     }
 }

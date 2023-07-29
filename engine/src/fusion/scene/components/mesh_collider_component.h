@@ -14,7 +14,7 @@ namespace fe {
         void serialize(Archive& archive) {
             archive(cereal::make_nvp("convex", convex));
             archive(cereal::make_nvp("trigger", trigger));
-            archive(cereal::make_nvp("override mesh", overrideMesh));
+            archive(cereal::make_nvp("overrideMesh", overrideMesh));
         }
     };
 }

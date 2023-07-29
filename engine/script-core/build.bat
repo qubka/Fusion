@@ -8,3 +8,4 @@ FOR /f "delims=" %%i IN ('dir /b /s ".\src\Fusion\*.cs"') DO (
 IF NOT EXIST "../assets/scripts" MKDIR "../assets/scripts"
 
 csc -target:library -out:../assets/scripts/Fusion-ScriptCore.dll %files%
+pause

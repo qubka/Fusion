@@ -320,7 +320,7 @@ void Graphics::recreateSwapchain(size_t id) {
     auto& perSurfaceBuffer = perSurfaceBuffers[id];
 
 #if FUSION_DEBUG
-    auto& size = surface->getWindow().getSize();
+    //auto& size = surface->getWindow().getSize();
     //LOG_DEBUG << "Recreating swapchain[" << id << "] old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")";
 #endif
     swapchain = std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, swapchain.get());

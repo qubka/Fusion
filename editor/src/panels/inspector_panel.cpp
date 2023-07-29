@@ -105,9 +105,6 @@ namespace ImGui {
     void ComponentEditorWidget<ScriptComponent>(entt::registry& registry, entt::registry::entity_type entity) {
         auto& script = registry.get<ScriptComponent>(entity);
 
-        auto scriptEngine = ScriptEngine::Get();
-        bool scriptClassExists = scriptEngine->entityClassExists(script.className);
-
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
         ImGui::Columns(2);
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
@@ -115,13 +112,14 @@ namespace ImGui {
 
         ImGuiUtils::PropertyText("Class", script.className);
 
-        auto& id = registry.get<IdComponent>(entity);
+        auto scriptEngine = ScriptEngine::Get();
+        bool scriptClassExists = scriptEngine->entityClassExists(script.className);
 
         // Fields
         auto scene = scriptEngine->getSceneContext();
         bool sceneRunning = scene && scene->isRuntime();
         if (sceneRunning) {
-            std::shared_ptr<ScriptInstance> scriptInstance = scriptEngine->getEntityScriptInstance(id.uuid);
+            std::shared_ptr<ScriptInstance> scriptInstance = scriptEngine->getEntityScriptInstance(entity);
             if (scriptInstance) {
                 const auto& fields = scriptInstance->getScriptClass()->getFields();
                 for (const auto& [name, field] : fields) {
@@ -180,8 +178,7 @@ namespace ImGui {
             if (scriptClassExists) {
                 std::shared_ptr<ScriptClass> entityClass = scriptEngine->getEntityClass(script.className);
                 const auto& fields = entityClass->getFields();
-
-                auto& entityFields = scriptEngine->getScriptFieldMap(id.uuid);
+                auto& entityFields = scriptEngine->getScriptFieldMap(entity);
                 for (const auto& [name, field] : fields) {
                     // Field has been set in editor
                     if (auto it = entityFields.find(name); it != entityFields.end()) {
@@ -633,14 +630,12 @@ void InspectorPanel::onImGui() {
         ImGui::Separator();
 
         if (debugMode) {
-            auto idComponent = registry.try_get<IdComponent>(selected);
-
-            ImGui::Text("UUID: %s", std::to_string(idComponent->uuid).c_str());
+            ImGui::Text("UUID: %s", std::to_string(static_cast<std::underlying_type_t<entt::entity>>(selected)).c_str());
 
             if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(selected)) {
                 auto parent = hierarchyComponent->parent;
                 if (parent != entt::null) {
-                    ImGui::Text("Parent : ID: %d", static_cast<int>(parent));
+                    ImGui::Text("Parent : ID: %d", static_cast<std::underlying_type_t<entt::entity>>(parent));
                     if (auto nameComponent = registry.try_get<NameComponent>(parent)) {
                         ImGui::SameLine();
                         ImGui::Text(" (%s)", nameComponent->name.c_str());
@@ -655,7 +650,7 @@ void InspectorPanel::onImGui() {
 
                 auto child = hierarchyComponent->first;
                 while (child != entt::null) {
-                    ImGui::Text("ID: %d", static_cast<int>(child));
+                    ImGui::Text("ID: %d", static_cast<std::underlying_type_t<entt::entity>>(child));
                     if (auto nameComponent = registry.try_get<NameComponent>(child)) {
                         ImGui::SameLine();
                         ImGui::Text(" (%s)", nameComponent->name.c_str());

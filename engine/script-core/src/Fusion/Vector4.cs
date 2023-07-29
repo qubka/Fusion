@@ -1,4 +1,6 @@
-﻿namespace Fusion
+﻿using System;
+
+namespace Fusion
 {
 	public struct Vector4
 	{
@@ -56,9 +58,29 @@
 			return new Vector4(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
 		}
 
+		public static Vector4 operator -(Vector4 a, Vector4 b)
+		{
+			return new Vector4(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
+		}
+
 		public static Vector4 operator *(Vector4 vector, float scalar)
 		{
 			return new Vector4(vector.X * scalar, vector.Y * scalar, vector.Z * scalar, vector.W * scalar);
+		}
+		
+		public static Vector4 operator /(Vector4 vector, float scalar)
+		{
+			return new Vector4(vector.X / scalar, vector.Y / scalar, vector.Z / scalar, vector.W / scalar);
+		}
+		
+		public float LengthSquared()
+		{
+			return X * X + Y * Y + Z * Z + W * W;
+		}
+
+		public float Length()
+		{
+			return (float)Math.Sqrt(LengthSquared());
 		}
 	}
 }

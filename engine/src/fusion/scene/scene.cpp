@@ -8,6 +8,7 @@
 #include "fusion/scene/systems/hierarchy_system.h"
 #include "fusion/scene/systems/camera_system.h"
 #include "fusion/scene/systems/physics_system.h"
+#include "fusion/scripting/script_engine.h"
 
 using namespace fe;
 
@@ -20,11 +21,6 @@ Scene::Scene(std::string_view name) : name{name} {
 Scene::Scene(const Scene& other) : Scene{other.name} {
     registry.assign(other.registry.data(), other.registry.data() + other.registry.size(), other.registry.released());
     copyRegistry<ALL_COMPONENTS>(other.registry);
-
-    auto view = registry.view<IdComponent>();
-    for (const auto& [entity, id] : view.each()) {
-        entityMap.emplace(id.uuid, entity);
-    }
 }
 
 void Scene::onStart() {
@@ -45,6 +41,8 @@ void Scene::onUpdate() {
 void Scene::onPlay() {
     runtime = true;
 
+    ScriptEngine::Get()->onRuntimeStart(this);
+
     systems.each([&](auto system) {
         if (system->isEnabled())
             system->onPlay();
@@ -58,6 +56,8 @@ void Scene::onStop() {
         if (system->isEnabled())
             system->onStop();
     });
+
+    ScriptEngine::Get()->onRuntimeStop();
 
     runtime = false;
 
@@ -92,7 +92,6 @@ entt::entity Scene::getCameraEntity() const {
 
 entt::entity Scene::createEntity(std::string name) {
     auto entity = registry.create();
-    auto& id = registry.emplace<IdComponent>(entity);
 
     if (name.empty())
         name = "Empty Entity";
@@ -107,17 +106,12 @@ entt::entity Scene::createEntity(std::string name) {
     if (i > 0)
         name += " (" + std::to_string(i) + ")";
 
-    registry.emplace<NameComponent>(entity, name);
-
-    entityMap[id.uuid] = entity;
+    registry.emplace<NameComponent>(entity, std::move(name));
 
     return entity;
 }
 
 bool Scene::destroyEntity(entt::entity entity) {
-    if (auto id = registry.try_get<IdComponent>(entity)) {
-        entityMap.erase(id->uuid);
-    }
     // TODO: Children ?
     registry.destroy(entity);
     return true;
@@ -161,12 +155,8 @@ entt::entity Scene::getEntityByName(std::string_view name) {
     return entt::null;
 }
 
-entt::entity Scene::getEntityByUUID(uint64_t uuid) {
-    // TODO: May be use registry instead ?
-    if (auto it = entityMap.find(uuid); it != entityMap.end())
-        return it->second;
-
-    return entt::null;
+bool Scene::isEntityValid(entt::entity entity) {
+    return entity != entt::null && registry.valid(entity);
 }
 
 void Scene::serialise(fs::path filepath, bool binary) {

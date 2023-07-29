@@ -9,7 +9,6 @@ SyncObject::SyncObject() {
 }
 
 SyncObject::~SyncObject() {
-    const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
     destroy();
 }
 
