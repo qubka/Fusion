@@ -23,8 +23,8 @@ namespace type_traits {
 namespace fst {
     template<typename Key, typename Value>
     class flatmap_storage {
-        using storage = std::vector<std::pair<Key, Value>>;
     public:
+        using storage = std::vector<std::pair<Key, Value>>;
         using value_type = std::pair<const Key, Value>;
         using size_type = typename storage::size_type;
 
@@ -103,7 +103,6 @@ namespace fst {
         const_iterator cend() const noexcept { return end(); }
 
     protected:
-
         key_storage m_keys;
         value_storage m_values;
     };
@@ -113,6 +112,7 @@ namespace fst {
         static_assert(std::is_nothrow_move_constructible<Key>{});
         static_assert(std::is_nothrow_move_constructible<Value>{});
     public:
+        using storage = std::vector<std::pair<Key, Value>>;
         using value_type = typename fst::flatmap_storage<Key, Value>::value_type;
         using iterator = typename fst::flatmap_storage<Key, Value>::iterator;
         using const_iterator = typename fst::flatmap_storage<Key, Value>::const_iterator;
@@ -180,12 +180,19 @@ namespace fst {
 
         const_iterator find(const T& key) const noexcept;
 
+        const storage& values() const { return this->m_values; }
+
         bool operator==(const unordered_flatmap& rhs) const {
             return this->m_values.size() == rhs.m_values.size() && this->m_values == rhs.m_values;
         }
 
         bool operator!=(const unordered_flatmap& rhs) const {
             return !operator==(rhs);
+        }
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("values", this->m_values));
         }
     };
 
@@ -278,6 +285,12 @@ namespace fst {
         bool operator!=(const unordered_split_flatmap& rhs) const {
             return !operator==(rhs);
         }
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("keys", this->m_keys));
+            archive(cereal::make_nvp("values", this->m_values));
+        }
     };
 
     template<typename Key, typename Value, typename Compare = std::less<>>
@@ -369,6 +382,12 @@ namespace fst {
 
         bool operator!=(const split_flatmap& rhs) const {
             return !operator==(rhs);
+        }
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("keys", this->m_keys));
+            archive(cereal::make_nvp("values", this->m_values));
         }
 
     private:
@@ -660,8 +679,8 @@ namespace fst {
     class flatmap : private fst::flatmap_storage<Key, Value>, private Compare {
         static_assert(std::is_nothrow_move_constructible<Key>{});
         static_assert(std::is_nothrow_move_constructible<Value>{});
-        using storage = std::vector<std::pair<Key, Value>>;
     public:
+        using storage = std::vector<std::pair<Key, Value>>;
         using value_type = typename fst::flatmap_storage<Key, Value>::value_type;
         using iterator = typename fst::flatmap_storage<Key, Value>::iterator;
         using const_iterator = typename fst::flatmap_storage<Key, Value>::const_iterator;
@@ -731,12 +750,19 @@ namespace fst {
 
         size_type count(const K& key) const noexcept;
 
+        const storage& values() const { return this->m_values; }
+
         bool operator==(const flatmap& rhs) const {
             return this->m_values.size() == rhs.m_values.size() && this->m_values == rhs.m_values;
         }
 
         bool operator!=(const flatmap& rhs) const {
             return !operator==(rhs);
+        }
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("values", this->m_values));
         }
 
     private:

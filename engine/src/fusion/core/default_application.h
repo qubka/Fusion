@@ -6,22 +6,6 @@
 #include "fusion/filesystem/file_system.h"
 
 namespace fe {
-    struct ProjectSettings {
-        std::string projectVersion{ "0.0.0.0" };
-        fs::path projectRoot;
-        std::string projectName;
-        //fs::path engineAssetPath;
-        fs::path scriptModulePath;
-        std::string title{ "Fusion App" };
-        glm::uvec2 size{ 1280, 720 };
-        bool isBorderless{ false };
-        bool isResizable{ true };
-        bool isFloating{ false };
-        bool isFullscreen{ false };
-        bool isVSync{ false };
-        bool isShowConsole{ true };
-    };
-
     class DefaultApplication : public Application {
     public:
         explicit DefaultApplication(std::string_view name);
@@ -40,20 +24,20 @@ namespace fe {
 
         bool isProjectLoaded() const { return projectLoaded; }
         bool isConsoleOpened() const { return consoleOpened; }
-        ProjectSettings& getProjectSettings() { return projectSettings; }
-        const fs::path& getRootPath() const override { return projectSettings.projectRoot; }
 
         void serialise();
         void deserialise();
 
         void showConsole();
 
+        void onProjectLoad();
+
         template<typename Archive>
         void save(Archive& archive) const {
             archive(cereal::make_nvp("projectVersion", projectSettings.projectVersion));
             archive(cereal::make_nvp("projectRoot", projectSettings.projectRoot));
             archive(cereal::make_nvp("projectName", projectSettings.projectName));
-            //archive(cereal::make_nvp("engineAssetPath", projectSettings.engineAssetPath));
+            archive(cereal::make_nvp("scriptModulePath", projectSettings.scriptModulePath));
             archive(cereal::make_nvp("title", projectSettings.title));
             archive(cereal::make_nvp("size", projectSettings.size));
             archive(cereal::make_nvp("isBorderless", projectSettings.isBorderless));
@@ -71,7 +55,7 @@ namespace fe {
             archive(cereal::make_nvp("projectVersion", projectSettings.projectVersion));
             archive(cereal::make_nvp("projectRoot", projectSettings.projectRoot));
             archive(cereal::make_nvp("projectName", projectSettings.projectName));
-            //archive(cereal::make_nvp("engineAssetPath", projectSettings.engineAssetPath));
+            archive(cereal::make_nvp("scriptModulePath", projectSettings.scriptModulePath));
             archive(cereal::make_nvp("title", projectSettings.title));
             archive(cereal::make_nvp("size", projectSettings.size));
             archive(cereal::make_nvp("isBorderless", projectSettings.isBorderless));
@@ -93,7 +77,6 @@ namespace fe {
 
     protected:
         fs::path executablePath;
-        ProjectSettings projectSettings;
         bool projectLoaded{ false };
         bool consoleOpened{ false };
     };

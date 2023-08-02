@@ -1,6 +1,6 @@
 #include "string.h"
 
-#ifdef FUSION_PLATFORM_WINDOWS
+#if FUSION_PLATFORM_WINDOWS
 #include <windows.h>
 #include <dbghelp.h>
 #else
@@ -191,22 +191,21 @@ std::string String::Quoted(const std::string& str) {
     return '"' + str + '"';
 }
 
-std::string String::Demangle(const std::string& str) {
-    if (str.empty())
-        return {};
+std::string String::Demangle(const char* name) {
+#if FUSION_PLATFORM_CLANG || FUSION_PLATFORM_GCC
+    int status = 0;
 
-#if FUSION_PLATFORM_WINDOWS
-    // TODO: Fix that
-    /*char undecorated_name[1024];
-    if (!UnDecorateSymbolName(str.c_str(), undecorated_name, sizeof(undecorated_name), UNDNAME_COMPLETE)) {
-        return str;
-    } else {
-        return std::string{undecorated_name};
-    }*/
-    return str;
+    std::unique_ptr<char, void(*)(void*)> res {
+        abi::__cxa_demangle(name, nullptr, nullptr, &status),
+        std::free
+    };
+
+    std::string_view ret{(status == 0) ? res.get() : name};
 #else
-    int status = -1;
-    std::string demangled = abi::__cxa_demangle(str.c_str(), nullptr, nullptr, &status);
-    return status == 0 ? demangled : str;
+    std::string_view ret{name};
 #endif
+    if (ret.substr(ret.size() - 3) == " ()")
+        ret.remove_suffix(3);
+
+    return std::string{ret};
 }

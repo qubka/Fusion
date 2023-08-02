@@ -21,9 +21,8 @@ Window::Window(const fe::VideoMode& videoMode, const fe::WindowInfo& windowInfo)
     window = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, nullptr);
 
     // Gets any window errors.
-    if (!window) {
+    if (!window)
         throw std::runtime_error("GLFW failed to create the window!");
-    }
 
     // Sets the user pointer.
     glfwSetWindowUserPointer(window, this);

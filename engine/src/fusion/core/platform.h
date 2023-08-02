@@ -155,3 +155,63 @@
 #define FUSION_PLATFORM_AVX2 1
 #endif
 #endif
+
+// Define macros for architecture type
+#if FUSION_PLATFORM_X86
+#if UINTPTR_MAX == UINT64_MAX
+#define FUSION_ARCH_X86 64
+#elif UINTPTR_MAX == UINT32_MAX
+#define FUSION_ARCH_X86 32
+#else
+#error "Unable to determine architecture type"
+#endif
+#endif
+
+// Function attributes
+#if !defined(FUSION_BUILD_DEBUG) && defined(__GNUC__)
+#define FUSION_FORCE_INLINE inline __attribute__((__always_inline__))
+#elif !defined(FUSION_BUILD_DEBUG) && defined(_MSC_VER)
+#define FUSION_FORCE_INLINE __forceinline
+#else
+#define FUSION_FORCE_INLINE inline
+#endif
+
+#if defined(__GNUC__)
+#define FUSION_NOINLINE __attribute__((__noinline__))
+#define FUSION_NORETURN __attribute__((__noreturn__))
+#elif defined(_MSC_VER)
+#define FUSION_NOINLINE __declspec(noinline)
+#define FUSION_NORETURN __declspec(noreturn)
+#else
+#define FUSION_NOINLINE
+#define FUSION_NORETURN
+#endif
+
+// Calling conventions
+#if FUSION_ARCH_X86 == 32 && defined(__GNUC__)
+#define FUSION_CDECL __attribute__((__cdecl__))
+#define FUSION_STDCALL __attribute__((__stdcall__))
+#define FUSION_FASTCALL __attribute__((__fastcall__))
+#define FUSION_THISCALL __attribute__((__thiscall__))
+#define FUSION_REGPARM(N) __attribute__((__regparm__(N)))
+#elif FUSION_ARCH_X86 == 32 && defined(_MSC_VER)
+#define FUSION_CDECL __cdecl
+#define FUSION_STDCALL __stdcall
+#define FUSION_FASTCALL __fastcall
+#define FUSION_THISCALL __thiscall
+#define FUSION_REGPARM(N)
+#else
+#define FUSION_CDECL
+#define FUSION_STDCALL
+#define FUSION_FASTCALL
+#define FUSION_THISCALL
+#define FUSION_REGPARM(N)
+#endif
+
+#if FUSION_ARCH_X86 && defined(_WIN32) && defined(_MSC_VER)
+#define FUSION_VECTORCALL __vectorcall
+#elif FUSION_ARCH_X86 && defined(_WIN32)
+#define FUSION_VECTORCALL __attribute__((__vectorcall__))
+#else
+#define FUSION_VECTORCALL
+#endif

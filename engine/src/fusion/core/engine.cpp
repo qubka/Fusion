@@ -51,7 +51,7 @@ void Engine::init() {
     SceneManager::Register("SceneManager", Module::Stage::Normal);
     AssetRegistry::Register("AssetRegistry", Module::Stage::Post);
     DebugRenderer::Register("DebugRenderer", Module::Stage::Render);
-    ScriptEngine::Register("FileSystem", Module::Stage::Never);
+    ScriptEngine::Register("ScriptEngine", Module::Stage::Never);
 
     StbToolbox::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
     GliToolbox::Register(".ktx", ".kmg", ".dds");

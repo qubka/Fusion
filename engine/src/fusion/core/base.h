@@ -65,4 +65,11 @@ namespace fe {
         seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
         hash_combine(seed, rest...);
     }
+
+    /* Clang fix */
+    struct PathHash {
+        auto operator()(const std::filesystem::path& p) const noexcept {
+            return std::filesystem::hash_value(p);
+        }
+    };
 }

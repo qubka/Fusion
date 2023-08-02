@@ -77,5 +77,14 @@ namespace fe {
          * @return The string extension.
          */
         static std::string GetExtension(const fs::path& filepath);
+
+        /**
+         * Return the paths of all files that have the specified extension
+         * in the specified directory and all subdirectories.
+         * @param root The path to the root folder.
+         * @param ext The extension string.
+         * @return The file array.
+         */
+        static std::vector<fs::path> GetFilesInPath(const fs::path& root, const std::string& ext);
     };
 }

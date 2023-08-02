@@ -77,7 +77,7 @@ void Texture2dArray::setPixels(const float* pixels, uint32_t arrayLayer) {
 }
 
 void Texture2dArray::loadFromFile() {
-    fs::path filepath{ Engine::Get()->getApp()->getRootPath() / path };
+    fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path };
 
     if (operator bool()) {
         LOG_DEBUG << "Texture2dArray: \"" << filepath << "\" already was loaded";

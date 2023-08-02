@@ -86,29 +86,24 @@ FileStorage::FileStorage(const fs::path& filepath) {
 #if FUSION_PLATFORM_ANDROID
     // Load shader from compressed asset
     asset = AAssetManager_open(assetManager, filepath.string().c_str(), AASSET_MODE_BUFFER);
-    if (!asset) {
+    if (!asset)
         throw std::runtime_error("File " + filepath.string() + " could not be opened");
-    }
     buffer = { static_cast<std::byte*>(AAsset_getBuffer(asset)), AAsset_getLength(asset) };
-    if (!buffer.data()) {
+    if (!buffer.data())
         throw std::runtime_error("File " + filepath.string() + " is invalid");
-    }
 #elif FUSION_PLATFORM_WINDOWS
     file = CreateFileA(filepath.string().c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
-    if (file == INVALID_HANDLE_VALUE) {
+    if (file == INVALID_HANDLE_VALUE)
         throw std::runtime_error("File " + filepath.string() + " could not be opened");
-    }
     DWORD dwFileSizeHigh;
     size_t size = GetFileSize(file, &dwFileSizeHigh);
     size += ((static_cast<size_t>(dwFileSizeHigh)) << 32);
     mapFile = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, NULL);
-    if (mapFile == INVALID_HANDLE_VALUE) {
+    if (mapFile == INVALID_HANDLE_VALUE)
         throw std::runtime_error("File " + filepath.string() + " could not be mapped");
-    }
     buffer = { static_cast<std::byte*>(MapViewOfFile(mapFile, FILE_MAP_READ, 0, 0, 0)), size };
-    if (!buffer.data()) {
+    if (!buffer.data())
         throw std::runtime_error("File " + filepath.string() + " is invalid");
-    }
 #endif
 }
 
@@ -135,9 +130,8 @@ StoragePointer Storage::ReadFile(const fs::path& filepath) {
     // open the file:
     std::ifstream is{filepath, std::ios::binary};
 
-    if (!is.is_open()) {
+    if (!is.is_open())
         throw std::runtime_error("File " + filepath.string() + " could not be opened");
-    }
 
     // Stop eating new lines in binary mode!!!
     is.unsetf(std::ios::skipws);

@@ -2,6 +2,7 @@
 #include "editor.h"
 
 #include "fusion/devices/device_manager.h"
+#include "fusion/scripting/script_engine.h"
 
 using namespace fe;
 
@@ -23,10 +24,22 @@ void ProjectSettingsPanel::onImGui() {
         ImGui::Columns(2);
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
 
+        static ImGuiTextFilter filter;
+        static fs::path selected;
+        static std::vector<fs::path> files;
+
         auto& projectSettings = editor.getProjectSettings();
         ImGuiUtils::PropertyText("Project Version", projectSettings.projectVersion.c_str());
         ImGuiUtils::PropertyText("Project Name", projectSettings.projectName.c_str());
         ImGuiUtils::PropertyText("Project Root", projectSettings.projectRoot.string().c_str());
+        if (ImGuiUtils::PropertyFile("Script Module Path", projectSettings.scriptModulePath, selected, filter, files, projectSettings.projectRoot, ".dll")) {
+            if (!projectSettings.scriptModulePath.empty()) {
+                auto scriptEngine = ScriptEngine::Get();
+                scriptEngine->setAssemblyPaths("engine/assets/scripts/Fusion-ScriptCore.dll", projectSettings.projectRoot / projectSettings.scriptModulePath);
+                scriptEngine->reloadAssembly();
+            }
+        }
+
         if (ImGuiUtils::PropertyText("Title", projectSettings.title))
             window->setTitle(projectSettings.title);
         const uint32_t width = projectSettings.size.x;

@@ -824,7 +824,7 @@ void Shader::loadConstants(const glslang::TIntermediate& intermediate, VkShaderS
                     return;
                 }
 
-                constants.emplace(name, Constant{ specId, computeSize(symbol->getType()), stageFlag, mapToGlType(symbol->getType()) });
+                constants.emplace(std::move(name), Constant{ specId, computeSize(symbol->getType()), stageFlag, mapToGlType(symbol->getType()) });
             }
         }
 

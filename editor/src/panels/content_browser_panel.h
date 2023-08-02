@@ -50,7 +50,7 @@ namespace fe {
         std::shared_ptr<DirectoryInfo> previousDirectory;
         std::shared_ptr<DirectoryInfo> nextDirectory;
         std::shared_ptr<DirectoryInfo> baseDirectory;
-        std::unordered_map<fs::path, std::shared_ptr<DirectoryInfo>> directories;
+        std::unordered_map<fs::path, std::shared_ptr<DirectoryInfo>, PathHash> directories;
         std::vector<std::shared_ptr<DirectoryInfo>> breadCrumbData;
     };
 }

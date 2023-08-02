@@ -12,7 +12,7 @@
 
 using namespace fe;
 
-SceneViewPanel::SceneViewPanel(Editor& editor) : EditorPanel{ICON_MDI_GAMEPAD_VARIANT " Scene###scene", "Scene", editor} {
+SceneViewPanel::SceneViewPanel(Editor& editor) : EditorPanel{ICON_MDI_VIEW_DASHBOARD " Scene###scene", "Scene", editor} {
     showComponentGizmosMap[type_id<LightComponent>] = true;
     showComponentGizmosMap[type_id<CameraComponent>] = true;
     //showComponentGizmosMap[type_id<SoundComponent>] = true;

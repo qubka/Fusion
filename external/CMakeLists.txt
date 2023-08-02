@@ -116,8 +116,8 @@ list(APPEND ALL_SYSTEM_LIBS magic_enum)
 
 # stb
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-find_package(stb QUIET)
-if(NOT stb_FOUND)
+find_package(Stb QUIET)
+if(NOT Stb_FOUND)
     add_library(stb INTERFACE)
 
     target_include_directories(stb INTERFACE stb/)

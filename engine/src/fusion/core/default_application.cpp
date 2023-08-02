@@ -4,6 +4,8 @@
 #include "fusion/devices/device_manager.h"
 #include "fusion/filesystem/file_system.h"
 #include "fusion/scene/scene_manager.h"
+#include "fusion/assets/asset_registry.h"
+#include "fusion/scripting/script_engine.h"
 
 #if FUSION_PLATFORM_WINDOWS
 #include <windows.h>
@@ -12,12 +14,12 @@
 using namespace fe;
 
 DefaultApplication::DefaultApplication(std::string_view name) : Application{name} {
-#ifdef FUSION_PLATFORM_WINDOWS
+#if FUSION_PLATFORM_WINDOWS
     wchar_t path[MAX_PATH] = { 0 };
     GetModuleFileNameW(nullptr, path, MAX_PATH);
     executablePath = fs::path{path}.parent_path().parent_path().parent_path();
 #else
-    #if FUSION_PLATFORM_MAC
+#if FUSION_PLATFORM_MAC
     executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path().parent_path().parent_path().parent_path();
 #else
     executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path();
@@ -31,6 +33,7 @@ DefaultApplication::DefaultApplication(std::string_view name) : Application{name
 }
 
 DefaultApplication::~DefaultApplication() {
+    projectLoaded = false;
     serialise();
 }
 
@@ -126,7 +129,7 @@ void DefaultApplication::openNewProject(const fs::path& path, std::string_view n
 
     serialise();
 
-    projectLoaded = true;
+    onProjectLoad();
 
     // Win32 : Sets up a console window and redirects standard output to it
     showConsole();
@@ -183,7 +186,7 @@ void DefaultApplication::deserialise() {
         return;
     }
 
-    projectLoaded = true;
+    onProjectLoad();
 
     LOG_INFO << "Deserialise application: \"" << projectPath << "\"";
 }
@@ -207,4 +210,16 @@ void DefaultApplication::showConsole() {
 #else
     consoleOpened = true;
 #endif
+}
+
+void DefaultApplication::onProjectLoad() {
+    if (!projectSettings.scriptModulePath.empty()) {
+        auto scriptEngine = ScriptEngine::Get();
+        scriptEngine->setAssemblyPaths("engine/assets/scripts/Fusion-ScriptCore.dll", projectSettings.projectRoot / projectSettings.scriptModulePath);
+        scriptEngine->reloadAssembly();
+    }
+
+    AssetRegistry::Get()->releaseAll();
+
+    projectLoaded = true;
 }

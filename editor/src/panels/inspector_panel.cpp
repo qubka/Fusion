@@ -81,7 +81,7 @@ namespace ImGui {
                 scriptInstance.setFieldValue(name, data);
             }
         }
-    
+
         template<typename T>
         inline void SetFieldProperty(ScriptFieldInstance& scriptField, const std::string& name) {
             T data = scriptField.getValue<T>();
@@ -89,18 +89,42 @@ namespace ImGui {
                 scriptField.setValue(data);
             }
         }
-    
+
         template<typename T>
-        inline void SetFieldProperty(ScriptFieldMap& entityFields, const ScriptField& scriptField, const std::string& name) {
-            T data{};
+        inline void SetFieldProperty(ScriptFieldMap& entityFields, const ScriptField& scriptField, const std::string& name, T data = {}) {
             if (ImGuiUtils::Property(name.c_str(), data)) {
                 ScriptFieldInstance& fieldInstance = entityFields[name];
                 fieldInstance.field = scriptField;
                 fieldInstance.setValue(data);
             }
         }
+
+        template<typename T>
+        inline void SetFieldPropertyControl(ScriptInstance& scriptInstance, const std::string& name) {
+            T data = scriptInstance.getFieldValue<T>(name);
+            if (ImGuiUtils::PropertyControl(name.c_str(), data)) {
+                scriptInstance.setFieldValue(name, data);
+            }
+        }
+
+        template<typename T>
+        inline void SetFieldPropertyControl(ScriptFieldInstance& scriptField, const std::string& name) {
+            T data = scriptField.getValue<T>();
+            if (ImGuiUtils::PropertyControl(name.c_str(), data)) {
+                scriptField.setValue(data);
+            }
+        }
+
+        template<typename T>
+        inline void SetFieldPropertyControl(ScriptFieldMap& entityFields, const ScriptField& scriptField, const std::string& name, T data = {}) {
+            if (ImGuiUtils::PropertyControl(name.c_str(), data)) {
+                ScriptFieldInstance& fieldInstance = entityFields[name];
+                fieldInstance.field = scriptField;
+                fieldInstance.setValue(data);
+            }
+        }
     }
-    
+
     template<>
     void ComponentEditorWidget<ScriptComponent>(entt::registry& registry, entt::registry::entity_type entity) {
         auto& script = registry.get<ScriptComponent>(entity);
@@ -110,19 +134,32 @@ namespace ImGui {
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
         ImGui::Separator();
 
-        ImGuiUtils::PropertyText("Class", script.className);
-
         auto scriptEngine = ScriptEngine::Get();
-        bool scriptClassExists = scriptEngine->entityClassExists(script.className);
+
+        auto& entityClasses = scriptEngine->getEntityClasses();
+
+        int32_t selected = -1;
+        std::vector<const char*> options;
+        options.reserve(entityClasses.size());
+        for (const auto& [i, entry] : enumerate(entityClasses)) {
+            const auto& key = entry.first;
+            options.push_back(key.c_str());
+            if (key == script.className)
+                selected = i;
+        }
+
+        if (ImGuiUtils::PropertyDropdown("Class", options, selected)) {
+            script.className = options[selected];
+        }
 
         // Fields
         auto scene = scriptEngine->getSceneContext();
         bool sceneRunning = scene && scene->isRuntime();
         if (sceneRunning) {
-            std::shared_ptr<ScriptInstance> scriptInstance = scriptEngine->getEntityScriptInstance(entity);
+            auto& scriptInstance = script.instance;
             if (scriptInstance) {
-                const auto& fields = scriptInstance->getScriptClass()->getFields();
-                for (const auto& [name, field] : fields) {
+                const auto& scriptFields = scriptInstance->getScriptClass()->getFields();
+                for (const auto& [name, field] : scriptFields) {
                     switch (field.type) {
                         case ScriptFieldType::Float:
                             Widget::SetFieldProperty<float>(*scriptInstance, name);
@@ -161,13 +198,14 @@ namespace ImGui {
                             Widget::SetFieldProperty<uint64_t>(*scriptInstance, name);
                             break;
                         case ScriptFieldType::Vector2:
-                            Widget::SetFieldProperty<glm::vec2>(*scriptInstance, name);
+                            Widget::SetFieldPropertyControl<glm::vec2>(*scriptInstance, name);
                             break;
                         case ScriptFieldType::Vector3:
-                            Widget::SetFieldProperty<glm::vec3>(*scriptInstance, name);
+                            Widget::SetFieldPropertyControl<glm::vec3>(*scriptInstance, name);
                             break;
                         case ScriptFieldType::Vector4:
-                            Widget::SetFieldProperty<glm::vec4>(*scriptInstance, name);
+                        case ScriptFieldType::Quaternion:
+                            Widget::SetFieldPropertyControl<glm::vec4>(*scriptInstance, name);
                             break;
                         default:
                             break;
@@ -175,14 +213,17 @@ namespace ImGui {
                 }
             }
         } else {
-            if (scriptClassExists) {
-                std::shared_ptr<ScriptClass> entityClass = scriptEngine->getEntityClass(script.className);
-                const auto& fields = entityClass->getFields();
-                auto& entityFields = scriptEngine->getScriptFieldMap(entity);
-                for (const auto& [name, field] : fields) {
+            std::shared_ptr<ScriptClass> entityClass = scriptEngine->getEntityClass(script.className);
+            if (entityClass) {
+                const auto& scriptFields = entityClass->getFields();
+                auto& entityFields = script.fields;
+                for (const auto& [name, field] : scriptFields) {
                     // Field has been set in editor
                     if (auto it = entityFields.find(name); it != entityFields.end()) {
                         ScriptFieldInstance& scriptField = it->second;
+
+                        if (scriptField.field.classField == nullptr)
+                            scriptField.field = field;
 
                         // Display control to set it maybe
                         switch (field.type) {
@@ -196,7 +237,7 @@ namespace ImGui {
                                 Widget::SetFieldProperty<bool>(scriptField, name);
                                 break;
                             case ScriptFieldType::Char:
-                                Widget::SetFieldProperty<int8_t>(scriptField, name);
+                                Widget::SetFieldProperty<char>(scriptField, name);
                                 break;
                             case ScriptFieldType::Byte:
                                 Widget::SetFieldProperty<int8_t>(scriptField, name);
@@ -223,13 +264,14 @@ namespace ImGui {
                                 Widget::SetFieldProperty<uint64_t>(scriptField, name);
                                 break;
                             case ScriptFieldType::Vector2:
-                                Widget::SetFieldProperty<glm::vec2>(scriptField, name);
+                                Widget::SetFieldPropertyControl<glm::vec2>(scriptField, name);
                                 break;
                             case ScriptFieldType::Vector3:
-                                Widget::SetFieldProperty<glm::vec3>(scriptField, name);
+                                Widget::SetFieldPropertyControl<glm::vec3>(scriptField, name);
                                 break;
                             case ScriptFieldType::Vector4:
-                                Widget::SetFieldProperty<glm::vec4>(scriptField, name);
+                            case ScriptFieldType::Quaternion:
+                                Widget::SetFieldPropertyControl<glm::vec4>(scriptField, name);
                                 break;
                             default:
                                 break;
@@ -247,7 +289,7 @@ namespace ImGui {
                                 Widget::SetFieldProperty<bool>(entityFields, field, name);
                                 break;
                             case ScriptFieldType::Char:
-                                Widget::SetFieldProperty<int8_t>(entityFields, field, name);
+                                Widget::SetFieldProperty<char>(entityFields, field, name);
                                 break;
                             case ScriptFieldType::Byte:
                                 Widget::SetFieldProperty<int8_t>(entityFields, field, name);
@@ -274,13 +316,14 @@ namespace ImGui {
                                 Widget::SetFieldProperty<uint64_t>(entityFields, field, name);
                                 break;
                             case ScriptFieldType::Vector2:
-                                Widget::SetFieldProperty<glm::vec2>(entityFields, field, name);
+                                Widget::SetFieldPropertyControl<glm::vec2>(entityFields, field, name);
                                 break;
                             case ScriptFieldType::Vector3:
-                                Widget::SetFieldProperty<glm::vec3>(entityFields, field, name);
+                                Widget::SetFieldPropertyControl<glm::vec3>(entityFields, field, name);
                                 break;
                             case ScriptFieldType::Vector4:
-                                Widget::SetFieldProperty<glm::vec4>(entityFields, field, name);
+                            case ScriptFieldType::Quaternion:
+                                Widget::SetFieldPropertyControl<glm::vec4>(entityFields, field, name);
                                 break;
                             default:
                                 break;
@@ -597,7 +640,7 @@ void InspectorPanel::onImGui() {
         std::string name{ nameComponent ? *nameComponent : std::to_string(entt::to_integral(selected)) };
 
         if (debugMode) {
-            ImGui::Text("ID: %d", static_cast<int>(selected));
+            ImGui::Text("ID: %d", static_cast<std::underlying_type_t<entt::entity>>(selected));
         }
 
         ImGui::SameLine();
@@ -605,7 +648,7 @@ void InspectorPanel::onImGui() {
         {
             ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
             if (ImGuiUtils::InputText("##InsEntityName", name))
-                registry.get_or_emplace<NameComponent>(selected).name = name;
+                registry.get_or_emplace<NameComponent>(selected).name = std::move(name);
             ImGui::PopFont();
         }
         ImGui::SameLine();
@@ -630,7 +673,7 @@ void InspectorPanel::onImGui() {
         ImGui::Separator();
 
         if (debugMode) {
-            ImGui::Text("UUID: %s", std::to_string(static_cast<std::underlying_type_t<entt::entity>>(selected)).c_str());
+            ImGui::Text("ID: %s", std::to_string(static_cast<std::underlying_type_t<entt::entity>>(selected)).c_str());
 
             if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(selected)) {
                 auto parent = hierarchyComponent->parent;

@@ -31,6 +31,7 @@ namespace fe {
         Vector2,
         Vector3,
         Vector4,
+        Quaternion,
         Entity
     };
 
@@ -55,6 +56,61 @@ namespace fe {
             std::memcpy(buffer, &value, sizeof(T));
         }
 
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(cereal::make_nvp("type", field.type));
+            switch (field.type) {
+                case ScriptFieldType::Float:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<float*>(buffer)));
+                    break;
+                case ScriptFieldType::Double:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<double*>(buffer)));
+                    break;
+                case ScriptFieldType::Bool:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<bool*>(buffer)));
+                    break;
+                case ScriptFieldType::Char:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<char*>(buffer)));
+                    break;
+                case ScriptFieldType::Byte:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<int8_t*>(buffer)));
+                    break;
+                case ScriptFieldType::Short:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<int16_t*>(buffer)));
+                    break;
+                case ScriptFieldType::Int:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<int32_t*>(buffer)));
+                    break;
+                case ScriptFieldType::Long:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<int64_t*>(buffer)));
+                    break;
+                case ScriptFieldType::UByte:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<uint8_t*>(buffer)));
+                    break;
+                case ScriptFieldType::UShort:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<uint16_t*>(buffer)));
+                    break;
+                case ScriptFieldType::UInt:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<uint32_t*>(buffer)));
+                    break;
+                case ScriptFieldType::ULong:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<uint64_t*>(buffer)));
+                    break;
+                case ScriptFieldType::Vector2:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<glm::vec2*>(buffer)));
+                    break;
+                case ScriptFieldType::Vector3:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<glm::vec3*>(buffer)));
+                    break;
+                case ScriptFieldType::Vector4:
+                case ScriptFieldType::Quaternion:
+                    archive(cereal::make_nvp("value", *reinterpret_cast<glm::vec4*>(buffer)));
+                    break;
+                default:
+                    break;
+            }
+        }
+
     private:
         uint8_t buffer[16]{};
 
@@ -72,13 +128,13 @@ namespace fe {
         MonoMethod* getMethod(const std::string& name, int parameterCount);
         MonoObject* invokeMethod(MonoObject* instance, MonoMethod* method, void** params = nullptr);
 
-        const fst::unordered_flatmap<std::string, ScriptField>& getFields() const { return fields; }
+        const std::unordered_map<std::string, ScriptField>& getFields() const { return fields; }
 
     private:
         std::string classNamespace;
         std::string className;
 
-        fst::unordered_flatmap<std::string, ScriptField> fields;
+        std::unordered_map<std::string, ScriptField> fields;
 
         MonoClass* monoClass{ nullptr };
 
@@ -132,31 +188,31 @@ namespace fe {
         friend struct ScriptFieldInstance;
     };
 
-    using ScriptFieldMap = std::unordered_map<std::string, ScriptFieldInstance>;
+    class ScriptComponent;
+    using ScriptFieldMap = fst::unordered_flatmap<std::string, ScriptFieldInstance>;
 
     class ScriptEngine : public Module::Registrar<ScriptEngine> {
     public:
-        bool loadAssembly(const fs::path& filepath);
+        bool loadCoreAssembly(const fs::path& filepath);
         bool loadAppAssembly(const fs::path& filepath);
 
         void reloadAssembly();
 
-        void onRuntimeStart(Scene* scene);
+        void onRuntimeStart();
         void onRuntimeStop();
 
+        void onCreateEntity(entt::entity entity, ScriptComponent& script);
+        void onUpdateEntity();
+
         bool entityClassExists(const std::string& fullClassName);
-        void onCreateEntity(entt::entity entity, const std::string& className);
-        void onUpdateEntity(entt::entity entity);
+        void setAssemblyPaths(fs::path coreFilepath, fs::path appFilepath);
 
         Scene* getSceneContext();
-        std::shared_ptr<ScriptInstance> getEntityScriptInstance(entt::entity entity);
 
         std::shared_ptr<ScriptClass> getEntityClass(const std::string& name);
         std::unordered_map<std::string, std::shared_ptr<ScriptClass>>& getEntityClasses();
-        ScriptFieldMap& getScriptFieldMap(entt::entity entity);
 
         MonoImage* getCoreAssemblyImage();
-        MonoObject* getManagedInstance(entt::entity entity);
         MonoString* createString(const char* string);
 
     private:
@@ -189,8 +245,6 @@ namespace fe {
         ScriptClass entityCoreClass;
 
         std::unordered_map<std::string, std::shared_ptr<ScriptClass>> entityClasses;
-        std::unordered_map<entt::entity, std::shared_ptr<ScriptInstance>> entityInstances;
-        std::unordered_map<entt::entity, ScriptFieldMap> entityScriptFields;
 
         //Scope<filewatch::FileWatch<std::string>> appAssemblyFileWatcher;
         bool assemblyReloadPending{ false };

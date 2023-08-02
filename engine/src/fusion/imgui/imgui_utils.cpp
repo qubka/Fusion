@@ -3,6 +3,7 @@
 #include "fusion/graphics/textures/texture2d.h"
 #include "fusion/graphics/textures/texture2d_array.h"
 #include "fusion/graphics/textures/texture_cube.h"
+#include "fusion/filesystem/file_format.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -30,10 +31,10 @@ bool PropertyText(const char* name, std::string& value) {
 
     ImGui::PushID(name);
 
-    char buffer[256]{};
-    std::strncpy(buffer, value.c_str(), sizeof(buffer));
-    if (ImGui::InputText("", buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
-        value = std::string{buffer};
+    std::array<char, 256> buffer{};
+    std::strncpy(buffer.data(), value.c_str(), sizeof(buffer));
+    if (ImGui::InputText("", buffer.data(), sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
+        value = std::string{buffer.data()};
         updated = true;
     }
 
@@ -67,7 +68,7 @@ bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t&
 
     ImGui::PushID(name);
 
-    const char* current = options[selected];
+    const char* current = selected != -1 ? options[selected] : "";
 
     if (ImGui::BeginCombo("", current)) {
         for (const auto& [i, option] : enumerate(options)) {
@@ -93,12 +94,11 @@ bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t&
     return updated;
 }
 
-/*bool PropertyFile(const char* name, const fs::path& path, fs::path& value, std::vector<fs::path>& files, fs::path& selected, ImGuiTextFilter& filter) {
+bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTextFilter& filter, std::vector<fs::path>& files, const fs::path& root, const std::string& ext) {
     bool updated = false;
 
     if (files.empty()) {
-        //files = FileSystem::GetFilesInPath("", true);
-        //LOG_WARNING << "Folder seems to be empty!";
+        files = FileSystem::GetFilesInPath(root, ext);
     }
 
     ImGui::TextUnformatted(name);
@@ -109,6 +109,8 @@ bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t&
 
     ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{4, 4});
+
+    ImGui::PushID(name);
 
     if (ImGui::BeginPopup("FileExplorer", ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Dummy(ImVec2{200.0f, 0.0f});  // fix resize
@@ -143,14 +145,14 @@ bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t&
         ImGui::BeginChild("FileBrowser", ImVec2{300.0f, 500.0f});
 
         for (const auto& file : files) {
-            if (filter.IsActive() && !filter.PassFilter(file.c_str()))
+            if (filter.IsActive() && !filter.PassFilter(file.filename().string().c_str()))
                 continue;
 
             std::string title{ FileFormat::GetIcon(file) + " "s + file.filename().string() };
             if (ImGui::Selectable(title.c_str(), selected == file, ImGuiSelectableFlags_AllowDoubleClick)) {
                 selected = file;
                 if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                    value = file;
+                    value = strip_root(file);
                     updated = true;
                     ImGui::CloseCurrentPopup();
                 }
@@ -174,7 +176,7 @@ bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t&
         if (ImGui::Button("...", buttonSize)) {
             filter.Clear();
             selected = "";
-            //files = FileSystem::GetFilesInPath("", true);
+            files = FileSystem::GetFilesInPath(root, ext);
             ImGui::OpenPopup("FileExplorer");
         }
     } else {
@@ -185,6 +187,8 @@ bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t&
         }
     }
 
+    ImGui::PopItemWidth();
+
     if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
         value = "";
         updated = true;
@@ -192,7 +196,7 @@ bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t&
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            value = static_cast<const char*>(payload->Data);
+            value = strip_root(static_cast<const char*>(payload->Data));
             updated = true;
         }
         ImGui::EndDragDropTarget();
@@ -203,14 +207,20 @@ bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t&
     if (ImGui::Button(ICON_MDI_FILE_SEARCH)) {
         filter.Clear();
         selected = "";
-        //files = FileSystem::GetFilesInPath("", true);
+        files = FileSystem::GetFilesInPath(root, ext);
         ImGui::OpenPopup("FileExplorer");
     }
 
+    ImGui::PopID();
+
+    ImGui::PopItemWidth();
+
     ImGui::PopStyleVar();
 
+    ImGui::NextColumn();
+
     return updated;
-}*/
+}
 
 void Tooltip(const char* text) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
@@ -455,15 +465,15 @@ bool InputText(const char* name, std::string& currentText) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
     ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
 
-    char buffer[256]{};
-    std::strncpy(buffer, currentText.c_str(), sizeof(buffer));
+    std::array<char, 256> buffer{};
+    std::strncpy(buffer.data(), currentText.c_str(), sizeof(buffer));
 
-    bool updated = ImGui::InputText(name, buffer, 256);
+    bool updated = ImGui::InputText(name, buffer.data(), 256);
 
     DrawItemActivityOutline(2.0f, false);
 
     if (updated)
-        currentText = std::string{buffer};
+        currentText = std::string{buffer.data()};
 
     ImGui::PopStyleVar();
     ImGui::PopStyleColor();

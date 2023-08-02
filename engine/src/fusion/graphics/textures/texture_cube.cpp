@@ -92,7 +92,7 @@ void TextureCube::setPixels(const std::byte* pixels, uint32_t layerCount, uint32
 }
 
 void TextureCube::loadFromFile() {
-    fs::path filepath{ Engine::Get()->getApp()->getRootPath() / path };
+    fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path };
 
     if (operator bool()) {
         LOG_DEBUG << "TextureCube: \"" << filepath << "\" already was loaded";

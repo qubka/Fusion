@@ -2,7 +2,7 @@
 
 namespace fe {
     using namespace std::string_literals;
-    inline std::string operator"" _q(const char* str, size_t len) { return '"' + std::string(str, len) + '"'; }
+    inline std::string operator"" _q(const char* str, size_t len) { return '"' + std::string{str, len} + '"'; }
 
     /**
      * @brief Helper class for C++ strings.
@@ -189,10 +189,10 @@ namespace fe {
 
         /**
          * Demangles a string.
-         * @param str The string.
+         * @param name The string.
          * @return The demangled string.
          */
-        static std::string Demangle(const std::string& str);
+        static std::string Demangle(const char* name);
 
         /**
          * Find position of a string.

@@ -6,7 +6,7 @@ namespace std::filesystem {
     template<class Archive> std::string save_minimal(const Archive&, const path& p) { return p.string(); }
     template<class Archive> void load_minimal(const Archive&, path& p, const std::string& in) { p = in; };
 }
-CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(std::filesystem::path, cereal::specialization::non_member_load_save_minimal);
+template<class Archive> struct cereal::specialize<Archive, std::filesystem::path, cereal::specialization::non_member_load_save_minimal> {};
 
 /*namespace uuids {
     template<class Archive> std::string save_minimal(const Archive&, const uuid& id) { return to_string(id); }
@@ -54,6 +54,10 @@ namespace cereal {
 
     template<class Archive> void serialize(Archive& archive, glm::quat& q) { archive(make_nvp("x", q.x), make_nvp("y", q.y), make_nvp("z", q.z), make_nvp("w", q.w)); }
     template<class Archive> void serialize(Archive& archive, glm::dquat& q) { archive(make_nvp("x", q.x), make_nvp("y", q.y), make_nvp("z", q.z), make_nvp("w", q.w)); }
+
+    template<class Archive, class F, class S> void save(Archive& archive, const std::pair<F, S>& pair) { archive(pair.first, pair.second); }
+    template<class Archive, class F, class S> void load(Archive& archive, std::pair<F, S>& pair) { archive(pair.first, pair.second); }
+    template<class Archive, class F, class S> struct specialize<Archive, std::pair<F, S>, cereal::specialization::non_member_load_save> {};
 
     template<class Archive>
     std::string to_string(Archive& archive) {

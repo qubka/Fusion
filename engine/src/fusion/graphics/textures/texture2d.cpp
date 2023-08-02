@@ -73,7 +73,7 @@ void Texture2d::setPixels(const std::byte* pixels, uint32_t layerCount, uint32_t
 }
 
 void Texture2d::loadFromFile() {
-    fs::path filepath{ Engine::Get()->getApp()->getRootPath() / path };
+    fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path };
 
     if (operator bool()) {
         LOG_DEBUG << "Texture2d: \"" << filepath << "\" already was loaded";

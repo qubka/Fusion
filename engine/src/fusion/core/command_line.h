@@ -37,4 +37,33 @@ namespace fe {
         };
         fst::unordered_flatmap<std::string, CommandLineOption> options;
     };
+
+    struct CommandResult {
+        std::string output;
+        int exitstatus;
+
+        friend std::ostream &operator<<(std::ostream &os, const CommandResult &result) {
+            os << "command exitstatus: " << result.exitstatus << " output: " << result.output;
+            return os;
+        }
+        bool operator==(const CommandResult &rhs) const {
+            return output == rhs.output && exitstatus == rhs.exitstatus;
+        }
+
+        bool operator!=(const CommandResult &rhs) const {
+            return !(rhs == *this);
+        }
+    };
+
+    class Command {
+        /**
+         * Execute system command and get STDOUT result.
+         * Regular system() only gives back exit status, this gives back output as well.
+         * @param command system command to execute
+         * @return commandResult containing STDOUT (not stderr) output & exitstatus
+         * of command. Empty if command failed (or has no output). If you want stderr,
+         * use shell redirection (2&>1).
+         */
+        static CommandResult Execute(const char* cmd);
+    };
 }

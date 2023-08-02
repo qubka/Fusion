@@ -118,18 +118,16 @@ bool Graphics::beginFrame(FrameInfo& info) {
     auto result = swapchain.acquireNextImage(syncObject.getImageAvailableSemaphore(), syncObject.getInFlightFence());
 
 #if FUSION_PLATFORM_ANDROID
-    if (result != VK_SUCCESS) {
+    if (result != VK_SUCCESS)
         throw std::runtime_error("Failed to acquire swap chain image!");
-    }
 #else
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapchain(id);
         return false;
     }
 
-    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
         throw std::runtime_error("Failed to acquire swap chain image!");
-    }
 #endif
 
     assert(!commandBuffer.isRunning());

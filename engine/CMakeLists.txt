@@ -17,6 +17,9 @@ set(PCH_FILE "src/pch.h")
 # mono-2.0
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(MONO REQUIRED mono-2)
+#set(${MONO_LIBRARIES} mono-2.0 ws2_32 psapi ole32 winmm oleaut32 advapi32 version)
+#set(${MONO_LIBRARY_DIRS} "C:/Program Files/Mono/lib")
+#set(${MONO_INCLUDE_DIRS} "C:/Program Files/Mono/include/mono-2.0")
 
 # create library and exectuable
 add_library(${PROJECT_NAME} STATIC ${SRC_FILES} ${HDR_FILES})

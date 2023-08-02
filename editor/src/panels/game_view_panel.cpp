@@ -164,7 +164,7 @@ void GameViewPanel::drawToolBar() {
         ImGui::OpenPopup("AspectPopup");
     if (ImGui::BeginPopup("AspectPopup")) {
 
-        static const std::vector<std::pair<std::string, float>> SUPPORTED_ASPECTS = {{
+        static const std::vector<std::pair<std::string_view, float>> SUPPORTED_ASPECTS = {{
                     {"Free Aspect ", 1.0f},
                     {"16:10", 16.0f / 10.0f},
                     {"16:9", 16.0f / 9.0f},
@@ -180,7 +180,7 @@ void GameViewPanel::drawToolBar() {
 
         for (const auto& [name, aspect] : SUPPORTED_ASPECTS) {
             bool is_selected = (it->first == name);
-            if (ImGui::Checkbox(name.c_str(), &is_selected)) {
+            if (ImGui::Checkbox(name.data(), &is_selected)) {
                 editor.getSettings().freeAspect = (name == "Free Aspect ");
                 editor.getSettings().fixedAspect = aspect;
             }

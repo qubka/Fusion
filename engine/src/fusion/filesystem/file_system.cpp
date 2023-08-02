@@ -12,15 +12,26 @@ FileSystem::~FileSystem() {
 }
 
 void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(std::span<const std::byte>)>& handler) {
+    if (!fs::exists(filepath)) {
+        LOG_ERROR << "File: \"" << filepath << "\" not exist!";
+        return;
+    }
+
     auto storage = Storage::ReadFile(filepath);
     handler(*storage);
 }
 
 std::string FileSystem::ReadText(const fs::path& filepath) {
+    if (!fs::exists(filepath)) {
+        LOG_ERROR << "File: \"" << filepath << "\" not exist!";
+        return {};
+    }
+
     std::ifstream is{filepath, std::ios::in};
 
     if (!is.is_open()) {
-        throw std::runtime_error("File " + filepath.string() + " could not be opened");
+        LOG_ERROR << "File: \"" << filepath << "\" could not be opened!";
+        return {};
     }
 
     std::stringstream ss;
@@ -47,4 +58,25 @@ bool FileSystem::WriteText(const fs::path& filepath, std::string_view text) {
 
 std::string FileSystem::GetExtension(const fs::path& filepath) {
     return String::Lowercase(filepath.extension().string());
+}
+
+std::vector<fs::path> FileSystem::GetFilesInPath(const fs::path& root, const std::string& ext) {
+    std::vector<fs::path> paths;
+
+    if (fs::exists(root) && fs::is_directory(root)) {
+        if (!ext.empty()) {
+            for (auto const& entry : fs::recursive_directory_iterator(root)) {
+                const auto& path = entry.path();
+                if (fs::is_regular_file(entry) && path.extension() == ext)
+                    paths.push_back(path);
+            }
+        } else {
+            for (auto const& entry : fs::recursive_directory_iterator(root)) {
+                if (fs::is_regular_file(entry))
+                    paths.push_back(entry.path());
+            }
+        }
+    }
+
+    return paths;
 }

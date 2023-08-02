@@ -35,7 +35,7 @@ namespace fe {
 
         template<typename T, typename = std::enable_if_t<std::is_base_of_v<Asset, T>>>
         std::unordered_map<fs::path, std::shared_ptr<Asset>>& getAssets() { return assets[type_id<T>]; }
-        const std::unordered_map<type_index, std::unordered_map<fs::path, std::shared_ptr<Asset>>>& getAllAssets() const { return assets; }
+        const std::unordered_map<type_index, std::unordered_map<fs::path, std::shared_ptr<Asset>, PathHash>>& getAllAssets() const { return assets; }
 
         void releaseAll();
 
@@ -43,7 +43,7 @@ namespace fe {
         //void onUpdate() override;
         //void onFileChanged(const fs::path& path, FileStatus status);
 
-        std::unordered_map<type_index, std::unordered_map<fs::path, std::shared_ptr<Asset>>> assets;
+        std::unordered_map<type_index, std::unordered_map<fs::path, std::shared_ptr<Asset>, PathHash>> assets;
 
         //std::unique_ptr<FileWatcher> fileWatcher;
     };

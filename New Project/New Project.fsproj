@@ -3,7 +3,7 @@
         "projectVersion": "0.1.0.0",
         "projectRoot": "New Project",
         "projectName": "New Project",
-		"scriptModule"
+        "scriptModulePath": "assets\\scripts\\Sandbox.dll",
         "title": "New Project",
         "size": {
             "x": 1280,

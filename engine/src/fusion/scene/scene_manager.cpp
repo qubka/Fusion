@@ -20,6 +20,8 @@ void SceneManager::onUpdate() {
     if (!scene->started) {
         scene->onStart();
         scene->started = true;
+        if (scene->runtime)
+            scene->onPlay();
     }
 
     scene->onUpdate();
@@ -37,6 +39,7 @@ bool SceneManager::cacheScene() {
 
     sceneCached = std::move(scene);
     scene = std::make_unique<Scene>(*sceneCached);
+    scene->runtime = true;
     return true;
 }
 
@@ -44,6 +47,8 @@ bool SceneManager::loadCachedScene() {
     if (!sceneCached)
         return false;
 
+    if (scene->runtime)
+        scene->onStop();
     scene = std::move(sceneCached);
     return true;
 }

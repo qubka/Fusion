@@ -8,7 +8,7 @@
 #include "fusion/scene/systems/hierarchy_system.h"
 #include "fusion/scene/systems/camera_system.h"
 #include "fusion/scene/systems/physics_system.h"
-#include "fusion/scripting/script_engine.h"
+#include "fusion/scene/systems/script_system.h"
 
 using namespace fe;
 
@@ -16,6 +16,7 @@ Scene::Scene(std::string_view name) : name{name} {
     addSystem<HierarchySystem>();
     addSystem<CameraSystem>();
     addSystem<PhysicsSystem>();
+    addSystem<ScriptSystem>();
 }
 
 Scene::Scene(const Scene& other) : Scene{other.name} {
@@ -41,8 +42,6 @@ void Scene::onUpdate() {
 void Scene::onPlay() {
     runtime = true;
 
-    ScriptEngine::Get()->onRuntimeStart(this);
-
     systems.each([&](auto system) {
         if (system->isEnabled())
             system->onPlay();
@@ -56,8 +55,6 @@ void Scene::onStop() {
         if (system->isEnabled())
             system->onStop();
     });
-
-    ScriptEngine::Get()->onRuntimeStop();
 
     runtime = false;
 
@@ -160,10 +157,10 @@ bool Scene::isEntityValid(entt::entity entity) {
 }
 
 void Scene::serialise(fs::path filepath, bool binary) {
-    if (binary) {
-        if (filepath.empty())
-            filepath = Engine::Get()->getApp()->getRootPath() / "assets/scenes" / (name + ".bin");
+    if (filepath.empty())
+        filepath = Engine::Get()->getApp()->getProjectSettings().projectRoot / "assets/scenes" / (name + ".fsn");
 
+    if (binary) {
         std::ofstream os{filepath, std::ios::binary};
         {
             cereal::BinaryOutputArchive output{os};
@@ -173,9 +170,6 @@ void Scene::serialise(fs::path filepath, bool binary) {
 
         LOG_INFO << "Serialise scene as binary: \"" << filepath << "\"";
     } else {
-        if (filepath.empty())
-            filepath = Engine::Get()->getApp()->getRootPath() / "assets/scenes" / (name + ".fsn");
-
         std::stringstream ss;
         {
             cereal::JSONOutputArchive output{ss};
@@ -194,10 +188,10 @@ void Scene::deserialise(fs::path filepath, bool binary) {
         system->setEnabled(false);
     });
 
-    if (binary) {
-        if (filepath.empty())
-            filepath = Engine::Get()->getApp()->getRootPath() / "assets/scenes" / (name + ".bin");
+    if (filepath.empty())
+        filepath = Engine::Get()->getApp()->getProjectSettings().projectRoot / "assets/scenes" / (name + ".fsn");
 
+    if (binary) {
         if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
             LOG_ERROR << "No saved scene file found: \"" << filepath << "\"";
             return;
@@ -216,9 +210,6 @@ void Scene::deserialise(fs::path filepath, bool binary) {
 
         LOG_INFO << "Deserialise scene as binary: \"" << filepath << "\"";
     } else {
-        if (filepath.empty())
-            filepath = Engine::Get()->getApp()->getRootPath() / "assets/scenes" / (name + ".fsn");
-
         if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
             LOG_ERROR << "No saved scene file found: \"" << filepath << "\"";
             return;

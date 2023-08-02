@@ -55,7 +55,7 @@ namespace fe {
         const fs::path& getWatchPath() const { return watchPath; }
 
     private:
-        std::unordered_map<fs::path, fs::file_time_type> paths;
+        std::unordered_map<fs::path, fs::file_time_type, PathHash> paths;
         std::function<void(const fs::path&, FileStatus)> callback;
         fs::path watchPath;
 

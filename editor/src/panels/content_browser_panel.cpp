@@ -451,7 +451,7 @@ const fs::path& ContentBrowserPanel::processDirectory(const fs::path& path, cons
     if (/*path == root*/parent == nullptr)
         directoryInfo->path = root;
     else
-        directoryInfo->path = fs::relative(path, root);
+        directoryInfo->path = relative(path, root);
 
     if (fs::is_directory(path)) {
         for (const auto& entry : fs::directory_iterator(path)) {

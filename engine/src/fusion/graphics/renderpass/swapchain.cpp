@@ -108,9 +108,8 @@ VkResult Swapchain::acquireNextImage(VkSemaphore presentCompleteSemaphore, VkFen
 
 	auto result = vkAcquireNextImageKHR(logicalDevice, swapchain, UINT64_MAX, presentCompleteSemaphore, VK_NULL_HANDLE, &activeImageIndex);
 
-    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR && result != VK_ERROR_OUT_OF_DATE_KHR) {
+    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR && result != VK_ERROR_OUT_OF_DATE_KHR)
         throw std::runtime_error("Failed to acquire swap chain image!");
-    }
 
     return result;
 }

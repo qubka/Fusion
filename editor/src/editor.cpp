@@ -421,7 +421,7 @@ void Editor::drawMenuBar() {
                         std::string sceneName{ path.filename().replace_extension().string() };
                         auto sceneManager = SceneManager::Get();
                         if (ImGui::MenuItem(sceneName.c_str(), nullptr, sceneName == sceneManager->getScene()->getName())) {
-                            auto scene = std::make_unique<Scene>(sceneName);
+                            auto scene = std::make_unique<Scene>(std::move(sceneName));
                             scene->deserialise();
                             sceneManager->setScene(std::move(scene));
                         }
@@ -685,7 +685,7 @@ void Editor::drawMenuBar() {
             fs::path scenePath{ projectSettings.projectRoot / "assets/scenes/New Scene.fsn" };
             scenePath = FileFormat::GetNextFileName(scenePath);
             std::string sceneName{ scenePath.filename().replace_extension().string() };
-            SceneManager::Get()->setScene(std::make_unique<Scene>(sceneName));
+            SceneManager::Get()->setScene(std::make_unique<Scene>(std::move(sceneName)));
             ImGui::CloseCurrentPopup();
         }
         ImGui::SetItemDefaultFocus();
@@ -760,8 +760,6 @@ void Editor::projectOpenCallback(const fs::path& path) {
     }
 
     LOG_DEBUG << "Project opened: \"" << path << "\"";
-
-    AssetRegistry::Get()->releaseAll();
 }
 
 /*void Editor::newProjectOpenCallback(const fs::path& path) {
@@ -773,8 +771,6 @@ void Editor::projectOpenCallback(const fs::path& path) {
     }
 
     LOG_DEBUG << "New project opened: \"" << path << "\"";
-
-    AssetRegistry::Get()->releaseAll();
 }*/
 
 void Editor::newProjectLocationCallback(const fs::path& path) {
@@ -784,8 +780,6 @@ void Editor::newProjectLocationCallback(const fs::path& path) {
     locationPopupOpened = false;
 
     LOG_DEBUG << "New Project opened: \"" << path << "\"";
-
-    AssetRegistry::Get()->releaseAll();
 }
 
 void Editor::removePanel(EditorPanel* panel) {

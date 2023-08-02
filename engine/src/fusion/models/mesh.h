@@ -92,7 +92,7 @@ namespace fe {
         uint32_t vertexCount{ 0 };
         uint32_t indexCount{ 0 };
         VkIndexType indexType{ VK_INDEX_TYPE_NONE_KHR };
-        AABB boundingBox;
         uint32_t index{ UINT32_MAX };
+        AABB boundingBox;
     };
 }

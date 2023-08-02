@@ -147,9 +147,8 @@ void PipelineGraphics::createAttributes() {
 	const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
 
-	if (polygonMode == VK_POLYGON_MODE_LINE && !logicalDevice.getEnabledFeatures().fillModeNonSolid) {
+	if (polygonMode == VK_POLYGON_MODE_LINE && !logicalDevice.getEnabledFeatures().fillModeNonSolid)
 		throw std::runtime_error("Cannot create graphics pipeline with line polygon mode when logical device does not support non solid fills.");
-	}
 
 	inputAssemblyState.topology = topology;
 	inputAssemblyState.primitiveRestartEnable = VK_FALSE;

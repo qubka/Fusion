@@ -2,8 +2,11 @@
 #include "script_glue.h"
 
 #include "fusion/filesystem/file_system.h"
-#include "fusion/scene/scene.h"
 #include "fusion/core/engine.h"
+#include "fusion/scene/scene.h"
+#include "fusion/scene/components/script_component.h"
+#include "fusion/scene/scene_manager.h"
+#include "fusion/core/module.h"
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
@@ -28,9 +31,10 @@ static std::unordered_map<std::string_view, ScriptFieldType> ScriptFieldTypeMap 
     { "System.UInt32", ScriptFieldType::UInt },
     { "System.UInt64", ScriptFieldType::ULong },
 
-    { "Fusion.Vector2", ScriptFieldType::Vector2 },
-    { "Fusion.Vector3", ScriptFieldType::Vector3 },
-    { "Fusion.Vector4", ScriptFieldType::Vector4 },
+    { "System.Numerics.Vector2", ScriptFieldType::Vector2 },
+    { "System.Numerics.Vector3", ScriptFieldType::Vector3 },
+    { "System.Numerics.Vector4", ScriptFieldType::Vector4 },
+    { "System.Numerics.Quaternion", ScriptFieldType::Quaternion },
 
     { "Fusion.Entity", ScriptFieldType::Entity },
 };
@@ -47,7 +51,7 @@ namespace Utils {
 
         if (status != MONO_IMAGE_OK) {
             const char* errorMessage = mono_image_strerror(status);
-            // Log some error message using the errorMessage data
+            LOG_ERROR <<  "Failed to load assembly file: \"" << errorMessage << "\"";
             return nullptr;
         }
 
@@ -63,7 +67,7 @@ namespace Utils {
             }
         }
 
-        std::string pathString = assemblyPath.string();
+        std::string pathString{ assemblyPath.string() };
         MonoAssembly* assembly = mono_assembly_load_from_full(image, pathString.c_str(), &status, 0);
         mono_image_close(image);
 
@@ -96,53 +100,6 @@ namespace Utils {
 
         return it->second;
     }
-
-    inline const char* ScriptFieldTypeToString(ScriptFieldType fieldType) {
-        switch (fieldType) {
-            case ScriptFieldType::None:    return "None";
-            case ScriptFieldType::Float:   return "Float";
-            case ScriptFieldType::Double:  return "Double";
-            case ScriptFieldType::Bool:    return "Bool";
-            case ScriptFieldType::Char:    return "Char";
-            case ScriptFieldType::Byte:    return "Byte";
-            case ScriptFieldType::Short:   return "Short";
-            case ScriptFieldType::Int:     return "Int";
-            case ScriptFieldType::Long:    return "Long";
-            case ScriptFieldType::UByte:   return "UByte";
-            case ScriptFieldType::UShort:  return "UShort";
-            case ScriptFieldType::UInt:    return "UInt";
-            case ScriptFieldType::ULong:   return "ULong";
-            case ScriptFieldType::Vector2: return "Vector2";
-            case ScriptFieldType::Vector3: return "Vector3";
-            case ScriptFieldType::Vector4: return "Vector4";
-            case ScriptFieldType::Entity:  return "Entity";
-        }
-        assert(false && "Unknown ScriptFieldType");
-        return "None";
-    }
-
-    inline ScriptFieldType ScriptFieldTypeFromString(std::string_view fieldType) {
-        if (fieldType == "None")    return ScriptFieldType::None;
-        if (fieldType == "Float")   return ScriptFieldType::Float;
-        if (fieldType == "Double")  return ScriptFieldType::Double;
-        if (fieldType == "Bool")    return ScriptFieldType::Bool;
-        if (fieldType == "Char")    return ScriptFieldType::Char;
-        if (fieldType == "Byte")    return ScriptFieldType::Byte;
-        if (fieldType == "Short")   return ScriptFieldType::Short;
-        if (fieldType == "Int")     return ScriptFieldType::Int;
-        if (fieldType == "Long")    return ScriptFieldType::Long;
-        if (fieldType == "UByte")   return ScriptFieldType::UByte;
-        if (fieldType == "UShort")  return ScriptFieldType::UShort;
-        if (fieldType == "UInt")    return ScriptFieldType::UInt;
-        if (fieldType == "ULong")   return ScriptFieldType::ULong;
-        if (fieldType == "Vector2") return ScriptFieldType::Vector2;
-        if (fieldType == "Vector3") return ScriptFieldType::Vector3;
-        if (fieldType == "Vector4") return ScriptFieldType::Vector4;
-        if (fieldType == "Entity")  return ScriptFieldType::Entity;
-
-        assert(false && "Unknown ScriptFieldType");
-        return ScriptFieldType::None;
-    }
 }
 
 /*static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type) {
@@ -161,28 +118,7 @@ void ScriptEngine::onStart() {
 
     ScriptGlue::RegisterFunctions();
 
-    bool status = loadAssembly("engine/assets/scripts/Fusion-ScriptCore.dll");
-    if (!status) {
-        LOG_ERROR << "[ScriptEngine] Could not load Fusion-ScriptCore assembly.";
-        return;
-    }
-
-    dynamic_cast<DefaultApplication*>(Engine::Get()->getApp())
-
-    projectSettings.projectRoot / (projectSettings.projectName + ".fsproj")
-    //auto scriptModulePath = Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
-    status = loadAppAssembly("engine/assets/scripts/Camera.dll");
-    if (!status) {
-        LOG_ERROR << "[ScriptEngine] Could not load app assembly.";
-        return;
-    }
-
-    loadAssemblyClasses();
-
-    ScriptGlue::RegisterComponents();
-
-    // Retrieve and instantiate class
-    entityCoreClass = ScriptClass{"Fusion", "Entity", true};
+    //loadAssembly();
 }
 
 void ScriptEngine::onStop() {
@@ -214,20 +150,24 @@ void ScriptEngine::initMono() {
 void ScriptEngine::shutdownMono() {
     mono_domain_set(mono_get_root_domain(), false);
 
-    mono_domain_unload(appDomain);
-    appDomain = nullptr;
+    if (appDomain) {
+        mono_domain_unload(appDomain);
+        appDomain = nullptr;
+    }
 
-    mono_jit_cleanup(rootDomain);
-    rootDomain = nullptr;
+    if (rootDomain) {
+        mono_jit_cleanup(rootDomain);
+        rootDomain = nullptr;
+    }
 }
 
-bool ScriptEngine::loadAssembly(const fs::path& filepath) {
+bool ScriptEngine::loadCoreAssembly(const fs::path& filepath) {
     // Create an App Domain
     char name[] = "FusionScriptRuntime";
     appDomain = mono_domain_create_appdomain(name, nullptr);
     mono_domain_set(appDomain, true);
 
-    coreAssemblyFilepath = filepath;
+    //coreAssemblyFilepath = filepath;
     coreAssembly = Utils::LoadMonoAssembly(filepath, enableDebugging);
     if (coreAssembly == nullptr)
         return false;
@@ -237,7 +177,7 @@ bool ScriptEngine::loadAssembly(const fs::path& filepath) {
 }
 
 bool ScriptEngine::loadAppAssembly(const fs::path& filepath) {
-    appAssemblyFilepath = filepath;
+    //appAssemblyFilepath = filepath;
     appAssembly = Utils::LoadMonoAssembly(filepath, enableDebugging);
     if (appAssembly == nullptr)
         return false;
@@ -252,10 +192,27 @@ bool ScriptEngine::loadAppAssembly(const fs::path& filepath) {
 void ScriptEngine::reloadAssembly() {
     mono_domain_set(mono_get_root_domain(), false);
 
-    mono_domain_unload(appDomain);
+    if (appDomain) {
+        mono_domain_unload(appDomain);
+        appDomain = nullptr;
+    }
 
-    loadAssembly(coreAssemblyFilepath);
-    loadAppAssembly(appAssemblyFilepath);
+    bool status = loadCoreAssembly(coreAssemblyFilepath);
+    if (!status) {
+        LOG_ERROR << "Could not load \"" << coreAssemblyFilepath << "\" assembly.";
+        return;
+    } else {
+        LOG_INFO << "Assembly: \"" << coreAssemblyFilepath << "\" was loaded successfully!";
+    }
+
+    status = loadAppAssembly(appAssemblyFilepath);
+    if (!status) {
+        LOG_ERROR << "Could not load app \"" << appAssemblyFilepath << "\" assembly.";
+        return;
+    } else {
+        LOG_INFO << "App assembly: \"" << appAssemblyFilepath << "\" was loaded successfully!";
+    }
+
     loadAssemblyClasses();
 
     ScriptGlue::RegisterComponents();
@@ -264,46 +221,61 @@ void ScriptEngine::reloadAssembly() {
     entityCoreClass = {"Fusion", "Entity", true};
 }
 
-void ScriptEngine::onRuntimeStart(Scene* scene) {
-    sceneContext = scene;
+void ScriptEngine::setAssemblyPaths(fs::path coreFilepath, fs::path appFilepath) {
+    coreAssemblyFilepath = std::move(coreFilepath);
+    appAssemblyFilepath = std::move(appFilepath);
 }
 
-bool ScriptEngine::entityClassExists(const std::string& fullClassName) {
-    return entityClasses.find(fullClassName) != entityClasses.end();
-}
+void ScriptEngine::onRuntimeStart() {
+    sceneContext = SceneManager::Get()->getScene();
 
-void ScriptEngine::onCreateEntity(entt::entity entity, const std::string& className) {
-    if (entityClassExists(className)) {
-        std::shared_ptr<ScriptInstance> instance = std::make_shared<ScriptInstance>(entityClasses[className], entity);
-        entityInstances[entity] = instance;
-
-        // Copy field values
-        if (auto it = entityScriptFields.find(entity); it != entityScriptFields.end()) {
-            const ScriptFieldMap& fieldMap = it->second;
-            for (const auto& [name, fieldInstance] : fieldMap)
-                instance->setFieldValueInternal(name, fieldInstance.buffer);
-        }
-
-        instance->invokeOnCreate();
+    auto& registry = sceneContext->getRegistry();
+    auto view = registry.view<ScriptComponent>();
+    for (auto [entity, script] : view.each()) {
+        onCreateEntity(entity, script);
     }
 }
 
-void ScriptEngine::onUpdateEntity(entt::entity entity) {
-    if (auto it = entityInstances.find(entity); it != entityInstances.end()) {
-        std::shared_ptr<ScriptInstance>& instance = it->second;
-        instance->invokeOnUpdate(Time::DeltaTime().asSeconds());
-    } else {
-        LOG_ERROR << "Could not find ScriptInstance for entity: " << static_cast<std::underlying_type_t<entt::entity>>(entity);
+void ScriptEngine::onRuntimeStop() {
+    auto& registry = sceneContext->getRegistry();
+    auto view = registry.view<ScriptComponent>();
+    for (auto [entity, script] : view.each()) {
+        script.instance.reset();
+    }
+
+    sceneContext = nullptr;
+}
+
+void ScriptEngine::onCreateEntity(entt::entity entity, ScriptComponent& script) {
+    if (!sceneContext || !sceneContext->isRuntime())
+        return;
+
+    if (auto scriptClass = getEntityClass(script.className)) {
+        auto instance = std::make_shared<ScriptInstance>(scriptClass, entity);
+
+        // Copy field values
+        for (const auto& [name, fieldInstance] : script.fields)
+            instance->setFieldValueInternal(name, fieldInstance.buffer);
+
+        instance->invokeOnCreate();
+
+        script.instance = instance;
+    }
+}
+
+void ScriptEngine::onUpdateEntity() {
+    if (!sceneContext || !sceneContext->isRuntime())
+        return;
+
+    auto& registry = sceneContext->getRegistry();
+    auto view = registry.view<ScriptComponent>();
+    for (auto [entity, script] : view.each()) {
+        script.instance->invokeOnUpdate(Time::DeltaTime().asSeconds());
     }
 }
 
 Scene* ScriptEngine::getSceneContext() {
     return sceneContext;
-}
-
-std::shared_ptr<ScriptInstance> ScriptEngine::getEntityScriptInstance(entt::entity entity) {
-    auto it = entityInstances.find(entity);
-    return it != entityInstances.end() ? it->second : nullptr;
 }
 
 std::shared_ptr<ScriptClass> ScriptEngine::getEntityClass(const std::string& name) {
@@ -312,17 +284,12 @@ std::shared_ptr<ScriptClass> ScriptEngine::getEntityClass(const std::string& nam
     return nullptr;
 }
 
-void ScriptEngine::onRuntimeStop() {
-    sceneContext = nullptr;
-    entityInstances.clear();
+bool ScriptEngine::entityClassExists(const std::string& fullClassName) {
+    return entityClasses.find(fullClassName) != entityClasses.end();
 }
 
 std::unordered_map<std::string, std::shared_ptr<ScriptClass>>& ScriptEngine::getEntityClasses() {
     return entityClasses;
-}
-
-ScriptFieldMap& ScriptEngine::getScriptFieldMap(entt::entity entity) {
-    return entityScriptFields[entity];
 }
 
 void ScriptEngine::loadAssemblyClasses() {
@@ -345,7 +312,6 @@ void ScriptEngine::loadAssemblyClasses() {
             fullName = className;
 
         MonoClass* monoClass = mono_class_from_name(appAssemblyImage, nameSpace, className);
-
         if (monoClass == entityClass)
             continue;
 
@@ -354,7 +320,7 @@ void ScriptEngine::loadAssemblyClasses() {
             continue;
 
         std::shared_ptr<ScriptClass> scriptClass = std::make_shared<ScriptClass>(nameSpace, className);
-        entityClasses[fullName] = scriptClass;
+        entityClasses[std::move(fullName)] = scriptClass;
 
         // This routine is an iterator routine for retrieving the fields in a class.
         // You must pass a gpointer that points to zero and is treated as an opaque handle
@@ -369,7 +335,7 @@ void ScriptEngine::loadAssemblyClasses() {
             if (flags & MONO_FIELD_ATTR_PUBLIC) {
                 MonoType* type = mono_field_get_type(field);
                 ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
-                LOG_WARNING << fieldName << " (" << Utils::ScriptFieldTypeToString(fieldType) << ")";
+                LOG_WARNING << fieldName << " (" << me::enum_name(fieldType) << ")";
 
                 scriptClass->fields[fieldName] = { fieldType, fieldName, field };
             }
@@ -379,12 +345,6 @@ void ScriptEngine::loadAssemblyClasses() {
 
 MonoImage* ScriptEngine::getCoreAssemblyImage() {
     return coreAssemblyImage;
-}
-
-MonoObject* ScriptEngine::getManagedInstance(entt::entity entity) {
-    if (auto it = entityInstances.find(entity); it != entityInstances.end())
-        return it->second->getManagedObject();
-    return nullptr;
 }
 
 MonoString* ScriptEngine::createString(const char* string) {
@@ -427,8 +387,7 @@ ScriptInstance::ScriptInstance(std::shared_ptr<ScriptClass> _scriptClass, entt::
 
     // Call Entity constructor
     {
-        auto entityID = static_cast<std::underlying_type_t<entt::entity>>(entity);
-        void* param = &entityID;
+        void* param = &entity;
         scriptClass->invokeMethod(instance, constructor, &param);
     }
 }

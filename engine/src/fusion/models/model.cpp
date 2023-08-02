@@ -32,7 +32,7 @@ void Model::loadFromFile() {
         return;
     }
 
-    fs::path modelPath{ Engine::Get()->getApp()->getRootPath() / path }; // get full path
+    fs::path modelPath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path }; // get full path
 
     uint32_t flags = aiProcess_Triangulate;
     if (Layout.contains(Vertex::Component::Normal)) {

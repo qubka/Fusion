@@ -3,6 +3,21 @@
 #include "version.h"
 
 namespace fe {
+    struct ProjectSettings {
+        std::string projectVersion{ "0.0.0.0" };
+        fs::path projectRoot;
+        std::string projectName;
+        fs::path scriptModulePath;
+        std::string title{ "Fusion App" };
+        glm::uvec2 size{ 1280, 720 };
+        bool isBorderless{ false };
+        bool isResizable{ true };
+        bool isFloating{ false };
+        bool isFullscreen{ false };
+        bool isVSync{ false };
+        bool isShowConsole{ true };
+    };
+
     class Application {
         friend class Engine;
         friend class ImGuiSubrender;
@@ -36,10 +51,10 @@ namespace fe {
         void setVersion(Version ver) { version = ver; }
 
         /**
-         * Gets the root path of the application.
+         * Gets the project's settings of the application.
          * @return The root path.
          */
-        virtual const fs::path& getRootPath() const = 0;
+        ProjectSettings& getProjectSettings() { return projectSettings; }
 
     protected:
         /**
@@ -66,5 +81,8 @@ namespace fe {
         std::string name;
         Version version{ 0, 1, 0, 0 };
         bool started{ false };
+
+    protected:
+        ProjectSettings projectSettings;
     };
 }
