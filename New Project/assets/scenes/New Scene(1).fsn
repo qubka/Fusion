@@ -1,0 +1,153 @@
+{
+    "value0": {
+        "name": "New Scene(1)"
+    },
+    "value1": 11,
+    "value2": 4294967295,
+    "value3": 0,
+    "value4": 1048577,
+    "value5": 2,
+    "value6": 3,
+    "value7": 2097156,
+    "value8": 5,
+    "value9": 6,
+    "value10": 7,
+    "value11": 8,
+    "value12": 9,
+    "value13": 10,
+    "value14": 0,
+    "value15": {
+        "name": "Empty Entity"
+    },
+    "value16": 9,
+    "value17": {
+        "name": "Empty Entity (9)"
+    },
+    "value18": 2,
+    "value19": {
+        "name": "Empty Entity (2)"
+    },
+    "value20": 3,
+    "value21": {
+        "name": "Empty Entity (3)"
+    },
+    "value22": 5,
+    "value23": {
+        "name": "Empty Entity (5)"
+    },
+    "value24": 6,
+    "value25": {
+        "name": "Empty Entity (6)"
+    },
+    "value26": 2097156,
+    "value27": {
+        "name": "Empty Entity (6)"
+    },
+    "value28": 7,
+    "value29": {
+        "name": "Empty Entity (7)"
+    },
+    "value30": 8,
+    "value31": {
+        "name": "Empty Entity (6)"
+    },
+    "value32": 1048577,
+    "value33": {
+        "name": "Empty Entity (9)"
+    },
+    "value34": 0,
+    "value35": 5,
+    "value36": 8,
+    "value37": {
+        "children": 1,
+        "parent": 4294967295,
+        "first": 9,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value38": 9,
+    "value39": {
+        "children": 0,
+        "parent": 8,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value40": 2097156,
+    "value41": {
+        "children": 1,
+        "parent": 7,
+        "first": 1048577,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value42": 7,
+    "value43": {
+        "children": 1,
+        "parent": 4294967295,
+        "first": 2097156,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value44": 1048577,
+    "value45": {
+        "children": 0,
+        "parent": 2097156,
+        "first": 4294967295,
+        "prev": 4294967295,
+        "next": 4294967295
+    },
+    "value46": 1,
+    "value47": 0,
+    "value48": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value49": 0,
+    "value50": 0,
+    "value51": 0,
+    "value52": 0,
+    "value53": 1,
+    "value54": 0,
+    "value55": {
+        "className": "Sandbox.Player",
+        "fields": {
+            "values": [
+                {
+                    "value0": "Speed",
+                    "value1": {
+						"type": 1,
+                        "value": 132.0
+                    }
+                },
+                {
+                    "value0": "Time",
+                    "value1": {
+						"type": 1,
+                        "value": 106.0
+                    }
+                }
+            ]
+        }
+    },
+    "value56": 0,
+    "value57": 0,
+    "value58": 0,
+    "value59": 0,
+    "value60": 0,
+    "value61": 0
+}

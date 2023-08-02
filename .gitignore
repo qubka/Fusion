@@ -19,10 +19,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
-cmake-build-release/
-cmake-build-debug/
-cmake-build-debug-mingw-clang/
-cmake-build-debug-mingw/
+cmake-build-*/
 
 # User-specific files
 *.suo
