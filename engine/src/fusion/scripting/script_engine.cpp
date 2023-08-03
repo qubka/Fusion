@@ -1,6 +1,8 @@
 #include "script_engine.h"
 #include "script_glue.h"
 
+#if FUSION_SCRIPTING
+
 #include "fusion/filesystem/file_system.h"
 #include "fusion/core/engine.h"
 #include "fusion/scene/scene.h"
@@ -426,3 +428,5 @@ bool ScriptInstance::setFieldValueInternal(const std::string& name, const void* 
     mono_field_set_value(instance, field.classField, (void*)value);
     return true;
 }
+
+#endif

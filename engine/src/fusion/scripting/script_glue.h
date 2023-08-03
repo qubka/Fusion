@@ -1,5 +1,7 @@
 #pragma once
 
+#if FUSION_SCRIPTING
+
 namespace fe {
     class ScriptGlue {
     public:
@@ -7,3 +9,5 @@ namespace fe {
         static void RegisterFunctions();
     };
 }
+
+#endif

@@ -32,6 +32,7 @@ void ProjectSettingsPanel::onImGui() {
         ImGuiUtils::PropertyText("Project Version", projectSettings.projectVersion.c_str());
         ImGuiUtils::PropertyText("Project Name", projectSettings.projectName.c_str());
         ImGuiUtils::PropertyText("Project Root", projectSettings.projectRoot.string().c_str());
+#if FUSION_SCRIPTING
         if (ImGuiUtils::PropertyFile("Script Module Path", projectSettings.scriptModulePath, selected, filter, files, projectSettings.projectRoot, ".dll")) {
             if (!projectSettings.scriptModulePath.empty()) {
                 auto scriptEngine = ScriptEngine::Get();
@@ -39,6 +40,7 @@ void ProjectSettingsPanel::onImGui() {
                 scriptEngine->reloadAssembly();
             }
         }
+#endif
 
         if (ImGuiUtils::PropertyText("Title", projectSettings.title))
             window->setTitle(projectSettings.title);

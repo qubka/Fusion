@@ -1,6 +1,8 @@
 #include "script_glue.h"
 #include "script_engine.h"
 
+#if FUSION_SCRIPTING
+
 #include "fusion/scene/components.h"
 #include "fusion/scene/scene.h"
 #include "fusion/input/input.h"
@@ -216,3 +218,5 @@ void ScriptGlue::RegisterFunctions() {
 
     ADD_INTERNAL_CALL(Input_IsKeyDown);
 }
+
+#endif

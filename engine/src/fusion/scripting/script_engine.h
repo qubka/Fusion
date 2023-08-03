@@ -1,5 +1,7 @@
 #pragma once
 
+#if FUSION_SCRIPTING
+
 extern "C" {
     typedef struct _MonoClass MonoClass;
     typedef struct _MonoObject MonoObject;
@@ -259,3 +261,5 @@ namespace fe {
         Scene* sceneContext{ nullptr };
     };
 }
+
+#endif

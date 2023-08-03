@@ -12,13 +12,19 @@ ScriptSystem::~ScriptSystem() {
 }
 
 void ScriptSystem::onPlay() {
+#if FUSION_SCRIPTING
     ScriptEngine::Get()->onRuntimeStart();
+#endif
 }
 
 void ScriptSystem::onUpdate() {
+#if FUSION_SCRIPTING
     ScriptEngine::Get()->onUpdateEntity();
+#endif
 }
 
 void ScriptSystem::onStop() {
+#if FUSION_SCRIPTING
     ScriptEngine::Get()->onRuntimeStop();
+#endif
 }
