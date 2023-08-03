@@ -1,6 +1,13 @@
 # Used to track if we're using ONLY system libs
 # Prevents errors with EXPORT
 set(ALL_LIBS)
+set(ALL_DIRS)
+set(ALL_INCS)
+
+if(ANDROID)
+	find_library(android-lib android)
+	list(APPEND ALL_LIBS ${android-lib})
+endif()
 
 # vulkan
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
@@ -139,16 +146,18 @@ list(APPEND ALL_LIBS stb)
 
 # freetype
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-find_package(Freetype QUIET)
-if(NOT Freetype_FOUND)
-    set(FT_DISABLE_ZLIB TRUE CACHE INTERNAL "")
-    set(FT_DISABLE_BZIP2 TRUE CACHE INTERNAL "")
-    set(FT_DISABLE_PNG TRUE CACHE INTERNAL "")
-    set(FT_DISABLE_HARFBUZZ TRUE CACHE INTERNAL "")
+if(NOT ANDROID)
+	find_package(Freetype QUIET)
+	if(NOT Freetype_FOUND)
+		set(FT_DISABLE_ZLIB TRUE CACHE INTERNAL "")
+		set(FT_DISABLE_BZIP2 TRUE CACHE INTERNAL "")
+		set(FT_DISABLE_PNG TRUE CACHE INTERNAL "")
+		set(FT_DISABLE_HARFBUZZ TRUE CACHE INTERNAL "")
 
-    add_subdirectory(freetype)
+		add_subdirectory(freetype)
+	endif()
+	list(APPEND ALL_LIBS freetype)
 endif()
-list(APPEND ALL_LIBS freetype)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # random
@@ -226,10 +235,7 @@ if(NOT ANDROID)
 	list(APPEND ALL_DIRS ${MONO_LIBRARY_DIRS})
 	list(APPEND ALL_INCS ${MONO_INCLUDE_DIRS})
 endif()
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # physx

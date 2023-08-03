@@ -19,7 +19,11 @@
 #include "components/sphere_collider_component.h"
 #include "components/physics_material_component.h"
 
+#if FUSION_SCRIPRING
 #define ALL_COMPONENTS NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent, MaterialComponent, ScriptComponent, RigidbodyComponent, BoxColliderComponent, CapsuleColliderComponent, MeshColliderComponent, SphereColliderComponent, PhysicsMaterialComponent
+#else
+#define ALL_COMPONENTS NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent, MaterialComponent, RigidbodyComponent, BoxColliderComponent, CapsuleColliderComponent, MeshColliderComponent, SphereColliderComponent, PhysicsMaterialComponent
+#endif
 namespace fe {
     template<typename... Component>
     struct ComponentGroup {
