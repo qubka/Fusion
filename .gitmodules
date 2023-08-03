@@ -106,6 +106,8 @@
 [submodule "external/gsl"]
 	path = external/gsl
 	url = https://github.com/microsoft/GSL
+	ignore = all
 [submodule "external/assimp"]
 	path = external/assimp
 	url = https://github.com/assimp/assimp
+	ignore = all

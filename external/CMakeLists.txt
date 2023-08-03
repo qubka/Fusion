@@ -278,7 +278,7 @@ list(APPEND ALL_LIBS physfs-static)
 
 #assimp
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-find_package(assimp REQUIRED)
+find_package(assimp QUIET)
 if(NOT assimp_FOUND)
     include_directories(assimp/include)
     add_subdirectory(assimp)
