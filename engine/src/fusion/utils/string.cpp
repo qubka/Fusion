@@ -3,10 +3,11 @@
 #if FUSION_PLATFORM_WINDOWS
 #include <windows.h>
 #include <dbghelp.h>
-#include <codecvt>
 #else
 #include <cxxabi.h> // __cxa_demangle()
 #endif
+
+#include <codecvt>
 
 using namespace fe;
 

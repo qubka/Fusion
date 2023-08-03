@@ -17,6 +17,10 @@
 #include <binary_fonts/RobotoRegular.inl>
 #include <binary_fonts/RobotoBold.inl>
 
+#if FUSION_PLATFORM_ANDROID
+#include "platform/android/android.h"
+#endif
+
 using namespace fe;
 
 ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
@@ -42,13 +46,13 @@ ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
 
 #if FUSION_PLATFORM_ANDROID
     // Screen density
-    if (android::screenDensity >= ACONFIGURATION_DENSITY_XXXHIGH) {
+    if (fe::android::screenDensity >= ACONFIGURATION_DENSITY_XXXHIGH) {
         fontScale = 4.5f;
-    } else if (android::screenDensity >= ACONFIGURATION_DENSITY_XXHIGH) {
+    } else if (fe::android::screenDensity >= ACONFIGURATION_DENSITY_XXHIGH) {
         fontScale = 3.5f;
-    } else if (android::screenDensity >= ACONFIGURATION_DENSITY_XHIGH) {
+    } else if (fe::android::screenDensity >= ACONFIGURATION_DENSITY_XHIGH) {
         fontScale = 2.5f;
-    } else if (android::screenDensity >= ACONFIGURATION_DENSITY_HIGH) {
+    } else if (fe::android::screenDensity >= ACONFIGURATION_DENSITY_HIGH) {
         fontScale = 2.0f;
     };
     LOG_DEBUG << "Android UI scale: " << fontScale;

@@ -40,7 +40,7 @@ if(ANDROID)
     add_library(app-glue STATIC ${APP_GLUE_DIR}/android_native_app_glue.c)
 endif()
 
-if(NOT WIN32)
+if(LINUX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
     link_libraries(${CMAKE_THREAD_LIBS_INIT})

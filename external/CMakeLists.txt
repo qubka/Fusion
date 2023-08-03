@@ -226,6 +226,10 @@ if(NOT ANDROID)
 	list(APPEND ALL_DIRS ${MONO_LIBRARY_DIRS})
 	list(APPEND ALL_INCS ${MONO_INCLUDE_DIRS})
 endif()
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # physx

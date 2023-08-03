@@ -33,7 +33,7 @@ std::unique_ptr<DeviceManager> DeviceManager::Init() {
         throw std::runtime_error("Device Manager already instantiated!");
 
 #if FUSION_PLATFORM_ANDROID
-    return std::make_unique<android::Devices>();
+    return std::make_unique<android::DeviceManager>();
 #elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_MAC
     return std::make_unique<glfw::DeviceManager>();
 #else

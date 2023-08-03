@@ -7,9 +7,11 @@ using namespace fe;
 #endif
 
 #if FUSION_PLATFORM_ANDROID
-AAssetManager* assetManager = nullptr;
-void setAssetManager(AAssetManager* assetManager) {
-    vkx::storage::assetManager = assetManager;
+namespace fe::android {
+	AAssetManager* AssetManager = nullptr;
+	void setAssetManager(AAssetManager* assetManager) {
+		AssetManager = assetManager;
+	}
 }
 #endif
 
@@ -85,10 +87,10 @@ private:
 FileStorage::FileStorage(const fs::path& filepath) {
 #if FUSION_PLATFORM_ANDROID
     // Load shader from compressed asset
-    asset = AAssetManager_open(assetManager, filepath.string().c_str(), AASSET_MODE_BUFFER);
+    asset = AAssetManager_open(fe::android::AssetManager, filepath.string().c_str(), AASSET_MODE_BUFFER);
     if (!asset)
         throw std::runtime_error("File " + filepath.string() + " could not be opened");
-    buffer = { static_cast<std::byte*>(AAsset_getBuffer(asset)), AAsset_getLength(asset) };
+    buffer = { (std::byte*)AAsset_getBuffer(asset), static_cast<size_t>(AAsset_getLength(asset)) };
     if (!buffer.data())
         throw std::runtime_error("File " + filepath.string() + " is invalid");
 #elif FUSION_PLATFORM_WINDOWS

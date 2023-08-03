@@ -1,9 +1,10 @@
 #pragma once
 
-namespace fe {
 #if FUSION_PLATFORM_ANDROID
-    void setAssetManager(AAssetManager* assetManager);
+#include <android/asset_manager.h>
 #endif
+
+namespace fe {
     class Storage;
     using StoragePointer = std::shared_ptr<const Storage>;
     using ByteArray = std::vector<uint8_t>;
@@ -24,4 +25,10 @@ namespace fe {
         static StoragePointer Create(gsl::span<const std::byte> buffer);
         static StoragePointer ReadFile(const fs::path& filename);
     };
+	
+#if FUSION_PLATFORM_ANDROID
+	namespace android {
+		void setAssetManager(AAssetManager* assetManager);
+	}
+#endif
 }
