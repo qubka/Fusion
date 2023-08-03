@@ -5,6 +5,7 @@
 namespace fe {
     struct ScriptComponent {
         std::string className;
+#if FUSION_SCRIPTING
         ScriptFieldMap fields;
 
         std::shared_ptr<ScriptInstance> instance;
@@ -14,5 +15,6 @@ namespace fe {
             archive(cereal::make_nvp("className", className));
             archive(cereal::make_nvp("fields", fields));
         }
+#endif
     };
 }

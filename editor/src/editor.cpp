@@ -392,12 +392,14 @@ void Editor::drawMenuBar() {
             ImGui::EndMenu();
         }
 
+#if FUSION_SCRIPTING
         if (ImGui::BeginMenu("Script")) {
             if (ImGui::MenuItem("Reload assembly", "Ctrl+T"))
                 ScriptEngine::Get()->reloadAssembly();
 
             ImGui::EndMenu();
         }
+#endif
 
         if (ImGui::BeginMenu("Panels")) {
             for (auto& panel : panels) {

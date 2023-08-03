@@ -72,7 +72,8 @@ namespace ImGui {
         ImGui::Separator();
         ImGui::PopStyleVar();
     }
-    
+
+#if FUSION_SCRIPTING
     namespace Widget {
         template<typename T>
         inline void SetFieldProperty(ScriptInstance& scriptInstance, const std::string& name) {
@@ -337,6 +338,7 @@ namespace ImGui {
         ImGui::Separator();
         ImGui::PopStyleVar();
     }
+#endif
 
     template<>
     void ComponentEditorWidget<MeshComponent>(entt::registry& registry, entt::registry::entity_type entity) {

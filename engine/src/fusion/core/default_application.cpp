@@ -213,12 +213,13 @@ void DefaultApplication::showConsole() {
 }
 
 void DefaultApplication::onProjectLoad() {
+#if FUSION_SCRIPTING
     if (!projectSettings.scriptModulePath.empty()) {
         auto scriptEngine = ScriptEngine::Get();
         scriptEngine->setAssemblyPaths("engine/assets/scripts/Fusion-ScriptCore.dll", projectSettings.projectRoot / projectSettings.scriptModulePath);
         scriptEngine->reloadAssembly();
     }
-
+#endif
     AssetRegistry::Get()->releaseAll();
 
     projectLoaded = true;
