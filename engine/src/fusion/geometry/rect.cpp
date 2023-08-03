@@ -2,7 +2,7 @@
 
 using namespace fe;
 
-Rect::Rect(std::span<const glm::vec2> points) {
+Rect::Rect(gsl::span<const glm::vec2> points) {
     x1 = FLT_MAX;
     x2 = -FLT_MAX;
     y1 = FLT_MAX;
@@ -230,7 +230,7 @@ void Rect::include(const glm::vec2& point) {
     if (y2 < point.y) y2 = point.y;
 }
 
-void Rect::include(std::span<const glm::vec2> points) {
+void Rect::include(gsl::span<const glm::vec2> points) {
     for (const auto& point : points)
         include(point);
 }

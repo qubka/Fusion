@@ -22,7 +22,7 @@ VkDescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(const VkDesc
     uint32_t lastBinding = UINT32_MAX;
 
     // Copy from the direct info struct into our own one
-    for (const auto& [i, binding] : enumerate(std::span(info.pBindings, info.bindingCount))) {
+    for (const auto& [i, binding] : enumerate(gsl::span(info.pBindings, info.bindingCount))) {
         layoutInfo.bindings.push_back(binding);
 
         // Check that the bindings are in strict increasing order

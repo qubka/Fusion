@@ -61,7 +61,7 @@ namespace fe {
          * @return A string that consists of the elements of values delimited by the separator string.
          * @link https://programming-idioms.org/idiom/53/join-a-list-of-strings/1552/cpp
          */
-        static std::string Join(std::span<const std::string> strings, std::string_view separator);
+        static std::string Join(gsl::span<const std::string> strings, std::string_view separator);
 
         /**
          * Gets if a string starts with a token.

@@ -28,7 +28,7 @@ VkPipelineLayout PipelineLayoutCache::createPipelineLayout(const VkPipelineLayou
     uint32_t lastOffset = UINT32_MAX;
 
     // Copy from the direct info struct into our own one
-    for (const auto& [i, pushConstant] : enumerate(std::span(info.pPushConstantRanges, info.pushConstantRangeCount))) {
+    for (const auto& [i, pushConstant] : enumerate(gsl::span(info.pPushConstantRanges, info.pushConstantRangeCount))) {
         layoutInfo.pushConstants.push_back(pushConstant);
 
         // Check that the offsets are in strict increasing order

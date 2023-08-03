@@ -5,7 +5,7 @@ namespace fe {
     public:
         //! Initializes the rectangle to be the bounding box of \a points
         Rect(float x1, float y1, float x2, float y2);
-        explicit Rect(std::span<const glm::vec2> points);
+        explicit Rect(gsl::span<const glm::vec2> points);
         explicit Rect(const glm::vec2& v1, const glm::vec2& v2);
 
         void set(float x1, float y1, float x2, float y2);
@@ -80,7 +80,7 @@ namespace fe {
         /** Expands the Rect to include \a point in its interior **/
         void include(const glm::vec2& point);
         /** Expands the Rect to include all points in \a points in its interior **/
-        void include(std::span<const glm::vec2> points);
+        void include(gsl::span<const glm::vec2> points);
         /** Expands the Rect to include \a rect in its interior **/
         void include(const Rect& rect);
 

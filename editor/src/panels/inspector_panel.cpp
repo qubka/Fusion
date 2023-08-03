@@ -640,7 +640,7 @@ void InspectorPanel::onImGui() {
         std::string name{ nameComponent ? *nameComponent : std::to_string(entt::to_integral(selected)) };
 
         if (debugMode) {
-            ImGui::Text("ID: %d", static_cast<std::underlying_type_t<entt::entity>>(selected));
+            ImGui::Text("ID: %d", entt::to_integral(selected));
         }
 
         ImGui::SameLine();
@@ -673,12 +673,12 @@ void InspectorPanel::onImGui() {
         ImGui::Separator();
 
         if (debugMode) {
-            ImGui::Text("ID: %s", std::to_string(static_cast<std::underlying_type_t<entt::entity>>(selected)).c_str());
+            ImGui::Text("ID: %d", entt::to_integral(selected));
 
             if (auto hierarchyComponent = registry.try_get<HierarchyComponent>(selected)) {
                 auto parent = hierarchyComponent->parent;
                 if (parent != entt::null) {
-                    ImGui::Text("Parent : ID: %d", static_cast<std::underlying_type_t<entt::entity>>(parent));
+                    ImGui::Text("Parent : ID: %d", entt::to_integral(parent));
                     if (auto nameComponent = registry.try_get<NameComponent>(parent)) {
                         ImGui::SameLine();
                         ImGui::Text(" (%s)", nameComponent->name.c_str());
@@ -693,7 +693,7 @@ void InspectorPanel::onImGui() {
 
                 auto child = hierarchyComponent->first;
                 while (child != entt::null) {
-                    ImGui::Text("ID: %d", static_cast<std::underlying_type_t<entt::entity>>(child));
+                    ImGui::Text("ID: %d", entt::to_integral(child));
                     if (auto nameComponent = registry.try_get<NameComponent>(child)) {
                         ImGui::SameLine();
                         ImGui::Text(" (%s)", nameComponent->name.c_str());

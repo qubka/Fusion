@@ -20,7 +20,7 @@ namespace fe {
         operator bool() const { return data.operator bool(); }
 
         template<typename T>
-        operator std::span<const T>() const { return { getData<T>(), getLength() }; }
+        operator gsl::span<const T>() const { return { getData<T>(), getLength() }; }
 
         int getWidth() const { return static_cast<int>(size.x); }
         int getHeight() const { return static_cast<int>(size.y); }

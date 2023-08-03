@@ -15,7 +15,7 @@ void setAssetManager(AAssetManager* assetManager) {
 
 class ViewStorage : public Storage {
 public:
-    ViewStorage(const StoragePointer& owner, std::span<const std::byte> buffer)
+    ViewStorage(const StoragePointer& owner, gsl::span<const std::byte> buffer)
         : owner{owner}
         , buffer{buffer} {
     }
@@ -26,12 +26,12 @@ public:
 
 private:
     StoragePointer owner;
-    std::span<const std::byte> buffer;
+    gsl::span<const std::byte> buffer;
 };
 
 class MemoryStorage : public Storage {
 public:
-    explicit MemoryStorage(std::span<const std::byte> data)
+    explicit MemoryStorage(gsl::span<const std::byte> data)
         : buffer(data.size()) {
         if (data.data()) {
             std::memcpy(buffer.data(), data.data(), data.size());
@@ -68,10 +68,10 @@ public:
     size_t size() const override { return buffer.size(); }
     bool isFast() const override { return false; }
 
-    static StoragePointer Create(std::span<const std::byte> buffer);
+    static StoragePointer Create(gsl::span<const std::byte> buffer);
 
 private:
-    std::span<const std::byte> buffer;
+    gsl::span<const std::byte> buffer;
 #if FUSION_PLATFORM_ANDROID
     AAsset* asset{ nullptr };
 #elif FUSION_PLATFORM_WINDOWS
@@ -118,7 +118,7 @@ FileStorage::~FileStorage() {
 }
 #endif
 
-StoragePointer Storage::Create(std::span<const std::byte> buffer)  {
+StoragePointer Storage::Create(gsl::span<const std::byte> buffer)  {
     return std::make_shared<MemoryStorage>(buffer);
 }
 

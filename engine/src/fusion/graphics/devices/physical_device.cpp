@@ -38,7 +38,7 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, uint32_t desiredDeviceI
     LOG_DEBUG << "Selected Physical Device: [" << properties.deviceID << "] \"" << properties.deviceName << "\"";
 }
 
-VkPhysicalDevice PhysicalDevice::ChoosePhysicalDevice(std::span<const VkPhysicalDevice> devices) {
+VkPhysicalDevice PhysicalDevice::ChoosePhysicalDevice(gsl::span<const VkPhysicalDevice> devices) {
     // Maps to hold devices and sort by rank.
     std::multimap<uint32_t, VkPhysicalDevice> rankedDevices;
     auto where = rankedDevices.end();
@@ -182,7 +182,7 @@ void PhysicalDevice::findQueueFamilyIndices() {
     }
 }
 
-void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalDeviceProperties, std::span<const VkExtensionProperties> extensionProperties) {
+void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalDeviceProperties, gsl::span<const VkExtensionProperties> extensionProperties) {
     std::stringstream ss;
     switch (static_cast<int32_t>(physicalDeviceProperties.deviceType)) {
         case 1:

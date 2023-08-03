@@ -71,7 +71,7 @@ namespace fe {
          * @param features The features to test for.
          * @return The format found, or VK_FORMAT_UNDEFINED.
          */
-        static VkFormat FindSupportedFormat(std::span<const VkFormat> candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+        static VkFormat FindSupportedFormat(gsl::span<const VkFormat> candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
         /**
          * Gets if a format has a depth component.

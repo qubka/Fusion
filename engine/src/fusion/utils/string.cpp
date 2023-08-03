@@ -3,6 +3,7 @@
 #if FUSION_PLATFORM_WINDOWS
 #include <windows.h>
 #include <dbghelp.h>
+#include <codecvt>
 #else
 #include <cxxabi.h> // __cxa_demangle()
 #endif
@@ -45,7 +46,7 @@ std::vector<std::string> String::Split(const std::string& str, char sep) {
     return tokens;
 }
 
-std::string String::Join(std::span<const std::string> strings, std::string_view separator) {
+std::string String::Join(gsl::span<const std::string> strings, std::string_view separator) {
     switch (strings.size()) {
         case 0: return {};
         case 1: return strings.front();

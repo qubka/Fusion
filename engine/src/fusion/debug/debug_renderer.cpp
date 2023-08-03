@@ -124,13 +124,13 @@ void DebugRenderer::DrawTriangleNDT(const glm::vec3& v0, const glm::vec3& v1, co
 }
 
 // Draw Polygon (Renders as a triangle fan, so verts must be arranged in order)
-void DebugRenderer::DrawPolygon(std::span<const glm::vec3> verts, const glm::vec4& color) {
+void DebugRenderer::DrawPolygon(gsl::span<const glm::vec3> verts, const glm::vec4& color) {
     for (int i = 2; i < verts.size(); ++i) {
         GenDrawTriangle(false, verts[0], verts[i - 1], verts[i], color);
     }
 }
 
-void DebugRenderer::DrawPolygonNDT(std::span<const glm::vec3> verts, const glm::vec4& color) {
+void DebugRenderer::DrawPolygonNDT(gsl::span<const glm::vec3> verts, const glm::vec4& color) {
     for (int i = 2; i < verts.size(); ++i) {
         GenDrawTriangle(true, verts[0], verts[i - 1], verts[i], color);
     }

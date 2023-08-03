@@ -45,8 +45,9 @@ void ConsolePanel::AddMessage(std::unique_ptr<Message>&& message) {
     auto messageStart = MessageBuffer.begin() + MessageBufferBegin;
     if (*messageStart) { // If contains old message here
         for (auto it = messageStart; it != MessageBuffer.end(); it++) {
-            if (message->getMessageID() == (*it)->getMessageID()) {
-                (*it)->increaseCount();
+            auto& msg = *it;
+            if (message->getMessageID() == msg->getMessageID()) {
+                msg->increaseCount();
                 return;
             }
         }
@@ -54,9 +55,10 @@ void ConsolePanel::AddMessage(std::unique_ptr<Message>&& message) {
 
     if (MessageBufferBegin != 0) {
         for (auto it = MessageBuffer.begin(); it != messageStart; it++) {
-            if (*it) {
-                if (message->getMessageID() == (*it)->getMessageID()) {
-                    (*it)->increaseCount();
+            auto& msg = *it;
+            if (msg) {
+                if (message->getMessageID() == msg->getMessageID()) {
+                    msg->increaseCount();
                     return;
                 }
             }
@@ -167,25 +169,27 @@ void ConsolePanel::renderMessages() {
         auto messageStart = MessageBuffer.begin() + MessageBufferBegin;
         if (*messageStart) {// If contains old message here
             for (auto it = messageStart; it != MessageBuffer.end(); it++) {
+                auto& msg = *it;
                 if (Filter.IsActive()) {
-                    if (Filter.PassFilter((*it)->message.c_str())) {
-                        (*it)->onImGui();
+                    if (Filter.PassFilter(msg->message.c_str())) {
+                        msg->onImGui();
                     }
                 } else {
-                    (*it)->onImGui();
+                    msg->onImGui();
                 }
             }
         }
 
         if (MessageBufferBegin != 0) { // Skipped first messages in vector
             for (auto it = MessageBuffer.begin(); it != messageStart; it++) {
-                if (*it) {
+                auto& msg = *it;
+                if (msg) {
                     if (Filter.IsActive()) {
-                        if (Filter.PassFilter((*it)->message.c_str())) {
-                            (*it)->onImGui();
+                        if (Filter.PassFilter(msg->message.c_str())) {
+                            msg->onImGui();
                         }
                     } else {
-                        (*it)->onImGui();
+                        msg->onImGui();
                     }
                 }
             }

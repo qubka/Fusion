@@ -187,7 +187,7 @@ void Window::setCursor(const fe::Cursor* cursor) {
     glfwSetCursor(window, cursor ? static_cast<GLFWcursor*>(cursor->getNativeCursor()) : nullptr);
 }
 
-void Window::setIcons(std::span<const fs::path> filepaths) {
+void Window::setIcons(gsl::span<const fs::path> filepaths) {
     std::vector<std::unique_ptr<fe::Bitmap>> bitmaps;
     bitmaps.reserve(filepaths.size());
 

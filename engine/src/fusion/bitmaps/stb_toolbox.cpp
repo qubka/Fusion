@@ -18,13 +18,13 @@ void StbToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
 
     std::string extension{ FileSystem::GetExtension(filepath) };
     if (extension == ".hdr") {
-        FileSystem::ReadBytes(filepath, [&](std::span<const std::byte> buffer) {
+        FileSystem::ReadBytes(filepath, [&](gsl::span<const std::byte> buffer) {
             pixels = std::unique_ptr<std::byte[]>(reinterpret_cast<std::byte*>(
                     stbi_loadf_from_memory(reinterpret_cast<const stbi_uc*>(buffer.data()), static_cast<int>(buffer.size()), &width, &height, &channels, desired_channels)));
         });
         hdr = true;
     } else {
-        FileSystem::ReadBytes(filepath, [&](std::span<const std::byte> buffer) {
+        FileSystem::ReadBytes(filepath, [&](gsl::span<const std::byte> buffer) {
             pixels = std::unique_ptr<std::byte[]>(reinterpret_cast<std::byte*>(
                     stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(buffer.data()), static_cast<int>(buffer.size()), &width, &height, &channels, desired_channels)));
         });

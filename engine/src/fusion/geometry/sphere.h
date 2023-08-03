@@ -26,7 +26,7 @@ namespace fe {
         glm::vec3 closestPoint(const Ray& ray) const;
 
         //! Generate \c sphere from the given sequence of \a points.
-        static Sphere CalculateBoundingSphere(std::span<const glm::vec3> points);
+        static Sphere CalculateBoundingSphere(gsl::span<const glm::vec3> points);
 
         //! Converts sphere to another coordinate system. Note that it will not return correct results if there are non-uniform scaling, shears, or other unusual transforms in \a transform.
         void transform(const glm::mat4& transform);

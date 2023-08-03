@@ -40,8 +40,10 @@ namespace fs = std::filesystem;
 
 #if __cplusplus >= 202002L
 #include <span>
+#elif _WIN32
+#include <gsl/span>
 #else
-#define TCB_SPAN_NAMESPACE_NAME std
+#define TCB_SPAN_NAMESPACE_NAME gsl
 #include <tcb/span.hpp>
 #endif
 

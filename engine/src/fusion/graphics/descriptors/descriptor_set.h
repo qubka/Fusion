@@ -8,7 +8,7 @@ namespace fe {
         explicit DescriptorSet(const Pipeline& pipeline);
         ~DescriptorSet();
 
-        static void updateDescriptor(std::span<const VkWriteDescriptorSet> descriptorWrites);
+        static void updateDescriptor(gsl::span<const VkWriteDescriptorSet> descriptorWrites);
         void bindDescriptor(const CommandBuffer& commandBuffer, const Pipeline& pipeline) const;
 
         operator bool() const { return descriptorSet != VK_NULL_HANDLE; }

@@ -4,7 +4,7 @@
 #include "fusion/filesystem/file_system.h"
 #include "fusion/core/engine.h"
 #include "fusion/scene/scene.h"
-#include "fusion/scene/components/script_component.h"
+#include "fusion/scene/components.h"
 #include "fusion/scene/scene_manager.h"
 #include "fusion/core/module.h"
 
@@ -45,7 +45,7 @@ namespace Utils {
         MonoImageOpenStatus status;
         MonoImage* image = nullptr;
 
-        FileSystem::ReadBytes(assemblyPath, [&](std::span<const std::byte> buffer) {
+        FileSystem::ReadBytes(assemblyPath, [&](gsl::span<const std::byte> buffer) {
             image = mono_image_open_from_data_full((char*) buffer.data(), buffer.size(), 1, &status, 0);
         });
 
@@ -60,7 +60,7 @@ namespace Utils {
             pdbPath.replace_extension(".pdb");
 
             if (fs::exists(pdbPath)) {
-                FileSystem::ReadBytes(pdbPath, [&](std::span<const std::byte> buffer) {
+                FileSystem::ReadBytes(pdbPath, [&](gsl::span<const std::byte> buffer) {
                     mono_debug_open_image_from_memory(image, reinterpret_cast<const mono_byte*>(buffer.data()), static_cast<int>(buffer.size()));
                     LOG_INFO << "Loaded PDB:" << pdbPath;
                 });
@@ -254,8 +254,9 @@ void ScriptEngine::onCreateEntity(entt::entity entity, ScriptComponent& script) 
         auto instance = std::make_shared<ScriptInstance>(scriptClass, entity);
 
         // Copy field values
-        for (const auto& [name, fieldInstance] : script.fields)
+        for (const auto& [name, fieldInstance] : script.fields) {
             instance->setFieldValueInternal(name, fieldInstance.buffer);
+        }
 
         instance->invokeOnCreate();
 
@@ -268,7 +269,7 @@ void ScriptEngine::onUpdateEntity() {
         return;
 
     auto& registry = sceneContext->getRegistry();
-    auto view = registry.view<ScriptComponent>();
+    auto view = registry.view<ScriptComponent>(entt::exclude<ActiveComponent>);
     for (auto [entity, script] : view.each()) {
         script.instance->invokeOnUpdate(Time::DeltaTime().asSeconds());
     }

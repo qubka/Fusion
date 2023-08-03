@@ -203,7 +203,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
         auto scene = SceneManager::Get()->getScene();
         auto hierarchySystem = scene->getSystem<HierarchySystem>();
 
-        ImGui::PushID(static_cast<int>(node));
+        ImGui::PushID(static_cast<int>(entt::to_integral(node)));
         auto hierarchyComponent = registry.try_get<HierarchyComponent>(node);
         bool hasChildren = (hierarchyComponent != nullptr && hierarchyComponent->children > 0); // hierarchySystem->hasChildren(node)
 

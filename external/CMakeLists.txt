@@ -1,6 +1,6 @@
 # Used to track if we're using ONLY system libs
 # Prevents errors with EXPORT
-set(ALL_SYSTEM_LIBS)
+set(ALL_LIBS)
 
 # vulkan
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
@@ -12,7 +12,7 @@ else()
     set(VOLK_STATIC_DEFINES VK_USE_PLATFORM_XCB_KHR)
 endif()
 add_subdirectory(volk)
-list(APPEND ALL_SYSTEM_LIBS volk)
+list(APPEND ALL_LIBS volk)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # tracy
@@ -21,20 +21,22 @@ find_package(tracy QUIET)
 if(NOT tracy_FOUND)
     add_subdirectory(tracy)
 endif()
-list(APPEND ALL_SYSTEM_LIBS TracyClient)
+list(APPEND ALL_LIBS TracyClient)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # glfw
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-find_package(glfw QUIET)
-if(NOT glfw_FOUND)
-    foreach(_glfw_option "GLFW_BUILD_TESTS" "GLFW_BUILD_EXAMPLES" "GLFW_BUILD_DOCS" "GLFW_INSTALL")
-        set(${_glfw_option} OFF CACHE INTERNAL "")
-    endforeach()
+if(NOT ANDROID)
+    find_package(glfw QUIET)
+    if(NOT glfw_FOUND)
+        foreach(_glfw_option "GLFW_BUILD_TESTS" "GLFW_BUILD_EXAMPLES" "GLFW_BUILD_DOCS" "GLFW_INSTALL")
+            set(${_glfw_option} OFF CACHE INTERNAL "")
+        endforeach()
 
-    add_subdirectory(glfw)
+        add_subdirectory(glfw)
+    endif()
+    list(APPEND ALL_LIBS glfw)
 endif()
-list(APPEND ALL_SYSTEM_LIBS glfw)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # plog
@@ -44,18 +46,28 @@ if(NOT plog_FOUND)
     set(PLOG_BUILD_SAMPLES OFF CACHE INTERNAL "")
     add_subdirectory(plog)
 endif()
-list(APPEND ALL_SYSTEM_LIBS plog)
+list(APPEND ALL_LIBS plog)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # span
 #╒◖═════════════════════════════════════════════════════════════════════◗╕
-find_package(span QUIET)
-if(NOT span_FOUND)
-    add_library(span INTERFACE)
+if(WIN32)
+    find_package(GSL QUIET)
+    if(NOT GSL_FOUND)
+        add_library(gsl INTERFACE)
 
-    target_include_directories(span INTERFACE span/include)
+        target_include_directories(gsl INTERFACE gsl/include)
+    endif()
+    list(APPEND ALL_LIBS gsl)
+else() # May be remove ?
+    find_package(span QUIET)
+    if(NOT span_FOUND)
+        add_library(span INTERFACE)
+
+        target_include_directories(span INTERFACE span/include)
+    endif()
+    list(APPEND ALL_LIBS span)
 endif()
-list(APPEND ALL_SYSTEM_LIBS span)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # glm
@@ -67,7 +79,7 @@ if(NOT glm_FOUND)
     target_include_directories(glm INTERFACE glm/)
     target_compile_definitions(glm INTERFACE GLM_FORCE_DEPTH_ZERO_TO_ONE)
 endif()
-list(APPEND ALL_SYSTEM_LIBS glm)
+list(APPEND ALL_LIBS glm)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # gli
@@ -78,7 +90,7 @@ if(NOT gli_FOUND)
 
     target_include_directories(gli INTERFACE gli/)
 endif()
-list(APPEND ALL_SYSTEM_LIBS gli)
+list(APPEND ALL_LIBS gli)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # entt
@@ -89,7 +101,7 @@ if(NOT entt_FOUND)
 
     target_include_directories(entt INTERFACE entt/src)
 endif()
-list(APPEND ALL_SYSTEM_LIBS entt)
+list(APPEND ALL_LIBS entt)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # bitmask
@@ -100,7 +112,7 @@ if(NOT bitmask_FOUND)
 
     target_include_directories(bitmask INTERFACE bitmask/include)
 endif()
-list(APPEND ALL_SYSTEM_LIBS bitmask)
+list(APPEND ALL_LIBS bitmask)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # magic_enum
@@ -111,7 +123,7 @@ if(NOT magic_enum_FOUND)
 
     target_include_directories(magic_enum INTERFACE magic_enum/include)
 endif()
-list(APPEND ALL_SYSTEM_LIBS magic_enum)
+list(APPEND ALL_LIBS magic_enum)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # stb
@@ -122,7 +134,7 @@ if(NOT Stb_FOUND)
 
     target_include_directories(stb INTERFACE stb/)
 endif()
-list(APPEND ALL_SYSTEM_LIBS stb)
+list(APPEND ALL_LIBS stb)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # freetype
@@ -136,7 +148,7 @@ if(NOT Freetype_FOUND)
 
     add_subdirectory(freetype)
 endif()
-list(APPEND ALL_SYSTEM_LIBS freetype)
+list(APPEND ALL_LIBS freetype)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # random
@@ -145,7 +157,7 @@ list(APPEND ALL_SYSTEM_LIBS freetype)
 if(NOT random_FOUND)
     add_subdirectory(random)
 endif()
-list(APPEND ALL_SYSTEM_LIBS effolkronium_random)
+list(APPEND ALL_LIBS effolkronium_random)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # meshoptimizer
@@ -154,7 +166,7 @@ find_package(meshoptimizer QUIET)
 if(NOT meshoptimizer_FOUND)
     add_subdirectory(meshoptimizer)
 endif()
-list(APPEND ALL_SYSTEM_LIBS meshoptimizer)
+list(APPEND ALL_LIBS meshoptimizer)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # glslang
@@ -189,7 +201,7 @@ if(NOT glslang_FOUND)
     set_target_properties(OSDependent PROPERTIES FOLDER ${GLSLANG_LIB_NAME})
     set_target_properties(SPIRV PROPERTIES FOLDER ${GLSLANG_LIB_NAME})
 endif()
-list(APPEND ALL_SYSTEM_LIBS glslang SPIRV)
+list(APPEND ALL_LIBS glslang SPIRV)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # cereal
@@ -202,7 +214,17 @@ if(NOT cereal_FOUND)
 
     add_subdirectory(cereal)
 endif()
-list(APPEND ALL_SYSTEM_LIBS cereal)
+list(APPEND ALL_LIBS cereal)
+#╘◖═════════════════════════════════════════════════════════════════════◗╛
+
+# mono
+#╒◖═════════════════════════════════════════════════════════════════════◗╕
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(MONO REQUIRED mono-2)
+list(APPEND ALL_LIBS ${MONO_LIBRARIES})
+list(APPEND ALL_DIRS ${MONO_LIBRARY_DIRS})
+list(APPEND ALL_INCS ${MONO_INCLUDE_DIRS})
+
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # physx
@@ -219,7 +241,7 @@ list(APPEND ALL_SYSTEM_LIBS cereal)
 #            # SnippetUtils
 #            )
 
-#list(APPEND ALL_SYSTEM_LIBS ${PHYSX_LIBRARIES})
+#list(APPEND ALL_LIBS ${PHYSX_LIBRARIES})
 
 #find_package(PhysX 4.1.1 QUIET COMPONENTS PHYSX_LIBRARIES)
 
@@ -241,7 +263,7 @@ if(NOT PhysFS_FOUND)
 
     add_subdirectory(physfs)
 endif()
-list(APPEND ALL_SYSTEM_LIBS physfs-static)
+list(APPEND ALL_LIBS physfs-static)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # lz4
@@ -250,7 +272,7 @@ list(APPEND ALL_SYSTEM_LIBS physfs-static)
 #if(NOT LZ4_FOUND)
 #    add_subdirectory(lz4/build/cmake/)
 #endif()
-#list(APPEND ALL_SYSTEM_LIBS lz4)
+#list(APPEND ALL_LIBS lz4)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 #assimp
@@ -260,7 +282,7 @@ if(NOT assimp_FOUND)
     include_directories(assimp/include)
     add_subdirectory(assimp)
 endif()
-list(APPEND ALL_SYSTEM_LIBS assimp)
+list(APPEND ALL_LIBS assimp)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
 # imgui and plugins
@@ -320,7 +342,9 @@ target_include_directories(imgui
         #"${GLAD_INC_PATH}"
         )
 
-list(APPEND ALL_SYSTEM_LIBS imgui)
+list(APPEND ALL_LIBS imgui)
 #╘◖═════════════════════════════════════════════════════════════════════◗╛
 
-set(FUSION_ALL_SYSTEM_LIBS ${ALL_SYSTEM_LIBS} CACHE INTERNAL "")
+set(FUSION_LINK_LIBS ${ALL_LIBS} CACHE INTERNAL "")
+set(FUSION_LIBRARY_DIRS ${ALL_DIRS} CACHE INTERNAL "")
+set(FUSION_INCLUDE_DIRS ${ALL_INCS} CACHE INTERNAL "")

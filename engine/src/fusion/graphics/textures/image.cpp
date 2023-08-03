@@ -74,7 +74,7 @@ uint32_t Image::GetMipLevels(const VkExtent3D& extent) {
 	return static_cast<uint32_t>(glm::floor(std::log2(glm::max(extent.width, glm::max(extent.height, extent.depth)))) + 1);
 }
 
-VkFormat Image::FindSupportedFormat(std::span<const VkFormat> candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
+VkFormat Image::FindSupportedFormat(gsl::span<const VkFormat> candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
 	
 	for (const auto& format : candidates) {

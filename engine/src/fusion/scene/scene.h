@@ -94,7 +94,7 @@ namespace fe {
          * Gets if the scene is in runtime.
          * @return If the scene is in runtime.
          */
-        bool isRuntime() const { return runtime; }
+        bool isRuntime() const { return started && runtime; }
 
         /**
          * Creates an entity with default components.

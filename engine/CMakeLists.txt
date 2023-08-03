@@ -14,18 +14,11 @@ file(GLOB_RECURSE SRC_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/fusion/*.c
 file(GLOB_RECURSE HDR_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/fusion/*.h" "src/platform/${PLATFORM_FOLDER}/*.h")
 set(PCH_FILE "src/pch.h")
 
-# mono-2.0
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(MONO REQUIRED mono-2)
-#set(${MONO_LIBRARIES} mono-2.0 ws2_32 psapi ole32 winmm oleaut32 advapi32 version)
-#set(${MONO_LIBRARY_DIRS} "C:/Program Files/Mono/lib")
-#set(${MONO_INCLUDE_DIRS} "C:/Program Files/Mono/include/mono-2.0")
-
 # create library and exectuable
 add_library(${PROJECT_NAME} STATIC ${SRC_FILES} ${HDR_FILES})
 target_precompile_headers(${PROJECT_NAME} PUBLIC ${PCH_FILE})
-target_include_directories(${PROJECT_NAME} PUBLIC "src" ${MONO_INCLUDE_DIRS})
-target_link_directories(${PROJECT_NAME} PRIVATE ${MONO_LIBRARY_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC "src" ${FUSION_INCLUDE_DIRS})
+target_link_directories(${PROJECT_NAME} PRIVATE ${FUSION_LIBRARY_DIRS})
 
 # copy all asset files to the binary directory of the engine
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
@@ -37,8 +30,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
         git-info
-        ${FUSION_ALL_SYSTEM_LIBS}
-        ${MONO_LIBRARIES}
+        ${FUSION_LINK_LIBS}
         )
 
 if(ANDROID)

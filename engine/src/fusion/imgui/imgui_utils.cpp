@@ -58,7 +58,7 @@ void PropertyText(const char* name, const char* value) {
     ImGui::NextColumn();
 }
 
-bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t& selected) {
+bool PropertyDropdown(const char* name, gsl::span<const char*> options, int32_t& selected) {
     bool updated = false;
 
     //ImGui::AlignTextToFramePadding();

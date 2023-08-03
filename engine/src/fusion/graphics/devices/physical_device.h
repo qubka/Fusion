@@ -26,13 +26,13 @@ namespace fe {
         const std::set<uint32_t>& getUniqueFamilies() const { return uniqueFamilies; };
 
     private:
-        static VkPhysicalDevice ChoosePhysicalDevice(std::span<const VkPhysicalDevice> devices);
+        static VkPhysicalDevice ChoosePhysicalDevice(gsl::span<const VkPhysicalDevice> devices);
         static uint32_t ScorePhysicalDevice(VkPhysicalDevice device);
 
         VkSampleCountFlagBits getMaxUsableSampleCount() const;
         void findQueueFamilyIndices();
 
-        static void LogVulkanDevice(const VkPhysicalDeviceProperties& physicalDeviceProperties, std::span<const VkExtensionProperties> extensionProperties);
+        static void LogVulkanDevice(const VkPhysicalDeviceProperties& physicalDeviceProperties, gsl::span<const VkExtensionProperties> extensionProperties);
 
         const Instance& instance;
 

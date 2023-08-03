@@ -499,7 +499,7 @@ namespace ImGuiUtils {
         return updated;
     }
 
-    bool PropertyDropdown(const char* name, std::span<const char*> options, int32_t& selected);
+    bool PropertyDropdown(const char* name, gsl::span<const char*> options, int32_t& selected);
     template<typename E, typename = std::enable_if_t<std::is_enum_v<E>>>
     bool PropertyDropdown(const char* name, E& value) {
         bool updated = false;

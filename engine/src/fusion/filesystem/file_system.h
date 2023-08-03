@@ -46,7 +46,7 @@ namespace fe {
          * @param filepath The path to read.
          * @param handler The lambda with data read from the file.
          */
-        static void ReadBytes(const fs::path& filepath, const std::function<void(std::span<const std::byte>)>& handler);
+        static void ReadBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler);
 
         /**
          * Opens a text file, reads all the text in the file into a string, and then closes the file.
@@ -61,7 +61,7 @@ namespace fe {
          * @param buffer The buffer data.
          * @return True on the success, false otherwise.
          */
-        static bool WriteBytes(const fs::path& filepath, std::span<const std::byte> buffer);
+        static bool WriteBytes(const fs::path& filepath, gsl::span<const std::byte> buffer);
 
         /**
          * Opens a file, write the text string into the file, and then closes the file.

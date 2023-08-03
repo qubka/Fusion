@@ -219,7 +219,7 @@ namespace fe {
          * Sets window icon images.
          * @param filepaths The new icon files.
          */
-        virtual void setIcons(std::span<const fs::path> filepaths) = 0;
+        virtual void setIcons(gsl::span<const fs::path> filepaths) = 0;
 
         /**
          * Gets the current state of a key.
@@ -506,7 +506,7 @@ namespace fe {
         entt::sigh<void(Key)> onKeyRelease{};
         entt::sigh<void(Key)> onKeyHold{};
         entt::sigh<void(uint32_t)> onCharInput{};
-        entt::sigh<void(std::span<const char*>)> onFileDrop{};
+        entt::sigh<void(gsl::span<const char*>)> onFileDrop{};
         entt::sigh<void(const glm::vec2 &)> onContentScale{};
         entt::sigh<void(bool)> onMaximize{};
     };

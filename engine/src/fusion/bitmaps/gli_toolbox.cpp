@@ -8,7 +8,7 @@ using namespace fe;
 
 void GliToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
     std::unique_ptr<gli::texture> texture;
-    FileSystem::ReadBytes(filepath, [&texture](std::span<const std::byte> buffer) {
+    FileSystem::ReadBytes(filepath, [&texture](gsl::span<const std::byte> buffer) {
         texture = std::make_unique<gli::texture>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
     });
 

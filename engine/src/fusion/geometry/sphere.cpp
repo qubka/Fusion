@@ -206,7 +206,7 @@ Sphere Sphere::transformed(const glm::mat4& transform) const {
     };
 }
 
-Sphere Sphere::CalculateBoundingSphere(std::span<const glm::vec3> points) {
+Sphere Sphere::CalculateBoundingSphere(gsl::span<const glm::vec3> points) {
     if (points.empty())
         return {};
 

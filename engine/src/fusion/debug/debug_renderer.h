@@ -41,8 +41,8 @@ namespace fe {
         static void DrawTriangleNDT(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec4& color = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});
 
         // Draw Polygon (Renders as a triangle fan, so verts must be arranged in order)
-        static void DrawPolygon(std::span<const glm::vec3> verts, const glm::vec4& color = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});
-        static void DrawPolygonNDT(std::span<const glm::vec3> verts, const glm::vec4& color = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});
+        static void DrawPolygon(gsl::span<const glm::vec3> verts, const glm::vec4& color = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});
+        static void DrawPolygonNDT(gsl::span<const glm::vec3> verts, const glm::vec4& color = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});
 
         static void DebugDraw(const AABB& box, const glm::vec4& edgeColour, bool cornersOnly = false, float width = 0.02f);
         static void DebugDraw(const Sphere& sphere, const glm::vec4& color);

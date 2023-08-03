@@ -34,7 +34,7 @@ namespace fe {
         }
 
         template<typename T, typename = std::enable_if_t<std::is_base_of_v<Asset, T>>>
-        std::unordered_map<fs::path, std::shared_ptr<Asset>>& getAssets() { return assets[type_id<T>]; }
+        std::unordered_map<fs::path, std::shared_ptr<Asset>, PathHash>& getAssets() { return assets[type_id<T>]; }
         const std::unordered_map<type_index, std::unordered_map<fs::path, std::shared_ptr<Asset>, PathHash>>& getAllAssets() const { return assets; }
 
         void releaseAll();
