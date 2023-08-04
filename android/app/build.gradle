@@ -1,60 +1,62 @@
-plugins {
-    id 'com.android.application'
-}
+/*
+ * Copyright (C) 2022 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
-    namespace 'com.fusion.sandbox'
     compileSdk 33
-
+    ndkVersion '25.1.8937393'
+    
     defaultConfig {
-        applicationId "com.fusion.sandbox"
-        minSdk 26
+        shaders {
+            glslcArgs.addAll(['-c'])
+        }
+        applicationId 'com.android.hellovk'
+        minSdk 30
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
-        ndk { abiFilter "x86_64" }
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-
-                cppFlags '-std=c++17'
-                arguments '-DANDROID_PLATFORM=android-26',
-                        '-DANDROID_TOOLCHAIN=clang',
-                        '-DANDROID_STL=c++_shared',
-                        '-DVULKAN_SDK=' + "$System.env.VULKAN_SDK"
+                // Available arguments are inside ${SDK}/cmake/.../android.toolchain.cmake file
+                arguments "-DANDROID_STL=c++_shared"
             }
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled = true
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
     externalNativeBuild {
         cmake {
-            path file('../../CMakeLists.txt')
-            version '3.22.1'
+            path 'src/main/cpp/CMakeLists.txt'
         }
     }
     buildFeatures {
-        viewBinding true
+        prefab true
     }
-    buildToolsVersion '33.0.1'
-    ndkVersion '25.1.8937393'
+    
+    namespace 'com.android.hellovk'
 }
 
 dependencies {
-
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'androidx.core:core:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.games:games-activity:1.2.2-alpha01'
 }
+
