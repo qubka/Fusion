@@ -9,7 +9,7 @@ namespace fe {
     /**
      * @brief Class that handles a pipeline push constant.
      */
-    class PushHandler {
+    class FUSION_API PushHandler {
     public:
         explicit PushHandler(bool multipipeline = false);
         explicit PushHandler(const Shader::UniformBlock& uniformBlock, bool multipipeline = false);

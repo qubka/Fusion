@@ -49,7 +49,7 @@ void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& 
     auto vtxDst = static_cast<ImDrawVert*>(vertexBuffer->getMappedMemory());
     auto idxDst = static_cast<ImDrawIdx*>(indexBuffer->getMappedMemory());
 
-    for (int i = 0; i < drawData->CmdListsCount; i++) {
+    for (int i = 0; i < drawData->CmdListsCount; ++i) {
         const ImDrawList* cmdList = drawData->CmdLists[i];
         std::memcpy(vtxDst, cmdList->VtxBuffer.Data, cmdList->VtxBuffer.Size * sizeof(ImDrawVert));
         std::memcpy(idxDst, cmdList->IdxBuffer.Data, cmdList->IdxBuffer.Size * sizeof(ImDrawIdx));
@@ -78,7 +78,7 @@ void ImGuiObject::cmdRender(const CommandBuffer& commandBuffer, const Pipeline& 
     ImVec2 clipScale{ drawData->FramebufferScale }; // (1,1) unless using retina display which are often (2,2)
 
     VkDescriptorSet lastSet = VK_NULL_HANDLE;
-    for (int i = 0; i < drawData->CmdListsCount; i++) {
+    for (int i = 0; i < drawData->CmdListsCount; ++i) {
         const ImDrawList* cmdLists = drawData->CmdLists[i];
         for (const auto& cmd : cmdLists->CmdBuffer) {
             if (cmd.TextureId) {

@@ -8,7 +8,7 @@
 
 namespace plog {
     template<class Formatter>
-    class EventConsoleAppender : public ColorConsoleAppender<Formatter> {
+    class FUSION_API EventConsoleAppender : public ColorConsoleAppender<Formatter> {
     public:
         void write(const Record& record) override{
             ColorConsoleAppender<Formatter>::write(record);// TODO: Create custom formatter
@@ -31,7 +31,7 @@ namespace plog {
 }
 
 namespace fe {
-    class Log {
+    class FUSION_API Log {
     public:
         static void Init();
 

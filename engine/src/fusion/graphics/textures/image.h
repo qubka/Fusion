@@ -8,7 +8,7 @@ namespace fe {
     /**
      * @brief A representation of a Vulkan image, sampler, and view.
      */
-    class Image : public Descriptor {
+    class FUSION_API Image : public Descriptor {
     public:
         Image() = default;
 

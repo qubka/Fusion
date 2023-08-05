@@ -3,7 +3,7 @@
 #include "bitmap_factory.h"
 
 namespace fe {
-    class Bitmap : public BitmapFactory<Bitmap> {
+    class FUSION_API Bitmap : public BitmapFactory<Bitmap> {
         friend class StbToolbox;
         friend class GliToolbox;
     public:

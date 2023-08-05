@@ -44,7 +44,7 @@ void ConsolePanel::AddMessage(std::unique_ptr<Message>&& message) {
 
     auto messageStart = MessageBuffer.begin() + MessageBufferBegin;
     if (*messageStart) { // If contains old message here
-        for (auto it = messageStart; it != MessageBuffer.end(); it++) {
+        for (auto it = messageStart; it != MessageBuffer.end(); ++it) {
             auto& msg = *it;
             if (message->getMessageID() == msg->getMessageID()) {
                 msg->increaseCount();
@@ -54,7 +54,7 @@ void ConsolePanel::AddMessage(std::unique_ptr<Message>&& message) {
     }
 
     if (MessageBufferBegin != 0) {
-        for (auto it = MessageBuffer.begin(); it != messageStart; it++) {
+        for (auto it = MessageBuffer.begin(); it != messageStart; ++it) {
             auto& msg = *it;
             if (msg) {
                 if (message->getMessageID() == msg->getMessageID()) {
@@ -78,7 +78,7 @@ void ConsolePanel::AddMessage(std::unique_ptr<Message>&& message) {
 
 void ConsolePanel::Flush() {
     for (auto& message : MessageBuffer)
-        message = nullptr;
+        message.reset();
     MessageBufferBegin = 0;
 }
 
@@ -127,7 +127,7 @@ void ConsolePanel::renderHeader() {
 
     ImGui::SameLine();
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; ++i) {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
         ImGui::SameLine();
         auto level = MessageLevel(glm::pow(2, i));
@@ -168,7 +168,7 @@ void ConsolePanel::renderMessages() {
 
         auto messageStart = MessageBuffer.begin() + MessageBufferBegin;
         if (*messageStart) {// If contains old message here
-            for (auto it = messageStart; it != MessageBuffer.end(); it++) {
+            for (auto it = messageStart; it != MessageBuffer.end(); ++it) {
                 auto& msg = *it;
                 if (Filter.IsActive()) {
                     if (Filter.PassFilter(msg->message.c_str())) {
@@ -181,7 +181,7 @@ void ConsolePanel::renderMessages() {
         }
 
         if (MessageBufferBegin != 0) { // Skipped first messages in vector
-            for (auto it = MessageBuffer.begin(); it != messageStart; it++) {
+            for (auto it = MessageBuffer.begin(); it != messageStart; ++it) {
                 auto& msg = *it;
                 if (msg) {
                     if (Filter.IsActive()) {

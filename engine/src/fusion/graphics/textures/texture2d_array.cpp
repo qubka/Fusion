@@ -119,8 +119,8 @@ void Texture2dArray::loadFromFile() {
     std::vector<VkBufferImageCopy> bufferCopyRegions;
     bufferCopyRegions.reserve(arrayLayers * mipLevels);
     VkDeviceSize offset = 0;
-    for (uint32_t layer = 0; layer < arrayLayers; layer++) {
-        for (uint32_t level = 0; level < mipLevels; level++) {
+    for (uint32_t layer = 0; layer < arrayLayers; ++layer) {
+        for (uint32_t level = 0; level < mipLevels; ++level) {
             auto image = tex2DArray[layer][level];
             auto imageExtent = image.extent();
 

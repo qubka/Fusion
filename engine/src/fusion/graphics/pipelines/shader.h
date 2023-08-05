@@ -10,9 +10,9 @@ namespace fe {\
     /**
      * @brief Class that loads and processes a shader, and provides a reflection.
      */
-    class Shader {
+    class FUSION_API Shader {
     public:
-        class SpecConstant {
+        class FUSION_API SpecConstant {
         public:
             SpecConstant() : value{0.0f} {}
             template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
@@ -22,7 +22,7 @@ namespace fe {\
             float value;
         };
 
-        class Specialization {
+        class FUSION_API Specialization {
             friend class Shader;
         public:
             const VkSpecializationInfo& getSpecializationInfo() const { return info; }
@@ -33,7 +33,7 @@ namespace fe {\
             fst::split_flatmap<uint32_t, SpecConstant> data;
         };
 
-        class Uniform {
+        class FUSION_API Uniform {
             friend class Shader;
         public:
             explicit Uniform(int32_t set = -1, int32_t binding = -1, int32_t offset = -1, int32_t size = -1, int32_t glType = -1, bool readOnly = false, bool writeOnly = false, VkShaderStageFlags stageFlags = 0)
@@ -79,7 +79,7 @@ namespace fe {\
             VkShaderStageFlags stageFlags;
         };
 
-        class UniformBlock {
+        class FUSION_API UniformBlock {
             friend class Shader;
         public:
             enum class Type : unsigned char { None, Uniform, Storage, Push };
@@ -125,7 +125,7 @@ namespace fe {\
             std::unordered_map<std::string, Uniform> uniforms{};
         };
 
-        class Attribute {
+        class FUSION_API Attribute {
             friend class Shader;
         public:
             explicit Attribute(int32_t set = -1, int32_t location = -1, int32_t size = -1, int32_t glType = -1)
@@ -159,7 +159,7 @@ namespace fe {\
             int32_t glType;
         };
 
-        class Constant {
+        class FUSION_API Constant {
             friend class Shader;
         public:
             explicit Constant(int32_t specId = -1, int32_t size = -1, VkShaderStageFlags stageFlags = 0, int32_t glType = -1)

@@ -7,7 +7,7 @@ namespace fe {
     /**
      * @brief Class used to manage {@link Subrender} objects to create a list of render pass.
      */
-    class Renderer {
+    class FUSION_API Renderer {
         friend class Graphics;
     public:
         /**

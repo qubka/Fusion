@@ -76,7 +76,7 @@ std::unique_ptr<Bitmap> TextureCube::getBitmap(uint32_t mipLevel) const {
 	auto bitmap = std::make_unique<Bitmap>(glm::uvec2{size.x, size.y * arrayLayers}, format);
 	auto offset = bitmap->getData<std::byte>();
 
-	for (uint32_t i = 0; i < 6; i++) {
+	for (uint32_t i = 0; i < 6; ++i) {
 		auto bitmapSide = Image::getBitmap(mipLevel, i);
 		std::memcpy(offset, bitmapSide->getData<void>(), sizeSide);
 		offset += sizeSide;
@@ -137,8 +137,8 @@ void TextureCube::loadFromFile() {
     std::vector<VkBufferImageCopy> bufferCopyRegions;
     bufferCopyRegions.reserve(arrayLayers * mipLevels);
     VkDeviceSize offset = 0;
-    for (uint32_t layer = 0; layer < arrayLayers; layer++) {
-        for (uint32_t level = 0; level < mipLevels; level++) {
+    for (uint32_t layer = 0; layer < arrayLayers; ++layer) {
+        for (uint32_t level = 0; level < mipLevels; ++level) {
             auto image = texCube[layer][level];
             auto imageExtent = image.extent();
 

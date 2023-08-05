@@ -36,7 +36,7 @@ namespace fe {
     /**
      * @brief Class used to represent a monitor.
      */
-    class Monitor {
+    class FUSION_API Monitor {
         friend class DeviceManager;
     public:
         Monitor() = default;

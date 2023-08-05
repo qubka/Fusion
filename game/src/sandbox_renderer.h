@@ -9,7 +9,7 @@
 #include "fusion/ligthing/light_subrender.h"
 
 namespace fe {
-    class SandboxRenderer : public Renderer {
+    class FUSION_API SandboxRenderer : public Renderer {
     public:
         SandboxRenderer() {
             std::vector<Attachment> renderpassAttachments = {

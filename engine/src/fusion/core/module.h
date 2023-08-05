@@ -5,7 +5,7 @@ namespace fe {
     /**
      * https://accu.org/journals/overload/6/27/bellingham_597/
      */
-    class ModuleFactory {
+    class FUSION_API ModuleFactory {
     public:
         struct TCreateValue {
             std::function<std::unique_ptr<Base>()> create;
@@ -23,7 +23,7 @@ namespace fe {
         }
 
         template<typename T>
-        class Registrar : public Base {
+        class FUSION_API Registrar : public Base {
         public:
             /**
              * Gets the engines instance.
@@ -57,7 +57,7 @@ namespace fe {
     /**
      * @brief A interface used for defining engine modules.
      */
-    class Module : public ModuleFactory<Module> {
+    class FUSION_API Module : public ModuleFactory<Module> {
         friend class Engine;
     public:
         /**

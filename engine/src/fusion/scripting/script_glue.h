@@ -3,7 +3,7 @@
 #if FUSION_SCRIPTING
 
 namespace fe {
-    class ScriptGlue {
+    class FUSION_API ScriptGlue {
     public:
         static void RegisterComponents();
         static void RegisterFunctions();

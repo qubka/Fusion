@@ -2,16 +2,18 @@
 
 #include "fusion/devices/monitor.h"
 
-#include <GLFW/glfw3.h>
+extern "C" {
+    typedef struct GLFWmonitor GLFWmonitor;
+}
 
 namespace glfw {
-    class Monitor : public fe::Monitor {
+    class FUSION_API Monitor : public fe::Monitor {
         friend class DeviceManager;
     public:
         explicit Monitor(GLFWmonitor* monitor);
         ~Monitor() override = default;
 
-        bool isPrimary() const override{ return monitor == glfwGetPrimaryMonitor(); }
+        bool isPrimary() const override;
 
         glm::uvec4 getWorkarea() const;
         glm::uvec2 getWorkareaSize() const override;

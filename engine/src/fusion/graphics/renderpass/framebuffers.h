@@ -8,7 +8,7 @@ namespace fe {
     class RenderStage;
     class Texture2d;
 
-    class Framebuffers {
+    class FUSION_API Framebuffers {
     public:
         Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& swapchain, const RenderStage& renderStage, const Renderpass& renderPass, const TextureDepth& depthStencil,
             const glm::uvec2& extent, VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT);

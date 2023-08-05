@@ -52,6 +52,9 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC FUSION_DEBUG)
 #target_compile_definitions(${PROJECT_NAME} PUBLIC FUSION_PROFILE)
 target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
 target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_USER_CONFIG="fusion/imgui/imconfig.h")
+if (NOT ANDROID)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FUSION_SCRIPTING)
+endif()
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC
         FUSION_VERSION_VARIANT=${FUSION_VERSION_VARIANT}

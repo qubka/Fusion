@@ -4,7 +4,7 @@ namespace fe {
     class AABB;
     class Ray;
 
-    class Sphere {
+    class FUSION_API Sphere {
     public:
         Sphere();
         Sphere(const glm::vec3& center, float radius);

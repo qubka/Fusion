@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class Semaphore {
+    class FUSION_API Semaphore {
     public:
         Semaphore();
         Semaphore(VkSemaphore semaphore);

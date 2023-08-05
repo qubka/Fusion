@@ -6,7 +6,7 @@
 #include "fusion/filesystem/file_system.h"
 
 namespace fe {
-    class DefaultApplication : public Application {
+    class FUSION_API DefaultApplication : public Application {
     public:
         explicit DefaultApplication(std::string_view name);
         ~DefaultApplication() override;

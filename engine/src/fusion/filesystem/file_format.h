@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class FileFormat {
+    class FUSION_API FileFormat {
     public:
         FileFormat() = delete;
 

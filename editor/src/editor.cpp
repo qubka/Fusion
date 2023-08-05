@@ -26,6 +26,8 @@
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
 
+#include <memory>
+
 #define BIND_FILEBROWSER_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 using namespace fe;
@@ -187,7 +189,8 @@ void Editor::onImGui() {
 
     drawMenuBar();
 
-    for (auto& panel : panels) {
+    for (size_t i = 0; i < panels.size(); ++i) {
+        auto& panel = panels[i]; // Panel could change during onImGui
         if (panel->isActive()) {
             panel->onImGui();
         }
@@ -785,16 +788,22 @@ void Editor::newProjectLocationCallback(const fs::path& path) {
 }
 
 void Editor::removePanel(EditorPanel* panel) {
-    panels.erase(std::remove_if(panels.begin(), panels.end(), [&panel](const auto& p) {
+    auto it = std::find_if(panels.begin(), panels.end(), [&panel](const auto& p) {
         return p.get() == panel;
-    }));
+    });
+    if (it != panels.end())
+        panels.erase(it);
 }
 
 void Editor::openTextFile(const fs::path& filepath, const std::function<void()>& callback) {
-    panels.erase(std::remove_if(panels.begin(), panels.end(), [](const auto& p) {
+    auto it = std::find_if(panels.begin(), panels.end(), [](const auto& p) {
         return p->getName() == "TextEdit";
-    }));
-    panels.push_back(std::make_unique<TextEditPanel>(filepath, callback, *this));
+    });
+
+    if (it != panels.end())
+        *it = std::make_unique<TextEditPanel>(filepath, callback, *this);
+    else
+        panels.push_back(std::make_unique<TextEditPanel>(filepath, callback, *this));
 }
 
 EditorPanel* Editor::getPanel(const std::string& name) {

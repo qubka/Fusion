@@ -6,7 +6,7 @@ namespace fe {
     // Define available file changes
     enum class FileStatus : unsigned char { Created, Modified, Erased };
 
-    class FileWatcher {
+    class FUSION_API FileWatcher {
     public:
         explicit FileWatcher(fs::path watchPath, std::function<void(const fs::path&, FileStatus)> callback, const DateTime& interval = 1s)
             : watchPath{std::move(watchPath)}

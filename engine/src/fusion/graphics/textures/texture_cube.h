@@ -6,7 +6,7 @@ namespace fe {
     /**
      * @brief Resource that represents a cubemap image.
      */
-    class TextureCube : public Texture {
+    class FUSION_API TextureCube : public Texture {
     public:
         TextureCube() = default;
 

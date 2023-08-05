@@ -28,7 +28,7 @@ Framebuffers::Framebuffers(const LogicalDevice& logicalDevice, const Swapchain& 
 
 	framebuffers.resize(swapchain.getImageCount());
 
-	for (uint32_t i = 0; i < swapchain.getImageCount(); i++) {
+	for (uint32_t i = 0; i < swapchain.getImageCount(); ++i) {
 		std::vector<VkImageView> attachments;
 		attachments.reserve(renderStage.getAttachments().size());
 

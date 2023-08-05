@@ -183,7 +183,7 @@ void main() {
     vec3 result = vec3(0.0);
 
     // Point lights
-    for (uint i = 0; i < ubo.lightsCount; i++) {
+    for (uint i = 0; i < ubo.lightsCount; ++i) {
         Light light = bufferLights.lights[i];
         if (dot(light.direction, light.direction) == 0.0) {
             result += CalcPointLight(light, diffuse, specular, normal, inPosition, viewDir);

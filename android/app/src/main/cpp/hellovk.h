@@ -340,7 +340,7 @@ uint32_t HelloVK::findMemoryType(uint32_t typeFilter,
   VkPhysicalDeviceMemoryProperties memProperties;
   vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
-  for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+  for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i) {
     if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags &
                                     properties) == properties) {
       return i;
@@ -357,7 +357,7 @@ void HelloVK::createUniformBuffers() {
   uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
   uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
-  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
     createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                      VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -510,7 +510,7 @@ void HelloVK::createDescriptorSets() {
   descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
   VK_CHECK(vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()));
 
-  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
     VkDescriptorBufferInfo bufferInfo{};
     bufferInfo.buffer = uniformBuffers[i];
     bufferInfo.offset = 0;
@@ -597,11 +597,11 @@ void HelloVK::recordCommandBuffer(VkCommandBuffer commandBuffer,
 }
 
 void HelloVK::cleanupSwapChain() {
-  for (size_t i = 0; i < swapChainFramebuffers.size(); i++) {
+  for (size_t i = 0; i < swapChainFramebuffers.size(); ++i) {
     vkDestroyFramebuffer(device, swapChainFramebuffers[i], nullptr);
   }
 
-  for (size_t i = 0; i < swapChainImageViews.size(); i++) {
+  for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
     vkDestroyImageView(device, swapChainImageViews[i], nullptr);
   }
 
@@ -615,12 +615,12 @@ void HelloVK::cleanup() {
 
   vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
-  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
     vkDestroyBuffer(device, uniformBuffers[i], nullptr);
     vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
   }
 
-  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
     vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
     vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
     vkDestroyFence(device, inFlightFences[i], nullptr);
@@ -1015,7 +1015,7 @@ void HelloVK::createSwapChain() {
 
 void HelloVK::createImageViews() {
   swapChainImageViews.resize(swapChainImages.size());
-  for (size_t i = 0; i < swapChainImages.size(); i++) {
+  for (size_t i = 0; i < swapChainImages.size(); ++i) {
     VkImageViewCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     createInfo.image = swapChainImages[i];
@@ -1247,7 +1247,7 @@ VkShaderModule HelloVK::createShaderModule(const std::vector<uint8_t> &code) {
 
 void HelloVK::createFramebuffers() {
   swapChainFramebuffers.resize(swapChainImageViews.size());
-  for (size_t i = 0; i < swapChainImageViews.size(); i++) {
+  for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
     VkImageView attachments[] = {swapChainImageViews[i]};
 
     VkFramebufferCreateInfo framebufferInfo{};
@@ -1295,7 +1295,7 @@ void HelloVK::createSyncObjects() {
   VkFenceCreateInfo fenceInfo{};
   fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
   fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
     VK_CHECK(vkCreateSemaphore(device, &semaphoreInfo, nullptr,
                                &imageAvailableSemaphores[i]));
 

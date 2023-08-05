@@ -2,8 +2,12 @@
 
 #include "fusion/devices/device_manager.h"
 
+extern "C" {
+    typedef struct GLFWmonitor GLFWmonitor;
+}
+
 namespace glfw {
-    class DeviceManager : public fe::DeviceManager {
+    class FUSION_API DeviceManager : public fe::DeviceManager {
         friend class Engine;
     public:
         DeviceManager();
@@ -21,13 +25,16 @@ namespace glfw {
         fe::Window* createWindow(const fe::WindowInfo& windowInfo) override;
         fe::Cursor* createCursor(const fs::path& filepath, fe::CursorHotspot hotspot) override;
 
+        void* getNativeManager() const override { return (void*) this; }
+
     protected:
+        void onStart() override {}
         void onUpdate() override;
+        void onStop() override {}
 
     private:
-#if GLFW_VERSION_MINOR >= 2
         static void JoystickCallback(int jid, int action);
-#endif
+
         static void ErrorCallback(int error, const char* description);
         static void MonitorCallback(GLFWmonitor* monitor, int action);
 

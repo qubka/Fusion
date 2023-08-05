@@ -61,7 +61,7 @@ void DebugSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
     pushObject.push("view", camera->getViewMatrix());
     pushObject.update(pipelines[0].getShader().getUniformBlock("PushObject"));
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 2; ++i) {
         bool depthTested = (i == 0);
 
         // Bind pipeline
@@ -74,7 +74,7 @@ void DebugSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
         triangles[i].cmdRender(commandBuffer, DebugRenderer::Get()->getTriangles(depthTested), 1.0f);
     }
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 2; ++i) {
         bool depthTested = (i == 0);
 
         // Bind pipeline

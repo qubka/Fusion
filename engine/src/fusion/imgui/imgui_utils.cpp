@@ -351,7 +351,7 @@ bool Spinner(const char* name, float radius, int thickness, ImU32 color) {
 
     const ImVec2 centre{pos.x + radius, pos.y + radius + style.FramePadding.y};
 
-    for (int i = 0; i < static_cast<int>(numSegments); i++) {
+    for (int i = 0; i < static_cast<int>(numSegments); ++i) {
         const float a = min + (static_cast<float>(i) / numSegments) * (max - min);
         drawList->PathLineTo(ImVec2{centre.x + glm::cos(a + static_cast<float>(g->Time) * 8) * radius,
                                     centre.y + glm::sin(a + static_cast<float>(g->Time) * 8) * radius});
@@ -431,7 +431,7 @@ void DrawRowsBackground(int rowCount, float lineHeight, float x1, float x2, floa
     ImGuiListClipper clipper;
     clipper.Begin(rowCount, lineHeight);
     while (clipper.Step()) {
-        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i) {
             ImU32 col = (i & 1) ? colOdd : colEven;
             if ((col & IM_COL32_A_MASK) == 0)
                 continue;

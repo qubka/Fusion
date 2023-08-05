@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class PipelineLayoutCache {
+    class FUSION_API PipelineLayoutCache {
     public:
         explicit PipelineLayoutCache(VkDevice device);
         ~PipelineLayoutCache();

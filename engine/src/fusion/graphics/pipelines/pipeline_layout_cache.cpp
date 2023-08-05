@@ -20,7 +20,7 @@ VkPipelineLayout PipelineLayoutCache::createPipelineLayout(const VkPipelineLayou
     layoutInfo.pushConstants.reserve(info.pushConstantRangeCount);
 
     // Copy from the direct info struct into our own one
-    for (int i = 0; i < info.setLayoutCount; i++) {
+    for (int i = 0; i < info.setLayoutCount; ++i) {
         layoutInfo.setLayouts.push_back(info.pSetLayouts[i]);
     }
 

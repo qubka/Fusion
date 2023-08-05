@@ -5,7 +5,7 @@ namespace fe {
      * https://www.cppstories.com/2018/02/factory-selfregister/
      */
     template<typename Base>
-    class BitmapFactory {
+    class FUSION_API BitmapFactory {
     public:
         using TLoadMethod = std::function<void(Base&, const fs::path&)>;
         using TWriteMethod = std::function<void(const Base&, const fs::path&)>;
@@ -20,7 +20,7 @@ namespace fe {
         }
 
         template<typename T>
-        class Registrar {
+        class FUSION_API Registrar {
         public:
             template<typename ... Args>
             static bool Register(Args&& ... names) {

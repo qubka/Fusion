@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class SyncObject {
+    class FUSION_API SyncObject {
     public:
         SyncObject();
         ~SyncObject();

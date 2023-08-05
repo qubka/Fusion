@@ -32,7 +32,7 @@ namespace fe {
         Transmission = 21,
     };*/
 
-    class Texture : public Image, public Asset {
+    class FUSION_API Texture : public Image, public Asset {
     public:
         Texture() = default;
 

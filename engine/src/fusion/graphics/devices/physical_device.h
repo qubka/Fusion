@@ -3,7 +3,7 @@
 namespace fe {
     class Instance;
 
-    class PhysicalDevice {
+    class FUSION_API PhysicalDevice {
         friend class Graphics;
     public:
         explicit PhysicalDevice(const Instance& instance, uint32_t desiredDeviceIndex = UINT32_MAX);

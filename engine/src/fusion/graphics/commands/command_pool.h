@@ -5,7 +5,7 @@ namespace fe {
     /**
      * @brief Class that represents a command pool.
      */
-    class CommandPool {
+    class FUSION_API CommandPool {
     public:
         CommandPool(const std::thread::id& threadId = std::this_thread::get_id());
         ~CommandPool();

@@ -81,13 +81,13 @@ void Model::processNode(const aiScene* scene, const aiNode* node, SceneObject& t
     }
 
     // continue for all child nodes
-    for (uint32_t i = 0; i < node->mNumChildren; i++) {
+    for (uint32_t i = 0; i < node->mNumChildren; ++i) {
         processNode(scene, node->mChildren[i], *parent);
     }
 }
 
 void Model::processMeshes(const aiScene* scene, const aiNode* node, SceneObject& parent) {
-    for (uint32_t i = 0; i < node->mNumMeshes; i++) {
+    for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
         std::vector<std::byte> vertices;
         std::vector<uint32_t> indices;
         uint32_t index = node->mMeshes[i];
@@ -96,15 +96,15 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, SceneObject&
             vertices.reserve(mesh->mNumVertices * Layout.getStride());
             indices.reserve(mesh->mNumFaces * 3);
 
-            for (uint32_t j = 0; j < mesh->mNumVertices; j++) {
+            for (uint32_t j = 0; j < mesh->mNumVertices; ++j) {
                 appendVertex(vertices, scene, mesh, j);
             }
 
-            for (uint32_t j = 0; j < mesh->mNumFaces; j++) {
+            for (uint32_t j = 0; j < mesh->mNumFaces; ++j) {
                 const aiFace& face = mesh->mFaces[j];
                 if (face.mNumIndices != 3)
                     continue;
-                for (uint32_t k = 0; k < face.mNumIndices; k++) {
+                for (uint32_t k = 0; k < face.mNumIndices; ++k) {
                     indices.push_back(face.mIndices[k]);
                 }
             }
@@ -146,7 +146,7 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, SceneObject&
 /*std::vector<std::shared_ptr<Texture2d>> Model::loadTextures(const aiMaterial* material, int type) {
     auto textureType = static_cast<aiTextureType>(type);
     std::vector<std::shared_ptr<Texture2d>> textures;
-    for (uint32_t i = 0; i < material->GetTextureCount(textureType); i++) {
+    for (uint32_t i = 0; i < material->GetTextureCount(textureType); ++i) {
         aiString str;
         if (material->GetTexture(textureType, i, &str) == AI_SUCCESS) {
             fs::path path{ directory / str.C_Str() };

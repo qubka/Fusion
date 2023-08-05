@@ -8,7 +8,7 @@
 #define USE_DEBUG_MESSENGER VK_HEADER_VERSION >= 121
 
 namespace fe {
-    class Instance {
+    class FUSION_API Instance {
         friend class Graphics;
     public:
     #if USE_DEBUG_MESSENGER

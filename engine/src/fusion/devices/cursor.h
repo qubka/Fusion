@@ -26,7 +26,7 @@ namespace fe {
     /**
      * @brief Class used to represent a cursor.
      */
-    class Cursor {
+    class FUSION_API Cursor {
     public:
         Cursor() = default;
         virtual ~Cursor() = default;

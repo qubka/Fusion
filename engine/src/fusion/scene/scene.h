@@ -4,7 +4,7 @@
 
 namespace fe {
     class Camera;
-    class Scene {
+    class FUSION_API Scene {
         friend class SceneManager;
     public:
         /**

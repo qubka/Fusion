@@ -17,10 +17,6 @@
 #include <binary_fonts/RobotoRegular.inl>
 #include <binary_fonts/RobotoBold.inl>
 
-#if FUSION_PLATFORM_ANDROID
-#include "platform/android/android.h"
-#endif
-
 using namespace fe;
 
 ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
@@ -44,15 +40,18 @@ ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
 
     fontSize = 14.0f;
 
+    window = DeviceManager::Get()->getWindow(0);
+
 #if FUSION_PLATFORM_ANDROID
     // Screen density
-    if (fe::android::screenDensity >= ACONFIGURATION_DENSITY_XXXHIGH) {
+    int32_t screenDensity = ACONFIGURATION_DENSITY_HIGH;//monitor->getScreenDensity()
+    if (screenDensity >= ACONFIGURATION_DENSITY_XXXHIGH) {
         fontScale = 4.5f;
-    } else if (fe::android::screenDensity >= ACONFIGURATION_DENSITY_XXHIGH) {
+    } else if (screenDensity >= ACONFIGURATION_DENSITY_XXHIGH) {
         fontScale = 3.5f;
-    } else if (fe::android::screenDensity >= ACONFIGURATION_DENSITY_XHIGH) {
+    } else if (screenDensity >= ACONFIGURATION_DENSITY_XHIGH) {
         fontScale = 2.5f;
-    } else if (fe::android::screenDensity >= ACONFIGURATION_DENSITY_HIGH) {
+    } else if (screenDensity >= ACONFIGURATION_DENSITY_HIGH) {
         fontScale = 2.0f;
     };
     LOG_DEBUG << "Android UI scale: " << fontScale;
@@ -76,7 +75,6 @@ ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
-    window = DeviceManager::Get()->getWindow(0);
     auto& size = window->getSize();
     io.DisplaySize = ImVec2{static_cast<float>(size.x), static_cast<float>(size.y)};
 
@@ -129,7 +127,7 @@ void ImGuiSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
 
         descriptorSetHasUpdated[frameIndex].clear();
 
-        for (int i = 0; i < drawData->CmdListsCount; i++) {
+        for (int i = 0; i < drawData->CmdListsCount; ++i) {
             const ImDrawList* cmdLists = drawData->CmdLists[i];
             for (const auto& cmd: cmdLists->CmdBuffer) {
                 if (cmd.TextureId) {
@@ -311,7 +309,7 @@ void ImGuiSubrender::setupStyle() {
     rebuildFont();
 
     io.Fonts->TexGlyphPadding = 1;
-    for (int i = 0; i < io.Fonts->ConfigData.Size; i++) {
+    for (int i = 0; i < io.Fonts->ConfigData.Size; ++i) {
         io.Fonts->ConfigData[i].RasterizerMultiply = 1.0f;
     }
 

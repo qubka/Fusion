@@ -6,7 +6,7 @@ namespace fe {
     /**
      * @brief Class that represents a command buffer.
      */
-    class CommandBuffer {
+    class FUSION_API CommandBuffer {
     public:
         /**
          * Creates a new command buffer.

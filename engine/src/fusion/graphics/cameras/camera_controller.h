@@ -2,7 +2,7 @@
 
 namespace fe {
     class Camera;
-    class CameraController {
+    class FUSION_API CameraController {
     public:
         CameraController() = default;
         virtual ~CameraController() = default;

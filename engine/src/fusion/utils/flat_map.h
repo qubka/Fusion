@@ -22,7 +22,7 @@ namespace type_traits {
 
 namespace fst {
     template<typename Key, typename Value>
-    class flatmap_storage {
+    class FUSION_API flatmap_storage {
     public:
         using storage = std::vector<std::pair<Key, Value>>;
         using value_type = std::pair<const Key, Value>;
@@ -62,7 +62,7 @@ namespace fst {
     };
 
     template<typename Key, typename Value>
-    class split_flatmap_storage {
+    class FUSION_API split_flatmap_storage {
     public:
         using key_storage = std::vector<Key>;
         using value_storage = std::vector<Value>;
@@ -108,7 +108,7 @@ namespace fst {
     };
 
     template<typename Key, typename Value>
-    class unordered_flatmap : private fst::flatmap_storage<Key, Value> {
+    class FUSION_API unordered_flatmap : private fst::flatmap_storage<Key, Value> {
         static_assert(std::is_nothrow_move_constructible<Key>{});
         static_assert(std::is_nothrow_move_constructible<Value>{});
     public:
@@ -197,7 +197,7 @@ namespace fst {
     };
 
     template<typename Key, typename Value>
-    class unordered_split_flatmap : private fst::split_flatmap_storage<Key, Value> {
+    class FUSION_API unordered_split_flatmap : private fst::split_flatmap_storage<Key, Value> {
         static_assert(std::is_nothrow_move_constructible<Key>{});
         static_assert(std::is_nothrow_move_constructible<Value>{});
     public:
@@ -294,7 +294,7 @@ namespace fst {
     };
 
     template<typename Key, typename Value, typename Compare = std::less<>>
-    class split_flatmap : private fst::split_flatmap_storage<Key, Value>, private Compare {
+    class FUSION_API split_flatmap : private fst::split_flatmap_storage<Key, Value>, private Compare {
         static_assert(std::is_nothrow_move_constructible<Key>{});
         static_assert(std::is_nothrow_move_constructible<Value>{});
     public:
@@ -676,7 +676,7 @@ namespace fst {
     }
 
     template<typename Key, typename Value, typename Compare = std::less<>>
-    class flatmap : private fst::flatmap_storage<Key, Value>, private Compare {
+    class FUSION_API flatmap : private fst::flatmap_storage<Key, Value>, private Compare {
         static_assert(std::is_nothrow_move_constructible<Key>{});
         static_assert(std::is_nothrow_move_constructible<Value>{});
     public:
@@ -925,7 +925,7 @@ namespace fst {
 
     template<typename Key, typename Value>
     template<typename type, typename container_iterator>
-    class fst::flatmap_storage<Key, Value>::iterator_type {
+    class FUSION_API fst::flatmap_storage<Key, Value>::iterator_type {
         template<typename V, typename I>
         friend class fst::flatmap_storage<Key, Value>::iterator_type;
         friend class fst::flatmap_storage<Key, Value>;
@@ -987,7 +987,7 @@ namespace fst {
 
     template<typename Key, typename Value>
     template<typename container>
-    class fst::split_flatmap_storage<Key, Value>::iterator_type {
+    class FUSION_API fst::split_flatmap_storage<Key, Value>::iterator_type {
         template<typename C>
         friend class fst::split_flatmap_storage<Key, Value>::iterator_type;
 
@@ -995,7 +995,7 @@ namespace fst {
 
         using data = std::pair<const typename container::key_type&, typename container::mapped_type&>;
     public:
-        class data_ptr {
+        class FUSION_API data_ptr {
         public:
             template<typename T, typename U>
             data_ptr(T& t, U& u) : m{t, u} {}

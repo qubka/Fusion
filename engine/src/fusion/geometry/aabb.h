@@ -4,7 +4,7 @@ namespace fe {
     class Ray;
     class Sphere;
 
-    class AABB {
+    class FUSION_API AABB {
     public:
         AABB();
         AABB(const glm::vec3& min, const glm::vec3& max);

@@ -22,7 +22,7 @@ namespace ImGui {
     }
 
     template<typename EntityType>
-    class EntityEditor {
+    class FUSION_API EntityEditor {
     private:
         using Registry = entt::basic_registry<EntityType>;
 

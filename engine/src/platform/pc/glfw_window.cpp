@@ -4,6 +4,8 @@
 #include "fusion/devices/device_manager.h"
 #include "fusion/devices/cursor.h"
 
+#include <GLFW/glfw3.h>
+
 using namespace glfw;
 
 Window::Window(const fe::VideoMode& videoMode, const fe::WindowInfo& windowInfo) : fe::Window{}
@@ -147,6 +149,14 @@ void Window::setVisible(bool flag) {
     onShow.publish(flag);
 }
 
+bool Window::isClose() const {
+    return glfwWindowShouldClose(window);
+};
+
+void Window::setClose(bool flag) {
+    glfwSetWindowShouldClose(window, flag);
+}
+
 void Window::setSize(const glm::ivec2& extent) {
     if (extent.x != -1)
         size.x = extent.x;
@@ -170,6 +180,14 @@ void Window::setTitle(std::string_view str) {
     title = str;
     glfwSetWindowTitle(window, title.c_str());
     onTitleChange.publish(title);
+}
+
+const char* Window::getClipboard() const {
+    return glfwGetClipboardString(window);
+}
+
+void Window::setClipboard(std::string_view str) {
+    glfwSetClipboardString(window, str.data());
 }
 
 void Window::setCursorHidden(bool hidden) {

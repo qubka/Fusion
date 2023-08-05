@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class Transform {
+    class FUSION_API Transform {
     public:
         enum class Space : unsigned char { Self, Parent, World };
 

@@ -4,8 +4,8 @@
 
 namespace fe {
     struct ScriptComponent {
-        std::string className;
 #if FUSION_SCRIPTING
+        std::string className;
         ScriptFieldMap fields;
 
         std::shared_ptr<ScriptInstance> instance;

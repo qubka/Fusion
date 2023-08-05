@@ -7,7 +7,7 @@ namespace fe {
     /**
      * @brief Helper class for C++ strings.
      */
-    class String {
+    class FUSION_API String {
     public:
         String() = delete;
 

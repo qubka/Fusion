@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class OffsetSize {
+    class FUSION_API OffsetSize {
     public:
         OffsetSize(uint32_t offset, uint32_t size) : offset{offset}, size{size} {}
         uint32_t getOffset() const { return offset; }
@@ -22,7 +22,7 @@ namespace fe {
 
     class Descriptor;
 
-    class WriteDescriptorSet {
+    class FUSION_API WriteDescriptorSet {
     public:
         WriteDescriptorSet(const VkWriteDescriptorSet& writeDescriptorSet, const VkDescriptorImageInfo& imageInfo)
                 : writeDescriptorSet{writeDescriptorSet}
@@ -46,7 +46,7 @@ namespace fe {
         std::vector<VkDescriptorBufferInfo> bufferInfos;
     };
 
-    class Descriptor {
+    class FUSION_API Descriptor {
     public:
         Descriptor() = default;
         virtual ~Descriptor() = default;

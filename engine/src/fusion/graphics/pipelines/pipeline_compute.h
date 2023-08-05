@@ -6,7 +6,7 @@ namespace fe {
     /**
      * @brief Class that represents a compute compute pipeline.
      */
-    class PipelineCompute : public Pipeline {
+    class FUSION_API PipelineCompute : public Pipeline {
     public:
         /**
          * Creates a new compute pipeline.

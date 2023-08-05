@@ -5,7 +5,7 @@ namespace fe {
     class Surface;
     class LogicalDevice;
 
-    class Swapchain {
+    class FUSION_API Swapchain {
     public:
         Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const Surface& surface, const Swapchain* oldSwapchain = nullptr);
         ~Swapchain();

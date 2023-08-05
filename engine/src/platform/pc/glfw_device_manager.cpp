@@ -4,6 +4,8 @@
 #include "glfw_joystick.h"
 #include "glfw_cursor.h"
 
+#include <GLFW/glfw3.h>
+
 using namespace glfw;
 
 DeviceManager::DeviceManager() : fe::DeviceManager{} {
@@ -38,7 +40,7 @@ DeviceManager::DeviceManager() : fe::DeviceManager{} {
     // Get connected monitors
     int count;
     auto glfwMonitors = glfwGetMonitors(&count);
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
         monitors.push_back(std::make_unique<Monitor>(glfwMonitors[i]));
     }
 

@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class Vector {
+    class FUSION_API Vector {
     public:
         Vector() = delete;
 

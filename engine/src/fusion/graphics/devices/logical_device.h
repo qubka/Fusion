@@ -4,7 +4,7 @@ namespace fe {
     class Instance;
     class PhysicalDevice;
 
-    class LogicalDevice {
+    class FUSION_API LogicalDevice {
         friend class Graphics;
     public:
         LogicalDevice(const Instance& instance, const PhysicalDevice& physicalDevice);

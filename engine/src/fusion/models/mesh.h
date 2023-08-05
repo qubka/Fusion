@@ -5,7 +5,7 @@
 #include "fusion/geometry/aabb.h"
 
 namespace fe {
-    class Mesh {
+    class FUSION_API Mesh {
         friend class Model;
     public:
         Mesh() = default;

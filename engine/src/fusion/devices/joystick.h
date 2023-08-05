@@ -14,7 +14,7 @@ namespace fe {
     /**
      * @brief Class used to represent a joystick.
      */
-    class Joystick {
+    class FUSION_API Joystick {
         friend class DeviceManager;
     public:
         Joystick() = default;

@@ -18,7 +18,7 @@ namespace fe {
         bool isShowConsole{ true };
     };
 
-    class Application {
+    class FUSION_API Application {
         friend class Engine;
         friend class ImGuiSubrender;
     public:

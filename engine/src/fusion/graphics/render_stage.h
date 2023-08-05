@@ -62,7 +62,7 @@ namespace fe {
 
     class Camera;
 
-    class RenderStage {
+    class FUSION_API RenderStage {
         friend class Graphics;
     public:
         explicit RenderStage(std::vector<Attachment>&& images = {}, std::vector<SubpassType>&& subpasses = {}, const Viewport& viewport = {});

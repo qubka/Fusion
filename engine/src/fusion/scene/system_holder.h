@@ -6,7 +6,7 @@ namespace fe {
     /**
      * @brief Class that contains and manages systems registered to a scene.
      */
-    class SystemHolder {
+    class FUSION_API SystemHolder {
         friend class Scene;
     public:
         SystemHolder() = default;

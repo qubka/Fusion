@@ -196,7 +196,7 @@ void Image::CreateMipmaps(VkImage image, const VkExtent3D& extent, VkFormat form
 	assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT);
 	assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
 
-	for (uint32_t i = 1; i < mipLevels; i++) {
+	for (uint32_t i = 1; i < mipLevels; ++i) {
 		VkImageMemoryBarrier barrier0 = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
 		barrier0.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 		barrier0.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;

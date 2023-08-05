@@ -20,7 +20,7 @@ namespace fe {
         void onRender(const CommandBuffer& commandBuffer, const Camera* overrideCamera) override;
 
         template<typename T>
-        class DrawBuffer {
+        class FUSION_API DrawBuffer {
         public:
             void cmdRender(const CommandBuffer& commandBuffer, const std::vector<T>& newVertices, float lineWidth = 0.0f) {
                 if (newVertices.empty())

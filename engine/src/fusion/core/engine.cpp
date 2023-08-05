@@ -35,11 +35,12 @@ Engine::Engine(CommandLineArgs&& args)
 }
 
 Engine::~Engine() {
-    application = nullptr;
+    application.reset();
     // Destroy modules in reverse order of insertion
     for (auto it = modules.rbegin(); it != modules.rend(); ++it) {
         it->reset();
     }
+    devices.reset();
     Instance = nullptr;
 }
 
@@ -67,42 +68,12 @@ void Engine::init() {
     }
 }
 
-int32_t Engine::run() {
-    try {
-        init();
-        startup();
-        running = true;
-        while (running) {
-            // Pre-Update
-            updateStage(Module::Stage::Pre);
-
-            // Main application and devices processing
-            devices->onUpdate();
-            if (application) {
-                if (!application->started) {
-                    application->onStart();
-                    application->started = true;
-                }
-                application->onUpdate();
-            }
-
-            // Update
-            updateStage(Module::Stage::Normal);
-            // Post-Update
-            updateStage(Module::Stage::Post);
-            // Render-Update
-            updateStage(Module::Stage::Render);
-        }
-        shutdown();
-    }
-    catch (std::exception& e) {
-        LOG_FATAL << e.what();
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-}
-
 void Engine::startup() {
+    if (!devices->started) {
+        devices->onStart();
+        devices->started = true;
+    }
+
     if (application && !application->started) {
         application->onStart();
         application->started = true;
@@ -117,16 +88,32 @@ void Engine::startup() {
 }
 
 void Engine::shutdown() {
-    if (application && application->started) {
-        application->started = false;
-        application->onStop();
-    }
-
     for (auto& module : modules) {
         if (module->started) {
             module->started = false;
             module->onStop();
         }
+    }
+
+    if (application && application->started) {
+        application->started = false;
+        application->onStop();
+    }
+
+    if (devices->started) {
+        devices->started = false;
+        devices->onStop();
+    }
+}
+
+void Engine::updateMain() {
+    devices->onUpdate();
+    if (application) {
+        if (!application->started) {
+            application->onStart();
+            application->started = true;
+        }
+        application->onUpdate();
     }
 }
 

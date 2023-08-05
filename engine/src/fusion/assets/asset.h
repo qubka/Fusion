@@ -4,7 +4,7 @@ namespace fe {
     /**
      * @brief A managed resource object.
      */
-    class Asset {
+    class FUSION_API Asset {
     public:
         Asset() = default;
         virtual ~Asset() = default;

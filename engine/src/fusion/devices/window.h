@@ -20,7 +20,7 @@ namespace fe {
     /**
      * @brief Class used to represent a window.
      */
-    class Window {
+    class FUSION_API Window {
         friend class DeviceManager;
     public:
         Window() = default;

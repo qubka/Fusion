@@ -2,10 +2,12 @@
 
 #include "fusion/devices/cursor.h"
 
-#include <GLFW/glfw3.h>
+extern "C" {
+    typedef struct GLFWcursor GLFWcursor;
+}
 
 namespace glfw {
-    class Cursor : public fe::Cursor {
+    class FUSION_API Cursor : public fe::Cursor {
     public:
         /**
          * Creates the cursor from a image file.

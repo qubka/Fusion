@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class SamplerCache {
+    class FUSION_API SamplerCache {
     public:
         explicit SamplerCache(VkDevice device);
         ~SamplerCache();

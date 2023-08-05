@@ -5,13 +5,11 @@
 #include "joystick.h"
 #include "cursor.h"
 
-//#include <GLFW/glfw3.h>
-
 namespace fe {
     /**
      * @brief Module used for managing some devices.
      */
-    class DeviceManager {
+    class FUSION_API DeviceManager {
         friend class Engine;
     public:
         DeviceManager();
@@ -100,11 +98,27 @@ namespace fe {
         const std::vector<std::unique_ptr<Joystick>>& getJoysticks() const { return joysticks; };
         const std::vector<std::unique_ptr<Cursor>>& getCursors() const { return cursors; };
 
+        /**
+         * Gets the current manager object.
+         * @return The object.
+         */
+        virtual void* getNativeManager() const = 0;
+
     protected:
+        /**
+         * Called when the manager is start working.
+         */
+        virtual void onStart() = 0;
+
         /**
          * Run every frame as long as the manager has work to do.
          */
         virtual void onUpdate() = 0;
+
+        /**
+         * Called when the manager is stop working.
+         */
+        virtual void onStop() = 0;
 
     public:
         /**
@@ -143,5 +157,7 @@ namespace fe {
         entt::sigh<void(Cursor*, bool)> onCursorCreate{};
         entt::sigh<void(Monitor*, bool)> onMonitorConnect{};
         entt::sigh<void(Joystick*, bool)> onJoystickConnect{};
+
+        bool started{ false };
     };
 }

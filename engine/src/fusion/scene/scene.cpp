@@ -16,7 +16,9 @@ Scene::Scene(std::string_view name) : name{name} {
     addSystem<HierarchySystem>();
     addSystem<CameraSystem>();
     addSystem<PhysicsSystem>();
+#if FUSION_SCRIPTING
     addSystem<ScriptSystem>();
+#endif
 }
 
 Scene::Scene(const Scene& other) : Scene{other.name} {

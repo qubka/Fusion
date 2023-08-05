@@ -120,10 +120,10 @@ namespace fe {
         friend class ScriptInstance;
     };
 
-    class ScriptClass {
+    class FUSION_API ScriptClass {
     public:
         ScriptClass() = default;
-        ScriptClass(std::string classNamespace, std::string className, bool isCore = false);
+        ScriptClass(FUSION_API std::string classNamespace, std::string className, bool isCore = false);
 
         MonoObject* instantiate();
 
@@ -143,14 +143,14 @@ namespace fe {
         friend class ScriptEngine;
     };
 
-    class ScriptInstance {
+    class FUSION_API ScriptInstance {
     public:
         ScriptInstance(std::shared_ptr<ScriptClass> scriptClass, entt::entity entity);
 
         void invokeOnCreate();
         void invokeOnUpdate(float ts);
 
-        std::shared_ptr<ScriptClass>& getScriptClass() { return scriptClass; }
+        std::shared_ptr<ScriptClass>& getScriptClass(FUSION_API ) { return scriptClass; }
 
         template<typename T>
         T getFieldValue(const std::string& name) {
@@ -193,7 +193,7 @@ namespace fe {
     class ScriptComponent;
     using ScriptFieldMap = fst::unordered_flatmap<std::string, ScriptFieldInstance>;
 
-    class ScriptEngine : public Module::Registrar<ScriptEngine> {
+    class FUSION_API ScriptEngine : public Module::Registrar<ScriptEngine> {
     public:
         bool loadCoreAssembly(const fs::path& filepath);
         bool loadAppAssembly(const fs::path& filepath);

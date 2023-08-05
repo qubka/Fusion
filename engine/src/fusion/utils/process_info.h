@@ -7,10 +7,10 @@
 #endif
 
 namespace fe {
-    class ProcessInfo {
+    class FUSION_API ProcessInfo {
     public:
         ProcessInfo(unsigned int processId);
-        ~ProcessInfo();
+        ~ProcessInfo() noexcept = default;
 
         unsigned int getProcessId();
         unsigned long long getProcessUptime();
@@ -19,19 +19,19 @@ namespace fe {
         unsigned long getProcessThreadCount();
 
     private:
-        unsigned int mProcessId;
+        unsigned int processId;
 #if FUSION_PLATFORM_WINDOWS
-        int mNumOfProcessors; // numbre of processors
-        ULARGE_INTEGER mCreationTime; // process creation time
-        ULARGE_INTEGER mPrevSystemTime; // previously measured system time
-        ULARGE_INTEGER mPrevKernelTime; // amount of time ran in kernel mode
-        ULARGE_INTEGER mPrevUserTime; // amount of time ran in user mode
+        int numOfProcessors; // numbre of processors
+        ULARGE_INTEGER creationTime; // process creation time
+        ULARGE_INTEGER prevSystemTime; // previously measured system time
+        ULARGE_INTEGER prevKernelTime; // amount of time ran in kernel mode
+        ULARGE_INTEGER prevUserTime; // amount of time ran in user mode
 #elif FUSION_PLATFORM_LINUX
-        long mJiffiesPerSecond;
-        unsigned long long mStartTimeSinceBoot;
-        unsigned long long mPrevSystemTime;
-        unsigned long long mPrevUserTime;
-        unsigned long long mPrevKernelTime;
+        long jiffiesPerSecond;
+        unsigned long long startTimeSinceBoot;
+        unsigned long long prevSystemTime;
+        unsigned long long prevUserTime;
+        unsigned long long prevKernelTime;
 #endif
     };
 }

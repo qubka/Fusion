@@ -27,7 +27,7 @@ namespace fe {
         }
     };
 
-    class Model : public Asset {
+    class FUSION_API Model : public Asset {
     public:
         // aiProcess_Triangulate by default
         Model() = default;

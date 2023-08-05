@@ -7,15 +7,11 @@ using namespace fe;
 #endif
 
 #if FUSION_PLATFORM_ANDROID
-namespace fe::android {
-	AAssetManager* AssetManager = nullptr;
-	void setAssetManager(AAssetManager* assetManager) {
-		AssetManager = assetManager;
-	}
-}
+#include <android/asset_manager.h>
+#include "fusion/devices/device_manager.h"
 #endif
 
-class ViewStorage : public Storage {
+class FUSION_API ViewStorage : public Storage {
 public:
     ViewStorage(const StoragePointer& owner, gsl::span<const std::byte> buffer)
         : owner{owner}
@@ -31,7 +27,7 @@ private:
     gsl::span<const std::byte> buffer;
 };
 
-class MemoryStorage : public Storage {
+class FUSION_API MemoryStorage : public Storage {
 public:
     explicit MemoryStorage(gsl::span<const std::byte> data)
         : buffer(data.size()) {
@@ -58,7 +54,7 @@ private:
 #endif
 
 #if MAPPED_FILES
-class FileStorage : public Storage {
+class FUSION_API FileStorage : public Storage {
 public:
     explicit FileStorage(const fs::path& filepath);
     ~FileStorage() override;
@@ -87,7 +83,8 @@ private:
 FileStorage::FileStorage(const fs::path& filepath) {
 #if FUSION_PLATFORM_ANDROID
     // Load shader from compressed asset
-    asset = AAssetManager_open(fe::android::AssetManager, filepath.string().c_str(), AASSET_MODE_BUFFER);
+    auto assetManager = static_cast<AAssetManager*>(DeviceManager::Get()->getNativeManager());
+    asset = AAssetManager_open(assetManager, filepath.string().c_str(), AASSET_MODE_BUFFER);
     if (!asset)
         throw std::runtime_error("File " + filepath.string() + " could not be opened");
     buffer = { (std::byte*)AAsset_getBuffer(asset), static_cast<size_t>(AAsset_getLength(asset)) };

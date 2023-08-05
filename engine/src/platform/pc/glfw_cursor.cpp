@@ -2,6 +2,8 @@
 
 #include "fusion/bitmaps/bitmap.h"
 
+#include <GLFW/glfw3.h>
+
 using namespace glfw;
 
 Cursor::Cursor(fs::path filepath, fe::CursorHotspot hotspot) : path{std::move(filepath)}, hotspot{hotspot} {

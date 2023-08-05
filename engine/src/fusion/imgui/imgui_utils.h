@@ -194,7 +194,7 @@ namespace ImGuiUtils {
 
         ImGui::PushID(name);
 
-        for (int i = 0; i < L; i++) {
+        for (int i = 0; i < L; ++i) {
             std::string id{ "##" + std::to_string(i) };
             if (ImGui::Checkbox(id.c_str(), &value[i]))
                 updated = true;

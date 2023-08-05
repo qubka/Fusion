@@ -3,7 +3,7 @@
 namespace fe {
     using namespace std::chrono_literals;
 
-    class DateTime {
+    class FUSION_API DateTime {
     public:
         DateTime() = default;
         ~DateTime() = default;

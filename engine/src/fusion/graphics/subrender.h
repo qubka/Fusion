@@ -9,7 +9,7 @@ namespace fe {
     /**
      * @brief Represents a render pipeline that is used to render a type of pipeline.
      */
-    class Subrender {
+    class FUSION_API Subrender {
         friend class Renderer;
         friend class SubrenderHolder;
     public:

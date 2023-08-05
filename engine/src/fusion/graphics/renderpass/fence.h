@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class Fence {
+    class FUSION_API Fence {
     public:
         Fence(bool signaled = false);
         Fence(VkFence fence);

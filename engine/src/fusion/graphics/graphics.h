@@ -25,7 +25,7 @@ namespace fe {
     /**
      * @brief Module that manages the Vulkan's graphics context.
      */
-    class Graphics : public Module::Registrar<Graphics> {
+    class FUSION_API Graphics : public Module::Registrar<Graphics> {
     public:
         Graphics();
         ~Graphics() override;

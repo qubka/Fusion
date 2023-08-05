@@ -1,5 +1,7 @@
 #include "glfw_joystick.h"
 
+#include <GLFW/glfw3.h>
+
 using namespace glfw;
 
 Joystick::Joystick(uint8_t port) : port{port}, name{isGamePad() ? glfwGetGamepadName(port) : glfwGetJoystickName(port)} {
@@ -18,7 +20,7 @@ void Joystick::onUpdate() {
     auto axesPtr = glfwGetJoystickAxes(port, &axeCount);
     axes.resize(axeCount);
 
-    for (int i = 0; i < axeCount; i++) {
+    for (int i = 0; i < axeCount; ++i) {
         float value = axesPtr[i];
         if (axes[i] != value) {
             axes[i] = value;
@@ -30,7 +32,7 @@ void Joystick::onUpdate() {
     auto buttonsPtr = glfwGetJoystickButtons(port, &buttonCount);
     buttons.resize(buttonCount);
 
-    for (int i = 0; i < buttonCount; i++) {
+    for (int i = 0; i < buttonCount; ++i) {
         auto value = static_cast<fe::InputAction>(buttonsPtr[i]);
         if (value != fe::InputAction::Release && buttons[i] != fe::InputAction::Release) {
             buttons[i] = fe::InputAction::Repeat;
@@ -44,7 +46,7 @@ void Joystick::onUpdate() {
     auto hatsPtr = glfwGetJoystickHats(port, &hatCount);
     hats.resize(hatCount);
 
-    for (int i = 0; i < hatCount; i++) {
+    for (int i = 0; i < hatCount; ++i) {
         auto value = bitmask::bitmask<fe::JoystickHat>(static_cast<fe::JoystickHat>(hatsPtr[i]));
         if (hats[i] != value) {
             hats[i] = value;

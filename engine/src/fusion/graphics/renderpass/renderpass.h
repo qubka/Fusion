@@ -5,9 +5,9 @@ namespace fe {
     class TextureDepth;
     class RenderStage;
 
-    class Renderpass {
+    class FUSION_API Renderpass {
     public:
-        class SubpassDescription {
+        class FUSION_API SubpassDescription {
         public:
             SubpassDescription(VkPipelineBindPoint bindPoint, std::vector<VkAttachmentReference>&& colorAttachment, const std::optional<uint32_t>& depthAttachment, bool resolveAttachment) : colorAttachments{std::move(colorAttachment)} {
                 subpassDescription.pipelineBindPoint = bindPoint;

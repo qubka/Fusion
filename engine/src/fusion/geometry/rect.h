@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class Rect {
+    class FUSION_API Rect {
     public:
         //! Initializes the rectangle to be the bounding box of \a points
         Rect(float x1, float y1, float x2, float y2);

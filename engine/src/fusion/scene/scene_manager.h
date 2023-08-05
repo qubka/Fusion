@@ -6,7 +6,7 @@ namespace fe {
     /**
      * @brief Module used for managing game scenes.
      */
-    class SceneManager : public Module::Registrar<SceneManager> {
+    class FUSION_API SceneManager : public Module::Registrar<SceneManager> {
     public:
         SceneManager() = default;
         ~SceneManager() override;

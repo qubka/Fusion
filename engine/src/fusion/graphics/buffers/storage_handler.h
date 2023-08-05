@@ -7,7 +7,7 @@ namespace fe {
     /**
      * @brief Class that handles a storage buffer.
      */
-    class StorageHandler {
+    class FUSION_API StorageHandler {
     public:
         explicit StorageHandler(bool multipipeline = false);
         explicit StorageHandler(const Shader::UniformBlock& uniformBlock, bool multipipeline = false);

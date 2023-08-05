@@ -7,7 +7,7 @@ namespace fe {
     /**
      * @brief Module used for managing assets.
      */
-    class AssetRegistry : public Module::Registrar<AssetRegistry> {
+    class FUSION_API AssetRegistry : public Module::Registrar<AssetRegistry> {
     public:
         AssetRegistry() = default;
         ~AssetRegistry() override;

@@ -3,7 +3,7 @@
 #include "fusion/utils/date_time.h"
 
 namespace fe {
-    class ElapsedTime {
+    class FUSION_API ElapsedTime {
     public:
         explicit ElapsedTime(const DateTime& interval = -1s);
 

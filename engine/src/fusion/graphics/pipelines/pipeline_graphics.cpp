@@ -107,7 +107,7 @@ void PipelineGraphics::createDescriptorLayout() {
     VkDescriptorSetLayoutBindingFlagsCreateInfoEXT setLayoutBindingFlags = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT };
     setLayoutBindingFlags.bindingCount = static_cast<uint32_t>(descriptorSetLayouts.size());
     std::vector<VkDescriptorBindingFlagsEXT> descriptorBindingFlags(descriptorSetLayouts.size());
-    for (size_t i = 0; i < descriptorBindingFlags.size(); i++) {
+    for (size_t i = 0; i < descriptorBindingFlags.size(); ++i) {
         auto setLayout = descriptorSetLayouts[i];
         if ((setLayout.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER || setLayout.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE) && setLayout.descriptorCount > 1) {
             descriptorBindingFlags[i] =
@@ -341,7 +341,7 @@ void PipelineGraphics::createPipelineMrt() {
 	std::vector<VkPipelineColorBlendAttachmentState> blendAttachmentStates;
 	blendAttachmentStates.reserve(attachmentCount);
 
-    for (uint32_t i = 0; i < attachmentCount; i++) {
+    for (uint32_t i = 0; i < attachmentCount; ++i) {
         auto& blendAttachmentState = blendAttachmentStates.emplace_back();
         blendAttachmentState.blendEnable = VK_TRUE;
         blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;

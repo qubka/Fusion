@@ -5,7 +5,7 @@
 namespace fe {
     class Pipeline;
     class CommandBuffer;
-    class ImGuiObject {
+    class FUSION_API ImGuiObject {
         typedef void* ImTextureID;
     public:
         ImGuiObject() = default;

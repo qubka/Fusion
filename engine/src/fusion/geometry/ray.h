@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class Ray {
+    class FUSION_API Ray {
     public:
         Ray();
         Ray(const glm::vec3& origin, const glm::vec3& direction);

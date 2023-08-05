@@ -5,7 +5,7 @@ namespace fe {
     class PhysicalDevice;
     class Window;
 
-    class Surface {
+    class FUSION_API Surface {
         friend class Graphics;
     public:
         Surface(const Instance& instance, const PhysicalDevice& physicalDevice, const Window& window);

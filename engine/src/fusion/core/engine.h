@@ -5,25 +5,23 @@
 #include "module.h"
 #include "application.h"
 
-int main(int argc, char** argv);
-
 namespace fe {
     class DeviceManager;
-    class Engine final {
+    class FUSION_API Engine {
     protected:
         /**
          * Carries out the setup for basic engine components and the engine. Call {@link Engine#Run} after creating a instance.
          * @param args The arguments passed to main.
          */
         explicit Engine(CommandLineArgs&& args);
-        ~Engine();
-        NONCOPYABLE(Engine);
+        virtual ~Engine();
+        NONCOPYABLE(Engine)
 
         /**
          * The run function for the engine.
          * @return {@code EXIT_SUCCESS} or {@code EXIT_FAILURE}
          */
-        int32_t run();
+        virtual int32_t run() = 0;
 
     public:
         /**
@@ -63,6 +61,12 @@ namespace fe {
         void setApp(std::unique_ptr<Application>&& app) { application = std::move(app); }
 
         /**
+         * Gets the current app object.
+         * @return The object.
+         */
+        virtual void* getNativeApp() const = 0;
+
+        /**
          * Gets if the engine is running.
          * @return If the engine is running.
          */
@@ -73,7 +77,7 @@ namespace fe {
          */
         void requestClose() { running = false; }
 
-    private:
+    protected:
         static Engine* Instance;
 
         /**
@@ -92,6 +96,11 @@ namespace fe {
         void shutdown();
 
         /**
+         * The update main application and devices.
+         */
+        void updateMain();
+
+        /**
          * The update engine modules for the required stage.
          */
         void updateStage(Module::Stage stage);
@@ -108,7 +117,5 @@ namespace fe {
         std::array<std::vector<uint32_t>, me::enum_count<Module::Stage>()> stages;
 
         bool running{ false };
-
-        friend int ::main(int argc, char** argv);
     };
 }

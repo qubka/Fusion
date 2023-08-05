@@ -11,7 +11,7 @@ namespace fe {
     /**
      * @brief Class that represents a graphics pipeline.
      */
-    class PipelineGraphics : public Pipeline {
+    class FUSION_API PipelineGraphics : public Pipeline {
     public:
         enum class Mode : unsigned char {
             Polygon,

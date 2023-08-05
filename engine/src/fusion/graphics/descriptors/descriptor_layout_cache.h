@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class DescriptorLayoutCache {
+    class FUSION_API DescriptorLayoutCache {
     public:
         explicit DescriptorLayoutCache(VkDevice device);
         ~DescriptorLayoutCache();

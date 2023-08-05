@@ -40,7 +40,7 @@ void main() {
     vec4 position = vec4(0.0f);
     vec4 normal = vec4(0.0f);
 
-    for (int i = 0; i < MAX_WEIGHTS; i++) {
+    for (int i = 0; i < MAX_WEIGHTS; ++i) {
         mat4 jointTransform = animation.jointTransforms[inJointIds[i]];
         vec4 posePosition = jointTransform * vec4(inPosition, 1.0f);
         position += posePosition * inWeights[i];

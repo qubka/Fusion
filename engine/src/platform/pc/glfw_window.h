@@ -3,10 +3,12 @@
 #include "fusion/devices/window.h"
 #include "fusion/devices/monitor.h"
 
-#include <GLFW/glfw3.h>
+extern "C" {
+    typedef struct GLFWwindow GLFWwindow;
+}
 
 namespace glfw {
-    class Window : public fe::Window {
+    class FUSION_API Window : public fe::Window {
         friend class DeviceManager;
     public:
         Window(const fe::VideoMode& videoMode, const fe::WindowInfo& windowInfo);
@@ -36,8 +38,8 @@ namespace glfw {
         bool isVisible() const override { return visible; }
         void setVisible(bool flag) override;
 
-        bool isClose() const override { return glfwWindowShouldClose(window); };
-        void setClose(bool flag) override { glfwSetWindowShouldClose(window, flag); }
+        bool isClose() const override;
+        void setClose(bool flag) override;
 
         const glm::uvec2& getSize(bool checkFullscreen = true) const override { return (fullscreen && checkFullscreen) ? fullscreenSize : size; }
         void setSize(const glm::ivec2& size) override;
@@ -49,8 +51,8 @@ namespace glfw {
         const std::string& getTitle() const override { return title; }
         void setTitle(std::string_view str) override;
 
-        const char* getClipboard() const override { return glfwGetClipboardString(window); }
-        void setClipboard(std::string_view str) override { glfwSetClipboardString(window, str.data()); }
+        const char* getClipboard() const override;
+        void setClipboard(std::string_view str) override;
 
         bool isSelected() const override { return selected; }
 
@@ -121,12 +123,8 @@ namespace glfw {
         static void ScrollCallback(GLFWwindow* window, double offsetX, double offsetY);
         static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void CharCallback(GLFWwindow* window, unsigned int keycode);
-#if GLFW_VERSION_MINOR >= 1
         static void FileDropCallback(GLFWwindow* window, int count, const char** paths);
-#endif
-#if GLFW_VERSION_MINOR >= 3
         static void MaximizeCallback(GLFWwindow* window, int maximized);
         static void ContentScaleCallback(GLFWwindow* window, float scaleX, float scaleY);
-#endif
     };
 }

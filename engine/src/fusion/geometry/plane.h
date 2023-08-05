@@ -3,7 +3,7 @@
 namespace fe {
     class Ray;
 
-    class Plane {
+    class FUSION_API Plane {
     public:
         Plane();
         Plane(const glm::vec3& normal, const glm::vec3& point);

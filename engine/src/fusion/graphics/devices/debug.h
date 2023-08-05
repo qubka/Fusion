@@ -6,7 +6,7 @@ namespace fe {
     // Note that the extension will only be present if run from an offline debugging application
     // The actual check for extension presence and enabling it on the device is done in the example base class
     // See VulkanExampleBase::createInstance and VulkanExampleBase::createDevice (base/vulkanexamplebase.cpp)
-    class DebugMarker {
+    class FUSION_API DebugMarker {
     public:
         DebugMarker(VkDevice device);
         ~DebugMarker() = default;

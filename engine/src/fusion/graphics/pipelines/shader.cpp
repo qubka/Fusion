@@ -15,7 +15,7 @@
 
 using namespace fe;
 
-class ShaderIncluder : public glslang::TShader::Includer {
+class FUSION_API ShaderIncluder : public glslang::TShader::Includer {
 public:
 	IncludeResult* includeLocal(const char* headerName, const char* includerName, size_t inclusionDepth) override {
 		auto directory = fs::path(includerName).parent_path();
@@ -578,10 +578,10 @@ VkShaderModule Shader::createShaderModule(const std::string& moduleName, const s
 	for (int32_t i = program.getNumLiveUniformBlocks() - 1; i >= 0; i--)
 		loadUniformBlock(program, moduleFlag, i);
 
-	for (int32_t i = 0; i < program.getNumLiveUniformVariables(); i++)
+	for (int32_t i = 0; i < program.getNumLiveUniformVariables(); ++i)
 		loadUniform(program, moduleFlag, i);
 
-	for (int32_t i = 0; i < program.getNumLiveAttributes(); i++)
+	for (int32_t i = 0; i < program.getNumLiveAttributes(); ++i)
 		loadAttribute(program, moduleFlag, i);
 
     // Custom traverser used
@@ -803,7 +803,7 @@ void Shader::loadAttribute(const glslang::TProgram& program, VkShaderStageFlagBi
 }
 
 void Shader::loadConstants(const glslang::TIntermediate& intermediate, VkShaderStageFlagBits stageFlag) {
-    class ConstantTraverser : public glslang::TIntermTraverser {
+    class FUSION_API ConstantTraverser : public glslang::TIntermTraverser {
     public:
         ConstantTraverser(fst::unordered_flatmap<std::string, Shader::Constant>& constants, VkShaderStageFlagBits stageFlag)
                 : TIntermTraverser{}, constants{constants}, stageFlag{stageFlag} {}

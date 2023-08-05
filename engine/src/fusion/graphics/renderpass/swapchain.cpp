@@ -89,7 +89,7 @@ Swapchain::Swapchain(const PhysicalDevice& physicalDevice, const LogicalDevice& 
 
 	VK_CHECK(vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, images.data()));
 
-	for (uint32_t i = 0; i < imageCount; i++) {
+	for (uint32_t i = 0; i < imageCount; ++i) {
 		Image::CreateImageView(images[i], imageViews[i], VK_IMAGE_VIEW_TYPE_2D, surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, 1, 0, 1, 0);
 	}
 }

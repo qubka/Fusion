@@ -592,8 +592,6 @@ InspectorPanel::InspectorPanel(Editor& editor) : EditorPanel{ICON_MDI_INFORMATIO
     REG_COMPONENT(TransformComponent, "Transform");
     REG_COMPONENT(MeshComponent, "Mesh");
     REG_COMPONENT(CameraComponent, "Camera");
-    REG_COMPONENT(LightComponent, "Light");
-    REG_COMPONENT(ScriptComponent, "Script");
     REG_COMPONENT(MaterialComponent, "Material");
     REG_COMPONENT(RigidbodyComponent, "Rigidbody");
     REG_COMPONENT(BoxColliderComponent, "Box Collider");
@@ -601,6 +599,10 @@ InspectorPanel::InspectorPanel(Editor& editor) : EditorPanel{ICON_MDI_INFORMATIO
     REG_COMPONENT(CapsuleColliderComponent, "Capsule Collider");
     REG_COMPONENT(MeshColliderComponent, "Mesh Collider");
     REG_COMPONENT(PhysicsMaterialComponent, "Physics Material");
+    REG_COMPONENT(LightComponent, "Light");
+#if FUSION_SCRIPTING
+    REG_COMPONENT(ScriptComponent, "Script");
+#endif
 }
 
 InspectorPanel::~InspectorPanel() {

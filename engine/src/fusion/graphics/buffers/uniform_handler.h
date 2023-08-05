@@ -7,7 +7,7 @@ namespace fe {
     /**
      * @brief Class that handles a uniform buffer.
      */
-    class UniformHandler {
+    class FUSION_API UniformHandler {
     public:
         explicit UniformHandler(bool multipipeline = false);
         explicit UniformHandler(const Shader::UniformBlock& uniformBlock, bool multipipeline = false);

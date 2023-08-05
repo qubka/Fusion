@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class CommandLineArgs {
+    class FUSION_API CommandLineArgs {
     public:
         CommandLineArgs() = default;
         CommandLineArgs(int count, char** args);
@@ -13,7 +13,7 @@ namespace fe {
         fst::unordered_flatmap<std::string, std::string> arguments;
     };
 
-    class CommandLineParser {
+    class FUSION_API CommandLineParser {
     public:
         CommandLineParser();
         ~CommandLineParser() = default;
@@ -55,7 +55,7 @@ namespace fe {
         }
     };
 
-    class Command {
+    class FUSION_API Command {
         /**
          * Execute system command and get STDOUT result.
          * Regular system() only gives back exit status, this gives back output as well.

@@ -87,7 +87,7 @@ void ContentBrowserPanel::onImGui() {
                             current = current->parent;
                         } else {
                             breadCrumbData.push_back(baseDirectory);
-                            current = nullptr;
+                            current.reset();
                         }
                     }
 
@@ -422,8 +422,8 @@ void ContentBrowserPanel::refresh() {
     directories.clear();
     auto base = processDirectory(root, nullptr);
     baseDirectory = directories[base];
-    previousDirectory = nullptr;
-    currentDirectory = nullptr;
+    previousDirectory.reset();
+    currentDirectory.reset();
 
     if (directories.find(currentPath) != directories.end())
         currentDirectory = directories[currentPath];

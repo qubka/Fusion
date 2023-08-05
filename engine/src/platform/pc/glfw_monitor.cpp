@@ -1,6 +1,8 @@
 #include "glfw_monitor.h"
 #include "glfw_device_manager.h"
 
+#include <GLFW/glfw3.h>
+
 using namespace glfw;
 
 Monitor::Monitor(GLFWmonitor* monitor) : monitor{monitor}, name{glfwGetMonitorName(monitor)} {
@@ -12,7 +14,7 @@ Monitor::Monitor(GLFWmonitor* monitor) : monitor{monitor}, name{glfwGetMonitorNa
     //std::vector<fe::VideoMode> modes;
     modes.reserve(videoModeCount);
 
-    for (int i = 0; i < videoModeCount; i++)
+    for (int i = 0; i < videoModeCount; ++i)
         modes.push_back(*reinterpret_cast<const fe::VideoMode*>(&videoModes[i]));
 }
 
@@ -65,4 +67,8 @@ const fe::GammaRamp& Monitor::getGammaRamp() const {
 void Monitor::setGammaRamp(const fe::GammaRamp& gammaRamp) {
     auto ramp = reinterpret_cast<const GLFWgammaramp*>(&gammaRamp);
     glfwSetGammaRamp(monitor, ramp);
+}
+
+bool Monitor::isPrimary() const {
+   return monitor == glfwGetPrimaryMonitor();
 }

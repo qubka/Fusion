@@ -2,8 +2,11 @@
 
 #include "fusion/devices/device_manager.h"
 
+class ANativeWindow;
+class AAssetManager;
+
 namespace android {
-    class DeviceManager : public fe::DeviceManager {
+    class FUSION_API DeviceManager : public fe::DeviceManager {
         friend class Engine;
     public:
         DeviceManager();
@@ -21,7 +24,15 @@ namespace android {
         fe::Window* createWindow(const fe::WindowInfo& windowInfo) override;
         fe::Cursor* createCursor(const fs::path& filepath, fe::CursorHotspot hotspot) override;
 
+        void* getNativeManager() const override { return assetManager; }
+
     protected:
+        void onStart() override;
         void onUpdate() override;
+        void onStop() override {};
+
+    private:
+        AAssetManager* assetManager{ nullptr };
+        ANativeWindow* nativeWindow{ nullptr };
     };
 }

@@ -4,7 +4,7 @@
 #include "fusion/geometry/ray.h"
 
 namespace fe {
-    class Camera {
+    class FUSION_API Camera {
     public:
         Camera();
         Camera(float fov, float near, float far, float aspect);

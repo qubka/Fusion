@@ -12,7 +12,7 @@ namespace fe {
     /**
      * @brief Class that handles a descriptor set.
      */
-    class DescriptorsHandler {
+    class FUSION_API DescriptorsHandler {
     public:
         DescriptorsHandler() = default;
         explicit DescriptorsHandler(const Pipeline& pipeline);

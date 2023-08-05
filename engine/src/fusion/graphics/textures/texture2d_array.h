@@ -6,7 +6,7 @@ namespace fe {
     /**
      * @brief Resource that represents an array of 2D images.
      */
-    class Texture2dArray : public Texture {
+    class FUSION_API Texture2dArray : public Texture {
     public:
         Texture2dArray() = default;
 

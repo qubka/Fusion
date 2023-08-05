@@ -3,7 +3,7 @@
 #include "fusion/core/default_application.h"
 
 namespace fe {
-    class Sandbox : public DefaultApplication {
+    class FUSION_API Sandbox : public DefaultApplication {
     public:
         explicit Sandbox(std::string_view name);
         ~Sandbox() override;

@@ -3,7 +3,7 @@
 namespace fe {
     class Pipeline;
     class CommandBuffer;
-    class DescriptorSet {
+    class FUSION_API DescriptorSet {
     public:
         explicit DescriptorSet(const Pipeline& pipeline);
         ~DescriptorSet();

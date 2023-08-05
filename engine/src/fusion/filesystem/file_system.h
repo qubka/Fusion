@@ -36,7 +36,7 @@ namespace fe {
     BITMASK_DEFINE_MAX_ELEMENT(FileAttributes, Symlink);
 #endif
 
-    class FileSystem : public Module::Registrar<FileSystem> {
+    class FUSION_API FileSystem : public Module::Registrar<FileSystem> {
     public:
         FileSystem();
         ~FileSystem() override;

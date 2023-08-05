@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class System {
+    class FUSION_API System {
         friend class Scene;
     public:
         explicit System(entt::registry& registry) : registry{registry} {}

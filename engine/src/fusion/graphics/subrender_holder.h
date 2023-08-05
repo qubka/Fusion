@@ -7,7 +7,7 @@ namespace fe {
     /**
      * @brief Class that contains and manages subrenders registered to a render manager.
      */
-    class SubrenderHolder {
+    class FUSION_API SubrenderHolder {
         friend class Graphics;
     public:
         SubrenderHolder() = default;

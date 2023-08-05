@@ -3,7 +3,7 @@
 #include "fusion/utils/date_time.h"
 
 namespace fe {
-    class Time : public Module::Registrar<Time> {
+    class FUSION_API Time : public Module::Registrar<Time> {
     public:
         Time() { lastTime = frameTime = DateTime::Now(); }
         ~Time() override = default;

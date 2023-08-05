@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    class Vertex {
+    class FUSION_API Vertex {
     public:
         /**
          * @brief Vertex layout components.
@@ -32,7 +32,7 @@ namespace fe {
         /**
          * @brief Stores vertex layout components for model loading and Vulkan vertex input and atribute bindings for shader.
          */
-        class Layout {
+        class FUSION_API Layout {
         public:
             Layout(const std::initializer_list<Component>& components) : components{components} {
                 for (const auto& component : this->components) {
@@ -80,7 +80,7 @@ namespace fe {
         /**
          * @brief Class used to define sets of vertex inputs used in a shader.
          */
-        class Input {
+        class FUSION_API Input {
         public:
             Input() = default;
             Input(const std::initializer_list<Layout>& vertexLayouts) {

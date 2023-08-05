@@ -145,7 +145,7 @@ uint32_t Buffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags requi
     const auto& physicalDevice = Graphics::Get()->getPhysicalDevice();
     auto memoryProperties = physicalDevice.getMemoryProperties();
 
-    for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++) {
+    for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i) {
         uint32_t memoryTypeBits = 1 << i;
 
         if (typeFilter & memoryTypeBits && (memoryProperties.memoryTypes[i].propertyFlags & requiredProperties) == requiredProperties) {

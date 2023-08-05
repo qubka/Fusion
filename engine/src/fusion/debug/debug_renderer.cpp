@@ -250,7 +250,7 @@ void DebugRenderer::DebugDraw(const LightComponent& light, const glm::vec3& posi
 void DebugRenderer::DebugDrawCircle(int numVerts, float radius, const glm::vec3& position, const glm::quat& rotation, const glm::vec4& color) {
     float step = 360.0f / static_cast<float>(numVerts);
 
-    for (int i = 0; i < numVerts; i++) {
+    for (int i = 0; i < numVerts; ++i) {
         float a = static_cast<float>(i);
         float cx = glm::cos(step * a) * radius;
         float cy = glm::sin(step * a) * radius;
@@ -276,7 +276,7 @@ void DebugRenderer::DebugDrawCone(int numCircleVerts, int numLinesToCircle, floa
     glm::vec3 endPosition{ position + forward * length };
     DebugDrawCircle(numCircleVerts, endAngle, endPosition, rotation, color);
 
-    for (int i = 0; i < numLinesToCircle; i++) {
+    for (int i = 0; i < numLinesToCircle; ++i) {
         float a = static_cast<float>(i) * 90.0f;
         glm::vec3 point{ rotation * glm::vec3{ glm::cos(a), glm::sin(a), 0.0f } * endAngle };
         DrawHairLine(position, position + point + forward * length, color);
@@ -289,7 +289,7 @@ void DebugDrawArc(int numVerts, float radius, const glm::vec3& start, const glm:
     rot = rotation * rot;
 
     glm::vec3 arcCentre = (start + end) * 0.5f;
-    for (int i = 0; i < numVerts; i++) {
+    for (int i = 0; i < numVerts; ++i) {
         float a = static_cast<float>(i);
         float cx = glm::cos(step * a) * radius;
         float cy = glm::sin(step * a) * radius;
@@ -315,7 +315,7 @@ void DebugRenderer::DebugDrawCapsule(const glm::vec3& position, const glm::quat&
     // Draw 10 arcs
     // Sides
     static constexpr float step = 360.0f / 20.0f;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 20; ++i) {
         float a = static_cast<float>(i);
         float z = glm::cos(step * a) * radius;
         float x = glm::sin(step * a) * radius;

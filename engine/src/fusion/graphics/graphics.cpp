@@ -44,7 +44,7 @@ Graphics::~Graphics() {
     perSurfaceBuffers.clear();
     commandPools.clear();
 
-    renderer = nullptr;
+    renderer.reset();
 }
 
 void Graphics::onStop() {
@@ -389,7 +389,7 @@ Graphics::PerSurfaceBuffers::PerSurfaceBuffers() {
     const auto& logicalDevice = Graphics::Get()->getLogicalDevice();
     auto graphicsQueue = logicalDevice.getGraphicsQueue();
 
-    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
         tracyContexts[i] = TracyVkContext(physicalDevice, logicalDevice, graphicsQueue, tracyBuffer);
 
     VK_CHECK(vkQueueWaitIdle(graphicsQueue));
@@ -398,7 +398,7 @@ Graphics::PerSurfaceBuffers::PerSurfaceBuffers() {
 
 Graphics::PerSurfaceBuffers::~PerSurfaceBuffers() {
 #if FUSION_PROFILE && TRACY_ENABLE
-    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
         TracyVkDestroy(tracyContexts[i]);
 #endif
 }

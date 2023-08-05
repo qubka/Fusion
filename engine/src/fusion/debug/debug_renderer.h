@@ -7,7 +7,7 @@ namespace fe {
     class Sphere;
     class LightComponent;
 
-    class DebugRenderer : public Module::Registrar<DebugRenderer> {
+    class FUSION_API DebugRenderer : public Module::Registrar<DebugRenderer> {
     public:
         explicit DebugRenderer() = default;
         ~DebugRenderer() override = default;

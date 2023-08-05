@@ -8,7 +8,7 @@ namespace fe {
     /**
      * @brief Class that is used to represent a pipeline.
      */
-    class Pipeline {
+    class FUSION_API Pipeline {
     public:
         /**
          * Represents position in the render structure, first value being the renderpass and second for subpass.

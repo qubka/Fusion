@@ -147,7 +147,7 @@ void main() {
 		F0 = mix(F0, diffuse.rgb, metallic);
 		vec3 Lo = vec3(0.0f);
 
-		for (int i = 0; i < scene.lightsCount; i++) {
+		for (int i = 0; i < scene.lightsCount; ++i) {
 			Light light = bufferLights.lights[i];
 			vec3 L = light.position - worldPosition;
 			float Dl = length(L);

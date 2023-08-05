@@ -3,7 +3,7 @@
 #include <imgui/imgui.h>
 
 namespace ImGui {
-    class ColorScheme {
+    class FUSION_API ColorScheme {
     public:
         static void SetColors(uint32_t backGroundColor, uint32_t textColor, uint32_t mainColor, uint32_t mainAccentColor, uint32_t highlightColor) {
             BackGroundColor = backGroundColor;
