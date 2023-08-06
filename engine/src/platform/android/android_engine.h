@@ -4,17 +4,14 @@
 
 struct android_app;
 
-void android_main(struct android_app* state);
-
-namespace android {
+namespace fe::android {
     class FUSION_API Engine : public fe::Engine {
-    protected:
-        explicit Engine(struct android_app* app, fe::CommandLineArgs&& args);
+    public:
+        explicit Engine(struct android_app* app, CommandLineArgs&& args);
         ~Engine() override = default;
 
         int32_t run() override;
 
-    public:
         void* getNativeApp() const override { return app; }
 
     private:
@@ -22,7 +19,5 @@ namespace android {
         bool render{ false };
 
         static void OnAppCmd(struct android_app* app, int32_t cmd);
-
-        friend void ::android_main(struct android_app* state);
     };
 }

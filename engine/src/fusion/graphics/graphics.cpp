@@ -130,7 +130,7 @@ bool Graphics::beginFrame(FrameInfo& info) {
         throw std::runtime_error("Failed to acquire swap chain image!");
 #endif
 
-    assert(!commandBuffer.isRunning());
+    FS_ASSERT(!commandBuffer.isRunning());
 
     commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
@@ -144,7 +144,7 @@ bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
     FUSION_PROFILE_GPU("Begin Renderpass");
 
     if (renderStage.isOutOfDate()) {
-        //LOG_WARNING << "Render stage is out of date!";
+        //FS_LOG_WARNING("Render stage is out of date!");
         recreatePass(info, renderStage);
         return false;
     }
@@ -285,7 +285,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     bitmap.write(filepath);
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Screenshot \"" << filepath << "\" created in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    FS_LOG_DEBUG("Screenshot '{}' created in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 }
 
@@ -319,7 +319,7 @@ void Graphics::recreateSwapchain(size_t id) {
 
 #if FUSION_DEBUG
     //auto& size = surface->getWindow().getSize();
-    //LOG_DEBUG << "Recreating swapchain[" << id << "] old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")";
+    //FS_LOG_DEBUG("Recreating swapchain[" << id << "] old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")");
 #endif
     swapchain = std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, swapchain.get());
 

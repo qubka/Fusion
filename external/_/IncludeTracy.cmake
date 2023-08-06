@@ -1,0 +1,5 @@
+find_package(tracy QUIET)
+if(NOT tracy_FOUND)
+    add_subdirectory(tracy)
+endif()
+list(APPEND ALL_LIBS TracyClient)

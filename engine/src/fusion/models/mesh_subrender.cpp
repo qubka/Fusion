@@ -13,7 +13,7 @@ static const uint32_t MAX_LIGHTS = 32; // TODO: Make configurable.
 MeshSubrender::MeshSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
         , pipeline{pipelineStage,
-                   {"engine/assets/shaders/simple/simple.vert", "engine/assets/shaders/simple/simple.frag"},
+                   {"assets/shaders/simple/simple.vert", "assets/shaders/simple/simple.frag"},
                    {{{
                        Vertex::Component::Position,
                        Vertex::Component::Normal,

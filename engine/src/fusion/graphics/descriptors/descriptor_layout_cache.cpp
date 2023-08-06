@@ -42,7 +42,7 @@ VkDescriptorSetLayout DescriptorLayoutCache::createDescriptorLayout(const VkDesc
 
     // Try to grab from cache
     if (auto it = layoutCache.find(layoutInfo); it != layoutCache.end()) {
-        LOG_INFO << "Find \"VkDescriptorSetLayout\" in cache";
+        FS_LOG_INFO("Find 'VkDescriptorSetLayout' in cache");
         return it->second;
     } else {
         // Create a new one (not found)

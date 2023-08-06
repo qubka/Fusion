@@ -6,7 +6,7 @@ extern "C" {
     typedef struct GLFWmonitor GLFWmonitor;
 }
 
-namespace glfw {
+namespace fe::glfw {
     class FUSION_API DeviceManager : public fe::DeviceManager {
         friend class Engine;
     public:
@@ -15,15 +15,15 @@ namespace glfw {
 
         void waitEvents() override;
 
-        fe::Key getScanCode(fe::Key key) const override;
-        std::string getKeyName(fe::Key key, fe::Key scancode) const override;
+        Key getScanCode(Key key) const override;
+        std::string getKeyName(Key key, Key scancode) const override;
 
         std::vector<const char*> getRequiredInstanceExtensions() const override;
         bool isRawMouseMotionSupported() const override;
         void updateGamepadMappings(std::string_view mappings) override;
 
-        fe::Window* createWindow(const fe::WindowInfo& windowInfo) override;
-        fe::Cursor* createCursor(const fs::path& filepath, fe::CursorHotspot hotspot) override;
+        Window* createWindow(const WindowInfo& windowInfo) override;
+        Cursor* createCursor(const fs::path& filepath, CursorHotspot hotspot) override;
 
         void* getNativeManager() const override { return (void*) this; }
 

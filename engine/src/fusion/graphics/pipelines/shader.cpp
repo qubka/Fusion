@@ -21,7 +21,7 @@ public:
 		auto directory = fs::path(includerName).parent_path();
 		auto fileLoaded = FileSystem::ReadText(directory / headerName);
 		if (fileLoaded.empty()) {
-            LOG_ERROR << "Shader Include could not be loaded: \"" << headerName << "\"";
+            FS_LOG_ERROR("Shader Include could not be loaded: '{}'", headerName);
 			return nullptr;
 		}
 
@@ -34,7 +34,7 @@ public:
 	IncludeResult* includeSystem(const char* headerName, const char* includerName, size_t inclusionDepth) override {
 		auto fileLoaded = FileSystem::ReadText(headerName);
 		if (fileLoaded.empty()) {
-            LOG_ERROR << "Shader Include could not be loaded: \"" << headerName << "\"";
+            FS_LOG_ERROR("Shader Include could not be loaded: '{}'", headerName);
 			return nullptr;
 		}
 
@@ -548,21 +548,21 @@ VkShaderModule Shader::createShaderModule(const std::string& moduleName, const s
 	std::string str;
 
 	if (!shader.preprocess(&resources, defaultVersion, ENoProfile, false, false, messages, &str, includer)) {
-        LOG_DEBUG << "\"" << shader.getInfoLog() << "\"";
-        LOG_DEBUG << "\"" << shader.getInfoDebugLog() << "\"";
-        LOG_ERROR << "SPRIV shader preprocess failed!";
+        FS_LOG_DEBUG(shader.getInfoLog());
+        FS_LOG_DEBUG(shader.getInfoDebugLog());
+        FS_LOG_ERROR("SPRIV shader preprocess failed!");
 	}
 
 	if (!shader.parse(&resources, defaultVersion, true, messages, includer)) {
-        LOG_DEBUG << "\"" << shader.getInfoLog() << "\"";
-        LOG_DEBUG << "\"" << shader.getInfoDebugLog() << "\"";
-        LOG_ERROR << "SPRIV shader parse failed!";
+        FS_LOG_DEBUG(shader.getInfoLog());
+        FS_LOG_DEBUG(shader.getInfoDebugLog());
+        FS_LOG_ERROR("SPRIV shader parse failed!");
 	}
 
 	program.addShader(&shader);
 
 	if (!program.link(messages) || !program.mapIO()) {
-		LOG_ERROR << "Error while linking shader program.";
+		FS_LOG_ERROR("Error while linking shader program.");
 	}
 
 	program.buildReflection();
@@ -629,7 +629,7 @@ std::optional<Shader::Specialization> Shader::createSpecialization(const fst::un
         return std::nullopt;
 
     if (data.size() != mapEntries.size()) {
-        LOG_ERROR << "Invalid amount of specialization constants provided in \"" << name << "\"" << " required = " << mapEntries.size() << ", provided = " << data.size();
+        FS_LOG_ERROR("Invalid amount of specialization constants provided in '{}' required = {}, provided = {}", name, mapEntries.size(), data.size());
         return std::nullopt;
     }
 
@@ -745,7 +745,8 @@ void Shader::loadUniformBlock(const glslang::TProgram& program, VkShaderStageFla
     auto& qualifier = reflection.getType()->getQualifier();
 
     if (auto it = uniformBlocks.find(reflection.name); it != uniformBlocks.end()) {
-        it->second.stageFlags |= stageFlag;
+        auto& uniformBlock = it->second;
+        uniformBlock.stageFlags |= stageFlag;
         return;
     }
 
@@ -773,16 +774,18 @@ void Shader::loadUniform(const glslang::TProgram& program, VkShaderStageFlagBits
 		if (splitName.size() > 1) {
             auto& name = splitName.front();
             if (auto it = uniformBlocks.find(name); it != uniformBlocks.end()) {
-                it->second.uniforms.emplace(String::ReplaceFirst(reflection.name, name + ".", ""),
-                                            Uniform{ static_cast<int32_t>(qualifier.layoutSet), reflection.getBinding(), reflection.offset,
-                                                     computeSize(*reflection.getType()), reflection.glDefineType, false, false, stageFlag });
+                auto& uniformBlock = it->second;
+                uniformBlock.uniforms.emplace(String::ReplaceFirst(reflection.name, name + ".", ""),
+                                              Uniform{ static_cast<int32_t>(qualifier.layoutSet), reflection.getBinding(), reflection.offset,
+                                                       computeSize(*reflection.getType()), reflection.glDefineType, false, false, stageFlag });
                 return;
             }
 		}
 	}
 
     if (auto it = uniforms.find(reflection.name); it != uniforms.end()) {
-        it->second.stageFlags |= stageFlag;
+        auto& uniform = it->second;
+        uniform.stageFlags |= stageFlag;
         return;
     }
 
@@ -817,10 +820,11 @@ void Shader::loadConstants(const glslang::TIntermediate& intermediate, VkShaderS
                 auto specId = static_cast<int32_t>(symbol->getQualifier().layoutSpecConstantId);
 
                 if (auto it = constants.find(name); it != constants.end()) {
-                    if (it->second.specId != specId) {
-                        LOG_WARNING << "Same constants with different specialization constant Id";
+                    auto& constant = it->second;
+                    if (constant.specId != specId) {
+                        FS_LOG_WARNING("Same constants with different specialization constant Id");
                     }
-                    it->second.stageFlags |= stageFlag;
+                    constant.stageFlags |= stageFlag;
                     return;
                 }
 

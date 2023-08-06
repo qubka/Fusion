@@ -17,12 +17,16 @@
 #include <binary_fonts/RobotoRegular.inl>
 #include <binary_fonts/RobotoBold.inl>
 
+#if FUSION_PLATFORM_ANDROID
+#include <android/configuration.h>
+#endif
+
 using namespace fe;
 
 ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
         , pipeline{pipelineStage,
-                   {"engine/assets/shaders/imgui/imgui.vert", "engine/assets/shaders/imgui/imgui.frag"},
+                   {"assets/shaders/imgui/imgui.vert", "assets/shaders/imgui/imgui.frag"},
                    {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}},
                    {},
                    PipelineGraphics::Mode::Polygon,
@@ -33,9 +37,9 @@ ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
         , descriptorSet{pipeline} {
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
-    LOG_INFO << "ImGui Version: " << IMGUI_VERSION;
+    FS_LOG_INFO("ImGui Version: {}", IMGUI_VERSION);
 #ifdef IMGUI_USER_CONFIG
-    LOG_INFO << "ImConfig File: " << IMGUI_USER_CONFIG;
+    FS_LOG_INFO("ImConfig File: {}", IMGUI_USER_CONFIG);
 #endif
 
     fontSize = 14.0f;
@@ -54,7 +58,7 @@ ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
     } else if (screenDensity >= ACONFIGURATION_DENSITY_HIGH) {
         fontScale = 2.0f;
     };
-    LOG_DEBUG << "Android UI scale: " << fontScale;
+    FS_LOG_DEBUG("Android UI scale: {}", fontScale);
 #elif FUSION_PLATFORM_IOS
     fontScale = 2.0f;
 #else

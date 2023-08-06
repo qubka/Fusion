@@ -4,10 +4,10 @@
 
 #include <GLFW/glfw3.h>
 
-using namespace glfw;
+using namespace fe::glfw;
 
-Cursor::Cursor(fs::path filepath, fe::CursorHotspot hotspot) : path{std::move(filepath)}, hotspot{hotspot} {
-    fe::Bitmap bitmap{path};
+Cursor::Cursor(fs::path filepath, CursorHotspot hotspot) : path{std::move(filepath)}, hotspot{hotspot} {
+    Bitmap bitmap{path};
     if (!bitmap)
         return;
 
@@ -17,26 +17,26 @@ Cursor::Cursor(fs::path filepath, fe::CursorHotspot hotspot) : path{std::move(fi
     image.pixels = bitmap.getData<unsigned char>();
 
     switch (hotspot) {
-        case fe::CursorHotspot::UpperLeft:
+        case CursorHotspot::UpperLeft:
             cursor = glfwCreateCursor(&image, 0, 0);
             break;
-        case fe::CursorHotspot::UpperRight:
+        case CursorHotspot::UpperRight:
             cursor = glfwCreateCursor(&image, image.width - 1, 0);
             break;
-        case fe::CursorHotspot::BottomLeft:
+        case CursorHotspot::BottomLeft:
             cursor = glfwCreateCursor(&image, 0, image.height - 1);
             break;
-        case fe::CursorHotspot::BottomRight:
+        case CursorHotspot::BottomRight:
             cursor = glfwCreateCursor(&image, image.width - 1, image.height - 1);
             break;
-        case fe::CursorHotspot::Centered:
+        case CursorHotspot::Centered:
             cursor = glfwCreateCursor(&image, image.width / 2, image.height / 2);
             break;
     }
 }
 
-Cursor::Cursor(fe::CursorStandard standard) : standard{standard} {
-    if (standard == fe::CursorStandard::None) standard = fe::CursorStandard::Arrow;
+Cursor::Cursor(CursorStandard standard) : standard{standard} {
+    if (standard == CursorStandard::None) standard = CursorStandard::Arrow;
     cursor = glfwCreateStandardCursor(0x00036000 | (static_cast<int>(standard)));
 }
 

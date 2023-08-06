@@ -6,6 +6,7 @@
 #include "fusion/skybox/atmosphere_subrender.h"
 #include "fusion/skybox/skybox_subrender.h"
 #include "fusion/models/mesh_subrender.h"
+#include "fusion/models/mesh2_subrender.h"
 #include "fusion/ligthing/light_subrender.h"
 //#include "fusion/post/deferred/deferred_subrender.h"
 #include "fusion/debug/debug_subrender.h"
@@ -25,7 +26,7 @@ namespace fe {
             std::vector<SubpassType> renderpassSubpasses0 = {
                    // {0, {0, 1, 2, 3, 4}},
                     {0, {0, 1}},
-            };
+            };//
 
             addRenderStage(std::make_unique<RenderStage>(std::move(renderpassAttachments0), std::move(renderpassSubpasses0)));
 
@@ -52,12 +53,12 @@ namespace fe {
 
     private:
         void onStart() override {
-            addSubrender<MeshSubrender>({0, 0});
+            addSubrender<Mesh2Subrender>({0, 0});
             addSubrender<LightSubrender>({0, 0});
             addSubrender<DebugSubrender>({0, 0});
             addSubrender<GridSubrender>({0, 0});
 
-            addSubrender<MeshSubrender>({1, 0});
+            addSubrender<Mesh2Subrender>({1, 0});
             addSubrender<LightSubrender>({1, 0});
             //addSubrender<SkyboxSubrender>({1, 0});
             //addSubrender<AtmosphereSubrender>({1, 0});

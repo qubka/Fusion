@@ -29,7 +29,7 @@ namespace quat {
 
 namespace glm {
     template<typename T, qualifier Q>
-    GLM_FUNC_QUALIFIER GLM_CONSTEXPR uint32_t rgbaColor(const glm::vec<3, T, Q>& color) {
+    GLM_FUNC_QUALIFIER GLM_CONSTEXPR uint32_t rgbaColor(const vec<3, T, Q>& color) {
         if (std::is_floating_point_v<T>)
             return (255 << 24) | (static_cast<uint32_t>(color.b * 255) << 16) | (static_cast<uint32_t>(color.g * 255) << 8) | (static_cast<uint32_t>(color.r * 255) << 0);
         else
@@ -37,7 +37,7 @@ namespace glm {
     }
 
     template<typename T, qualifier Q>
-    GLM_FUNC_QUALIFIER GLM_CONSTEXPR uint32_t rgbaColor(const glm::vec<4, T, Q>& color) {
+    GLM_FUNC_QUALIFIER GLM_CONSTEXPR uint32_t rgbaColor(const vec<4, T, Q>& color) {
         if (std::is_floating_point_v<T>)
             return (static_cast<uint32_t>(color.a * 255) << 24) | (static_cast<uint32_t>(color.b * 255) << 16) | (static_cast<uint32_t>(color.g * 255) << 8) | (static_cast<uint32_t>(color.r * 255) << 0);
         else

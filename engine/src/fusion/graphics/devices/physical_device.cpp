@@ -35,7 +35,7 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, uint32_t desiredDeviceI
 
     findQueueFamilyIndices();
 
-    LOG_DEBUG << "Selected Physical Device: [" << properties.deviceID << "] \"" << properties.deviceName << "\"";
+    FS_LOG_DEBUG("Selected Physical Device: [{}] '{}'", properties.deviceID, properties.deviceName);
 }
 
 VkPhysicalDevice PhysicalDevice::ChoosePhysicalDevice(gsl::span<const VkPhysicalDevice> devices) {
@@ -65,12 +65,12 @@ uint32_t PhysicalDevice::ScorePhysicalDevice(VkPhysicalDevice device) {
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionPropertyCount, extensionProperties.data());
 
     // Iterates through all extensions requested
-    for (const char* currentExtension : LogicalDevice::DeviceExtensions) {
+    for (const auto extensionName : LogicalDevice::DeviceExtensions) {
         bool extensionFound = false;
 
         // Checks if the extension is in the available extensions
         for (const auto& extension : extensionProperties) {
-            if (strcmp(currentExtension, extension.extensionName) == 0) {
+            if (strcmp(extensionName, extension.extensionName) == 0) {
                 extensionFound = true;
                 break;
             }
@@ -78,7 +78,7 @@ uint32_t PhysicalDevice::ScorePhysicalDevice(VkPhysicalDevice device) {
 
         // Returns a score of 0 if this device is missing a required extension
         if (!extensionFound) {
-            LOG_ERROR << "Extension \"" << currentExtension << "\" wasn't found";
+            FS_LOG_ERROR("Extension '{}' wasn't found", extensionName);
             return 0;
         }
     }
@@ -225,7 +225,7 @@ void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalD
     };
     ss << "API Version: " << supportedVersion[0] << '.' << supportedVersion[1] << '.' << supportedVersion[2] << '\n';
 
-    LOG_DEBUG << ss.str();
+    FS_LOG_DEBUG(ss.str());
 
     ss.str("");
 
@@ -237,7 +237,7 @@ void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalD
 
         // Limit print
         if (i > 50) {
-            LOG_DEBUG << ss.str();
+            FS_LOG_DEBUG(ss.str());
             ss.str("");
             i = 0;
         }

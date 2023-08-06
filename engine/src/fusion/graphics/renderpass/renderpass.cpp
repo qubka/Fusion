@@ -50,7 +50,7 @@ Renderpass::Renderpass(const LogicalDevice& logicalDevice, const RenderStage& re
 			auto attachment = renderStage.getAttachment(attachmentBinding);
 
 			if (!attachment) {
-				LOG_ERROR << "Failed to find a renderpass attachment bound to: " << attachmentBinding;
+				FS_LOG_ERROR("Failed to find a renderpass attachment bound to: {}", attachmentBinding);
 				continue;
 			}
 

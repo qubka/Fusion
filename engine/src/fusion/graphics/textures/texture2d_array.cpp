@@ -80,7 +80,7 @@ void Texture2dArray::loadFromFile() {
     fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path };
 
     if (operator bool()) {
-        LOG_DEBUG << "Texture2dArray: \"" << filepath << "\" already was loaded";
+        FS_LOG_DEBUG("Texture2dArray: '{}' already was loaded", filepath);
         return;
     }
 
@@ -92,7 +92,7 @@ void Texture2dArray::loadFromFile() {
         texture = std::make_unique<gli::texture2d_array>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
     });
 #if FUSION_DEBUG
-    LOG_DEBUG << "Texture2dArray: \"" << filepath << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    FS_LOG_DEBUG("Texture2dArray: '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 
     const gli::texture2d_array& tex2DArray = *texture;

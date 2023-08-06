@@ -4,11 +4,6 @@
 
 namespace fe {
     inline fs::path operator""_p(const char* str, size_t len) { return fs::path{std::string{str, len}}; }
-    inline fs::path strip_root(fs::path p) {
-        p = p.relative_path();
-        if (p.empty()) return {};
-        return p.lexically_relative(*p.begin());
-    }
 
 #if PHYSFS
     enum class FileType : unsigned char {

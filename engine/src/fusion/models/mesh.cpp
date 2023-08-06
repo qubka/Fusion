@@ -18,7 +18,7 @@ bool Mesh::cmdRender(const CommandBuffer& commandBuffer, uint32_t instances) con
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
         vkCmdDraw(commandBuffer, vertexCount, instances, 0, 0);
     } else {
-        LOG_WARNING << "Mesh with no buffers can't be rendered";
+        FS_LOG_WARNING("Mesh with no buffers can't be rendered");
         return false;
     }
     return true;

@@ -1,0 +1,5 @@
+find_package(meshoptimizer QUIET)
+if(NOT meshoptimizer_FOUND)
+    add_subdirectory(meshoptimizer)
+endif()
+list(APPEND ALL_LIBS meshoptimizer)

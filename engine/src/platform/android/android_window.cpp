@@ -5,9 +5,9 @@
 
 #include <android/native_window.h>
 
-using namespace android;
+using namespace fe::android;
 
-Window::Window(ANativeWindow* window, const fe::WindowInfo& windowInfo) : fe::Window{}
+Window::Window(ANativeWindow* window, const WindowInfo& windowInfo) : fe::Window{}
     , window{window}
     , size{ANativeWindow_getWidth(window), ANativeWindow_getHeight(window)}
     , title{windowInfo.title} {
@@ -20,7 +20,7 @@ Window::~Window() {
 }
 
 void Window::onUpdate() {
-    float dt = fe::Time::DeltaTime().asSeconds();
+    float dt = Time::DeltaTime().asSeconds();
 
     // Updates the position delta.
     mousePositionDelta = dt * (mouseLastPosition - mousePosition);
@@ -111,7 +111,7 @@ VkResult Window::createSurface(VkInstance instance, const VkAllocationCallbacks*
     void Window::cursorPosCallback(AInputEvent* event) {
         glm::vec2 pos {AMotionEvent_getX(event, 0), AMotionEvent_getY(event, 0)};
 
-        LOG_VERBOSE << "MouseMotionEvent: " << glm::to_string(pos);
+        FS_LOG_VERBOSE("MouseMotionEvent: " << pos);
 
         window.mousePosition = pos;
         window.onMouseMotion.publish(pos);
@@ -123,7 +123,7 @@ VkResult Window::createSurface(VkInstance instance, const VkAllocationCallbacks*
 
         glm::vec2 norm{ 2.0f * (pos / glm::vec2{size}) - 1.0f};
 
-        LOG_VERBOSE << "MouseMotionNormEvent: " << glm::to_string(norm);
+        FS_LOG_VERBOSE("MouseMotionNormEvent: " << norm);
 
         window.mousePositionNorm = norm;
         window.onMouseMotionNorm.publish(norm);

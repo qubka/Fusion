@@ -6,7 +6,7 @@
 
 #include <GLFW/glfw3.h>
 
-using namespace glfw;
+using namespace fe::glfw;
 
 DeviceManager::DeviceManager() : fe::DeviceManager{} {
     // Set the error error callback
@@ -41,10 +41,10 @@ DeviceManager::DeviceManager() : fe::DeviceManager{} {
     int count;
     auto glfwMonitors = glfwGetMonitors(&count);
     for (int i = 0; i < count; ++i) {
-        monitors.push_back(std::make_unique<Monitor>(glfwMonitors[i]));
+        monitors.push_back(std::make_unique<glfw::Monitor>(glfwMonitors[i]));
     }
 
-    constexpr auto values = me::enum_values<fe::CursorStandard>();
+    constexpr auto values = me::enum_values<CursorStandard>();
     for (auto& cursor : values) {
         cursors.push_back(std::make_unique<Cursor>(cursor));
     }
@@ -96,11 +96,11 @@ std::vector<const char*> DeviceManager::getRequiredInstanceExtensions() const {
     return result;
 }
 
-fe::Key DeviceManager::getScanCode(fe::Key key) const{
-    return static_cast<fe::Key>(glfwGetKeyScancode(static_cast<int>(key)));
+fe::Key DeviceManager::getScanCode(Key key) const{
+    return static_cast<Key>(glfwGetKeyScancode(static_cast<int>(key)));
 }
 
-std::string DeviceManager::getKeyName(fe::Key key, fe::Key scancode) const {
+std::string DeviceManager::getKeyName(Key key, Key scancode) const {
     return glfwGetKeyName(static_cast<int>(key), static_cast<int>(scancode));
 }
 
@@ -112,13 +112,13 @@ void DeviceManager::updateGamepadMappings(std::string_view mappings) {
     glfwUpdateGamepadMappings(mappings.data());
 }
 
-fe::Window* DeviceManager::createWindow(const fe::WindowInfo& windowInfo) {
+fe::Window* DeviceManager::createWindow(const WindowInfo& windowInfo) {
     auto& it = windows.emplace_back(std::make_unique<glfw::Window>(getPrimaryMonitor()->getVideoMode(), windowInfo));
     onWindowCreate.publish(it.get(), true);
     return it.get();
 }
 
-fe::Cursor* DeviceManager::createCursor(const fs::path& filepath, fe::CursorHotspot hotspot) {
+fe::Cursor* DeviceManager::createCursor(const fs::path& filepath, CursorHotspot hotspot) {
     auto& it = cursors.emplace_back(std::make_unique<glfw::Cursor>(filepath, hotspot));
     onCursorCreate.publish(it.get(), true);
     return it.get();
@@ -126,20 +126,20 @@ fe::Cursor* DeviceManager::createCursor(const fs::path& filepath, fe::CursorHots
 
 /* Events Callbacks */
 
-namespace glfw {
+namespace fe::glfw {
 
     void DeviceManager::ErrorCallback(int error, const char* description) {
         CheckGlfw(error);
     }
 
     void DeviceManager::MonitorCallback(GLFWmonitor* monitor, int action) {
-        auto manager = static_cast<glfw::DeviceManager*>(DeviceManager::Get());
+        auto manager = dynamic_cast<glfw::DeviceManager*>(DeviceManager::Get());
         auto& monitors = manager->monitors;
 
-        LOG_VERBOSE << "MonitorEvent: \"" << glfwGetMonitorName(monitor) << "\" - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
+        FS_LOG_VERBOSE("MonitorEvent: '{}' - {}", glfwGetMonitorName(monitor), (action == GLFW_CONNECTED ? "Connected" : "Disconnected"));
 
         if (action == GLFW_CONNECTED) {
-            auto& it = monitors.emplace_back(std::make_unique<Monitor>(monitor));
+            auto& it = monitors.emplace_back(std::make_unique<glfw::Monitor>(monitor));
             manager->onMonitorConnect.publish(it.get(), true);
         } else if (action == GLFW_DISCONNECTED) {
             auto it = std::find_if(monitors.begin(), monitors.end(), [monitor](const auto& m) {
@@ -154,10 +154,10 @@ namespace glfw {
 
     #if GLFW_VERSION_MINOR >= 2
     void DeviceManager::JoystickCallback(int jid, int action) {
-        auto manager = static_cast<glfw::DeviceManager*>(DeviceManager::Get());
+        auto manager = dynamic_cast<glfw::DeviceManager*>(DeviceManager::Get());
         auto& joysticks = manager->joysticks;
 
-        LOG_VERBOSE << "JoystickEvent: [" << jid << "] \"" << glfwGetJoystickName(jid) << "\" - " << (action == GLFW_CONNECTED ? "Connected" : "Disconnected");
+        FS_LOG_VERBOSE("JoystickEvent: [{}] '{}' - {}", jid, glfwGetJoystickName(jid), (action == GLFW_CONNECTED ? "Connected" : "Disconnected"));
 
         if (action == GLFW_CONNECTED) {
             auto& it = joysticks.emplace_back(std::make_unique<Joystick>(jid));
@@ -206,7 +206,7 @@ namespace glfw {
     void DeviceManager::CheckGlfw(int result) {
         if (result == GLFW_TRUE) return;
         auto failure = StringifyResultGlfw(result);
-        LOG_ERROR << "GLFW error: [" << result << "] \"" << failure << "\"";
+        FS_LOG_ERROR("GLFW error: [{}] '{}'", result, failure);
         throw std::runtime_error("GLFW error: " + failure);
     }
 }

@@ -215,3 +215,30 @@
 #else
 #define FUSION_VECTORCALL
 #endif
+
+#define MEM_ALIGNMENT 16
+#ifdef FUSION_PLATFORM_WINDOWS
+#define FUSION_MEM_ALIGN __declspec(align(MEM_ALIGNMENT))
+#else
+#define FUSION_MEM_ALIGN __attribute__((aligned(MEM_ALIGNMENT)))
+#endif
+
+#if FUSION_SHARED_LIB
+#if defined(_MSC_VER)
+    #if FUSION_EXPORTS
+        #define FUSION_API __declspec(dllexport)
+    #else
+        #define FUSION_API __declspec(dllimport)
+    #endif
+#elif defined(__GNUC__)
+    #if FUSION_EXPORTS
+        #define FUSION_API __attribute__((visibility("default")))
+    #else
+        #define FUSION_API
+    #endif
+#else
+    #error "Unknown dynamic link import/export semantics."
+#endif
+#else
+#define FUSION_API
+#endif

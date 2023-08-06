@@ -1,12 +1,11 @@
 #include "pc_engine.h"
 
-using namespace pc;
+using namespace fe::pc;
 
-Engine::Engine(fe::CommandLineArgs&& args) : fe::Engine{std::move(args)} {
+Engine::Engine(CommandLineArgs&& args) : fe::Engine{std::move(args)} {
 }
 
 int32_t Engine::run() {
-    using fe::Module;
     try {
         init();
         startup();
@@ -28,7 +27,7 @@ int32_t Engine::run() {
         shutdown();
     }
     catch (std::exception& e) {
-        LOG_FATAL << e.what();
+        FS_LOG_FATAL(e.what());
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

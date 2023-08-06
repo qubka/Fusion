@@ -1,0 +1,6 @@
+#find_package(random QUIET)
+if(NOT random_FOUND)
+    set(Random_BuildTests OFF CACHE INTERNAL "")
+    add_subdirectory(random)
+endif()
+list(APPEND ALL_LIBS effolkronium_random)

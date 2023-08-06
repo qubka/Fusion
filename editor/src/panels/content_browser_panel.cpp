@@ -225,7 +225,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
                 fs::path file = fs::current_path() / fs::path{static_cast<const char*>(payload->Data)};
                 fs::path move = fs::current_path() / (dirInfo->parent ? root / dirInfo->path : root);
                 if (moveFile(file, move)) {
-                    LOG_INFO << "Moved File: \"" << file << "\" to \"" << move << "\"";
+                    FS_LOG_INFO("Moved File: '{}' to '{}'", file, move);
                     refresh();
                 }
             }
@@ -348,7 +348,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
                 fs::path file = fs::current_path() / fs::path{static_cast<const char*>(payload->Data)};
                 fs::path move = fs::current_path() / (parent ? root / path : root);
                 if (moveFile(file, move)) {
-                    LOG_INFO << "Moved File: \"" << file << "\" to \"" << move << "\"";
+                    FS_LOG_INFO("Moved File: '{}' to '{}'", file, move);
                     refresh();
                     return true;
                 }
@@ -465,14 +465,16 @@ const fs::path& ContentBrowserPanel::processDirectory(const fs::path& path, cons
 }
 
 bool ContentBrowserPanel::moveFile(const fs::path& filepath, const fs::path& movepath) {
-    std::string cmd{ String::Quoted(filepath.string()) + " " + String::Quoted(movepath.string()) };
 #if FUSION_PLATFORM_LINUX
-    system(("mv " + cmd).c_str());
+    std::string cmd{ fmt::format("mv '{}' '{}'", filepath, movepath) };
+    system(cmd.c_str());
 #else
     #ifndef FUSION_PLATFORM_IOS
-        system(("move " + cmd).c_str());
+    std::string cmd{ fmt::format("move '{}' '{}'", filepath, movepath) };
+        system(cmd.c_str());
     #endif
 #endif
+
     return fs::exists(movepath / filepath.filename());
 }
 

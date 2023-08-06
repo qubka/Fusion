@@ -193,8 +193,8 @@ void Image::CreateMipmaps(VkImage image, const VkExtent3D& extent, VkFormat form
 	vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &formatProperties);
 
 	// Mip-chain generation requires support for blit source and destination
-	assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT);
-	assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
+	FS_ASSERT(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT);
+	FS_ASSERT(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
 
 	for (uint32_t i = 1; i < mipLevels; ++i) {
 		VkImageMemoryBarrier barrier0 = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
@@ -362,7 +362,7 @@ bool Image::CopyImage(VkImage srcImage, VkImage& dstImage, VkDeviceMemory& dstIm
 	vkGetPhysicalDeviceFormatProperties(physicalDevice, swapchain->getSurfaceFormat().format, &formatProperties);
 
 	if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT)) {
-		LOG_WARNING << "Device does not support blitting from optimal tiled images, using copy instead of blit!";
+		FS_LOG_WARNING("Device does not support blitting from optimal tiled images, using copy instead of blit!");
 		supportsBlit = false;
 	}
 
@@ -370,7 +370,7 @@ bool Image::CopyImage(VkImage srcImage, VkImage& dstImage, VkDeviceMemory& dstIm
 	vkGetPhysicalDeviceFormatProperties(physicalDevice, srcFormat, &formatProperties);
 
 	if (!(formatProperties.linearTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT)) {
-        LOG_WARNING << "Device does not support blitting to linear tiled images, using copy instead of blit!";
+        FS_LOG_WARNING("Device does not support blitting to linear tiled images, using copy instead of blit!");
 		supportsBlit = false;
 	}
 
@@ -435,7 +435,7 @@ VkPipelineStageFlags Image::AccessFlagsToPipelineStage(VkAccessFlags accessFlags
 
     while (accessFlags != 0) {
         auto AccessFlag = static_cast<VkAccessFlagBits>(accessFlags & (~(accessFlags - 1)));
-        assert(AccessFlag != 0 && (AccessFlag & (AccessFlag - 1)) == 0 && "Error");
+        FS_ASSERT(AccessFlag != 0 && (AccessFlag & (AccessFlag - 1)) == 0 && "Error");
         accessFlags &= ~AccessFlag;
 
         switch (AccessFlag) {
@@ -506,7 +506,7 @@ VkPipelineStageFlags Image::AccessFlagsToPipelineStage(VkAccessFlags accessFlags
                 break;
 
             default:
-                LOG_ERROR << "Unknown access flag";
+                FS_LOG_ERROR("Unknown access flag");
                 break;
         }
     }
@@ -519,7 +519,7 @@ VkPipelineStageFlags Image::LayoutToAccessMask(VkImageLayout layout, bool isDest
     switch (layout) {
         case VK_IMAGE_LAYOUT_UNDEFINED:
             if (isDestination) {
-                LOG_ERROR << "The new layout used in a transition must not be VK_IMAGE_LAYOUT_UNDEFINED.";
+                FS_LOG_ERROR("The new layout used in a transition must not be VK_IMAGE_LAYOUT_UNDEFINED.");
             }
             break;
 
@@ -555,7 +555,7 @@ VkPipelineStageFlags Image::LayoutToAccessMask(VkImageLayout layout, bool isDest
             if (!isDestination) {
                 accessMask = VK_ACCESS_HOST_WRITE_BIT;
             } else {
-                LOG_ERROR << "The new layout used in a transition must not be VK_IMAGE_LAYOUT_PREINITIALIZED.";
+                FS_LOG_ERROR("The new layout used in a transition must not be VK_IMAGE_LAYOUT_PREINITIALIZED.");
             }
             break;
 
@@ -572,7 +572,7 @@ VkPipelineStageFlags Image::LayoutToAccessMask(VkImageLayout layout, bool isDest
             break;
 
         default:
-            LOG_ERROR << "Unexpected image layout";
+            FS_LOG_ERROR("Unexpected image layout");
             break;
     }
 

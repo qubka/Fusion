@@ -112,6 +112,7 @@ namespace fe {
 
         std::unique_ptr<Application> application;
         std::unique_ptr<DeviceManager> devices;
+        std::unique_ptr<Log> logger;
 
         std::vector<std::unique_ptr<Module>> modules;
         std::array<std::vector<uint32_t>, me::enum_count<Module::Stage>()> stages;

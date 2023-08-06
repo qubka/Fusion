@@ -1,7 +1,7 @@
 #include "android_engine.h"
 #include "android.h"
 
-using namespace android;
+using namespace fe::android;
 
 extern "C" bool VulkanKeyEventFilter(const GameActivityKeyEvent* event) {
     return false;
@@ -10,7 +10,7 @@ extern "C" bool VulkanMotionEventFilter(const GameActivityMotionEvent* event) {
     return false;
 }
 
-Engine::Engine(struct android_app* state, fe::CommandLineArgs&& args) : fe::Engine{std::move(args)}, app{state} {
+Engine::Engine(struct android_app* state, CommandLineArgs&& args) : fe::Engine{std::move(args)}, app{state} {
     app->userData = this;
     app->onAppCmd = OnAppCmd;
     android_app_set_key_event_filter(app, VulkanKeyEventFilter);
@@ -67,8 +67,6 @@ static void HandleInputEvents(struct android_app* app) {
 }
 
 int32_t Engine::run() {
-    using fe::Module;
-
     running = true;
     while (running) {
         // Pre-Update
@@ -103,4 +101,5 @@ int32_t Engine::run() {
         }
     }
     shutdown();
+    return 0;
 }

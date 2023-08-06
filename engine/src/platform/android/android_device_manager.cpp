@@ -3,7 +3,7 @@
 #include "android_engine.h"
 #include "android.h"
 
-using namespace android;
+using namespace fe::android;
 
 DeviceManager::DeviceManager() : fe::DeviceManager{} {
 }
@@ -24,14 +24,14 @@ void DeviceManager::waitEvents() {
 }
 
 std::vector<const char*> DeviceManager::getRequiredInstanceExtensions() const {
-    return { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_ANDROID_SURFACE_EXTENSION_NAME };
+    return { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_ANDROID_SURFACE_EXTENSION_NAME, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME };
 }
 
-fe::Key DeviceManager::getScanCode(fe::Key key) const{
+fe::Key DeviceManager::getScanCode(Key key) const{
     return key;
 }
 
-std::string DeviceManager::getKeyName(fe::Key key, fe::Key scancode) const {
+std::string DeviceManager::getKeyName(Key key, Key scancode) const {
     return "";
 }
 
@@ -42,7 +42,7 @@ bool DeviceManager::isRawMouseMotionSupported() const {
 void DeviceManager::updateGamepadMappings(std::string_view mappings) {
 }
 
-fe::Window* DeviceManager::createWindow(const fe::WindowInfo& windowInfo) {
+fe::Window* DeviceManager::createWindow(const WindowInfo& windowInfo) {
     if (!windows.empty())
         return nullptr;
 
@@ -51,6 +51,6 @@ fe::Window* DeviceManager::createWindow(const fe::WindowInfo& windowInfo) {
     return it.get();
 }
 
-fe::Cursor* DeviceManager::createCursor(const fs::path& filepath, fe::CursorHotspot hotspot) {
+fe::Cursor* DeviceManager::createCursor(const fs::path& filepath, CursorHotspot hotspot) {
     return nullptr;
 }

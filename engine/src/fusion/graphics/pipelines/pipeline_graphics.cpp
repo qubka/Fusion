@@ -54,7 +54,7 @@ PipelineGraphics::PipelineGraphics(Stage stage, std::vector<fs::path>&& paths, s
 	}
 
 #if FUSION_DEBUG
-	LOG_DEBUG << "Pipeline Graphics: \"" << shader.getName() << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+	FS_LOG_DEBUG("Pipeline Graphics: '{}' loaded in {}ms", shader.getName(), (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 }
 

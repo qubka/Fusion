@@ -53,7 +53,7 @@ namespace Utils {
 
         if (status != MONO_IMAGE_OK) {
             const char* errorMessage = mono_image_strerror(status);
-            LOG_ERROR <<  "Failed to load assembly file: \"" << errorMessage << "\"";
+            FS_LOG_ERROR( "Failed to load assembly file: '{}'", errorMessage);
             return nullptr;
         }
 
@@ -64,7 +64,7 @@ namespace Utils {
             if (fs::exists(pdbPath)) {
                 FileSystem::ReadBytes(pdbPath, [&](gsl::span<const std::byte> buffer) {
                     mono_debug_open_image_from_memory(image, reinterpret_cast<const mono_byte*>(buffer.data()), static_cast<int>(buffer.size()));
-                    LOG_INFO << "Loaded PDB:" << pdbPath;
+                    FS_LOG_INFO("Loaded PDB: '{}'", pdbPath);
                 });
             }
         }
@@ -87,7 +87,8 @@ namespace Utils {
 
             const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
             const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
-            LOG_VERBOSE << nameSpace << "." << name;
+
+            FS_LOG_VERBOSE("{}.{}", nameSpace, name);
         }
     }
 
@@ -96,7 +97,7 @@ namespace Utils {
 
         auto it = ScriptFieldTypeMap.find(typeName);
         if (it == ScriptFieldTypeMap.end()) {
-            LOG_ERROR << "Unknown type: " << typeName;
+            FS_LOG_ERROR("Unknown type: {}", typeName);
             return ScriptFieldType::None;
         }
 
@@ -128,7 +129,7 @@ void ScriptEngine::onStop() {
 }
 
 void ScriptEngine::initMono() {
-    mono_set_assemblies_path("engine/mono/lib");
+    mono_set_assemblies_path("mono/lib");
 
     if (enableDebugging) {
         const char* argv[2] = {
@@ -141,7 +142,7 @@ void ScriptEngine::initMono() {
     }
 
     rootDomain = mono_jit_init("FusionJITRuntime");
-    assert(rootDomain);
+    FS_ASSERT(rootDomain);
 
     if (enableDebugging)
         mono_debug_domain_create(rootDomain);
@@ -201,18 +202,18 @@ void ScriptEngine::reloadAssembly() {
 
     bool status = loadCoreAssembly(coreAssemblyFilepath);
     if (!status) {
-        LOG_ERROR << "Could not load \"" << coreAssemblyFilepath << "\" assembly.";
+        FS_LOG_ERROR("Could not load '{}' assembly.", coreAssemblyFilepath);
         return;
     } else {
-        LOG_INFO << "Assembly: \"" << coreAssemblyFilepath << "\" was loaded successfully!";
+        FS_LOG_INFO("Assembly: '{}' was loaded successfully!", coreAssemblyFilepath);
     }
 
     status = loadAppAssembly(appAssemblyFilepath);
     if (!status) {
-        LOG_ERROR << "Could not load app \"" << appAssemblyFilepath << "\" assembly.";
+        FS_LOG_ERROR("Could not load app '{}' assembly.", appAssemblyFilepath);
         return;
     } else {
-        LOG_INFO << "App assembly: \"" << appAssemblyFilepath << "\" was loaded successfully!";
+        FS_LOG_INFO("App assembly: '{}' was loaded successfully!", appAssemblyFilepath);
     }
 
     loadAssemblyClasses();
@@ -310,7 +311,7 @@ void ScriptEngine::loadAssemblyClasses() {
         const char* className = mono_metadata_string_heap(appAssemblyImage, cols[MONO_TYPEDEF_NAME]);
         std::string fullName;
         if (strlen(nameSpace) != 0)
-            fullName = nameSpace + "."s + className;
+            fullName = fmt::format("{}.{}", nameSpace, className);
         else
             fullName = className;
 
@@ -330,7 +331,7 @@ void ScriptEngine::loadAssemblyClasses() {
         // to iterate over all the elements. When no more values are available, the return value is NULL.
 
         int fieldCount = mono_class_num_fields(monoClass);
-        LOG_WARNING << className << " has " << fieldCount << " fields: ";
+        FS_LOG_WARNING("{} has {} fields: ", className, fieldCount);
         void* iterator = nullptr;
         while (MonoClassField* field = mono_class_get_fields(monoClass, &iterator)) {
             const char* fieldName = mono_field_get_name(field);
@@ -338,7 +339,7 @@ void ScriptEngine::loadAssemblyClasses() {
             if (flags & MONO_FIELD_ATTR_PUBLIC) {
                 MonoType* type = mono_field_get_type(field);
                 ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
-                LOG_WARNING << fieldName << " (" << me::enum_name(fieldType) << ")";
+                FS_LOG_WARNING("{} ({})", fieldName, me::enum_name(fieldType));
 
                 scriptClass->fields[fieldName] = { fieldType, fieldName, field };
             }

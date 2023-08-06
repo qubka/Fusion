@@ -23,11 +23,11 @@ Engine::Engine(CommandLineArgs&& args)
         , version{FUSION_VERSION_VARIANT, FUSION_VERSION_MAJOR, FUSION_VERSION_MINOR, FUSION_VERSION_PATCH} {
     Instance = this;
 
-    Log::Init();
+    logger = Log::Init();
 
-    LOG_INFO << "Version: " << version.toString();
-    LOG_INFO << "Git: [" << GIT_COMMIT_HASH << "]:(" << GIT_TAG << ") - " << GIT_COMMIT_SUBJECT << " on " << GIT_BRANCH << " at " << GIT_COMMIT_DATE;
-    LOG_INFO << "Compiled on: " << FUSION_COMPILED_SYSTEM << " from: " << FUSION_COMPILED_GENERATOR << " with: " << FUSION_COMPILED_COMPILER;
+    FS_LOG_INFO("Version: {}", version.toString());
+    FS_LOG_INFO("Git: [{}]:({}) - {} on {} at '{}'", GIT_COMMIT_HASH, GIT_TAG, GIT_COMMIT_SUBJECT, GIT_BRANCH, GIT_COMMIT_DATE);
+    FS_LOG_INFO("Compiled on: {} from: {} with: '{}'", FUSION_COMPILED_SYSTEM, FUSION_COMPILED_GENERATOR, FUSION_COMPILED_COMPILER);
 
     commandLineParser.parse(commandLineArgs);
 
@@ -41,6 +41,7 @@ Engine::~Engine() {
         it->reset();
     }
     devices.reset();
+    logger.reset();
     Instance = nullptr;
 }
 
@@ -64,7 +65,7 @@ void Engine::init() {
         auto index = static_cast<uint32_t>(modules.size());
         modules.push_back(module.create());
         stages[me::enum_integer(module.stage)].push_back(index);
-        LOG_DEBUG << "Module: \"" << module.name << "\" was registered for the \"" << me::enum_name(module.stage) << "\" stage";
+        FS_LOG_DEBUG("Module: '{}' was registered for the '{}' stage", module.name, me::enum_name(module.stage));
     }
 }
 

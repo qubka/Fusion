@@ -48,7 +48,7 @@ namespace ImGui {
         ComponentInfo& registerComponent(const ComponentInfo& info) {
             auto index = entt::type_hash<Component>::value();
             auto [it, result] = componentInfos.insert_or_assign(index, info);
-            assert(result);
+            FS_ASSERT(result);
             return it->second;
         }
 

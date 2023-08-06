@@ -1,23 +1,25 @@
 #pragma once
 
-#include <plog/Log.h>
-#include <plog/Formatters/TxtFormatter.h>
-#include <plog/Appenders/ColorConsoleAppender.h>
+namespace fe {
+    enum class Severity : uint8_t {
+        None = 0,
+        Fatal = 1,
+        Error = 2,
+        Warning = 3,
+        Info = 4,
+        Debug = 5,
+        Verbose = 6
+    };
 
-#include "fusion/utils/string.h"
-
-namespace plog {
-    template<class Formatter>
-    class FUSION_API EventConsoleAppender : public ColorConsoleAppender<Formatter> {
+    class FUSION_API Log {
     public:
-        void write(const Record& record) override{
-            ColorConsoleAppender<Formatter>::write(record);// TODO: Create custom formatter
-#if FUSION_PLATFORM_WINDOWS
-            onMessage.publish(record, fe::String::ConvertUtf8(Formatter::format(record)));
-#else
-            onMessage.publish(record, Formatter::format(record));
-#endif
-        }
+        Log();
+        virtual ~Log();
+        NONCOPYABLE(Log);
+
+        static std::unique_ptr<Log> Init();
+
+        static Log* Get() { return Instance; }
 
         /**
          * Event when the message is written to console.
@@ -25,19 +27,10 @@ namespace plog {
          */
         auto OnMessage() { return entt::sink{onMessage}; }
 
-    private:
-        entt::sigh<void(const Record&, const std::string&)> onMessage;
-    };
-}
+        // Unprotected
+        entt::sigh<void(Severity, const std::string&)> onMessage;
 
-namespace fe {
-    class FUSION_API Log {
-    public:
-        static void Init();
-
-        static plog::EventConsoleAppender<plog::TxtFormatter>& GetConsoleAppender() { return ConsoleAppender; }
-
-    private:
-        static plog::EventConsoleAppender<plog::TxtFormatter> ConsoleAppender;
+    protected:
+        static Log* Instance;
     };
 }

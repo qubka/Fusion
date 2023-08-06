@@ -71,6 +71,8 @@ namespace fs = std::filesystem;
 #include <cereal/archives/json.hpp>
 
 // Customization
+#include <fmt/core.h>
+#include <fmt/format.h>
 #include <magic_enum.hpp>
 namespace me = magic_enum;
 #include <effolkronium/random.hpp>
@@ -86,8 +88,6 @@ using Random = effolkronium::random_static;
 
 // Engine
 #include "fusion/core/base.h"
-#include "fusion/core/log.h"
-#include "fusion/core/profiler.h"
 
 #include "fusion/utils/flat_map.h"
 #include "fusion/utils/date_time.h"
@@ -95,10 +95,12 @@ using Random = effolkronium::random_static;
 #include "fusion/utils/enumerate.h"
 #include "fusion/utils/glm_extention.h"
 #include "fusion/utils/cereal_extention.h"
+#include "fusion/utils/format_extention.h"
 #include "fusion/utils/string.h"
 #include "fusion/utils/vulkan.h"
 #include "fusion/utils/vector.h"
 
+// TEMP ?
 #include "fusion/input/codes.h"
 #include "fusion/core/module.h"
 #include "fusion/core/time.h"

@@ -3,7 +3,7 @@
 
 #include <GLFW/glfw3.h>
 
-using namespace glfw;
+using namespace fe::glfw;
 
 Monitor::Monitor(GLFWmonitor* monitor) : monitor{monitor}, name{glfwGetMonitorName(monitor)} {
     glfwSetMonitorUserPointer(monitor, this);
@@ -11,11 +11,11 @@ Monitor::Monitor(GLFWmonitor* monitor) : monitor{monitor}, name{glfwGetMonitorNa
     int videoModeCount;
     auto videoModes = glfwGetVideoModes(monitor, &videoModeCount);
 
-    //std::vector<fe::VideoMode> modes;
+    //std::vector<VideoMode> modes;
     modes.reserve(videoModeCount);
 
     for (int i = 0; i < videoModeCount; ++i)
-        modes.push_back(*reinterpret_cast<const fe::VideoMode*>(&videoModes[i]));
+        modes.push_back(*reinterpret_cast<const VideoMode*>(&videoModes[i]));
 }
 
 glm::uvec4 Monitor::getWorkarea() const {
@@ -56,15 +56,15 @@ glm::uvec2 Monitor::getPosition() const {
 
 const fe::VideoMode& Monitor::getVideoMode() const {
     auto videoMode = glfwGetVideoMode(monitor);
-    return *reinterpret_cast<const fe::VideoMode*>(videoMode);
+    return *reinterpret_cast<const VideoMode*>(videoMode);
 }
 
 const fe::GammaRamp& Monitor::getGammaRamp() const {
     auto gamaRamp = glfwGetGammaRamp(monitor);
-    return *reinterpret_cast<const fe::GammaRamp*>(gamaRamp);
+    return *reinterpret_cast<const GammaRamp*>(gamaRamp);
 }
 
-void Monitor::setGammaRamp(const fe::GammaRamp& gammaRamp) {
+void Monitor::setGammaRamp(const GammaRamp& gammaRamp) {
     auto ramp = reinterpret_cast<const GLFWgammaramp*>(&gammaRamp);
     glfwSetGammaRamp(monitor, ramp);
 }

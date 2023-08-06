@@ -6,7 +6,7 @@ extern "C" {
     typedef struct GLFWmonitor GLFWmonitor;
 }
 
-namespace glfw {
+namespace fe::glfw {
     class FUSION_API Monitor : public fe::Monitor {
         friend class DeviceManager;
     public:
@@ -23,11 +23,11 @@ namespace glfw {
         glm::uvec2 getPosition() const override;
         const std::string& getName() const override { return name; }
 
-        const std::vector<fe::VideoMode>& getVideoModes() const override { return modes; }
-        const fe::VideoMode& getVideoMode() const override;
+        const std::vector<VideoMode>& getVideoModes() const override { return modes; }
+        const VideoMode& getVideoMode() const override;
 
-        const fe::GammaRamp& getGammaRamp() const override;
-        void setGammaRamp(const fe::GammaRamp& gammaRamp) override;
+        const GammaRamp& getGammaRamp() const override;
+        void setGammaRamp(const GammaRamp& gammaRamp) override;
 
         void* getNativeMonitor() const override { return monitor; }
 
@@ -37,6 +37,6 @@ namespace glfw {
     private:
         GLFWmonitor* monitor;
         std::string name;
-        std::vector<fe::VideoMode> modes;
+        std::vector<VideoMode> modes;
     };
 }

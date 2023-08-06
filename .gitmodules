@@ -111,3 +111,7 @@
 	path = external/assimp
 	url = https://github.com/assimp/assimp
 	ignore = all
+[submodule "external/fmt"]
+	path = external/fmt
+	url = https://github.com/fmtlib/fmt
+	ignore = all

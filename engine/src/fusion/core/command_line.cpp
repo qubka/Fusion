@@ -97,14 +97,14 @@ T CommandLineParser::getValue(const std::string& name, const T& defaultValue) {
 
 template<>
 std::string CommandLineParser::getValue<std::string>(const std::string& name, const std::string& defaultValue) {
-    assert(options.find(name) != options.end());
+    FS_ASSERT(options.find(name) != options.end());
     const std::string& value = options[name].value;
     return !value.empty() ? value : defaultValue;
 }
 
 template<>
 int CommandLineParser::getValue<int>(const std::string& name, const int& defaultValue) {
-    assert(options.find(name) != options.end());
+    FS_ASSERT(options.find(name) != options.end());
     const std::string& value = options[name].value;
     if (!value.empty()) {
         int result = std::stoi(value);
@@ -116,7 +116,7 @@ int CommandLineParser::getValue<int>(const std::string& name, const int& default
 
 template<>
 float CommandLineParser::getValue<float>(const std::string& name, const float& defaultValue) {
-    assert(options.find(name) != options.end());
+    FS_ASSERT(options.find(name) != options.end());
     const std::string& value = options[name].value;
     if (!value.empty()) {
         float result = std::stof(value);
@@ -128,7 +128,7 @@ float CommandLineParser::getValue<float>(const std::string& name, const float& d
 
 template<>
 bool CommandLineParser::getValue<bool>(const std::string& name, const bool& defaultValue) {
-    assert(options.find(name) != options.end());
+    FS_ASSERT(options.find(name) != options.end());
     const std::string& value = options[name].value;
     if (!value.empty()) {
         return String::ConvertBool(value);

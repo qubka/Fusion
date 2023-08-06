@@ -78,7 +78,7 @@ ProcessInfo::ProcessInfo(unsigned int id) : processId{id} {
             fscanf(lpFile, "%s", lTemp);
         unsigned long long lStartTimeSinceBoot;
         fscanf(lpFile, "%llu", &lStartTimeSinceBoot);
-        mStartTimeSinceBoot = lStartTimeSinceBoot / jiffiesPerSecond;
+        startTimeSinceBoot = lStartTimeSinceBoot / jiffiesPerSecond;
 
         fclose(lpFile);
     }
@@ -110,7 +110,7 @@ unsigned long long ProcessInfo::getProcessUptime() {
     int lReturn = sysinfo(&lSysinfo);
 
     if (lReturn == 0)
-        lUptimeInSec = lSysinfo.uptime - mStartTimeSinceBoot;
+        lUptimeInSec = lSysinfo.uptime - startTimeSinceBoot;
 
 #endif
     return lUptimeInSec;

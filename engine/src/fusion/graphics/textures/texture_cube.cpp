@@ -95,7 +95,7 @@ void TextureCube::loadFromFile() {
     fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path };
 
     if (operator bool()) {
-        LOG_DEBUG << "TextureCube: \"" << filepath << "\" already was loaded";
+        FS_LOG_DEBUG("TextureCube: '{}' already was loaded", filepath);
         return;
     }
 
@@ -107,7 +107,7 @@ void TextureCube::loadFromFile() {
         texture = std::make_unique<gli::texture_cube>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
     });
 #if FUSION_DEBUG
-    LOG_DEBUG << "TextureCube: \"" << filepath << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    FS_LOG_DEBUG("TextureCube: '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 
     const gli::texture_cube& texCube = *texture;

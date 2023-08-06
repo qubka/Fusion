@@ -1,0 +1,5 @@
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(MONO REQUIRED mono-2)
+list(APPEND ALL_LIBS ${MONO_LIBRARIES})
+list(APPEND ALL_DIRS ${MONO_LIBRARY_DIRS})
+list(APPEND ALL_INCS ${MONO_INCLUDE_DIRS})

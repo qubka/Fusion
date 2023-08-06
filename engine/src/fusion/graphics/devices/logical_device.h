@@ -7,7 +7,7 @@ namespace fe {
     class FUSION_API LogicalDevice {
         friend class Graphics;
     public:
-        LogicalDevice(const Instance& instance, const PhysicalDevice& physicalDevice);
+        LogicalDevice(const Instance& instance, const PhysicalDevice& physicalDevice, void* pNextChain = nullptr);
         ~LogicalDevice();
         NONCOPYABLE(LogicalDevice);
 
@@ -29,8 +29,6 @@ namespace fe {
 
         VkDevice logicalDevice{ VK_NULL_HANDLE };
         VkPhysicalDeviceFeatures enabledFeatures = {};
-
-        VkPhysicalDeviceDescriptorIndexingFeaturesEXT physicalDeviceDescriptorIndexingFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT };
 
         VkQueue graphicsQueue{ VK_NULL_HANDLE };
         VkQueue presentQueue{ VK_NULL_HANDLE };

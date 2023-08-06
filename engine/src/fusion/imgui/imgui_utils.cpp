@@ -148,11 +148,11 @@ bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTe
             if (filter.IsActive() && !filter.PassFilter(file.filename().string().c_str()))
                 continue;
 
-            std::string title{ FileFormat::GetIcon(file) + " "s + file.filename().string() };
+            std::string title{ fmt::format("{} {}", FileFormat::GetIcon(file), file.filename()) };
             if (ImGui::Selectable(title.c_str(), selected == file, ImGuiSelectableFlags_AllowDoubleClick)) {
                 selected = file;
                 if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                    value = strip_root(file);
+                    value = file.lexically_relative(Engine::Get()->getApp()->getProjectSettings().projectRoot);
                     updated = true;
                     ImGui::CloseCurrentPopup();
                 }
@@ -163,7 +163,7 @@ bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTe
         ImGui::Separator();
 
         if (!selected.empty()) {
-            std::string title{ FileFormat::GetIcon(selected) + " "s + selected.string() };
+            std::string title{ fmt::format("{} {}", FileFormat::GetIcon(selected), selected) };
             ImGui::TextUnformatted(title.c_str());
         }
 
@@ -180,7 +180,7 @@ bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTe
             ImGui::OpenPopup("FileExplorer");
         }
     } else {
-        std::string title{ FileFormat::GetIcon(value) + " "s + value.filename().string() };
+        std::string title{ fmt::format("{} {}", FileFormat::GetIcon(value), value.filename()) };
         if (ImGui::Button(title.c_str(), buttonSize)) {
             //contentBrowserPanel.selectFile(value);
             // TODO: Finish
@@ -196,7 +196,8 @@ bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTe
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            value = strip_root(static_cast<const char*>(payload->Data));
+            fs::path path{ static_cast<const char*>(payload->Data) };
+            value = path.lexically_relative(Engine::Get()->getApp()->getProjectSettings().projectRoot);
             updated = true;
         }
         ImGui::EndDragDropTarget();

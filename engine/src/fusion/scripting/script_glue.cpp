@@ -27,22 +27,22 @@ namespace Utils {
 
 static void NativeLog(MonoString* string, int parameter) {
     std::string str = Utils::MonoStringToString(string);
-    LOG_WARNING << str << ", " << parameter;
+    FS_LOG_WARNING("{}, {}", str, parameter);
 }
 
 static void NativeLog_Vector(glm::vec3* parameter, glm::vec3* outResult) {
-    LOG_WARNING << "Value: " << glm::to_string(*parameter);
+    FS_LOG_WARNING("Value: {}", *parameter);
     *outResult = glm::normalize(*parameter);
 }
 
 static float NativeLog_VectorDot(glm::vec3* parameter) {
-    LOG_WARNING << "Value: " << glm::to_string(*parameter);
+    FS_LOG_WARNING("Value: {}", *parameter);
     return glm::dot(*parameter, *parameter);
 }
 
 static MonoObject* GetScriptInstance(uint32_t entityID) {
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = static_cast<entt::entity>(entityID);
     if (auto scriptComponent = scene->getRegistry().try_get<ScriptComponent>(entity)) {
         auto& scriptInstance = scriptComponent->instance;
@@ -53,14 +53,14 @@ static MonoObject* GetScriptInstance(uint32_t entityID) {
 
 static bool Entity_HasComponent(uint32_t entityID, MonoReflectionType* componentType) {
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = static_cast<entt::entity>(entityID);
     if (!scene->isEntityValid(entity))
         return false;
 
     MonoType* managedType = mono_reflection_type_get_type(componentType);
     auto it = EntityHasComponentFuncs.find(managedType);
-    assert(it != EntityHasComponentFuncs.end());
+    FS_ASSERT(it != EntityHasComponentFuncs.end());
     return it->second(scene->getRegistry(), entity);
 }
 
@@ -68,7 +68,7 @@ static uint32_t Entity_FindEntityByName(MonoString* name) {
     char* nameCStr = mono_string_to_utf8(name);
 
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = scene->getEntityByName(nameCStr);
     mono_free(nameCStr);
 
@@ -79,7 +79,7 @@ static uint32_t Entity_FindEntityByName(MonoString* name) {
 
 static void TransformComponent_GetPosition(uint32_t entityID, glm::vec3* outPosition) {
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = static_cast<entt::entity>(entityID);
     if (!scene->isEntityValid(entity))
         return;
@@ -90,7 +90,7 @@ static void TransformComponent_GetPosition(uint32_t entityID, glm::vec3* outPosi
 
 static void TransformComponent_SetPosition(uint32_t entityID, glm::vec3* position) {
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = static_cast<entt::entity>(entityID);
     if (!scene->isEntityValid(entity))
         return;
@@ -102,7 +102,7 @@ static void TransformComponent_SetPosition(uint32_t entityID, glm::vec3* positio
 #if GLM_FORCE_QUAT_DATA_XYZW
 static void TransformComponent_GetRotation(uint32_t entityID, glm::quat* outRotation) {
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = static_cast<entt::entity>(entityID);
     if (!scene->isEntityValid(entity))
         return;
@@ -113,7 +113,7 @@ static void TransformComponent_GetRotation(uint32_t entityID, glm::quat* outRota
 
 static void TransformComponent_SetRotation(uint32_t entityID, glm::quat* rotation) {
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = static_cast<entt::entity>(entityID);
     if (!scene->isEntityValid(entity))
         return;
@@ -124,7 +124,7 @@ static void TransformComponent_SetRotation(uint32_t entityID, glm::quat* rotatio
 #else
 static void TransformComponent_GetRotation(uint32_t entityID, glm::vec4* outRotation) {
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = static_cast<entt::entity>(entityID);
     if (!scene->isEntityValid(entity))
         return;
@@ -136,7 +136,7 @@ static void TransformComponent_GetRotation(uint32_t entityID, glm::vec4* outRota
 
 static void TransformComponent_SetRotation(uint32_t entityID, glm::vec4* rotation) {
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = static_cast<entt::entity>(entityID);
     if (!scene->isEntityValid(entity))
         return;
@@ -148,7 +148,7 @@ static void TransformComponent_SetRotation(uint32_t entityID, glm::vec4* rotatio
 
 static void TransformComponent_GetScale(uint32_t entityID, glm::vec3* outScale) {
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = static_cast<entt::entity>(entityID);
     if (!scene->isEntityValid(entity))
         return;
@@ -159,7 +159,7 @@ static void TransformComponent_GetScale(uint32_t entityID, glm::vec3* outScale) 
 
 static void TransformComponent_SetScale(uint32_t entityID, glm::vec3* scale) {
     auto scene = ScriptEngine::Get()->getSceneContext();
-    assert(scene);
+    FS_ASSERT(scene);
     auto entity = static_cast<entt::entity>(entityID);
     if (!scene->isEntityValid(entity))
         return;
@@ -182,7 +182,7 @@ static void RegisterComponent() {
 
         MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::Get()->getCoreAssemblyImage());
         if (!managedType) {
-            LOG_ERROR << "Could not find component type " << managedTypename;
+            FS_LOG_ERROR("Could not find component type: {}", managedTypename);
             return;
         }
         EntityHasComponentFuncs[managedType] = [](entt::registry& registry, entt::entity entity) { return registry.try_get<Component>(entity) != nullptr; };

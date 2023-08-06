@@ -2,7 +2,7 @@
 
 #include "fusion/devices/joystick.h"
 
-namespace glfw {
+namespace fe::glfw {
     class FUSION_API Joystick : public fe::Joystick {
         friend class DeviceManager;
     public:
@@ -19,11 +19,11 @@ namespace glfw {
         size_t getAxisCount() const override { return connected ? axes.size() : 0; }
         size_t getHatCount() const override { return connected ? hats.size() : 0; }
 
-        fe::InputAction getButton(uint8_t button) override { return connected && button < buttons.size() ? buttons[button] : fe::InputAction::Release; }
+        InputAction getButton(uint8_t button) override { return connected && button < buttons.size() ? buttons[button] : InputAction::Release; }
         float getAxis(uint8_t axis) const override { return connected && axis < axes.size() ? axes[axis] : 0.0f; }
-        bitmask::bitmask<fe::JoystickHat> getHat(uint8_t hat) const override { return connected && hat < hats.size() ? hats[hat] : bitmask::bitmask<fe::JoystickHat>(); }
+        bitmask::bitmask<JoystickHat> getHat(uint8_t hat) const override { return connected && hat < hats.size() ? hats[hat] : bitmask::bitmask<JoystickHat>(); }
 
-        const fe::GamepadState& getGamepadState() const override;
+        const GamepadState& getGamepadState() const override;
 
         void* getNativeJoystick() const override { return (void*) this; }
 
@@ -33,9 +33,9 @@ namespace glfw {
     private:
         uint8_t port;
         std::string name;
-        std::vector<fe::InputAction> buttons;
+        std::vector<InputAction> buttons;
         std::vector<float> axes;
-        std::vector<bitmask::bitmask<fe::JoystickHat>> hats;
+        std::vector<bitmask::bitmask<JoystickHat>> hats;
         bool connected{ true };
     };
 }

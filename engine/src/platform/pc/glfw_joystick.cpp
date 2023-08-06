@@ -2,7 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
-using namespace glfw;
+using namespace fe::glfw;
 
 Joystick::Joystick(uint8_t port) : port{port}, name{isGamePad() ? glfwGetGamepadName(port) : glfwGetJoystickName(port)} {
     // Validate whether the specified joystick is present.
@@ -33,9 +33,9 @@ void Joystick::onUpdate() {
     buttons.resize(buttonCount);
 
     for (int i = 0; i < buttonCount; ++i) {
-        auto value = static_cast<fe::InputAction>(buttonsPtr[i]);
-        if (value != fe::InputAction::Release && buttons[i] != fe::InputAction::Release) {
-            buttons[i] = fe::InputAction::Repeat;
+        auto value = static_cast<InputAction>(buttonsPtr[i]);
+        if (value != InputAction::Release && buttons[i] != InputAction::Release) {
+            buttons[i] = InputAction::Repeat;
         } else if (buttons[i] != value) {
             buttons[i] = value;
             onButton.publish(i, value);
@@ -47,7 +47,7 @@ void Joystick::onUpdate() {
     hats.resize(hatCount);
 
     for (int i = 0; i < hatCount; ++i) {
-        auto value = bitmask::bitmask<fe::JoystickHat>(static_cast<fe::JoystickHat>(hatsPtr[i]));
+        auto value = bitmask::bitmask<JoystickHat>(static_cast<JoystickHat>(hatsPtr[i]));
         if (hats[i] != value) {
             hats[i] = value;
             onHat.publish(i, value);
@@ -62,7 +62,7 @@ bool Joystick::isGamePad() const {
 const fe::GamepadState& Joystick::getGamepadState() const {
     GLFWgamepadstate* gamepadState;
     if (glfwGetGamepadState(port, gamepadState) == GLFW_TRUE) {
-        return *reinterpret_cast<const fe::GamepadState*>(gamepadState);
+        return *reinterpret_cast<const GamepadState*>(gamepadState);
     }
     throw std::runtime_error("GLFW joystick does not have gamepad mapping");
 }

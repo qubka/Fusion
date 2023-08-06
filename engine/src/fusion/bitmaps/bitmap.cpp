@@ -27,15 +27,16 @@ void Bitmap::load(const fs::path& filepath) {
 
     std::string extension{ FileSystem::GetExtension(filepath) };
     if (auto it = Registry().find(extension); it != Registry().end()) {
-        it->second.first(*this, filepath);
+        auto& loadFunc = it->second.first;
+        loadFunc(*this, filepath);
         path = filepath;
     } else {
-        LOG_ERROR << "Unknown file extension format: \"" << extension << "\" for the file: \"" << filepath << "\"";
+        FS_LOG_ERROR("Unknown file extension format: '{}' for the file: '{}'", extension, filepath);
         return;
     }
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Bitmap: \"" << filepath << "\" loaded in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    FS_LOG_DEBUG("Bitmap: '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 }
 
@@ -48,13 +49,14 @@ void Bitmap::write(const fs::path& filepath) const {
 
     std::string extension{ FileSystem::GetExtension(filepath) };
     if (auto it = Registry().find(extension); it != Registry().end()) {
-        it->second.second(*this, filepath);
+        auto& writeFunc = it->second.second;
+        writeFunc(*this, filepath);
     } else {
-        LOG_ERROR << "Unknown file extension format: \"" << extension << "\" for the file: \"" << filepath << "\"";
+        FS_LOG_ERROR("Unknown file extension format: '{}' for the file: '{}'", extension, filepath);
         return;
     }
 
 #if FUSION_DEBUG
-    LOG_DEBUG << "Bitmap: \"" << filepath << "\" written in " << (DateTime::Now() - debugStart).asMilliseconds<float>() << "ms";
+    FS_LOG_DEBUG("Bitmap: '{}' written in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 }

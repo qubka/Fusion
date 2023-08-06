@@ -15,11 +15,11 @@ bool ConsolePanel::AllowScrollingToBottom = true;
 bool ConsolePanel::RequestScrollToBottom = false;
 
 ConsolePanel::ConsolePanel(Editor& editor) : EditorPanel{ICON_MDI_VIEW_LIST " Console###console", "Console", editor} {
-    Log::GetConsoleAppender().OnMessage().connect<&ConsolePanel::OnMessage>();
+    Log::Get()->OnMessage().connect<&ConsolePanel::OnMessage>();
 }
 
 ConsolePanel::~ConsolePanel() {
-    Log::GetConsoleAppender().OnMessage().connect<&ConsolePanel::OnMessage>();
+    Log::Get()->OnMessage().connect<&ConsolePanel::OnMessage>();
 }
 
 void ConsolePanel::onImGui() {
@@ -34,8 +34,8 @@ void ConsolePanel::onImGui() {
     ImGui::End();
 }
 
-void ConsolePanel::OnMessage(const plog::Record& record, const std::string& message) {
-    AddMessage(std::make_unique<Message>(message, me::enum_value<MessageLevel>(record.getSeverity())));
+void ConsolePanel::OnMessage(Severity severity, const std::string& message) {
+    AddMessage(std::make_unique<Message>(message, me::enum_value<MessageLevel>(me::enum_integer(severity))));
 }
 
 void ConsolePanel::AddMessage(std::unique_ptr<Message>&& message) {

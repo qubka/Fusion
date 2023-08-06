@@ -76,7 +76,7 @@ class VulkanActivity : GameActivity() {
 
     companion object {
         init {
-            System.loadLibrary("hellovkjni")
+            System.loadLibrary("fusionjnid")
         }
     }
 }

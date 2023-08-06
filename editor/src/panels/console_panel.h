@@ -18,7 +18,7 @@ namespace fe {
     public:
         class Message {
         public:
-            explicit Message(std::string  message, MessageLevel level, std::string source = "");
+            explicit Message(std::string message, MessageLevel level, std::string source = "");
             ~Message();
 
             void onImGui();
@@ -47,7 +47,7 @@ namespace fe {
         static void Flush();
 
         static void AddMessage(std::unique_ptr<Message>&& message);
-        static void OnMessage(const plog::Record& record, const std::string& message);
+        static void OnMessage(Severity severity, const std::string& message);
 
     private:
         void renderHeader();

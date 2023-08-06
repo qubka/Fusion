@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fusion/core/engine.h"
 #include "fusion/assets/asset_registry.h"
 #include "fusion/filesystem/file_system.h"
 
@@ -69,29 +70,28 @@ namespace ImGuiUtils {
 
     template<typename T>
     constexpr ImGuiDataType_ GetDataType() {
-        if constexpr (std::is_same_v<T, int8_t>) {
+        if constexpr (std::is_same_v<T, int8_t>)
             return ImGuiDataType_S8;
-        } else if constexpr (std::is_same_v<T, uint8_t>) {
+        else if constexpr (std::is_same_v<T, uint8_t>)
             return ImGuiDataType_U8;
-        } else if constexpr (std::is_same_v<T, int16_t>) {
+        else if constexpr (std::is_same_v<T, int16_t>)
             return ImGuiDataType_S16;
-        } else if constexpr (std::is_same_v<T, uint16_t>) {
+        else if constexpr (std::is_same_v<T, uint16_t>)
             return ImGuiDataType_U16;
-        } else if constexpr (std::is_same_v<T, int32_t>) {
+        else if constexpr (std::is_same_v<T, int32_t>)
             return ImGuiDataType_S32;
-        } else if constexpr (std::is_same_v<T, uint32_t>) {
+        else if constexpr (std::is_same_v<T, uint32_t>)
             return ImGuiDataType_U32;
-        } else if constexpr (std::is_same_v<T, int64_t>) {
+        else if constexpr (std::is_same_v<T, int64_t>)
             return ImGuiDataType_S64;
-        } else if constexpr (std::is_same_v<T, uint64_t>) {
+        else if constexpr (std::is_same_v<T, uint64_t>)
             return ImGuiDataType_U64;
-        } else if constexpr (std::is_same_v<T, float>) {
+        else if constexpr (std::is_same_v<T, float>)
             return ImGuiDataType_Float;
-        } else if constexpr (std::is_same_v<T, double>) {
+        else if constexpr (std::is_same_v<T, double>)
             return ImGuiDataType_Double;
-        } else {
+        else
             static_assert("Invalid type");
-        }
         return ImGuiDataType_COUNT;
     }
 
@@ -634,7 +634,8 @@ namespace ImGuiUtils {
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                value = AssetRegistry::Get()->load<T>(strip_root(static_cast<const char*>(payload->Data)));
+                fs::path path{ static_cast<const char*>(payload->Data) };
+                value = AssetRegistry::Get()->load<T>(path.lexically_relative(Engine::Get()->getApp()->getProjectSettings().projectRoot));
                 updated = true;
             }
             ImGui::EndDragDropTarget();

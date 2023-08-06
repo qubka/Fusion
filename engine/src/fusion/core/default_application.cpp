@@ -17,28 +17,28 @@ DefaultApplication::DefaultApplication(std::string_view name) : Application{name
 #if FUSION_PLATFORM_WINDOWS
     wchar_t path[MAX_PATH] = { 0 };
     GetModuleFileNameW(nullptr, path, MAX_PATH);
-    executablePath = fs::path{path}.parent_path().parent_path().parent_path();
+    executablePath = fs::path{path}.parent_path().parent_path();
 #else
 #if FUSION_PLATFORM_MAC
-    executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path().parent_path().parent_path().parent_path();
+    executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path().parent_path().parent_path();
 #else
-    executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path();
+    executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path();
 #endif
 #endif
 
-    LOG_INFO << "Working directory: \"" << executablePath << "\"";
+    FS_LOG_INFO("Working directory: '{}'", executablePath);
     fs::current_path(executablePath);
 
     projectSettings.projectVersion = getVersion().toString();
 }
 
 DefaultApplication::~DefaultApplication() {
-    projectLoaded = false;
     serialise();
+    projectLoaded = false;
 }
 
 void DefaultApplication::onStart() {
-    LOG_INFO << "Default application starting!";
+    FS_LOG_INFO("Default application starting!");
 
     deserialise();
 
@@ -56,7 +56,7 @@ void DefaultApplication::onStart() {
     window->OnClose().connect<&Engine::requestClose>(Engine::Get());
 
     // Sets icons to window
-    fs::path iconPath{ "engine/assets/icons" };
+    fs::path iconPath{ "assets/icons" };
     std::vector<fs::path> iconPaths {
         iconPath / "icon-16.png", iconPath / "icon-24.png", iconPath / "icon-32.png",
         iconPath / "icon-48.png", iconPath / "icon-64.png", iconPath / "icon-96.png",
@@ -127,9 +127,9 @@ void DefaultApplication::openNewProject(const fs::path& path, std::string_view n
 
     SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
 
-    serialise();
-
     onProjectLoad();
+
+    serialise();
 
     // Win32 : Sets up a console window and redirects standard output to it
     showConsole();
@@ -156,18 +156,18 @@ void DefaultApplication::serialise() {
     fs::path projectPath{ projectSettings.projectRoot / (projectSettings.projectName + ".fsproj") };
     FileSystem::WriteText(projectPath, ss.str());
 
-    LOG_INFO << "Serialising application: \"" << projectPath << "\"";
+    FS_LOG_INFO("Serialising application: '{}'", projectPath);
 }
 
 void DefaultApplication::deserialise() {
     if (projectSettings.projectRoot.empty() || projectSettings.projectName.empty()) {
-        LOG_INFO << "No saved Project file found";
+        FS_LOG_INFO("No saved Project file found");
         return;
     }
 
     fs::path projectPath{ projectSettings.projectRoot / (projectSettings.projectName + ".fsproj") };
     if (!fs::exists(projectPath)) {
-        LOG_INFO << "No saved Project file found: \"" << projectPath << "\"";
+        FS_LOG_INFO("No saved Project file found: '{}'", projectPath);
         return;
     }
 
@@ -182,13 +182,13 @@ void DefaultApplication::deserialise() {
 
         SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
 
-        LOG_ERROR << "Failed to load project";
+        FS_LOG_ERROR("Failed to load project");
         return;
     }
 
     onProjectLoad();
 
-    LOG_INFO << "Deserialise application: \"" << projectPath << "\"";
+    FS_LOG_INFO("Deserialise application: '{}'", projectPath);
 }
 
 void DefaultApplication::showConsole() {
@@ -216,7 +216,7 @@ void DefaultApplication::onProjectLoad() {
 #if FUSION_SCRIPTING
     if (!projectSettings.scriptModulePath.empty()) {
         auto scriptEngine = ScriptEngine::Get();
-        scriptEngine->setAssemblyPaths("engine/assets/scripts/Fusion-ScriptCore.dll", projectSettings.projectRoot / projectSettings.scriptModulePath);
+        scriptEngine->setAssemblyPaths("assets/scripts/Fusion-ScriptCore.dll", projectSettings.projectRoot / projectSettings.scriptModulePath);
         scriptEngine->reloadAssembly();
     }
 #endif

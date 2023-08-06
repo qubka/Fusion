@@ -9,7 +9,7 @@ using namespace fe;
 
 AtmosphereSubrender::AtmosphereSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"engine/assets/shaders/sky/atmosphere.vert", "engine/assets/shaders/sky/atmosphere.frag"}} {
+        , pipeline{pipelineStage, {"assets/shaders/sky/atmosphere.vert", "assets/shaders/sky/atmosphere.frag"}} {
 }
 
 AtmosphereSubrender::~AtmosphereSubrender() {

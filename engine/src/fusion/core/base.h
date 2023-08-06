@@ -1,26 +1,8 @@
 #pragma once
 
 #include "platform.h"
-
-#if FUSION_SHARED_LIB
-#if defined(_MSC_VER)
-    #if FUSION_EXPORTS
-        #define FUSION_API __declspec(dllexport)
-    #else
-        #define FUSION_API __declspec(dllimport)
-    #endif
-#elif defined(__GNUC__)
-    #if FUSION_EXPORTS
-        #define FUSION_API __attribute__((visibility("default")))
-    #else
-        #define FUSION_API
-    #endif
-#else
-    #error "Unknown dynamic link import/export semantics."
-#endif
-#else
-#define FUSION_API
-#endif
+#include "asserts.h"
+#include "profiler.h"
 
 #define NONCOPYABLE(x) x(const x&) = delete; \
                        x(x&&) = delete; \
@@ -36,11 +18,15 @@
                          [[nodiscard]] std::vector<t>::const_reverse_iterator rbegin() const { return o.rbegin(); } \
                          [[nodiscard]] std::vector<t>::const_reverse_iterator rend() const { return o.rend(); } \
 
-#define MEM_ALIGNMENT 16
-#ifdef FUSION_PLATFORM_WINDOWS
-#define MEM_ALIGN __declspec(align(MEM_ALIGNMENT))
+
+#define BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+
+#if FUSION_PLATFORM_ANDROID
+#include "platform/android/android_log.h"
+#elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLEDVK_USE_PLATFORM_XCB_KHR
+#include "platform/pc/pc_log.h"
 #else
-#define MEM_ALIGN __attribute__((aligned(MEM_ALIGNMENT)))
+#pragma error("Unknown platform!");
 #endif
 
 namespace fe {

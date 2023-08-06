@@ -13,7 +13,7 @@ FileSystem::~FileSystem() {
 
 void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler) {
     if (!fs::exists(filepath)) {
-        LOG_ERROR << "File: \"" << filepath << "\" not exist!";
+        FS_LOG_ERROR("File: '{}' not exist!", filepath);
         return;
     }
 
@@ -23,14 +23,14 @@ void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gs
 
 std::string FileSystem::ReadText(const fs::path& filepath) {
     if (!fs::exists(filepath)) {
-        LOG_ERROR << "File: \"" << filepath << "\" not exist!";
+        FS_LOG_ERROR("File: '{}' not exist!", filepath);
         return {};
     }
 
     std::ifstream is{filepath, std::ios::in};
 
     if (!is.is_open()) {
-        LOG_ERROR << "File: \"" << filepath << "\" could not be opened!";
+        FS_LOG_ERROR("File: '{}' could not be opened!", filepath);
         return {};
     }
 

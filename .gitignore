@@ -33,6 +33,7 @@ bin_debug
 
 # External data
 external/
+!external/_
 !external/binary_fonts
 !external/imgui-plugins
 !external/CMakeLists.txt

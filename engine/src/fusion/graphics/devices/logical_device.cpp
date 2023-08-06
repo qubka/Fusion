@@ -9,11 +9,12 @@ using namespace fe;
 
 const std::vector<const char*> LogicalDevice::DeviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-        //VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME,
-        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+        VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME,
+        //VK_KHR_MAINTENANCE3_EXTENSION_NAME,
+        //VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
 };
 
-LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& physicalDevice) : instance{instance}, physicalDevice{physicalDevice} {
+LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& physicalDevice, void* pNextChain) : instance{instance}, physicalDevice{physicalDevice} {
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     const float queuePriority = 0.0f;
 
@@ -26,6 +27,7 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
 
     enabledFeatures = physicalDevice.getFeatures();
 
+    /*VkPhysicalDeviceDescriptorIndexingFeaturesEXT physicalDeviceDescriptorIndexingFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT };
     // Enable required extension features
     physicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
     physicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
@@ -33,7 +35,7 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
     physicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound = VK_TRUE;
     physicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
     physicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
-    void* pNextChain = &physicalDeviceDescriptorIndexingFeatures;
+    void* pNextChain = &physicalDeviceDescriptorIndexingFeatures;*/
 
     /// TODO: Rework that to allow user to change enable features
     {
@@ -49,12 +51,12 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
             if (enabledFeatures.wideLines)
                 enabledFeatures.wideLines = VK_TRUE;
         } else
-            LOG_WARNING << "Selected GPU does not support wireframe pipelines!";
+            FS_LOG_WARNING("Selected GPU does not support wireframe pipelines!");
 
         if (enabledFeatures.samplerAnisotropy)
             enabledFeatures.samplerAnisotropy = VK_TRUE;
         else
-            LOG_WARNING << "Selected GPU does not support sampler anisotropy!";
+            FS_LOG_WARNING("Selected GPU does not support sampler anisotropy!");
 
         if (enabledFeatures.textureCompressionBC)
             enabledFeatures.textureCompressionBC = VK_TRUE;
@@ -66,22 +68,22 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
         if (enabledFeatures.vertexPipelineStoresAndAtomics)
             enabledFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
         else
-            LOG_WARNING << "Selected GPU does not support vertex pipeline stores and atomics!";
+            FS_LOG_WARNING("Selected GPU does not support vertex pipeline stores and atomics!");
 
         if (enabledFeatures.fragmentStoresAndAtomics)
             enabledFeatures.fragmentStoresAndAtomics = VK_TRUE;
         else
-            LOG_WARNING << "Selected GPU does not support fragment stores and atomics!";
+            FS_LOG_WARNING("Selected GPU does not support fragment stores and atomics!");
 
         if (enabledFeatures.shaderStorageImageExtendedFormats)
             enabledFeatures.shaderStorageImageExtendedFormats = VK_TRUE;
         else
-            LOG_WARNING << "Selected GPU does not support shader storage extended formats!";
+            FS_LOG_WARNING("Selected GPU does not support shader storage extended formats!");
 
         if (enabledFeatures.shaderStorageImageWriteWithoutFormat)
             enabledFeatures.shaderStorageImageWriteWithoutFormat = VK_TRUE;
         else
-            LOG_WARNING << "Selected GPU does not support shader storage write without format!";
+            FS_LOG_WARNING("Selected GPU does not support shader storage write without format!");
 
         //enabledFeatures.shaderClipDistance = VK_TRUE;
         //enabledFeatures.shaderCullDistance = VK_TRUE;
@@ -89,17 +91,17 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
         if (enabledFeatures.geometryShader)
             enabledFeatures.geometryShader = VK_TRUE;
         else
-            LOG_WARNING << "Selected GPU does not support geometry shaders!";
+            FS_LOG_WARNING("Selected GPU does not support geometry shaders!");
 
         if (enabledFeatures.tessellationShader)
             enabledFeatures.tessellationShader = VK_TRUE;
         else
-            LOG_WARNING << "Selected GPU does not support tessellation shaders!";
+            FS_LOG_WARNING("Selected GPU does not support tessellation shaders!");
 
         if (enabledFeatures.multiViewport)
             enabledFeatures.multiViewport = VK_TRUE;
         else
-            LOG_WARNING << "Selected GPU does not support multi viewports!";
+            FS_LOG_WARNING("Selected GPU does not support multi viewports!");
     }
 
     VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };

@@ -7,11 +7,11 @@ extern "C" {
     typedef struct GLFWwindow GLFWwindow;
 }
 
-namespace glfw {
+namespace fe::glfw {
     class FUSION_API Window : public fe::Window {
         friend class DeviceManager;
     public:
-        Window(const fe::VideoMode& videoMode, const fe::WindowInfo& windowInfo);
+        Window(const VideoMode& videoMode, const WindowInfo& windowInfo);
         ~Window() override;
 
         bool isBorderless() const override { return borderless; }
@@ -59,11 +59,11 @@ namespace glfw {
         bool isCursorHidden() const override { return cursorHidden; }
         void setCursorHidden(bool hidden) override;
 
-        void setCursor(const fe::Cursor* cursor) override;
+        void setCursor(const Cursor* cursor) override;
         void setIcons(gsl::span<const fs::path> filepaths) override;
 
-        fe::InputAction getKey(fe::Key key) const override;
-        fe::InputAction getMouseButton(fe::MouseButton button) const override;
+        InputAction getKey(Key key) const override;
+        InputAction getMouseButton(MouseButton button) const override;
 
         const glm::vec2& getMousePosition() const override { return mousePosition; }
         const glm::vec2& getMousePositionDelta() const override { return mousePositionDelta; }
@@ -74,7 +74,7 @@ namespace glfw {
         void setMouseScroll(const glm::vec2& scroll) override;
         const glm::vec2& getMouseScrollDelta() const override { return mouseScrollDelta; }
 
-        const fe::Monitor* getCurrentMonitor() const override;
+        const Monitor* getCurrentMonitor() const override;
         void* getNativeWindow() const override { return window; }
 
         VkResult createSurface(VkInstance instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const override;

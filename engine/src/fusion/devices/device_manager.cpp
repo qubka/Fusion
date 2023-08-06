@@ -34,10 +34,10 @@ std::unique_ptr<DeviceManager> DeviceManager::Init() {
 
 #if FUSION_PLATFORM_ANDROID
     return std::make_unique<android::DeviceManager>();
-#elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_MAC
+#elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLE
     return std::make_unique<glfw::DeviceManager>();
 #else
-    LOG_FATAL << "Unknown platform!";
+    FS_LOG_FATAL("Unknown platform!");
     return nullptr;
 #endif
 }

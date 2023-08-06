@@ -28,8 +28,6 @@
 
 #include <memory>
 
-#define BIND_FILEBROWSER_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
-
 using namespace fe;
 
 Editor::Editor(std::string_view name) : DefaultApplication{name} {
@@ -330,7 +328,7 @@ void Editor::drawMenuBar() {
 
             if (ImGui::MenuItem("Open File")) {
                 fileBrowserPanel.setCurrentPath(projectSettings.projectRoot);
-                fileBrowserPanel.setCallback(BIND_FILEBROWSER_FN(fileOpenCallback));
+                fileBrowserPanel.setCallback(BIND_EVENT_FN(fileOpenCallback));
                 fileBrowserPanel.open();
             }
 
@@ -611,7 +609,7 @@ void Editor::drawMenuBar() {
             // Set path to working directory
             fileBrowserPanel.setFileTypeFilters({ ".fsproj" });
             fileBrowserPanel.setOpenDirectory(false);
-            fileBrowserPanel.setCallback(BIND_FILEBROWSER_FN(projectOpenCallback));
+            fileBrowserPanel.setCallback(BIND_EVENT_FN(projectOpenCallback));
             fileBrowserPanel.open();
         }
 
@@ -631,7 +629,7 @@ void Editor::drawMenuBar() {
             // Set path to working directory
             fileBrowserPanel.clearFileTypeFilters();
             fileBrowserPanel.setOpenDirectory(true);
-            fileBrowserPanel.setCallback(BIND_FILEBROWSER_FN(newProjectLocationCallback));
+            fileBrowserPanel.setCallback(BIND_EVENT_FN(newProjectLocationCallback));
             fileBrowserPanel.open();
         }
 
@@ -725,12 +723,12 @@ void Editor::drawMenuBar() {
 }
 
 void Editor::openFile() {
-    fileBrowserPanel.setCallback(BIND_FILEBROWSER_FN(fileOpenCallback));
+    fileBrowserPanel.setCallback(BIND_EVENT_FN(fileOpenCallback));
     fileBrowserPanel.open();
 }
 
 void Editor::fileOpenCallback(const fs::path& path) {
-    fs::path filepath{ strip_root(path) };
+    fs::path filepath{ path.lexically_relative(projectSettings.projectRoot) };
 
     if (FileFormat::IsTextFile(path)) {
         openTextFile(path, []{});
@@ -750,7 +748,7 @@ void Editor::fileOpenCallback(const fs::path& path) {
     } else if (FileFormat::IsTextureFile(path)) {
     }
 
-    LOG_DEBUG << "File opened: \"" << filepath << "\"";
+    FS_LOG_DEBUG("File opened: '{}'", filepath);
 }
 
 void Editor::projectOpenCallback(const fs::path& path) {
@@ -764,7 +762,7 @@ void Editor::projectOpenCallback(const fs::path& path) {
         panel->onNewProject();
     }
 
-    LOG_DEBUG << "Project opened: \"" << path << "\"";
+    FS_LOG_DEBUG("Project opened: '{}'", path);
 }
 
 /*void Editor::newProjectOpenCallback(const fs::path& path) {
@@ -775,7 +773,7 @@ void Editor::projectOpenCallback(const fs::path& path) {
         panel->onNewProject();
     }
 
-    LOG_DEBUG << "New project opened: \"" << path << "\"";
+    LOG_DEBUG << "New project opened: '{}'", path);
 }*/
 
 void Editor::newProjectLocationCallback(const fs::path& path) {
@@ -784,7 +782,7 @@ void Editor::newProjectLocationCallback(const fs::path& path) {
     reopenNewProjectPopup = true;
     locationPopupOpened = false;
 
-    LOG_DEBUG << "New Project opened: \"" << path << "\"";
+    FS_LOG_DEBUG("New Project opened: '{}'", path);
 }
 
 void Editor::removePanel(EditorPanel* panel) {
