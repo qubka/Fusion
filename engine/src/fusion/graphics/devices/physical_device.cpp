@@ -48,7 +48,7 @@ VkPhysicalDevice PhysicalDevice::ChoosePhysicalDevice(gsl::span<const VkPhysical
         where = rankedDevices.insert(where, { ScorePhysicalDevice(device), device });
 
     // Checks to make sure the best candidate scored higher than 0  rbegin points to last element of ranked devices(highest rated), first is its rating.
-    if (rankedDevices.rbegin()->first > 0)
+    if (rankedDevices.rbegin()->first >= 0)
         return rankedDevices.rbegin()->second;
 
     return nullptr;

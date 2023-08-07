@@ -12,6 +12,7 @@
 #include "fusion/filesystem/file_system.h"
 #include "fusion/geometry/ray.h"
 #include "fusion/scripting/script_engine.h"
+#include "fusion/filesystem/file_system.h"
 
 #include "panels/application_info_panel.h"
 #include "panels/console_panel.h"
@@ -417,7 +418,7 @@ void Editor::drawMenuBar() {
 
         if (ImGui::BeginMenu("Scenes")) {
             fs::path scenePath{ projectSettings.projectRoot / "assets/scenes" };
-            if (fs::exists(scenePath)) {
+            if (FileSystem::IsExists(scenePath)) {
                 for (const auto& entry : fs::directory_iterator(scenePath)) {
                     const auto& path = entry.path();
                     if (FileFormat::IsSceneFile(path)) {

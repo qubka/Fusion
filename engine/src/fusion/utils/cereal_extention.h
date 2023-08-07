@@ -6,7 +6,7 @@ namespace std::filesystem {
     template<class Archive> std::string save_minimal(const Archive&, const path& p) { return p.string(); }
     template<class Archive> void load_minimal(const Archive&, path& p, const std::string& in) { p = in; };
 }
-template<class Archive> struct cereal::specialize<Archive, std::filesystem::path, cereal::specialization::non_member_load_save_minimal> {};
+template<class Archive> struct cereal::specialize<Archive, fs::path, cereal::specialization::non_member_load_save_minimal> {};
 
 /*namespace uuids {
     template<class Archive> std::string save_minimal(const Archive&, const uuid& id) { return to_string(id); }

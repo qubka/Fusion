@@ -5,7 +5,7 @@
 #include "fusion/debug/grid_subrender.h"
 #include "fusion/skybox/atmosphere_subrender.h"
 #include "fusion/skybox/skybox_subrender.h"
-#include "fusion/models/mesh_subrender.h"
+#include "fusion/models/mesh2_subrender.h"
 #include "fusion/ligthing/light_subrender.h"
 
 namespace fe {
@@ -26,9 +26,10 @@ namespace fe {
 
     private:
         void onStart() override {
-            addSubrender<MeshSubrender>({0, 0});
-            addSubrender<LightSubrender>({0, 0});
-            //addSubrender<SkyboxSubrender>({0, 0});
+            //addSubrender<AtmosphereSubrender>({0, 0});
+            //addSubrender<Mesh2Subrender>({0, 0});
+            //addSubrender<LightSubrender>({0, 0});
+            addSubrender<SkyboxSubrender>({0, 0});
         }
 
         void onUpdate() override {

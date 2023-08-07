@@ -1,9 +1,9 @@
 {
     "value0": {
         "projectVersion": "0.1.0.0",
-        "projectRoot": "D:\\Fusion\\New Project",
+        "projectRoot": "",
         "projectName": "New Project",
-        "scriptModulePath": "assets\\scripts\\Sandbox.dll",
+        "scriptModulePath": "assets/scripts/Sandbox.dll",
         "title": "New Project",
         "size": {
             "x": 1280,

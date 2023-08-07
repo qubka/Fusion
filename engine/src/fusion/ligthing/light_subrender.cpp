@@ -9,7 +9,7 @@ using namespace fe;
 LightSubrender::LightSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
         , pipeline{pipelineStage,
-                   {"assets/shaders/simple/light.vert", "assets/shaders/simple/light.frag"},
+                   {FUSION_ASSET_PATH "shaders/simple/light.vert", FUSION_ASSET_PATH "shaders/simple/light.frag"},
                    {}, {},
                    PipelineGraphics::Mode::Polygon,
                    PipelineGraphics::Depth::ReadWrite,

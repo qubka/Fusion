@@ -13,7 +13,7 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 # Speed up building on MinGW
 if(WIN32)
-    add_link_options(-fuse-ld=lld)
+    #add_link_options(-fuse-ld=lld)
     #add_compile_options(-femulated-tls)
 endif()
 

@@ -23,8 +23,10 @@
 
 #if FUSION_PLATFORM_ANDROID
 #include "platform/android/android_log.h"
-#elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLEDVK_USE_PLATFORM_XCB_KHR
+#define FUSION_ASSET_PATH
+#elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLE
 #include "platform/pc/pc_log.h"
+#define FUSION_ASSET_PATH "assets/"
 #else
 #pragma error("Unknown platform!");
 #endif
@@ -54,7 +56,7 @@ namespace fe {
 
     /* Clang fix */
     struct PathHash {
-        auto operator()(const std::filesystem::path& p) const noexcept {
+        auto operator()(const fs::path& p) const noexcept {
             return std::filesystem::hash_value(p);
         }
     };

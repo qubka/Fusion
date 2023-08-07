@@ -277,7 +277,7 @@ const fe::Monitor* Window::getCurrentMonitor() const {
         where = rankedMonitor.insert(where, { overlappingArea(monitor->getWorkareaPosition(), monitor->getWorkareaPosition() + monitor->getWorkareaSize(), position, position + size), monitor.get() });
     }
 
-    if (rankedMonitor.begin()->first > 0)
+    if (rankedMonitor.begin()->first >= 0)
         return rankedMonitor.begin()->second;
 
     return nullptr;

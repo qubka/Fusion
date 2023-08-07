@@ -9,7 +9,8 @@ using namespace fe;
 
 GridSubrender::GridSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
-        , pipeline{pipelineStage, {"assets/shaders/grid/grid.vert", "assets/shaders/grid/grid.frag"}} {
+        , pipeline{pipelineStage, {FUSION_ASSET_PATH "shaders/grid/grid.vert", FUSION_ASSET_PATH "shaders/grid/grid.frag"}}
+        , descriptorSet{pipeline} {
 }
 
 GridSubrender::~GridSubrender() {

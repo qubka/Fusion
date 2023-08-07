@@ -61,7 +61,7 @@ namespace Utils {
             fs::path pdbPath{ assemblyPath };
             pdbPath.replace_extension(".pdb");
 
-            if (fs::exists(pdbPath)) {
+            if (FileSystem::IsExists(pdbPath)) {
                 FileSystem::ReadBytes(pdbPath, [&](gsl::span<const std::byte> buffer) {
                     mono_debug_open_image_from_memory(image, reinterpret_cast<const mono_byte*>(buffer.data()), static_cast<int>(buffer.size()));
                     FS_LOG_INFO("Loaded PDB: '{}'", pdbPath);

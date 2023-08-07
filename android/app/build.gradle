@@ -28,6 +28,10 @@ android {
         applicationId 'com.android.hellovk'
         minSdk 30
         targetSdk 33
+        versionCode 1
+        versionName "1.0"
+        //ndk { abiFilter "x86_64" }
+        ndk { abiFilter "armeabi-v7a" }
         externalNativeBuild {
             cmake {
                 // Available arguments are inside ${SDK}/cmake/.../android.toolchain.cmake file
@@ -43,6 +47,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs += "${android.ndkDirectory}/sources/third_party/vulkan/src/build-android/jniLibs"
+            assets.srcDirs += [
+                    "${projectDir.absolutePath}/../../assets",
+                    "${projectDir.absolutePath}/../../New Project"
+            ]
+        }
+    }
 
     externalNativeBuild {
         cmake {
@@ -55,23 +68,8 @@ android {
         prefab true
     }
 
-    sourceSets {
-        main {
-            jniLibs.srcDirs += "${android.ndkDirectory}/sources/third_party/vulkan/src/build-android/jniLibs"
-            assets.srcDirs += "${projectDir.absolutePath}/../../engine/assets"
-        }
-    }
-    
     namespace 'com.android.hellovk'
 }
-
-
-tasks.register('copyFiles', Copy) {
-    from "${projectDir.absolutePath}/../../New Project"
-    into 'src/main/res'
-}
-
-preBuild.dependsOn(copyFiles)
 
 dependencies {
     implementation 'androidx.core:core:1.9.0'

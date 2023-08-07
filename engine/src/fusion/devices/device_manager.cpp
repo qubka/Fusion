@@ -4,8 +4,10 @@
 
 #if FUSION_PLATFORM_ANDROID
 #include "platform/android/android_device_manager.h"
-#else
+#elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLE
 #include "platform/pc/glfw_device_manager.h"
+#else
+#pragma error("Unknown platform!");
 #endif
 
 using namespace fe;

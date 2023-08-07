@@ -45,6 +45,14 @@ void Model::loadFromFile() {
         flags |= aiProcess_CalcTangentSpace;
     }
 
+    /*const aiScene* scene = nullptr;
+    Assimp::Importer import;
+
+    FileSystem::ReadBytes(modelPath, [&](gsl::span<const std::byte> buffer) {
+        scene = import.ReadFileFromMemory(buffer.data(), buffer.size(), flags);
+    });*/
+
+
     Assimp::Importer import;
     const aiScene* scene = import.ReadFile(modelPath.string(), flags);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
@@ -160,7 +168,7 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, SceneObject&
 
             // if texture hasn't been loaded already, load it
             if (!skip) {
-                if (!fs::exists(path)) {
+                if (!FileSystem::IsExists(path)) {
                     FS_LOG_ERROR("Could load texture from path: '{}'", path);
                     continue;
                 }

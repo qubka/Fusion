@@ -1,7 +1,5 @@
 #pragma once
 
-#include <utility>
-
 #include "fusion/graphics/pipelines/pipeline.h"
 
 namespace fe {

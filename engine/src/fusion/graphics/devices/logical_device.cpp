@@ -9,9 +9,11 @@ using namespace fe;
 
 const std::vector<const char*> LogicalDevice::DeviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+#ifndef FUSION_PLATFORM_ANDROID
         VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME,
-        //VK_KHR_MAINTENANCE3_EXTENSION_NAME,
-        //VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+        VK_KHR_MAINTENANCE3_EXTENSION_NAME,
+        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+#endif
 };
 
 LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& physicalDevice, void* pNextChain) : instance{instance}, physicalDevice{physicalDevice} {
@@ -27,15 +29,17 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
 
     enabledFeatures = physicalDevice.getFeatures();
 
-    /*VkPhysicalDeviceDescriptorIndexingFeaturesEXT physicalDeviceDescriptorIndexingFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT };
     // Enable required extension features
+#ifndef FUSION_PLATFORM_ANDROID
     physicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
     physicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
     physicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount = VK_TRUE;
     physicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound = VK_TRUE;
     physicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
     physicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
-    void* pNextChain = &physicalDeviceDescriptorIndexingFeatures;*/
+    physicalDeviceDescriptorIndexingFeatures.pNext = pNextChain;
+    pNextChain = &physicalDeviceDescriptorIndexingFeatures;
+#endif
 
     /// TODO: Rework that to allow user to change enable features
     {

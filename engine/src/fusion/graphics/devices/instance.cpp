@@ -168,7 +168,7 @@ void Instance::createInstance() {
 	applicationInfo.applicationVersion =  static_cast<uint32_t>(appVersion);
 	applicationInfo.pEngineName = "Fusion";
 	applicationInfo.engineVersion = static_cast<uint32_t>(engineVersion);
-	applicationInfo.apiVersion = volkGetInstanceVersion();
+	applicationInfo.apiVersion = volkGetInstanceVersion() >= VK_API_VERSION_1_1 ? VK_API_VERSION_1_1 : VK_MAKE_VERSION(1, 0, 57);
 
 	if (enableValidationLayers && !CheckValidationLayerSupport()) {
 		FS_LOG_ERROR("Validation layers requested, but not available!");

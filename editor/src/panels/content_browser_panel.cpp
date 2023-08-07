@@ -471,11 +471,11 @@ bool ContentBrowserPanel::moveFile(const fs::path& filepath, const fs::path& mov
 #else
     #ifndef FUSION_PLATFORM_IOS
     std::string cmd{ fmt::format("move '{}' '{}'", filepath, movepath) };
-        system(cmd.c_str());
+    system(cmd.c_str());
     #endif
 #endif
 
-    return fs::exists(movepath / filepath.filename());
+    return FileSystem::IsExists(movepath / filepath.filename());
 }
 
 DirectoryInfo::DirectoryInfo(const fs::path& filepath) {

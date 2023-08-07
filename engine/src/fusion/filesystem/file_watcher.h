@@ -1,4 +1,4 @@
-#include <utility>
+#include "file_system.h"
 
 #pragma once
 
@@ -22,7 +22,7 @@ namespace fe {
             if (elapsedUpdate.getElapsed() != 0) {
                 auto it = paths.begin();
                 while (it != paths.end()) {
-                    if (!fs::exists(it->first)) {
+                    if (!FileSystem::IsExists(it->first)) {
                         callback(it->first, FileStatus::Erased);
                         it = paths.erase(it);
                     } else {

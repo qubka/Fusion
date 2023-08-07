@@ -2,8 +2,10 @@
 
 #if FUSION_PLATFORM_ANDROID
 #include "platform/android/android_log.h"
-#else
+#elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLE
 #include "platform/pc/pc_log.h"
+#else
+#pragma error("Unknown platform!");
 #endif
 
 using namespace fe;

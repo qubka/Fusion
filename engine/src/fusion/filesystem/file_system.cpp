@@ -3,6 +3,11 @@
 
 #include "fusion/core/engine.h"
 
+#if FUSION_PLATFORM_ANDROID
+#include <android/asset_manager.h>
+#include "fusion/devices/device_manager.h"
+#endif
+
 using namespace fe;
 
 FileSystem::FileSystem() {
@@ -12,7 +17,7 @@ FileSystem::~FileSystem() {
 }
 
 void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler) {
-    if (!fs::exists(filepath)) {
+    if (!FileSystem::IsExists(filepath)) {
         FS_LOG_ERROR("File: '{}' not exist!", filepath);
         return;
     }
@@ -22,12 +27,15 @@ void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gs
 }
 
 std::string FileSystem::ReadText(const fs::path& filepath) {
-    if (!fs::exists(filepath)) {
+    if (!FileSystem::IsExists(filepath)) {
         FS_LOG_ERROR("File: '{}' not exist!", filepath);
         return {};
     }
 
-    std::ifstream is{filepath, std::ios::in};
+    auto storage = Storage::ReadFile(filepath);
+    return { (char*)storage->data(), storage->size() };
+
+    /*std::ifstream is{filepath, std::ios::in};
 
     if (!is.is_open()) {
         FS_LOG_ERROR("File: '{}' could not be opened!", filepath);
@@ -41,7 +49,7 @@ std::string FileSystem::ReadText(const fs::path& filepath) {
         getline(is, line);
         ss << line << '\n';
     }
-    return ss.str();
+    return ss.str();*/
 }
 
 bool FileSystem::WriteBytes(const fs::path& filepath, gsl::span<const std::byte> buffer) {
@@ -63,7 +71,7 @@ std::string FileSystem::GetExtension(const fs::path& filepath) {
 std::vector<fs::path> FileSystem::GetFilesInPath(const fs::path& root, const std::string& ext) {
     std::vector<fs::path> paths;
 
-    if (fs::exists(root) && fs::is_directory(root)) {
+    if (FileSystem::IsExists(root) && fs::is_directory(root)) {
         if (!ext.empty()) {
             for (auto const& entry : fs::recursive_directory_iterator(root)) {
                 const auto& path = entry.path();
@@ -79,4 +87,29 @@ std::vector<fs::path> FileSystem::GetFilesInPath(const fs::path& root, const std
     }
 
     return paths;
+}
+
+bool FileSystem::IsExists(const fs::path& filepath) {
+#ifdef FUSION_PLATFORM_ANDROID
+    auto assetManager = static_cast<AAssetManager*>(DeviceManager::Get()->getNativeManager());
+    auto dir = AAssetManager_openDir(assetManager, filepath.parent_path().string().c_str());
+
+    std::string filename{ filepath.filename() };
+
+    bool found = false;
+
+    const char* name = nullptr;
+    while ((name = AAssetDir_getNextFileName(dir)) != nullptr) {
+        if (filename == name) {
+            found = true;
+            break;
+        }
+    }
+
+    AAssetDir_close(dir);
+
+    return found;
+#else
+    return fs::exists(filepath);
+#endif
 }

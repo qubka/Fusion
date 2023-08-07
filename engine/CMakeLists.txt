@@ -22,10 +22,10 @@ target_link_directories(${PROJECT_NAME} PRIVATE ${FUSION_LIBRARY_DIRS})
 
 # copy all asset files to the binary directory of the engine
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
-        ${CMAKE_CURRENT_SOURCE_DIR}/assets
+        ${CMAKE_CURRENT_SOURCE_DIR}/../assets
         ${CMAKE_CURRENT_BINARY_DIR}/../assets)
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
-        ${CMAKE_CURRENT_SOURCE_DIR}/mono
+        ${CMAKE_CURRENT_SOURCE_DIR}/../mono
         ${CMAKE_CURRENT_BINARY_DIR}/../mono)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC

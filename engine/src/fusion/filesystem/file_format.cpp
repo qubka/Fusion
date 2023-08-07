@@ -262,7 +262,7 @@ fs::path FileFormat::GetNextFileName(fs::path filepath) {
     std::string stem{ filepath.stem().string() };
     std::string ext{ filepath.extension().string() };
 
-    for (int i = 1; fs::exists(filepath); ++i) {
+    for (int i = 1; FileSystem::IsExists(filepath); ++i) {
         std::ostringstream os;
         os << stem << "(" << i << ")" << ext;
         filepath.replace_filename(os.str());

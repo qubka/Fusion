@@ -1,7 +1,5 @@
 #include "console_panel.h"
 
-#include <utility>
-
 using namespace fe;
 using namespace std::string_literals;
 

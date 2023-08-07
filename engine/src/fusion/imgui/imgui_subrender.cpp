@@ -26,7 +26,7 @@ using namespace fe;
 ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
         : Subrender{pipelineStage}
         , pipeline{pipelineStage,
-                   {"assets/shaders/imgui/imgui.vert", "assets/shaders/imgui/imgui.frag"},
+                   {FUSION_ASSET_PATH "shaders/imgui/imgui.vert", FUSION_ASSET_PATH "shaders/imgui/imgui.frag"},
                    {{{Vertex::Component::Position2, Vertex::Component::UV, Vertex::Component::RGBA}}},
                    {},
                    PipelineGraphics::Mode::Polygon,

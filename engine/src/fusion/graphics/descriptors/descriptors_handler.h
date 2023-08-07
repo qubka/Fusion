@@ -77,7 +77,7 @@ namespace fe {
             }
 
             // Only non-null descriptors can be mapped
-            if (descriptor.empty())
+            if (descriptor.empty()/* || std::any_of(descriptor.begin(), descriptor.end(), [](const T* d) { return d == nullptr; })*/)
                 return;
 
             // When adding the descriptor find the location in the shader

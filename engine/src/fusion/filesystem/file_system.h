@@ -81,5 +81,7 @@ namespace fe {
          * @return The file array.
          */
         static std::vector<fs::path> GetFilesInPath(const fs::path& root, const std::string& ext);
+
+        static bool IsExists(const fs::path& filepath);
     };
 }

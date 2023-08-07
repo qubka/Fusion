@@ -13,7 +13,7 @@ static const uint32_t MAX_LIGHTS = 32; // TODO: Make configurable.
 Mesh2Subrender::Mesh2Subrender(Pipeline::Stage pipelineStage)
     : Subrender{pipelineStage}
     , pipeline{pipelineStage,
-               {"assets/shaders/simple/simple2.vert", "assets/shaders/simple/simple2.frag"},
+               {FUSION_ASSET_PATH "shaders/simple/simple2.vert", FUSION_ASSET_PATH "shaders/simple/simple2.frag"},
                {{{
                      Vertex::Component::Position,
                      Vertex::Component::Normal,
@@ -84,7 +84,7 @@ void Mesh2Subrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
 
     // Draws the object
     pipeline.bindPipeline(commandBuffer);
-    descriptorSet.bindDescriptor(commandBuffer, pipeline);
+    //descriptorSet.bindDescriptor(commandBuffer, pipeline);
 
     auto group = registry.group<MeshComponent>(entt::get<TransformComponent, MaterialComponent>);
 
@@ -101,36 +101,15 @@ void Mesh2Subrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
 
         glm::mat4 normal{ transform.getNormalMatrix() };
 
-        if (material.diffuse && *material.diffuse) {
-            normal[0].w = 1.0f;
-            descriptorSet.push("diffuseSampler", material.diffuse.get());
-        } else {
-            normal[0].w = -1.0f;
-        }
-
-        if (material.specular && *material.specular) {
-            normal[1].w = 1.0f;
-            descriptorSet.push("specularSampler", material.specular.get());
-        } else {
-            normal[1].w = -1.0f;
-        }
-
-        if (material.normal && *material.normal) {
-            normal[2].w = 1.0f;
-            descriptorSet.push("normalSampler", material.normal.get());
-        } else {
-            normal[2].w = -1.0f;
-        }
-
-        if (!descriptorSet.update(pipeline))
-            return;
-
         normal[3] = glm::vec4{material.baseColor, material.shininess};
         pushObject.push("normal", normal);
 
         descriptorSet.push("PushObject", pushObject);
 
         pushObject.bindPush(commandBuffer, pipeline);
+
+        descriptorSet.bindDescriptor(commandBuffer, pipeline);
+
         filter->cmdRender(commandBuffer);
     }
 }

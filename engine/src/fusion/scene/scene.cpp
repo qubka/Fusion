@@ -194,7 +194,7 @@ void Scene::deserialise(fs::path filepath, bool binary) {
         filepath = Engine::Get()->getApp()->getProjectSettings().projectRoot / "assets/scenes" / (name + ".fsn");
 
     if (binary) {
-        if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
+        if (!FileSystem::IsExists(filepath)) {
             FS_LOG_ERROR("No saved scene file found: '{}'", filepath);
             return;
         }
@@ -212,7 +212,7 @@ void Scene::deserialise(fs::path filepath, bool binary) {
 
         FS_LOG_INFO("Deserialise scene as binary: '{}'", filepath);
     } else {
-        if (!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
+        if (!FileSystem::IsExists(filepath)) {
             FS_LOG_ERROR("No saved scene file found: '{}'", filepath);
             return;
         }

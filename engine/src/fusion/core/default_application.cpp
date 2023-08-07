@@ -9,6 +9,8 @@
 
 #if FUSION_PLATFORM_WINDOWS
 #include <windows.h>
+#elif FUSION_PLATFORM_ANDROID
+
 #endif
 
 using namespace fe;
@@ -18,12 +20,12 @@ DefaultApplication::DefaultApplication(std::string_view name) : Application{name
     wchar_t path[MAX_PATH] = { 0 };
     GetModuleFileNameW(nullptr, path, MAX_PATH);
     executablePath = fs::path{path}.parent_path().parent_path();
-#else
-#if FUSION_PLATFORM_MAC
+#elif FUSION_PLATFORM_MAC
     executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path().parent_path().parent_path().parent_path();
-#else
+#elif FUSION_PLATFORM_ANDROID
+    executablePath = "/";
+#elif FUSION_PLATFORM_LINUX
     executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path();
-#endif
 #endif
 
     FS_LOG_INFO("Working directory: '{}'", executablePath);
@@ -56,7 +58,7 @@ void DefaultApplication::onStart() {
     window->OnClose().connect<&Engine::requestClose>(Engine::Get());
 
     // Sets icons to window
-    fs::path iconPath{ "assets/icons" };
+    fs::path iconPath{ FUSION_ASSET_PATH "icons" };
     std::vector<fs::path> iconPaths {
         iconPath / "icon-16.png", iconPath / "icon-24.png", iconPath / "icon-32.png",
         iconPath / "icon-48.png", iconPath / "icon-64.png", iconPath / "icon-96.png",
@@ -72,7 +74,7 @@ void DefaultApplication::openNewProject(const fs::path& path, std::string_view n
     projectSettings.projectRoot = path / name;
     projectSettings.projectName = name;
 
-    if (!fs::exists(projectSettings.projectRoot)) {
+    if (!FileSystem::IsExists(projectSettings.projectRoot)) {
         fs::create_directory(projectSettings.projectRoot);
     }
 
@@ -98,31 +100,31 @@ void DefaultApplication::openNewProject(const fs::path& path, std::string_view n
     projectSettings.isShowConsole = true;
 
     fs::path assetPath{ projectSettings.projectRoot / "assets" };
-    if (!fs::exists(assetPath))
+    if (!FileSystem::IsExists(assetPath))
         fs::create_directory(assetPath);
 
     fs::path scriptPath{ assetPath / "scripts" };
-    if (!fs::exists(scriptPath))
+    if (!FileSystem::IsExists(scriptPath))
         fs::create_directory(scriptPath);
 
     fs::path shaderPath{ assetPath / "shaders" };
-    if (!fs::exists(shaderPath))
+    if (!FileSystem::IsExists(shaderPath))
         fs::create_directory(shaderPath);
 
     fs::path scenePath{ assetPath / "scenes" };
-    if (!fs::exists(scenePath))
+    if (!FileSystem::IsExists(scenePath))
         fs::create_directory(scenePath);
 
     fs::path texturePath{ assetPath / "textures" };
-    if (!fs::exists(texturePath))
+    if (!FileSystem::IsExists(texturePath))
         fs::create_directory(texturePath);
 
     fs::path meshPath{ assetPath / "meshes" };
-    if (!fs::exists(meshPath))
+    if (!FileSystem::IsExists(meshPath))
         fs::create_directory(meshPath);
 
     fs::path soundPath{ assetPath / "sounds" };
-    if (!fs::exists(soundPath))
+    if (!FileSystem::IsExists(soundPath))
         fs::create_directory(soundPath);
 
     SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
@@ -160,13 +162,13 @@ void DefaultApplication::serialise() {
 }
 
 void DefaultApplication::deserialise() {
-    if (projectSettings.projectRoot.empty() || projectSettings.projectName.empty()) {
+    if (projectSettings.projectRoot.empty() && projectSettings.projectName.empty()) {
         FS_LOG_INFO("No saved Project file found");
         return;
     }
 
     fs::path projectPath{ projectSettings.projectRoot / (projectSettings.projectName + ".fsproj") };
-    if (!fs::exists(projectPath)) {
+    if (!FileSystem::IsExists(projectPath)) {
         FS_LOG_INFO("No saved Project file found: '{}'", projectPath);
         return;
     }
@@ -216,7 +218,7 @@ void DefaultApplication::onProjectLoad() {
 #if FUSION_SCRIPTING
     if (!projectSettings.scriptModulePath.empty()) {
         auto scriptEngine = ScriptEngine::Get();
-        scriptEngine->setAssemblyPaths("assets/scripts/Fusion-ScriptCore.dll", projectSettings.projectRoot / projectSettings.scriptModulePath);
+        scriptEngine->setAssemblyPaths(FUSION_ASSET_PATH "scripts/Fusion-ScriptCore.dll", projectSettings.projectRoot / projectSettings.scriptModulePath);
         scriptEngine->reloadAssembly();
     }
 #endif
