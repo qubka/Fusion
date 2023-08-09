@@ -12,10 +12,10 @@ namespace fe::pc {
     };
 }
 
-#define FS_LOG_VERBOSE(...)   LOG_VERBOSE << fmt::format(__VA_ARGS__)
-#define FS_LOG_DEBUG(...)     LOG_DEBUG << fmt::format(__VA_ARGS__)
-#define FS_LOG_INFO(...)      LOG_INFO << fmt::format(__VA_ARGS__)
-#define FS_LOG_WARNING(...)   LOG_WARNING << fmt::format(__VA_ARGS__)
-#define FS_LOG_ERROR(...)     LOG_ERROR << fmt::format(__VA_ARGS__)
-#define FS_LOG_FATAL(...)     LOG_FATAL << fmt::format(__VA_ARGS__)
-#define FS_LOG_NONE(...)      LOG_NONE << fmt::format(__VA_ARGS__)
+#define FE_LOG_VERBOSE(...)   LOG_VERBOSE << fmt::format(__VA_ARGS__)
+#define FE_LOG_DEBUG(...)     LOG_DEBUG << fmt::format(__VA_ARGS__)
+#define FE_LOG_INFO(...)      LOG_INFO << fmt::format(__VA_ARGS__)
+#define FE_LOG_WARNING(...)   LOG_WARNING << fmt::format(__VA_ARGS__)
+#define FE_LOG_ERROR(...)     LOG_ERROR << fmt::format(__VA_ARGS__)
+#define FE_LOG_FATAL(...)     LOG_FATAL << fmt::format(__VA_ARGS__)
+#define FE_LOG_NONE(...)      LOG_NONE << fmt::format(__VA_ARGS__)

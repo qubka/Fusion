@@ -1,50 +1,28 @@
 #pragma once
 
 // Standart
+#include <iostream>
+#include <memory>
+#include <utility>
+#include <algorithm>
+#include <functional>
+
+#include <string>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <algorithm>
-#include <functional>
-#include <memory>
-#include <thread>
-#include <utility>
-#include <cstdlib>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <string>
-#include <deque>
 #include <queue>
 #include <array>
 #include <vector>
-#include <set>
-#include <bitset>
-#include <map>
 #include <unordered_map>
 #include <unordered_set>
-#include <optional>
-#include <future>
-#include <list>
-#include <mutex>
-#include <numeric>
-#include <random>
-#include <any>
-#include <iterator>
-#include <type_traits>
-#include <experimental/type_traits>
-#include <new>
-#include <tuple>
 #include <filesystem>
 namespace fs = std::filesystem;
 
 #if __cplusplus >= 202002L
 #include <span>
-#elif _WIN32
-#include <gsl/span>
 #else
-#define TCB_SPAN_NAMESPACE_NAME gsl
-#include <tcb/span.hpp>
+#include <gsl/span>
 #endif
 
 // Math

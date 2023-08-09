@@ -20,7 +20,7 @@
 
 using namespace fe;
 
-static std::unordered_map<std::string_view, ScriptFieldType> ScriptFieldTypeMap = {
+static std::unordered_map<std::string, ScriptFieldType> ScriptFieldTypeMap = {
     { "System.Single", ScriptFieldType::Float },
     { "System.Double", ScriptFieldType::Double },
     { "System.Boolean", ScriptFieldType::Bool },
@@ -46,14 +46,15 @@ namespace Utils {
         // NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
         MonoImageOpenStatus status;
         MonoImage* image = nullptr;
-        // fix leak
+
+        // TODO: fix possible leak
         FileSystem::ReadBytes(assemblyPath, [&](gsl::span<const std::byte> buffer) {
             image = mono_image_open_from_data_full((char*) buffer.data(), buffer.size(), 1, &status, 0);
         });
 
         if (status != MONO_IMAGE_OK) {
             const char* errorMessage = mono_image_strerror(status);
-            FS_LOG_ERROR( "Failed to load assembly file: '{}'", errorMessage);
+            FE_LOG_ERROR( "Failed to load assembly file: '{}'", errorMessage);
             return nullptr;
         }
 
@@ -61,12 +62,10 @@ namespace Utils {
             fs::path pdbPath{ assemblyPath };
             pdbPath.replace_extension(".pdb");
 
-            if (FileSystem::IsExists(pdbPath)) {
-                FileSystem::ReadBytes(pdbPath, [&](gsl::span<const std::byte> buffer) {
-                    mono_debug_open_image_from_memory(image, reinterpret_cast<const mono_byte*>(buffer.data()), static_cast<int>(buffer.size()));
-                    FS_LOG_INFO("Loaded PDB: '{}'", pdbPath);
-                });
-            }
+            FileSystem::ReadBytes(pdbPath, [&](gsl::span<const std::byte> buffer) {
+                mono_debug_open_image_from_memory(image, reinterpret_cast<const mono_byte*>(buffer.data()), static_cast<int>(buffer.size()));
+                FE_LOG_INFO("Loaded PDB: '{}'", pdbPath);
+            });
         }
 
         std::string pathString{ assemblyPath.string() };
@@ -88,7 +87,7 @@ namespace Utils {
             const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
             const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
 
-            FS_LOG_VERBOSE("{}.{}", nameSpace, name);
+            FE_LOG_VERBOSE("{}.{}", nameSpace, name);
         }
     }
 
@@ -97,7 +96,7 @@ namespace Utils {
 
         auto it = ScriptFieldTypeMap.find(typeName);
         if (it == ScriptFieldTypeMap.end()) {
-            FS_LOG_ERROR("Unknown type: {}", typeName);
+            FE_LOG_ERROR("Unknown type: {}", typeName);
             return ScriptFieldType::None;
         }
 
@@ -116,12 +115,10 @@ namespace Utils {
     }
 }*/
 
-void ScriptEngine::onStart() {
+ScriptEngine::ScriptEngine() {
     initMono();
 
     ScriptGlue::RegisterFunctions();
-
-    //loadAssembly();
 }
 
 void ScriptEngine::onStop() {
@@ -142,7 +139,7 @@ void ScriptEngine::initMono() {
     }
 
     rootDomain = mono_jit_init("FusionJITRuntime");
-    FS_ASSERT(rootDomain);
+    FE_ASSERT(rootDomain);
 
     if (enableDebugging)
         mono_debug_domain_create(rootDomain);
@@ -202,18 +199,18 @@ void ScriptEngine::reloadAssembly() {
 
     bool status = loadCoreAssembly(coreAssemblyFilepath);
     if (!status) {
-        FS_LOG_ERROR("Could not load '{}' assembly.", coreAssemblyFilepath);
+        FE_LOG_ERROR("Could not load '{}' assembly.", coreAssemblyFilepath);
         return;
     } else {
-        FS_LOG_INFO("Assembly: '{}' was loaded successfully!", coreAssemblyFilepath);
+        FE_LOG_INFO("Assembly: '{}' was loaded successfully!", coreAssemblyFilepath);
     }
 
     status = loadAppAssembly(appAssemblyFilepath);
     if (!status) {
-        FS_LOG_ERROR("Could not load app '{}' assembly.", appAssemblyFilepath);
+        FE_LOG_ERROR("Could not load app '{}' assembly.", appAssemblyFilepath);
         return;
     } else {
-        FS_LOG_INFO("App assembly: '{}' was loaded successfully!", appAssemblyFilepath);
+        FE_LOG_INFO("App assembly: '{}' was loaded successfully!", appAssemblyFilepath);
     }
 
     loadAssemblyClasses();
@@ -331,7 +328,7 @@ void ScriptEngine::loadAssemblyClasses() {
         // to iterate over all the elements. When no more values are available, the return value is NULL.
 
         int fieldCount = mono_class_num_fields(monoClass);
-        FS_LOG_WARNING("{} has {} fields: ", className, fieldCount);
+        FE_LOG_WARNING("{} has {} fields: ", className, fieldCount);
         void* iterator = nullptr;
         while (MonoClassField* field = mono_class_get_fields(monoClass, &iterator)) {
             const char* fieldName = mono_field_get_name(field);
@@ -339,7 +336,7 @@ void ScriptEngine::loadAssemblyClasses() {
             if (flags & MONO_FIELD_ATTR_PUBLIC) {
                 MonoType* type = mono_field_get_type(field);
                 ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
-                FS_LOG_WARNING("{} ({})", fieldName, me::enum_name(fieldType));
+                FE_LOG_WARNING("{} ({})", fieldName, me::enum_name(fieldType));
 
                 scriptClass->fields[fieldName] = { fieldType, fieldName, field };
             }
@@ -371,8 +368,8 @@ MonoObject* ScriptClass::instantiate() {
     return ScriptEngine::Get()->instantiateClass(monoClass);
 }
 
-MonoMethod* ScriptClass::getMethod(const std::string& name, int parameterCount) {
-    return mono_class_get_method_from_name(monoClass, name.c_str(), parameterCount);
+MonoMethod* ScriptClass::getMethod(std::string_view name, int parameterCount) {
+    return mono_class_get_method_from_name(monoClass, name.data(), parameterCount);
 }
 
 MonoObject* ScriptClass::invokeMethod(MonoObject* instance, MonoMethod* method, void** params) {

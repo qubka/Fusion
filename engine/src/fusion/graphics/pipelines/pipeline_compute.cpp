@@ -22,7 +22,7 @@ PipelineCompute::PipelineCompute(fs::path&& path, fst::unordered_flatmap<std::st
 	createPipelineCompute();
 
 #if FUSION_DEBUG
-	FS_LOG_DEBUG("Pipeline Compute '{}' created in {}ms", shader.getName(), (DateTime::Now() - debugStart).asMilliseconds<float>());
+	FE_LOG_DEBUG("Pipeline Compute '{}' created in {}ms", shader.getName(), (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 }
 

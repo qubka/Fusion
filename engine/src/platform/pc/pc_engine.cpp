@@ -27,7 +27,7 @@ int32_t Engine::run() {
         shutdown();
     }
     catch (std::exception& e) {
-        FS_LOG_FATAL(e.what());
+        FE_LOG_FATAL(e.what());
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

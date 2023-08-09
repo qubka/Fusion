@@ -6,7 +6,7 @@ namespace fe {
         CommandLineArgs() = default;
         CommandLineArgs(int count, char** args);
 
-        //const std::string& operator[](size_t index) const;
+        const std::pair<std::string, std::string>& operator[](size_t index) const;
         std::optional<std::string> getParameter(const std::string& name) const;
 
     private:
@@ -42,15 +42,15 @@ namespace fe {
         std::string output;
         int exitstatus;
 
-        friend std::ostream &operator<<(std::ostream &os, const CommandResult &result) {
-            os << "command exitstatus: " << result.exitstatus << " output: " << result.output;
-            return os;
+        friend std::ostream& operator<<(std::ostream& ostream, const CommandResult& result) {
+            ostream << "command exitstatus: " << result.exitstatus << " output: " << result.output;
+            return ostream;
         }
-        bool operator==(const CommandResult &rhs) const {
+        bool operator==(const CommandResult& rhs) const {
             return output == rhs.output && exitstatus == rhs.exitstatus;
         }
 
-        bool operator!=(const CommandResult &rhs) const {
+        bool operator!=(const CommandResult& rhs) const {
             return !(rhs == *this);
         }
     };

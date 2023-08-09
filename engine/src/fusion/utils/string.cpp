@@ -189,8 +189,8 @@ size_t String::FindInsensitive(std::string str, std::string pattern, size_t pos)
     return str.find(pattern, pos);
 }
 
-std::string String::Quoted(const std::string& str) {
-    return '"' + str + '"';
+std::string String::Quoted(std::string_view str) {
+    return fmt::format("\"{}\"", str);
 }
 
 std::string String::Demangle(const char* name) {

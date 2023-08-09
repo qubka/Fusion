@@ -185,7 +185,7 @@ namespace fe {
          * @param str The string.
          * @return The uppercased string.
          */
-        static std::string Quoted(const std::string& str);
+        static std::string Quoted(std::string_view str);
 
         /**
          * Demangles a string.

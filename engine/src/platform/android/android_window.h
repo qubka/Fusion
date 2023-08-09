@@ -9,7 +9,7 @@ namespace fe::android {
     class FUSION_API Window : public fe::Window {
         friend class DeviceManager;
     public:
-        Window(ANativeWindow* window, const WindowInfo& windowInfo);
+        Window(const WindowInfo& windowInfo);
         ~Window() override;
 
         bool isBorderless() const override { return true; }

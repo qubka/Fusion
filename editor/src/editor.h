@@ -61,7 +61,7 @@ namespace fe {
 
         void openTextFile(const fs::path& filepath, const std::function<void()>& callback);
         void removePanel(EditorPanel* panel);
-        EditorPanel* getPanel(const std::string& name);
+        EditorPanel* getPanel(std::string_view name);
 
         std::shared_ptr<Camera> getCamera() { return editorCamera; }
 

@@ -94,11 +94,11 @@ bool PropertyDropdown(const char* name, gsl::span<const char*> options, int32_t&
     return updated;
 }
 
-bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTextFilter& filter, std::vector<fs::path>& files, const fs::path& root, const std::string& ext) {
+bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTextFilter& filter, std::vector<fs::path>& files, const fs::path& root, std::string_view ext) {
     bool updated = false;
 
     if (files.empty()) {
-        files = FileSystem::GetFilesInPath(root, ext);
+        files = FileSystem::GetFiles(root, true, ext);
     }
 
     ImGui::TextUnformatted(name);
@@ -176,7 +176,7 @@ bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTe
         if (ImGui::Button("...", buttonSize)) {
             filter.Clear();
             selected = "";
-            files = FileSystem::GetFilesInPath(root, ext);
+            files = FileSystem::GetFiles(root, true, ext);
             ImGui::OpenPopup("FileExplorer");
         }
     } else {
@@ -208,7 +208,7 @@ bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTe
     if (ImGui::Button(ICON_MDI_FILE_SEARCH)) {
         filter.Clear();
         selected = "";
-        files = FileSystem::GetFilesInPath(root, ext);
+        files = FileSystem::GetFiles(root, true, ext);
         ImGui::OpenPopup("FileExplorer");
     }
 

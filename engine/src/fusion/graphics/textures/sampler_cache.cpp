@@ -16,7 +16,7 @@ SamplerCache::~SamplerCache() {
 VkSampler SamplerCache::createSampler(const VkSamplerCreateInfo& info) const {
     // Try to grab from cache
     if (auto it = samplerCache.find(info); it != samplerCache.end()) {
-        FS_LOG_INFO("Find 'VkSampler' in cache");
+        FE_LOG_INFO("Find 'VkSampler' in cache");
         return it->second;
     } else {
         // Create a new one (not found)

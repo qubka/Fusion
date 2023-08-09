@@ -23,7 +23,7 @@ namespace fe {
         /**
          * @brief Whenever the system starts updating because scene in the active state.
          */
-        virtual void onPlay() = 0;
+        virtual void onPlay() = 0; //
 
         /**
          * @brief Every frame as long as the system has work to do and the system is Enabled.
@@ -33,7 +33,7 @@ namespace fe {
         /**
         * @brief Whenever the system stops updating because scene not in the active state.
         */
-        virtual void onStop() = 0;
+        virtual void onStop() = 0; //
 
         /**
          * @brief Called when the system is enabled.

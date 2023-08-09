@@ -25,9 +25,9 @@ Engine::Engine(CommandLineArgs&& args)
 
     logger = Log::Init();
 
-    FS_LOG_INFO("Version: {}", version.toString());
-    FS_LOG_INFO("Git: [{}]:({}) - {} on {} at '{}'", GIT_COMMIT_HASH, GIT_TAG, GIT_COMMIT_SUBJECT, GIT_BRANCH, GIT_COMMIT_DATE);
-    FS_LOG_INFO("Compiled on: {} from: {} with: '{}'", FUSION_COMPILED_SYSTEM, FUSION_COMPILED_GENERATOR, FUSION_COMPILED_COMPILER);
+    FE_LOG_INFO("Version: {}", version.toString());
+    FE_LOG_INFO("Git: [{}]:({}) - {} on {} at '{}'", GIT_COMMIT_HASH, GIT_TAG, GIT_COMMIT_SUBJECT, GIT_BRANCH, GIT_COMMIT_DATE);
+    FE_LOG_INFO("Compiled on: {} from: {} with: '{}'", FUSION_COMPILED_SYSTEM, FUSION_COMPILED_GENERATOR, FUSION_COMPILED_COMPILER);
 
     commandLineParser.parse(commandLineArgs);
 
@@ -65,7 +65,7 @@ void Engine::init() {
         auto index = static_cast<uint32_t>(modules.size());
         modules.push_back(module.create());
         stages[me::enum_integer(module.stage)].push_back(index);
-        FS_LOG_DEBUG("Module: '{}' was registered for the '{}' stage", module.name, me::enum_name(module.stage));
+        FE_LOG_DEBUG("Module: '{}' was registered for the '{}' stage", module.name, me::enum_name(module.stage));
     }
 }
 
@@ -86,6 +86,8 @@ void Engine::startup() {
             module->started = true;
         }
     }
+
+    started = true;
 }
 
 void Engine::shutdown() {
@@ -105,6 +107,8 @@ void Engine::shutdown() {
         devices->started = false;
         devices->onStop();
     }
+
+    started = false;
 }
 
 void Engine::updateMain() {

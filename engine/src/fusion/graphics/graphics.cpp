@@ -130,7 +130,7 @@ bool Graphics::beginFrame(FrameInfo& info) {
         throw std::runtime_error("Failed to acquire swap chain image!");
 #endif
 
-    FS_ASSERT(!commandBuffer.isRunning());
+    FE_ASSERT(!commandBuffer.isRunning());
 
     commandBuffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
@@ -144,7 +144,7 @@ bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
     FUSION_PROFILE_GPU("Begin Renderpass");
 
     if (renderStage.isOutOfDate()) {
-        //FS_LOG_WARNING("Render stage is out of date!");
+        //FE_LOG_WARNING("Render stage is out of date!");
         recreatePass(info, renderStage);
         return false;
     }
@@ -285,7 +285,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     bitmap.write(filepath);
 
 #if FUSION_DEBUG
-    FS_LOG_DEBUG("Screenshot '{}' created in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
+    FE_LOG_DEBUG("Screenshot '{}' created in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 }
 
@@ -319,7 +319,7 @@ void Graphics::recreateSwapchain(size_t id) {
 
 #if FUSION_DEBUG
     //auto& size = surface->getWindow().getSize();
-    //FS_LOG_DEBUG("Recreating swapchain[" << id << "] old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")");
+    //FE_LOG_DEBUG("Recreating swapchain[" << id << "] old (" << swapchain->getExtent().width << ", " << swapchain->getExtent().height << ") new (" << size.x << ", " << size.y << ")");
 #endif
     swapchain = std::make_unique<Swapchain>(physicalDevice, logicalDevice, *surface, swapchain.get());
 
@@ -365,9 +365,11 @@ void Graphics::onWindowCreate(Window* window, bool create) {
     if (create) {
         surfaces.push_back(std::make_unique<Surface>(instance, physicalDevice, *window));
     } else {
-        /*surfaces.erase(std::remove_if(surfaces.begin(), surfaces.end(), [window](const auto& s) {
+        auto it = std::find_if(surfaces.begin(), surfaces.end(), [window](const auto& s) {
             return window == &s->window;
-        }), surfaces.end());*/
+        });
+        if (it != surfaces.end())
+            surfaces.erase(it);
     }
 }
 

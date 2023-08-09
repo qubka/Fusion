@@ -17,7 +17,7 @@ Window::Window(const VideoMode& videoMode, const WindowInfo& windowInfo) : fe::W
     , fullscreen{windowInfo.isFullscreen}
     , vsync{windowInfo.isVSync} {
 
-    FS_LOG_INFO("Creating window: '{}' [{} {}]", title, size.x, size.y);
+    FE_LOG_INFO("Creating window: '{}' [{} {}]", title, size.x, size.y);
 
     // Create a windowed mode window and its context.
     window = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, nullptr);
@@ -114,11 +114,11 @@ void Window::setFullscreen(bool flag, const Monitor* monitor) {
     fullscreen = flag;
 
     if (fullscreen) {
-        FS_LOG_DEBUG("Window is going fullscreen");
+        FE_LOG_DEBUG("Window is going fullscreen");
         fullscreenSize = {videoMode.width, videoMode.height};
         glfwSetWindowMonitor(window, static_cast<GLFWmonitor*>(selected->getNativeMonitor()), 0, 0, fullscreenSize.x, fullscreenSize.y, GLFW_DONT_CARE);
     } else {
-        FS_LOG_DEBUG("Window is going windowed");
+        FE_LOG_DEBUG("Window is going windowed");
         position = ((glm::uvec2{videoMode.width, videoMode.height} - size) / 2U) + selected->getPosition();
         glfwSetWindowMonitor(window, nullptr, position.x, position.y, size.x, size.y, GLFW_DONT_CARE);
     }
@@ -292,7 +292,7 @@ namespace fe::glfw {
 
         glm::uvec2 pos {x, y};
 
-        FS_LOG_VERBOSE("PositionChangeEvent: {}", pos);
+        FE_LOG_VERBOSE("PositionChangeEvent: {}", pos);
 
         window.position = pos;
         window.onPositionChange.publish(pos);
@@ -306,7 +306,7 @@ namespace fe::glfw {
 
         glm::uvec2 size {width, height};
 
-        FS_LOG_VERBOSE("SizeChangeEvent: {}", size);
+        FE_LOG_VERBOSE("SizeChangeEvent: {}", size);
 
         if (window.fullscreen) {
             window.fullscreenSize = size;
@@ -319,7 +319,7 @@ namespace fe::glfw {
     void Window::CloseCallback(GLFWwindow* handle) {
         auto& window = *static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-        FS_LOG_VERBOSE("CloseEvent");
+        FE_LOG_VERBOSE("CloseEvent");
 
         window.onClose.publish();
     }
@@ -327,7 +327,7 @@ namespace fe::glfw {
     void Window::RefreshCallback(GLFWwindow* handle) {
         auto& window = *static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-        FS_LOG_VERBOSE("RefreshEvent");
+        FE_LOG_VERBOSE("RefreshEvent");
 
         window.onRefresh.publish();
     }
@@ -335,7 +335,7 @@ namespace fe::glfw {
     void Window::FocusCallback(GLFWwindow* handle, int focused) {
         auto& window = *static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-        FS_LOG_VERBOSE("FocusEvent: {}", (focused ? "TRUE" : "FALSE"));
+        FE_LOG_VERBOSE("FocusEvent: {}", (focused ? "TRUE" : "FALSE"));
 
         window.focused = focused;
         window.onFocus.publish(focused);
@@ -344,7 +344,7 @@ namespace fe::glfw {
     void Window::IconifyCallback(GLFWwindow* handle, int iconified) {
         auto& window = *static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-        FS_LOG_VERBOSE("IconifyEvent: {}", (iconified ? "TRUE" : "FALSE"));
+        FE_LOG_VERBOSE("IconifyEvent: {}", (iconified ? "TRUE" : "FALSE"));
 
         window.iconified = iconified;
         window.onIconify.publish(iconified);
@@ -355,7 +355,7 @@ namespace fe::glfw {
 
         glm::uvec2 size {width, height};
 
-        FS_LOG_VERBOSE("FramebufferResize: {}{}", size);
+        FE_LOG_VERBOSE("FramebufferResize: {}{}", size);
 
         if (window.fullscreen) {
             window.fullscreenSize = size;
@@ -370,7 +370,7 @@ namespace fe::glfw {
 
         glm::vec2 pos {posX, posY};
 
-        FS_LOG_VERBOSE("MouseMotionEvent: {}", pos);
+        FE_LOG_VERBOSE("MouseMotionEvent: {}", pos);
 
         window.mousePosition = pos;
         window.onMouseMotion.publish(pos);
@@ -382,7 +382,7 @@ namespace fe::glfw {
 
         glm::vec2 norm{ 2.0f * (pos / glm::vec2{size}) - 1.0f};
 
-        FS_LOG_VERBOSE("MouseMotionNormEvent: {}", norm);
+        FE_LOG_VERBOSE("MouseMotionNormEvent: {}", norm);
 
         window.mousePositionNorm = norm;
         window.onMouseMotionNorm.publish(norm);
@@ -393,7 +393,7 @@ namespace fe::glfw {
 
         glm::vec2 offset {offsetX, offsetY};
 
-        FS_LOG_VERBOSE("MouseScrollEvent: {}", offset);
+        FE_LOG_VERBOSE("MouseScrollEvent: {}", offset);
 
         window.mouseScroll = offset;
         window.onMouseScroll.publish(offset);
@@ -402,7 +402,7 @@ namespace fe::glfw {
     void Window::MouseButtonCallback(GLFWwindow* handle, int button, int action, int mods) {
         auto& window = *static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-        FS_LOG_VERBOSE("MouseButtonEvent: {}", glm::ivec3{button, action, mods});
+        FE_LOG_VERBOSE("MouseButtonEvent: {}", glm::ivec3{button, action, mods});
 
         window.onMouseButton.publish(static_cast<MouseButton>(button), static_cast<InputAction>(action), bitmask::bitmask<InputMod>(static_cast<InputMod>(mods)));
 
@@ -419,7 +419,7 @@ namespace fe::glfw {
     void Window::KeyCallback(GLFWwindow* handle, int key, int scancode, int action, int mods) {
         auto& window = *static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-        FS_LOG_VERBOSE("KeyEvent: {}", glm::ivec4{key, scancode, action, mods});
+        FE_LOG_VERBOSE("KeyEvent: {}", glm::ivec4{key, scancode, action, mods});
 
         window.onKey.publish(static_cast<Key>(key), static_cast<InputAction>(action), static_cast<Key>(scancode), bitmask::bitmask<InputMod>(static_cast<InputMod>(mods)));
 
@@ -439,7 +439,7 @@ namespace fe::glfw {
     void Window::CursorEnterCallback(GLFWwindow* handle, int entered) {
         auto& window = *static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-        FS_LOG_VERBOSE("MouseEnterEvent: {}", (entered ? "TRUE" : "FALSE"));
+        FE_LOG_VERBOSE("MouseEnterEvent: {}", (entered ? "TRUE" : "FALSE"));
 
         window.selected = entered;
         window.onMouseEnter.publish(entered);
@@ -448,7 +448,7 @@ namespace fe::glfw {
     void Window::CharCallback(GLFWwindow* handle, unsigned int keycode) {
         auto& window = *static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-        FS_LOG_VERBOSE("CharInputEvent: {}", keycode);
+        FE_LOG_VERBOSE("CharInputEvent: {}", keycode);
 
         window.onCharInput.publish(keycode);
     }
@@ -457,7 +457,7 @@ namespace fe::glfw {
     void Window::FileDropCallback(GLFWwindow* handle, int count, const char** paths) {
         auto& window = *static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-        FS_LOG_VERBOSE("FileDropEvent: {}", count);
+        FE_LOG_VERBOSE("FileDropEvent: {}", count);
 
         window.onFileDrop.publish({ paths, static_cast<size_t>(count) });
     }
@@ -467,7 +467,7 @@ namespace fe::glfw {
     void Window::MaximizeCallback(GLFWwindow* handle, int maximized) {
         auto& window = *static_cast<Window*>(glfwGetWindowUserPointer(handle));
 
-        FS_LOG_VERBOSE("MaximizeEvent: {}", (maximized ? "TRUE" : "FALSE"));
+        FE_LOG_VERBOSE("MaximizeEvent: {}", (maximized ? "TRUE" : "FALSE"));
 
         window.onMaximize.publish(maximized);
     }
@@ -477,7 +477,7 @@ namespace fe::glfw {
 
         glm::vec2 scale {scaleX, scaleY};
 
-        FS_LOG_VERBOSE("ContentScaleEvent: {}", scale);
+        FE_LOG_VERBOSE("ContentScaleEvent: {}", scale);
 
         window.onContentScale.publish(scale);
     }

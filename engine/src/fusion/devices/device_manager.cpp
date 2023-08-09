@@ -39,7 +39,7 @@ std::unique_ptr<DeviceManager> DeviceManager::Init() {
 #elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLE
     return std::make_unique<glfw::DeviceManager>();
 #else
-    FS_LOG_FATAL("Unknown platform!");
+    FE_LOG_FATAL("Unknown platform!");
     return nullptr;
 #endif
 }

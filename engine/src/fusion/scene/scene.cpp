@@ -31,7 +31,7 @@ void Scene::onStart() {
         system->setEnabled(true);
     });
 
-    FS_LOG_DEBUG("Scene : '{}' created", name);
+    FE_LOG_DEBUG("Scene : '{}' created", name);
 }
 
 void Scene::onUpdate() {
@@ -49,7 +49,7 @@ void Scene::onPlay() {
             system->onPlay();
     });
 
-    FS_LOG_DEBUG("Scene : '{}' started runtime", name);
+    FE_LOG_DEBUG("Scene : '{}' started runtime", name);
 }
 
 void Scene::onStop() {
@@ -60,7 +60,7 @@ void Scene::onStop() {
 
     runtime = false;
 
-    FS_LOG_DEBUG("Scene : '{}' stopped runtime", name);
+    FE_LOG_DEBUG("Scene : '{}' stopped runtime", name);
 }
 
 void Scene::clearSystems() {
@@ -170,7 +170,7 @@ void Scene::serialise(fs::path filepath, bool binary) {
             entt::snapshot{ registry }.entities(output).component<ALL_COMPONENTS>(output);
         }
 
-        FS_LOG_INFO("Serialise scene as binary: '{}'", filepath);
+        FE_LOG_INFO("Serialise scene as binary: '{}'", filepath);
     } else {
         std::stringstream ss;
         {
@@ -181,7 +181,7 @@ void Scene::serialise(fs::path filepath, bool binary) {
 
         FileSystem::WriteText(filepath, ss.str());
 
-        FS_LOG_INFO("Serialise scene: '{}'", filepath);
+        FE_LOG_INFO("Serialise scene: '{}'", filepath);
     }
 }
 
@@ -195,7 +195,7 @@ void Scene::deserialise(fs::path filepath, bool binary) {
 
     if (binary) {
         if (!FileSystem::IsExists(filepath)) {
-            FS_LOG_ERROR("No saved scene file found: '{}'", filepath);
+            FE_LOG_ERROR("No saved scene file found: '{}'", filepath);
             return;
         }
 
@@ -207,13 +207,13 @@ void Scene::deserialise(fs::path filepath, bool binary) {
             entt::snapshot_loader{ registry }.entities(input).component<ALL_COMPONENTS>(input);
         }
         catch (...) {
-            FS_LOG_ERROR("Failed to load scene: '{}'", filepath);
+            FE_LOG_ERROR("Failed to load scene: '{}'", filepath);
         }
 
-        FS_LOG_INFO("Deserialise scene as binary: '{}'", filepath);
+        FE_LOG_INFO("Deserialise scene as binary: '{}'", filepath);
     } else {
         if (!FileSystem::IsExists(filepath)) {
-            FS_LOG_ERROR("No saved scene file found: '{}'", filepath);
+            FE_LOG_ERROR("No saved scene file found: '{}'", filepath);
             return;
         }
 
@@ -225,10 +225,10 @@ void Scene::deserialise(fs::path filepath, bool binary) {
             entt::snapshot_loader{ registry }.entities(input).component<ALL_COMPONENTS>(input);
         }
         catch (...) {
-            FS_LOG_ERROR("Failed to load scene: '{}'", filepath);
+            FE_LOG_ERROR("Failed to load scene: '{}'", filepath);
         }
 
-        FS_LOG_INFO("Deserialise scene: '{}'", filepath);
+        FE_LOG_INFO("Deserialise scene: '{}'", filepath);
     }
 
     systems.each([&](auto system) {

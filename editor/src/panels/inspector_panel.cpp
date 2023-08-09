@@ -583,9 +583,7 @@ namespace ImGui {
 {                                                              \
     std::string name;                                          \
     editor.getComponentIcon(type_id<ComponentType>, name);     \
-    name += "\t";                                              \
-    name += (ComponentName);                                   \
-    enttEditor.registerComponent<ComponentType>(name); \
+    enttEditor.registerComponent<ComponentType>(name + ("\t" ComponentName)); \
 }
 
 InspectorPanel::InspectorPanel(Editor& editor) : EditorPanel{ICON_MDI_INFORMATION " Inspector###inspector", "Inspector", editor} {

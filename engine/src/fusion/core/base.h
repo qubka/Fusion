@@ -24,9 +24,11 @@
 #if FUSION_PLATFORM_ANDROID
 #include "platform/android/android_log.h"
 #define FUSION_ASSET_PATH
+#define FUSION_VIRTUAL_FS true
 #elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLE
 #include "platform/pc/pc_log.h"
 #define FUSION_ASSET_PATH "assets/"
+#define FUSION_VIRTUAL_FS false
 #else
 #pragma error("Unknown platform!");
 #endif

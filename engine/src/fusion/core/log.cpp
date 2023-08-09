@@ -29,7 +29,7 @@ std::unique_ptr<Log> Log::Init() {
 #elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLE
     return std::make_unique<pc::Log>();
 #else
-    FS_LOG_FATAL("Unknown platform!");
+    FE_LOG_FATAL("Unknown platform!");
     return nullptr;
 #endif
 }

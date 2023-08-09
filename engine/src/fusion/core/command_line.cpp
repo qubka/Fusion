@@ -13,9 +13,9 @@ CommandLineArgs::CommandLineArgs(int count, char** args) {
     }
 }
 
-/*const std::string& CommandLineArgs::operator[](size_t index) const {
+const std::pair<std::string, std::string>& CommandLineArgs::operator[](size_t index) const {
     return arguments.values().at(index);
-}*/
+}
 
 std::optional<std::string> CommandLineArgs::getParameter(const std::string& name) const {
     if (auto it = arguments.find(name); it != arguments.end())
@@ -97,14 +97,14 @@ T CommandLineParser::getValue(const std::string& name, const T& defaultValue) {
 
 template<>
 std::string CommandLineParser::getValue<std::string>(const std::string& name, const std::string& defaultValue) {
-    FS_ASSERT(options.find(name) != options.end());
+    FE_ASSERT(options.find(name) != options.end());
     const std::string& value = options[name].value;
     return !value.empty() ? value : defaultValue;
 }
 
 template<>
 int CommandLineParser::getValue<int>(const std::string& name, const int& defaultValue) {
-    FS_ASSERT(options.find(name) != options.end());
+    FE_ASSERT(options.find(name) != options.end());
     const std::string& value = options[name].value;
     if (!value.empty()) {
         int result = std::stoi(value);
@@ -116,7 +116,7 @@ int CommandLineParser::getValue<int>(const std::string& name, const int& default
 
 template<>
 float CommandLineParser::getValue<float>(const std::string& name, const float& defaultValue) {
-    FS_ASSERT(options.find(name) != options.end());
+    FE_ASSERT(options.find(name) != options.end());
     const std::string& value = options[name].value;
     if (!value.empty()) {
         float result = std::stof(value);
@@ -128,7 +128,7 @@ float CommandLineParser::getValue<float>(const std::string& name, const float& d
 
 template<>
 bool CommandLineParser::getValue<bool>(const std::string& name, const bool& defaultValue) {
-    FS_ASSERT(options.find(name) != options.end());
+    FE_ASSERT(options.find(name) != options.end());
     const std::string& value = options[name].value;
     if (!value.empty()) {
         return String::ConvertBool(value);

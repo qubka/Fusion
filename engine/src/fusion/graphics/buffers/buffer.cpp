@@ -72,7 +72,7 @@ void Buffer::bind(VkDeviceSize offset) {
 }
 
 void Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
-    FS_ASSERT(buffer && memory && "Called map on buffer before create");
+    FE_ASSERT(buffer && memory && "Called map on buffer before create");
 
     VK_CHECK(vkMapMemory(logicalDevice, memory, offset, size, 0, &mapped));
 }
@@ -85,7 +85,7 @@ void Buffer::unmap() {
 }
 
 void Buffer::copy(const void* data, VkDeviceSize size, VkDeviceSize offset) {
-    FS_ASSERT(mapped && "Cannot copy to unmapped buffer");
+    FE_ASSERT(mapped && "Cannot copy to unmapped buffer");
 
     if (size == VK_WHOLE_SIZE) {
         std::memcpy(mapped, data, this->size);
@@ -95,7 +95,7 @@ void Buffer::copy(const void* data, VkDeviceSize size, VkDeviceSize offset) {
 }
 
 int Buffer::compare(const void* data, VkDeviceSize size, VkDeviceSize offset) {
-    FS_ASSERT(mapped && "Cannot compare to unmapped buffer");
+    FE_ASSERT(mapped && "Cannot compare to unmapped buffer");
 
     if (size == VK_WHOLE_SIZE) {
         return std::memcmp(mapped, data, this->size);
@@ -105,7 +105,7 @@ int Buffer::compare(const void* data, VkDeviceSize size, VkDeviceSize offset) {
 }
 
 void Buffer::extract(void* data, VkDeviceSize size, VkDeviceSize offset) {
-    FS_ASSERT(mapped && "Cannot extract from unmapped buffer");
+    FE_ASSERT(mapped && "Cannot extract from unmapped buffer");
 
     if (size == VK_WHOLE_SIZE) {
         std::memcpy(data, mapped, this->size);

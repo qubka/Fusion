@@ -2,31 +2,31 @@
 
 #ifdef FUSION_DEBUG
     #if FUSION_PLATFORM_WINDOWS
-		#define FS_DEBUGBREAK() __debugbreak()
+		#define FE_DEBUGBREAK() __debugbreak()
 	#else
 		#include <csignal>
-		#define FS_DEBUGBREAK() raise(SIGTRAP)
+		#define FE_DEBUGBREAK() raise(SIGTRAP)
     #endif
-	#define FS_ENABLE_ASSERTS
+	#define FE_ENABLE_ASSERTS
 #else
-#define FS_DEBUGBREAK()
+#define FE_DEBUGBREAK()
 #endif
 
-#define FS_EXPAND_MACRO(x) x
-#define FS_STRINGIFY_MACRO(x) #x
+#define FE_EXPAND_MACRO(x) x
+#define FE_STRINGIFY_MACRO(x) #x
 
-#ifdef FS_ENABLE_ASSERTS
+#ifdef FE_ENABLE_ASSERTS
     // Alteratively we could use the same "default" message for both "WITH_MSG" and "NO_MSG" and
 	// provide support for custom formatting by concatenating the formatting string instead of having the format inside the default message
-	#define FS_INTERNAL_ASSERT_IMPL(type, check, msg, ...) { if(!(check)) { FS##type##ERROR(msg, __VA_ARGS__); FS_DEBUGBREAK(); } }
-	#define FS_INTERNAL_ASSERT_WITH_MSG(type, check, ...) FS_INTERNAL_ASSERT_IMPL(type, check, "Assertion failed: {0}", __VA_ARGS__)
-	#define FS_INTERNAL_ASSERT_NO_MSG(type, check) FS_INTERNAL_ASSERT_IMPL(type, check, "Assertion '{0}' failed at {1}:{2}", FS_STRINGIFY_MACRO(check), fs::path(__FILE__).filename(), __LINE__)
+	#define FE_INTERNAL_ASSERT_IMPL(type, check, msg, ...) { if(!(check)) { FE##type##ERROR(msg, __VA_ARGS__); FE_DEBUGBREAK(); } }
+	#define FE_INTERNAL_ASSERT_WITH_MSG(type, check, ...) FE_INTERNAL_ASSERT_IMPL(type, check, "Assertion failed: {0}", __VA_ARGS__)
+	#define FE_INTERNAL_ASSERT_NO_MSG(type, check) FE_INTERNAL_ASSERT_IMPL(type, check, "Assertion '{0}' failed at {1}:{2}", FE_STRINGIFY_MACRO(check), fs::path(__FILE__).filename(), __LINE__)
 
-	#define FS_INTERNAL_ASSERT_GET_MACRO_NAME(arg1, arg2, macro, ...) macro
-	#define FS_INTERNAL_ASSERT_GET_MACRO(...) FS_EXPAND_MACRO( FS_INTERNAL_ASSERT_GET_MACRO_NAME(__VA_ARGS__, FS_INTERNAL_ASSERT_WITH_MSG, FS_INTERNAL_ASSERT_NO_MSG) )
+	#define FE_INTERNAL_ASSERT_GET_MACRO_NAME(arg1, arg2, macro, ...) macro
+	#define FE_INTERNAL_ASSERT_GET_MACRO(...) FE_EXPAND_MACRO( FE_INTERNAL_ASSERT_GET_MACRO_NAME(__VA_ARGS__, FE_INTERNAL_ASSERT_WITH_MSG, FE_INTERNAL_ASSERT_NO_MSG) )
 
 	// Currently accepts at least the condition and one additional parameter (the message) being optional
-	#define FS_ASSERT(...) FS_EXPAND_MACRO( FS_INTERNAL_ASSERT_GET_MACRO(__VA_ARGS__)(_LOG_, __VA_ARGS__) )
+	#define FE_ASSERT(...) FE_EXPAND_MACRO( FE_INTERNAL_ASSERT_GET_MACRO(__VA_ARGS__)(_LOG_, __VA_ARGS__) )
 #else
-#define FS_ASSERT(...)
+#define FE_ASSERT(...)
 #endif

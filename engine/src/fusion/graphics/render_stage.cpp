@@ -93,7 +93,7 @@ void RenderStage::rebuild(size_t id, const Swapchain& swapchain) {
 	}
 
 #if FUSION_DEBUG
-	FS_LOG_DEBUG("Render Stage created in {}ms", (DateTime::Now() - debugStart).asMilliseconds<float>());
+	FE_LOG_DEBUG("Render Stage created in {}ms", (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 }
 

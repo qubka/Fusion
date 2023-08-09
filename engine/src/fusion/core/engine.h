@@ -118,5 +118,6 @@ namespace fe {
         std::array<std::vector<uint32_t>, me::enum_count<Module::Stage>()> stages;
 
         bool running{ false };
+        bool started{ false };
     };
 }

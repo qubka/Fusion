@@ -87,10 +87,6 @@
 	path = external/meshoptimizer
 	url = https://github.com/zeux/meshoptimizer
 	ignore = all
-[submodule "external/span"]
-	path = external/span
-	url = https://github.com/tcbrindle/span
-	ignore = all
 [submodule "external/imgui-texteditor"]
 	path = external/imgui-texteditor
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit

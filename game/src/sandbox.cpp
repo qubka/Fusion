@@ -19,7 +19,7 @@ void Sandbox::onStart() {
 
     Graphics::Get()->setRenderer(std::make_unique<SandboxRenderer>());
 
-    openProject("New Project/New Project.fsproj");
+    openProject("D:/Fusion/New Project/New Project.fsproj");
 }
 
 void Sandbox::onUpdate() {

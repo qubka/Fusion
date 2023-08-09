@@ -1,5 +1,8 @@
 #pragma once
 
+#include <type_traits>
+#include <experimental/type_traits>
+
 //https://playfulprogramming.blogspot.com/2017/08/performance-of-flat-maps.html
 
 namespace type_traits {

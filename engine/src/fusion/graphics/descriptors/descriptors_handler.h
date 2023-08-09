@@ -40,7 +40,7 @@ namespace fe {
             if (!location) {
     #if FUSION_DEBUG
                 if (shader->reportedNotFound(descriptorName, true)) {
-                    FS_LOG_ERROR("Could not find descriptor in shader '{}' of name '{}'", shader->getName(), descriptorName);
+                    FE_LOG_ERROR("Could not find descriptor in shader '{}' of name '{}'", shader->getName(), descriptorName);
                 }
     #endif
                 return;
@@ -50,7 +50,7 @@ namespace fe {
             if (!descriptorType) {
     #if FUSION_DEBUG
                 if (shader->reportedNotFound(descriptorName, true)) {
-                    FS_LOG_ERROR("Could not find descriptor in shader '{}' of name '{}' at location: {}", shader->getName(), descriptorName, *location);
+                    FE_LOG_ERROR("Could not find descriptor in shader '{}' of name '{}' at location: {}", shader->getName(), descriptorName, *location);
                 }
     #endif
                 return;
@@ -85,7 +85,7 @@ namespace fe {
             if (!location) {
 #if FUSION_DEBUG
                 if (shader->reportedNotFound(descriptorName, true)) {
-                    FS_LOG_ERROR("Could not find descriptor in shader '{}' of name '{}'", shader->getName(), descriptorName);
+                    FE_LOG_ERROR("Could not find descriptor in shader '{}' of name '{}'", shader->getName(), descriptorName);
                 }
 #endif
                 return;
@@ -95,7 +95,7 @@ namespace fe {
             if (!descriptorType) {
 #if FUSION_DEBUG
                 if (shader->reportedNotFound(descriptorName, true)) {
-                    FS_LOG_ERROR("Could not find descriptor in shader '{}' of name '{}' at location: {}", shader->getName(), descriptorName, *location);
+                    FE_LOG_ERROR("Could not find descriptor in shader '{}' of name '{}' at location: {}", shader->getName(), descriptorName, *location);
                 }
 #endif
                 return;
@@ -123,7 +123,7 @@ namespace fe {
             if (!location) {
 #if FUSION_DEBUG
                 if (shader->reportedNotFound(descriptorName, true)) {
-                    FS_LOG_ERROR("Could not find descriptor in shader '{}' of name '{}'", shader->getName(), descriptorName);
+                    FE_LOG_ERROR("Could not find descriptor in shader '{}' of name '{}'", shader->getName(), descriptorName);
                 }
 #endif
                 return;

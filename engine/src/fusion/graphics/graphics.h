@@ -14,6 +14,8 @@
 #include "fusion/graphics/pipelines/pipeline_layout_cache.h"
 #include "fusion/graphics/textures/sampler_cache.h"
 
+#include <thread>
+
 static const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 static const uint32_t MAX_BINDLESS_RESOURCES = 1024;
 

@@ -48,7 +48,7 @@ VkPipelineLayout PipelineLayoutCache::createPipelineLayout(const VkPipelineLayou
 
     // Try to grab from cache
     if (auto it = layoutCache.find(layoutInfo); it != layoutCache.end()) {
-        FS_LOG_INFO("Find 'VkPipelineLayout' in cache");
+        FE_LOG_INFO("Find 'VkPipelineLayout' in cache");
         return it->second;
     } else {
         // Create a new one (not found)

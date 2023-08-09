@@ -1,16 +1,13 @@
 #include "android_window.h"
-
-#include "fusion/devices/device_manager.h"
-#include "fusion/filesystem/storage.h"
-
-#include <android/native_window.h>
+#include "android_engine.h"
+#include "android.h"
 
 using namespace fe::android;
 
-Window::Window(ANativeWindow* window, const WindowInfo& windowInfo) : fe::Window{}
-    , window{window}
-    , size{ANativeWindow_getWidth(window), ANativeWindow_getHeight(window)}
-    , title{windowInfo.title} {
+Window::Window(const WindowInfo& windowInfo) : fe::Window{}, title{windowInfo.title} {
+    auto app = static_cast<struct android_app*>(Engine::Get()->getNativeApp());
+    window = app->window;
+    size = { ANativeWindow_getWidth(window), ANativeWindow_getHeight(window) };
 
     onStart.publish();
 }
@@ -111,7 +108,7 @@ VkResult Window::createSurface(VkInstance instance, const VkAllocationCallbacks*
     void Window::cursorPosCallback(AInputEvent* event) {
         glm::vec2 pos {AMotionEvent_getX(event, 0), AMotionEvent_getY(event, 0)};
 
-        FS_LOG_VERBOSE("MouseMotionEvent: " << pos);
+        FE_LOG_VERBOSE("MouseMotionEvent: " << pos);
 
         window.mousePosition = pos;
         window.onMouseMotion.publish(pos);
@@ -123,7 +120,7 @@ VkResult Window::createSurface(VkInstance instance, const VkAllocationCallbacks*
 
         glm::vec2 norm{ 2.0f * (pos / glm::vec2{size}) - 1.0f};
 
-        FS_LOG_VERBOSE("MouseMotionNormEvent: " << norm);
+        FE_LOG_VERBOSE("MouseMotionNormEvent: " << norm);
 
         window.mousePositionNorm = norm;
         window.onMouseMotionNorm.publish(norm);

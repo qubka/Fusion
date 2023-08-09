@@ -76,7 +76,7 @@ void Texture2d::loadFromFile() {
     fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path };
 
     if (operator bool()) {
-        FS_LOG_DEBUG("Texture2d: '{}' already was loaded", filepath);
+        FE_LOG_DEBUG("Texture2d: '{}' already was loaded", filepath);
         return;
     }
 
@@ -90,7 +90,7 @@ void Texture2d::loadFromFile() {
             texture = std::make_unique<gli::texture2d>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
         });
 #if FUSION_DEBUG
-        FS_LOG_DEBUG("Texture2d '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
+        FE_LOG_DEBUG("Texture2d '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
         const gli::texture2d& tex = *texture;
         if (tex.empty())

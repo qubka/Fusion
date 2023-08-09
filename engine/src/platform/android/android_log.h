@@ -30,13 +30,13 @@ namespace fe::android {
     }
 }
 
-#define FS_LOG_TAG "Fusion"
+#define FE_LOG_TAG "Fusion"
 
-#define FS_LOG(pri, tag, ...) { std::string fmt{ fmt::format(__VA_ARGS__) }; __android_log_print(pri, tag, "%s", fmt.c_str()); fe::Log::Get()->onMessage.publish(fe::android::ConvertPriorityToSeverity<pri>(), fmt); }
-#define FS_LOG_VERBOSE(...)   FS_LOG(ANDROID_LOG_VERBOSE, FS_LOG_TAG, __VA_ARGS__)
-#define FS_LOG_DEBUG(...)     FS_LOG(ANDROID_LOG_DEBUG, FS_LOG_TAG, __VA_ARGS__)
-#define FS_LOG_INFO(...)      FS_LOG(ANDROID_LOG_INFO, FS_LOG_TAG, __VA_ARGS__)
-#define FS_LOG_WARNING(...)   FS_LOG(ANDROID_LOG_WARN, FS_LOG_TAG, __VA_ARGS__)
-#define FS_LOG_ERROR(...)     FS_LOG(ANDROID_LOG_ERROR, FS_LOG_TAG, __VA_ARGS__)
-#define FS_LOG_FATAL(...)     FS_LOG(ANDROID_LOG_FATAL, FS_LOG_TAG, __VA_ARGS__)
-#define FS_LOG_NONE(...)      FS_LOG(ANDROID_LOG_SILENT, FS_LOG_TAG, __VA_ARGS__)
+#define FE_LOG(pri, tag, ...) { std::string fmt{ fmt::format(__VA_ARGS__) }; __android_log_print(pri, tag, "%s", fmt.c_str()); fe::Log::Get()->onMessage.publish(fe::android::ConvertPriorityToSeverity<pri>(), fmt); }
+#define FE_LOG_VERBOSE(...)   FE_LOG(ANDROID_LOG_VERBOSE, FE_LOG_TAG, __VA_ARGS__)
+#define FE_LOG_DEBUG(...)     FE_LOG(ANDROID_LOG_DEBUG, FE_LOG_TAG, __VA_ARGS__)
+#define FE_LOG_INFO(...)      FE_LOG(ANDROID_LOG_INFO, FE_LOG_TAG, __VA_ARGS__)
+#define FE_LOG_WARNING(...)   FE_LOG(ANDROID_LOG_WARN, FE_LOG_TAG, __VA_ARGS__)
+#define FE_LOG_ERROR(...)     FE_LOG(ANDROID_LOG_ERROR, FE_LOG_TAG, __VA_ARGS__)
+#define FE_LOG_FATAL(...)     FE_LOG(ANDROID_LOG_FATAL, FE_LOG_TAG, __VA_ARGS__)
+#define FE_LOG_NONE(...)      FE_LOG(ANDROID_LOG_SILENT, FE_LOG_TAG, __VA_ARGS__)

@@ -31,12 +31,12 @@ void Bitmap::load(const fs::path& filepath) {
         loadFunc(*this, filepath);
         path = filepath;
     } else {
-        FS_LOG_ERROR("Unknown file extension format: '{}' for the file: '{}'", extension, filepath);
+        FE_LOG_ERROR("Unknown file extension format: '{}' for the file: '{}'", extension, filepath);
         return;
     }
 
 #if FUSION_DEBUG
-    FS_LOG_DEBUG("Bitmap: '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
+    FE_LOG_DEBUG("Bitmap: '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 }
 
@@ -52,11 +52,11 @@ void Bitmap::write(const fs::path& filepath) const {
         auto& writeFunc = it->second.second;
         writeFunc(*this, filepath);
     } else {
-        FS_LOG_ERROR("Unknown file extension format: '{}' for the file: '{}'", extension, filepath);
+        FE_LOG_ERROR("Unknown file extension format: '{}' for the file: '{}'", extension, filepath);
         return;
     }
 
 #if FUSION_DEBUG
-    FS_LOG_DEBUG("Bitmap: '{}' written in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
+    FE_LOG_DEBUG("Bitmap: '{}' written in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 }

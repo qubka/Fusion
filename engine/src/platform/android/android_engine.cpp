@@ -13,6 +13,7 @@ extern "C" bool VulkanMotionEventFilter(const GameActivityMotionEvent* event) {
 Engine::Engine(struct android_app* state, CommandLineArgs&& args) : fe::Engine{std::move(args)}, app{state} {
     app->userData = this;
     app->onAppCmd = OnAppCmd;
+
     android_app_set_key_event_filter(app, VulkanKeyEventFilter);
     android_app_set_motion_event_filter(app, VulkanMotionEventFilter);
 }
@@ -69,9 +70,6 @@ static void HandleInputEvents(struct android_app* app) {
 int32_t Engine::run() {
     running = true;
     while (running) {
-        // Pre-Update
-        updateStage(Module::Stage::Pre);
-
         int ident, events;
         android_poll_source* source;
         while ((ident = ALooper_pollAll(render ? 0 : -1, nullptr, &events, (void **)&source)) >= 0) {
@@ -87,17 +85,22 @@ int32_t Engine::run() {
 
         HandleInputEvents(app);
 
-        // Main application and devices processing
-        updateMain();
+        if (started) {
+            // Pre-Update
+            updateStage(Module::Stage::Pre);
 
-        // Update
-        updateStage(Module::Stage::Normal);
-        // Post-Update
-        updateStage(Module::Stage::Post);
+            // Main application and devices processing
+            updateMain();
 
-        if (render) {
-            // Render-Update
-            updateStage(Module::Stage::Render);
+            // Update
+            updateStage(Module::Stage::Normal);
+            // Post-Update
+            updateStage(Module::Stage::Post);
+
+            if (render) {
+                // Render-Update
+                updateStage(Module::Stage::Render);
+            }
         }
     }
     shutdown();

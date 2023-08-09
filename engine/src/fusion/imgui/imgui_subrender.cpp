@@ -37,9 +37,9 @@ ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
         , descriptorSet{pipeline} {
     ImGui::SetCurrentContext(ImGui::CreateContext());
 
-    FS_LOG_INFO("ImGui Version: {}", IMGUI_VERSION);
+    FE_LOG_INFO("ImGui Version: {}", IMGUI_VERSION);
 #ifdef IMGUI_USER_CONFIG
-    FS_LOG_INFO("ImConfig File: {}", IMGUI_USER_CONFIG);
+    FE_LOG_INFO("ImConfig File: {}", IMGUI_USER_CONFIG);
 #endif
 
     fontSize = 14.0f;
@@ -58,7 +58,7 @@ ImGuiSubrender::ImGuiSubrender(Pipeline::Stage pipelineStage)
     } else if (screenDensity >= ACONFIGURATION_DENSITY_HIGH) {
         fontScale = 2.0f;
     };
-    FS_LOG_DEBUG("Android UI scale: {}", fontScale);
+    FE_LOG_DEBUG("Android UI scale: {}", fontScale);
 #elif FUSION_PLATFORM_IOS
     fontScale = 2.0f;
 #else
@@ -355,6 +355,7 @@ void ImGuiSubrender::setupStyle() {
     //ImGui::ColorScheme::SetColors(0x252131FF /* Background */, 0xF4F1DEFF /* Text */, 0xDA115EFF /* MainColor */, 0x792359FF /* MainAccent */, 0xC7EF00FF /* Highlight */ );
     //ImGui::ColorScheme::ApplyTheme();
     ImGuiUtils::SetTheme(ImGuiUtils::Theme::Black);
+    //OS::Get()->setTitleBarColor(style.Colors[ImGuiCol_MenuBarBg]);
 }
 
 void ImGuiSubrender::addIconFont() {

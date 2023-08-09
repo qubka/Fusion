@@ -35,7 +35,7 @@ PhysicalDevice::PhysicalDevice(const Instance& instance, uint32_t desiredDeviceI
 
     findQueueFamilyIndices();
 
-    FS_LOG_DEBUG("Selected Physical Device: [{}] '{}'", properties.deviceID, properties.deviceName);
+    FE_LOG_DEBUG("Selected Physical Device: [{}] '{}'", properties.deviceID, properties.deviceName);
 }
 
 VkPhysicalDevice PhysicalDevice::ChoosePhysicalDevice(gsl::span<const VkPhysicalDevice> devices) {
@@ -78,7 +78,7 @@ uint32_t PhysicalDevice::ScorePhysicalDevice(VkPhysicalDevice device) {
 
         // Returns a score of 0 if this device is missing a required extension
         if (!extensionFound) {
-            FS_LOG_ERROR("Extension '{}' wasn't found", extensionName);
+            FE_LOG_ERROR("Extension '{}' wasn't found", extensionName);
             return 0;
         }
     }
@@ -225,7 +225,7 @@ void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalD
     };
     ss << "API Version: " << supportedVersion[0] << '.' << supportedVersion[1] << '.' << supportedVersion[2] << '\n';
 
-    FS_LOG_DEBUG(ss.str());
+    FE_LOG_DEBUG(ss.str());
 
     ss.str("");
 
@@ -237,7 +237,7 @@ void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalD
 
         // Limit print
         if (i > 50) {
-            FS_LOG_DEBUG(ss.str());
+            FE_LOG_DEBUG(ss.str());
             ss.str("");
             i = 0;
         }

@@ -1,6 +1,5 @@
 #include "android_device_manager.h"
 #include "android_window.h"
-#include "android_engine.h"
 #include "android.h"
 
 using namespace fe::android;
@@ -9,12 +8,6 @@ DeviceManager::DeviceManager() : fe::DeviceManager{} {
 }
 
 DeviceManager::~DeviceManager() {
-}
-
-void DeviceManager::onStart() {
-    auto app = static_cast<struct android_app*>(Engine::Get()->getNativeApp());
-    assetManager = app->activity->assetManager;
-    nativeWindow = app->window;
 }
 
 void DeviceManager::onUpdate() {
@@ -46,7 +39,7 @@ fe::Window* DeviceManager::createWindow(const WindowInfo& windowInfo) {
     if (!windows.empty())
         return nullptr;
 
-    auto& it = windows.emplace_back(std::make_unique<android::Window>(nativeWindow, windowInfo));
+    auto& it = windows.emplace_back(std::make_unique<android::Window>(windowInfo));
     onWindowCreate.publish(it.get(), true);
     return it.get();
 }

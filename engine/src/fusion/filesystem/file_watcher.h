@@ -22,7 +22,7 @@ namespace fe {
             if (elapsedUpdate.getElapsed() != 0) {
                 auto it = paths.begin();
                 while (it != paths.end()) {
-                    if (!FileSystem::IsExists(it->first)) {
+                    if (!fs::exists(it->first)) {
                         callback(it->first, FileStatus::Erased);
                         it = paths.erase(it);
                     } else {

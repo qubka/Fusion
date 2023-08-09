@@ -475,7 +475,7 @@ bool ContentBrowserPanel::moveFile(const fs::path& filepath, const fs::path& mov
     #endif
 #endif
 
-    return FileSystem::IsExists(movepath / filepath.filename());
+    return fs::exists(movepath / filepath.filename());
 }
 
 DirectoryInfo::DirectoryInfo(const fs::path& filepath) {

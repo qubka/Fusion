@@ -537,7 +537,7 @@ namespace ImGuiUtils {
         return updated;
     }
 
-    bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTextFilter& filter, std::vector<fs::path>& files, const fs::path& root, const std::string& ext = "");
+    bool PropertyFile(const char* name, fs::path& value, fs::path& selected, ImGuiTextFilter& filter, std::vector<fs::path>& files, const fs::path& root, std::string_view ext = "");
 
     template<typename T, typename = std::enable_if_t<std::is_convertible_v<T*, Asset*>>>
     bool PropertyAsset(const char* name, std::shared_ptr<Asset>& value, std::shared_ptr<Asset>& selected, ImGuiTextFilter& filter) {

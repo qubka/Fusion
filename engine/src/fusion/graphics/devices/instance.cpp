@@ -11,13 +11,13 @@ const std::vector<const char*> Instance::ValidationLayers = { "VK_LAYER_KHRONOS_
 
 VKAPI_ATTR VkBool32 VKAPI_CALL CallbackDebug(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
     if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
-        FS_LOG_VERBOSE("[{}] = {}", messageTypes, pCallbackData->pMessage);
+        FE_LOG_VERBOSE("[{}] = {}", messageTypes, pCallbackData->pMessage);
     } else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
-        FS_LOG_INFO("[{}] = {}", messageTypes, pCallbackData->pMessage);
+        FE_LOG_INFO("[{}] = {}", messageTypes, pCallbackData->pMessage);
     } else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-        FS_LOG_WARNING("[{}] = {}", messageTypes, pCallbackData->pMessage);
+        FE_LOG_WARNING("[{}] = {}", messageTypes, pCallbackData->pMessage);
     } else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-        FS_LOG_ERROR("[{}] = {}", messageTypes, pCallbackData->pMessage);
+        FE_LOG_ERROR("[{}] = {}", messageTypes, pCallbackData->pMessage);
     }
 	return VK_FALSE;
 }
@@ -54,15 +54,15 @@ VKAPI_ATTR VkBool32 VKAPI_CALL CallbackDebug(VkDebugReportFlagsEXT flags, VkDebu
 	const char* pLayerPrefix, const char* pMessage, void* pUserData) {
 
     if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT) {
-        FS_LOG_INFO("[{}] ({}) Code {} : {}", pLayerPrefix, objectType, messageCode, pMessage);
+        FE_LOG_INFO("[{}] ({}) Code {} : {}", pLayerPrefix, objectType, messageCode, pMessage);
     } else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT) {
-        FS_LOG_WARNING("[{}] ({}) Code {} : {}", pLayerPrefix, objectType, messageCode, pMessage);
+        FE_LOG_WARNING("[{}] ({}) Code {} : {}", pLayerPrefix, objectType, messageCode, pMessage);
     } else if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) {
-        FS_LOG_VERBOSE("[{}] ({}) Code {} : {}", pLayerPrefix, objectType, messageCode, pMessage);
+        FE_LOG_VERBOSE("[{}] ({}) Code {} : {}", pLayerPrefix, objectType, messageCode, pMessage);
     } else if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
-        FS_LOG_ERROR("[{}] ({}) Code {} : {}", pLayerPrefix, objectType, messageCode, pMessage);
+        FE_LOG_ERROR("[{}] ({}) Code {} : {}", pLayerPrefix, objectType, messageCode, pMessage);
     } else if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT) {
-        FS_LOG_DEBUG("[{}] ({}) Code {} : {}", pLayerPrefix, objectType, messageCode, pMessage);
+        FE_LOG_DEBUG("[{}] ({}) Code {} : {}", pLayerPrefix, objectType, messageCode, pMessage);
     }
 
 	return VK_FALSE;
@@ -138,7 +138,7 @@ bool Instance::CheckValidationLayerSupport() {
 		}
 
 		if (!layerFound) {
-			FS_LOG_ERROR("Vulkan validation layer not found: '{}'", layerName);
+			FE_LOG_ERROR("Vulkan validation layer not found: '{}'", layerName);
 			return false;
 		}
 	}
@@ -171,7 +171,7 @@ void Instance::createInstance() {
 	applicationInfo.apiVersion = volkGetInstanceVersion() >= VK_API_VERSION_1_1 ? VK_API_VERSION_1_1 : VK_MAKE_VERSION(1, 0, 57);
 
 	if (enableValidationLayers && !CheckValidationLayerSupport()) {
-		FS_LOG_ERROR("Validation layers requested, but not available!");
+		FE_LOG_ERROR("Validation layers requested, but not available!");
 		enableValidationLayers = false;
 	}
 
@@ -227,7 +227,7 @@ void Instance::createDebugMessenger() {
 	auto debugReportResult = FvkCreateDebugReportCallbackEXT(instance, &debugReportCallbackCreateInfo, nullptr, &debugReportCallback);
 	if (debugReportResult == VK_ERROR_EXTENSION_NOT_PRESENT) {
 		enableValidationLayers = false;
-		FS_LOG_ERROR("Extension vkCreateDebugReportCallbackEXT not present!");
+		FE_LOG_ERROR("Extension vkCreateDebugReportCallbackEXT not present!");
 	} else {
         VK_CHECK_RESULT(debugReportResult);
 	}
@@ -242,5 +242,5 @@ void Instance::LogVulkanLayers(gsl::span<const VkLayerProperties> layerPropertie
 		ss << layer.layerName << ", ";
 
 	ss << "\n\n";
-	FS_LOG_DEBUG(ss.str());
+	FE_LOG_DEBUG(ss.str());
 }

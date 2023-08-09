@@ -168,12 +168,12 @@ namespace fe {
         /**
          * Called when scene is being activated, and will begin being rendered/updated.
          */
-        virtual void onPlay();
+        virtual void onPlay(); //
 
         /**
          * Called when scene is being swapped and will no longer be rendered/updated
          */
-        virtual void onStop();
+        virtual void onStop(); //
 
     private:
         template<typename... T>
@@ -202,7 +202,7 @@ namespace fe {
         std::string name;
         entt::registry registry;
         SystemHolder systems;
-        bool started{ false };
         bool runtime{ false };
+        bool started{ false };
     };
 }

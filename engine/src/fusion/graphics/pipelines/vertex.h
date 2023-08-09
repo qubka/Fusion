@@ -58,7 +58,7 @@ namespace fe {
             uint32_t getStride() const { return stride; }
 
             uint32_t getOffset(uint32_t index) const {
-                FS_ASSERT(index < components.size());
+                FE_ASSERT(index < components.size());
                 uint32_t res = 0;
                 for (uint32_t i = 0; i < index; ++i) {
                     res += ComponentSize(components[i]);

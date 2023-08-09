@@ -28,7 +28,7 @@ Model::Model(fs::path filepath, bool load) : path{std::move(filepath)} {
 
 void Model::loadFromFile() {
     if (!meshesLoaded.empty()) {
-        FS_LOG_DEBUG("Model: '{}' already was loaded", path);
+        FE_LOG_DEBUG("Model: '{}' already was loaded", path);
         return;
     }
 
@@ -56,7 +56,7 @@ void Model::loadFromFile() {
     Assimp::Importer import;
     const aiScene* scene = import.ReadFile(modelPath.string(), flags);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        FS_LOG_ERROR("Failed to load model at: '{}' - {}", modelPath, import.GetErrorString());
+        FE_LOG_ERROR("Failed to load model at: '{}' - {}", modelPath, import.GetErrorString());
         return;
     }
 
@@ -169,7 +169,7 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, SceneObject&
             // if texture hasn't been loaded already, load it
             if (!skip) {
                 if (!FileSystem::IsExists(path)) {
-                    FS_LOG_ERROR("Could load texture from path: '{}'", path);
+                    FE_LOG_ERROR("Could load texture from path: '{}'", path);
                     continue;
                 }
 
@@ -180,7 +180,7 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, SceneObject&
                 //AssetRegistry::Get()->add(texture, path);
             }
         } else {
-            FS_LOG_ERROR("Could not get texture from material");
+            FE_LOG_ERROR("Could not get texture from material");
         }
     }
 

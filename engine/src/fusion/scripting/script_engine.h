@@ -127,7 +127,7 @@ namespace fe {
 
         MonoObject* instantiate();
 
-        MonoMethod* getMethod(const std::string& name, int parameterCount);
+        MonoMethod* getMethod(std::string_view name, int parameterCount);
         MonoObject* invokeMethod(MonoObject* instance, MonoMethod* method, void** params = nullptr);
 
         const std::unordered_map<std::string, ScriptField>& getFields() const { return fields; }
@@ -195,6 +195,9 @@ namespace fe {
 
     class FUSION_API ScriptEngine : public Module::Registrar<ScriptEngine> {
     public:
+        ScriptEngine();
+        ~ScriptEngine() override = default;
+
         bool loadCoreAssembly(const fs::path& filepath);
         bool loadAppAssembly(const fs::path& filepath);
 
@@ -218,7 +221,8 @@ namespace fe {
         MonoString* createString(const char* string);
 
     private:
-        void onStart() override;
+        void onStart() override {};
+        void onUpdate() override {};
         void onStop() override;
 
         void initMono();

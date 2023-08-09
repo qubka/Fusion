@@ -8,23 +8,23 @@ using namespace fe;
 DebugMarker::DebugMarker(VkDevice device) : device{device} {
     pfnDebugMarkerSetObjectTag = reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetDeviceProcAddr(device, "vkDebugMarkerSetObjectTagEXT"));
     if (!pfnDebugMarkerSetObjectTag) {
-        FS_LOG_ERROR("vkDebugMarkerSetObjectTagEXT not exist!");
+        FE_LOG_ERROR("vkDebugMarkerSetObjectTagEXT not exist!");
     }
     pfnDebugMarkerSetObjectName = reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetDeviceProcAddr(device, "vkDebugMarkerSetObjectNameEXT"));
     if (!pfnDebugMarkerSetObjectName) {
-        FS_LOG_ERROR("vkDebugMarkerSetObjectNameEXT not exist!");
+        FE_LOG_ERROR("vkDebugMarkerSetObjectNameEXT not exist!");
     }
     pfnCmdDebugMarkerBegin = reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetDeviceProcAddr(device, "vkCmdDebugMarkerBeginEXT"));
     if (!pfnCmdDebugMarkerBegin) {
-        FS_LOG_ERROR("vkCmdDebugMarkerBeginEXT not exist!");
+        FE_LOG_ERROR("vkCmdDebugMarkerBeginEXT not exist!");
     }
     pfnCmdDebugMarkerEnd = reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetDeviceProcAddr(device, "vkCmdDebugMarkerEndEXT"));
     if (!pfnCmdDebugMarkerEnd) {
-        FS_LOG_ERROR("vkCmdDebugMarkerEndEXT not exist!");
+        FE_LOG_ERROR("vkCmdDebugMarkerEndEXT not exist!");
     }
     pfnCmdDebugMarkerInsert = reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetDeviceProcAddr(device, "vkCmdDebugMarkerInsertEXT"));
     if (!pfnCmdDebugMarkerInsert) {
-        FS_LOG_ERROR("vkCmdDebugMarkerInsertEXT not exist!");
+        FE_LOG_ERROR("vkCmdDebugMarkerInsertEXT not exist!");
     }
 }
 

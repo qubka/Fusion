@@ -21,7 +21,7 @@ public:
 		auto directory = fs::path(includerName).parent_path();
 		auto fileLoaded = FileSystem::ReadText(directory / headerName);
 		if (fileLoaded.empty()) {
-            FS_LOG_ERROR("Shader Include could not be loaded: '{}'", headerName);
+            FE_LOG_ERROR("Shader Include could not be loaded: '{}'", headerName);
 			return nullptr;
 		}
 
@@ -34,7 +34,7 @@ public:
 	IncludeResult* includeSystem(const char* headerName, const char* includerName, size_t inclusionDepth) override {
 		auto fileLoaded = FileSystem::ReadText(headerName);
 		if (fileLoaded.empty()) {
-            FS_LOG_ERROR("Shader Include could not be loaded: '{}'", headerName);
+            FE_LOG_ERROR("Shader Include could not be loaded: '{}'", headerName);
 			return nullptr;
 		}
 
@@ -548,21 +548,21 @@ VkShaderModule Shader::createShaderModule(const std::string& moduleName, const s
 	std::string str;
 
 	if (!shader.preprocess(&resources, defaultVersion, ENoProfile, false, false, messages, &str, includer)) {
-        FS_LOG_DEBUG(shader.getInfoLog());
-        FS_LOG_DEBUG(shader.getInfoDebugLog());
-        FS_LOG_ERROR("SPRIV shader preprocess failed!");
+        FE_LOG_DEBUG(shader.getInfoLog());
+        FE_LOG_DEBUG(shader.getInfoDebugLog());
+        FE_LOG_ERROR("SPRIV shader preprocess failed!");
 	}
 
 	if (!shader.parse(&resources, defaultVersion, true, messages, includer)) {
-        FS_LOG_DEBUG(shader.getInfoLog());
-        FS_LOG_DEBUG(shader.getInfoDebugLog());
-        FS_LOG_ERROR("SPRIV shader parse failed!");
+        FE_LOG_DEBUG(shader.getInfoLog());
+        FE_LOG_DEBUG(shader.getInfoDebugLog());
+        FE_LOG_ERROR("SPRIV shader parse failed!");
 	}
 
 	program.addShader(&shader);
 
 	if (!program.link(messages) || !program.mapIO()) {
-		FS_LOG_ERROR("Error while linking shader program.");
+		FE_LOG_ERROR("Error while linking shader program.");
 	}
 
 	program.buildReflection();
@@ -575,7 +575,7 @@ VkShaderModule Shader::createShaderModule(const std::string& moduleName, const s
 			localSizes[dim] = localSize;
 	}
 
-	for (int32_t i = program.getNumLiveUniformBlocks() - 1; i >= 0; i--)
+	for (int32_t i = program.getNumLiveUniformBlocks() - 1; i >= 0; --i)
 		loadUniformBlock(program, moduleFlag, i);
 
 	for (int32_t i = 0; i < program.getNumLiveUniformVariables(); ++i)
@@ -629,7 +629,7 @@ std::optional<Shader::Specialization> Shader::createSpecialization(const fst::un
         return std::nullopt;
 
     if (data.size() != mapEntries.size()) {
-        FS_LOG_ERROR("Invalid amount of specialization constants provided in '{}' required = {}, provided = {}", name, mapEntries.size(), data.size());
+        FE_LOG_ERROR("Invalid amount of specialization constants provided in '{}' required = {}, provided = {}", name, mapEntries.size(), data.size());
         return std::nullopt;
     }
 
@@ -822,7 +822,7 @@ void Shader::loadConstants(const glslang::TIntermediate& intermediate, VkShaderS
                 if (auto it = constants.find(name); it != constants.end()) {
                     auto& constant = it->second;
                     if (constant.specId != specId) {
-                        FS_LOG_WARNING("Same constants with different specialization constant Id");
+                        FE_LOG_WARNING("Same constants with different specialization constant Id");
                     }
                     constant.stageFlags |= stageFlag;
                     return;

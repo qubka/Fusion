@@ -14,7 +14,7 @@ void GliToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
 
     const gli::texture& tex = *texture;
     if (tex.empty()) {
-        FS_LOG_ERROR("Failed to load bitmap file: '{}'", filepath);
+        FE_LOG_ERROR("Failed to load bitmap file: '{}'", filepath);
         return;
     }
 

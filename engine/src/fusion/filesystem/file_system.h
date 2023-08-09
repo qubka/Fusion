@@ -1,36 +1,10 @@
 #pragma once
 
-#define PHYSFS 0
-
 namespace fe {
     inline fs::path operator""_p(const char* str, size_t len) { return fs::path{std::string{str, len}}; }
 
-#if PHYSFS
-    enum class FileType : unsigned char {
-        Regular,      /**< a normal file */
-        Directory,    /**< a directory */
-        Symlink,      /**< a symlink */
-        Other         /**< something completely different like a device */
-    };
-
-    struct FileStats {
-        size_t filesize;     /**< size in bytes, -1 for non-files and unknown */
-        DateTime modtime;    /**< last modification time */
-        DateTime createtime; /**< like modtime, but for file creation time */
-        DateTime accesstime; /**< like modtime, but for file access time */
-        FileType filetype;   /**< File? Directory? Symlink? */
-        bool readonly;       /**< non-zero if read only, zero if writable. */
-    };
-
-    enum class FileAttributes : unsigned char {
-        ReadOnly = 1,
-        Regular = 2,
-        Directory = 4,
-        Symlink = 8,
-    };
-    BITMASK_DEFINE_MAX_ELEMENT(FileAttributes, Symlink);
-#endif
-
+    class VirtualFileSystem;
+    
     class FUSION_API FileSystem : public Module::Registrar<FileSystem> {
     public:
         FileSystem();
@@ -41,14 +15,14 @@ namespace fe {
          * @param filepath The path to read.
          * @param handler The lambda with data read from the file.
          */
-        static void ReadBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler);
+        static void ReadBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler, bool virtual_vs = FUSION_VIRTUAL_FS);
 
         /**
          * Opens a text file, reads all the text in the file into a string, and then closes the file.
          * @param filepath The path to read.
          * @return The data read from the file.
          */
-        static std::string ReadText(const fs::path& filepath);
+        static std::string ReadText(const fs::path& filepath, bool virtual_vs = FUSION_VIRTUAL_FS);
 
         /**
          * Opens a file, write the binary data into the file, and then closes the file.
@@ -56,7 +30,7 @@ namespace fe {
          * @param buffer The buffer data.
          * @return True on the success, false otherwise.
          */
-        static bool WriteBytes(const fs::path& filepath, gsl::span<const std::byte> buffer);
+        static bool WriteBytes(const fs::path& filepath, gsl::span<const std::byte> buffer, bool virtual_vs = FUSION_VIRTUAL_FS);
 
         /**
          * Opens a file, write the text string into the file, and then closes the file.
@@ -64,24 +38,39 @@ namespace fe {
          * @param text The text string.
          * @return True on the success, false otherwise.
          */
-        static bool WriteText(const fs::path& filepath, std::string_view text);
+        static bool WriteText(const fs::path& filepath, std::string_view text, bool virtual_vs = FUSION_VIRTUAL_FS);
 
         /**
          * Gets the file extention in the lowercase format.
          * @param filepath The path to the file.
          * @return The string extension.
          */
-        static std::string GetExtension(const fs::path& filepath);
+        static std::string GetExtension(const fs::path& filepath, bool virtual_vs = FUSION_VIRTUAL_FS);
 
         /**
-         * Return the paths of all files that have the specified extension
-         * in the specified directory and all subdirectories.
-         * @param root The path to the root folder.
-         * @param ext The extension string.
-         * @return The file array.
+         * Gets if the path is found in one of the search paths.
+         * @param filepath The path to look for.
+         * @return If the path is found in one of the searches.
          */
-        static std::vector<fs::path> GetFilesInPath(const fs::path& root, const std::string& ext);
+        static bool IsExists(const fs::path& filepath, bool virtual_vs = FUSION_VIRTUAL_FS);
 
-        static bool IsExists(const fs::path& filepath);
+        /**
+        * Checks that file is a directory.
+        * @param filepath The path to the file.
+        * @return True if path has a directory.
+        */
+        static bool IsDirectory(const fs::path& filepath, bool virtual_vs = FUSION_VIRTUAL_FS);
+
+        /**
+         * Finds all the files in a path.
+         * @param filepath The path to search.
+         * @param recursive If paths will be recursively searched.
+         * @param ext The extension string.
+         * @return The files found.
+         */
+        static std::vector<fs::path> GetFiles(const fs::path& root, bool recursive = false, std::string_view ext = "", bool virtual_vs = FUSION_VIRTUAL_FS);
+
+    private:
+        std::unique_ptr<VirtualFileSystem> vfs;
     };
 }

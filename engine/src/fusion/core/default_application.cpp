@@ -28,7 +28,7 @@ DefaultApplication::DefaultApplication(std::string_view name) : Application{name
     executablePath = fs::canonical("/proc/self/exe").parent_path().parent_path();
 #endif
 
-    FS_LOG_INFO("Working directory: '{}'", executablePath);
+    FE_LOG_INFO("Working directory: '{}'", executablePath);
     fs::current_path(executablePath);
 
     projectSettings.projectVersion = getVersion().toString();
@@ -40,7 +40,7 @@ DefaultApplication::~DefaultApplication() {
 }
 
 void DefaultApplication::onStart() {
-    FS_LOG_INFO("Default application starting!");
+    FE_LOG_INFO("Default application starting!");
 
     deserialise();
 
@@ -74,7 +74,7 @@ void DefaultApplication::openNewProject(const fs::path& path, std::string_view n
     projectSettings.projectRoot = path / name;
     projectSettings.projectName = name;
 
-    if (!FileSystem::IsExists(projectSettings.projectRoot)) {
+    if (!fs::exists(projectSettings.projectRoot)) {
         fs::create_directory(projectSettings.projectRoot);
     }
 
@@ -100,31 +100,31 @@ void DefaultApplication::openNewProject(const fs::path& path, std::string_view n
     projectSettings.isShowConsole = true;
 
     fs::path assetPath{ projectSettings.projectRoot / "assets" };
-    if (!FileSystem::IsExists(assetPath))
+    if (!fs::exists(assetPath))
         fs::create_directory(assetPath);
 
     fs::path scriptPath{ assetPath / "scripts" };
-    if (!FileSystem::IsExists(scriptPath))
+    if (!fs::exists(scriptPath))
         fs::create_directory(scriptPath);
 
     fs::path shaderPath{ assetPath / "shaders" };
-    if (!FileSystem::IsExists(shaderPath))
+    if (!fs::exists(shaderPath))
         fs::create_directory(shaderPath);
 
     fs::path scenePath{ assetPath / "scenes" };
-    if (!FileSystem::IsExists(scenePath))
+    if (!fs::exists(scenePath))
         fs::create_directory(scenePath);
 
     fs::path texturePath{ assetPath / "textures" };
-    if (!FileSystem::IsExists(texturePath))
+    if (!fs::exists(texturePath))
         fs::create_directory(texturePath);
 
     fs::path meshPath{ assetPath / "meshes" };
-    if (!FileSystem::IsExists(meshPath))
+    if (!fs::exists(meshPath))
         fs::create_directory(meshPath);
 
     fs::path soundPath{ assetPath / "sounds" };
-    if (!FileSystem::IsExists(soundPath))
+    if (!fs::exists(soundPath))
         fs::create_directory(soundPath);
 
     SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
@@ -158,18 +158,18 @@ void DefaultApplication::serialise() {
     fs::path projectPath{ projectSettings.projectRoot / (projectSettings.projectName + ".fsproj") };
     FileSystem::WriteText(projectPath, ss.str());
 
-    FS_LOG_INFO("Serialising application: '{}'", projectPath);
+    FE_LOG_INFO("Serialising application: '{}'", projectPath);
 }
 
 void DefaultApplication::deserialise() {
     if (projectSettings.projectRoot.empty() && projectSettings.projectName.empty()) {
-        FS_LOG_INFO("No saved Project file found");
+        FE_LOG_INFO("No saved Project file found");
         return;
     }
 
     fs::path projectPath{ projectSettings.projectRoot / (projectSettings.projectName + ".fsproj") };
     if (!FileSystem::IsExists(projectPath)) {
-        FS_LOG_INFO("No saved Project file found: '{}'", projectPath);
+        FE_LOG_INFO("No saved Project file found: '{}'", projectPath);
         return;
     }
 
@@ -184,13 +184,13 @@ void DefaultApplication::deserialise() {
 
         SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
 
-        FS_LOG_ERROR("Failed to load project");
+        FE_LOG_ERROR("Failed to load project");
         return;
     }
 
     onProjectLoad();
 
-    FS_LOG_INFO("Deserialise application: '{}'", projectPath);
+    FE_LOG_INFO("Deserialise application: '{}'", projectPath);
 }
 
 void DefaultApplication::showConsole() {

@@ -418,7 +418,7 @@ void Editor::drawMenuBar() {
 
         if (ImGui::BeginMenu("Scenes")) {
             fs::path scenePath{ projectSettings.projectRoot / "assets/scenes" };
-            if (FileSystem::IsExists(scenePath)) {
+            if (fs::exists(scenePath)) {
                 for (const auto& entry : fs::directory_iterator(scenePath)) {
                     const auto& path = entry.path();
                     if (FileFormat::IsSceneFile(path)) {
@@ -805,7 +805,7 @@ void Editor::openTextFile(const fs::path& filepath, const std::function<void()>&
         panels.push_back(std::make_unique<TextEditPanel>(filepath, callback, *this));
 }
 
-EditorPanel* Editor::getPanel(const std::string& name) {
+EditorPanel* Editor::getPanel(std::string_view name) {
     auto it = std::find_if(panels.begin(), panels.end(), [&name](const auto& p) {
         return p->getName() == name;
     });
