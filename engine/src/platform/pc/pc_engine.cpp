@@ -17,10 +17,9 @@ int32_t Engine::run() {
             // Main application and devices processing
             updateMain();
 
-            // Update
-            updateStage(Module::Stage::Normal);
             // Post-Update
             updateStage(Module::Stage::Post);
+			
             // Render-Update
             updateStage(Module::Stage::Render);
         }

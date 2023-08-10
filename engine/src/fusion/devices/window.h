@@ -288,6 +288,12 @@ namespace fe {
          * @return The object.
          */
         virtual void* getNativeWindow() const = 0;
+		
+		/**
+         * Sets the current window object.
+         * @param ptr The object.
+         */
+		virtual void setNativeWindow(void* ptr) = 0;
 
         /**
          * Creates a Vulkan surface for the specified window.

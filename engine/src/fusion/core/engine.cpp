@@ -48,9 +48,9 @@ Engine::~Engine() {
 void Engine::init() {
     Time::Register("Time", Module::Stage::Pre);
     FileSystem::Register("FileSystem", Module::Stage::Never);
-    Input::Register("Input", Module::Stage::Normal);
+    Input::Register("Input", Module::Stage::Post);
     Graphics::Register("Graphics", Module::Stage::Render);
-    SceneManager::Register("SceneManager", Module::Stage::Normal);
+    SceneManager::Register("SceneManager", Module::Stage::Post);
     AssetRegistry::Register("AssetRegistry", Module::Stage::Post);
     DebugRenderer::Register("DebugRenderer", Module::Stage::Render);
 #if FUSION_SCRIPTING
@@ -91,6 +91,8 @@ void Engine::startup() {
 }
 
 void Engine::shutdown() {
+	running = false;
+	
     for (auto& module : modules) {
         if (module->started) {
             module->started = false;

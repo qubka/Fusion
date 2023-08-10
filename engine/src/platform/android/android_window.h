@@ -27,10 +27,10 @@ namespace fe::android {
         bool isFocused() const override { return true; }
         void setFocused() override {};
 
-        bool isIconified() const override { return false; }
+        bool isIconified() const override { return window == nullptr; }
         void setIconified(bool flag) override {};
 
-        bool isVSync() const override { return false; }
+        bool isVSync() const override { return true; }
         void setVSync(bool flag) override {}
 
         bool isVisible() const override { return true; }
@@ -73,7 +73,9 @@ namespace fe::android {
         const glm::vec2& getMouseScrollDelta() const override { return mouseScrollDelta; }
 
         const Monitor* getCurrentMonitor() const override { return nullptr; };
+		
         void* getNativeWindow() const override { return window; }
+		void setNativeWindow(void* ptr) override;
 
         VkResult createSurface(VkInstance instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const override;
 

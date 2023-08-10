@@ -43,3 +43,33 @@ std::unique_ptr<DeviceManager> DeviceManager::Init() {
     return nullptr;
 #endif
 }
+
+void destroyWindow(size_t id) {
+	if (id < windows.size())
+		windows.erase(windows.begin() + id);
+}
+
+void destroyWindow(const Window* window) {
+	auto it = std::find_if(windows.begin(), windows.end(), [window](const auto& w) {
+		return window == w.get();
+	});
+	if (it != windows.end()) {
+		onWindowCreate.publish(it->get(), false);
+		windows.erase(it);
+	}
+}
+
+void destroyCursor(size_t id) {
+	if (id < cursors.size())
+		cursors.erase(cursors.begin() + id);
+}
+
+void destroyCursor(const Cursor* cursor) {
+	auto it = std::find_if(cursors.begin(), cursors.end(), [cursor](const auto& c) {
+		return cursor == c.get();
+	});
+	if (it != cursors.end()) {
+		onCursorCreate.publish(it->get(), false);
+		cursors.erase(it);
+	}
+}

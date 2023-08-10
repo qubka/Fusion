@@ -27,17 +27,19 @@ void Engine::OnAppCmd(struct android_app* app, int32_t cmd) {
     switch (cmd) {
         case APP_CMD_START:
             engine->init();
+			engine->startup();
             break;
         case APP_CMD_INIT_WINDOW:
             // The window is being shown, get it ready.
-            if (engine->app->window != nullptr) {
-                engine->startup();
+            if (app->window != nullptr) {
+				DeviceManager::Get()->getWindow(0).setNativeWindow(engine->app->window)
                 engine->render = true;
             }
             break;
         case APP_CMD_TERM_WINDOW:
             // The window is being hidden or closed, clean it up.
             engine->render = false;
+			DeviceManager::Get()->getWindow(0).setNativeWindow(nullptr);
             break;
         case APP_CMD_DESTROY:
             // The window is being hidden or closed, clean it up.
@@ -68,40 +70,43 @@ static void HandleInputEvents(struct android_app* app) {
 }
 
 int32_t Engine::run() {
+	int ident, events;
+	android_poll_source* source;
+
+	while (!started) {
+        while ((ident = ALooper_pollAll(-1, nullptr, &events, (void **)&source)) >= 0) {
+            if (source != nullptr) {
+                source->process(app, source);
+            }
+        }
+
+        if (app->destroyRequested != 0)
+            return;
+	}
+	
     running = true;
     while (running) {
-        int ident, events;
-        android_poll_source* source;
         while ((ident = ALooper_pollAll(render ? 0 : -1, nullptr, &events, (void **)&source)) >= 0) {
             if (source != nullptr) {
                 source->process(app, source);
             }
         }
 
-        if (app->destroyRequested != 0) {
-            running = false;
-            break;
-        }
+        if (app->destroyRequested != 0)
+            break
 
-        HandleInputEvents(app);
+		// Pre-Update
+		updateStage(Module::Stage::Pre);
 
-        if (started) {
-            // Pre-Update
-            updateStage(Module::Stage::Pre);
+		// Main application and devices processing
+        HandleInputEvents(app); // TODO: Move to deviceManager
+		updateMain();
 
-            // Main application and devices processing
-            updateMain();
+		// Post-Update
+		updateStage(Module::Stage::Post);
 
-            // Update
-            updateStage(Module::Stage::Normal);
-            // Post-Update
-            updateStage(Module::Stage::Post);
-
-            if (render) {
-                // Render-Update
-                updateStage(Module::Stage::Render);
-            }
-        }
+		// Render-Update
+		updateStage(Module::Stage::Render);
     }
     shutdown();
     return 0;

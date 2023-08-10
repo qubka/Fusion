@@ -7,9 +7,11 @@ using namespace fe::android;
 Window::Window(const WindowInfo& windowInfo) : fe::Window{}, title{windowInfo.title} {
     auto app = static_cast<struct android_app*>(Engine::Get()->getNativeApp());
     window = app->window;
-    size = { ANativeWindow_getWidth(window), ANativeWindow_getHeight(window) };
-
-    onStart.publish();
+	if (window != nullptr) {
+		size = { ANativeWindow_getWidth(window), ANativeWindow_getHeight(window) };
+		//...
+	}
+	onStart.publish();
 }
 
 Window::~Window() {
@@ -32,6 +34,15 @@ VkResult Window::createSurface(VkInstance instance, const VkAllocationCallbacks*
     VkAndroidSurfaceCreateInfoKHR surfaceCreateInfo = { VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR };
     surfaceCreateInfo.window = window;
     return vkCreateAndroidSurfaceKHR(instance, &surfaceCreateInfo, nullptr, surface);
+}
+
+void setNativeWindow(void* ptr) {
+	window = static_cast<ANativeWindow*>(ptr);
+	if (window != nullptr) {
+		size = { ANativeWindow_getWidth(window), ANativeWindow_getHeight(window) };
+		//...
+	}
+	OnIconify.publish();
 }
 
 /*int32_t Window::onInput(AInputEvent* event) {

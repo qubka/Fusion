@@ -59,26 +59,12 @@ namespace fe {
         virtual void updateGamepadMappings(std::string_view mappings) = 0;
 
         virtual Window* createWindow(const WindowInfo& windowInfo) = 0;
-        void destroyWindow(const Window* window) {
-            auto it = std::find_if(windows.begin(), windows.end(), [window](const auto& w) {
-                return window == w.get();
-            });
-            if (it != windows.end()) {
-                onWindowCreate.publish(it->get(), false);
-                windows.erase(it);
-            }
-        }
+        void destroyWindow(size_t id);
+        void destroyWindow(const Window* window);
 
         virtual Cursor* createCursor(const fs::path& filepath, fe::CursorHotspot hotspot) = 0;
-        void destroyCursor(const Cursor* cursor) {
-            auto it = std::find_if(cursors.begin(), cursors.end(), [cursor](const auto& c) {
-                return cursor == c.get();
-            });
-            if (it != cursors.end()) {
-                onCursorCreate.publish(it->get(), false);
-                cursors.erase(it);
-            }
-        }
+        void destroyCursor(size_t id);
+        void destroyCursor(const Cursor* cursor);
 
         const Window* getWindow(size_t id) const { return id < windows.size() ? windows[id].get() : nullptr; }
         Window* getWindow(size_t id) { return id < windows.size() ? windows[id].get() : nullptr; }

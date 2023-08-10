@@ -75,7 +75,9 @@ namespace fe::glfw {
         const glm::vec2& getMouseScrollDelta() const override { return mouseScrollDelta; }
 
         const Monitor* getCurrentMonitor() const override;
+		
         void* getNativeWindow() const override { return window; }
+		void setNativeWindow(void* ptr) override {};
 
         VkResult createSurface(VkInstance instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) const override;
 

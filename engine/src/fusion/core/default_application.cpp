@@ -16,6 +16,7 @@
 using namespace fe;
 
 DefaultApplication::DefaultApplication(std::string_view name) : Application{name} {
+	// TODO: Move to OS
 #if FUSION_PLATFORM_WINDOWS
     wchar_t path[MAX_PATH] = { 0 };
     GetModuleFileNameW(nullptr, path, MAX_PATH);

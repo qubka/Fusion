@@ -63,7 +63,7 @@ namespace fe {
         /**
          * @brief Represents the stage where the module will be updated in the engine.
          */
-        enum class Stage : unsigned char { Never, Pre, Normal, Post, Render };
+        enum class Stage : unsigned char { Never, Pre, /*Main,*/ Post, Render };
 
         Module() = default;
         ~Module() override = default;
