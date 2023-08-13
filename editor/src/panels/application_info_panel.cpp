@@ -40,11 +40,13 @@ void ApplicationInfoPanel::onImGui() {
                             ImGui::TableSetupColumn("Count", ImGuiTableColumnFlags_WidthFixed);
                             ImGui::TableHeadersRow();
 
-                            for (const auto& [key, asset] : type) {
+                            for (const auto& [uuid, asset] : type) {
                                 ImGui::TableNextRow();
 
                                 ImGui::TableSetColumnIndex(0);
-                                ImGui::TextUnformatted(key.path.string().c_str());
+
+                                std::string key{ fmt::format("[{}]{} ", uuid, asset->getPath().string().c_str())};
+                                ImGui::TextUnformatted(key.c_str());
 
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::Text("%ld", asset.use_count());

@@ -32,3 +32,12 @@ struct fmt::formatter<fs::path>: formatter<std::string_view> {
     }
 };
 
+
+template <>
+struct fmt::formatter<uuids::uuid>: formatter<std::string_view> {
+    template<typename FormatContext>
+    auto format(uuids::uuid uuid, FormatContext& ctx) {
+        return formatter<std::string_view>::format(uuids::to_string(uuid), ctx);
+    }
+};
+

@@ -3,15 +3,8 @@
 #include <cereal/cereal.hpp>
 
 namespace std::filesystem {
-    template<class Archive> std::string save_minimal(const Archive&, const path& p) {
-        if constexpr (fs::path::preferred_separator == L'\\') {
-            std::string str{ p.string() };
-            std::replace(str.begin(), str.end(), '\\', '/');
-            return str;
-        } else
-            return p.string();
-    }
-    template<class Archive> void load_minimal(const Archive&, path& p, const std::string& in) { p = in; };
+    template<class Archive> std::string save_minimal(const Archive&, const path& p) { return p.generic_string(); }
+    template<class Archive> void load_minimal(const Archive&, path& p, const std::string& in) { p = in; p.make_preferred(); };
 }
 template<class Archive> struct cereal::specialize<Archive, fs::path, cereal::specialization::non_member_load_save_minimal> {};
 

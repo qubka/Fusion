@@ -16,7 +16,7 @@ AssetDatabase::AssetDatabase(fs::path path) : databaseDirectory{std::move(path)}
 
     if (const int rc = mdb_env_open(env, databaseDirectory.string().c_str(), MDB_NOTLS, 0664)) {
         mdb_env_close(env);
-        throw std::runtime_error("Could not load" + databaseDirectory.string() + " database. Error: " + mdb_strerror(rc));
+        throw std::runtime_error(fmt::format("Could not load '{}' database. Error: {}", databaseDirectory, mdb_strerror(rc)));
     }
 }
 
@@ -28,6 +28,11 @@ AssetDatabase::~AssetDatabase() {
 }
 
 std::optional<uuids::uuid> AssetDatabase::getKey(const fs::path& filepath) {
+    if (filepath.empty()) {
+        FE_LOG_ERROR("AssetDatabase: value is empty!");
+        return std::nullopt;
+    }
+
     mdb::Transaction txn{env, MDB_RDONLY};
     mdb_dbi_open(txn, nullptr, 0, &dbi);
 
@@ -36,9 +41,12 @@ std::optional<uuids::uuid> AssetDatabase::getKey(const fs::path& filepath) {
     MDB_val key{ 0, nullptr };
     MDB_val value{ 0, nullptr };
 
+    std::string pathStr{ filepath.generic_string() };
+
     while (mdb_cursor_get(cursor, &key, &value, MDB_NEXT) == 0) {
-        fs::path path{ std::string_view{static_cast<char*>(value.mv_data), value.mv_size} };
-        if (filepath == path) {
+        std::string_view path{static_cast<char*>(value.mv_data), value.mv_size};
+
+        if (pathStr == path) {
             gsl::span<uint8_t, 16> bytes{ static_cast<uint8_t*>(key.mv_data), key.mv_size };
             return { uuids::uuid{ bytes } };
         }
@@ -47,7 +55,12 @@ std::optional<uuids::uuid> AssetDatabase::getKey(const fs::path& filepath) {
     return std::nullopt;
 }
 
-std::optional<fs::path> AssetDatabase::getValue(const uuids::uuid& uuid) {
+std::optional<fs::path> AssetDatabase::getValue(uuids::uuid uuid) {
+    if (uuid.is_nil()) {
+        FE_LOG_ERROR("AssetDatabase: key is empty!");
+        return std::nullopt;
+    }
+
     mdb::Transaction txn{env, MDB_RDONLY};
     mdb_dbi_open(txn, nullptr, 0, &dbi);
 
@@ -59,24 +72,33 @@ std::optional<fs::path> AssetDatabase::getValue(const uuids::uuid& uuid) {
     if (rc != 0)
         return std::nullopt;
 
-    return { std::string_view{static_cast<char*>(value.mv_data), value.mv_size} };
+    fs::path path{ std::string_view{static_cast<char*>(value.mv_data), value.mv_size} };
+    path.make_preferred();
+    return { std::move(path) };
 }
 
-void AssetDatabase::put(const uuids::uuid& uuid, const fs::path& filepath) {
+bool AssetDatabase::put(uuids::uuid uuid, const fs::path& filepath, bool overwrite) {
+    if (uuid.is_nil() || filepath.empty()) {
+        FE_LOG_ERROR("AssetDatabase: key/value is empty!");
+        return false;
+    }
+
     mdb::Transaction txn{env};
     mdb_dbi_open(txn, nullptr, 0, &dbi);
 
     auto bytes = uuid.as_bytes();
     MDB_val key{bytes.size(), (void*)bytes.data()};
 
-    std::string path{ filepath.string() };
-    MDB_val value{ path.size(), (void*) path.c_str() };
+    std::string pathStr{ filepath.generic_string() };
+    MDB_val value{ pathStr.size(), (void*) pathStr.c_str() };
 
-    MDB_RESULT(mdb_put(txn, dbi, &key, &value, MDB_NOOVERWRITE));
+    MDB_RESULT(mdb_put(txn, dbi, &key, &value, overwrite ? 0 : MDB_NOOVERWRITE));
 
     mdb_txn_commit(txn);
 
     txn.clear();
+
+    return true;
 }
 
 namespace fe::mdb {

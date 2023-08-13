@@ -5,16 +5,15 @@
 
 using namespace fe;
 
-Texture::Texture(fs::path filepath, VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples,
+Texture::Texture(uuids::uuid uuid, VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples,
                  VkImageLayout layout, VkImageUsageFlags usage, VkImageAspectFlags aspect, VkImageViewType viewType,
                  VkFormat format, uint32_t mipLevels, uint32_t arrayLayers, const VkExtent3D& extent, bool anisotropic, bool mipmap)
         : Image{filter, addressMode, samples, layout, usage, aspect, viewType, format, extent}
-        , path{std::move(filepath)}
+        , uuid{uuid}
         , mipLevels{mipLevels}
         , arrayLayers{arrayLayers}
         , anisotropic{anisotropic}
         , mipmap{mipmap} {
-    name = path.filename().replace_extension().string();
 }
 
 Texture::Texture(VkFilter filter, VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, VkImageLayout layout,

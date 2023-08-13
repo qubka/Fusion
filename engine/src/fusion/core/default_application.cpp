@@ -128,9 +128,9 @@ void DefaultApplication::openNewProject(const fs::path& path, std::string_view n
     if (!fs::exists(soundPath))
         fs::create_directory(soundPath);
 
-    SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
-
     onProjectLoad();
+
+    SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
 
     serialise();
 
@@ -191,6 +191,14 @@ void DefaultApplication::deserialise() {
 
     onProjectLoad();
 
+    if (currentScene.empty()) {
+        SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
+    } else {
+        auto scene = std::make_unique<Scene>(currentScene);
+        scene->deserialise();
+        SceneManager::Get()->setScene(std::move(scene));
+    }
+
     FE_LOG_INFO("Deserialise application: '{}'", projectPath);
 }
 
@@ -224,6 +232,9 @@ void DefaultApplication::onProjectLoad() {
     }
 #endif
     AssetRegistry::Get()->releaseAll();
+
+
+    //TODO: Reload all modules
 
     projectLoaded = true;
 }

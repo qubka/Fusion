@@ -152,7 +152,7 @@ namespace fe {
             archive(cereal::make_nvp("name", name));
         }
 
-        void importMesh(const fs::path& filepath);
+        void importMesh(fs::path filepath);
 
     protected:
         /**

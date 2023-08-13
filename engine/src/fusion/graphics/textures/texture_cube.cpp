@@ -1,6 +1,7 @@
 #include "texture_cube.h"
 
 #include "fusion/core/engine.h"
+#include "fusion/assets/asset_registry.h"
 #include "fusion/bitmaps/bitmap.h"
 #include "fusion/graphics/buffers/buffer.h"
 #include "fusion/graphics/commands/command_buffer.h"
@@ -11,8 +12,8 @@
 
 using namespace fe;
 
-TextureCube::TextureCube(fs::path filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
-        : Texture{std::move(filepath),
+TextureCube::TextureCube(uuids::uuid uuid, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
+        : Texture{uuid,
                   filter,
                   addressMode,
                   VK_SAMPLE_COUNT_1_BIT,
@@ -26,9 +27,6 @@ TextureCube::TextureCube(fs::path filepath, VkFilter filter, VkSamplerAddressMod
                   { 0, 0, 1 },
                   anisotropic,
                   mipmap} {
-    if (!FileFormat::IsTextureStorageFile(path))
-        throw std::runtime_error("Unsupported format for fast and single loading");
-
     if (load)
         loadFromFile();
 }
@@ -92,12 +90,26 @@ void TextureCube::setPixels(const std::byte* pixels, uint32_t layerCount, uint32
 }
 
 void TextureCube::loadFromFile() {
-    fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path };
-
-    if (operator bool()) {
-        FE_LOG_DEBUG("TextureCube: '{}' already was loaded", filepath);
+    if (loaded) {
+        FE_LOG_DEBUG("TextureCube: '{}' already was loaded", path);
         return;
     }
+
+    auto op = AssetRegistry::Get()->getDatabase()->getValue(uuid);
+    if (!op.has_value()) {
+        FE_LOG_ERROR("TextureCube: [{}] is not valid", uuid);
+        return;
+    }
+
+    if (!FileFormat::IsTextureStorageFile(op.value())) {
+        FE_LOG_ERROR("TextureCube: Unsupported format for fast and single loading");
+        return;
+    }
+
+    path = std::move(*op);
+    name = path.filename().replace_extension().string();
+
+    fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path }; // get full path
 
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
@@ -171,4 +183,6 @@ void TextureCube::loadFromFile() {
     }
 
     updateDescriptor();
+
+    loaded = true;
 }

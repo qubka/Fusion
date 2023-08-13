@@ -12,14 +12,14 @@ namespace fe {
 
         /**
          * Creates a new 2D image.
-         * @param filename The file to load the image from.
+         * @param uuid The file uuid to load the image from.
          * @param filter The magnification/minification filter to apply to lookups.
          * @param addressMode The addressing mode for outside [0..1] range.
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          * @param load If this resource will be loaded immediately, otherwise {@link Texture2d#load} can be called later.
          */
-        explicit Texture2d(fs::path filepath,
+        explicit Texture2d(uuids::uuid uuid,
                            VkFilter filter = VK_FILTER_LINEAR,
                            VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT,
                            bool anisotropic = true,
@@ -80,7 +80,8 @@ namespace fe {
 
         type_index getType() const override { return type_id<Texture2d>; }
 
-        void loadResource() override { loadFromFile(); };
+        void load() override { loadFromFile(); };
+        void unload() override { loaded = false; /*TODO: implement unload/reload feature*/ }
 
     private:
         void loadFromFile();

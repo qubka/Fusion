@@ -21,18 +21,25 @@ static inline glm::mat4 mat4_cast(const aiMatrix3x3& m) { return glm::transpose(
 // TODO: May be load from shader ?
 Vertex::Layout Model::Layout = {{ Vertex::Component::Position, Vertex::Component::Normal, Vertex::Component::Tangent, Vertex::Component::Bitangent, Vertex::Component::UV }};
 
-Model::Model(fs::path filepath, bool load) : path{std::move(filepath)} {
+Model::Model(uuids::uuid uuid, bool load) : uuid{uuid} {
     if (load)
         loadFromFile();
 }
 
 void Model::loadFromFile() {
-    if (!meshesLoaded.empty()) {
+    if (loaded) {
         FE_LOG_DEBUG("Model: '{}' already was loaded", path);
         return;
     }
 
-    fs::path modelPath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path }; // get full path
+    auto op = AssetRegistry::Get()->getDatabase()->getValue(uuid);
+    if (!op.has_value()) {
+        FE_LOG_ERROR("Model: [{}] is not valid", uuid);
+        return;
+    }
+    path = std::move(*op);
+
+    fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path }; // get full path
 
     uint32_t flags = aiProcess_Triangulate;
     if (Layout.contains(Vertex::Component::Normal)) {
@@ -52,15 +59,13 @@ void Model::loadFromFile() {
         scene = import.ReadFileFromMemory(buffer.data(), buffer.size(), flags);
     });*/
 
-
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(modelPath.string(), flags);
+    const aiScene* scene = import.ReadFile(filepath.string(), flags);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        FE_LOG_ERROR("Failed to load model at: '{}' - {}", modelPath, import.GetErrorString());
+        FE_LOG_ERROR("Failed to load model at: '{}' - {}", filepath, import.GetErrorString());
         return;
     }
 
-    name = scene->mRootNode->mName.C_Str();
     //directory = modelPath.parent_path();
 
     aiVector3D position; aiQuaternion orientation; aiVector3D scale;
@@ -68,6 +73,8 @@ void Model::loadFromFile() {
     root = { scene->mRootNode->mName.C_Str(), vec3_cast(position), quat_cast(orientation), vec3_cast(scale) };
 
     processNode(scene, scene->mRootNode, root);
+
+    loaded = true;
 }
 
 void Model::processNode(const aiScene* scene, const aiNode* node, SceneObject& targetParent) {

@@ -30,12 +30,11 @@ namespace fe {
 
         void showConsole();
 
-        void onProjectLoad();
+        virtual void onProjectLoad();
 
         template<typename Archive>
         void save(Archive& archive) const {
             archive(cereal::make_nvp("projectVersion", projectSettings.projectVersion));
-            archive(cereal::make_nvp("projectRoot", projectSettings.projectRoot));
             archive(cereal::make_nvp("projectName", projectSettings.projectName));
             archive(cereal::make_nvp("scriptModulePath", projectSettings.scriptModulePath));
             archive(cereal::make_nvp("title", projectSettings.title));
@@ -64,19 +63,12 @@ namespace fe {
             archive(cereal::make_nvp("isFullscreen", projectSettings.isFullscreen));
             archive(cereal::make_nvp("isVSync", projectSettings.isVSync));
             archive(cereal::make_nvp("isShowConsole", projectSettings.isShowConsole));
-            archive(cereal::make_nvp("currentScene", sceneName));
-
-            if (sceneName.empty()) {
-                SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
-            } else {
-                auto scene = std::make_unique<Scene>(sceneName);
-                scene->deserialise();
-                SceneManager::Get()->setScene(std::move(scene));
-            }
+            archive(cereal::make_nvp("currentScene", currentScene));
         }
 
     protected:
         fs::path executablePath;
+        std::string currentScene;
         bool projectLoaded{ false };
         bool consoleOpened{ false };
     };

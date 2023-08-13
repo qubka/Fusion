@@ -187,6 +187,7 @@ void Editor::onImGui() {
 
     drawMenuBar();
 
+    // Not range based loop
     for (size_t i = 0; i < panels.size(); ++i) {
         auto& panel = panels[i]; // Panel could change during onImGui
         if (panel->isActive()) {
@@ -250,7 +251,6 @@ void Editor::beginDockSpace(bool gameFullScreen) {
                 }
             }
         } else {
-
 
             for (auto& panel: hiddenPanels) {
                 panel->setActive(true);
@@ -643,10 +643,6 @@ void Editor::drawMenuBar() {
             openNewProject(projectLocation, newProjectName);
             fileBrowserPanel.setOpenDirectory(false);
 
-            for (auto& panel : panels) {
-                panel->onNewProject();
-            }
-
             ImGui::CloseCurrentPopup();
         }
 
@@ -728,13 +724,12 @@ void Editor::openFile() {
 }
 
 void Editor::fileOpenCallback(const fs::path& path) {
-    fs::path filepath{ path.lexically_relative(projectSettings.projectRoot) };
-
     if (FileFormat::IsTextFile(path)) {
         openTextFile(path, []{});
     } else if (FileFormat::IsModelFile(path)) {
-        SceneManager::Get()->getScene()->importMesh(filepath);
+        SceneManager::Get()->getScene()->importMesh(path);
     } else if (FileFormat::IsAudioFile(path)) {
+        ///
     } else if (FileFormat::IsSceneFile(path)) {
         /*auto sceneManager = SceneManager::Get()->getScene();
         sceneManager->serialise();
@@ -748,7 +743,7 @@ void Editor::fileOpenCallback(const fs::path& path) {
     } else if (FileFormat::IsTextureFile(path)) {
     }
 
-    FS_LOG_DEBUG("File opened: '{}'", filepath);
+    FE_LOG_DEBUG("File opened: '{}'", path.lexically_relative(projectSettings.projectRoot));
 }
 
 void Editor::projectOpenCallback(const fs::path& path) {
@@ -758,20 +753,12 @@ void Editor::projectOpenCallback(const fs::path& path) {
     fileBrowserPanel.clearFileTypeFilters();
     openProject(path);
 
-    for (auto& panel : panels) {
-        panel->onNewProject();
-    }
-
-    FS_LOG_DEBUG("Project opened: '{}'", path);
+    FE_LOG_DEBUG("Project opened: '{}'", path);
 }
 
 /*void Editor::newProjectOpenCallback(const fs::path& path) {
     openNewProject(path);
     fileBrowserPanel.setOpenDirectory(false);
-
-    for (auto& panel : panels) {
-        panel->onNewProject();
-    }
 
     LOG_DEBUG << "New project opened: '{}'", path);
 }*/
@@ -782,7 +769,7 @@ void Editor::newProjectLocationCallback(const fs::path& path) {
     reopenNewProjectPopup = true;
     locationPopupOpened = false;
 
-    FS_LOG_DEBUG("New Project opened: '{}'", path);
+    FE_LOG_DEBUG("New Project opened: '{}'", path);
 }
 
 void Editor::removePanel(EditorPanel* panel) {
@@ -863,4 +850,12 @@ void Editor::selectObject(const Ray& ray, const glm::vec2& position) {
 
     lastSelectTime = now;
     lastSelectPos = position;
+}
+
+void Editor::onProjectLoad() {
+    DefaultApplication::onProjectLoad();
+
+    for (auto& panel : panels) {
+        panel->onNewProject();
+    }
 }

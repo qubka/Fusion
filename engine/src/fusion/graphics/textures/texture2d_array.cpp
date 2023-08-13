@@ -1,6 +1,7 @@
 #include "texture2d_array.h"
 
 #include "fusion/core/engine.h"
+#include "fusion/assets/asset_registry.h"
 #include "fusion/bitmaps/bitmap.h"
 #include "fusion/graphics/buffers/buffer.h"
 #include "fusion/graphics/commands/command_buffer.h"
@@ -11,8 +12,8 @@
 
 using namespace fe;
 
-Texture2dArray::Texture2dArray(fs::path filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
-        : Texture{std::move(filepath),
+Texture2dArray::Texture2dArray(uuids::uuid uuid, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
+        : Texture{uuid,
                   filter,
                   addressMode,
                   VK_SAMPLE_COUNT_1_BIT,
@@ -26,9 +27,6 @@ Texture2dArray::Texture2dArray(fs::path filepath, VkFilter filter, VkSamplerAddr
                   { 0, 0, 1 },
                   anisotropic,
                   mipmap} {
-    if (!FileFormat::IsTextureStorageFile(path))
-        throw std::runtime_error("Unsupported format for fast and single loading");
-
     if (load)
         loadFromFile();
 }
@@ -77,12 +75,26 @@ void Texture2dArray::setPixels(const float* pixels, uint32_t arrayLayer) {
 }
 
 void Texture2dArray::loadFromFile() {
-    fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path };
-
-    if (operator bool()) {
-        FE_LOG_DEBUG("Texture2dArray: '{}' already was loaded", filepath);
+    if (loaded) {
+        FE_LOG_DEBUG("Texture2dArray: '{}' already was loaded", path);
         return;
     }
+
+    auto op = AssetRegistry::Get()->getDatabase()->getValue(uuid);
+    if (!op.has_value()) {
+        FE_LOG_ERROR("Texture2dArray: [{}] is not valid", uuid);
+        return;
+    }
+
+    if (!FileFormat::IsTextureStorageFile(op.value())) {
+        FE_LOG_ERROR("Texture2dArray: Unsupported format for fast and single loading");
+        return;
+    }
+
+    path = std::move(*op);
+    name = path.filename().replace_extension().string();
+
+    fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path }; // get full path
 
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
@@ -153,4 +165,6 @@ void Texture2dArray::loadFromFile() {
     }
 
     updateDescriptor();
+
+    loaded = true;
 }

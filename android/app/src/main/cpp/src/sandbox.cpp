@@ -23,5 +23,5 @@ void Sandbox::onStart() {
 }
 
 void Sandbox::onUpdate() {
-    //FS_LOG_DEBUG("{}", Time::FramesPerSecond());
+    //FE_LOG_DEBUG("{}", Time::FramesPerSecond());
 }

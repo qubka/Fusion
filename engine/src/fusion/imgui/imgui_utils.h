@@ -1,6 +1,5 @@
 #pragma once
 
-#include "fusion/core/engine.h"
 #include "fusion/assets/asset_registry.h"
 #include "fusion/filesystem/file_system.h"
 
@@ -635,8 +634,14 @@ namespace ImGuiUtils {
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                 fs::path path{ static_cast<const char*>(payload->Data) };
-                value = AssetRegistry::Get()->load<T>(path.lexically_relative(Engine::Get()->getApp()->getProjectSettings().projectRoot), false);
-                updated = true;
+                path += ".meta";
+                auto uuid = uuids::uuid::from_string(FileSystem::ReadText(path));
+                if (uuid.has_value()) {
+                    value = AssetRegistry::Get()->load<T>(uuid.value());
+                    updated = true;
+                } else {
+                    FE_LOG_ERROR("Cannot find asset. Wrong metadata: '{}'", path);
+                }
             }
             ImGui::EndDragDropTarget();
         }

@@ -141,7 +141,7 @@ void HierarchyPanel::onImGui() {
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
                         auto entity = *static_cast<entt::entity*>(payload->Data);
                         hierarchySystem->removeParent(entity);
-                        FS_LOG_INFO("Unparent");
+                        FE_LOG_INFO("Unparent");
                     }
                     ImGui::EndDragDropTarget();
                 }
@@ -172,7 +172,7 @@ void HierarchyPanel::onImGui() {
                             if (const ImGuiPayload* customPayload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ITEM")) {
                                 entity = *static_cast<entt::entity*>(customPayload->Data);
                                 hierarchySystem->removeParent(entity);
-                                FS_LOG_INFO("Unparent");
+                                FE_LOG_INFO("Unparent");
                             }
                             ImGui::EndDragDropTarget();
                         }
@@ -346,7 +346,7 @@ void HierarchyPanel::drawNode(entt::entity node, entt::registry& registry) {
                     if (acceptable) {
                         hierarchySystem->assignChild(node, entity);
                         hadRecentDroppedEntity = node;
-                        FS_LOG_INFO("Parent");
+                        FE_LOG_INFO("Parent");
                     }
                 }
 

@@ -225,7 +225,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
                 fs::path file = fs::current_path() / fs::path{static_cast<const char*>(payload->Data)};
                 fs::path move = fs::current_path() / (dirInfo->parent ? root / dirInfo->path : root);
                 if (moveFile(file, move)) {
-                    FS_LOG_INFO("Moved File: '{}' to '{}'", file, move);
+                    FE_LOG_INFO("Moved File: '{}' to '{}'", file, move);
                     refresh();
                 }
             }
@@ -238,7 +238,7 @@ void ContentBrowserPanel::drawFolder(const std::shared_ptr<DirectoryInfo>& dirIn
 
                 ImGui::SameLine();
 
-                std::string pathStr{ (root / dirInfo->path).string() };
+                std::string pathStr{ (root / dirInfo->path).generic_string() };
                 ImGui::TextUnformatted(pathStr.c_str());
                 ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
                 ImGui::EndDragDropSource();
@@ -348,7 +348,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
                 fs::path file = fs::current_path() / fs::path{static_cast<const char*>(payload->Data)};
                 fs::path move = fs::current_path() / (parent ? root / path : root);
                 if (moveFile(file, move)) {
-                    FS_LOG_INFO("Moved File: '{}' to '{}'", file, move);
+                    FE_LOG_INFO("Moved File: '{}' to '{}'", file, move);
                     refresh();
                     return true;
                 }
@@ -361,7 +361,7 @@ bool ContentBrowserPanel::drawFile(size_t dirIndex, bool folder, int shownIndex,
 
         ImGui::SameLine();
 
-        std::string pathStr{ (root / path).string() };
+        std::string pathStr{ (root / path).generic_string() };
         ImGui::TextUnformatted(pathStr.c_str());
         ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", pathStr.c_str(), pathStr.length() + 1);
         ImGui::EndDragDropSource();

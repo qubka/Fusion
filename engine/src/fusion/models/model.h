@@ -31,19 +31,23 @@ namespace fe {
     public:
         // aiProcess_Triangulate by default
         Model() = default;
-        explicit Model(fs::path filepath, bool load = false);
+        explicit Model(uuids::uuid uuid, bool load = false);
         ~Model() override = default;
 
-        const fs::path& getPath() const override { return path; }
-        const std::string& getName() const override { return name; }
+        uuids::uuid getUuid() const override { return uuid; }
         type_index getType() const override { return type_id<Model>; }
+        const std::string& getName() const override { return root.name; }
+        const fs::path& getPath() const override { return path; }
+        bool isLoaded() const override { return loaded; }
+        bool isInternal() const override { return internal; }
 
         const SceneObject& getRoot() const { return root; }
         const Mesh* getMesh(uint32_t index) const { return index < meshesLoaded.size() ? meshesLoaded[index] : nullptr; }
 
         operator bool() const { return !root.name.empty(); }
 
-        void loadResource() override { loadFromFile(); }
+        void load() override { loadFromFile(); };
+        void unload() override { };
 
     private:
         // TODO: May be load from shader ?
@@ -61,12 +65,12 @@ namespace fe {
 
         //static aiScene GenerateScene(const Mesh& mesh);
 
-        fs::path path;
-        std::string name;
-        //fs::path directory;
-
         SceneObject root;
         std::vector<const Mesh*> meshesLoaded;
         //std::unordered_map<fs::path, const Texture2d*> texturesLoaded;
+        fs::path path;
+        uuids::uuid uuid;
+        bool loaded{ false };
+        bool internal{ false };
     };
 }

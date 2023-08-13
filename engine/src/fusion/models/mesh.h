@@ -21,6 +21,7 @@ namespace fe {
         VkIndexType getIndexType() const { return indexType; }
         const AABB& getBoundingBox() const { return boundingBox; }
 
+        // TODO: Do we need store this in RAM too ?
         std::vector<std::byte> getVertices(uint32_t stride) const {
             auto vertexStaging = Buffer::DeviceToStageBuffer(*vertexBuffer);
 
@@ -51,6 +52,7 @@ namespace fe {
             boundingBox = AABB{min, max};
         }
 
+        // TODO: Do we need store this in RAM too ?
         template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
         std::vector<T> getIndices() const {
             auto indexStaging = Buffer::DeviceToStageBuffer(*indexBuffer);

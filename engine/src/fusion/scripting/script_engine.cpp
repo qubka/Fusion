@@ -68,8 +68,7 @@ namespace Utils {
             });
         }
 
-        std::string pathString{ assemblyPath.string() };
-        MonoAssembly* assembly = mono_assembly_load_from_full(image, pathString.c_str(), &status, 0);
+        MonoAssembly* assembly = mono_assembly_load_from_full(image, assemblyPath.string().c_str(), &status, 0);
         mono_image_close(image);
 
         return assembly;

@@ -1,6 +1,7 @@
 #include "texture2d.h"
 
 #include "fusion/core/engine.h"
+#include "fusion/assets/asset_registry.h"
 #include "fusion/bitmaps/bitmap.h"
 #include "fusion/graphics/buffers/buffer.h"
 #include "fusion/graphics/commands/command_buffer.h"
@@ -11,8 +12,8 @@
 
 using namespace fe;
 
-Texture2d::Texture2d(fs::path filepath, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
-        : Texture{std::move(filepath),
+Texture2d::Texture2d(uuids::uuid uuid, VkFilter filter, VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap, bool load)
+        : Texture{uuid,
                   filter,
                   addressMode,
                   VK_SAMPLE_COUNT_1_BIT,
@@ -73,12 +74,21 @@ void Texture2d::setPixels(const std::byte* pixels, uint32_t layerCount, uint32_t
 }
 
 void Texture2d::loadFromFile() {
-    fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path };
-
-    if (operator bool()) {
-        FE_LOG_DEBUG("Texture2d: '{}' already was loaded", filepath);
+    if (loaded) {
+        FE_LOG_DEBUG("Texture2d: '{}' already was loaded", path);
         return;
     }
+
+    auto op = AssetRegistry::Get()->getDatabase()->getValue(uuid);
+    if (!op.has_value()) {
+        FE_LOG_ERROR("Texture2d: [{}] is not valid", uuid);
+        return;
+    }
+
+    path = std::move(*op);
+    name = path.filename().replace_extension().string();
+
+    fs::path filepath{ Engine::Get()->getApp()->getProjectSettings().projectRoot / path }; // get full path
 
     // That is fast loading approach
     if (FileFormat::IsTextureStorageFile(filepath)) {
@@ -138,4 +148,6 @@ void Texture2d::loadFromFile() {
     }
 
     updateDescriptor();
+
+    loaded = true;
 }

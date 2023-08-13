@@ -38,7 +38,7 @@ namespace fe {
 
         /**
          * Creates a new image.
-         * @param path
+         * @param uuid The file uuid to load the image from.
          * @param filter The magnification/minification filter to apply to lookups.
          * @param addressMode The addressing mode for outside [0..1] range.
          * @param samples The number of samples per texel.
@@ -53,7 +53,7 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        Texture(fs::path filepath,
+        Texture(uuids::uuid uuid,
                 VkFilter filter,
                 VkSamplerAddressMode addressMode,
                 VkSampleCountFlagBits samples,
@@ -156,8 +156,12 @@ namespace fe {
             descriptor.imageLayout = layout;
         }
 
-        const fs::path& getPath() const override { return path; };
+        //type_index getType() const override { return ?; };
+        uuids::uuid getUuid() const override { return uuid; };
         const std::string& getName() const override { return name; };
+        const fs::path& getPath() const override { return path; }
+        bool isLoaded() const override { return loaded; };
+        bool isInternal() const override { return internal; };
 
         /*bool operator==(const Texture& rhs) const {
             //if (!Image::operator==(rhs)) return false;
@@ -178,13 +182,15 @@ namespace fe {
 
     protected:
         VkDescriptorImageInfo descriptor = {};
-
-        fs::path path;
+        uuids::uuid uuid;
         std::string name;
+        fs::path path;
         //TextureType textureType{ TextureType::None };
         uint32_t mipLevels{ 0 };
         uint32_t arrayLayers{ 0 };
         bool anisotropic{ false };
         bool mipmap{ false };
+        bool loaded{ false };
+        bool internal{ false };
     };
 }

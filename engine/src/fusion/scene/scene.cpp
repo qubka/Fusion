@@ -236,8 +236,15 @@ void Scene::deserialise(fs::path filepath, bool binary) {
     });
 }
 
-void Scene::importMesh(const fs::path& filepath) {
-    auto model = AssetRegistry::Get()->load<Model>(filepath);
+void Scene::importMesh(fs::path filepath) {
+    filepath += ".meta";
+    auto uuid = uuids::uuid::from_string(FileSystem::ReadText(filepath));
+    if (!uuid.has_value()) {
+        FE_LOG_ERROR("Cannot find asset. Wrong metadata: '{}'", filepath);
+        return;
+    }
+
+    auto model = AssetRegistry::Get()->load<Model>(uuid.value());
 
     auto hierarchySystem = getSystem<HierarchySystem>();
 

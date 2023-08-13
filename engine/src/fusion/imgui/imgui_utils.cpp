@@ -1,5 +1,6 @@
 #include "imgui_utils.h"
 
+#include "fusion/core/engine.h"
 #include "fusion/graphics/textures/texture2d.h"
 #include "fusion/graphics/textures/texture2d_array.h"
 #include "fusion/graphics/textures/texture_cube.h"

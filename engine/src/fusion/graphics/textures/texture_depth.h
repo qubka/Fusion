@@ -12,6 +12,7 @@ namespace fe {
 
         type_index getType() const override { return type_id<TextureDepth>; }
 
-        void loadResource() override {};
+        void load() override {};
+        void unload() override {};
     };
 }

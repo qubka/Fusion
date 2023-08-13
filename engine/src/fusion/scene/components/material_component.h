@@ -13,24 +13,24 @@ namespace fe {
         template<typename Archive>
         void load(Archive& archive) {
             archive(cereal::make_nvp("baseColor", baseColor));
-            fs::path diffusePath;
-            archive(cereal::make_nvp("diffuse", diffusePath));
-            diffuse = AssetRegistry::Get()->load<Texture2d>(diffusePath);
-            fs::path specularPath;
-            archive(cereal::make_nvp("specular", specularPath));
-            specular = AssetRegistry::Get()->load<Texture2d>(specularPath);
-            fs::path normalPath;
-            archive(cereal::make_nvp("normal", normalPath));
-            normal = AssetRegistry::Get()->load<Texture2d>(normalPath);
+            uuids::uuid diffuseUuid;
+            archive(cereal::make_nvp("diffuse", diffuseUuid));
+            diffuse = AssetRegistry::Get()->load<Texture2d>(diffuseUuid);
+            uuids::uuid specularUuid;
+            archive(cereal::make_nvp("specular", specularUuid));
+            specular = AssetRegistry::Get()->load<Texture2d>(specularUuid);
+            uuids::uuid normalUuid;
+            archive(cereal::make_nvp("normal", normalUuid));
+            normal = AssetRegistry::Get()->load<Texture2d>(normalUuid);
             archive(cereal::make_nvp("shininess", shininess));
         }
 
         template<typename Archive>
         void save(Archive& archive) const {
             archive(cereal::make_nvp("baseColor", baseColor));
-            archive(cereal::make_nvp("diffuse", diffuse->getPath()));
-            archive(cereal::make_nvp("specular", specular->getPath()));
-            archive(cereal::make_nvp("normal", normal->getPath()));
+            archive(cereal::make_nvp("diffuse", diffuse->getUuid()));
+            archive(cereal::make_nvp("specular", specular->getUuid()));
+            archive(cereal::make_nvp("normal", normal->getUuid()));
             archive(cereal::make_nvp("shininess", shininess));
         }
     };

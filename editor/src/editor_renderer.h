@@ -60,7 +60,7 @@ namespace fe {
 
             addSubrender<Mesh2Subrender>({1, 0});
             addSubrender<LightSubrender>({1, 0});
-            addSubrender<SkyboxSubrender>({1, 0});
+            //addSubrender<SkyboxSubrender>({1, 0});
             //addSubrender<AtmosphereSubrender>({1, 0});
 
             addSubrender<ImGuiSubrender>({2, 0});

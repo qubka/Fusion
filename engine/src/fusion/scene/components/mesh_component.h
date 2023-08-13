@@ -14,15 +14,15 @@ namespace fe {
 
         template<typename Archive>
         void load(Archive& archive) {
-            fs::path modelPath;
-            archive(cereal::make_nvp("model", modelPath));
-            model = AssetRegistry::Get()->load<Model>(modelPath);
+            uuids::uuid modelUuid;
+            archive(cereal::make_nvp("model", modelUuid));
+            model = AssetRegistry::Get()->load<Model>(modelUuid);
             archive(cereal::make_nvp("index", index));
         }
 
         template<typename Archive>
         void save(Archive& archive) const {
-            archive(cereal::make_nvp("model", model->getPath()));
+            archive(cereal::make_nvp("model", model->getUuid()));
             archive(cereal::make_nvp("index", index));
         }
     };

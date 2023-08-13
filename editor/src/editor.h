@@ -102,6 +102,8 @@ namespace fe {
         void endDockSpace();
         void drawMenuBar();
 
+        void onProjectLoad() override;
+
         EditorSettings editorSettings;
         EditorState editorState{ EditorState::Paused };
 

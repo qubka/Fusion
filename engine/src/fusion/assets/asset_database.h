@@ -17,9 +17,9 @@ namespace fe {
         ~AssetDatabase();
 
         std::optional<uuids::uuid> getKey(const fs::path& value);
-        std::optional<fs::path> getValue(const uuids::uuid& key);
+        std::optional<fs::path> getValue(uuids::uuid key);
 
-        void put(const uuids::uuid& key, const fs::path& value);
+        bool put(uuids::uuid key, const fs::path& value, bool overwrite = false);
 
     private:
         MDB_env* env{ nullptr };
