@@ -12,7 +12,7 @@ namespace fe {
         explicit Bitmap(const glm::uvec2& size, VkFormat format = VK_FORMAT_R8G8B8A8_UNORM);
         Bitmap(std::unique_ptr<std::byte[]>&& data, const glm::uvec2& size, VkFormat format = VK_FORMAT_R8G8B8A8_UNORM);
         ~Bitmap() override = default;
-        NONCOPYABLE(Bitmap);
+        NONCOPYABLE(Bitmap); // TEMP
 
         void load(const fs::path& filepath);
         void write(const fs::path& filepath) const;

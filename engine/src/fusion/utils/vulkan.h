@@ -976,7 +976,7 @@ namespace vku {
 
 #ifdef FUSION_DEBUG
 #define VK_CHECK(func) { auto result = func; if (result != VK_SUCCESS) vku::CheckVk(__FILE__, __LINE__, result); }
-#define VK_CHECK_RESULT(result) if (result != VK_SUCCESS) vku::CheckVk(__FILE__, __LINE__, result);
+#define VK_CHECK_RESULT(result) if ((result) != VK_SUCCESS) vku::CheckVk(__FILE__, __LINE__, result);
 #else
 #define VK_CHECK(func) func
 #define VK_CHECK_RESULT(result)

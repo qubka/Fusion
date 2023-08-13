@@ -41,6 +41,10 @@ namespace fe {
 }
 
 namespace fe {
+    inline static uuids::uuid_random_generator uuid_random_generator{ Random::engine() };
+}
+
+namespace fe {
     /**
      * Combines a seed into a hash and modifies the seed by the new hash.
      * @param seed The seed.
@@ -56,10 +60,9 @@ namespace fe {
         hash_combine(seed, rest...);
     }
 
-    /* Clang fix */
     struct PathHash {
-        auto operator()(const fs::path& p) const noexcept {
-            return std::filesystem::hash_value(p);
+        auto operator()(const fs::path& path) const noexcept {
+            return fs::hash_value(path);
         }
     };
 }

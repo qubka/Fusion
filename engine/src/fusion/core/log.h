@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    enum class Severity : uint8_t {
+    enum class Severity : unsigned char {
         None = 0,
         Fatal = 1,
         Error = 2,

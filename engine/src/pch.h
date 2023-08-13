@@ -25,6 +25,8 @@ namespace fs = std::filesystem;
 #include <gsl/span>
 #endif
 
+#include <uuid.h>
+
 // Math
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>

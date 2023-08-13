@@ -4,12 +4,13 @@
 #include "fusion/filesystem/file_watcher.h"
 
 namespace fe {
+    class AssetDatabase;
     /**
      * @brief Module used for managing assets.
      */
     class FUSION_API AssetRegistry : public Module::Registrar<AssetRegistry> {
     public:
-        AssetRegistry() = default;
+        AssetRegistry();
         ~AssetRegistry() override;
 
         template<typename T, typename = std::enable_if_t<std::is_base_of_v<Asset, T>>>
@@ -40,11 +41,13 @@ namespace fe {
         void releaseAll();
 
     private:
-        //void onUpdate() override;
-        //void onFileChanged(const fs::path& path, FileStatus status);
+        void onStart() override;
+        void onUpdate() override;
+        void onFileChanged(const fs::path& path, FileEvent event);
 
         std::unordered_map<type_index, std::unordered_map<fs::path, std::shared_ptr<Asset>, PathHash>> assets;
 
-        //std::unique_ptr<FileWatcher> fileWatcher;
+        std::unique_ptr<FileWatcher> fileWatcher;
+        std::unique_ptr<AssetDatabase> assetDatabase;
     };
 }

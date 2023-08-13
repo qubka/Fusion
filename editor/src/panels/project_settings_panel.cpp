@@ -19,8 +19,6 @@ void ProjectSettingsPanel::onImGui() {
     ImGui::SetNextWindowSize(ImVec2{640, 480}, ImGuiCond_FirstUseEver);
     ImGui::Begin(title.c_str(), &active, flags);
     {
-        auto window = DeviceManager::Get()->getWindow(0);
-
         ImGui::Columns(2);
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
 
@@ -41,6 +39,8 @@ void ProjectSettingsPanel::onImGui() {
             }
         }
 #endif
+
+#define window DeviceManager::Get()->getWindow(0)
 
         if (ImGuiUtils::PropertyText("Title", projectSettings.title))
             window->setTitle(projectSettings.title);

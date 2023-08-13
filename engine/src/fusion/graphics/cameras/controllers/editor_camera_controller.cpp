@@ -27,7 +27,8 @@ void EditorCameraController::update(Camera& camera) {
 void EditorCameraController::handleMouse(Camera& camera, float dt) {
     auto input = Input::Get();
     const glm::vec2& pos = input->getMousePosition();
-    auto window = DeviceManager::Get()->getWindow(0);
+
+#define window DeviceManager::Get()->getWindow(0)
 
     static bool mouseHeld = false;
     if (input->getMouseButtonDown(MouseButton::ButtonRight)) {

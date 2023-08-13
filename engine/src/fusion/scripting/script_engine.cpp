@@ -423,7 +423,7 @@ bool ScriptInstance::setFieldValueInternal(const std::string& name, const void* 
         return false;
 
     const ScriptField& field = it->second;
-    mono_field_set_value(instance, field.classField, (void*)value);
+    mono_field_set_value(instance, field.classField, const_cast<void*>(value));
     return true;
 }
 

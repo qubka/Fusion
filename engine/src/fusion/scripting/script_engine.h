@@ -16,7 +16,7 @@ extern "C" {
 namespace fe {
     class Scene;
 
-    enum class ScriptFieldType : uint8_t {
+    enum class ScriptFieldType : unsigned char {
         None = 0,
         Float,
         Double,
@@ -252,6 +252,9 @@ namespace fe {
 
         std::unordered_map<std::string, std::shared_ptr<ScriptClass>> entityClasses;
 
+        // Runtime
+        Scene* sceneContext{ nullptr };
+
         //Scope<filewatch::FileWatch<std::string>> appAssemblyFileWatcher;
         bool assemblyReloadPending{ false };
 
@@ -261,8 +264,6 @@ namespace fe {
         bool enableDebugging{ false };
 #endif
 
-        // Runtime
-        Scene* sceneContext{ nullptr };
     };
 }
 

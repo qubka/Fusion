@@ -1,7 +1,7 @@
 #pragma once
 
 namespace fe {
-    enum PowerState : uint8_t {
+    enum PowerState : unsigned char {
         Unknown,
         OnBattery,
         NoBattery,

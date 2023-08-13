@@ -22,7 +22,7 @@ void AtmosphereSubrender::onRender(const CommandBuffer& commandBuffer, const Cam
     if (!scene)
         return;
 
-    const Camera* camera = overrideCamera ? overrideCamera : scene->getCamera();
+    auto camera = overrideCamera ? overrideCamera : scene->getCamera();
     if (!camera)
         return;
 

@@ -111,3 +111,11 @@
 	path = external/fmt
 	url = https://github.com/fmtlib/fmt
 	ignore = all
+[submodule "external/lmdb"]
+	path = external/lmdb
+	url = https://github.com/LMDB/lmdb
+	ignore = all
+[submodule "external/stduuid"]
+	path = external/stduuid
+	url = https://github.com/mariusbancila/stduuid
+	ignore = all

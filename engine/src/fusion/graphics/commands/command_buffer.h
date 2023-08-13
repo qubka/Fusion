@@ -14,7 +14,7 @@ namespace fe {
          * @param queueType The queue to run this command buffer on.
          * @param bufferLevel The buffer level.
          */
-        explicit CommandBuffer(bool begin = false, VkQueueFlagBits queueType = VK_QUEUE_GRAPHICS_BIT, VkCommandBufferLevel bufferLevel = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+        CommandBuffer(bool begin = false, VkQueueFlagBits queueType = VK_QUEUE_GRAPHICS_BIT, VkCommandBufferLevel bufferLevel = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
         ~CommandBuffer();
 
         /**

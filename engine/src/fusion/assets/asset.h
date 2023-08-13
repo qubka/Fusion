@@ -16,4 +16,22 @@ namespace fe {
 
         virtual void loadResource() = 0;
     };
+    /*class FUSION_API Asset {
+    public:
+        Asset() = default;
+        virtual ~Asset() = default;
+        NONCOPYABLE(Asset); // TEMP
+
+        type_index getType() const { return type; }
+        const fs::path& getPath() const { return path; }
+
+        virtual void load() = 0;
+        virtual void unload() = 0;
+
+    protected:
+        fs::path path;
+        type_index type;
+        bool loaded{ false };
+        bool internal{ false };
+    };*/
 }

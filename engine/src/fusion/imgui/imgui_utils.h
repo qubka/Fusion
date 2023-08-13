@@ -586,7 +586,7 @@ namespace ImGuiUtils {
 
             ImGui::BeginChild("AssetExplorer", ImVec2{300.0f, 500.0f});
 
-            for (const auto& [path, asset] : AssetRegistry::Get()->getAssets<T>()) {
+            for (const auto& [key, asset] : AssetRegistry::Get()->getAssets<T>()) {
                 if (filter.IsActive() && !filter.PassFilter(asset->getName().c_str()))
                     continue;
 
@@ -635,7 +635,7 @@ namespace ImGuiUtils {
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                 fs::path path{ static_cast<const char*>(payload->Data) };
-                value = AssetRegistry::Get()->load<T>(path.lexically_relative(Engine::Get()->getApp()->getProjectSettings().projectRoot));
+                value = AssetRegistry::Get()->load<T>(path.lexically_relative(Engine::Get()->getApp()->getProjectSettings().projectRoot), false);
                 updated = true;
             }
             ImGui::EndDragDropTarget();

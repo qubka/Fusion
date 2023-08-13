@@ -30,21 +30,21 @@ void ApplicationInfoPanel::onImGui() {
             }*/
 
             if (ImGui::TreeNode("Asset Manager")) {
-                auto manager = AssetRegistry::Get();
+                const auto& assets = AssetRegistry::Get()->getAllAssets();
 
-                if (!manager->getAllAssets().empty()) {
-                    for (const auto& [id, type] : manager->getAllAssets()) {
+                if (!assets.empty()) {
+                    for (const auto& [id, type] : assets) {
                         std::string table{ "##" + std::to_string(id) };
                         if (ImGui::BeginTable(table.c_str(), 2, flags)) {
                             ImGui::TableSetupColumn("Path", ImGuiTableColumnFlags_WidthStretch);
                             ImGui::TableSetupColumn("Count", ImGuiTableColumnFlags_WidthFixed);
                             ImGui::TableHeadersRow();
 
-                            for (const auto& [path, asset] : type) {
+                            for (const auto& [key, asset] : type) {
                                 ImGui::TableNextRow();
 
                                 ImGui::TableSetColumnIndex(0);
-                                ImGui::TextUnformatted(path.string().c_str());
+                                ImGui::TextUnformatted(key.path.string().c_str());
 
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::Text("%ld", asset.use_count());

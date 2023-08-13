@@ -33,6 +33,8 @@ include(_/IncludeMeshOptimizer.cmake)
 include(_/IncludeAssimp.cmake)
 #include(_/IncludePhysX.cmake)
 include(_/IncludeImGui.cmake)
+include(_/IncludeLMDB.cmake)
+include(_/IncludeUUID.cmake)
 
 set(FUSION_LINK_LIBS ${ALL_LIBS} CACHE INTERNAL "")
 set(FUSION_LIBRARY_DIRS ${ALL_DIRS} CACHE INTERNAL "")

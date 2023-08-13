@@ -52,7 +52,7 @@ void DebugSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
     if (!scene)
         return;
 
-    const Camera* camera = overrideCamera ? overrideCamera : scene->getCamera();
+    auto camera = overrideCamera ? overrideCamera : scene->getCamera();
     if (!camera)
         return;
 

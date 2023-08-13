@@ -3,7 +3,7 @@
 namespace fe {
     class FUSION_API DescriptorAllocator {
     public:
-        explicit DescriptorAllocator(VkDevice device, uint32_t count, VkDescriptorPoolCreateFlags flags = 0);
+        DescriptorAllocator(VkDevice device, uint32_t count, VkDescriptorPoolCreateFlags flags = 0);
         ~DescriptorAllocator();
         NONCOPYABLE(DescriptorAllocator);
 

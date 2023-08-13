@@ -106,7 +106,7 @@ std::vector<fs::path> VirtualFileSystem::getFiles(const fs::path& filepath, bool
             auto filesInFound = getFiles(path, recursive);
             files.insert(files.end(), filesInFound.begin(), filesInFound.end());
         } else {
-            if (ext.empty() || ext == path.filename().string())
+            if (ext.empty() || ext == FileSystem::GetExtension(path))
                 files.push_back(std::move(path));
         }
     }

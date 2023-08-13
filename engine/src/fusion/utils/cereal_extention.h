@@ -3,16 +3,23 @@
 #include <cereal/cereal.hpp>
 
 namespace std::filesystem {
-    template<class Archive> std::string save_minimal(const Archive&, const path& p) { return p.string(); }
+    template<class Archive> std::string save_minimal(const Archive&, const path& p) {
+        if constexpr (fs::path::preferred_separator == L'\\') {
+            std::string str{ p.string() };
+            std::replace(str.begin(), str.end(), '\\', '/');
+            return str;
+        } else
+            return p.string();
+    }
     template<class Archive> void load_minimal(const Archive&, path& p, const std::string& in) { p = in; };
 }
 template<class Archive> struct cereal::specialize<Archive, fs::path, cereal::specialization::non_member_load_save_minimal> {};
 
-/*namespace uuids {
+namespace uuids {
     template<class Archive> std::string save_minimal(const Archive&, const uuid& id) { return to_string(id); }
-    template<class Archive> void load_minimal(const Archive&, uuid& id, const std::string& in) { id = uuid::from_string(in).value_or(uuid_random_generator()); };
+    template<class Archive> void load_minimal(const Archive&, uuid& id, const std::string& in) { id = uuid::from_string(in).value_or(uuid{}); };
 }
-CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(uuids::uuid, cereal::specialization::non_member_load_save_minimal);*/
+template<class Archive> struct cereal::specialize<Archive, uuids::uuid, cereal::specialization::non_member_load_save_minimal> {};
 
 namespace cereal {
     template<class Archive> void serialize(Archive& archive, VkExtent3D& e) { archive(make_nvp("width", e.width), make_nvp("height", e.height), make_nvp("depth", e.depth)); }

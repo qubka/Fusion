@@ -139,7 +139,7 @@ bool CommandLineParser::getValue<bool>(const std::string& name, const bool& defa
 
 CommandResult Command::Execute(const char* cmd)  {
     std::array<char, 1048576> buffer{};
-    std::string result;
+    std::stringstream ss;
 #if FUSION_PLATFORM_WINDOWS
 #define popen _popen
 #define pclose _pclose
@@ -152,9 +152,9 @@ CommandResult Command::Execute(const char* cmd)  {
         if (pipe) {
             size_t bytesread;
             while ((bytesread = std::fread(buffer.data(), sizeof(buffer.at(0)), sizeof(buffer), pipe.get())) != 0) {
-                result += std::string{buffer.data(), bytesread};
+                ss << std::string_view{buffer.data(), bytesread};
             }
         }
     }
-    return { std::move(result), return_code };
+    return { ss.str(), return_code };
 }

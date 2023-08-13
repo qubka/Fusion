@@ -43,7 +43,6 @@ void Editor::onStart() {
 
     Graphics::Get()->setRenderer(std::make_unique<EditorRenderer>());
 
-    const auto& size = DeviceManager::Get()->getWindow(0)->getSize();
     editorCamera = std::make_shared<Camera>();
 
     componentIconMap[type_id<TransformComponent>] = ICON_MDI_AXIS_ARROW;
@@ -457,7 +456,7 @@ void Editor::drawMenuBar() {
         ImGuiStyle& style = ImGui::GetStyle();
 
         if (ImGui::BeginMenu("Window")) {
-            auto window = DeviceManager::Get()->getWindow(0);
+#define window DeviceManager::Get()->getWindow(0)
 
             if (ImGui::MenuItem("Fullscreen", "F11", &projectSettings.isFullscreen, true)) {
                 window->setFullscreen(projectSettings.isFullscreen, nullptr);

@@ -21,7 +21,7 @@ void GridSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
     if (!scene)
         return;
 
-    const Camera* camera = overrideCamera ? overrideCamera : scene->getCamera();
+    auto camera = overrideCamera ? overrideCamera : scene->getCamera();
     if (!camera)
         return;
 

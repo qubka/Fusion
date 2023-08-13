@@ -2,10 +2,10 @@
 
 using namespace fe;
 
-ElapsedTime::ElapsedTime(const DateTime& interval) : startTime{DateTime::Now()}, interval{interval} {
+ElapsedTime::ElapsedTime(DateTime interval) : startTime{DateTime::Now()}, interval{interval} {
 }
 
-uint32_t ElapsedTime::getElapsed() {
+uint32_t ElapsedTime::getElapsed() const {
     auto now = DateTime::Now();
     auto elapsed = static_cast<uint32_t>(glm::floor((now - startTime) / interval));
 

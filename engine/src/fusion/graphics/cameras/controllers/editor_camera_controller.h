@@ -5,7 +5,7 @@
 namespace fe {
     class EditorCameraController  : public CameraController {
     public:
-        explicit EditorCameraController();
+        EditorCameraController();
         ~EditorCameraController() override;
 
         void update(Camera& camera) override;

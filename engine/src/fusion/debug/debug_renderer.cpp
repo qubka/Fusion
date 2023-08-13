@@ -288,16 +288,16 @@ void DebugDrawArc(int numVerts, float radius, const glm::vec3& start, const glm:
     glm::quat rot{ glm::lookAt(rotation * start, rotation * end, glm::vec3{0.0f, 1.0f, 0.0f}) };
     rot = rotation * rot;
 
-    glm::vec3 arcCentre = (start + end) * 0.5f;
+    glm::vec3 arcCentre{ (start + end) * 0.5f };
     for (int i = 0; i < numVerts; ++i) {
         float a = static_cast<float>(i);
         float cx = glm::cos(step * a) * radius;
         float cy = glm::sin(step * a) * radius;
-        glm::vec3 current = glm::vec3{cx, cy, 0.0f};
+        glm::vec3 current{cx, cy, 0.0f};
 
         float nx = glm::cos(step * (a + 1.0f)) * radius;
         float ny = glm::sin(step * (a + 1.0f)) * radius;
-        glm::vec3 next = glm::vec3{nx, ny, 0.0f};
+        glm::vec3 next{nx, ny, 0.0f};
 
         DebugRenderer::DrawHairLine(arcCentre + (rot * current), arcCentre + (rot * next), color);
     }

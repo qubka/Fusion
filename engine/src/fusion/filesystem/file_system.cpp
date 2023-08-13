@@ -11,6 +11,7 @@
 using namespace fe;
 
 FileSystem::FileSystem() {
+#if FUSION_VIRTUAL_FS
 #if FUSION_PLATFORM_ANDROID
     vfs = std::make_unique<android::VirtualFileSystem>();
 #elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLE
@@ -18,15 +19,16 @@ FileSystem::FileSystem() {
 #else
     FE_LOG_FATAL("Unknown platform!");
 #endif
+#endif
 }
 
 FileSystem::~FileSystem() {
 }
 
-void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler, bool virtual_vs) {
-    if (virtual_vs) {
+void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler) {
+#if FUSION_VIRTUAL_FS
         ModuleInstance->vfs->readBytes(filepath, handler);
-    } else {
+#else
         std::ifstream is{filepath, std::ios::binary};
 
         if (!is.is_open()) {
@@ -47,13 +49,13 @@ void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gs
         buffer.insert(buffer.begin(), std::istream_iterator<uint8_t>(is), std::istream_iterator<uint8_t>());
 
         handler({ reinterpret_cast<std::byte*>(buffer.data()), buffer.size() });
-    }
+#endif
 }
 
-std::string FileSystem::ReadText(const fs::path& filepath, bool virtual_vs) {
-    if (virtual_vs) {
+std::string FileSystem::ReadText(const fs::path& filepath) {
+#if FUSION_VIRTUAL_FS
         return ModuleInstance->vfs->readText(filepath);
-    } else {
+#else
         std::ifstream is{filepath, std::ios::binary};
 
         if (!is.is_open()) {
@@ -65,60 +67,60 @@ std::string FileSystem::ReadText(const fs::path& filepath, bool virtual_vs) {
         is.unsetf(std::ios::skipws);
 
         return { std::istream_iterator<int8_t>(is), std::istream_iterator<int8_t>() };
-    }
+#endif
 }
 
-bool FileSystem::WriteBytes(const fs::path& filepath, gsl::span<const std::byte> buffer, bool virtual_vs) {
-    if (virtual_vs) {
+bool FileSystem::WriteBytes(const fs::path& filepath, gsl::span<const std::byte> buffer) {
+#if FUSION_VIRTUAL_FS
         return ModuleInstance->vfs->writeBytes(filepath, buffer);
-    } else {
+#else
         std::ofstream os{filepath, std::ios::binary};
         os.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
         return true;
-    }
+#endif
 }
 
-bool FileSystem::WriteText(const fs::path& filepath, std::string_view text, bool virtual_vs) {
-    if (virtual_vs) {
+bool FileSystem::WriteText(const fs::path& filepath, std::string_view text) {
+#if FUSION_VIRTUAL_FS
         return ModuleInstance->vfs->writeText(filepath, text);
-    } else {
+#else
         std::ofstream os{filepath, std::ios::binary};
         os.write(text.data(), text.size());
         return true;
-    }
+#endif
 }
 
-std::string FileSystem::GetExtension(const fs::path& filepath, bool virtual_vs) {
+std::string FileSystem::GetExtension(const fs::path& filepath) {
     return String::Lowercase(filepath.extension().string());
 }
 
-bool FileSystem::IsExists(const fs::path& filepath, bool virtual_vs) {
-    if (virtual_vs) {
+bool FileSystem::IsExists(const fs::path& filepath) {
+#if FUSION_VIRTUAL_FS
         return ModuleInstance->vfs->isExists(filepath);
-    } else {
+#else
         return fs::exists(filepath);
-    }
+#endif
 }
 
-bool FileSystem::IsDirectory(const fs::path& filepath, bool virtual_vs) {
-    if (virtual_vs) {
+bool FileSystem::IsDirectory(const fs::path& filepath) {
+#if FUSION_VIRTUAL_FS
         return ModuleInstance->vfs->isDirectory(filepath);
-    } else {
+#else
         return fs::is_directory(filepath);
-    }
+#endif
 }
 
-std::vector<fs::path> FileSystem::GetFiles(const fs::path& root, bool recursive, std::string_view ext, bool virtual_vs) {
-    if (virtual_vs) {
+std::vector<fs::path> FileSystem::GetFiles(const fs::path& root, bool recursive, std::string_view ext) {
+#if FUSION_VIRTUAL_FS
         return ModuleInstance->vfs->getFiles(root, recursive, ext);
-    } else {
+#else
         std::vector<fs::path> paths;
 
         if (fs::exists(root) && fs::is_directory(root)) {
             if (!ext.empty()) {
                 for (auto const& entry : fs::recursive_directory_iterator(root)) {
                     const auto& path = entry.path();
-                    if (fs::is_regular_file(entry) && path.extension() == ext)
+                    if (fs::is_regular_file(entry) && FileSystem::GetExtension(path) == ext)
                         paths.push_back(path);
                 }
             } else {
@@ -130,5 +132,5 @@ std::vector<fs::path> FileSystem::GetFiles(const fs::path& root, bool recursive,
         }
 
         return paths;
-    }
+#endif
 }

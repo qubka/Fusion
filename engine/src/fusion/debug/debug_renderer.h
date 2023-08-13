@@ -9,7 +9,7 @@ namespace fe {
 
     class FUSION_API DebugRenderer : public Module::Registrar<DebugRenderer> {
     public:
-        explicit DebugRenderer() = default;
+        DebugRenderer() = default;
         ~DebugRenderer() override = default;
 
         // Draw Point (circle)

@@ -1,0 +1,5 @@
+find_package(stduuid QUIET)
+if(NOT stduuid_FOUND)
+    add_subdirectory(stduuid)
+endif()
+list(APPEND ALL_LIBS stduuid)
