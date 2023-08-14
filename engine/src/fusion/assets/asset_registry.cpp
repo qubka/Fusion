@@ -42,7 +42,7 @@ void AssetRegistry::onFileChanged(const fs::path& path, FileEvent event) {
                 onFileInit(path);
             break;
         case FileEvent::Modified:
-            //
+            onFileModified(path);
             break;
         case FileEvent::Erased:
             //
@@ -50,24 +50,25 @@ void AssetRegistry::onFileChanged(const fs::path& path, FileEvent event) {
     }
 }
 
-void AssetRegistry::onFileInit(fs::path filepath) {
+void AssetRegistry::onFileInit(const fs::path& filepath) {
     // get full path to metadata
     fs::path metaPath { filepath };
     metaPath += ".meta";
     // get short path in project folder
-    filepath = filepath.lexically_relative(Engine::Get()->getApp()->getProjectSettings().projectRoot);
+    fs::path shortPath{ filepath.lexically_relative(Engine::Get()->getApp()->getProjectSettings().projectRoot) };
 
-    if (FileSystem::IsExists(metaPath)) {
+	// Is meta valid ?
+    if (fs::exist(metaPath)) {
         //.. look like old file, check db
         auto uuid = uuids::uuid::from_string(FileSystem::ReadText(metaPath));
         if (uuid.has_value()) {
             auto path = assetDatabase->getValue(uuid.value());
             if (!path.has_value()) {
                 // if not present, add a new entry to db
-                assetDatabase->put(uuid.value(), filepath);
-            } else if (path.value() != filepath) {
+                assetDatabase->put(uuid.value(), shortPath);
+            } else if (path.value() != shortPath) {
                 // if value not valid, overwrite old one
-                assetDatabase->put(uuid.value(), filepath, true);
+                assetDatabase->put(uuid.value(), shortPath, true);
             }
             return; // exit
         }
@@ -76,7 +77,7 @@ void AssetRegistry::onFileInit(fs::path filepath) {
 
     //.. new file |
     // try to find value in db to get uuid
-    auto uuid = assetDatabase->getKey(filepath);
+    auto uuid = assetDatabase->getKey(shortPath);
     if (uuid.has_value()) {
         // if preset, write uuid to metafile back
         FileSystem::WriteText(metaPath, uuids::to_string(uuid.value()));
@@ -89,6 +90,80 @@ void AssetRegistry::onFileInit(fs::path filepath) {
         // generate metafile
         FileSystem::WriteText(metaPath, uuids::to_string(id));
         // add to db
-        assetDatabase->put(id, filepath);
+        assetDatabase->put(id, shortPath);
     }
+}
+
+void AssetRegistry::onFileModified(const fs::path& filepath) {
+	// is it meta file?
+	if (filepath.extension.string() == ".meta") {
+		// get path to main file
+		fs::path shortPath{ filepath };
+		shortPath.replace_extension(".meta", "");
+		
+		// if not valid, skip
+		if (!fs::exist(shortPath))
+			return;
+
+		// get short path in project folder
+		shortPath = shortPath.lexically_relative(Engine::Get()->getApp()->getProjectSettings().projectRoot)
+		
+		//.. look like old file, check db
+        auto uuid = uuids::uuid::from_string(FileSystem::ReadText(filepath));
+        if (uuid.has_value()) {
+            auto path = assetDatabase->getValue(uuid.value());
+            if (!path.has_value()) {
+                // if not present, add a new entry to db
+                assetDatabase->put(uuid.value(), shortPath);
+            } else if (path.value() != shortPath) {
+                // if value not valid, overwrite old one
+                assetDatabase->put(uuid.value(), shortPath, true);
+            }
+        } else {
+			 // try to find value in db to get uuid
+			auto uuid = assetDatabase->getKey(shortPath);
+			if (uuid.has_value()) {
+				// if preset, write uuid to metafile back
+				FileSystem::WriteText(fullPath, uuids::to_string(uuid.value()));
+			} else {
+				// if not, (How it can be possible ?)
+			}
+		}
+	} 
+	// Regular file
+	else {
+		// get full path to metadata
+		fs::path metaPath { filepath };
+		metaPath += ".meta";
+		
+		// if not valid, skip (How it can be possible?)
+		if (!fs::exist(metaPath))
+			return;
+		
+		// get short path in project folder
+		fs::path shortPath{ filepath.lexically_relative(Engine::Get()->getApp()->getProjectSettings().projectRoot) };
+
+		//.. look like old file, check db
+        auto uuid = uuids::uuid::from_string(FileSystem::ReadText(metaPath));
+        if (uuid.has_value()) {
+            auto path = assetDatabase->getValue(uuid.value());
+            if (!path.has_value()) {
+                // if not, (How it can be possible ?)
+            } else if (path.value() != shortPath) {
+                // if not, (How it can be possible ?)
+            }
+			
+			// reload asset with given uuid
+			
+        } else {
+			// try to find value in db to get uuid
+			auto uuid = assetDatabase->getKey(shortPath);
+			if (uuid.has_value()) {
+				// if preset, write uuid to metafile back
+				FileSystem::WriteText(fullPath, uuids::to_string(uuid.value()));
+			} else {
+				// if not, (How it can be possible ?)
+			}
+		}
+	}
 }
