@@ -86,7 +86,7 @@ void Texture2dArray::loadFromFile() {
         return;
     }
 
-    if (!FileFormat::IsTextureStorageFile(op.value())) {
+    if (!FileFormat::IsTextureStorageFile(*op)) {
         FE_LOG_ERROR("Texture2dArray: Unsupported format for fast and single loading");
         return;
     }

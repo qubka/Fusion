@@ -35,6 +35,7 @@ namespace fe {
         template<typename Archive>
         void save(Archive& archive) const {
             archive(cereal::make_nvp("projectVersion", projectSettings.projectVersion));
+            archive(cereal::make_nvp("projectRoot", projectSettings.projectRoot));
             archive(cereal::make_nvp("projectName", projectSettings.projectName));
             archive(cereal::make_nvp("scriptModulePath", projectSettings.scriptModulePath));
             archive(cereal::make_nvp("title", projectSettings.title));

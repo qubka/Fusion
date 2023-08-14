@@ -86,7 +86,7 @@ namespace Utils {
             const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
             const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
 
-            FE_LOG_VERBOSE("{}.{}", nameSpace, name);
+            FE_LOG_INFO("{}.{}", nameSpace, name);
         }
     }
 

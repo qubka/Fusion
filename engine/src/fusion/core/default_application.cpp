@@ -179,13 +179,14 @@ void DefaultApplication::deserialise() {
         cereal::JSONInputArchive input{is};
         input(*this);
     }
-    catch (...) {
+    catch (std::exception& e) {
         projectSettings = {};
         projectSettings.projectVersion = getVersion().toString();
 
         SceneManager::Get()->setScene(std::make_unique<Scene>("Empty Scene"));
 
-        FE_LOG_ERROR("Failed to load project");
+        FE_LOG_FATAL(e.what());
+        FE_LOG_ERROR("Failed to load project: '{}'", projectPath);
         return;
     }
 

@@ -158,22 +158,22 @@ namespace fe {
         /**
          * Called when the scene is created.
          */
-        virtual void onStart();
+        void onStart();
 
         /**
          * Run when updating the scene.
          */
-        virtual void onUpdate();
+        void onUpdate();
 
         /**
          * Called when scene is being activated, and will begin being rendered/updated.
          */
-        virtual void onPlay(); //
+        void onPlay(); //
 
         /**
          * Called when scene is being swapped and will no longer be rendered/updated
          */
-        virtual void onStop(); //
+        void onStop(); //
 
     private:
         template<typename... T>

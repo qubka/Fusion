@@ -27,10 +27,11 @@ namespace fe {
 
         template<typename Archive>
         void save(Archive& archive) const {
+            uuids::uuid uuid;
             archive(cereal::make_nvp("baseColor", baseColor));
-            archive(cereal::make_nvp("diffuse", diffuse->getUuid()));
-            archive(cereal::make_nvp("specular", specular->getUuid()));
-            archive(cereal::make_nvp("normal", normal->getUuid()));
+            archive(cereal::make_nvp("diffuse", diffuse && *diffuse ? diffuse->getUuid() : uuid));
+            archive(cereal::make_nvp("specular", specular && *specular ? specular->getUuid() : uuid));
+            archive(cereal::make_nvp("normal", normal && *normal ? normal->getUuid() : uuid));
             archive(cereal::make_nvp("shininess", shininess));
         }
     };

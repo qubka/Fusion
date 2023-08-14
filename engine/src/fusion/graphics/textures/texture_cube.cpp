@@ -101,7 +101,7 @@ void TextureCube::loadFromFile() {
         return;
     }
 
-    if (!FileFormat::IsTextureStorageFile(op.value())) {
+    if (!FileFormat::IsTextureStorageFile(*op)) {
         FE_LOG_ERROR("TextureCube: Unsupported format for fast and single loading");
         return;
     }

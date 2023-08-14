@@ -206,7 +206,8 @@ void Scene::deserialise(fs::path filepath, bool binary) {
 
             entt::snapshot_loader{ registry }.entities(input).component<ALL_COMPONENTS>(input);
         }
-        catch (...) {
+        catch (std::exception& e) {
+            FE_LOG_FATAL(e.what());
             FE_LOG_ERROR("Failed to load scene: '{}'", filepath);
         }
 
@@ -224,7 +225,8 @@ void Scene::deserialise(fs::path filepath, bool binary) {
 
             entt::snapshot_loader{ registry }.entities(input).component<ALL_COMPONENTS>(input);
         }
-        catch (...) {
+        catch (std::exception& e) {
+            FE_LOG_FATAL(e.what());
             FE_LOG_ERROR("Failed to load scene: '{}'", filepath);
         }
 
@@ -244,7 +246,7 @@ void Scene::importMesh(fs::path filepath) {
         return;
     }
 
-    auto model = AssetRegistry::Get()->load<Model>(uuid.value());
+    auto model = AssetRegistry::Get()->load<Model>(*uuid);
 
     auto hierarchySystem = getSystem<HierarchySystem>();
 

@@ -4,12 +4,12 @@
 
 namespace std::filesystem {
     template<class Archive> std::string save_minimal(const Archive&, const path& p) { return p.generic_string(); }
-    template<class Archive> void load_minimal(const Archive&, path& p, const std::string& in) { p = in; p.make_preferred(); };
+    template<class Archive> void load_minimal(const Archive&, path& p, const std::string& in) { p = in; if (!p.empty()) p.make_preferred(); };
 }
 template<class Archive> struct cereal::specialize<Archive, fs::path, cereal::specialization::non_member_load_save_minimal> {};
 
 namespace uuids {
-    template<class Archive> std::string save_minimal(const Archive&, const uuid& id) { return to_string(id); }
+    template<class Archive> std::string save_minimal(const Archive&, const uuid& id) { return id.is_nil() ? "" : to_string(id); }
     template<class Archive> void load_minimal(const Archive&, uuid& id, const std::string& in) { id = uuid::from_string(in).value_or(uuid{}); };
 }
 template<class Archive> struct cereal::specialize<Archive, uuids::uuid, cereal::specialization::non_member_load_save_minimal> {};

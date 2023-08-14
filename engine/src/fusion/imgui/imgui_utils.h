@@ -637,7 +637,7 @@ namespace ImGuiUtils {
                 path += ".meta";
                 auto uuid = uuids::uuid::from_string(FileSystem::ReadText(path));
                 if (uuid.has_value()) {
-                    value = AssetRegistry::Get()->load<T>(uuid.value());
+                    value = AssetRegistry::Get()->load<T>(*uuid);
                     updated = true;
                 } else {
                     FE_LOG_ERROR("Cannot find asset. Wrong metadata: '{}'", path);

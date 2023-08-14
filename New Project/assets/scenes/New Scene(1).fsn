@@ -2,19 +2,24 @@
     "value0": {
         "name": "New Scene(1)"
     },
-    "value1": 2,
+    "value1": 3,
     "value2": 4294967295,
     "value3": 0,
     "value4": 1,
-    "value5": 0,
-    "value6": {
+    "value5": 2,
+    "value6": 0,
+    "value7": {
         "name": "RootNode"
     },
-    "value7": 0,
-    "value8": 0,
-    "value9": 1,
+    "value8": 1,
+    "value9": {
+        "name": "Light"
+    },
     "value10": 0,
-    "value11": {
+    "value11": 0,
+    "value12": 2,
+    "value13": 0,
+    "value14": {
         "position": {
             "x": 0.0,
             "y": 0.0,
@@ -32,20 +37,82 @@
             "z": 1.0
         }
     },
-    "value12": 0,
-    "value13": 1,
-    "value14": 0,
-    "value15": {
+    "value15": 1,
+    "value16": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 2.1791317462921144
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value17": 0,
+    "value18": 1,
+    "value19": 0,
+    "value20": {
         "model": "27f1da89-8893-42ff-b000-19f83b6e7a68",
         "index": 0
     },
-    "value16": 0,
-    "value17": 0,
-    "value18": 0,
-    "value19": 0,
-    "value20": 0,
-    "value21": 0,
-    "value22": 0,
-    "value23": 0,
-    "value24": 0
+    "value21": 1,
+    "value22": 1,
+    "value23": {
+        "type": 0,
+        "color": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0,
+            "w": 1.0
+        },
+        "radius": 0.0,
+        "cutOff": 0.0,
+        "outerCutOff": 0.0,
+        "ambient": {
+            "x": 0.10000000149011612,
+            "y": 0.10000000149011612,
+            "z": 0.10000000149011612
+        },
+        "diffuse": {
+            "x": 0.800000011920929,
+            "y": 0.800000011920929,
+            "z": 0.800000011920929
+        },
+        "specular": {
+            "x": 1.7999999523162842,
+            "y": 1.7999999523162842,
+            "z": 1.7999999523162842
+        },
+        "constant": 1.0,
+        "linear": 0.09000000357627869,
+        "quadratic": 0.03200000151991844
+    },
+    "value24": 1,
+    "value25": 0,
+    "value26": {
+        "baseColor": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+        },
+        "diffuse": "",
+        "specular": "",
+        "normal": "",
+        "shininess": 32.0
+    },
+    "value27": 0,
+    "value28": 0,
+    "value29": 0,
+    "value30": 0,
+    "value31": 0,
+    "value32": 0,
+    "value33": 0
 }
