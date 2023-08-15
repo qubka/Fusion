@@ -65,7 +65,7 @@ std::optional<fs::path> AssetDatabase::getValue(uuids::uuid uuid) {
     mdb_dbi_open(txn, nullptr, 0, &dbi);
 
     auto bytes = uuid.as_bytes();
-    MDB_val key{bytes.size(), (void*)bytes.data()};
+    MDB_val key{ bytes.size(), (void*)bytes.data() };
     MDB_val value;
 
     const int rc = mdb_get(txn, dbi, &key, &value);
@@ -87,7 +87,7 @@ bool AssetDatabase::put(uuids::uuid uuid, const fs::path& filepath, bool overwri
     mdb_dbi_open(txn, nullptr, 0, &dbi);
 
     auto bytes = uuid.as_bytes();
-    MDB_val key{bytes.size(), (void*)bytes.data()};
+    MDB_val key{ bytes.size(), (void*)bytes.data() };
 
     std::string pathStr{ filepath.generic_string() };
     MDB_val value{ pathStr.size(), (void*) pathStr.c_str() };

@@ -16,21 +16,27 @@ void AssetRegistry::releaseAll() {
 
     // TODO: Move to reload
 
-    std::set<std::string> exts{".fbx", ".obj", ".png", ".meta"};
-
     const auto& path = Engine::Get()->getApp()->getProjectSettings().projectRoot;
 
     assetDatabase = std::make_unique<AssetDatabase>(path);
+
+#if !FUSION_VIRTUAL_FS
+    std::set<std::string> exts{".fbx", ".obj", ".png", ".meta"};
+
     fileWatcher = std::make_unique<FileWatcher>(path, [&](const fs::path& path, FileEvent event) {
         return onFileChanged(path, event);
     }, std::move(exts));
+#endif
 }
 
 void AssetRegistry::onUpdate() {
+#if !FUSION_VIRTUAL_FS
     if (fileWatcher)
         fileWatcher->update();
+#endif
 }
 
+#if !FUSION_VIRTUAL_FS
 void AssetRegistry::onFileChanged(const fs::path& path, FileEvent event) {
     if (!fs::is_regular_file(path))
         return;
@@ -45,7 +51,7 @@ void AssetRegistry::onFileChanged(const fs::path& path, FileEvent event) {
             onFileModified(path);
             break;
         case FileEvent::Erased:
-            //
+            onFileErased(path);
             break;
     }
 }
@@ -173,3 +179,8 @@ recover:
         }
 	}
 }
+
+void AssetRegistry::onFileErased(const fs::path& filepath) {
+
+}
+#endif

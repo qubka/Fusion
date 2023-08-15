@@ -35,7 +35,7 @@ bool PropertyText(const char* name, std::string& value) {
     std::array<char, 256> buffer{};
     std::strncpy(buffer.data(), value.c_str(), sizeof(buffer));
     if (ImGui::InputText("", buffer.data(), sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll)) {
-        value = std::string{buffer.data()};
+        value = std::string{ buffer.data() };
         updated = true;
     }
 
@@ -475,7 +475,7 @@ bool InputText(const char* name, std::string& currentText) {
     DrawItemActivityOutline(2.0f, false);
 
     if (updated)
-        currentText = std::string{buffer.data()};
+        currentText = std::string{ buffer.data() };
 
     ImGui::PopStyleVar();
     ImGui::PopStyleColor();
@@ -501,8 +501,8 @@ void AlternatingRowsBackground(float lineHeight) {
     float scrolledOutLines = glm::floor(yScroll / lineHeight);
     yScroll -= lineHeight * scrolledOutLines;
 
-    ImVec2 clipRectMin{ImGui::GetWindowPos()};
-    ImVec2 clipRectMax{clipRectMin.x + ImGui::GetWindowWidth(), clipRectMin.y + ImGui::GetWindowHeight()};
+    ImVec2 clipRectMin{ ImGui::GetWindowPos() };
+    ImVec2 clipRectMax{ clipRectMin.x + ImGui::GetWindowWidth(), clipRectMin.y + ImGui::GetWindowHeight() };
 
     if (ImGui::GetScrollMaxX() > 0) {
         clipRectMax.y -= style.ScrollbarSize;

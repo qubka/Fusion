@@ -50,14 +50,17 @@ namespace fe {
 
     private:
         void onUpdate() override;
-        void onFileChanged(const fs::path& path, FileEvent event);
 
+#if !FUSION_VIRTUAL_FS
+
+        void onFileChanged(const fs::path& path, FileEvent event);
         void onFileInit(const fs::path& filepath);
         void onFileModified(const fs::path& filepath);
-
-        std::unordered_map<type_index, std::unordered_map<uuids::uuid, std::shared_ptr<Asset>>> assets;
+        void onFileErased(const fs::path& filepath);
 
         std::unique_ptr<FileWatcher> fileWatcher;
+#endif
         std::unique_ptr<AssetDatabase> assetDatabase;
+        std::unordered_map<type_index, std::unordered_map<uuids::uuid, std::shared_ptr<Asset>>> assets;
     };
 }

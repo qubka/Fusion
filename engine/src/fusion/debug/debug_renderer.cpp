@@ -137,8 +137,8 @@ void DebugRenderer::DrawPolygonNDT(gsl::span<const glm::vec3> verts, const glm::
 }
 
 void DebugRenderer::DebugDraw(const AABB& box, const glm::vec4& edgeColour, bool cornersOnly, float width) {
-    glm::vec3 uuu {box.getMax()};
-    glm::vec3 lll {box.getMin()};
+    glm::vec3 uuu{ box.getMax() };
+    glm::vec3 lll{ box.getMin() };
 
     glm::vec3 ull{uuu.x, lll.y, lll.z};
     glm::vec3 uul{uuu.x, uuu.y, lll.z};

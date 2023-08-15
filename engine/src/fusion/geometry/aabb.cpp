@@ -41,8 +41,8 @@ bool AABB::intersects(const Sphere& sphere) const {
     float dmin = 0;
 
     const auto& center = sphere.getCenter();
-    glm::vec3 bmin {getMin()};
-    glm::vec3 bmax {getMax()};
+    glm::vec3 bmin{ getMin() };
+    glm::vec3 bmax{ getMax() };
 
     if (center.x < bmin.x) {
         float d = center.x - bmin.x;
@@ -75,8 +75,8 @@ bool AABB::intersects(const Ray& ray) const {
     if (glm::length2(ray.getDirection()) < FLT_EPSILON)
         return false;
 
-    glm::vec3 min {(getMin() - ray.getOrigin()) / ray.getDirection()};
-    glm::vec3 max {(getMax() - ray.getOrigin()) / ray.getDirection()};
+    glm::vec3 min{ (getMin() - ray.getOrigin()) / ray.getDirection() };
+    glm::vec3 max{ (getMax() - ray.getOrigin()) / ray.getDirection() };
 
     float fmin = glm::max(glm::max(glm::min(min.x, max.x), glm::min(min.y, max.y)), glm::min(min.z, max.z));
     float fmax = glm::min(glm::min(glm::max(min.x, max.x), glm::max(min.y, max.y)), glm::max(min.z, max.z));
@@ -88,8 +88,8 @@ int AABB::intersect(const Ray& ray, float& min, float& max) const {
     if (glm::length2(ray.getDirection()) < FLT_EPSILON)
         return 0;
 
-    glm::vec3 _min {(getMin() - ray.getOrigin()) / ray.getDirection()};
-    glm::vec3 _max {(getMax() - ray.getOrigin()) / ray.getDirection()};
+    glm::vec3 _min{ (getMin() - ray.getOrigin()) / ray.getDirection() };
+    glm::vec3 _max{ (getMax() - ray.getOrigin()) / ray.getDirection() };
 
     float fmin = glm::max(glm::max(glm::min(_min.x, _max.x), glm::min(_min.y, _max.y)), glm::min(_min.z, _max.z));
     float fmax = glm::min(glm::min(glm::max(_min.x, _max.x), glm::max(_min.y, _max.y)), glm::max(_min.z, _max.z));
@@ -115,8 +115,8 @@ void AABB::project(const glm::vec3& normal, float& min, float& max) const {
 }
 
 glm::vec3 AABB::getNegative(const glm::vec3& normal) const {
-    glm::vec3 result {getMin()};
-    glm::vec3 size {getSize()};
+    glm::vec3 result{ getMin() };
+    glm::vec3 size{ getSize() };
 
     if (normal.x < 0)
         result.x += size.x;
@@ -131,8 +131,8 @@ glm::vec3 AABB::getNegative(const glm::vec3& normal) const {
 }
 
 glm::vec3 AABB::getPositive(const glm::vec3& normal) const {
-    glm::vec3 result {getMin()};
-    glm::vec3 size {getSize()};
+    glm::vec3 result{ getMin() };
+    glm::vec3 size{ getSize() };
 
     if (normal.x > 0)
         result.x += size.x;
@@ -147,8 +147,8 @@ glm::vec3 AABB::getPositive(const glm::vec3& normal) const {
 }
 
 float AABB::getDistanceToNearestEdge(const glm::vec3& point) const {
-    glm::vec3 min {getMin()};
-    glm::vec3 max {getMax()};
+    glm::vec3 min{ getMin() };
+    glm::vec3 max{ getMax() };
     
     std::array<glm::vec3, 12> edges = {
         min,

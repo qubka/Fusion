@@ -103,7 +103,7 @@ Rect Rect::inflated(const glm::vec2& amount) const {
 void Rect::scaleCentered(const glm::vec2& scale) {
     const float halfWidth = getWidth() * scale.x / 2.0f;
     const float halfHeight = getHeight() * scale.y / 2.0f;
-    glm::vec2 center {getCenter()};
+    glm::vec2 center{ getCenter() };
     x1 = center.x - halfWidth;
     x2 = center.x + halfWidth;
     y1 = center.y - halfHeight;
@@ -113,7 +113,7 @@ void Rect::scaleCentered(const glm::vec2& scale) {
 void Rect::scaleCentered(float scale) {
     const float halfWidth = getWidth() * scale / 2;
     const float halfHeight = getHeight() * scale / 2;
-    glm::vec2 center {getCenter()};
+    glm::vec2 center{ getCenter() };
     x1 = center.x - halfWidth;
     x2 = center.x + halfWidth;
     y1 = center.y - halfHeight;
@@ -123,14 +123,14 @@ void Rect::scaleCentered(float scale) {
 Rect Rect::scaledCentered(const glm::vec2& scale) const {
     const float halfWidth = getWidth() * scale.x / 2;
     const float halfHeight = getHeight() * scale.y / 2;
-    glm::vec2 center {getCenter()};
+    glm::vec2 center{ getCenter() };
     return { center.x - halfWidth, center.y - halfHeight, center.x + halfWidth, center.y + halfHeight };
 }
 
 Rect Rect::scaledCentered(float scale) const {
     const float halfWidth = getWidth() * scale / 2;
     const float halfHeight = getHeight() * scale / 2;
-    glm::vec2 center {getCenter()};
+    glm::vec2 center{ getCenter() };
     return { center.x - halfWidth, center.y - halfHeight, center.x + halfWidth, center.y + halfHeight };
 }
 
