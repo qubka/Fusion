@@ -10,9 +10,12 @@
 
 using namespace fe;
 
+FileSystem* FileSystem::Instance = nullptr;
+
 FileSystem::FileSystem() {
+    Instance = this;
 #if FUSION_VIRTUAL_FS
-#if FUSION_PLATFORM_ANDROID
+    #if FUSION_PLATFORM_ANDROID
     vfs = std::make_unique<android::VirtualFileSystem>();
 #elif FUSION_PLATFORM_LINUX || FUSION_PLATFORM_WINDOWS || FUSION_PLATFORM_APPLE
     vfs = std::make_unique<pc::VirtualFileSystem>();
@@ -23,11 +26,24 @@ FileSystem::FileSystem() {
 }
 
 FileSystem::~FileSystem() {
+    Instance = nullptr;
+}
+
+void FileSystem::onStart() {
+
+}
+
+void FileSystem::onUpdate() {
+
+}
+
+void FileSystem::onStop() {
+
 }
 
 void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler) {
 #if FUSION_VIRTUAL_FS
-        ModuleInstance->vfs->readBytes(filepath, handler);
+        Instance->vfs->readBytes(filepath, handler);
 #else
         std::ifstream is{filepath, std::ios::binary};
 
@@ -54,7 +70,7 @@ void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gs
 
 std::string FileSystem::ReadText(const fs::path& filepath) {
 #if FUSION_VIRTUAL_FS
-        return ModuleInstance->vfs->readText(filepath);
+        return Instance->vfs->readText(filepath);
 #else
         std::ifstream is{filepath, std::ios::binary};
 
@@ -72,7 +88,7 @@ std::string FileSystem::ReadText(const fs::path& filepath) {
 
 bool FileSystem::WriteBytes(const fs::path& filepath, gsl::span<const std::byte> buffer) {
 #if FUSION_VIRTUAL_FS
-        return ModuleInstance->vfs->writeBytes(filepath, buffer);
+        return Instance->vfs->writeBytes(filepath, buffer);
 #else
         std::ofstream os{filepath, std::ios::binary};
         os.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
@@ -82,7 +98,7 @@ bool FileSystem::WriteBytes(const fs::path& filepath, gsl::span<const std::byte>
 
 bool FileSystem::WriteText(const fs::path& filepath, std::string_view text) {
 #if FUSION_VIRTUAL_FS
-        return ModuleInstance->vfs->writeText(filepath, text);
+        return Instance->vfs->writeText(filepath, text);
 #else
         std::ofstream os{filepath, std::ios::binary};
         os.write(text.data(), text.size());
@@ -96,7 +112,7 @@ std::string FileSystem::GetExtension(const fs::path& filepath) {
 
 bool FileSystem::IsExists(const fs::path& filepath) {
 #if FUSION_VIRTUAL_FS
-        return ModuleInstance->vfs->isExists(filepath);
+        return Instance->vfs->isExists(filepath);
 #else
         return fs::exists(filepath);
 #endif
@@ -104,7 +120,7 @@ bool FileSystem::IsExists(const fs::path& filepath) {
 
 bool FileSystem::IsDirectory(const fs::path& filepath) {
 #if FUSION_VIRTUAL_FS
-        return ModuleInstance->vfs->isDirectory(filepath);
+        return Instance->vfs->isDirectory(filepath);
 #else
         return fs::is_directory(filepath);
 #endif
@@ -112,7 +128,7 @@ bool FileSystem::IsDirectory(const fs::path& filepath) {
 
 std::vector<fs::path> FileSystem::GetFiles(const fs::path& root, bool recursive, std::string_view ext) {
 #if FUSION_VIRTUAL_FS
-        return ModuleInstance->vfs->getFiles(root, recursive, ext);
+        return Instance->vfs->getFiles(root, recursive, ext);
 #else
         std::vector<fs::path> paths;
 

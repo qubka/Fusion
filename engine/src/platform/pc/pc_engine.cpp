@@ -11,17 +11,7 @@ int32_t Engine::run() {
         startup();
         running = true;
         while (running) {
-            // Pre-Update
-            updateStage(Module::Stage::Pre);
-
-            // Main application and devices processing
             updateMain();
-
-            // Post-Update
-            updateStage(Module::Stage::Post);
-			
-            // Render-Update
-            updateStage(Module::Stage::Render);
         }
         shutdown();
     }

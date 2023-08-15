@@ -3,13 +3,6 @@
 #include "time.h"
 
 #include "fusion/devices/device_manager.h"
-#include "fusion/graphics/graphics.h"
-#include "fusion/filesystem/file_system.h"
-#include "fusion/scene/scene_manager.h"
-#include "fusion/assets/asset_registry.h"
-#include "fusion/input/input.h"
-#include "fusion/debug/debug_renderer.h"
-#include "fusion/scripting/script_engine.h"
 
 #include "fusion/bitmaps/gli_toolbox.h"
 #include "fusion/bitmaps/stb_toolbox.h"
@@ -36,55 +29,30 @@ Engine::Engine(CommandLineArgs&& args)
 
 Engine::~Engine() {
     application.reset();
-    // Destroy modules in reverse order of insertion
-    for (auto it = modules.rbegin(); it != modules.rend(); ++it) {
-        it->reset();
-    }
+    moduleHolder.reset();
     devices.reset();
     logger.reset();
     Instance = nullptr;
 }
 
 void Engine::init() {
-    Time::Register("Time", Module::Stage::Pre);
-    FileSystem::Register("FileSystem", Module::Stage::Never);
-    Input::Register("Input", Module::Stage::Post);
-    Graphics::Register("Graphics", Module::Stage::Render);
-    SceneManager::Register("SceneManager", Module::Stage::Post);
-    AssetRegistry::Register("AssetRegistry", Module::Stage::Post);
-    DebugRenderer::Register("DebugRenderer", Module::Stage::Render);
-#if FUSION_SCRIPTING
-    ScriptEngine::Register("ScriptEngine", Module::Stage::Never);
-#endif
-
     StbToolbox::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
     GliToolbox::Register(".ktx", ".kmg", ".dds");
 
-    // Create all registered modules
-    for (const auto& [type, module] : Module::Registry()) {
-        auto index = static_cast<uint32_t>(modules.size());
-        modules.push_back(module.create());
-        stages[me::enum_integer(module.stage)].push_back(index);
-        FE_LOG_DEBUG("Module: '{}' was registered for the '{}' stage", module.name, me::enum_name(module.stage));
-    }
+    moduleHolder = std::make_unique<ModuleHolder>();
 }
 
 void Engine::startup() {
-    if (!devices->started) {
-        devices->onStart();
-        devices->started = true;
-    }
-
     if (application && !application->started) {
         application->onStart();
         application->started = true;
     }
 
-    for (auto& module : modules) {
-        if (!module->started) {
-            module->onStart();
-            module->started = true;
-        }
+    moduleHolder->startModules();
+
+    if (!devices->started) {
+        devices->onStart();
+        devices->started = true;
     }
 
     started = true;
@@ -92,28 +60,25 @@ void Engine::startup() {
 
 void Engine::shutdown() {
 	running = false;
-	
-    for (auto& module : modules) {
-        if (module->started) {
-            module->started = false;
-            module->onStop();
-        }
-    }
-
-    if (application && application->started) {
-        application->started = false;
-        application->onStop();
-    }
 
     if (devices->started) {
         devices->started = false;
         devices->onStop();
     }
 
+    moduleHolder->stopModules();
+
+    if (application && application->started) {
+        application->started = false;
+        application->onStop();
+    }
+
     started = false;
 }
 
 void Engine::updateMain() {
+    moduleHolder->updateModules<ModuleBase::Stage::Pre>();
+
     devices->onUpdate();
     if (application) {
         if (!application->started) {
@@ -122,9 +87,8 @@ void Engine::updateMain() {
         }
         application->onUpdate();
     }
-}
 
-void Engine::updateStage(Module::Stage stage) {
-    for (auto index : stages[me::enum_integer(stage)])
-        modules[index]->onUpdate();
+    moduleHolder->updateModules<ModuleBase::Stage::Post>();
+
+    moduleHolder->updateModules<ModuleBase::Stage::Render>();
 }

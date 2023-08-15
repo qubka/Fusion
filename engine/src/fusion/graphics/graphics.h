@@ -24,13 +24,19 @@ namespace tracy {
 }
 
 namespace fe {
+    template<typename T>
+    class Module;
     /**
      * @brief Module that manages the Vulkan's graphics context.
      */
-    class FUSION_API Graphics : public Module::Registrar<Graphics> {
-    public:
+    class FUSION_API Graphics {
+        friend class Module<Graphics>;
+    private:
         Graphics();
-        ~Graphics() override;
+        ~Graphics();
+
+    public:
+        static Graphics* Get() { return Instance; }
 
         /**
          * Gets the current renderer.
@@ -70,9 +76,9 @@ namespace fe {
         void captureScreenshot(const fs::path& filepath, size_t id = 0) const;
 
     private:
-        void onStart() override;
-        void onUpdate() override;
-        void onStop() override;
+        void onStart();
+        void onUpdate();
+        void onStop();
 
         struct FrameInfo {
             const size_t& id;
@@ -137,5 +143,7 @@ namespace fe {
 #endif
         };
         std::vector<std::unique_ptr<PerSurfaceBuffers>> perSurfaceBuffers;
+
+        static Graphics* Instance;
     };
 }

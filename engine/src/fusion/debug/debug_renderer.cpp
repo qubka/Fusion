@@ -9,9 +9,19 @@
 
 using namespace fe;
 
+DebugRenderer* DebugRenderer::Instance = nullptr;
+
+DebugRenderer::DebugRenderer() {
+    Instance = this;
+}
+
+DebugRenderer::~DebugRenderer() {
+    Instance = nullptr;
+}
+
 // Draw Point (circle)
 void DebugRenderer::GenDrawPoint(bool ndt, const glm::vec3& pos, float pointRadius, const glm::vec4& color) {
-    auto& points = ndt ? ModuleInstance->drawListNDT.points : ModuleInstance->drawList.points;
+    auto& points = ndt ? Instance->drawListNDT.points : Instance->drawList.points;
     points.emplace_back(pos, color, pointRadius);
     points.emplace_back(pos, color, pointRadius);
 }
@@ -34,7 +44,7 @@ void DebugRenderer::DrawPointNDT(const glm::vec3& pos, float pointRadius, const 
 
 // Draw Line with a given thickness
 void DebugRenderer::GenDrawThickLine(bool ndt, const glm::vec3& start, const glm::vec3& end, float lineWidth, const glm::vec4& color) {
-    auto& thickLines = ndt ? ModuleInstance->drawListNDT.thickLines : ModuleInstance->drawList.thickLines;
+    auto& thickLines = ndt ? Instance->drawListNDT.thickLines : Instance->drawList.thickLines;
     thickLines.emplace_back(start, color);
     thickLines.emplace_back(end, color);
 }
@@ -57,7 +67,7 @@ void DebugRenderer::DrawThickLineNDT(const glm::vec3& start, const glm::vec3& en
 
 // Draw line with thickness of 1 screen pixel regardless of distance from camera
 void DebugRenderer::GenDrawHairLine(bool ndt, const glm::vec3& start, const glm::vec3& end, const glm::vec4& color) {
-    auto& lines = ndt ? ModuleInstance->drawListNDT.lines : ModuleInstance->drawList.lines;
+    auto& lines = ndt ? Instance->drawListNDT.lines : Instance->drawList.lines;
     lines.emplace_back(start, color);
     lines.emplace_back(end, color);
 }
@@ -109,7 +119,7 @@ void DebugRenderer::DrawMatrixNDT(const glm::mat3& mtx, const glm::vec3& positio
 
 // Draw Triangle
 void DebugRenderer::GenDrawTriangle(bool ndt, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec4& color) {
-    auto& triangles = ndt ? ModuleInstance->drawListNDT.triangles : ModuleInstance->drawList.triangles;
+    auto& triangles = ndt ? Instance->drawListNDT.triangles : Instance->drawList.triangles;
     triangles.emplace_back(v0, color);
     triangles.emplace_back(v1, color);
     triangles.emplace_back(v2, color);
@@ -340,7 +350,13 @@ void DebugRenderer::DebugDraw(const Ray& ray, const glm::vec4& color, float dist
     DrawHairLine(ray.getOrigin(), ray.getPoint(distance), color);
 }
 
+void DebugRenderer::onStart() {
+}
+
 void DebugRenderer::onUpdate() {
     drawList.clear();
     drawListNDT.clear();
+}
+
+void DebugRenderer::onStop() {
 }

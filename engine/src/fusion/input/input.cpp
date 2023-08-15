@@ -6,6 +6,16 @@
 
 using namespace fe;
 
+Input* Input::Instance = nullptr;
+
+Input::Input() {
+    Instance = this;
+}
+
+Input::~Input() {
+    Instance = nullptr;
+}
+
 void Input::onStart() {
     // Set the window events callbacks.
     auto window = DeviceManager::Get()->getWindow(0);
@@ -20,6 +30,9 @@ void Input::onStart() {
 void Input::onUpdate() {
     mousePositionDelta = vec3::zero;
     mouseScroll = vec3::zero;
+}
+
+void Input::onStop() {
 }
 
 bool Input::getKey(Key key) {

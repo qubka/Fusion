@@ -193,10 +193,17 @@ namespace fe {
     class ScriptComponent;
     using ScriptFieldMap = fst::unordered_flatmap<std::string, ScriptFieldInstance>;
 
-    class FUSION_API ScriptEngine : public Module::Registrar<ScriptEngine> {
-    public:
+    template<typename T>
+    class Module;
+
+    class FUSION_API ScriptEngine {
+        friend class Module<ScriptEngine>;
+    private:
         ScriptEngine();
-        ~ScriptEngine() override = default;
+        ~ScriptEngine();
+
+    public:
+        static ScriptEngine* Get() { return Instance; }
 
         bool loadCoreAssembly(const fs::path& filepath);
         bool loadAppAssembly(const fs::path& filepath);
@@ -221,9 +228,9 @@ namespace fe {
         MonoString* createString(const char* string);
 
     private:
-        void onStart() override {};
-        void onUpdate() override {};
-        void onStop() override;
+        void onStart();
+        void onUpdate();
+        void onStop();
 
         void initMono();
         void shutdownMono();
@@ -264,6 +271,7 @@ namespace fe {
         bool enableDebugging{ false };
 #endif
 
+        static ScriptEngine* Instance;
     };
 }
 

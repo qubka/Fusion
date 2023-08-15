@@ -20,7 +20,11 @@
 
 using namespace fe;
 
+Graphics* Graphics::Instance = nullptr;
+
 Graphics::Graphics() : elapsedPurge{5s} {
+    Instance = this;
+
     /*for (auto& window : DeviceManager::Get()->getWindows()) {
         onWindowCreate(window.get(), true);
     }*/
@@ -31,6 +35,8 @@ Graphics::Graphics() : elapsedPurge{5s} {
 }
 
 Graphics::~Graphics() {
+    Instance = nullptr;
+
     auto graphicsQueue = logicalDevice.getGraphicsQueue();
 
     swapchains.clear();

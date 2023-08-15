@@ -6,13 +6,20 @@
 #include "fusion/filesystem/file_watcher.h"
 
 namespace fe {
+    template<typename T>
+    class Module;
+
     /**
      * @brief Module used for managing assets.
      */
-    class FUSION_API AssetRegistry : public Module::Registrar<AssetRegistry> {
-    public:
+    class FUSION_API AssetRegistry {
+        friend class Module<AssetRegistry>;
+    private:
         AssetRegistry();
-        ~AssetRegistry() override;
+        ~AssetRegistry();
+
+    public:
+        static AssetRegistry* Get() { return Instance; }
 
         template<typename T, typename = std::enable_if_t<std::is_base_of_v<Asset, T>>>
         std::shared_ptr<T> get(uuids::uuid uuid) const {
@@ -49,7 +56,9 @@ namespace fe {
         void releaseAll();
 
     private:
-        void onUpdate() override;
+        void onStart();
+        void onUpdate();
+        void onStop();
 
 #if !FUSION_VIRTUAL_FS
 
@@ -62,5 +71,7 @@ namespace fe {
 #endif
         std::unique_ptr<AssetDatabase> assetDatabase;
         std::unordered_map<type_index, std::unordered_map<uuids::uuid, std::shared_ptr<Asset>>> assets;
+
+        static AssetRegistry* Instance;
     };
 }

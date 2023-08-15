@@ -93,20 +93,9 @@ int32_t Engine::run() {
         }
 
         if (app->destroyRequested != 0)
-            break
+            break;
 
-		// Pre-Update
-		updateStage(Module::Stage::Pre);
-
-		// Main application and devices processing
-        HandleInputEvents(app); // TODO: Move to deviceManager
 		updateMain();
-
-		// Post-Update
-		updateStage(Module::Stage::Post);
-
-		// Render-Update
-		updateStage(Module::Stage::Render);
     }
     shutdown();
     return 0;

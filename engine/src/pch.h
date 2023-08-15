@@ -82,5 +82,4 @@ using Random = effolkronium::random_static;
 
 // TEMP ?
 #include "fusion/input/codes.h"
-#include "fusion/core/module.h"
 #include "fusion/core/time.h"

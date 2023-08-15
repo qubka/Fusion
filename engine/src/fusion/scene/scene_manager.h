@@ -3,13 +3,19 @@
 #include "fusion/scene/scene.h"
 
 namespace fe {
+    template<typename T>
+    class Module;
     /**
      * @brief Module used for managing game scenes.
      */
-    class FUSION_API SceneManager : public Module::Registrar<SceneManager> {
+    class FUSION_API SceneManager {
+        friend class Module<SceneManager>;
+    private:
+        SceneManager();
+        ~SceneManager();
+
     public:
-        SceneManager() = default;
-        ~SceneManager() override;
+        static SceneManager* Get() { return Instance; }
 
         /**
          * Gets the current scene.
@@ -27,11 +33,16 @@ namespace fe {
         bool loadCachedScene();
 
     private:
-        void onStart() override;
-        void onUpdate() override;
+        void onStart();
+        void onUpdate();
+        void onStop();
+
+
         void onWindowResize(const glm::uvec2& size);
 
         std::unique_ptr<Scene> scene;
         std::unique_ptr<Scene> sceneCached;
+
+        static SceneManager* Instance;
     };
 }

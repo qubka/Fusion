@@ -7,10 +7,17 @@ namespace fe {
     class Sphere;
     class LightComponent;
 
-    class FUSION_API DebugRenderer : public Module::Registrar<DebugRenderer> {
+    template<typename T>
+    class Module;
+
+    class FUSION_API DebugRenderer {
+        friend class Module<DebugRenderer>;
+    private:
+        DebugRenderer();
+        ~DebugRenderer();
+
     public:
-        DebugRenderer() = default;
-        ~DebugRenderer() override = default;
+        static DebugRenderer* Get() { return Instance; }
 
         // Draw Point (circle)
         static void DrawPoint(const glm::vec3& pos, float pointRadius, const glm::vec3& color);
@@ -95,7 +102,9 @@ namespace fe {
         const std::vector<DrawSpatialVertex>& getPoints(bool depthTested = false) const { return depthTested ? drawList.points : drawListNDT.points; }
 
     private:
-        void onUpdate() override;
+        void onStart();
+        void onUpdate();
+        void onStop();
 
         // Actual functions managing data parsing to save code bloat - called by public functions
         static void GenDrawPoint(bool ndt, const glm::vec3& pos, float pointRadius, const glm::vec4& color);
@@ -119,5 +128,7 @@ namespace fe {
 
         DrawList drawList;
         DrawList drawListNDT;
+
+        static DebugRenderer* Instance;
     };
 }

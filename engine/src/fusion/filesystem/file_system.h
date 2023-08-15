@@ -4,12 +4,17 @@ namespace fe {
     inline fs::path operator""_p(const char* str, size_t len) { return fs::path{std::string_view{str, len}}; }
 
     class VirtualFileSystem;
-    
-    class FUSION_API FileSystem : public Module::Registrar<FileSystem> {
-    public:
-        FileSystem();
-        ~FileSystem() override;
 
+    template<typename T>
+    class Module;
+
+    class FUSION_API FileSystem {
+        friend class Module<FileSystem>;
+    private:
+        FileSystem();
+        ~FileSystem();
+
+    public:
         /**
          * Reads a file found by real or partial path with a lambda.
          * @param filepath The path to read.
@@ -71,8 +76,15 @@ namespace fe {
         static std::vector<fs::path> GetFiles(const fs::path& root, bool recursive = false, std::string_view ext = "");
 
     private:
+        void onStart();
+        void onUpdate();
+        void onStop();
+
+
 #if FUSION_VIRTUAL_FS
         std::unique_ptr<VirtualFileSystem> vfs;
 #endif
+
+        static FileSystem* Instance;
     };
 }

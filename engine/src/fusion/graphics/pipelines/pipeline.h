@@ -11,7 +11,7 @@ namespace fe {
     class FUSION_API Pipeline {
     public:
         /**
-         * Represents position in the render structure, first value being the renderpass and second for subpass.
+         * @brief Represents position in the render structure, first value being the renderpass and second for subpass.
          */
         using Stage = std::pair<uint32_t, uint32_t>;
 

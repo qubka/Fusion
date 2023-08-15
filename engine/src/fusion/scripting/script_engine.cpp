@@ -8,7 +8,6 @@
 #include "fusion/scene/scene.h"
 #include "fusion/scene/components.h"
 #include "fusion/scene/scene_manager.h"
-#include "fusion/core/module.h"
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
@@ -114,10 +113,24 @@ namespace Utils {
     }
 }*/
 
+ScriptEngine* ScriptEngine::Instance = nullptr;
+
 ScriptEngine::ScriptEngine() {
+    Instance = this;
+
     initMono();
 
     ScriptGlue::RegisterFunctions();
+}
+
+ScriptEngine::~ScriptEngine() {
+    Instance = nullptr;
+}
+
+void ScriptEngine::onStart(){
+}
+
+void ScriptEngine::onUpdate() {
 }
 
 void ScriptEngine::onStop() {

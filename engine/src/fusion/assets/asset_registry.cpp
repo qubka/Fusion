@@ -4,11 +4,14 @@
 
 using namespace fe;
 
-AssetRegistry::AssetRegistry() {
+AssetRegistry* AssetRegistry::Instance = nullptr;
 
+AssetRegistry::AssetRegistry() {
+    Instance = this;
 }
 
 AssetRegistry::~AssetRegistry() {
+    Instance = nullptr;
 }
 
 void AssetRegistry::releaseAll() {
@@ -29,11 +32,17 @@ void AssetRegistry::releaseAll() {
 #endif
 }
 
+void AssetRegistry::onStart() {
+}
+
 void AssetRegistry::onUpdate() {
 #if !FUSION_VIRTUAL_FS
     if (fileWatcher)
         fileWatcher->update();
 #endif
+}
+
+void AssetRegistry::onStop() {
 }
 
 #if !FUSION_VIRTUAL_FS

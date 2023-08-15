@@ -3,11 +3,18 @@
 #include "codes.h"
 
 namespace fe {
+    template<typename T>
+    class Module;
+
     // if you want use individual inputs, not called init here, use BaseInput's classes
-    class FUSION_API Input : public Module::Registrar<Input>{
+    class FUSION_API Input {
+        friend class Module<Input>;
+    private:
+        Input();
+        ~Input();
+
     public:
-        Input() = default;
-        ~Input() override = default;
+        static Input* Get() { return Instance; }
 
         //! Returns true while the user holds down the key identified by GLFW code.
         bool getKey(Key key);
@@ -31,8 +38,9 @@ namespace fe {
         const glm::vec2& getMouseScroll() const { return mouseScroll; }
 
     private:
-        void onStart() override;
-        void onUpdate() override;
+        void onStart();
+        void onUpdate();
+        void onStop();
 
         void onMouseButton(MouseButton button, InputAction action, bitmask::bitmask<InputMod> mods);
         void onMouseMotion(const glm::vec2& pos);
@@ -49,5 +57,7 @@ namespace fe {
         glm::vec2 mousePosition{ 0.0f };
         glm::vec2 mousePositionDelta{ 0.0f };
         glm::vec2 mouseScroll{ 0.0f };
+
+        static Input* Instance;
     };
 }

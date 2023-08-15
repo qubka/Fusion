@@ -1,11 +1,17 @@
 #include "scene_manager.h"
 
-#include "fusion/devices/device_manager.h"
+//#include "fusion/devices/device_manager.h"
 
 using namespace fe;
 
+SceneManager* SceneManager::Instance = nullptr;
+
+SceneManager::SceneManager() {
+    Instance = this;
+}
+
 SceneManager::~SceneManager() {
-    //if (started) DeviceManager::Get()->getWindow(0)->OnResize().connect<&SceneManager::onWindowResize>(this);
+    Instance = nullptr;
 }
 
 void SceneManager::onStart() {
@@ -25,6 +31,11 @@ void SceneManager::onUpdate() {
     }
 
     scene->onUpdate();
+}
+
+void SceneManager::onStop() {
+    //DeviceManager::Get()->getWindow(0)->OnResize().disconnect<&SceneManager::onWindowResize>(this);
+    // TODO: Delete hook ?
 }
 
 void SceneManager::onWindowResize(const glm::uvec2& size) {

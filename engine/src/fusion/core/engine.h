@@ -2,11 +2,11 @@
 
 #include "version.h"
 #include "command_line.h"
-#include "module.h"
 #include "application.h"
 
 namespace fe {
     class DeviceManager;
+    class ModuleHolder;
     class FUSION_API Engine {
     protected:
         /**
@@ -100,22 +100,15 @@ namespace fe {
          */
         void updateMain();
 
-        /**
-         * The update engine modules for the required stage.
-         */
-        void updateStage(Module::Stage stage);
-
         CommandLineArgs commandLineArgs;
         CommandLineParser commandLineParser;
 
         Version version;
 
-        std::unique_ptr<Application> application;
-        std::unique_ptr<DeviceManager> devices;
         std::unique_ptr<Log> logger;
-
-        std::vector<std::unique_ptr<Module>> modules;
-        std::array<std::vector<uint32_t>, me::enum_count<Module::Stage>()> stages;
+        std::unique_ptr<DeviceManager> devices;
+        std::unique_ptr<Application> application;
+        std::unique_ptr<ModuleHolder> moduleHolder;
 
         bool running{ false };
         bool started{ false };

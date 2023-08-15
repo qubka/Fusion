@@ -1,91 +1,119 @@
 #pragma once
 
+#include "fusion/assets/asset_registry.h"
+#include "fusion/core/time.h"
+#include "fusion/debug/debug_renderer.h"
+#include "fusion/filesystem/file_system.h"
+#include "fusion/graphics/graphics.h"
+#include "fusion/input/input.h"
+#include "fusion/scene/scene_manager.h"
+#include "fusion/scripting/script_engine.h"
+
 namespace fe {
-    template<typename Base>
-    /**
-     * https://accu.org/journals/overload/6/27/bellingham_597/
-     */
-    class FUSION_API ModuleFactory {
-    public:
-        struct TCreateValue {
-            std::function<std::unique_ptr<Base>()> create;
-            std::string_view name;
-            typename Base::Stage stage;
-        };
-        using TRegistryMap = fst::unordered_flatmap<type_index, TCreateValue>;
-
-        //ModuleFactory() = default;
-        virtual ~ModuleFactory() = default;
-
-        static TRegistryMap& Registry() {
-            static TRegistryMap map;
-            return map;
-        }
-
-        template<typename T>
-        class FUSION_API Registrar : public Base {
-        public:
-            /**
-             * Gets the engines instance.
-             * @return The current module instance.
-             */
-            static T* Get() { return ModuleInstance; }
-
-            /**
-             * Creates a new module singleton instance and registers into the module registry map.
-             * @param name Module name string for debugging purpose.
-             * @tparam Args Modules that will be initialized before this module.
-             * @return A dummy value in static initialization.
-             */
-            template<typename ... Args>
-            static bool Register(std::string_view name, typename Base::Stage stage) {
-
-                // Then, add the module
-                ModuleFactory::Registry().emplace(type_id<T>, TCreateValue{ []() {
-                    ModuleInstance = new T();
-                    return std::unique_ptr<Base>(ModuleInstance);
-                }, name, stage});
-
-                return true;
-            }
-
-        protected:
-            inline static T* ModuleInstance = nullptr;
-        };
+    struct ModuleBase {
+        /**
+         * @brief Represents the stage where the module will be updated in the engine.
+         */
+        enum class Stage : unsigned char { Never, Pre, /*Main,*/ Post, Render };
     };
 
     /**
      * @brief A interface used for defining engine modules.
      */
-    class FUSION_API Module : public ModuleFactory<Module> {
-        friend class Engine;
-    public:
-        /**
-         * @brief Represents the stage where the module will be updated in the engine.
-         */
-        enum class Stage : unsigned char { Never, Pre, /*Main,*/ Post, Render };
-
+    template<typename ModuleImpl>
+    class Module : public ModuleBase {
+        friend class ModuleHolder;
+    private:
         Module() = default;
-        ~Module() override = default;
+        ~Module() = default;
         NONCOPYABLE(Module);
 
-    protected:
         /**
          * The start function for the module.
          */
-        virtual void onStart() {};
+        void onStart() { moduleImpl.onStart(); };
 
         /**
          * The update function for the module.
          */
-        virtual void onUpdate() {};
+        void onUpdate() { moduleImpl.onUpdate(); };
 
         /**
          * The stop function for the module.
          */
-        virtual void onStop() {};
+        void onStop() { moduleImpl.onStop(); };
 
     private:
+        ModuleImpl moduleImpl;
         bool started{ false };
+    };
+
+    class ModuleHolder {
+        //friend class Engine;
+    public:
+        ModuleHolder() = default;
+        ~ModuleHolder() = default;
+        NONCOPYABLE(ModuleHolder);
+
+#define ALL_MODULES Time, Input, AssetRegistry, DebugRenderer, FileSystem, Graphics, SceneManager, ScriptEngine
+
+#define PRE_MODULES Time
+#define POST_MODULES Input, SceneManager, AssetRegistry
+#define RENDER_MODULES Graphics, DebugRenderer
+
+    public:
+        void startModules() {
+            startModules(ALL_MODULES);
+        }
+
+        template<ModuleBase::Stage S>
+        void updateModules() {
+            if constexpr (S == ModuleBase::Stage::Pre)
+                updateModules(PRE_MODULES);
+            else if constexpr (S == ModuleBase::Stage::Post)
+                updateModules(POST_MODULES);
+            else if constexpr (S == ModuleBase::Stage::Render)
+                updateModules(RENDER_MODULES);
+        }
+
+        void stopModules() {
+            stopModules(ALL_MODULES);
+        }
+
+    private:
+        template<typename... Args>
+        void startModules(Args&&...modules) {
+            ([&]() {
+                modules.onStart();
+                modules.started = true;
+            }(), ...);
+        }
+
+        template<typename... Args>
+        void updateModules(Args&&...modules) {
+            ([&]() {
+                modules.onUpdate();
+            }(), ...);
+        }
+
+        template<typename... Args>
+        void stopModules(Args&&...modules) {
+            ([&]() {
+                modules.started = false;
+                modules.onStop();
+            }(), ...);
+        }
+
+    private:
+        Module<Time> Time;
+        Module<Input> Input;
+        Module<AssetRegistry> AssetRegistry;
+        Module<DebugRenderer> DebugRenderer;
+        Module<FileSystem> FileSystem;
+        Module<Graphics> Graphics;
+        Module<SceneManager> SceneManager;
+#if FUSION_SCRIPTING
+        Module<ScriptEngine> ScriptEngine;
+#endif
     };
 }
