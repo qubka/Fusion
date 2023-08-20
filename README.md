@@ -83,5 +83,4 @@ The final build of the game engine, the editor application and the source code a
 report. To run the editor application, simply execute the "editor.exe" file located in the 
 "EditorBuild/editor" directory. To run the game engine sample app, simply execute the "sandbox.exe" file 
 located in the "SandboxBuild/game" directory. To upload all submodules for the sourcecode to compile 
-the project. Execute command in the command prompt: "git submodule update --init --
-recursive"
+the project. Execute command in the command prompt: "git submodule update --init --recursive"
