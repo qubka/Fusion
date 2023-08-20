@@ -27,7 +27,7 @@ namespace fe {
         }
     };
 
-    class FUSION_API Model : public Asset {
+    class FUSION_API Model final : public Asset {
     public:
         // aiProcess_Triangulate by default
         Model() = default;
@@ -61,7 +61,7 @@ namespace fe {
         //void processCamera(const aiScene* scene, const aiNode* node, const aiCamera* camera);
 
         //std::vector<std::shared_ptr<Texture2d>> loadTextures(const aiMaterial* material, int type);
-        void appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t vertexIndex);
+        void appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t vertexIndex);
 
         //static aiScene GenerateScene(const Mesh& mesh);
 

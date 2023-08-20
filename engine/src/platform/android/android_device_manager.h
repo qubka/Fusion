@@ -3,7 +3,7 @@
 #include "fusion/devices/device_manager.h"
 
 namespace  fe::android {
-    class FUSION_API DeviceManager : public fe::DeviceManager {
+    class FUSION_API DeviceManager final : public fe::DeviceManager {
         friend class Engine;
     public:
         DeviceManager();

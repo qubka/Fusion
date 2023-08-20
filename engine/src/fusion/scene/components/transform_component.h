@@ -3,7 +3,7 @@
 #include "fusion/geometry/transform.h"
 
 namespace fe {
-    struct TransformComponent : public Transform {
+    struct TransformComponent final : public Transform {
         TransformComponent() = default;
         TransformComponent(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale)
             : Transform{position, rotation, scale} {

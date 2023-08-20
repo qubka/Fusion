@@ -47,7 +47,7 @@ std::unique_ptr<Bitmap> Image::getBitmap(uint32_t mipLevel, uint32_t arrayLayer)
     VkSubresourceLayout dstSubresourceLayout;
     vkGetImageSubresourceLayout(logicalDevice, dstImage, &dstImageSubresource, &dstSubresourceLayout);
 
-    auto bitmap = std::make_unique<Bitmap>(std::make_unique<std::byte[]>(dstSubresourceLayout.size), size, format);
+    auto bitmap = std::make_unique<Bitmap>(std::make_unique<uint8_t[]>(dstSubresourceLayout.size), size, format);
 
     void* data;
     vkMapMemory(logicalDevice, dstImageMemory, dstSubresourceLayout.offset, dstSubresourceLayout.size, 0, &data);

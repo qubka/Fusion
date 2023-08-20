@@ -96,21 +96,42 @@ namespace fe {
             }
         };
 
-        const std::vector<DrawVertex>& getTriangles(bool depthTested = false) const { return (depthTested ? drawList.triangles : drawListNDT.triangles); }
-        const std::vector<DrawVertex>& getLines(bool depthTested = false) const { return depthTested ? drawList.lines : drawListNDT.lines; }
-        const std::vector<DrawVertex>& getThickLines(bool depthTested = false) const { return depthTested ? drawList.thickLines : drawListNDT.thickLines; }
-        const std::vector<DrawSpatialVertex>& getPoints(bool depthTested = false) const { return depthTested ? drawList.points : drawListNDT.points; }
+        const std::vector<DrawVertex>& getTriangles(bool depthTested = false) const { return drawLists[!depthTested].triangles; }
+        const std::vector<DrawVertex>& getLines(bool depthTested = false) const { return drawLists[!depthTested].lines; }
+        const std::vector<DrawVertex>& getThickLines(bool depthTested = false) const { return drawLists[!depthTested].thickLines; }
+        const std::vector<DrawSpatialVertex>& getPoints(bool depthTested = false) const { return drawLists[!depthTested].points; }
 
     private:
         void onStart();
         void onUpdate();
         void onStop();
 
-        // Actual functions managing data parsing to save code bloat - called by public functions
-        static void GenDrawPoint(bool ndt, const glm::vec3& pos, float pointRadius, const glm::vec4& color);
-        static void GenDrawThickLine(bool ndt, const glm::vec3& start, const glm::vec3& end, float lineWidth, const glm::vec4& color);
-        static void GenDrawHairLine(bool ndt, const glm::vec3& start, const glm::vec3& end, const glm::vec4& color);
-        static void GenDrawTriangle(bool ndt, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec4& color);
+        template<bool NDT>
+        static void GenDrawPoint(const glm::vec3& pos, float pointRadius, const glm::vec4& color) {
+            auto& points = Instance->drawLists[NDT].points;
+            points.emplace_back(pos, color, pointRadius);
+            points.emplace_back(pos, color, pointRadius);
+        }
+        template<bool NDT>
+        static void GenDrawThickLine(const glm::vec3& start, const glm::vec3& end, float lineWidth, const glm::vec4& color) {
+            auto& thickLines = Instance->drawLists[NDT].thickLines;
+            thickLines.emplace_back(start, color);
+            thickLines.emplace_back(end, color);
+        }
+        template<bool NDT>
+        static void GenDrawHairLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color) {
+            auto& lines = Instance->drawLists[NDT].lines;
+            lines.emplace_back(start, color);
+            lines.emplace_back(end, color);
+        }
+
+        template<bool NDT>
+        static void GenDrawTriangle(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec4& color) {
+            auto& triangles = Instance->drawLists[NDT].triangles;
+            triangles.emplace_back(v0, color);
+            triangles.emplace_back(v1, color);
+            triangles.emplace_back(v2, color);
+        }
 
         struct DrawList {
             std::vector<DrawVertex> triangles;
@@ -126,8 +147,7 @@ namespace fe {
             }
         };
 
-        DrawList drawList;
-        DrawList drawListNDT;
+        std::array<DrawList, 2> drawLists;
 
         static DebugRenderer* Instance;
     };

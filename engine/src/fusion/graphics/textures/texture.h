@@ -100,7 +100,7 @@ namespace fe {
 
         /**
          * Creates a new image.
-         * @param bitmap
+         * @param pixels The pixels to copy from.
          * @param filter The magnification/minification filter to apply to lookups.
          * @param addressMode The addressing mode for outside [0..1] range.
          * @param samples The number of samples per texel.
@@ -115,7 +115,7 @@ namespace fe {
          * @param anisotropic If anisotropic filtering is enabled.
          * @param mipmap If mapmaps will be generated.
          */
-        Texture(const std::unique_ptr<Bitmap>& bitmap,
+        Texture(gsl::span<const uint8_t> pixels,
                 VkFilter filter,
                 VkSamplerAddressMode addressMode,
                 VkSampleCountFlagBits samples,
@@ -148,6 +148,14 @@ namespace fe {
                 updateDescriptor();
             }
         }*/
+
+        /**
+         * Sets the pixels of this image.
+         * @param pixels The pixels to copy from.
+         * @param layerCount The amount of layers contained in the pixels.
+         * @param baseArrayLayer The first layer to copy into.
+         */
+        void setPixels(gsl::span<const uint8_t> pixels, uint32_t layerCount = 1, uint32_t baseArrayLayer = 0);
 
         /** @brief Update image descriptor from current sampler, view and image layout */
         void updateDescriptor() {

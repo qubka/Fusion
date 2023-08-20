@@ -4,7 +4,7 @@
 
 using namespace fe;
 
-#define MDB_RESULT(x) if (const int err = x) { char* error = mdb_strerror(err); FE_LOG_ERROR(error); throw std::runtime_error(error); }
+#define MDB_RESULT(x) if (const int err = (x)) { char* error = mdb_strerror(err); FE_LOG_ERROR(error); throw std::runtime_error(error); }
 
 AssetDatabase::AssetDatabase(fs::path path) : databaseDirectory{std::move(path)} {
     if (mdb_env_create(&env))
@@ -29,7 +29,7 @@ AssetDatabase::~AssetDatabase() {
 
 std::optional<uuids::uuid> AssetDatabase::getKey(const fs::path& filepath) {
     if (filepath.empty()) {
-        FE_LOG_ERROR("AssetDatabase: value is empty!");
+        FE_LOG_ERROR("Value is empty!");
         return std::nullopt;
     }
 
@@ -57,7 +57,7 @@ std::optional<uuids::uuid> AssetDatabase::getKey(const fs::path& filepath) {
 
 std::optional<fs::path> AssetDatabase::getValue(uuids::uuid uuid) {
     if (uuid.is_nil()) {
-        FE_LOG_ERROR("AssetDatabase: key is empty!");
+        FE_LOG_ERROR("Key is empty!");
         return std::nullopt;
     }
 
@@ -65,7 +65,7 @@ std::optional<fs::path> AssetDatabase::getValue(uuids::uuid uuid) {
     mdb_dbi_open(txn, nullptr, 0, &dbi);
 
     auto bytes = uuid.as_bytes();
-    MDB_val key{ bytes.size(), (void*)bytes.data() };
+    MDB_val key{ bytes.size(), (void*) bytes.data() };
     MDB_val value;
 
     const int rc = mdb_get(txn, dbi, &key, &value);
@@ -79,7 +79,7 @@ std::optional<fs::path> AssetDatabase::getValue(uuids::uuid uuid) {
 
 bool AssetDatabase::put(uuids::uuid uuid, const fs::path& filepath, bool overwrite) {
     if (uuid.is_nil() || filepath.empty()) {
-        FE_LOG_ERROR("AssetDatabase: key/value is empty!");
+        FE_LOG_ERROR("Key/value is empty!");
         return false;
     }
 
@@ -87,7 +87,7 @@ bool AssetDatabase::put(uuids::uuid uuid, const fs::path& filepath, bool overwri
     mdb_dbi_open(txn, nullptr, 0, &dbi);
 
     auto bytes = uuid.as_bytes();
-    MDB_val key{ bytes.size(), (void*)bytes.data() };
+    MDB_val key{ bytes.size(), (void*) bytes.data() };
 
     std::string pathStr{ filepath.generic_string() };
     MDB_val value{ pathStr.size(), (void*) pathStr.c_str() };

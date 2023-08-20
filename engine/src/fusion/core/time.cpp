@@ -21,9 +21,9 @@ void Time::onUpdate() {
     deltaTime = (currentTime - lastTime);
     lastTime = currentTime;
 
-    frameCount++;
+    ++frameCount;
+    ++frameNumber;
 
-    frameNumber++;
     if ((currentTime - frameTime).asSeconds() >= 1) {
         framesPerSecond = frameNumber;
         frameNumber = 0;

@@ -4,7 +4,7 @@
 #include "fusion/graphics/buffers/buffer.h"
 
 namespace fe {
-    class FUSION_API StorageBuffer : public Descriptor, public Buffer {
+    class FUSION_API StorageBuffer final : public Descriptor, public Buffer {
     public:
         explicit StorageBuffer(VkDeviceSize size, const void* data = nullptr);
 

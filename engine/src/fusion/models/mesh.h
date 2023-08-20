@@ -22,18 +22,18 @@ namespace fe {
         const AABB& getBoundingBox() const { return boundingBox; }
 
         // TODO: Do we need store this in RAM too ?
-        std::vector<std::byte> getVertices(uint32_t stride) const {
+        std::vector<uint8_t> getVertices(uint32_t stride) const {
             auto vertexStaging = Buffer::DeviceToStageBuffer(*vertexBuffer);
 
             vertexStaging->map();
-            std::vector<std::byte> vertices(vertexCount * stride);
+            std::vector<uint8_t> vertices(vertexCount * stride);
             vertexStaging->extract(vertices.data());
             vertexStaging->unmap();
 
             return vertices;
         }
 
-        void setVertices(const std::vector<std::byte>& vertices, uint32_t stride) {
+        void setVertices(const std::vector<uint8_t>& vertices, uint32_t stride) {
             vertexBuffer = nullptr;
             vertexCount = static_cast<uint32_t>(vertices.size() / stride);
 
@@ -42,9 +42,9 @@ namespace fe {
 
             vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, vertices.size(), vertices.data());
 
-            glm::vec3 min{ FLT_MAX };
-            glm::vec3 max{ -FLT_MAX };
-            for (size_t i = 0; i < vertices.size(); i += stride) {
+            glm::vec3 min{ *reinterpret_cast<const glm::vec3*>(&vertices[0]) };
+            glm::vec3 max{ *reinterpret_cast<const glm::vec3*>(&vertices[0]) };
+            for (size_t i = stride; i < vertices.size(); i += stride) {
                 const auto& position = *reinterpret_cast<const glm::vec3*>(&vertices[i]);
                 min = glm::min(position, min);
                 max = glm::max(position, max);
@@ -75,11 +75,11 @@ namespace fe {
 
             indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(T) * indices.size(), indices.data());
 
-            if (sizeof(uint8_t) == sizeof(T)) {
+            if constexpr (sizeof(uint8_t) == sizeof(T)) {
                 indexType = VK_INDEX_TYPE_UINT8_EXT;
-            } else if (sizeof(uint16_t) == sizeof(T)) {
+            } else if constexpr (sizeof(uint16_t) == sizeof(T)) {
                 indexType = VK_INDEX_TYPE_UINT16;
-            } else if (sizeof(uint32_t) == sizeof(T)) {
+            } else if constexpr (sizeof(uint32_t) == sizeof(T)) {
                 indexType = VK_INDEX_TYPE_UINT32;
             } else {
                 static_assert("Invalid type");

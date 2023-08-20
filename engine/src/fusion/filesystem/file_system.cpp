@@ -41,7 +41,7 @@ void FileSystem::onStop() {
 
 }
 
-void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler) {
+void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gsl::span<const uint8_t>)>& handler) {
 #if FUSION_VIRTUAL_FS
         Instance->vfs->readBytes(filepath, handler);
 #else
@@ -64,7 +64,7 @@ void FileSystem::ReadBytes(const fs::path& filepath, const std::function<void(gs
         buffer.reserve(size);
         buffer.insert(buffer.begin(), std::istream_iterator<uint8_t>(is), std::istream_iterator<uint8_t>());
 
-        handler({ reinterpret_cast<std::byte*>(buffer.data()), buffer.size() });
+        handler({ buffer.data(), buffer.size() });
 #endif
 }
 
@@ -86,7 +86,7 @@ std::string FileSystem::ReadText(const fs::path& filepath) {
 #endif
 }
 
-bool FileSystem::WriteBytes(const fs::path& filepath, gsl::span<const std::byte> buffer) {
+bool FileSystem::WriteBytes(const fs::path& filepath, gsl::span<const uint8_t> buffer) {
 #if FUSION_VIRTUAL_FS
         return Instance->vfs->writeBytes(filepath, buffer);
 #else

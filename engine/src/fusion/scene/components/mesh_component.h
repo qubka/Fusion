@@ -14,9 +14,9 @@ namespace fe {
 
         template<typename Archive>
         void load(Archive& archive) {
-            uuids::uuid modelUuid;
-            archive(cereal::make_nvp("model", modelUuid));
-            model = AssetRegistry::Get()->load<Model>(modelUuid);
+            uuids::uuid uuid;
+            archive(cereal::make_nvp("model", uuid));
+            model = AssetRegistry::Get()->load<Model>(uuid);
             archive(cereal::make_nvp("index", index));
         }
 

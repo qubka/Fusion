@@ -95,6 +95,7 @@ namespace ImGuiUtils {
     }
 
 /// TEXT
+    bool PropertyTextbox(const char* name, std::string& value, const ImVec2& size = ImVec2{0, 0});
     bool PropertyText(const char* name, std::string& value);
     void PropertyText(const char* name, const char* value);
 ///

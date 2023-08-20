@@ -3,7 +3,7 @@
 #include "fusion/graphics/cameras/camera_controller.h"
 
 namespace fe {
-    class EditorCameraController  : public CameraController {
+    class EditorCameraController final : public CameraController {
     public:
         EditorCameraController();
         ~EditorCameraController() override;

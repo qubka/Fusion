@@ -38,7 +38,7 @@ namespace vku {
     }
 
     inline VkRect2D rect2D(uint32_t width, uint32_t height, int32_t offsetX = 0, int32_t offsetY = 0) {
-        return {{offsetX,offsetY},{width,height}};
+        return {{offsetX, offsetY},{width, height}};
     }
 
     inline VkRect2D rect2D(const glm::uvec2& size, const glm::ivec2& offset = {}) {
@@ -197,26 +197,24 @@ namespace vku {
         return ret;
     }
 
-    inline void BlitRGBToBGRSurface(std::byte* dst, const std::byte* src, const glm::uvec2& size) {
-        for (auto i = 0; i < size.y; ++i) {
-            for (auto j = 0; j < size.x; ++j) {
-                *dst++ = src[2];
-                *dst++ = src[1];
-                *dst++ = src[0];
-                src += 3;
-            }
+    inline void rgba_to_bgra(uint8_t* dst, const uint8_t* src, size_t count) {
+        for (size_t i = 0; i < count; ++i, src += 4) {
+            *dst++ = src[2]; // b
+            *dst++ = src[1]; // g
+            *dst++ = src[0]; // r
+            *dst++ = src[3]; // a
         }
     }
 
-    inline void BlitRGBAToBGRASurface(std::byte* dst, const std::byte* src, const glm::uvec2& size) {
-        for (auto i = 0; i < size.y; ++i) {
-            for (auto j = 0; j < size.x; ++j) {
-                *dst++ = src[2];
-                *dst++ = src[1];
-                *dst++ = src[0];
-                *dst++ = src[3];
-                src += 4;
-            }
+    // https://stackoverflow.com/questions/7069090/convert-rgb-to-rgba-in-c
+    inline void rgb_to_rgba(uint8_t* dst, const uint8_t* src, size_t count) {
+        if (count == 0)
+            return;
+        for (size_t i = count; --i; dst += 4, src += 3) {
+            *(uint32_t*)(void*)dst = *(const uint32_t*)(const void*)src;
+        }
+        for (int j = 0; j < 3; ++j) {
+            dst[j] = src[j];
         }
     }
 

@@ -27,7 +27,7 @@ Scene::Scene(const Scene& other) : Scene{other.name} {
 }
 
 void Scene::onStart() {
-    systems.each([&](auto system) {
+    systems.each([](auto system) {
         system->setEnabled(true);
     });
 
@@ -35,7 +35,7 @@ void Scene::onStart() {
 }
 
 void Scene::onUpdate() {
-    systems.each([&](auto system) {
+    systems.each([](auto system) {
         if (system->isEnabled())
             system->onUpdate();
     });
@@ -44,7 +44,7 @@ void Scene::onUpdate() {
 void Scene::onPlay() {
     runtime = true;
 
-    systems.each([&](auto system) {
+    systems.each([](auto system) {
         if (system->isEnabled())
             system->onPlay();
     });
@@ -53,7 +53,7 @@ void Scene::onPlay() {
 }
 
 void Scene::onStop() {
-    systems.each([&](auto system) {
+    systems.each([](auto system) {
         if (system->isEnabled())
             system->onStop();
     });
@@ -80,15 +80,6 @@ const Camera* Scene::getCamera() const {
     }
 }
 
-entt::entity Scene::getCameraEntity() const {
-    auto view = registry.view<CameraComponent>();
-    if (!view.empty()) {
-        return view.front();
-    } else {
-        return entt::null;
-    }
-}
-
 entt::entity Scene::createEntity(std::string name) {
     auto entity = registry.create();
 
@@ -99,7 +90,7 @@ entt::entity Scene::createEntity(std::string name) {
     auto view = registry.view<NameComponent>();
     for (const auto& [e, n] : view.each()) {
         if (n.name.find(name) != std::string::npos) {
-            i++;
+            ++i;
         }
     }
     if (i > 0)
@@ -141,7 +132,11 @@ entt::entity Scene::duplicateEntity(entt::entity entity, entt::entity parent) {
         hierarchySystem->assignChild(parent, newEntity);
 
     hierarchySystem->setEnabled(true);
-    
+
+    if (auto scriptComponent = registry.try_get<ScriptComponent>(newEntity)) {
+        ScriptEngine::Get()->onCreateEntity(newEntity, *scriptComponent);
+    }
+
     return newEntity;
 }
 
@@ -247,6 +242,10 @@ void Scene::importMesh(fs::path filepath) {
     }
 
     auto model = AssetRegistry::Get()->load<Model>(*uuid);
+    if (model == nullptr || !model->isLoaded()) {
+        FE_LOG_ERROR("Cannot load model");
+        return;
+    }
 
     auto hierarchySystem = getSystem<HierarchySystem>();
 

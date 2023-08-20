@@ -38,8 +38,8 @@ void GameViewPanel::onImGui() {
     viewportSize.x -= static_cast<int>(viewportSize.x) % 2 != 0 ? 1.0f : 0.0f;
     viewportSize.y -= static_cast<int>(viewportSize.y) % 2 != 0 ? 1.0f : 0.0f;
 
-    auto camera = scene->getCameraEntity();
-    if (camera == entt::null) {
+    auto camera = scene->getComponent<CameraComponent>();
+    if (!camera) {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
         drawList->AddRectFilled(viewportPos, viewportPos + viewportSize, IM_COL32(0, 0, 0, 255));
         ImGuiUtils::TextCentered(ICON_MDI_CAMERA_OFF " No Cameras Rendering", 0.0f);
@@ -69,8 +69,7 @@ void GameViewPanel::onImGui() {
     }
 
     float aspect = viewportSize.x / viewportSize.y;
-    //camera->setAspectRatio(aspect);
-    scene->getRegistry().get<CameraComponent>(camera).setAspectRatio(aspect);
+    camera->setAspectRatio(aspect);
 
     auto renderStage = Graphics::Get()->getRenderStage(1);
     if (!renderStage->setViewport({glm::vec2{1.0f, 1.0f}, glm::uvec2{viewportSize.x, viewportSize.y}, glm::ivec2{0, 0}})) {

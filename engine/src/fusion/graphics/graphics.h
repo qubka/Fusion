@@ -80,34 +80,24 @@ namespace fe {
         void onUpdate();
         void onStop();
 
-        struct FrameInfo {
-            const size_t& id;
-            size_t& currentFrame;
-            Swapchain& swapchain;
-            CommandBuffer& commandBuffer;
-            SyncObject& syncObject;
 #if FUSION_PROFILE && TRACY_ENABLE
-            tracy::VkCtx* tracyContext;
-#endif
-        };
-
-#if FUSION_PROFILE && TRACY_ENABLE
-        #define UNPACK_FRAME_INFO(info) auto& [id, currentFrame, swapchain, commandBuffer, syncObject, tracyContext] = info
+        #define FRAME_INFO CommandBuffer& commandBuffer, SyncObject& syncObject, tracy::VkCtx* tracyContext, Swapchain& swapchain, size_t& currentFrame, size_t id
         #define FUSION_PROFILE_GPU(name) TracyVkZone(tracyContext, commandBuffer, name)
 #else
-        #define UNPACK_FRAME_INFO(info) auto& [id, currentFrame, swapchain, commandBuffer, syncObject] = info
+        #define FRAME_INFO CommandBuffer& commandBuffer, SyncObject& syncObject, Swapchain& swapchain, size_t& currentFrame, size_t id
         #define FUSION_PROFILE_GPU(name)
 #endif
-        bool beginFrame(FrameInfo& info);
-        bool beginRenderpass(FrameInfo& info, RenderStage& renderStage);
-        void nextSubpasses(FrameInfo& info, RenderStage& renderStage, Pipeline::Stage& pipelineStage);
-        void endRenderpass(FrameInfo& info);
-        void endFrame(FrameInfo& info);
+
+        bool beginFrame(FRAME_INFO);
+        bool beginRenderpass(FRAME_INFO, RenderStage& renderStage);
+        void nextSubpasses(FRAME_INFO, RenderStage& renderStage, Pipeline::Stage& pipelineStage);
+        void endRenderpass(FRAME_INFO);
+        void endFrame(FRAME_INFO);
 
         void resetRenderStages();
         void recreateSwapchain(size_t id);
         void recreateAttachmentsMap();
-        void recreatePass(FrameInfo& info, RenderStage& renderStage);
+        void recreatePass(size_t id, Swapchain& swapchain, RenderStage& renderStage);
 
         void onWindowCreate(Window* window, bool create);
 

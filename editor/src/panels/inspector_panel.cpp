@@ -380,6 +380,38 @@ namespace ImGui {
     }
 
     template<>
+    void ComponentEditorWidget<TextComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& text = registry.get<TextComponent>(entity);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        static ImGuiTextFilter filter;
+        static std::shared_ptr<Asset> selected;
+
+        ImGuiUtils::PropertyTextbox("Text", text.text);
+        {
+            std::shared_ptr<Asset> current = text.font;
+            if (ImGuiUtils::PropertyAsset<Font>("Font", current, selected, filter)) {
+                if (current) {
+                    text.font = std::dynamic_pointer_cast<Font>(current);
+                } else {
+                    text.font.reset();
+                }
+            }
+        }
+        ImGuiUtils::Property("Color", text.color, 0.0f, 0.0f, 1.0f, ImGuiUtils::PropertyType::Color);
+        ImGuiUtils::Property("Kerning", text.kerning, 0.0f, 0.0f, 0.001f);
+        ImGuiUtils::Property("Line Spacing", text.lineSpacing, 0.0f, 0.0f, 0.001f);
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
+
+    template<>
     void ComponentEditorWidget<LightComponent>(entt::registry& registry, entt::registry::entity_type entity) {
         auto& light = registry.get<LightComponent>(entity);
 
@@ -577,6 +609,32 @@ namespace ImGui {
         ImGui::Separator();
         ImGui::PopStyleVar();
     }
+
+    template<>
+    void ComponentEditorWidget<SkyboxComponent>(entt::registry& registry, entt::registry::entity_type entity) {
+        auto& skybox = registry.get<SkyboxComponent>(entity);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() / 3.0f);
+        ImGui::Separator();
+
+        static ImGuiTextFilter filter;
+        static std::shared_ptr<Asset> selected;
+
+        std::shared_ptr<Asset> current = skybox.texture;
+        if (ImGuiUtils::PropertyAsset<TextureCube>("Texture", current, selected, filter)) {
+            if (current) {
+                skybox.texture = std::dynamic_pointer_cast<TextureCube>(current);
+            } else {
+                skybox.texture.reset();
+            }
+        }
+
+        ImGui::Columns(1);
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+    }
 }
 
 #define REG_COMPONENT(ComponentType, ComponentName)            \
@@ -598,6 +656,8 @@ InspectorPanel::InspectorPanel(Editor& editor) : EditorPanel{ICON_MDI_INFORMATIO
     REG_COMPONENT(MeshColliderComponent, "Mesh Collider");
     REG_COMPONENT(PhysicsMaterialComponent, "Physics Material");
     REG_COMPONENT(LightComponent, "Light");
+    REG_COMPONENT(TextComponent, "Text");
+    REG_COMPONENT(SkyboxComponent, "Skybox");
 #if FUSION_SCRIPTING
     REG_COMPONENT(ScriptComponent, "Script");
 #endif

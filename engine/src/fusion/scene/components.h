@@ -10,7 +10,9 @@
 #include "components/mesh_component.h"
 #include "components/light_component.h"
 #include "components/material_component.h"
+#include "components/text_component.h"
 #include "components/script_component.h"
+#include "components/skybox_component.h"
 
 #include "components/rigidbody_component.h"
 #include "components/box_collider_component.h"
@@ -20,9 +22,9 @@
 #include "components/physics_material_component.h"
 
 #if FUSION_SCRIPTING
-#define ALL_COMPONENTS NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent, MaterialComponent, ScriptComponent, RigidbodyComponent, BoxColliderComponent, CapsuleColliderComponent, MeshColliderComponent, SphereColliderComponent, PhysicsMaterialComponent
+#define ALL_COMPONENTS NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent, MaterialComponent, TextComponent, SkyboxComponent, ScriptComponent, RigidbodyComponent, BoxColliderComponent, CapsuleColliderComponent, MeshColliderComponent, SphereColliderComponent, PhysicsMaterialComponent
 #else
-#define ALL_COMPONENTS NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent, MaterialComponent, RigidbodyComponent, BoxColliderComponent, CapsuleColliderComponent, MeshColliderComponent, SphereColliderComponent, PhysicsMaterialComponent
+#define ALL_COMPONENTS NameComponent, ActiveComponent, HierarchyComponent, TransformComponent, CameraComponent, MeshComponent, LightComponent, MaterialComponent, TextComponent, RigidbodyComponent, BoxColliderComponent, CapsuleColliderComponent, MeshColliderComponent, SphereColliderComponent, PhysicsMaterialComponent
 #endif
 namespace fe {
     template<typename... Component>

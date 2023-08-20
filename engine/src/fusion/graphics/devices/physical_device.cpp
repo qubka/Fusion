@@ -242,6 +242,6 @@ void PhysicalDevice::LogVulkanDevice(const VkPhysicalDeviceProperties& physicalD
             i = 0;
         }
 
-        i++;
+        ++i;
     }
 }

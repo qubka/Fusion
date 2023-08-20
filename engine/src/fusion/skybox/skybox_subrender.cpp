@@ -6,6 +6,7 @@
 #include "fusion/graphics/textures/texture_cube.h"
 #include "fusion/devices/device_manager.h"
 #include "fusion/scene/scene_manager.h"
+#include "fusion/scene/components.h"
 
 using namespace fe;
 
@@ -55,7 +56,7 @@ SkyboxSubrender::SkyboxSubrender(Pipeline::Stage pipelineStage)
     vertexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(glm::vec3) * vertices.size(), vertices.data());
 
 
-    std::vector<uint16_t> indices {
+    std::vector<uint8_t> indices {
             2,  1,  0,		3,  2,  0,  //front
             6,  5,  4,		7,  6,  4,  //right
             10, 9,  8,		11, 10, 8,  //back
@@ -64,9 +65,7 @@ SkyboxSubrender::SkyboxSubrender(Pipeline::Stage pipelineStage)
             22, 21, 20,		23, 22, 20  //bottom
     };
 
-    indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint16_t) * indices.size(), indices.data());
-
-    //skyboxSampler = std::make_unique<TextureCube>(FUSION_ASSET_PATH "textures/cubemap_vulkan.ktx", VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, true, true, true);
+    indexBuffer = Buffer::StageToDeviceBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, sizeof(uint8_t) * indices.size(), indices.data());
 }
 
 SkyboxSubrender::~SkyboxSubrender() {
@@ -81,12 +80,16 @@ void SkyboxSubrender::onRender(const CommandBuffer& commandBuffer, const Camera*
     if (!camera)
         return;
 
+    auto skybox = scene->getComponent<SkyboxComponent>();
+    if (!skybox || !skybox->texture)
+        return;
+
     // Updates uniform
     pushObject.push("projection", camera->getProjectionMatrix());
     pushObject.push("view", glm::mat4{glm::mat3{camera->getViewMatrix()}});
 
     // Updates descriptors
-    descriptorSet.push("skyboxSampler", skyboxSampler.get());
+    descriptorSet.push("skyboxSampler", skybox->texture.get());
     descriptorSet.push("PushObject", pushObject);
 
     if (!descriptorSet.update(pipeline))
@@ -100,6 +103,6 @@ void SkyboxSubrender::onRender(const CommandBuffer& commandBuffer, const Camera*
     VkBuffer vertexBuffers[1] = { *vertexBuffer };
     VkDeviceSize offsets[1] = { 0 };
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT8_EXT);
     vkCmdDrawIndexed(commandBuffer, 36, 1, 0, 0, 0);
 }

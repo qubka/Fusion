@@ -19,130 +19,101 @@ DebugRenderer::~DebugRenderer() {
     Instance = nullptr;
 }
 
-// Draw Point (circle)
-void DebugRenderer::GenDrawPoint(bool ndt, const glm::vec3& pos, float pointRadius, const glm::vec4& color) {
-    auto& points = ndt ? Instance->drawListNDT.points : Instance->drawList.points;
-    points.emplace_back(pos, color, pointRadius);
-    points.emplace_back(pos, color, pointRadius);
-}
-
 void DebugRenderer::DrawPoint(const glm::vec3& pos, float pointRadius, const glm::vec3& color) {
-    GenDrawPoint(false, pos, pointRadius, glm::vec4{color, 1.0f});
+    GenDrawPoint<false>(pos, pointRadius, glm::vec4{color, 1.0f});
 }
 
 void DebugRenderer::DrawPoint(const glm::vec3& pos, float pointRadius, const glm::vec4& color) {
-    GenDrawPoint(false, pos, pointRadius, color);
+    GenDrawPoint<false>(pos, pointRadius, color);
 }
 
 void DebugRenderer::DrawPointNDT(const glm::vec3& pos, float pointRadius, const glm::vec3& color) {
-    GenDrawPoint(true, pos, pointRadius, glm::vec4{color, 1.0f});
+    GenDrawPoint<true>(pos, pointRadius, glm::vec4{color, 1.0f});
 }
 
 void DebugRenderer::DrawPointNDT(const glm::vec3& pos, float pointRadius, const glm::vec4& color) {
-    GenDrawPoint(true, pos, pointRadius, color);
-}
-
-// Draw Line with a given thickness
-void DebugRenderer::GenDrawThickLine(bool ndt, const glm::vec3& start, const glm::vec3& end, float lineWidth, const glm::vec4& color) {
-    auto& thickLines = ndt ? Instance->drawListNDT.thickLines : Instance->drawList.thickLines;
-    thickLines.emplace_back(start, color);
-    thickLines.emplace_back(end, color);
+    GenDrawPoint<true>(pos, pointRadius, color);
 }
 
 void DebugRenderer::DrawThickLine(const glm::vec3& start, const glm::vec3& end, float lineWidth, const glm::vec3& color) {
-    GenDrawThickLine(false, start, end, lineWidth, glm::vec4{color, 1.0f});
+    GenDrawThickLine<false>(start, end, lineWidth, glm::vec4{color, 1.0f});
 }
 
 void DebugRenderer::DrawThickLine(const glm::vec3& start, const glm::vec3& end, float lineWidth, const glm::vec4& color) {
-    GenDrawThickLine(false, start, end, lineWidth, color);
+    GenDrawThickLine<false>(start, end, lineWidth, color);
 }
 
 void DebugRenderer::DrawThickLineNDT(const glm::vec3& start, const glm::vec3& end, float lineWidth, const glm::vec3& color) {
-    GenDrawThickLine(true, start, end, lineWidth, glm::vec4{color, 1.0f});
+    GenDrawThickLine<true>(start, end, lineWidth, glm::vec4{color, 1.0f});
 }
 
 void DebugRenderer::DrawThickLineNDT(const glm::vec3& start, const glm::vec3& end, float lineWidth, const glm::vec4& color) {
-    GenDrawThickLine(true, start, end, lineWidth, color);
-}
-
-// Draw line with thickness of 1 screen pixel regardless of distance from camera
-void DebugRenderer::GenDrawHairLine(bool ndt, const glm::vec3& start, const glm::vec3& end, const glm::vec4& color) {
-    auto& lines = ndt ? Instance->drawListNDT.lines : Instance->drawList.lines;
-    lines.emplace_back(start, color);
-    lines.emplace_back(end, color);
+    GenDrawThickLine<true>(start, end, lineWidth, color);
 }
 
 void DebugRenderer::DrawHairLine(const glm::vec3& start, const glm::vec3& end, const glm::vec3& color) {
-    GenDrawHairLine(false, start, end, glm::vec4{color, 1.0f});
+    GenDrawHairLine<false>(start, end, glm::vec4{color, 1.0f});
 }
 
 void DebugRenderer::DrawHairLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color) {
-    GenDrawHairLine(false, start, end, color);
+    GenDrawHairLine<false>(start, end, color);
 }
 
 void DebugRenderer::DrawHairLineNDT(const glm::vec3& start, const glm::vec3& end, const glm::vec3& color) {
-    GenDrawHairLine(true, start, end, glm::vec4{color, 1.0f});
+    GenDrawHairLine<true>(start, end, glm::vec4{color, 1.0f});
 }
 
 void DebugRenderer::DrawHairLineNDT(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color) {
-    GenDrawHairLine(true, start, end, color);
+    GenDrawHairLine<true>(start, end, color);
 }
 
 // Draw Matrix (x,y,z axis at pos)
 void DebugRenderer::DrawMatrix(const glm::mat4& mtx) {
     glm::vec3 position{ mtx[3] };
     auto m = glm::value_ptr(mtx);
-    GenDrawHairLine(false, position, position + glm::vec3{m[0], m[1], m[2]}, glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
-    GenDrawHairLine(false, position, position + glm::vec3{m[4], m[5], m[6]}, glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
-    GenDrawHairLine(false, position, position + glm::vec3{m[8], m[9], m[10]}, glm::vec4{0.0f, 0.0f, 1.0f, 1.0f});
+    GenDrawHairLine<false>(position, position + glm::vec3{m[0], m[1], m[2]}, glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
+    GenDrawHairLine<false>(position, position + glm::vec3{m[4], m[5], m[6]}, glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+    GenDrawHairLine<false>(position, position + glm::vec3{m[8], m[9], m[10]}, glm::vec4{0.0f, 0.0f, 1.0f, 1.0f});
 }
 
 void DebugRenderer::DrawMatrix(const glm::mat3& mtx, const glm::vec3& position) {
-    GenDrawHairLine(false, position, position + mtx[0], glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
-    GenDrawHairLine(false, position, position + mtx[1], glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
-    GenDrawHairLine(false, position, position + mtx[2], glm::vec4{0.0f, 0.0f, 1.0f, 1.0f});
+    GenDrawHairLine<false>(position, position + mtx[0], glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
+    GenDrawHairLine<false>(position, position + mtx[1], glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+    GenDrawHairLine<false>(position, position + mtx[2], glm::vec4{0.0f, 0.0f, 1.0f, 1.0f});
 }
 
 void DebugRenderer::DrawMatrixNDT(const glm::mat4& mtx) {
     glm::vec3 position{ mtx[3] };
     auto m = glm::value_ptr(mtx);
-    GenDrawHairLine(true, position, position + glm::vec3{m[0], m[1], m[2]}, glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
-    GenDrawHairLine(true, position, position + glm::vec3{m[4], m[5], m[6]}, glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
-    GenDrawHairLine(true, position, position + glm::vec3{m[8], m[9], m[10]}, glm::vec4{0.0f, 0.0f, 1.0f, 1.0f});
+    GenDrawHairLine<true>(position, position + glm::vec3{m[0], m[1], m[2]}, glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
+    GenDrawHairLine<true>(position, position + glm::vec3{m[4], m[5], m[6]}, glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+    GenDrawHairLine<true>(position, position + glm::vec3{m[8], m[9], m[10]}, glm::vec4{0.0f, 0.0f, 1.0f, 1.0f});
 }
 
 void DebugRenderer::DrawMatrixNDT(const glm::mat3& mtx, const glm::vec3& position) {
-    GenDrawHairLine(true, position, position + mtx[0], glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
-    GenDrawHairLine(true, position, position + mtx[1], glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
-    GenDrawHairLine(true, position, position + mtx[2], glm::vec4{0.0f, 0.0f, 1.0f, 1.0f});
-}
-
-// Draw Triangle
-void DebugRenderer::GenDrawTriangle(bool ndt, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec4& color) {
-    auto& triangles = ndt ? Instance->drawListNDT.triangles : Instance->drawList.triangles;
-    triangles.emplace_back(v0, color);
-    triangles.emplace_back(v1, color);
-    triangles.emplace_back(v2, color);
+    GenDrawHairLine<true>(position, position + mtx[0], glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
+    GenDrawHairLine<true>(position, position + mtx[1], glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+    GenDrawHairLine<true>(position, position + mtx[2], glm::vec4{0.0f, 0.0f, 1.0f, 1.0f});
 }
 
 void DebugRenderer::DrawTriangle(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec4& color) {
-    GenDrawTriangle(false, v0, v1, v2, color);
+    GenDrawTriangle<false>(v0, v1, v2, color);
 }
 
 void DebugRenderer::DrawTriangleNDT(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec4& color) {
-    GenDrawTriangle(true, v0, v1, v2, color);
+    GenDrawTriangle<true>(v0, v1, v2, color);
 }
 
 // Draw Polygon (Renders as a triangle fan, so verts must be arranged in order)
 void DebugRenderer::DrawPolygon(gsl::span<const glm::vec3> verts, const glm::vec4& color) {
     for (int i = 2; i < verts.size(); ++i) {
-        GenDrawTriangle(false, verts[0], verts[i - 1], verts[i], color);
+        GenDrawTriangle<false>(verts[0], verts[i - 1], verts[i], color);
     }
 }
 
 void DebugRenderer::DrawPolygonNDT(gsl::span<const glm::vec3> verts, const glm::vec4& color) {
     for (int i = 2; i < verts.size(); ++i) {
-        GenDrawTriangle(true, verts[0], verts[i - 1], verts[i], color);
+        GenDrawTriangle<true>(verts[0], verts[i - 1], verts[i], color);
     }
 }
 
@@ -354,8 +325,8 @@ void DebugRenderer::onStart() {
 }
 
 void DebugRenderer::onUpdate() {
-    drawList.clear();
-    drawListNDT.clear();
+    drawLists[0].clear();
+    drawLists[1].clear();
 }
 
 void DebugRenderer::onStop() {

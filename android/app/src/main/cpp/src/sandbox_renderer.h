@@ -5,7 +5,6 @@
 #include "fusion/debug/grid_subrender.h"
 #include "fusion/skybox/atmosphere_subrender.h"
 #include "fusion/skybox/skybox_subrender.h"
-#include "fusion/models/mesh2_subrender.h"
 #include "fusion/ligthing/light_subrender.h"
 
 namespace fe {

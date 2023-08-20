@@ -78,8 +78,6 @@ namespace fe {
         void requestClose() { running = false; }
 
     protected:
-        static Engine* Instance;
-
         /**
          * The initialization function for the engine.
          */
@@ -112,5 +110,7 @@ namespace fe {
 
         bool running{ false };
         bool started{ false };
+
+        static Engine* Instance;
     };
 }

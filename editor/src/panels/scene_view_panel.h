@@ -27,14 +27,16 @@ namespace fe {
         bool drawComponentGizmos(entt::registry& registry, Camera& camera, const glm::vec2& coord, const glm::vec2& offset, const char* text) {
             bool hovered = false;
             if (showComponentGizmosMap[type_id<T>]) {
+                const auto& frustum = camera.getFrustum();
+
                 auto view = registry.view<T, TransformComponent>();
                 for (const auto& [entity, component, transform] : view.each()) {
-                    glm::vec3 pos = transform.getWorldPosition();
-                    if (!camera.getFrustum().contains(pos))
+                    glm::vec3 pos{ transform.getWorldPosition() };
+                    if (!frustum.contains(pos))
                         continue;
 
                     float shift = ImGui::GetFontSize() * 0.5f;
-                    glm::vec2 screenPos = camera.worldToScreen(pos, coord) + offset - shift;
+                    glm::vec2 screenPos{ camera.worldToScreen(pos, coord) + offset - shift };
                     ImGui::SetCursorPos(screenPos);
 
                     ImVec4 color{0.7f, 0.7f, 0.7f, 0.0f};

@@ -47,7 +47,7 @@ namespace Utils {
         MonoImage* image = nullptr;
 
         // TODO: fix possible leak
-        FileSystem::ReadBytes(assemblyPath, [&](gsl::span<const std::byte> buffer) {
+        FileSystem::ReadBytes(assemblyPath, [&](gsl::span<const uint8_t> buffer) {
             image = mono_image_open_from_data_full((char*) buffer.data(), buffer.size(), 1, &status, 0);
         });
 
@@ -61,7 +61,7 @@ namespace Utils {
             fs::path pdbPath{ assemblyPath };
             pdbPath.replace_extension(".pdb");
 
-            FileSystem::ReadBytes(pdbPath, [&](gsl::span<const std::byte> buffer) {
+            FileSystem::ReadBytes(pdbPath, [&](gsl::span<const uint8_t> buffer) {
                 mono_debug_open_image_from_memory(image, reinterpret_cast<const mono_byte*>(buffer.data()), static_cast<int>(buffer.size()));
                 FE_LOG_INFO("Loaded PDB: '{}'", pdbPath);
             });

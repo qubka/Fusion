@@ -7,7 +7,7 @@ extern "C" {
 }
 
 namespace fe::glfw {
-    class FUSION_API Cursor : public fe::Cursor {
+    class FUSION_API Cursor final : public fe::Cursor {
     public:
         /**
          * Creates the cursor from a image file.

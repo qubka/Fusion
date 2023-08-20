@@ -30,7 +30,7 @@ namespace fe {
                         callback(it->first, FileEvent::Erased);
                         it = paths.erase(it);
                     } else {
-                        it++;
+                        ++it;
                     }
                 }
 

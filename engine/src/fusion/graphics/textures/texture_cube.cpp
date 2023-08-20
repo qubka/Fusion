@@ -48,9 +48,27 @@ TextureCube::TextureCube(const glm::uvec2& extent, VkFormat format, VkImageLayou
                   mipmap} {
 }
 
+TextureCube::TextureCube(gsl::span<const uint8_t> pixels, const glm::uvec2& extent, VkFormat format, VkImageLayout layout, VkImageUsageFlags usage, VkFilter filter,
+                         VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, bool anisotropic, bool mipmap)
+        : Texture{pixels,
+                  filter,
+                  addressMode,
+                  samples,
+                  layout,
+                  usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
+                  VK_IMAGE_VIEW_TYPE_CUBE,
+                  format,
+                  1,
+                  6,
+                  { extent.x, extent.y, 1 },
+                  anisotropic,
+                  mipmap} {
+}
+
 TextureCube::TextureCube(const std::unique_ptr<Bitmap>& bitmap, VkFormat format, VkImageLayout layout, VkImageUsageFlags usage, VkFilter filter,
                          VkSamplerAddressMode addressMode, VkSampleCountFlagBits samples, bool anisotropic, bool mipmap)
-        : Texture{bitmap,
+        : Texture{*bitmap,
                   filter,
                   addressMode,
                   samples,
@@ -72,7 +90,7 @@ std::unique_ptr<Bitmap> TextureCube::getBitmap(uint32_t mipLevel) const {
 
 	auto sizeSide = size.x * size.y * components;
 	auto bitmap = std::make_unique<Bitmap>(glm::uvec2{size.x, size.y * arrayLayers}, format);
-	auto offset = bitmap->getData<std::byte>();
+	auto offset = bitmap->getData<uint8_t>();
 
 	for (uint32_t i = 0; i < 6; ++i) {
 		auto bitmapSide = Image::getBitmap(mipLevel, i);
@@ -81,12 +99,6 @@ std::unique_ptr<Bitmap> TextureCube::getBitmap(uint32_t mipLevel) const {
 	}
 
 	return bitmap;
-}
-
-void TextureCube::setPixels(const std::byte* pixels, uint32_t layerCount, uint32_t baseArrayLayer) {
-    uint8_t components = vku::get_format_params(format).bytes;
-	Buffer bufferStaging{extent.width * extent.height * components * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels};
-	CopyBufferToImage(bufferStaging, image, extent, layerCount, baseArrayLayer);
 }
 
 void TextureCube::loadFromFile() {
@@ -115,16 +127,17 @@ void TextureCube::loadFromFile() {
     auto debugStart = DateTime::Now();
 #endif
     std::unique_ptr<gli::texture_cube> texture;
-    FileSystem::ReadBytes(filepath, [&texture](gsl::span<const std::byte> buffer) {
+    FileSystem::ReadBytes(filepath, [&texture](gsl::span<const uint8_t> buffer) {
         texture = std::make_unique<gli::texture_cube>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
     });
-#if FUSION_DEBUG
-    FE_LOG_DEBUG("TextureCube: '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
-#endif
 
     const gli::texture_cube& texCube = *texture;
     if (texCube.empty())
         throw std::runtime_error("Texture is empty");
+
+#if FUSION_DEBUG
+    FE_LOG_DEBUG("TextureCube: '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
+#endif
 
     extent.width = static_cast<uint32_t>(texCube.extent().x);
     extent.height = static_cast<uint32_t>(texCube.extent().y);

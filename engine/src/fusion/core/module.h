@@ -21,7 +21,7 @@ namespace fe {
      * @brief A interface used for defining engine modules.
      */
     template<typename ModuleImpl>
-    class Module : public ModuleBase {
+    class Module final : public ModuleBase {
         friend class ModuleHolder;
     private:
         Module() = default;

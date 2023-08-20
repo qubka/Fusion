@@ -6,7 +6,7 @@ namespace fe {
         Vector() = delete;
 
         template<typename T>
-        static void Append(std::vector<std::byte>& outputBuffer, const std::vector<T>& t) {
+        static void Append(std::vector<uint8_t>& outputBuffer, const std::vector<T>& t) { //! not use span here
             auto offset = outputBuffer.size();
             auto copySize = t.size() * sizeof(T);
             outputBuffer.resize(offset + copySize);
@@ -14,7 +14,7 @@ namespace fe {
         }
 
         template<typename T>
-        static void Append(std::vector<std::byte>& outputBuffer, const T& t) {
+        static void Append(std::vector<uint8_t>& outputBuffer, const T& t) {
             auto offset = outputBuffer.size();
             auto copySize = sizeof(T);
             outputBuffer.resize(offset + copySize);

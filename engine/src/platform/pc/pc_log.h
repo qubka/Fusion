@@ -5,7 +5,7 @@
 #include "fusion/core/log.h"
 
 namespace fe::pc {
-    class FUSION_API Log : public fe::Log {
+    class FUSION_API Log final : public fe::Log {
     public:
         Log();
         ~Log() override;

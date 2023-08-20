@@ -5,7 +5,6 @@
 
 using namespace fe;
 
-
 bool FileFormat::IsTextFile(const fs::path& filepath) {
     std::string extension{ FileSystem::GetExtension(filepath) };
 

@@ -3,7 +3,7 @@
 #include "fusion/core/engine.h"
 
 namespace fe::pc {
-    class FUSION_API Engine : public fe::Engine {
+    class FUSION_API Engine final : public fe::Engine {
     public:
         explicit Engine(CommandLineArgs&& args);
         ~Engine() override = default;

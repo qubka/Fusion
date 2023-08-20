@@ -7,7 +7,7 @@ extern "C" {
 }
 
 namespace fe::glfw {
-    class FUSION_API Monitor : public fe::Monitor {
+    class FUSION_API Monitor final : public fe::Monitor {
         friend class DeviceManager;
     public:
         explicit Monitor(GLFWmonitor* monitor);

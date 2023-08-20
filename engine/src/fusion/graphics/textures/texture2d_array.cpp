@@ -49,10 +49,29 @@ Texture2dArray::Texture2dArray(const glm::uvec2& extent, uint32_t arrayLayers, V
                   mipmap} {
 }
 
+Texture2dArray::Texture2dArray(gsl::span<const uint8_t> pixels, const glm::uvec2& extent, uint32_t arrayLayers, VkFormat format, VkImageLayout layout,
+                               VkImageUsageFlags usage, VkFilter filter, VkSamplerAddressMode addressMode,
+                               bool anisotropic, bool mipmap)
+        : Texture{pixels,
+                  filter,
+                  addressMode,
+                  VK_SAMPLE_COUNT_1_BIT,
+                  layout,
+                  usage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT,
+                  VK_IMAGE_VIEW_TYPE_2D_ARRAY,
+                  format,
+                  1,
+                  arrayLayers,
+                  { extent.x, extent.y, 1 },
+                  anisotropic,
+                  mipmap} {
+}
+
 Texture2dArray::Texture2dArray(const std::unique_ptr<Bitmap>& bitmap, uint32_t arrayLayers, VkFormat format,
                                VkImageLayout layout, VkImageUsageFlags usage, VkFilter filter,
                                VkSamplerAddressMode addressMode, bool anisotropic, bool mipmap)
-        : Texture{bitmap,
+        : Texture{*bitmap,
                   filter,
                   addressMode,
                   VK_SAMPLE_COUNT_1_BIT,
@@ -66,12 +85,6 @@ Texture2dArray::Texture2dArray(const std::unique_ptr<Bitmap>& bitmap, uint32_t a
                   vku::uvec3_cast(bitmap->getExtent()),
                   anisotropic,
                   mipmap} {
-}
-
-void Texture2dArray::setPixels(const float* pixels, uint32_t arrayLayer) {
-    uint8_t components = vku::get_format_params(format).bytes;
-	Buffer bufferStaging{extent.width * extent.height * components * arrayLayers, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels};
-	CopyBufferToImage(bufferStaging, image, extent, 1, arrayLayer);
 }
 
 void Texture2dArray::loadFromFile() {
@@ -100,16 +113,17 @@ void Texture2dArray::loadFromFile() {
     auto debugStart = DateTime::Now();
 #endif
     std::unique_ptr<gli::texture2d_array> texture;
-    FileSystem::ReadBytes(filepath, [&texture](gsl::span<const std::byte> buffer) {
+    FileSystem::ReadBytes(filepath, [&texture](gsl::span<const uint8_t> buffer) {
         texture = std::make_unique<gli::texture2d_array>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
     });
-#if FUSION_DEBUG
-    FE_LOG_DEBUG("Texture2dArray: '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
-#endif
 
     const gli::texture2d_array& tex2DArray = *texture;
     if (tex2DArray.empty())
         throw std::runtime_error("Texture is empty");
+
+#if FUSION_DEBUG
+    FE_LOG_DEBUG("Texture2dArray: '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
+#endif
 
     extent.width = static_cast<uint32_t>(tex2DArray.extent().x);
     extent.height = static_cast<uint32_t>(tex2DArray.extent().y);

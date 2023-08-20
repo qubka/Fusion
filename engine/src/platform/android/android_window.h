@@ -6,7 +6,7 @@
 class ANativeWindow;
 
 namespace fe::android {
-    class FUSION_API Window : public fe::Window {
+    class FUSION_API Window final : public fe::Window {
         friend class DeviceManager;
     public:
         Window(const WindowInfo& windowInfo);

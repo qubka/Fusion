@@ -77,16 +77,11 @@ void Graphics::onUpdate() {
         auto& perSurfaceBuffer = perSurfaceBuffers[id];
         auto& currentFrame = perSurfaceBuffer->currentFrame;
 
-        FrameInfo info {
-            id,
-            currentFrame,
-            *swapchain,
-            perSurfaceBuffer->commandBuffers[currentFrame],
-            perSurfaceBuffer->syncObjects[currentFrame],
 #if FUSION_PROFILE && TRACY_ENABLE
-            perSurfaceBuffer->tracyContexts[currentFrame]
+#define info perSurfaceBuffer->commandBuffers[currentFrame], perSurfaceBuffer->syncObjects[currentFrame], perSurfaceBuffer->tracyContexts[currentFrame], *swapchain, currentFrame, id
+#else
+#define info perSurfaceBuffer->commandBuffers[currentFrame], perSurfaceBuffer->syncObjects[currentFrame], *swapchain, currentFrame, id
 #endif
-        };
 
         if (!beginFrame(info))
             continue;
@@ -101,7 +96,7 @@ void Graphics::onUpdate() {
                 endRenderpass(info);
             }
 
-            stage.first++;
+            ++stage.first;
         }
 
         endFrame(info);
@@ -118,9 +113,7 @@ void Graphics::onUpdate() {
     }
 }
 
-bool Graphics::beginFrame(FrameInfo& info) {
-    UNPACK_FRAME_INFO(info);
-
+bool Graphics::beginFrame(FRAME_INFO) {
     auto result = swapchain.acquireNextImage(syncObject.getImageAvailableSemaphore(), syncObject.getInFlightFence());
 
 #if FUSION_PLATFORM_ANDROID
@@ -145,13 +138,12 @@ bool Graphics::beginFrame(FrameInfo& info) {
     return true;
 }
 
-bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
-    UNPACK_FRAME_INFO(info);
+bool Graphics::beginRenderpass(FRAME_INFO, RenderStage& renderStage) {
     FUSION_PROFILE_GPU("Begin Renderpass");
 
     if (renderStage.isOutOfDate()) {
         //FE_LOG_WARNING("Render stage is out of date!");
-        recreatePass(info, renderStage);
+        recreatePass(id, swapchain, renderStage);
         return false;
     }
 
@@ -176,9 +168,7 @@ bool Graphics::beginRenderpass(FrameInfo& info, RenderStage& renderStage) {
     return true;
 }
 
-void Graphics::nextSubpasses(FrameInfo& info, RenderStage& renderStage, Pipeline::Stage& pipelineStage) {
-    UNPACK_FRAME_INFO(info);
-
+void Graphics::nextSubpasses(FRAME_INFO, RenderStage& renderStage, Pipeline::Stage& pipelineStage) {
     auto lastBinding = renderStage.getSubpasses().back().binding;
 
     for (const auto& subpass : renderStage.getSubpasses()) {
@@ -194,15 +184,11 @@ void Graphics::nextSubpasses(FrameInfo& info, RenderStage& renderStage, Pipeline
     }
 }
 
-void Graphics::endRenderpass(FrameInfo& info) {
-    UNPACK_FRAME_INFO(info);
-
+void Graphics::endRenderpass(FRAME_INFO) {
     vkCmdEndRenderPass(commandBuffer);
 }
 
-void Graphics::endFrame(FrameInfo& info) {
-    UNPACK_FRAME_INFO(info);
-
+void Graphics::endFrame(FRAME_INFO) {
 #if FUSION_PROFILE && TRACY_ENABLE
     TracyVkCollect(tracyContext, commandBuffer);
 #endif
@@ -257,7 +243,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     VkSubresourceLayout dstSubresourceLayout;
     vkGetImageSubresourceLayout(logicalDevice, dstImage, &imageSubresource, &dstSubresourceLayout);
 
-    Bitmap bitmap{std::make_unique<std::byte[]>(dstSubresourceLayout.size), size};
+    Bitmap bitmap{std::make_unique<uint8_t[]>(dstSubresourceLayout.size), size};
 
     // If source is BGR (destination is always RGB) and we can't use blit (which does automatic conversion), we'll have to manually swizzle color components
     bool colorSwizzle = false;
@@ -278,7 +264,7 @@ void Graphics::captureScreenshot(const fs::path& filepath, size_t id) const {
     void* data;
     vkMapMemory(logicalDevice, dstImageMemory, dstSubresourceLayout.offset, dstSubresourceLayout.size, 0, &data);
     if (colorSwizzle)
-        vku::BlitRGBAToBGRASurface(bitmap.getData<std::byte>(), static_cast<const std::byte*>(data), size);
+        vku::rgba_to_bgra(bitmap.getData<uint8_t>(), static_cast<const uint8_t*>(data), size.x * size.y);
     else
         std::memcpy(bitmap.getData<void>(), data, dstSubresourceLayout.size);
     vkUnmapMemory(logicalDevice, dstImageMemory);
@@ -352,12 +338,10 @@ void Graphics::recreateAttachmentsMap() {
     }
 }
 
-void Graphics::recreatePass(FrameInfo& info, RenderStage& renderStage) {
+void Graphics::recreatePass(size_t id, Swapchain& swapchain, RenderStage& renderStage) {
     // Swapchain should recreate in the begin or the end frame stage
     if (renderStage.hasSwapchain())
         return;
-
-    UNPACK_FRAME_INFO(info);
 
     auto graphicsQueue = logicalDevice.getGraphicsQueue();
     VK_CHECK(vkQueueWaitIdle(graphicsQueue));

@@ -11,9 +11,6 @@ namespace fe {
         using TWriteMethod = std::function<void(const Base&, const fs::path&)>;
         using TRegistryMap = std::unordered_map<std::string, std::pair<TLoadMethod, TWriteMethod>>;
 
-        //BitmapFactory() = default;
-        virtual ~BitmapFactory() = default;
-
         static TRegistryMap& Registry() {
             static TRegistryMap map;
             return map;

@@ -5,7 +5,7 @@
 #include "fusion/core/log.h"
 
 namespace fe::android {
-    class FUSION_API Log : public fe::Log {
+    class FUSION_API Log final : public fe::Log {
     public:
         Log() = default;
         ~Log() override = default;

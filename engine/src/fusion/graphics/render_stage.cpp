@@ -25,7 +25,7 @@ RenderStage::RenderStage(std::vector<Attachment>&& images, std::vector<SubpassTy
 
                 for (const auto& subpass : this->subpasses) {
                     if (const auto& subpassBindings = subpass.attachmentBindings; std::find(subpassBindings.begin(), subpassBindings.end(), image.binding) != subpassBindings.end()) {
-                        subpassAttachmentCount[subpass.binding]++;
+                        ++subpassAttachmentCount[subpass.binding];
 
                         if (image.multisampled)
                             subpassMultisampled[subpass.binding] = true;

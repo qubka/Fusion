@@ -5,7 +5,7 @@
 struct android_app;
 
 namespace fe::android {
-    class FUSION_API Engine : public fe::Engine {
+    class FUSION_API Engine final : public fe::Engine {
     public:
         Engine(struct android_app* app, CommandLineArgs&& args);
         ~Engine() override = default;

@@ -92,13 +92,13 @@ int Sphere::intersect(const Ray& ray, float& min, float& max) const {
         t = (-b - e) / denom;
         if (t > EPSILON_VALUE) {
             min = t;
-            count++;
+            ++count;
         }
 
         t = (-b + e) / denom;
         if (t > EPSILON_VALUE) {
             max = t;
-            count++;
+            ++count;
         }
     }
 

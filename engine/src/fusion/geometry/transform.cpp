@@ -92,8 +92,8 @@ void Transform::setLocalTransform(const glm::mat4& localMat) {
 }
 
 bool Transform::setLocalPosition(const glm::vec3& localPos) {
-    if (glm::all(glm::epsilonEqual(localPosition, localPos, FLT_EPSILON)))
-        return false;
+    //if (glm::all(glm::epsilonEqual(localPosition, localPos, FLT_EPSILON)))
+    //    return false;
 
     localPosition = localPos;
     dirty = true;
@@ -101,8 +101,8 @@ bool Transform::setLocalPosition(const glm::vec3& localPos) {
 }
 
 bool Transform::setLocalScale(const glm::vec3& scale) {
-    if (glm::all(glm::epsilonEqual(localScale, scale, FLT_EPSILON)))
-        return false;
+    //if (glm::all(glm::epsilonEqual(localScale, scale, FLT_EPSILON)))
+    //    return false;
 
     localScale = scale;
     dirty = true;
@@ -110,8 +110,8 @@ bool Transform::setLocalScale(const glm::vec3& scale) {
 }
 
 bool Transform::setLocalOrientation(const glm::quat& rotation) {
-    if (glm::all(glm::epsilonEqual(localOrientation, rotation, FLT_EPSILON)))
-        return false;
+    //if (glm::all(glm::epsilonEqual(localOrientation, rotation, FLT_EPSILON)))
+    //    return false;
 
     localOrientation = rotation;
     dirty = true;
@@ -120,8 +120,8 @@ bool Transform::setLocalOrientation(const glm::quat& rotation) {
 
 bool Transform::setLocalOrientation(const glm::vec3& axis, float angle) {
     glm::quat orientation{ glm::angleAxis(angle, axis) };
-    if (glm::all(glm::epsilonEqual(localOrientation, orientation, FLT_EPSILON)))
-        return false;
+    //if (glm::all(glm::epsilonEqual(localOrientation, orientation, FLT_EPSILON)))
+    //    return false;
 
     localOrientation = orientation;
     dirty = true;
@@ -189,8 +189,8 @@ glm::vec3 Transform::getLocalBackDirection() const {
 }
 
 bool Transform::translateLocal(const glm::vec3& translation) {
-    if (glm::all(glm::epsilonEqual(translation, vec3::zero, FLT_EPSILON)))
-        return false;
+    //if (glm::all(glm::epsilonEqual(translation, vec3::zero, FLT_EPSILON)))
+    //    return false;
 
     localPosition += translation;
     dirty = true;
@@ -233,8 +233,8 @@ bool Transform::lookAt(glm::vec3 target, glm::vec3 up) {
 }
 
 bool Transform::scaleLocal(const glm::vec3& scale) {
-    if (glm::all(glm::epsilonEqual(scale, vec3::one, FLT_EPSILON)))
-        return false;
+    //if (glm::all(glm::epsilonEqual(scale, vec3::one, FLT_EPSILON)))
+    //    return false;
 
     localScale *= scale;
     dirty = true;

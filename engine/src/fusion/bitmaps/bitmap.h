@@ -3,15 +3,15 @@
 #include "bitmap_factory.h"
 
 namespace fe {
-    class FUSION_API Bitmap : public BitmapFactory<Bitmap> {
+    class FUSION_API Bitmap final : public BitmapFactory<Bitmap> {
         friend class StbToolbox;
         friend class GliToolbox;
     public:
         Bitmap() = default;
         explicit Bitmap(const fs::path& filepath);
         explicit Bitmap(const glm::uvec2& size, VkFormat format = VK_FORMAT_R8G8B8A8_UNORM);
-        Bitmap(std::unique_ptr<std::byte[]>&& data, const glm::uvec2& size, VkFormat format = VK_FORMAT_R8G8B8A8_UNORM);
-        ~Bitmap() override = default;
+        Bitmap(std::unique_ptr<uint8_t[]>&& data, const glm::uvec2& size, VkFormat format = VK_FORMAT_R8G8B8A8_UNORM);
+        ~Bitmap() = default;
         NONCOPYABLE(Bitmap); // TEMP
 
         void load(const fs::path& filepath);
@@ -38,7 +38,7 @@ namespace fe {
         bool isEmpty() const { return !data || (size.x == 0 && size.y == 0); }
 
     private:
-        std::unique_ptr<std::byte[]> data;
+        std::unique_ptr<uint8_t[]> data;
         glm::uvec2 size{ 0 };
         VkFormat format{ VK_FORMAT_UNDEFINED };
         fs::path path;

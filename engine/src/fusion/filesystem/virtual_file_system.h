@@ -26,7 +26,7 @@ namespace fe {
          * @param filepath The path to read.
          * @param handler The lambda with data read from the file.
          */
-        virtual void readBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler) const = 0;
+        virtual void readBytes(const fs::path& filepath, const std::function<void(gsl::span<const uint8_t>)>& handler) const = 0;
 
         /**
          * Opens a text file, reads all the text in the file into a string, and then closes the file.
@@ -41,7 +41,7 @@ namespace fe {
          * @param buffer The buffer data.
          * @return True on the success, false otherwise.
          */
-        virtual bool writeBytes(const fs::path& filepath, gsl::span<const std::byte> buffer) const = 0;
+        virtual bool writeBytes(const fs::path& filepath, gsl::span<const uint8_t> buffer) const = 0;
 
         /**
          * Opens a file, write the text string into the file, and then closes the file.

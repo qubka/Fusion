@@ -2,24 +2,39 @@
     "value0": {
         "name": "New Scene(1)"
     },
-    "value1": 3,
+    "value1": 6,
     "value2": 4294967295,
     "value3": 0,
     "value4": 1,
     "value5": 2,
-    "value6": 0,
-    "value7": {
+    "value6": 3,
+    "value7": 4,
+    "value8": 5,
+    "value9": 0,
+    "value10": {
         "name": "RootNode"
     },
-    "value8": 1,
-    "value9": {
+    "value11": 1,
+    "value12": {
         "name": "Light"
     },
-    "value10": 0,
-    "value11": 0,
-    "value12": 2,
-    "value13": 0,
+    "value13": 2,
     "value14": {
+        "name": "Label"
+    },
+    "value15": 3,
+    "value16": {
+        "name": "Camera"
+    },
+    "value17": 4,
+    "value18": {
+        "name": "Skybox"
+    },
+    "value19": 0,
+    "value20": 0,
+    "value21": 4,
+    "value22": 0,
+    "value23": {
         "position": {
             "x": 0.0,
             "y": 0.0,
@@ -37,8 +52,8 @@
             "z": 1.0
         }
     },
-    "value15": 1,
-    "value16": {
+    "value24": 1,
+    "value25": {
         "position": {
             "x": 0.0,
             "y": 0.0,
@@ -56,16 +71,68 @@
             "z": 1.0
         }
     },
-    "value17": 0,
-    "value18": 1,
-    "value19": 0,
-    "value20": {
+    "value26": 2,
+    "value27": {
+        "position": {
+            "x": -0.9941295385360718,
+            "y": 1.4134795665740967,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value28": 3,
+    "value29": {
+        "position": {
+            "x": 0.03676397353410721,
+            "y": 0.0,
+            "z": 7.11086893081665
+        },
+        "orientation": {
+            "x": 4.448333257300874e-8,
+            "y": 0.9998412132263184,
+            "z": 4.448333257300874e-8,
+            "w": -0.017818870022892953
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value30": 1,
+    "value31": 3,
+    "value32": {
+        "fovDegrees": 45.0,
+        "nearClip": 0.10000000149011612,
+        "farClip": 1000.0,
+        "aspectRatio": 0.9578713774681091,
+        "pivotDistance": 44.821868896484378,
+        "scale": 10.0,
+        "aperture": 50.0,
+        "shutterSpeed": 0.01666666753590107,
+        "sensitivity": 200.0,
+        "shadowBoundingRadius": 10.0,
+        "orthographic": false
+    },
+    "value33": 1,
+    "value34": 0,
+    "value35": {
         "model": "27f1da89-8893-42ff-b000-19f83b6e7a68",
         "index": 0
     },
-    "value21": 1,
-    "value22": 1,
-    "value23": {
+    "value36": 1,
+    "value37": 1,
+    "value38": {
         "type": 0,
         "color": {
             "x": 1.0,
@@ -95,9 +162,9 @@
         "linear": 0.09000000357627869,
         "quadratic": 0.03200000151991844
     },
-    "value24": 1,
-    "value25": 0,
-    "value26": {
+    "value39": 1,
+    "value40": 0,
+    "value41": {
         "baseColor": {
             "x": 0.5,
             "y": 0.5,
@@ -108,11 +175,30 @@
         "normal": "",
         "shininess": 32.0
     },
-    "value27": 0,
-    "value28": 0,
-    "value29": 0,
-    "value30": 0,
-    "value31": 0,
-    "value32": 0,
-    "value33": 0
+    "value42": 1,
+    "value43": 2,
+    "value44": {
+        "text": "Cubik",
+        "font": "c8ca3991-f1bf-47db-8ed9-c60fc0316421",
+        "color": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0,
+            "w": 1.0
+        },
+        "kerning": 0.0,
+        "lineSpacing": 0.0
+    },
+    "value45": 1,
+    "value46": 4,
+    "value47": {
+        "texture": "b8ae7456-bcc2-469c-b4d3-55608a617177"
+    },
+    "value48": 0,
+    "value49": 0,
+    "value50": 0,
+    "value51": 0,
+    "value52": 0,
+    "value53": 0,
+    "value54": 0
 }

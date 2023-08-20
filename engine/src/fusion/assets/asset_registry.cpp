@@ -24,7 +24,13 @@ void AssetRegistry::releaseAll() {
     assetDatabase = std::make_unique<AssetDatabase>(path);
 
 #if !FUSION_VIRTUAL_FS
-    std::set<std::string> exts{".fbx", ".obj", ".png", ".meta"};
+    std::set<std::string> exts{
+        ".fbx", ".obj",
+        ".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm",
+        ".ktx", ".kmg", ".dds",
+        ".ttf",
+        ".meta"
+    };
 
     fileWatcher = std::make_unique<FileWatcher>(path, [&](const fs::path& path, FileEvent event) {
         return onFileChanged(path, event);
@@ -170,6 +176,8 @@ void AssetRegistry::onFileModified(const fs::path& filepath) {
 
                 // reload asset
                 FE_LOG_DEBUG("[{}] Asset reload: '{}'", *uuid, shortPath);
+
+                // TODO: Finish
 
                 return;
             }

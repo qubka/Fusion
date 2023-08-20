@@ -228,12 +228,12 @@ double ProcessInfo::getProcessMemoryUsed() {
                 char* cursor = lLineBuf + 6;
                 /* Get rid of preceding blanks */
                 while (!isdigit(*cursor)) {
-                    cursor++;
+                    ++cursor;
                 }
                 /* Get rid of following blanks */
                 char* lNumString = cursor;
                 while (isdigit(*cursor)) {
-                    cursor++;
+                    ++cursor;
                 }
                 *cursor = '\0';
                 lMemUsed = std::stod(lNumString) / 1024.0;

@@ -64,6 +64,8 @@ void Editor::onStart() {
     componentIconMap[type_id<LuaScriptComponent>] = ICON_MDI_SCRIPT;
     componentIconMap[type_id<EnvironmentComponent>] = ICON_MDI_EARTH;*/
     componentIconMap[type_id<ScriptComponent>] = ICON_MDI_SCRIPT;
+    componentIconMap[type_id<TextComponent>] = ICON_MDI_FORMAT_TEXT;
+    componentIconMap[type_id<SkyboxComponent>] = ICON_MDI_WEATHER_NIGHT;
     componentIconMap[type_id<Editor>] = ICON_MDI_SQUARE;
 
     panels.push_back(std::make_unique<ApplicationInfoPanel>(*this));

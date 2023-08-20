@@ -47,10 +47,6 @@
 	path = external/iconfontcppheaders
 	url = https://github.com/juliettef/IconFontCppHeaders
 	ignore = all
-[submodule "external/freetype"]
-	path = external/freetype
-	url = https://github.com/freetype/freetype
-	ignore = all
 [submodule "external/glslang"]
 	path = external/glslang
 	url = https://github.com/KhronosGroup/glslang
@@ -118,4 +114,8 @@
 [submodule "external/stduuid"]
 	path = external/stduuid
 	url = https://github.com/mariusbancila/stduuid
+	ignore = all
+[submodule "external/msdf-atlas-gen"]
+	path = external/msdf-atlas-gen
+	url = https://github.com/Chlumsky/msdf-atlas-gen
 	ignore = all

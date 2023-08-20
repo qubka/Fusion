@@ -22,6 +22,31 @@ void TextCentered(const char* text, std::optional<float> offsetY) {
     ImGui::TextUnformatted(text);
 }
 
+bool PropertyTextbox(const char* name, std::string& value, const ImVec2& size) {
+    bool updated = false;
+
+    //ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted(name);
+    ImGui::NextColumn();
+    ImGui::PushItemWidth(-1);
+
+    ImGui::PushID(name);
+
+    std::array<char, 1024> buffer{};
+    std::strncpy(buffer.data(), value.c_str(), sizeof(buffer));
+    if (ImGui::InputTextMultiline("", buffer.data(), sizeof(buffer), size, ImGuiInputTextFlags_AutoSelectAll)) {
+        value = std::string{ buffer.data() };
+        updated = true;
+    }
+
+    ImGui::PopID();
+
+    ImGui::PopItemWidth();
+    ImGui::NextColumn();
+
+    return updated;
+}
+
 bool PropertyText(const char* name, std::string& value) {
     bool updated = false;
 

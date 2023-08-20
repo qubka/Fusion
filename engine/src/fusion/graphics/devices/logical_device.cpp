@@ -9,6 +9,7 @@ using namespace fe;
 
 const std::vector<const char*> LogicalDevice::DeviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME,
 #ifndef FUSION_PLATFORM_ANDROID
         VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME,
         VK_KHR_MAINTENANCE3_EXTENSION_NAME,
@@ -29,7 +30,8 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
 
     enabledFeatures = physicalDevice.getFeatures();
 
-    // Enable required extension features
+    /// TODO: Rework that to allow user to change enable features
+
 #ifndef FUSION_PLATFORM_ANDROID
     physicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
     physicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
@@ -41,7 +43,10 @@ LogicalDevice::LogicalDevice(const Instance& instance, const PhysicalDevice& phy
     pNextChain = &physicalDeviceDescriptorIndexingFeatures;
 #endif
 
-    /// TODO: Rework that to allow user to change enable features
+    physicalDeviceIndexTypeUint8Features.indexTypeUint8 = VK_TRUE;
+    physicalDeviceIndexTypeUint8Features.pNext = pNextChain;
+    pNextChain = &physicalDeviceIndexTypeUint8Features;
+
     {
         // Enable sample rate shading filtering if supported.
         if (enabledFeatures.sampleRateShading)

@@ -99,29 +99,6 @@ static void TransformComponent_SetPosition(uint32_t entityID, glm::vec3* positio
     registry.get<TransformComponent>(entity).setLocalPosition(*position);
 }
 
-#if GLM_FORCE_QUAT_DATA_XYZW
-static void TransformComponent_GetRotation(uint32_t entityID, glm::quat* outRotation) {
-    auto scene = ScriptEngine::Get()->getSceneContext();
-    FE_ASSERT(scene);
-    auto entity = static_cast<entt::entity>(entityID);
-    if (!scene->isEntityValid(entity))
-        return;
-
-    auto& registry = scene->getRegistry();
-    *outRotation = registry.get<TransformComponent>(entity).getLocalOrientation();
-}
-
-static void TransformComponent_SetRotation(uint32_t entityID, glm::quat* rotation) {
-    auto scene = ScriptEngine::Get()->getSceneContext();
-    FE_ASSERT(scene);
-    auto entity = static_cast<entt::entity>(entityID);
-    if (!scene->isEntityValid(entity))
-        return;
-
-    auto& registry = scene->getRegistry();
-    registry.get<TransformComponent>(entity).setLocalOrientation(*rotation);
-}
-#else
 static void TransformComponent_GetRotation(uint32_t entityID, glm::vec4* outRotation) {
     auto scene = ScriptEngine::Get()->getSceneContext();
     FE_ASSERT(scene);
@@ -144,7 +121,6 @@ static void TransformComponent_SetRotation(uint32_t entityID, glm::vec4* rotatio
     auto& registry = scene->getRegistry();
     registry.get<TransformComponent>(entity).setLocalOrientation(glm::quat{ rotation->w, rotation->x, rotation->y, rotation->z });
 }
-#endif
 
 static void TransformComponent_GetScale(uint32_t entityID, glm::vec3* outScale) {
     auto scene = ScriptEngine::Get()->getSceneContext();

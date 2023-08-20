@@ -3,7 +3,7 @@
 #include "fusion/devices/joystick.h"
 
 namespace fe::glfw {
-    class FUSION_API Joystick : public fe::Joystick {
+    class FUSION_API Joystick final : public fe::Joystick {
         friend class DeviceManager;
     public:
         explicit Joystick(uint8_t port);

@@ -12,16 +12,14 @@ namespace fe {
 
         template<typename Archive>
         void load(Archive& archive) {
+            uuids::uuid uuid;
             archive(cereal::make_nvp("baseColor", baseColor));
-            uuids::uuid diffuseUuid;
-            archive(cereal::make_nvp("diffuse", diffuseUuid));
-            diffuse = AssetRegistry::Get()->load<Texture2d>(diffuseUuid);
-            uuids::uuid specularUuid;
-            archive(cereal::make_nvp("specular", specularUuid));
-            specular = AssetRegistry::Get()->load<Texture2d>(specularUuid);
-            uuids::uuid normalUuid;
-            archive(cereal::make_nvp("normal", normalUuid));
-            normal = AssetRegistry::Get()->load<Texture2d>(normalUuid);
+            archive(cereal::make_nvp("diffuse", uuid));
+            diffuse = AssetRegistry::Get()->load<Texture2d>(uuid);
+            archive(cereal::make_nvp("specular", uuid));
+            specular = AssetRegistry::Get()->load<Texture2d>(uuid);
+            archive(cereal::make_nvp("normal", uuid));
+            normal = AssetRegistry::Get()->load<Texture2d>(uuid);
             archive(cereal::make_nvp("shininess", shininess));
         }
 

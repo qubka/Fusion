@@ -3,7 +3,7 @@
 #include "fusion/graphics/buffers/buffer.h"
 
 namespace fe {
-    class FUSION_API InstanceBuffer : public Buffer {
+    class FUSION_API InstanceBuffer final : public Buffer {
     public:
         explicit InstanceBuffer(VkDeviceSize size);
 

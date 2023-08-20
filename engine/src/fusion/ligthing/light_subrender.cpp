@@ -29,6 +29,8 @@ void LightSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
     if (!camera)
         return;
 
+    auto& registry = scene->getRegistry();
+
     // Update uniforms
     uniformObject.push("projection", camera->getProjectionMatrix());
     uniformObject.push("view", camera->getViewMatrix());
@@ -42,7 +44,7 @@ void LightSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* 
     descriptorSet.bindDescriptor(commandBuffer, pipeline);
     //pushObject.bindPush(commandBuffer, pipeline);
 
-    auto lightView = scene->getRegistry().view<TransformComponent, LightComponent>();
+    auto lightView = registry.view<TransformComponent, LightComponent>();
 
     for (const auto& [entity, transform, light] : lightView.each()) {
         if (light.type == LightComponent::LightType::Directional)

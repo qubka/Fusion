@@ -6,8 +6,8 @@
 #include "fusion/skybox/atmosphere_subrender.h"
 #include "fusion/skybox/skybox_subrender.h"
 #include "fusion/models/mesh_subrender.h"
-#include "fusion/models/mesh2_subrender.h"
 #include "fusion/ligthing/light_subrender.h"
+#include "fusion/text/text_subrender.h"
 //#include "fusion/post/deferred/deferred_subrender.h"
 #include "fusion/debug/debug_subrender.h"
 
@@ -53,14 +53,16 @@ namespace fe {
 
     private:
         void onStart() override {
-            addSubrender<Mesh2Subrender>({0, 0});
+            addSubrender<MeshSubrender>({0, 0});
             addSubrender<LightSubrender>({0, 0});
+            addSubrender<TextSubrender>({0, 0});
             addSubrender<DebugSubrender>({0, 0});
             addSubrender<GridSubrender>({0, 0});
 
-            addSubrender<Mesh2Subrender>({1, 0});
+            addSubrender<MeshSubrender>({1, 0});
             addSubrender<LightSubrender>({1, 0});
-            //addSubrender<SkyboxSubrender>({1, 0});
+            addSubrender<TextSubrender>({1, 0});
+            addSubrender<SkyboxSubrender>({1, 0});
             //addSubrender<AtmosphereSubrender>({1, 0});
 
             addSubrender<ImGuiSubrender>({2, 0});

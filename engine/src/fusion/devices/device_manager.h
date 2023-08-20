@@ -132,8 +132,6 @@ namespace fe {
         auto OnJoystickConnect() { return entt::sink{onJoystickConnect}; }
 
     protected:
-        static DeviceManager* Instance;
-
         std::vector<std::unique_ptr<Window>> windows{};
         std::vector<std::unique_ptr<Monitor>> monitors{};
         std::vector<std::unique_ptr<Joystick>> joysticks{};
@@ -145,5 +143,7 @@ namespace fe {
         entt::sigh<void(Joystick*, bool)> onJoystickConnect{};
 
         bool started{ false };
+
+        static DeviceManager* Instance;
     };
 }

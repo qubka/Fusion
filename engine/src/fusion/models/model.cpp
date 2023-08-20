@@ -55,7 +55,7 @@ void Model::loadFromFile() {
     /*const aiScene* scene = nullptr;
     Assimp::Importer import;
 
-    FileSystem::ReadBytes(modelPath, [&](gsl::span<const std::byte> buffer) {
+    FileSystem::ReadBytes(modelPath, [&](gsl::span<const uint8_t> buffer) {
         scene = import.ReadFileFromMemory(buffer.data(), buffer.size(), flags);
     });*/
 
@@ -103,7 +103,7 @@ void Model::processNode(const aiScene* scene, const aiNode* node, SceneObject& t
 
 void Model::processMeshes(const aiScene* scene, const aiNode* node, SceneObject& parent) {
     for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
-        std::vector<std::byte> vertices;
+        std::vector<uint8_t> vertices;
         std::vector<uint32_t> indices;
         uint32_t index = node->mMeshes[i];
         {
@@ -197,7 +197,7 @@ void Model::processMeshes(const aiScene* scene, const aiNode* node, SceneObject&
 static aiVector3D zero{0.0f, 0.0f, 0.0f};
 
 const aiVector3D& getTextureCoord(const aiMesh* mesh, uint32_t texture, uint32_t i) {
-    for (uint32_t j = texture; j != -1; j--) {
+    for (uint32_t j = texture; j != -1; --j) {
         if (mesh->HasTextureCoords(j)) {
             return mesh->mTextureCoords[j][i];
         }
@@ -205,7 +205,7 @@ const aiVector3D& getTextureCoord(const aiMesh* mesh, uint32_t texture, uint32_t
     return zero;
 }
 
-void Model::appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t i) {
+void Model::appendVertex(std::vector<uint8_t>& outputBuffer, const aiScene* scene, const aiMesh* mesh, uint32_t i) {
     uint32_t texture = 0;
 
     // preallocate float buffer with approximate size
@@ -253,7 +253,7 @@ void Model::appendVertex(std::vector<std::byte>& outputBuffer, const aiScene* sc
                 const aiVector3D& texCoord = getTextureCoord(mesh, texture, i);
                 vertexBuffer.push_back(texCoord.x);
                 vertexBuffer.push_back(texCoord.y);
-                //texture++;
+                //++texture;
                 break;
             }
             case Component::Color: {

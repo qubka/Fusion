@@ -67,16 +67,10 @@ namespace fe {
         void clearEntities();
 
         /**
-         * Gets the primary camera component.
+         * Gets the primary camera component. (as read-only)
          * @return The camera component.
          */
         const Camera* getCamera() const;
-
-        /**
-         * Gets the primary camera entity.
-         * @return The camera entity.
-         */
-        entt::entity getCameraEntity() const;
 
         /**
          * Gets the name of the scene.
@@ -133,6 +127,34 @@ namespace fe {
          * @param camera The new entity registry.
          */
         //void setRegistry(entt::registry&& registry) { this->registry = std::move(registry) ; }
+
+        /**
+         * Gets the component of the first entity.
+         * @return The first component.
+         */
+        template<typename T>
+        T* getComponent() {
+            auto view = registry.view<T>();
+            if (!view.empty()) {
+                return &registry.get<T>(view.front());
+            } else {
+                return nullptr;
+            }
+        }
+
+        /**
+         * Gets the first entity.
+         * @return The first entity.
+         */
+        template<typename T>
+        entt::entity getEntity() {
+            auto view = registry.view<T>();
+            if (!view.empty()) {
+                return view.front();
+            } else {
+                return entt::null;
+            }
+        }
 
         template<typename T>
         auto getAllEntitiesWith() { return registry.view<T>(); }

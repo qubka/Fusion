@@ -3,7 +3,7 @@
 #include "fusion/filesystem/virtual_file_system.h"
 
 namespace fe::pc {
-    class FUSION_API VirtualFileSystem : public fe::VirtualFileSystem {
+    class FUSION_API VirtualFileSystem final : public fe::VirtualFileSystem {
     public:
         VirtualFileSystem();
         ~VirtualFileSystem() override;
@@ -12,11 +12,11 @@ namespace fe::pc {
 
         void unmount(const fs::path& path) override;
 
-        void readBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler) const override;
+        void readBytes(const fs::path& filepath, const std::function<void(gsl::span<const uint8_t>)>& handler) const override;
 
         std::string readText(const fs::path& filepath) const override;
 
-        bool writeBytes(const fs::path& filepath, gsl::span<const std::byte> buffer) const override;
+        bool writeBytes(const fs::path& filepath, gsl::span<const uint8_t> buffer) const override;
 
         bool writeText(const fs::path& filepath, std::string_view text) const override;
 

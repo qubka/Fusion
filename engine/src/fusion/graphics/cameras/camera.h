@@ -57,7 +57,7 @@ namespace fe {
         glm::vec3 getPivotPoint() const { return eyePoint - viewDirection * pivotDistance; }
 
         //! Returns the Camera's frustum object using current view and current projection matrices
-        const Frustum& getFrustum() { if (frustumDirty) calcFrustum(); return frustum; }
+        const Frustum& getFrustum() const { if (frustumDirty) calcFrustum(); return frustum; }
         //! Returns the Camera's Projection matrix, which converts view-space into clip-space
         const glm::mat4& getProjectionMatrix() const { if (projectionDirty) calcProjection(); return projectionMatrix; }
         //! Returns the Camera's Inverse Projection matrix, which converts view-space into clip-space
@@ -134,7 +134,7 @@ namespace fe {
         void calcInverseProjection() const;
         void calcView() const;
         void calcInverseView() const;
-        void calcFrustum();
+        void calcFrustum() const;
 
         void dirtyView() const { viewDirty = inverseViewDirty = frustumDirty = true; }
         bool isViewDirty() const { return viewDirty || inverseViewDirty; }
@@ -175,6 +175,6 @@ namespace fe {
         mutable bool inverseViewDirty{ true };
         mutable bool frustumDirty{ true };
 
-        Frustum frustum;
+        mutable Frustum frustum;
     };
 }

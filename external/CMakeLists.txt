@@ -23,7 +23,6 @@ include(_/IncludeEnTT.cmake)
 include(_/IncludeBitmask.cmake)
 include(_/IncludeMagicEnum.cmake)
 include(_/IncludeSTB.cmake)
-include(_/IncludeFreetype.cmake)
 include(_/IncludeRandom.cmake)
 include(_/IncludeSpan.cmake)
 include(_/IncludeGLSlang.cmake)
@@ -35,6 +34,9 @@ include(_/IncludeAssimp.cmake)
 include(_/IncludeImGui.cmake)
 include(_/IncludeLMDB.cmake)
 include(_/IncludeUUID.cmake)
+
+#
+include(_/IncludeMSDF.cmake)
 
 set(FUSION_LINK_LIBS ${ALL_LIBS} CACHE INTERNAL "")
 set(FUSION_LIBRARY_DIRS ${ALL_DIRS} CACHE INTERNAL "")

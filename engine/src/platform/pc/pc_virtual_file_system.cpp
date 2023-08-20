@@ -49,7 +49,7 @@ void VirtualFileSystem::unmount(const fs::path& path) {
     //return mountPoints;
 }*/
 
-void VirtualFileSystem::readBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler) const {
+void VirtualFileSystem::readBytes(const fs::path& filepath, const std::function<void(gsl::span<const uint8_t>)>& handler) const {
     auto fsFile = PHYSFS_openRead(filepath.string().c_str());
 
     if (!fsFile) {
@@ -58,14 +58,14 @@ void VirtualFileSystem::readBytes(const fs::path& filepath, const std::function<
     }
 
     auto size = PHYSFS_fileLength(fsFile);
-    std::vector<std::byte> data(size);
-    PHYSFS_readBytes(fsFile, data.data(), static_cast<PHYSFS_uint64>(size));
+    std::vector<uint8_t> buffer(size);
+    PHYSFS_readBytes(fsFile, buffer.data(), static_cast<PHYSFS_uint64>(size));
 
     if (PHYSFS_close(fsFile) == 0) {
         FE_LOG_ERROR("Failed to close file: {} - {}", filepath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     }
 
-    handler(data);
+    handler(buffer);
 }
 
 std::string VirtualFileSystem::readText(const fs::path& filepath) const {
@@ -77,17 +77,17 @@ std::string VirtualFileSystem::readText(const fs::path& filepath) const {
     }
 
     auto size = PHYSFS_fileLength(fsFile);
-    std::vector<uint8_t> data(size);
-    PHYSFS_readBytes(fsFile, data.data(), static_cast<PHYSFS_uint64>(size));
+    std::vector<uint8_t> buffer(size);
+    PHYSFS_readBytes(fsFile, buffer.data(), static_cast<PHYSFS_uint64>(size));
 
     if (PHYSFS_close(fsFile) == 0) {
         FE_LOG_ERROR("Failed to close file: {} - {}", filepath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     }
 
-    return { data.begin(), data.end() };
+    return { buffer.begin(), buffer.end() };
 }
 
-bool VirtualFileSystem::writeBytes(const fs::path& filepath, gsl::span<const std::byte> buffer) const {
+bool VirtualFileSystem::writeBytes(const fs::path& filepath, gsl::span<const uint8_t> buffer) const {
     return false;
 }
 

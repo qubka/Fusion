@@ -60,7 +60,7 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
             baseLight.linear = light.linear;
             baseLight.quadratic = light.quadratic;
             lights[lightCount] = baseLight;
-            lightCount++;
+            ++lightCount;
 
             if (lightCount >= MAX_LIGHTS)
                 break;
@@ -83,11 +83,11 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
 
     auto view = registry.view<MaterialComponent>();
 
-    float i = 0.0f;
+    float id = 0.0f;
     for (const auto& [entity, material]: view.each()) {
-        if (material.diffuse && *material.diffuse) if (bindlessDescriptors.emplace(material.diffuse.get(), i).second) i++;
-        if (material.specular && *material.specular) if (bindlessDescriptors.emplace(material.specular.get(), i).second) i++;
-        if (material.normal && *material.normal) if (bindlessDescriptors.emplace(material.normal.get(), i).second) i++;
+        if (material.diffuse && *material.diffuse) if (bindlessDescriptors.emplace(material.diffuse.get(), id).second) ++id;
+        if (material.specular && *material.specular) if (bindlessDescriptors.emplace(material.specular.get(), id).second) ++id;
+        if (material.normal && *material.normal) if (bindlessDescriptors.emplace(material.normal.get(), id).second) ++id;
     }
 
     descriptorSet.push("textures", bindlessDescriptors.keys());
@@ -105,9 +105,11 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
         return registry.get<MeshComponent>(a).get() < registry.get<MeshComponent>(b).get();
     });
 
+    const auto& frustum = camera->getFrustum();
+
     for (const auto& [entity, mesh, transform, material] : group.each()) {
         auto filter = mesh.get();
-        if (!filter)
+        if (!filter || !frustum.intersects(filter->getBoundingBox()))
             continue;
 
         pushObject.push("model", transform.getWorldMatrix());
@@ -206,7 +208,7 @@ void MeshSubrender::onRender(const CommandBuffer& commandBuffer, const Camera* o
         pointsLight.linear = light.linear;
         pointsLight.quadratic = light.quadratic;
         lights[lightCount] = pointsLight;
-        lightCount++;
+        ++lightCount;
 
         if (lightCount >= MAX_LIGHTS)
             break;

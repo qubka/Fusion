@@ -8,7 +8,7 @@ extern "C" {
 }
 
 namespace fe::glfw {
-    class FUSION_API Window : public fe::Window {
+    class FUSION_API Window final : public fe::Window {
         friend class DeviceManager;
     public:
         Window(const VideoMode& videoMode, const WindowInfo& windowInfo);

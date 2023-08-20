@@ -21,7 +21,7 @@ void VirtualFileSystem::unmount(const fs::path& path) {
 
 }
 
-void VirtualFileSystem::readBytes(const fs::path& filepath, const std::function<void(gsl::span<const std::byte>)>& handler) const {
+void VirtualFileSystem::readBytes(const fs::path& filepath, const std::function<void(gsl::span<const uint8_t>)>& handler) const {
     auto asset = AAssetManager_open(assetManager, filepath.string().c_str(), AASSET_MODE_BUFFER);
 
     if (!asset) {
@@ -29,7 +29,7 @@ void VirtualFileSystem::readBytes(const fs::path& filepath, const std::function<
         return;
     }
 
-    handler({ (std::byte*)AAsset_getBuffer(asset), static_cast<size_t>(AAsset_getLength(asset)) });
+    handler({ (uint8_t*)AAsset_getBuffer(asset), static_cast<size_t>(AAsset_getLength(asset)) });
 
     AAsset_close(asset);
 }
@@ -49,7 +49,7 @@ std::string VirtualFileSystem::readText(const fs::path& filepath) const {
     return data;
 }
 
-bool VirtualFileSystem::writeBytes(const fs::path& filepath, gsl::span<const std::byte> buffer) const {
+bool VirtualFileSystem::writeBytes(const fs::path& filepath, gsl::span<const uint8_t> buffer) const {
     return false;
 }
 

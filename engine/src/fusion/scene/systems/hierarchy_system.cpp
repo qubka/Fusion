@@ -165,7 +165,7 @@ void HierarchySystem::assignChild(entt::entity parent, entt::entity child) {
         }
     }
 
-    p.children++;
+    ++p.children;
 }
 
 void HierarchySystem::removeChild(entt::entity parent, entt::entity child) {
