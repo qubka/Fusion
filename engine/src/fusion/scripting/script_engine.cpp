@@ -177,7 +177,7 @@ void ScriptEngine::reloadAssembly() {
     // Create a Core Assembly
     coreAssembly = Utils::LoadMonoAssembly(coreAssemblyFilepath, enableDebugging);
     if (!coreAssembly) {
-        FE_LOG_ERROR("Could not load '{}' assembly.", coreAssemblyFilepath);
+        FE_LOG_ERROR("Could not load '{}' core assembly.", coreAssemblyFilepath);
         return;
     } else {
         coreAssemblyImage = mono_assembly_get_image(coreAssembly);
@@ -187,7 +187,7 @@ void ScriptEngine::reloadAssembly() {
     // Create an App Assembly
     appAssembly = Utils::LoadMonoAssembly(appAssemblyFilepath, enableDebugging);
     if (!appAssembly) {
-        FE_LOG_ERROR("Could not load app '{}' assembly.", appAssemblyFilepath);
+        FE_LOG_ERROR("Could not load '{}' app assembly.", appAssemblyFilepath);
         return;
     } else {
         appAssemblyImage = mono_assembly_get_image(appAssembly);
