@@ -1,4 +1,4 @@
-#include "gli_toolbox.h"
+#include "gli_bitmap.h"
 
 #include "fusion/filesystem/file_system.h"
 
@@ -6,7 +6,7 @@
 
 using namespace fe;
 
-void GliToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
+void GliBitmap::Load(Bitmap& bitmap, const fs::path& filepath) {
     gli::texture texture;
     FileSystem::ReadBytes(filepath, [&texture](gsl::span<const uint8_t> buffer) {
         texture = gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size());
@@ -25,6 +25,6 @@ void GliToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
     bitmap.format = vku::convert_format(texture.format());
 }
 
-void GliToolbox::Write(const Bitmap& bitmap, const fs::path& filepath) {
+void GliBitmap::Write(const Bitmap& bitmap, const fs::path& filepath) {
     throw std::runtime_error("Error: gli::write not exist!");
 }

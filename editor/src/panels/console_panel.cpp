@@ -68,7 +68,7 @@ void ConsolePanel::AddMessage(std::unique_ptr<Message>&& message) {
         MessageBufferBegin = 0;
 
     if (MessageBufferSize < MessageBufferCapacity)
-        MessageBufferSize++;
+        ++MessageBufferSize;
 
     if (AllowScrollingToBottom)
         RequestScrollToBottom = true;

@@ -99,7 +99,7 @@ void Font::loadFromFile() {
 
     msdf_atlas::Charset charset;
     for (CharsetRange range : charsetRanges) {
-        for (uint32_t c = range.first; c <= range.second; c++)
+        for (uint32_t c = range.first; c <= range.second; ++c)
             charset.add(c);
     }
 

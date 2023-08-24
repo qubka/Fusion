@@ -245,9 +245,9 @@ namespace fe {
         MonoDomain* appDomain{ nullptr };
 
         MonoAssembly* coreAssembly{ nullptr };
-        MonoImage* coreAssemblyImage{ nullptr };
-
         MonoAssembly* appAssembly{ nullptr };
+
+        MonoImage* coreAssemblyImage{ nullptr };
         MonoImage* appAssemblyImage{ nullptr };
 
         fs::path coreAssemblyFilepath;

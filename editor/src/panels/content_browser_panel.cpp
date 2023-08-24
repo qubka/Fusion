@@ -139,7 +139,7 @@ void ContentBrowserPanel::onImGui() {
                         if (drawFile(i, child->isDirectory, shownIndex, false))
                             break;
 
-                        shownIndex++;
+                        ++shownIndex;
                     }
                 } else {
                     for (const auto& [i, child] : enumerate(currentDirectory->children)) {
@@ -152,7 +152,7 @@ void ContentBrowserPanel::onImGui() {
                         if (drawFile(i, child->isDirectory, shownIndex, true))
                             break;
 
-                        shownIndex++;
+                        ++shownIndex;
                     }
                 }
 

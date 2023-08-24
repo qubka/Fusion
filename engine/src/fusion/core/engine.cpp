@@ -4,8 +4,8 @@
 
 #include "fusion/devices/device_manager.h"
 
-#include "fusion/bitmaps/gli_toolbox.h"
-#include "fusion/bitmaps/stb_toolbox.h"
+#include "fusion/bitmaps/gli_bitmap.h"
+#include "fusion/bitmaps/stb_bitmap.h"
 
 using namespace fe;
 
@@ -36,8 +36,8 @@ Engine::~Engine() {
 }
 
 void Engine::init() {
-    StbToolbox::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
-    GliToolbox::Register(".ktx", ".kmg", ".dds");
+    StbBitmap::Register(".jpeg", ".jpg", ".png", ".bmp", ".hdr", ".psd", ".tga", ".gif", ".pic", ".pgm", ".ppm");
+    GliBitmap::Register(".ktx", ".kmg", ".dds");
 
     moduleHolder = std::make_unique<ModuleHolder>();
 }

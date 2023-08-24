@@ -23,7 +23,7 @@ namespace fe {
 
             void onImGui();
 
-            void increaseCount() { count++; }
+            void increaseCount() { ++count; }
             uint32_t getMessageID() const { return messageID; }
 
             static const char* GetLevelName(MessageLevel level);

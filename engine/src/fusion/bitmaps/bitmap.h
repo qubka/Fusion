@@ -4,8 +4,8 @@
 
 namespace fe {
     class FUSION_API Bitmap final : public BitmapFactory<Bitmap> {
-        friend class StbToolbox;
-        friend class GliToolbox;
+        friend class StbBitmap;
+        friend class GliBitmap;
     public:
         Bitmap() = default;
         explicit Bitmap(const fs::path& filepath);

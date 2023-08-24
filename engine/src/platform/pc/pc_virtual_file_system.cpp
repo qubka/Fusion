@@ -41,7 +41,7 @@ void VirtualFileSystem::unmount(const fs::path& path) {
 
     std::vector<fs::path> files;
 
-    for (auto i = sp; *i; i++)
+    for (auto i = sp; *i; ++i)
         files.emplace_back(*i);
 
     PHYSFS_freeList(sp);
@@ -123,7 +123,7 @@ std::vector<fs::path> VirtualFileSystem::getFiles(const fs::path& filepath, bool
 
     std::vector<fs::path> files;
 
-    for (auto i = rc; *i; i++) {
+    for (auto i = rc; *i; ++i) {
         fs::path path { *i };
         if (recursive && isDirectory(path)) {
             auto filesInFound = getFiles(path, recursive);
