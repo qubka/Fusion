@@ -69,7 +69,6 @@ namespace Utils {
 
         MonoAssembly* assembly = mono_assembly_load_from_full(image, assemblyPath.string().c_str(), &status, 0);
         mono_image_close(image);
-
         return assembly;
     }
 
@@ -101,17 +100,6 @@ namespace Utils {
         return it->second;
     }
 }
-
-/*static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type) {
-    if (!assemblyReloadPending && change_type == filewatch::Event::modified) {
-        assemblyReloadPending = true;
-
-        Application::Get().SubmitToMainThread([]() {
-            AppAssemblyFileWatcher.reset();
-            ScriptEngine::ReloadAssembly();
-        });
-    }
-}*/
 
 ScriptEngine* ScriptEngine::Instance = nullptr;
 
@@ -173,14 +161,13 @@ void ScriptEngine::shutdownMono() {
     }
 }
 
-bool ScriptEngine::loadCoreAssembly(const fs::path& filepath) {
+bool ScriptEngine::loadCoreAssembly() {
     // Create an App Domain
     char name[] = "FusionScriptRuntime";
     appDomain = mono_domain_create_appdomain(name, nullptr);
     mono_domain_set(appDomain, true);
 
-    //coreAssemblyFilepath = filepath;
-    coreAssembly = Utils::LoadMonoAssembly(filepath, enableDebugging);
+    coreAssembly = Utils::LoadMonoAssembly(coreAssemblyFilepath, enableDebugging);
     if (coreAssembly == nullptr)
         return false;
 
@@ -188,20 +175,23 @@ bool ScriptEngine::loadCoreAssembly(const fs::path& filepath) {
     return true;
 }
 
-bool ScriptEngine::loadAppAssembly(const fs::path& filepath) {
-    //appAssemblyFilepath = filepath;
-    appAssembly = Utils::LoadMonoAssembly(filepath, enableDebugging);
+bool ScriptEngine::loadAppAssembly() {
+    appAssembly = Utils::LoadMonoAssembly(appAssemblyFilepath, enableDebugging);
     if (appAssembly == nullptr)
         return false;
 
     appAssemblyImage = mono_assembly_get_image(appAssembly);
-
-    //appAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
-    assemblyReloadPending = false;
     return true;
 }
 
+// TODO: Rework properly
+
 void ScriptEngine::reloadAssembly() {
+    if (sceneContext && sceneContext->isRuntime()) {
+        FE_LOG_ERROR("Could not reload '{}' assembly during play mode!");
+        return;
+    }
+
     mono_domain_set(mono_get_root_domain(), false);
 
     if (appDomain) {
@@ -209,7 +199,7 @@ void ScriptEngine::reloadAssembly() {
         appDomain = nullptr;
     }
 
-    bool status = loadCoreAssembly(coreAssemblyFilepath);
+    bool status = loadCoreAssembly();
     if (!status) {
         FE_LOG_ERROR("Could not load '{}' assembly.", coreAssemblyFilepath);
         return;
@@ -217,7 +207,7 @@ void ScriptEngine::reloadAssembly() {
         FE_LOG_INFO("Assembly: '{}' was loaded successfully!", coreAssemblyFilepath);
     }
 
-    status = loadAppAssembly(appAssemblyFilepath);
+    status = loadAppAssembly();
     if (!status) {
         FE_LOG_ERROR("Could not load app '{}' assembly.", appAssemblyFilepath);
         return;
@@ -230,7 +220,21 @@ void ScriptEngine::reloadAssembly() {
     ScriptGlue::RegisterComponents();
 
     // Retrieve and instantiate class
-    entityCoreClass FUSION_API = {"Fusion", "Entity", true};
+    entityCoreClass = {"Fusion", "Entity", true};
+}
+
+void ScriptEngine::unloadAssembly() {
+    if (sceneContext && sceneContext->isRuntime()) {
+        FE_LOG_ERROR("Could not unload '{}' assembly during play mode!");
+        return;
+    }
+
+    mono_domain_set(mono_get_root_domain(), false);
+
+    if (appDomain) {
+        mono_domain_unload(appDomain);
+        appDomain = nullptr;
+    }
 }
 
 void ScriptEngine::setAssemblyPaths(fs::path coreFilepath, fs::path appFilepath) {

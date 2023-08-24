@@ -7,23 +7,22 @@
 using namespace fe;
 
 void GliToolbox::Load(Bitmap& bitmap, const fs::path& filepath) {
-    std::unique_ptr<gli::texture> texture;
+    gli::texture texture;
     FileSystem::ReadBytes(filepath, [&texture](gsl::span<const uint8_t> buffer) {
-        texture = std::make_unique<gli::texture>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
+        texture = gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size());
     });
 
-    const gli::texture& tex = *texture;
-    if (tex.empty()) {
+    if (texture.empty()) {
         FE_LOG_ERROR("Failed to load bitmap file: '{}'", filepath);
         return;
     }
 
-    auto pixels = std::make_unique<uint8_t[]>(tex.size());
-    std::memcpy(pixels.get(), tex.data(), tex.size());
+    auto pixels = std::make_unique<uint8_t[]>(texture.size());
+    std::memcpy(pixels.get(), texture.data(), texture.size());
 
     bitmap.data = std::move(pixels);
-    bitmap.size = tex.extent();
-    bitmap.format = vku::convert_format(tex.format());
+    bitmap.size = texture.extent();
+    bitmap.format = vku::convert_format(texture.format());
 }
 
 void GliToolbox::Write(const Bitmap& bitmap, const fs::path& filepath) {

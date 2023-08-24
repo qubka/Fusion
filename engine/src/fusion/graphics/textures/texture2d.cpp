@@ -107,34 +107,33 @@ void Texture2d::loadFromFile() {
 #if FUSION_DEBUG
         auto debugStart = DateTime::Now();
 #endif
-        std::unique_ptr<gli::texture2d> texture;
+        gli::texture2d texture;
         FileSystem::ReadBytes(filepath, [&texture](gsl::span<const uint8_t> buffer) {
-            texture = std::make_unique<gli::texture2d>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
+            texture = gli::texture2d{gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size())};
         });
 
-        const gli::texture2d& tex = *texture;
-        if (tex.empty())
+        if (texture.empty())
             throw std::runtime_error("Texture is empty");
 
 #if FUSION_DEBUG
         FE_LOG_DEBUG("Texture2d '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 
-        extent.width = static_cast<uint32_t>(tex.extent().x);
-        extent.height = static_cast<uint32_t>(tex.extent().y);
+        extent.width = static_cast<uint32_t>(texture.extent().x);
+        extent.height = static_cast<uint32_t>(texture.extent().y);
         // arrayLayers = 1
-        mipLevels = static_cast<uint32_t>(tex.levels());
-        format = vku::convert_format(tex.format());
+        mipLevels = static_cast<uint32_t>(texture.levels());
+        format = vku::convert_format(texture.format());
 
         if (extent.width == 0 || extent.height == 0)
             throw std::runtime_error("Width or height is empty");
 
-        CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, vku::convert_type(tex.target()));
+        CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, vku::convert_type(texture.target()));
         CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
         CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
 
         TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
-        Buffer bufferStaging{tex.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, tex.data()};
+        Buffer bufferStaging{texture.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, texture.data()};
         CopyBufferToImage(bufferStaging, image, extent, arrayLayers, 0);
     } else {
         auto loadBitmap = std::make_unique<Bitmap>(filepath);

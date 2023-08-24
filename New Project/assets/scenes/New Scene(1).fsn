@@ -2,7 +2,7 @@
     "value0": {
         "name": "New Scene(1)"
     },
-    "value1": 8,
+    "value1": 9,
     "value2": 4294967295,
     "value3": 0,
     "value4": 1,
@@ -12,39 +12,44 @@
     "value8": 5,
     "value9": 1048582,
     "value10": 7,
-    "value11": 0,
-    "value12": {
+    "value11": 8,
+    "value12": 0,
+    "value13": {
         "name": "RootNode"
     },
-    "value13": 1,
-    "value14": {
+    "value14": 1,
+    "value15": {
         "name": "Light"
     },
-    "value15": 2,
-    "value16": {
+    "value16": 2,
+    "value17": {
         "name": "Label"
     },
-    "value17": 3,
-    "value18": {
+    "value18": 3,
+    "value19": {
         "name": "Camera"
     },
-    "value19": 4,
-    "value20": {
+    "value20": 4,
+    "value21": {
         "name": "Skybox"
     },
-    "value21": 5,
-    "value22": {
+    "value22": 5,
+    "value23": {
         "name": "Empty Entity"
     },
-    "value23": 1048582,
-    "value24": {
+    "value24": 1048582,
+    "value25": {
         "name": "Empty Entity (1)"
     },
-    "value25": 0,
-    "value26": 0,
-    "value27": 6,
+    "value26": 7,
+    "value27": {
+        "name": "Empty Entity (2)"
+    },
     "value28": 0,
-    "value29": {
+    "value29": 0,
+    "value30": 7,
+    "value31": 0,
+    "value32": {
         "position": {
             "x": 0.0,
             "y": 0.0,
@@ -62,8 +67,8 @@
             "z": 1.0
         }
     },
-    "value30": 1,
-    "value31": {
+    "value33": 1,
+    "value34": {
         "position": {
             "x": 0.0,
             "y": 4.714524269104004,
@@ -81,8 +86,8 @@
             "z": 1.0
         }
     },
-    "value32": 2,
-    "value33": {
+    "value35": 2,
+    "value36": {
         "position": {
             "x": -0.9941295385360718,
             "y": 1.4134795665740967,
@@ -100,8 +105,8 @@
             "z": 1.0
         }
     },
-    "value34": 3,
-    "value35": {
+    "value37": 3,
+    "value38": {
         "position": {
             "x": 0.03676440194249153,
             "y": 6.338777542114258,
@@ -119,8 +124,8 @@
             "z": 1.0
         }
     },
-    "value36": 5,
-    "value37": {
+    "value39": 5,
+    "value40": {
         "position": {
             "x": -0.27300000190734866,
             "y": 0.10700000077486038,
@@ -138,8 +143,8 @@
             "z": 1.0
         }
     },
-    "value38": 1048582,
-    "value39": {
+    "value41": 1048582,
+    "value42": {
         "position": {
             "x": 0.0,
             "y": 0.0,
@@ -157,9 +162,28 @@
             "z": 1.0
         }
     },
-    "value40": 1,
-    "value41": 3,
-    "value42": {
+    "value43": 7,
+    "value44": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value45": 1,
+    "value46": 3,
+    "value47": {
         "fovDegrees": 45.0,
         "nearClip": 0.10000000149011612,
         "farClip": 1000.0,
@@ -172,15 +196,15 @@
         "shadowBoundingRadius": 10.0,
         "orthographic": false
     },
-    "value43": 1,
-    "value44": 0,
-    "value45": {
+    "value48": 1,
+    "value49": 0,
+    "value50": {
         "model": "27f1da89-8893-42ff-b000-19f83b6e7a68",
         "index": 0
     },
-    "value46": 2,
-    "value47": 1,
-    "value48": {
+    "value51": 2,
+    "value52": 1,
+    "value53": {
         "type": 2,
         "color": {
             "x": 1.0,
@@ -210,8 +234,8 @@
         "linear": 0.09000000357627869,
         "quadratic": 0.03200000151991844
     },
-    "value49": 5,
-    "value50": {
+    "value54": 5,
+    "value55": {
         "type": 1,
         "color": {
             "x": 1.0,
@@ -241,9 +265,9 @@
         "linear": 0.09000000357627869,
         "quadratic": 0.03200000151991844
     },
-    "value51": 1,
-    "value52": 0,
-    "value53": {
+    "value56": 1,
+    "value57": 0,
+    "value58": {
         "baseColor": {
             "x": 0.5,
             "y": 0.5,
@@ -254,9 +278,9 @@
         "normal": "",
         "shininess": 32.0
     },
-    "value54": 1,
-    "value55": 2,
-    "value56": {
+    "value59": 1,
+    "value60": 2,
+    "value61": {
         "text": "Cubik",
         "font": "c8ca3991-f1bf-47db-8ed9-c60fc0316421",
         "color": {
@@ -268,14 +292,14 @@
         "kerning": 0.0,
         "lineSpacing": 0.0
     },
-    "value57": 1,
-    "value58": 4,
-    "value59": {
+    "value62": 1,
+    "value63": 4,
+    "value64": {
         "texture": "b8ae7456-bcc2-469c-b4d3-55608a617177"
     },
-    "value60": 1,
-    "value61": 1048582,
-    "value62": {
+    "value65": 1,
+    "value66": 1048582,
+    "value67": {
         "className": "Sandbox.Player",
         "fields": {
             "values": [
@@ -292,14 +316,21 @@
                         "type": 1,
                         "value": 10.0
                     }
+                },
+                {
+                    "value0": "DistanceFromPlayer",
+                    "value1": {
+                        "type": 1,
+                        "value": 15.0
+                    }
                 }
             ]
         }
     },
-    "value63": 0,
-    "value64": 0,
-    "value65": 0,
-    "value66": 0,
-    "value67": 0,
-    "value68": 0
+    "value68": 0,
+    "value69": 0,
+    "value70": 0,
+    "value71": 0,
+    "value72": 0,
+    "value73": 0
 }

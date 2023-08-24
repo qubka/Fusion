@@ -205,10 +205,8 @@ namespace fe {
     public:
         static ScriptEngine* Get() { return Instance; }
 
-        bool loadCoreAssembly(const fs::path& filepath);
-        bool loadAppAssembly(const fs::path& filepath);
-
         void reloadAssembly();
+        void unloadAssembly();
 
         void onRuntimeStart();
         void onRuntimeStop();
@@ -235,12 +233,20 @@ namespace fe {
         void initMono();
         void shutdownMono();
 
+        bool loadCoreAssembly();
+        bool loadAppAssembly();
+
         MonoObject* instantiateClass(MonoClass* monoClass);
         void loadAssemblyClasses();
 
         friend class ScriptClass;
         friend class ScriptGlue;
         friend class ScriptInstance;
+
+        /*struct ScriptLibrary {
+            MonoAssembly* assembly{ nullptr };
+            MonoImage* image{ nullptr };
+        };*/
 
     private:
         MonoDomain* rootDomain{ nullptr };
@@ -261,9 +267,6 @@ namespace fe {
 
         // Runtime
         Scene* sceneContext{ nullptr };
-
-        //Scope<filewatch::FileWatch<std::string>> appAssemblyFileWatcher;
-        bool assemblyReloadPending{ false };
 
 #ifdef FUSION_DEBUG
         bool enableDebugging{ true };

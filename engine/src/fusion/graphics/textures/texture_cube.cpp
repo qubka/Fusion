@@ -126,24 +126,23 @@ void TextureCube::loadFromFile() {
 #if FUSION_DEBUG
     auto debugStart = DateTime::Now();
 #endif
-    std::unique_ptr<gli::texture_cube> texture;
+    gli::texture_cube texture;
     FileSystem::ReadBytes(filepath, [&texture](gsl::span<const uint8_t> buffer) {
-        texture = std::make_unique<gli::texture_cube>(gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size()));
+        texture = gli::texture_cube{gli::load(reinterpret_cast<const char*>(buffer.data()), buffer.size())};
     });
 
-    const gli::texture_cube& texCube = *texture;
-    if (texCube.empty())
+    if (texture.empty())
         throw std::runtime_error("Texture is empty");
 
 #if FUSION_DEBUG
     FE_LOG_DEBUG("TextureCube: '{}' loaded in {}ms", filepath, (DateTime::Now() - debugStart).asMilliseconds<float>());
 #endif
 
-    extent.width = static_cast<uint32_t>(texCube.extent().x);
-    extent.height = static_cast<uint32_t>(texCube.extent().y);
+    extent.width = static_cast<uint32_t>(texture.extent().x);
+    extent.height = static_cast<uint32_t>(texture.extent().y);
     // arrayLayers = 6
-    mipLevels = static_cast<uint32_t>(texCube.levels());
-    format = vku::convert_format(texCube.format());
+    mipLevels = static_cast<uint32_t>(texture.levels());
+    format = vku::convert_format(texture.format());
 
     if (extent.width == 0 || extent.height == 0)
         throw std::runtime_error("Width or height is empty");
@@ -151,12 +150,12 @@ void TextureCube::loadFromFile() {
     if (arrayLayers != 6)
         throw std::runtime_error("Invalid amount of layers");
 
-    CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, vku::convert_type(texCube.target()));
+    CreateImage(image, memory, extent, format, samples, VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mipLevels, arrayLayers, vku::convert_type(texture.target()));
     CreateImageSampler(sampler, filter, addressMode, anisotropic, mipLevels);
     CreateImageView(image, view, viewType, format, aspect, mipLevels, 0, arrayLayers, 0);
 
     TransitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, aspect, mipLevels, 0, arrayLayers, 0);
-    Buffer bufferStaging{texCube.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, texCube.data()};
+    Buffer bufferStaging{texture.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, texture.data()};
 
     // Setup buffer copy regions for each layer including all of it's miplevels
     std::vector<VkBufferImageCopy> bufferCopyRegions;
@@ -164,7 +163,7 @@ void TextureCube::loadFromFile() {
     VkDeviceSize offset = 0;
     for (uint32_t layer = 0; layer < arrayLayers; ++layer) {
         for (uint32_t level = 0; level < mipLevels; ++level) {
-            auto image = texCube[layer][level];
+            auto image = texture[layer][level];
             auto imageExtent = image.extent();
 
             auto& region = bufferCopyRegions.emplace_back();

@@ -32,10 +32,12 @@ void ProjectSettingsPanel::onImGui() {
         ImGuiUtils::PropertyText("Project Root", projectSettings.projectRoot.string().c_str());
 #if FUSION_SCRIPTING
         if (ImGuiUtils::PropertyFile("Script Module Path", projectSettings.scriptModulePath, selected, filter, files, projectSettings.projectRoot, ".dll")) {
+            auto scriptEngine = ScriptEngine::Get();
             if (!projectSettings.scriptModulePath.empty()) {
-                auto scriptEngine = ScriptEngine::Get();
                 scriptEngine->setAssemblyPaths(FUSION_ASSET_PATH "scripts/Fusion-ScriptCore.dll", projectSettings.projectRoot / projectSettings.scriptModulePath);
                 scriptEngine->reloadAssembly();
+            } else {
+                scriptEngine->unloadAssembly();
             }
         }
 #endif

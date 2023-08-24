@@ -15,7 +15,7 @@
 
 using namespace fe;
 
-class FUSION_API ShaderIncluder : public glslang::TShader::Includer {
+class ShaderIncluder : public glslang::TShader::Includer {
 public:
 	IncludeResult* includeLocal(const char* headerName, const char* includerName, size_t inclusionDepth) override {
 		auto directory = fs::path(includerName).parent_path();
@@ -806,7 +806,7 @@ void Shader::loadAttribute(const glslang::TProgram& program, VkShaderStageFlagBi
 }
 
 void Shader::loadConstants(const glslang::TIntermediate& intermediate, VkShaderStageFlagBits stageFlag) {
-    class FUSION_API ConstantTraverser : public glslang::TIntermTraverser {
+    class ConstantTraverser : public glslang::TIntermTraverser {
     public:
         ConstantTraverser(fst::unordered_flatmap<std::string, Shader::Constant>& constants, VkShaderStageFlagBits stageFlag)
                 : TIntermTraverser{}, constants{constants}, stageFlag{stageFlag} {}
