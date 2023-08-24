@@ -233,20 +233,12 @@ namespace fe {
         void initMono();
         void shutdownMono();
 
-        bool loadCoreAssembly();
-        bool loadAppAssembly();
-
         MonoObject* instantiateClass(MonoClass* monoClass);
         void loadAssemblyClasses();
 
         friend class ScriptClass;
         friend class ScriptGlue;
         friend class ScriptInstance;
-
-        /*struct ScriptLibrary {
-            MonoAssembly* assembly{ nullptr };
-            MonoImage* image{ nullptr };
-        };*/
 
     private:
         MonoDomain* rootDomain{ nullptr };

@@ -155,8 +155,7 @@ namespace ImGui {
 
         // Fields
         auto scene = scriptEngine->getSceneContext();
-        bool sceneRunning = scene && scene->isRuntime();
-        if (sceneRunning) {
+        if (scene && scene->isRuntime()) {
             auto& scriptInstance = script.instance;
             if (scriptInstance) {
                 const auto& scriptFields = scriptInstance->getScriptClass()->getFields();
