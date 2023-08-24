@@ -5,10 +5,9 @@
 namespace fe {
     struct ScriptComponent {
 #if FUSION_SCRIPTING
+        std::shared_ptr<ScriptInstance> instance;
         std::string className;
         ScriptFieldMap fields;
-
-        std::shared_ptr<ScriptInstance> instance;
 
         template<typename Archive>
         void serialize(Archive& archive) {

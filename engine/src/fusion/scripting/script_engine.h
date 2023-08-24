@@ -123,7 +123,7 @@ namespace fe {
     class FUSION_API ScriptClass {
     public:
         ScriptClass() = default;
-        ScriptClass(FUSION_API std::string classNamespace, std::string className, bool isCore = false);
+        ScriptClass(std::string classNamespace, std::string className, bool isCore = false);
 
         MonoObject* instantiate();
 
@@ -150,7 +150,7 @@ namespace fe {
         void invokeOnCreate();
         void invokeOnUpdate(float ts);
 
-        std::shared_ptr<ScriptClass>& getScriptClass(FUSION_API ) { return scriptClass; }
+        std::shared_ptr<ScriptClass>& getScriptClass() { return scriptClass; }
 
         template<typename T>
         T getFieldValue(const std::string& name) {

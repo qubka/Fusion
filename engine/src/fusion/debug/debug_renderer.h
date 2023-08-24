@@ -58,8 +58,9 @@ namespace fe {
         static void DebugDraw(const Ray& ray, const glm::vec4& color = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f}, float distance = 1000.0f);
         //static void DebugDraw(SoundNode* sound, const glm::vec4& color);
         static void DebugDrawSphere(float radius, const glm::vec3& position, const glm::vec4& color);
+        static void DebugDrawArc(int numVerts, float radius, const glm::vec3& start, const glm::vec3& end, const glm::quat& rotation, const glm::vec4& color);
         static void DebugDrawCircle(int numVerts, float radius, const glm::vec3& position, const glm::quat& rotation, const glm::vec4& color);
-        static void DebugDrawCone(int numCircleVerts, int numLinesToCircle, float angle, float length, const glm::vec3& position, const glm::quat& rotation, const glm::vec4& color);
+        static void DebugDrawCone(int numCircleVerts, int numLinesToCircle, float radius, float length, const glm::vec3& position, const glm::quat& rotation, const glm::vec4& color);
         static void DebugDrawCapsule(const glm::vec3& position, const glm::quat& rotation, float height, float radius, const glm::vec4& color);
 
         struct DrawVertex {

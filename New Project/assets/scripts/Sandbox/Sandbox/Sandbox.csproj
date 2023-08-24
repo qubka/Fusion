@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <Reference Include="Fusion-ScriptCore">
-        <HintPath>..\..\..\..\..\engine\assets\scripts\Fusion-ScriptCore.dll</HintPath>
+        <HintPath>..\..\..\..\..\assets\scripts\Fusion-ScriptCore.dll</HintPath>
       </Reference>
     </ItemGroup>
 

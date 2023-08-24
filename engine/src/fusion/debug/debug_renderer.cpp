@@ -212,14 +212,14 @@ void DebugRenderer::DebugDraw(const LightComponent& light, const glm::vec3& posi
             DebugDrawSphere(light.radius * 0.5f, position, color);
             break;
         case LightComponent::LightType::Spot:
-            DebugDrawCone(20, 4, light.outerCutOff - light.cutOff, 10.0f, position, rotation, color);
+            DebugDrawCone(20, 4, light.outerCutOff, 3.0f, position, rotation, color);
             break;
         case LightComponent::LightType::Directional:
             glm::vec3 offset{0.0f, 0.1f, 0.0f};
             DrawHairLine(position + offset, (position + direction * 2.0f) + offset, color);
             DrawHairLine(position - offset, (position + direction * 2.0f) - offset, color);
             DrawHairLine(position, (position + direction * 2.0f), color);
-            DebugDrawCone(20, 4, 30.0f, 1.5f, (position - direction * 1.5f), rotation, color);
+            DebugDrawCone(20, 4, 15.0f, 1.5f, (position - direction * 1.5f), rotation, color);
             break;
     }
 }
@@ -229,7 +229,7 @@ void DebugRenderer::DebugDraw(const LightComponent& light, const glm::vec3& posi
 }*/
 
 void DebugRenderer::DebugDrawCircle(int numVerts, float radius, const glm::vec3& position, const glm::quat& rotation, const glm::vec4& color) {
-    float step = 360.0f / static_cast<float>(numVerts);
+    float step = glm::two_pi<float>() / static_cast<float>(numVerts);
 
     for (int i = 0; i < numVerts; ++i) {
         float a = static_cast<float>(i);
@@ -252,21 +252,26 @@ void DebugRenderer::DebugDrawSphere(float radius, const glm::vec3& position, con
 }
 
 void DebugRenderer::DebugDrawCone(int numCircleVerts, int numLinesToCircle, float angle, float length, const glm::vec3& position, const glm::quat& rotation, const glm::vec4& color) {
-    float endAngle = glm::tan(angle * 0.5f) * length;
-    glm::vec3 forward{ -(rotation * glm::vec3{ 0.0f, 0.0f, -1.0f }) };
+    float radius = glm::tan(glm::radians(angle) * 0.5f) * length;
+    glm::vec3 forward{ -(rotation * vec3::forward) };
     glm::vec3 endPosition{ position + forward * length };
-    DebugDrawCircle(numCircleVerts, endAngle, endPosition, rotation, color);
+    DebugDrawCircle(numCircleVerts, radius, endPosition, rotation, color);
+
+    float step = glm::two_pi<float>() / static_cast<float>(numLinesToCircle);
 
     for (int i = 0; i < numLinesToCircle; ++i) {
-        float a = static_cast<float>(i) * 90.0f;
-        glm::vec3 point{ rotation * glm::vec3{ glm::cos(a), glm::sin(a), 0.0f } * endAngle };
+        float a = static_cast<float>(i);
+        float x = glm::cos(step * a) * radius;
+        float y = glm::sin(step * a) * radius;
+
+        glm::vec3 point{ rotation * glm::vec3{x, y, 0.0f} };
         DrawHairLine(position, position + point + forward * length, color);
     }
 }
 
-void DebugDrawArc(int numVerts, float radius, const glm::vec3& start, const glm::vec3& end, const glm::quat& rotation, const glm::vec4& color) {
+void DebugRenderer::DebugDrawArc(int numVerts, float radius, const glm::vec3& start, const glm::vec3& end, const glm::quat& rotation, const glm::vec4& color) {
     float step = 180.0f / static_cast<float>(numVerts);
-    glm::quat rot{ glm::lookAt(rotation * start, rotation * end, glm::vec3{0.0f, 1.0f, 0.0f}) };
+    glm::quat rot{ glm::lookAt(rotation * start, rotation * end, vec3::up) };
     rot = rotation * rot;
 
     glm::vec3 arcCentre{ (start + end) * 0.5f };
@@ -280,7 +285,7 @@ void DebugDrawArc(int numVerts, float radius, const glm::vec3& start, const glm:
         float ny = glm::sin(step * (a + 1.0f)) * radius;
         glm::vec3 next{nx, ny, 0.0f};
 
-        DebugRenderer::DrawHairLine(arcCentre + (rot * current), arcCentre + (rot * next), color);
+        DrawHairLine(arcCentre + (rot * current), arcCentre + (rot * next), color);
     }
 }
 
@@ -290,12 +295,16 @@ void DebugRenderer::DebugDrawCapsule(const glm::vec3& position, const glm::quat&
     glm::vec3 topSphereCentre{ position + up * (height * 0.5f) };
     glm::vec3 bottomSphereCentre{ position - up * (height * 0.5f) };
 
-    DebugDrawCircle(20, radius, topSphereCentre, rotation * glm::quat{glm::vec3{glm::radians(90.0f), 0.0f, 0.0f}}, color);
-    DebugDrawCircle(20, radius, bottomSphereCentre, rotation * glm::quat{glm::vec3{glm::radians(90.0f), 0.0f, 0.0f}}, color);
+    glm::quat forward{ glm::vec3{glm::radians(90.0f), 0.0f, 0.0f} };
+    glm::quat down{ glm::quat{glm::vec3{glm::radians(180.0f), 0.0f, 0.0f}} };
+
+    DebugDrawCircle(20, radius, topSphereCentre, rotation * forward, color);
+    DebugDrawCircle(20, radius, bottomSphereCentre, rotation * forward, color);
 
     // Draw 10 arcs
     // Sides
-    static constexpr float step = 360.0f / 20.0f;
+    constexpr float step = glm::two_pi<float>() / 20.0f;
+
     for (int i = 0; i < 20; ++i) {
         float a = static_cast<float>(i);
         float z = glm::cos(step * a) * radius;
@@ -312,7 +321,7 @@ void DebugRenderer::DebugDrawCapsule(const glm::vec3& position, const glm::quat&
             // Top Hemishpere
             DebugDrawArc(20, radius, topSphereCentre + offset, topSphereCentre + offset2, rotation, color);
             // Bottom Hemisphere
-            DebugDrawArc(20, radius, bottomSphereCentre + offset, bottomSphereCentre + offset2, rotation * glm::quat{glm::vec3{glm::radians(180.0f), 0.0f, 0.0f}}, color);
+            DebugDrawArc(20, radius, bottomSphereCentre + offset, bottomSphereCentre + offset2, rotation * down, color);
         }
     }
 }
@@ -325,8 +334,9 @@ void DebugRenderer::onStart() {
 }
 
 void DebugRenderer::onUpdate() {
-    drawLists[0].clear();
-    drawLists[1].clear();
+    for (auto& drawList: drawLists) {
+        drawList.clear();
+    }
 }
 
 void DebugRenderer::onStop() {

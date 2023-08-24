@@ -34,6 +34,7 @@ include(_/IncludeAssimp.cmake)
 include(_/IncludeImGui.cmake)
 include(_/IncludeLMDB.cmake)
 include(_/IncludeUUID.cmake)
+include(_/IncludeDrLibs.cmake)
 
 #
 include(_/IncludeMSDF.cmake)

@@ -2,7 +2,7 @@
     "value0": {
         "name": "New Scene(1)"
     },
-    "value1": 6,
+    "value1": 8,
     "value2": 4294967295,
     "value3": 0,
     "value4": 1,
@@ -10,31 +10,41 @@
     "value6": 3,
     "value7": 4,
     "value8": 5,
-    "value9": 0,
-    "value10": {
+    "value9": 1048582,
+    "value10": 7,
+    "value11": 0,
+    "value12": {
         "name": "RootNode"
     },
-    "value11": 1,
-    "value12": {
+    "value13": 1,
+    "value14": {
         "name": "Light"
     },
-    "value13": 2,
-    "value14": {
+    "value15": 2,
+    "value16": {
         "name": "Label"
     },
-    "value15": 3,
-    "value16": {
+    "value17": 3,
+    "value18": {
         "name": "Camera"
     },
-    "value17": 4,
-    "value18": {
+    "value19": 4,
+    "value20": {
         "name": "Skybox"
     },
-    "value19": 0,
-    "value20": 0,
-    "value21": 4,
-    "value22": 0,
-    "value23": {
+    "value21": 5,
+    "value22": {
+        "name": "Empty Entity"
+    },
+    "value23": 1048582,
+    "value24": {
+        "name": "Empty Entity (1)"
+    },
+    "value25": 0,
+    "value26": 0,
+    "value27": 6,
+    "value28": 0,
+    "value29": {
         "position": {
             "x": 0.0,
             "y": 0.0,
@@ -52,18 +62,18 @@
             "z": 1.0
         }
     },
-    "value24": 1,
-    "value25": {
+    "value30": 1,
+    "value31": {
         "position": {
             "x": 0.0,
-            "y": 0.0,
-            "z": 2.1791317462921144
+            "y": 4.714524269104004,
+            "z": -0.8668920993804932
         },
         "orientation": {
-            "x": 0.0,
+            "x": -0.6753270030021668,
             "y": 0.0,
             "z": 0.0,
-            "w": 1.0
+            "w": 0.7375184297561646
         },
         "scale": {
             "x": 1.0,
@@ -71,8 +81,8 @@
             "z": 1.0
         }
     },
-    "value26": 2,
-    "value27": {
+    "value32": 2,
+    "value33": {
         "position": {
             "x": -0.9941295385360718,
             "y": 1.4134795665740967,
@@ -90,18 +100,18 @@
             "z": 1.0
         }
     },
-    "value28": 3,
-    "value29": {
+    "value34": 3,
+    "value35": {
         "position": {
-            "x": 0.03676397353410721,
-            "y": 0.0,
+            "x": 0.03676440194249153,
+            "y": 6.338777542114258,
             "z": 7.11086893081665
         },
         "orientation": {
-            "x": 4.448333257300874e-8,
-            "y": 0.9998412132263184,
-            "z": 4.448333257300874e-8,
-            "w": -0.017818870022892953
+            "x": -0.006031963042914867,
+            "y": 0.9408100843429565,
+            "z": -0.33846554160118105,
+            "w": -0.016767114400863649
         },
         "scale": {
             "x": 1.0,
@@ -109,13 +119,51 @@
             "z": 1.0
         }
     },
-    "value30": 1,
-    "value31": 3,
-    "value32": {
+    "value36": 5,
+    "value37": {
+        "position": {
+            "x": -0.27300000190734866,
+            "y": 0.10700000077486038,
+            "z": 4.328273296356201
+        },
+        "orientation": {
+            "x": -0.009567282162606717,
+            "y": -0.034764960408210757,
+            "z": -0.0003275415219832212,
+            "w": 0.9993496537208557
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value38": 1048582,
+    "value39": {
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "orientation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+        },
+        "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        }
+    },
+    "value40": 1,
+    "value41": 3,
+    "value42": {
         "fovDegrees": 45.0,
         "nearClip": 0.10000000149011612,
         "farClip": 1000.0,
-        "aspectRatio": 0.9578713774681091,
+        "aspectRatio": 1.2705882787704468,
         "pivotDistance": 44.821868896484378,
         "scale": 10.0,
         "aperture": 50.0,
@@ -124,23 +172,23 @@
         "shadowBoundingRadius": 10.0,
         "orthographic": false
     },
-    "value33": 1,
-    "value34": 0,
-    "value35": {
+    "value43": 1,
+    "value44": 0,
+    "value45": {
         "model": "27f1da89-8893-42ff-b000-19f83b6e7a68",
         "index": 0
     },
-    "value36": 1,
-    "value37": 1,
-    "value38": {
-        "type": 0,
+    "value46": 2,
+    "value47": 1,
+    "value48": {
+        "type": 2,
         "color": {
             "x": 1.0,
             "y": 1.0,
             "z": 1.0,
             "w": 1.0
         },
-        "radius": 0.0,
+        "radius": 0.009999999776482582,
         "cutOff": 0.0,
         "outerCutOff": 0.0,
         "ambient": {
@@ -162,9 +210,40 @@
         "linear": 0.09000000357627869,
         "quadratic": 0.03200000151991844
     },
-    "value39": 1,
-    "value40": 0,
-    "value41": {
+    "value49": 5,
+    "value50": {
+        "type": 1,
+        "color": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0,
+            "w": 1.0
+        },
+        "radius": 0.009999999776482582,
+        "cutOff": 3.505000114440918,
+        "outerCutOff": 16.31999969482422,
+        "ambient": {
+            "x": 0.10000000149011612,
+            "y": 0.10000000149011612,
+            "z": 0.10000000149011612
+        },
+        "diffuse": {
+            "x": 0.800000011920929,
+            "y": 0.800000011920929,
+            "z": 0.800000011920929
+        },
+        "specular": {
+            "x": 1.7999999523162842,
+            "y": 1.7999999523162842,
+            "z": 1.7999999523162842
+        },
+        "constant": 1.0,
+        "linear": 0.09000000357627869,
+        "quadratic": 0.03200000151991844
+    },
+    "value51": 1,
+    "value52": 0,
+    "value53": {
         "baseColor": {
             "x": 0.5,
             "y": 0.5,
@@ -175,9 +254,9 @@
         "normal": "",
         "shininess": 32.0
     },
-    "value42": 1,
-    "value43": 2,
-    "value44": {
+    "value54": 1,
+    "value55": 2,
+    "value56": {
         "text": "Cubik",
         "font": "c8ca3991-f1bf-47db-8ed9-c60fc0316421",
         "color": {
@@ -189,16 +268,38 @@
         "kerning": 0.0,
         "lineSpacing": 0.0
     },
-    "value45": 1,
-    "value46": 4,
-    "value47": {
+    "value57": 1,
+    "value58": 4,
+    "value59": {
         "texture": "b8ae7456-bcc2-469c-b4d3-55608a617177"
     },
-    "value48": 0,
-    "value49": 0,
-    "value50": 0,
-    "value51": 0,
-    "value52": 0,
-    "value53": 0,
-    "value54": 0
+    "value60": 1,
+    "value61": 1048582,
+    "value62": {
+        "className": "Sandbox.Player",
+        "fields": {
+            "values": [
+                {
+                    "value0": "Time",
+                    "value1": {
+                        "type": 1,
+                        "value": 2.0
+                    }
+                },
+                {
+                    "value0": "Speed",
+                    "value1": {
+                        "type": 1,
+                        "value": 10.0
+                    }
+                }
+            ]
+        }
+    },
+    "value63": 0,
+    "value64": 0,
+    "value65": 0,
+    "value66": 0,
+    "value67": 0,
+    "value68": 0
 }

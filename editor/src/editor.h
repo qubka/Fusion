@@ -21,6 +21,8 @@ namespace fe {
     };
 
     struct EditorSettings {
+        ImGuiUtils::Theme theme{ ImGuiUtils::Theme::Black };
+        bool view2D{ false };
         bool fullScreenOnPlay{ false };
         bool fullScreenSceneView{ false };
         bool showImGuiDemo{ false };
@@ -32,11 +34,9 @@ namespace fe {
         bool showGrid{ true };
         bool showStats{ false };
         bool muteAudio{ false };
-        bool view2D{ false };
         bool freeAspect{ true };
         float fixedAspect{ 1.0f };
         float aspectRatio{ 1.0f };
-        ImGuiUtils::Theme theme{ ImGuiUtils::Theme::Black };
         int debugDrawFlags{};
     };
 

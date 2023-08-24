@@ -76,9 +76,9 @@ namespace Utils {
     void PrintAssemblyTypes(MonoAssembly* assembly) {
         MonoImage* image = mono_assembly_get_image(assembly);
         const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
-        int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
+        int numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 
-        for (int32_t i = 0; i < numTypes; ++i) {
+        for (int i = 0; i < numTypes; ++i) {
             uint32_t cols[MONO_TYPEDEF_SIZE];
             mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
 
@@ -262,7 +262,7 @@ void ScriptEngine::onCreateEntity(entt::entity entity, ScriptComponent& script) 
     if (!sceneContext || !sceneContext->isRuntime())
         return;
 
-    if (auto scriptClass = getEntityClass(FUSION_API script.className)) {
+    if (auto scriptClass = getEntityClass(script.className)) {
         auto instance = std::make_shared<ScriptInstance>(scriptClass, entity);
 
         // Copy field values
@@ -309,10 +309,10 @@ void ScriptEngine::loadAssemblyClasses() {
     entityClasses.clear();
 
     const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(appAssemblyImage, MONO_TABLE_TYPEDEF);
-    int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
+    int numTypes = mono_table_info_get_rows(typeDefinitionsTable);
     MonoClass* entityClass = mono_class_from_name(coreAssemblyImage, "Fusion", "Entity");
 
-    for (int32_t i = 0; i < numTypes; ++i) {
+    for (int i = 0; i < numTypes; ++i) {
         uint32_t cols[MONO_TYPEDEF_SIZE];
         mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
 
@@ -391,7 +391,7 @@ MonoObject* ScriptClass::invokeMethod(MonoObject* instance, MonoMethod* method, 
 
 /*_________________________________________________*/
 
-ScriptInstance::ScriptInstance(std::shared_ptr<ScriptClass> _scriptClass, entt::entity entity) : scriptClass{FUSION_API std::move(_scriptClass)FUSION_API } {
+ScriptInstance::ScriptInstance(std::shared_ptr<ScriptClass> _scriptClass, entt::entity entity) : scriptClass{std::move(_scriptClass) } {
     instance = scriptClass->instantiate();
 
     constructor = ScriptEngine::Get()->entityCoreClass.getMethod(".ctor", 1);
